@@ -142,9 +142,9 @@ export interface Request {
   clientId: string;
   number: string;
   requestType: string;
-  status: 'Новая' | 'В работе' | 'Исполнена' | 'Отклонена';
+  status: 'Ожидает' | 'Принято' | 'Отклонено';
   date: string;
-  source: 'CRM' | 'Email' | 'Телефон' | 'Личный кабинет';
+  source: 'Личный кабинет' | 'Почта';
 }
 
 export interface Report {

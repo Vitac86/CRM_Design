@@ -7,6 +7,7 @@ import { DocumentsPage } from '../pages/DocumentsPage';
 import { TradingPage } from '../pages/TradingPage';
 import { TradingCardPage } from '../pages/TradingCardPage';
 import { SubjectProfilePage } from '../pages/SubjectProfilePage';
+import { RequestsPage } from '../pages/RequestsPage';
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ export const router = createBrowserRouter([
       { path: 'agents', element: <RoutePlaceholderPage /> },
       { path: 'documents', element: <DocumentsPage /> },
       { path: 'archives', element: <RoutePlaceholderPage /> },
-      { path: 'requests', element: <RoutePlaceholderPage /> },
+      { path: 'requests', element: <RequestsPage /> },
       { path: 'compliance', element: <RoutePlaceholderPage /> },
       { path: 'compliance/:id', element: <RoutePlaceholderPage /> },
       { path: 'middle-office', element: <RoutePlaceholderPage /> },
