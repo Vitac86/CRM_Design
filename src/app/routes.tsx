@@ -5,6 +5,7 @@ import { DashboardPage } from '../pages/DashboardPage';
 import { SubjectsPage } from '../pages/SubjectsPage';
 import { DocumentsPage } from '../pages/DocumentsPage';
 import { TradingPage } from '../pages/TradingPage';
+import { TradingCardPage } from '../pages/TradingCardPage';
 
 export const router = createBrowserRouter([
   {
@@ -26,7 +27,7 @@ export const router = createBrowserRouter([
       { path: 'middle-office', element: <RoutePlaceholderPage /> },
       { path: 'back-office', element: <RoutePlaceholderPage /> },
       { path: 'trading', element: <TradingPage /> },
-      { path: 'trading/:id', element: <RoutePlaceholderPage /> },
+      { path: 'trading/:id', element: <TradingCardPage /> },
       { path: 'depository', element: <RoutePlaceholderPage /> },
       { path: 'administration', element: <RoutePlaceholderPage /> },
     ],
