@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
 import { RoutePlaceholderPage } from '../pages/RoutePlaceholderPage';
+import { DashboardPage } from '../pages/DashboardPage';
 
 export const router = createBrowserRouter([
   {
@@ -8,7 +9,7 @@ export const router = createBrowserRouter([
     element: <AppShell />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: 'dashboard', element: <RoutePlaceholderPage /> },
+      { path: 'dashboard', element: <DashboardPage /> },
       { path: 'subjects', element: <RoutePlaceholderPage /> },
       { path: 'subjects/:id', element: <RoutePlaceholderPage /> },
       { path: 'brokerage', element: <RoutePlaceholderPage /> },
