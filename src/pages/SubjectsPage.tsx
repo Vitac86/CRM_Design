@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clients } from '../data/clients';
-import type { Client, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
+import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
 
 const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | 'danger' | 'neutral'> = {
@@ -11,7 +11,8 @@ const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | '
   'ТРЕБУЕТ ДОКУМЕНТЫ': 'neutral',
 };
 
-const allRoles = ['Клиент', 'Бенефициар', 'Представитель'];
+const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
+const pageSize = 10;
 
 export const SubjectsPage = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export const SubjectsPage = () => {
   const [residencyFilter, setResidencyFilter] = useState<ResidencyStatus | 'all'>('all');
   const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>('all');
   const [qualificationFilter, setQualificationFilter] = useState<'all' | 'qualified' | 'not-qualified'>('all');
-  const [roleFilter, setRoleFilter] = useState<'all' | string>('all');
+  const [roleFilter, setRoleFilter] = useState<ClientRole | 'all'>('all');
   const [page, setPage] = useState(1);
 
   const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], []);
@@ -50,10 +51,26 @@ export const SubjectsPage = () => {
           return false;
         }
 
+        if (roleFilter !== 'all' && !client.roles.includes(roleFilter)) {
+          return false;
+        }
+
         return true;
       }),
-    [typeFilter, residencyFilter, complianceFilter, qualificationFilter],
+    [typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredClients.length / pageSize));
+  const paginatedClients = useMemo(
+    () => filteredClients.slice((page - 1) * pageSize, page * pageSize),
+    [filteredClients, page],
+  );
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(1);
+    }
+  }, [page, totalPages]);
 
   const resetFilters = () => {
     setTypeFilter('all');
@@ -61,6 +78,7 @@ export const SubjectsPage = () => {
     setComplianceFilter('all');
     setQualificationFilter('all');
     setRoleFilter('all');
+    setPage(1);
   };
 
   return (
@@ -103,7 +121,7 @@ export const SubjectsPage = () => {
           ))}
         </SelectFilter>
 
-        <SelectFilter value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
+        <SelectFilter value={roleFilter} onChange={(event) => setRoleFilter(event.target.value as ClientRole | 'all')}>
           <option value="all">Роли</option>
           {allRoles.map((role) => (
             <option key={role} value={role}>
@@ -126,7 +144,7 @@ export const SubjectsPage = () => {
         <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
           Очистить фильтры
         </Button>
-        <Button>+ Добавить</Button>
+        <Button>{/* TODO: open create client modal */}+ Добавить</Button>
       </FilterBar>
 
       <DataTable<Client>
@@ -153,7 +171,7 @@ export const SubjectsPage = () => {
             ),
           },
         ]}
-        rows={filteredClients}
+        rows={paginatedClients}
         emptyMessage="По выбранным фильтрам данных нет"
         rowClassName={() => 'cursor-pointer'}
         onRowClick={(client) => navigate(`/subjects/${client.id}`)}
@@ -162,9 +180,9 @@ export const SubjectsPage = () => {
       <div className="flex justify-end">
         <Pagination
           page={page}
-          totalPages={24}
+          totalPages={totalPages}
           onPrev={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-          onNext={() => setPage((currentPage) => Math.min(24, currentPage + 1))}
+          onNext={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
         />
       </div>
     </div>
