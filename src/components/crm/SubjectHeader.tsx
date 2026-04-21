@@ -1,12 +1,10 @@
 import type { Client } from '../../data/types';
 import { Badge, Card } from '../ui';
+import { formatClientType, formatResidency, getClientTypeBadgeVariant, getResidencyBadgeVariant } from '../../utils/labels';
 
 type SubjectHeaderProps = {
   client: Client;
 };
-
-const residencyBadgeVariant = (residency: Client['residency']) =>
-  residency === 'Резидент РФ' ? 'success' : 'danger';
 
 export const SubjectHeader = ({ client }: SubjectHeaderProps) => {
   const isRepresentative = client.roles.includes('Представитель');
@@ -20,8 +18,8 @@ export const SubjectHeader = ({ client }: SubjectHeaderProps) => {
           <h1 className="text-2xl font-semibold text-slate-900 md:text-3xl">{client.name}</h1>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="info">{client.type}</Badge>
-            <Badge variant={residencyBadgeVariant(client.residency)}>{client.residency}</Badge>
+            <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
+            <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
             {isRepresentative ? <Badge variant="purple">ПРЕДСТАВИТЕЛЬ</Badge> : null}
             <Badge variant={client.qualification ? 'success' : 'danger'}>
               {client.qualification ? 'КВАЛИФИЦИРОВАН' : 'НЕ КВАЛИФИЦИРОВАН'}

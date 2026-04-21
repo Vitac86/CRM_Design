@@ -1,5 +1,6 @@
 import type { Client } from '../../data/types';
 import { Badge, Button, Card } from '../ui';
+import { formatClientType, formatResidency, getClientTypeBadgeVariant, getResidencyBadgeVariant } from '../../utils/labels';
 
 type ClientProfileHeaderProps = {
   client: Client;
@@ -31,8 +32,8 @@ export const ClientProfileHeader = ({ client }: ClientProfileHeaderProps) => {
           <h1 className="text-xl font-semibold text-slate-900">{client.name}</h1>
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-xs text-slate-500">{client.code}</span>
-            <Badge variant="info">{client.type}</Badge>
-            <Badge variant={client.residency === 'Резидент РФ' ? 'success' : 'warning'}>{client.residency}</Badge>
+            <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
+            <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
           </div>
         </div>
       </div>

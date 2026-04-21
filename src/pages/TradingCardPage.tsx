@@ -5,6 +5,7 @@ import { Badge, Button, Card, EmptyState } from '../components/ui';
 import { getClientById } from '../data/clients';
 import { getTradingProfileByClientId } from '../data/trading';
 import type { RiskCategory } from '../data/types';
+import { formatClientType } from '../utils/labels';
 
 type TradingRiskCode = 'КНУР' | 'КСУР' | 'КПУР' | 'КОУР';
 
@@ -64,7 +65,7 @@ export const TradingCardPage = () => {
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <ClientHeader name={client.name} clientType={client.type} clientCode={client.code} riskCategory={currentRisk} />
+      <ClientHeader name={client.name} clientType={formatClientType(client.type)} clientCode={client.code} riskCategory={currentRisk} />
 
       <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
         <Card className="space-y-4 p-4">
@@ -91,7 +92,7 @@ export const TradingCardPage = () => {
               <p className="text-sm font-semibold text-slate-900">Параметры клиента</p>
               <div className="grid grid-cols-[1fr_auto] items-center gap-2 text-sm">
                 <p className="text-slate-600">Тип клиента</p>
-                <p className="font-medium text-slate-900">{client.type}</p>
+                <p className="font-medium text-slate-900">{formatClientType(client.type)}</p>
 
                 <p className="text-slate-600">Категория риска (профиль)</p>
                 <p className="font-medium text-slate-900">{profile.riskCategory}</p>
