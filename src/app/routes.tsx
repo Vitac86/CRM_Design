@@ -6,6 +6,7 @@ import { SubjectsPage } from '../pages/SubjectsPage';
 import { DocumentsPage } from '../pages/DocumentsPage';
 import { TradingPage } from '../pages/TradingPage';
 import { TradingCardPage } from '../pages/TradingCardPage';
+import { SubjectProfilePage } from '../pages/SubjectProfilePage';
 
 export const router = createBrowserRouter([
   {
@@ -15,7 +16,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'subjects', element: <SubjectsPage /> },
-      { path: 'subjects/:id', element: <RoutePlaceholderPage /> },
+      { path: 'subjects/:id', element: <SubjectProfilePage /> },
       { path: 'brokerage', element: <RoutePlaceholderPage /> },
       { path: 'trust-management', element: <RoutePlaceholderPage /> },
       { path: 'agents', element: <RoutePlaceholderPage /> },
