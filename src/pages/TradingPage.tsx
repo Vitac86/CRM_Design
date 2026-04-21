@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, DataTable, FilterBar, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
+import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
 import type { RiskCategory, TradingProfile } from '../data/types';
 
@@ -14,11 +15,13 @@ type TradingRow = TradingProfile & {
   riskCode: TradingRiskCode;
 };
 
+const PAGE_SIZE = 10;
+
 const riskCategoryToCode: Record<RiskCategory, TradingRiskCode> = {
-  'Низкий': 'КНУР',
-  'Средний': 'КСУР',
-  'Повышенный': 'КПУР',
-  'Высокий': 'КОУР',
+  Низкий: 'КНУР',
+  Средний: 'КСУР',
+  Повышенный: 'КПУР',
+  Высокий: 'КОУР',
 };
 
 const booleanBadgeVariant = (value: boolean): 'success' | 'danger' => (value ? 'success' : 'danger');
@@ -30,18 +33,24 @@ export const TradingPage = () => {
 
   const [qualificationFilter, setQualificationFilter] = useState<BooleanFilter>('all');
   const [podFtFilter, setPodFtFilter] = useState<BooleanFilter>('all');
+  const [page, setPage] = useState(1);
 
   const rows = useMemo<TradingRow[]>(
     () =>
-      tradingProfiles.map((profile) => {
-        const numericId = profile.clientId.replace('c-', '');
+      tradingProfiles.flatMap((profile) => {
+        const client = getClientById(profile.clientId);
+
+        if (!client) {
+          return [];
+        }
+
         const podFt = profile.allowCashUsage && profile.allowSecuritiesUsage;
 
         return {
           ...profile,
           podFt,
-          clientCode: `CL-${numericId.padStart(6, '0')}`,
-          clientName: `Клиент ${numericId}`,
+          clientCode: client.code,
+          clientName: client.name,
           riskCode: riskCategoryToCode[profile.riskCategory],
         };
       }),
@@ -71,6 +80,24 @@ export const TradingPage = () => {
       }),
     [podFtFilter, qualificationFilter, rows],
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setPage(1);
+  }, [qualificationFilter, podFtFilter]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (page - 1) * PAGE_SIZE;
+
+    return filteredRows.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredRows, page]);
 
   const resetFilters = () => {
     setQualificationFilter('all');
@@ -133,9 +160,17 @@ export const TradingPage = () => {
             ),
           },
         ]}
-        rows={filteredRows}
+        rows={paginatedRows}
         emptyMessage="По выбранным фильтрам данных нет"
         onRowClick={(row) => navigate(`/trading/${row.clientId}`)}
+      />
+
+      <Pagination
+        className="justify-end"
+        page={page}
+        totalPages={totalPages}
+        onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
+        onNext={() => setPage((prev) => Math.min(totalPages, prev + 1))}
       />
     </div>
   );
