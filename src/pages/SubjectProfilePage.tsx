@@ -13,6 +13,7 @@ import { SubjectRelationsTab } from '../components/crm/SubjectRelationsTab';
 import { SubjectContractsTab } from '../components/crm/SubjectContractsTab';
 import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
+import { formatClientType, formatResidency } from '../utils/labels';
 
 
 export const SubjectProfilePage = () => {
@@ -48,8 +49,8 @@ export const SubjectProfilePage = () => {
               <ProfileField label="Фамилия" value={client.lastName} />
               <ProfileField label="Имя" value={client.firstName} />
               <ProfileField label="Отчество" value={client.middleName} />
-              <ProfileField label="Тип клиента" value={client.type} />
-              <ProfileField label="Признак резидентства" value={client.residency} />
+              <ProfileField label="Тип клиента" value={formatClientType(client.type)} />
+              <ProfileField label="Признак резидентства" value={formatResidency(client.residency)} />
               <ProfileField label="Дата рождения" value={client.birthDate} />
               <ProfileField label="ИНН" value={client.inn} mono />
               <ProfileField label="ОГРНИП" value={client.ogrnip} mono />

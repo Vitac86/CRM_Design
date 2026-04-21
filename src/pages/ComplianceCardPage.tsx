@@ -8,6 +8,13 @@ import {
   getLegalEntityComplianceCardByClientId,
 } from '../data/compliance';
 import type { ComplianceStatus } from '../data/types';
+import {
+  formatClientType,
+  formatComplianceStatus,
+  formatResidency,
+  getClientTypeBadgeVariant,
+  getComplianceBadgeVariant,
+} from '../utils/labels';
 
 type DecisionStatus = Extract<ComplianceStatus, 'ПРОЙДЕН' | 'НА ДОРАБОТКЕ' | 'БАН'>;
 type CardTab = 'profile' | 'data';
@@ -17,13 +24,6 @@ const decisionOptions: Array<{ value: DecisionStatus; label: string; variant: 'p
   { value: 'НА ДОРАБОТКЕ', label: 'На доработку', variant: 'secondary' },
   { value: 'БАН', label: 'Забанить', variant: 'danger' },
 ];
-
-const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | 'orange' | 'danger'> = {
-  ПРОЙДЕН: 'success',
-  'НА ПРОВЕРКЕ': 'warning',
-  'НА ДОРАБОТКЕ': 'orange',
-  БАН: 'danger',
-};
 
 export const ComplianceCardPage = () => {
   const { id } = useParams();
@@ -87,8 +87,8 @@ export const ComplianceCardPage = () => {
           <h1 className="text-xl font-semibold text-slate-900">{client.name}</h1>
           <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
             <span>{client.code}</span>
-            <Badge variant="info">{client.type}</Badge>
-            <Badge variant={complianceBadgeVariant[currentStatus]}>{currentStatus}</Badge>
+            <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
+            <Badge variant={getComplianceBadgeVariant(currentStatus)}>{formatComplianceStatus(currentStatus)}</Badge>
           </div>
         </div>
       </Card>
@@ -109,7 +109,7 @@ export const ComplianceCardPage = () => {
               <Card className="space-y-3 p-4">
                 <p className="text-sm font-semibold text-slate-900">Базовые данные</p>
                 <p className="text-sm text-slate-700">ИНН: {client.inn}</p>
-                <p className="text-sm text-slate-700">Резидентство: {client.residency}</p>
+                <p className="text-sm text-slate-700">Резидентство: {formatResidency(client.residency)}</p>
                 <p className="text-sm text-slate-700">Полный комплект: {client.fullDocumentSet ? 'Да' : 'Нет'}</p>
                 <p className="text-sm text-slate-700">Телефон: {client.phone}</p>
                 <p className="text-sm text-slate-700">Email: {client.email}</p>

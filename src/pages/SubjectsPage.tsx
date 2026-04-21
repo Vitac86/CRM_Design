@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { clients } from '../data/clients';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
-
-const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | 'orange' | 'danger'> = {
-  ПРОЙДЕН: 'success',
-  'НА ПРОВЕРКЕ': 'warning',
-  'НА ДОРАБОТКЕ': 'orange',
-  БАН: 'danger',
-};
+import {
+  formatClientType,
+  formatComplianceStatus,
+  formatResidency,
+  getClientTypeBadgeVariant,
+  getComplianceBadgeVariant,
+  getResidencyBadgeVariant,
+} from '../utils/labels';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
 const pageSize = 10;
@@ -92,7 +93,7 @@ export const SubjectsPage = () => {
           <option value="all">Типы</option>
           {typeOptions.map((type) => (
             <option key={type} value={type}>
-              {type}
+              {formatClientType(type)}
             </option>
           ))}
         </SelectFilter>
@@ -104,7 +105,7 @@ export const SubjectsPage = () => {
           <option value="all">Признак резидентства</option>
           {residencyOptions.map((residency) => (
             <option key={residency} value={residency}>
-              {residency}
+              {formatResidency(residency)}
             </option>
           ))}
         </SelectFilter>
@@ -116,7 +117,7 @@ export const SubjectsPage = () => {
           <option value="all">Статус комплаенса</option>
           {complianceOptions.map((status) => (
             <option key={status} value={status}>
-              {status}
+              {formatComplianceStatus(status)}
             </option>
           ))}
         </SelectFilter>
@@ -152,13 +153,25 @@ export const SubjectsPage = () => {
           { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800' },
           { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]' },
           { key: 'inn', header: 'ИНН' },
-          { key: 'type', header: 'Тип' },
-          { key: 'residency', header: 'Резидент' },
+          {
+            key: 'type',
+            header: 'Тип',
+            render: (client) => <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>,
+          },
+          {
+            key: 'residency',
+            header: 'Резидент',
+            render: (client) => (
+              <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
+            ),
+          },
           {
             key: 'complianceStatus',
             header: 'Статус комплаенса',
             render: (client) => (
-              <Badge variant={complianceBadgeVariant[client.complianceStatus]}>{client.complianceStatus}</Badge>
+              <Badge variant={getComplianceBadgeVariant(client.complianceStatus)}>
+                {formatComplianceStatus(client.complianceStatus)}
+              </Badge>
             ),
           },
           {

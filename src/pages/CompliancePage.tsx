@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Badge, Button, DataTable, EmptyState, FilterBar, SelectFilter } from '../components/ui';
 import { clients } from '../data/clients';
 import type { ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
+import {
+  formatClientType,
+  formatComplianceStatus,
+  formatResidency,
+  getClientTypeBadgeVariant,
+  getComplianceBadgeVariant,
+  getResidencyBadgeVariant,
+} from '../utils/labels';
 
 type ComplianceRow = {
   id: string;
@@ -13,13 +21,6 @@ type ComplianceRow = {
   residency: ResidencyStatus;
   complianceStatus: ComplianceStatus;
   fullDocumentSet: boolean;
-};
-
-const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | 'orange' | 'danger'> = {
-  ПРОЙДЕН: 'success',
-  'НА ПРОВЕРКЕ': 'warning',
-  'НА ДОРАБОТКЕ': 'orange',
-  БАН: 'danger',
 };
 
 export const CompliancePage = () => {
@@ -85,7 +86,7 @@ export const CompliancePage = () => {
           <option value="all">Типы</option>
           {typeOptions.map((type) => (
             <option key={type} value={type}>
-              {type}
+              {formatClientType(type)}
             </option>
           ))}
         </SelectFilter>
@@ -97,7 +98,7 @@ export const CompliancePage = () => {
           <option value="all">Признак резидентства</option>
           {residencyOptions.map((residency) => (
             <option key={residency} value={residency}>
-              {residency}
+              {formatResidency(residency)}
             </option>
           ))}
         </SelectFilter>
@@ -109,7 +110,7 @@ export const CompliancePage = () => {
           <option value="all">Статус комплаенса</option>
           {complianceOptions.map((status) => (
             <option key={status} value={status}>
-              {status}
+              {formatComplianceStatus(status)}
             </option>
           ))}
         </SelectFilter>
@@ -130,12 +131,24 @@ export const CompliancePage = () => {
             { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800 whitespace-nowrap' },
             { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]' },
             { key: 'inn', header: 'ИНН' },
-            { key: 'type', header: 'Тип' },
-            { key: 'residency', header: 'Резидент' },
+            {
+              key: 'type',
+              header: 'Тип',
+              render: (row) => <Badge variant={getClientTypeBadgeVariant(row.type)}>{formatClientType(row.type)}</Badge>,
+            },
+            {
+              key: 'residency',
+              header: 'Резидент',
+              render: (row) => <Badge variant={getResidencyBadgeVariant(row.residency)}>{formatResidency(row.residency)}</Badge>,
+            },
             {
               key: 'complianceStatus',
               header: 'Статус комплаенса',
-              render: (row) => <Badge variant={complianceBadgeVariant[row.complianceStatus]}>{row.complianceStatus}</Badge>,
+              render: (row) => (
+                <Badge variant={getComplianceBadgeVariant(row.complianceStatus)}>
+                  {formatComplianceStatus(row.complianceStatus)}
+                </Badge>
+              ),
             },
             {
               key: 'fullDocumentSet',

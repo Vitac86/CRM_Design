@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clients } from '../../data/clients';
-import type { Client, ComplianceStatus } from '../../data/types';
+import type { Client } from '../../data/types';
+import { formatClientType, formatComplianceStatus, getComplianceBadgeVariant } from '../../utils/labels';
 
-const complianceBadgeVariant: Record<ComplianceStatus, string> = {
-  ПРОЙДЕН: 'bg-emerald-100 text-emerald-700',
-  'НА ПРОВЕРКЕ': 'bg-amber-100 text-amber-700',
-  'НА ДОРАБОТКЕ': 'bg-orange-100 text-orange-700',
-  БАН: 'bg-rose-100 text-rose-700',
+const complianceBadgeClassMap = {
+  success: 'bg-emerald-100 text-emerald-700',
+  warning: 'bg-amber-100 text-amber-700',
+  orange: 'bg-orange-100 text-orange-700',
+  danger: 'bg-rose-100 text-rose-700',
 };
 
 const maxResults = 8;
@@ -96,12 +97,14 @@ export const Topbar = () => {
                       <div className="min-w-0">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{client.code}</p>
                         <p className="truncate text-sm font-medium text-slate-900">{client.name}</p>
-                        <p className="text-xs text-slate-500">{client.type}</p>
+                        <p className="text-xs text-slate-500">{formatClientType(client.type)}</p>
                       </div>
                       <span
-                        className={`inline-flex shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${complianceBadgeVariant[client.complianceStatus]}`}
+                        className={`inline-flex shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${
+                          complianceBadgeClassMap[getComplianceBadgeVariant(client.complianceStatus)]
+                        }`}
                       >
-                        {client.complianceStatus}
+                        {formatComplianceStatus(client.complianceStatus)}
                       </span>
                     </button>
                   </li>
