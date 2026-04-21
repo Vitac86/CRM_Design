@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Investica CRM — Дизайн интерфейса</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--nav-w:210px;--bg:#f0f2f8;--surface:#fff;--navy:#0a0e27;--blue:#4355ff;
+--border:rgba(10,14,39,0.1);--text1:#0a0e27;--text2:#4a5078;--text3:#8a90b0;
+--hover-bg:rgba(67,85,255,0.04);--tag-bg:rgba(67,85,255,0.07);--tag-text:#3040cc;
+--green:#1a8a5a;--green-bg:rgba(26,138,90,0.08);
+--orange:#c97a1a;--orange-bg:rgba(201,122,26,0.08);
+--red:#a02020;--red-bg:rgba(192,48,48,0.08);
+--purple:#6a40cc;--purple-bg:rgba(106,64,204,0.08);
+}
+html,body{height:100%}
+body{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text1);background:#dde0e8;overflow:hidden}
+
+/* === TOP SCREEN SELECTOR === */
+.screen-bar{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:0.5px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:16px;z-index:100;box-shadow:0 1px 4px rgba(10,14,39,0.06)}
+.screen-bar-title{font-weight:500;font-size:14px;margin-right:8px;color:var(--navy)}
+.screen-bar-title span{color:var(--blue);font-weight:500}
+.screen-select{padding:6px 14px;border-radius:8px;border:0.5px solid var(--border);font-family:inherit;font-size:12px;background:var(--bg);color:var(--text1);cursor:pointer;outline:none;min-width:380px;transition:border 0.15s}
+.screen-select:focus{border-color:var(--blue)}
+.screen-counter{margin-left:auto;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+
+/* === APP === */
+.app-wrap{position:fixed;top:54px;left:0;right:0;bottom:0;overflow:auto;padding:20px;display:flex;justify-content:center}
+.app{display:flex;width:100%;max-width:1280px;min-height:calc(100vh - 94px);background:var(--bg);border-radius:12px;border:0.5px solid var(--border);overflow:hidden;box-shadow:0 4px 24px rgba(10,14,39,0.1)}
+
+/* === NAV === */
+.nav{width:var(--nav-w);background:var(--navy);padding:20px 0;display:flex;flex-direction:column;flex-shrink:0}
+.nav-brand{padding:0 16px 22px;display:flex;flex-direction:column;gap:1px}
+.brand-name{font-size:22px;font-weight:500;color:#fff;letter-spacing:0.5px;line-height:1.1}
+.brand-sub{font-size:7.5px;color:rgba(255,255,255,0.3);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.15s;font-size:12.5px;border-left:2px solid transparent;text-decoration:none}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8)}
+.nav-item.active{background:rgba(67,85,255,0.15);color:#fff;border-left-color:var(--blue);font-weight:500}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.4}
+.nav-item.active svg{opacity:0.9}
+.nav-divider{height:0.5px;background:rgba(255,255,255,0.08);margin:10px 16px}
+.nav-spacer{flex:1}
+
+/* === MAIN === */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid var(--border);background:var(--surface)}
+.topbar h1{font-size:16px;font-weight:500}
+.tba{display:flex;gap:8px}
+.btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all 0.15s}
+.bp{background:var(--blue);color:#fff}.bp:hover{background:#3345e0}
+.bg-btn{background:transparent;color:var(--text2);border:0.5px solid var(--border)}.bg-btn:hover{background:var(--hover-bg);color:var(--blue)}
+
+/* === CLIENT/COUNTERPARTY HEADER === */
+.header{padding:20px 24px 0;background:var(--surface);border-bottom:0.5px solid var(--border)}
+.ht{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ci{display:flex;align-items:center;gap:16px}
+.av{width:48px;height:48px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:500;font-size:16px;flex-shrink:0}
+.cm h2{font-size:18px;font-weight:500;margin-bottom:4px}
+.cc{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
+.tabs{display:flex;gap:0;margin-top:4px}
+.tab{padding:10px 18px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.tab:hover{color:var(--text1)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:500}
+.content{flex:1;padding:20px 24px;overflow:auto}
+
+/* === SECTIONS === */
+.section{margin-bottom:24px}
+.section-title{font-size:13px;font-weight:500;margin-bottom:12px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.fg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 24px}
+.field{margin-bottom:4px}
+.field .lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:1px}
+.field .val{font-size:12px;color:var(--text1)}
+.field .val.mono{font-family:'JetBrains Mono',monospace;font-size:11px}
+.field .val.bold{font-weight:500}
+
+/* === MANAGER/AGENT === */
+.people-row{display:flex;gap:16px}
+.person-card{flex:1;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-top:4px}
+.person-card.manager{background:rgba(67,85,255,0.04);border:0.5px solid rgba(67,85,255,0.12)}
+.person-card.agent{background:rgba(26,138,90,0.04);border:0.5px solid rgba(26,138,90,0.12)}
+.pa{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:500;flex-shrink:0}
+.pa.mgr{background:var(--blue)}.pa.agt{background:var(--green)}
+.pi{flex:1}
+.pn{font-size:12px;font-weight:500}
+.pr{font-size:10px;color:var(--text3)}
+.pc{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:2px}
+.plabel{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.plabel.mgr{color:var(--blue)}.plabel.agt{color:var(--green)}
+
+/* === REPORTS === */
+.report-methods{display:flex;gap:10px;margin-top:4px}
+.rm-card{flex:1;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:0.5px solid var(--border)}
+.rm-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rm-icon svg{width:16px;height:16px}
+.rm-icon.email{background:var(--tag-bg);color:var(--tag-text)}
+.rm-icon.lk{background:var(--green-bg);color:var(--green)}
+.rm-info{flex:1}
+.rm-name{font-size:12px;font-weight:500;margin-bottom:1px}
+.rm-detail{font-size:10px;color:var(--text3)}
+.rm-detail.mono{font-family:'JetBrains Mono',monospace}
+
+/* === TABLES === */
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead{position:sticky;top:0;z-index:2}
+th{padding:0;background:var(--surface);vertical-align:bottom;border-bottom:0.5px solid var(--border)}
+th .tl{display:block;padding:6px 10px;font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg);white-space:nowrap}
+th .tf{display:block;padding:5px 10px 7px}
+td{padding:9px 10px;border-bottom:0.5px solid var(--border);vertical-align:middle;background:var(--surface);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr{transition:background 0.1s}
+tr:hover td{background:var(--hover-bg)}
+.si{width:100%;padding:4px 8px;border-radius:8px;border:0.5px solid var(--border);font-size:10px;color:var(--text1);font-family:inherit;outline:none;background:var(--bg);box-sizing:border-box}
+.si:focus{border-color:var(--blue)}.si::placeholder{color:var(--text3)}
+.fd{position:relative;width:100%}
+.fb{display:flex;align-items:center;justify-content:space-between;width:100%;padding:4px 8px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg);font-size:10px;color:var(--text2);cursor:pointer;font-family:inherit;box-sizing:border-box}
+.fb:hover{border-color:var(--blue);color:var(--blue)}
+.fb svg{width:9px;height:9px;opacity:0.4;flex-shrink:0}
+.cn{font-weight:500;font-size:12px;color:var(--text1)}
+.inn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
+.ct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2)}
+.code-cell{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text1);font-weight:500}
+.dt{font-size:11px;color:var(--text2)}
+.res{font-size:11px;color:var(--text2)}
+.tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;display:inline-block;background:var(--tag-bg);color:var(--tag-text)}
+.role-tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;display:inline-block;background:rgba(67,85,255,0.05);color:var(--blue)}
+.tag-active{background:var(--green-bg);color:var(--green)}
+.tag-closed{background:var(--red-bg);color:var(--red)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text1);font-weight:500}
+.muted{color:var(--text3);font-size:11px}
+.st{display:flex;align-items:center;gap:5px;font-size:11px}
+.sd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sa .sd{background:var(--blue)}.sa{color:var(--tag-text)}
+.sc .sd{background:var(--text3)}.sc{color:var(--text3)}
+.sr .sd{background:transparent;border:1.5px solid var(--text3)}.sr{color:var(--text2)}
+.sf .sd{background:#c03030}.sf{color:var(--red)}
+
+/* === BADGES === */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:500}
+.b-on{background:var(--green-bg);color:var(--green)}
+.b-off{background:var(--bg);color:var(--text3)}
+.b-active{background:var(--green-bg);color:var(--green)}
+.b-expired{background:var(--red-bg);color:var(--red)}
+.b-qual{background:var(--green-bg);color:var(--green)}
+.b-noqual{background:var(--tag-bg);color:var(--tag-text)}
+.b-start{background:var(--tag-bg);color:var(--tag-text)}
+.b-standard{background:var(--green-bg);color:var(--green)}
+.b-special{background:var(--orange-bg);color:var(--orange)}
+.b-high{background:var(--red-bg);color:var(--red)}
+
+/* === RIGHTS === */
+.rights-row{display:flex;gap:10px}
+.right-card{flex:1;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;border:0.5px solid var(--border);background:var(--surface);transition:border 0.15s}
+.right-card:hover{border-color:rgba(67,85,255,0.2)}
+.right-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.right-icon.money{background:var(--green-bg);color:var(--green)}
+.right-icon.secu{background:var(--tag-bg);color:var(--tag-text)}
+.right-icon svg{width:18px;height:18px}
+.right-info{flex:1;min-width:0}
+.right-name{font-size:12px;font-weight:500;margin-bottom:2px}
+.right-desc{font-size:10px;color:var(--text3)}
+.toggle{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:500;cursor:pointer;flex-shrink:0}
+.toggle.yes{background:var(--green-bg);color:var(--green)}
+.toggle.no{background:var(--red-bg);color:var(--red)}
+.toggle-dot{width:6px;height:6px;border-radius:50%}
+.toggle.yes .toggle-dot{background:var(--green)}
+.toggle.no .toggle-dot{background:var(--red)}
+
+/* === DOCUMENTS === */
+.doc-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:0.5px solid var(--border);border-radius:8px;margin-bottom:8px}
+.doc-type{flex-shrink:0;width:200px}
+.doc-type select{width:100%;padding:6px 24px 6px 10px;border-radius:8px;border:0.5px solid var(--border);font-size:11px;color:var(--text1);font-family:inherit;background:var(--bg);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
+.doc-file{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.doc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:500;text-transform:uppercase}
+.doc-icon.pdf{background:rgba(192,48,48,0.1);color:var(--red)}
+.doc-icon.docx{background:var(--tag-bg);color:var(--tag-text)}
+.doc-icon.jpg{background:rgba(184,134,11,0.1);color:#8a6a08}
+.doc-fn{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-sz{font-size:10px;color:var(--text3);white-space:nowrap}
+.doc-dt{font-size:10px;color:var(--text3);width:80px;text-align:right;flex-shrink:0}
+.upload-zone{margin-top:16px;border:1.5px dashed var(--border);border-radius:12px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer}
+.upload-zone:hover{border-color:var(--blue);background:var(--hover-bg)}
+.upload-icon{width:40px;height:40px;border-radius:50%;background:var(--tag-bg);display:flex;align-items:center;justify-content:center}
+.upload-icon svg{width:20px;height:20px;color:var(--blue)}
+.upload-text{font-size:13px;font-weight:500}
+.upload-hint{font-size:11px;color:var(--text3)}
+.btn-sm{padding:4px 12px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;border:0.5px solid var(--border);background:transparent;color:var(--text2)}
+.btn-sm:hover{border-color:var(--blue);color:var(--blue);background:var(--hover-bg)}
+
+/* === HISTORY === */
+.old-val{padding:2px 6px;border-radius:4px;background:rgba(192,48,48,0.08);color:var(--red);font-size:11px;text-decoration:line-through;display:inline-block}
+.new-val{padding:2px 6px;border-radius:4px;background:rgba(26,138,90,0.08);color:var(--green);font-size:11px;display:inline-block}
+.arrow{color:var(--text3);font-size:11px;margin:0 4px}
+.subj{font-size:11px;color:var(--text1);font-weight:500}
+.subj-code{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);display:block;margin-top:1px}
+
+/* === LINKS === */
+.link-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:0.5px solid var(--border);border-radius:8px;margin-bottom:10px}
+.link-card:hover{border-color:rgba(67,85,255,0.25)}
+.link-av{width:40px;height:40px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;color:var(--tag-text);flex-shrink:0}
+.link-info{flex:1;min-width:0}
+.link-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.link-detail{font-size:11px;color:var(--text3);display:flex;gap:12px}
+.link-date{font-size:10px;color:var(--text3);flex-shrink:0;white-space:nowrap}
+
+/* === KANBAN === */
+.stats{display:flex;gap:10px;padding:14px 20px;border-bottom:0.5px solid var(--border);background:var(--surface)}
+.stat-card{flex:1;padding:10px 14px;border-radius:8px;background:var(--bg)}
+.stat-num{font-size:20px;font-weight:500;margin-bottom:2px}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px}
+.s-new .stat-num{color:var(--blue)}
+.s-review .stat-num{color:var(--orange)}
+.s-fix .stat-num{color:var(--purple)}
+.s-done .stat-num{color:var(--green)}
+.s-reject .stat-num{color:var(--red)}
+.s-all .stat-num{color:var(--blue)}
+.s-q .stat-num{color:var(--green)}
+.s-nq .stat-num{color:var(--text2)}
+.s-h .stat-num{color:var(--orange)}
+.s-g .stat-num{color:var(--green)}
+.s-o .stat-num{color:var(--orange)}
+.s-r .stat-num{color:var(--red)}
+.board{flex:1;display:flex;gap:12px;padding:16px 20px;overflow-x:auto}
+.column{flex:1;min-width:180px;display:flex;flex-direction:column}
+.col-header{display:flex;align-items:center;gap:6px;padding:8px 10px;margin-bottom:8px;border-radius:8px;font-size:11px;font-weight:500}
+.col-header .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.col-header .count{margin-left:auto;font-size:10px;font-weight:400;color:var(--text3)}
+.ch-new{background:rgba(67,85,255,0.06);color:var(--blue)}.ch-new .dot{background:var(--blue)}
+.ch-review{background:var(--orange-bg);color:var(--orange)}.ch-review .dot{background:var(--orange)}
+.ch-fix{background:var(--purple-bg);color:var(--purple)}.ch-fix .dot{background:var(--purple)}
+.ch-done{background:var(--green-bg);color:var(--green)}.ch-done .dot{background:var(--green)}
+.ch-reject{background:var(--red-bg);color:var(--red)}.ch-reject .dot{background:var(--red)}
+.col-cards{flex:1;display:flex;flex-direction:column;gap:8px}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer}
+.card:hover{border-color:rgba(67,85,255,0.25);box-shadow:0 1px 4px rgba(10,14,39,0.06)}
+.card-name{font-size:12px;font-weight:500;margin-bottom:4px}
+.card-code{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:6px}
+.card-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.ct-tag{padding:1px 6px;border-radius:12px;font-size:9px;font-weight:500;background:var(--tag-bg);color:var(--tag-text)}
+.ct-res-tag{background:rgba(67,85,255,0.04);color:var(--blue)}
+.card-meta{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--text3)}
+.card-return{display:flex;align-items:center;gap:4px;margin-top:6px;padding-top:6px;border-top:0.5px solid var(--border);font-size:10px;color:var(--purple)}
+.card-issues{display:flex;align-items:center;gap:4px;margin-top:6px;padding-top:6px;border-top:0.5px solid var(--border);font-size:10px;color:var(--red)}
+.card-iter{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);padding:1px 5px;border-radius:8px;background:var(--bg)}
+
+/* === TRADING METHODS/TERMINALS === */
+.method-card,.term-card{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:0.5px solid var(--border);border-radius:8px;margin-bottom:8px}
+.method-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.method-icon.quik{background:var(--tag-bg);color:var(--tag-text)}
+.method-icon.voice{background:var(--orange-bg);color:var(--orange)}
+.method-icon svg,.term-icon svg{width:18px;height:18px}
+.term-icon{width:36px;height:36px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text2)}
+.method-info,.term-info{flex:1}
+.method-name,.term-name{font-size:12px;font-weight:500;margin-bottom:2px}
+.method-desc,.term-meta{font-size:10px;color:var(--text3)}
+.term-meta{display:flex;gap:12px}
+.code-word{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:var(--bg);border:0.5px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px}
+.disp-card{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(67,85,255,0.04);border:0.5px solid rgba(67,85,255,0.12);border-radius:8px;margin-top:4px}
+.disp-av{width:32px;height:32px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:500;flex-shrink:0}
+.disp-info{flex:1}
+.disp-name{font-size:12px;font-weight:500}
+.disp-detail{font-size:10px;color:var(--text3);margin-top:1px}
+.disp-dates{flex-shrink:0;text-align:right}
+.disp-dates .dl{font-size:9px;color:var(--text3)}
+.disp-dates .dv{font-size:11px}
+
+/* === MIDDLE OFFICE === */
+.mo-layout{display:flex;flex:1;overflow:hidden}
+.list-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:0.5px solid var(--border);min-width:0}
+.list-toolbar{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:0.5px solid var(--border);background:var(--surface)}
+.si-w{flex:1}
+.list-scroll{flex:1;overflow:auto}
+.msg{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:0.5px solid var(--border);cursor:pointer}
+.msg:hover{background:var(--hover-bg)}
+.msg.selected{background:rgba(67,85,255,0.06);border-left:2px solid var(--blue)}
+.msg-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.msg-icon svg{width:16px;height:16px}
+.msg-icon.sent{background:var(--green-bg);color:var(--green)}
+.msg-icon.pending{background:var(--orange-bg);color:var(--orange)}
+.msg-icon.failed{background:var(--red-bg);color:var(--red)}
+.msg-body{flex:1;min-width:0}
+.msg-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.msg-client{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);flex-shrink:0;margin-left:8px}
+.msg-subject{font-size:11px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-tags{display:flex;gap:4px}
+.mt{padding:1px 6px;border-radius:12px;font-size:8px;font-weight:500}
+.mt-email{background:var(--tag-bg);color:var(--tag-text)}
+.mt-lk{background:var(--green-bg);color:var(--green)}
+.mt-type{background:var(--bg);color:var(--text2)}
+.preview{width:380px;display:flex;flex-direction:column;background:var(--surface);overflow:auto;flex-shrink:0}
+.preview-header{padding:16px 20px;border-bottom:0.5px solid var(--border)}
+.preview-header h3{font-size:14px;font-weight:500;margin-bottom:8px}
+.preview-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.pm .pl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px}
+.pm .pv{font-size:11px}
+.pm .pv.mono{font-family:'JetBrains Mono',monospace;font-size:10px}
+.preview-attach{padding:0 20px 16px}
+.attach{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border-radius:8px;border:0.5px solid var(--border)}
+.attach-icon{width:28px;height:28px;border-radius:8px;background:rgba(192,48,48,0.1);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500;flex-shrink:0}
+.attach-info{flex:1}
+.attach-name{font-size:11px;font-weight:500}
+.attach-size{font-size:9px;color:var(--text3)}
+.preview-actions{padding:0 20px 16px;display:flex;gap:8px}
+
+/* === FOOTER === */
+.footer{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-top:0.5px solid var(--border);background:var(--surface);font-size:11px;color:var(--text3)}
+.pg{display:flex;gap:4px}
+.pb{width:26px;height:26px;border-radius:8px;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;font-size:11px;color:var(--text2);font-family:inherit}
+.pb:hover{background:var(--hover-bg);color:var(--blue)}
+.pb.pa{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* === SCREEN VISIBILITY === */
+.screen{display:none;flex:1;flex-direction:column}
+.screen.active{display:flex}
+.methods-row{display:flex;gap:3px}
+.m-tag{padding:2px 6px;border-radius:12px;font-size:8px;font-weight:500}
+.m-quik{background:var(--tag-bg);color:var(--tag-text)}
+.m-voice{background:var(--orange-bg);color:var(--orange)}
+</style>
+</head>
+<body>
+
+<div class="screen-bar">
+  <div class="screen-bar-title">Investica CRM <span>— Дизайн интерфейса</span></div>
+  <select class="screen-select" id="screenSelect" onchange="switchScreen(this.value)">
+    <optgroup label="Клиенты">
+      <option value="s1">01 · Клиенты — Список</option>
+      <option value="s2">02 · Клиенты — Профиль</option>
+      <option value="s3">03 · Клиенты — Документы</option>
+      <option value="s4">04 · Клиенты — Договоры и счета</option>
+      <option value="s5">05 · Клиенты — История</option>
+    </optgroup>
+    <optgroup label="Контрагенты">
+      <option value="s6">06 · Контрагенты — Список</option>
+      <option value="s7">07 · Контрагенты — Профиль</option>
+      <option value="s8">08 · Контрагенты — Документы</option>
+      <option value="s9">09 · Контрагенты — Договоры</option>
+      <option value="s10">10 · Контрагенты — Связи</option>
+    </optgroup>
+    <optgroup label="Комплаенс">
+      <option value="s11">11 · Комплаенс — Канбан проверок</option>
+    </optgroup>
+    <optgroup label="Трейдинг">
+      <option value="s12">12 · Трейдинг — Общий журнал</option>
+      <option value="s13">13 · Трейдинг — Торговые параметры</option>
+    </optgroup>
+    <optgroup label="Мидл-офис">
+      <option value="s14">14 · Мидл-офис — Реестр отчётов</option>
+    </optgroup>
+  </select>
+  <span class="screen-counter" id="counter">1 / 14</span>
+</div>
+
+<div class="app-wrap">
+  <div class="app">
+    <nav class="nav" id="sidebar"></nav>
+    <div class="main" id="mainContent"></div>
+  </div>
+</div>
+
+<script>
+// === NAVIGATION ===
+function buildNav(active){
+  const items=[
+    {id:'dashboard',label:'Дашборд',icon:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>'},
+    {id:'clients',label:'Клиенты',icon:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'},
+    {id:'counterparties',label:'Контрагенты',icon:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'},
+    {id:'compliance',label:'Комплаенс',icon:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'},
+    {id:'trading',label:'Трейдинг',icon:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
+    {id:'depository',label:'Депозитарий',icon:'<path d="M2 7v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7"/><path d="M2 7l10 6 10-6"/><path d="M2 7h20"/>'},
+    {id:'divider'},
+    {id:'middle',label:'Мидл-офис',icon:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'},
+    {id:'back',label:'Бэк-офис',icon:'<rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M10 3v18"/>'}
+  ];
+  let html='<div class="nav-brand"><div class="brand-name">investica</div><div class="brand-sub">Investment Group</div></div>';
+  items.forEach(it=>{
+    if(it.id==='divider'){html+='<div class="nav-divider"></div>';return}
+    const ac=it.id===active?' active':'';
+    html+='<div class="nav-item'+ac+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">'+it.icon+'</svg>'+it.label+'</div>';
+  });
+  html+='<div class="nav-spacer"></div>';
+  return html;
+}
+
+// === SCREEN DEFINITIONS ===
+const navFor = {s1:'clients',s2:'clients',s3:'clients',s4:'clients',s5:'clients',s6:'counterparties',s7:'counterparties',s8:'counterparties',s9:'counterparties',s10:'counterparties',s11:'compliance',s12:'trading',s13:'trading',s14:'middle'};
+
+// Client header HTML (no "Оформить договор" button — only on list)
+function clientHeader(activeTab){
+  const tabs=['Профиль','Документы','Договоры и счета','История'];
+  return `<div class="header"><div class="ht"><div class="ci"><div class="av">ИИ</div><div class="cm"><h2>ИП Иванов Иван Иванович</h2><div class="cc">INV00003</div></div></div></div><div class="tabs">${tabs.map(t=>`<div class="tab${t===activeTab?' active':''}">${t}</div>`).join('')}</div></div>`;
+}
+function ckaHeader(activeTab){
+  const tabs=['Профиль','Документы','Договоры','Связи'];
+  return `<div class="header"><div class="ht"><div class="ci"><div class="av">ФК</div><div class="cm"><h2>ООО «ФинКонсалт Групп»</h2><div class="cc">КА-000001</div></div></div></div><div class="tabs">${tabs.map(t=>`<div class="tab${t===activeTab?' active':''}">${t}</div>`).join('')}</div></div>`;
+}
+
+const screens = {
+// ============ 01 CLIENT LIST ============
+s1: `
+<div class="topbar"><h1>Клиенты</h1><div class="tba"><button class="btn bg-btn">Экспорт</button><button class="btn bp">+ Оформить договор</button></div></div>
+<div style="flex:1;overflow:auto"><table>
+<colgroup><col style="width:8%"><col style="width:20%"><col style="width:11%"><col style="width:12%"><col style="width:9%"><col style="width:10%"><col style="width:11%"><col style="width:19%"></colgroup>
+<thead><tr>
+<th><span class="tl">Код</span><div class="tf"><input class="si" placeholder="INV..."></div></th>
+<th><span class="tl">Наименование</span><div class="tf"><input class="si" placeholder="Поиск..."></div></th>
+<th><span class="tl">ИНН</span><div class="tf"><input class="si" placeholder="ИНН..."></div></th>
+<th><span class="tl">№ договора</span><div class="tf"><input class="si" placeholder="BR-..."></div></th>
+<th><span class="tl">Дата</span><div class="tf"><input class="si" placeholder="дд.мм"></div></th>
+<th><span class="tl">Тип</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Резидентство</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Статус</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+</tr></thead>
+<tbody>
+<tr><td class="code-cell">INV00001</td><td class="cn">ООО «Новые Решения»</td><td class="inn">101010101011</td><td class="ct">BR-2025/00001</td><td class="dt">15.01.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Резидент</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="code-cell">INV00002</td><td class="cn">ООО «Горизонт Плюс»</td><td class="inn">101010102345</td><td class="ct">BR-2025/00002</td><td class="dt">03.02.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Резидент</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="code-cell">INV00003</td><td class="cn">ИП Иванов Иван Иванович</td><td class="inn">542110101011</td><td class="ct">BR-2025/00003</td><td class="dt">18.02.2025</td><td><span class="tag">ИП</span></td><td class="res">Резидент</td><td><div class="st sr"><span class="sd"></span>На проверке</div></td></tr>
+<tr><td class="code-cell">INV00004</td><td class="cn">ПАО «РосТехноГрупп»</td><td class="inn">101047651011</td><td class="ct">BR-2025/00004</td><td class="dt">22.03.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Нерезидент</td><td><div class="st sf"><span class="sd"></span>Не прошёл проверку</div></td></tr>
+<tr><td class="code-cell">INV00005</td><td class="cn">ЗАО «Альфа-Строй»</td><td class="inn">101010938211</td><td class="ct">BR-2025/00005</td><td class="dt">11.04.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Резидент</td><td><div class="st sc"><span class="sd"></span>Закрытый</div></td></tr>
+<tr><td class="code-cell">INV00006</td><td class="cn">ООО «Северная Логистическая Компания»</td><td class="inn">101010109845</td><td class="ct">BR-2025/00006</td><td class="dt">05.05.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Нерезидент</td><td><div class="st sr"><span class="sd"></span>На проверке</div></td></tr>
+<tr><td class="code-cell">INV00007</td><td class="cn">АО «ЦентрИнвест»</td><td class="inn">101047651011</td><td class="ct">BR-2025/00007</td><td class="dt">19.05.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Резидент</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="code-cell">INV00008</td><td class="cn">Карпов Дмитрий Олегович</td><td class="inn">101010109845</td><td class="ct">BR-2025/00008</td><td class="dt">28.06.2025</td><td><span class="tag">Физ. лицо</span></td><td class="res">Резидент</td><td><div class="st sf"><span class="sd"></span>Не прошёл проверку</div></td></tr>
+<tr><td class="code-cell">INV00009</td><td class="cn">ООО «БизнесПартнёр 24»</td><td class="inn">101047651011</td><td class="ct">BR-2025/00009</td><td class="dt">14.07.2025</td><td><span class="tag">Юр. лицо</span></td><td class="res">Резидент</td><td><div class="st sa"><span class="sa"></span>Активный</div></td></tr>
+</tbody></table></div>
+<div class="footer"><span>Показано 9 из 25 клиентов</span><div class="pg"><button class="pb">‹</button><button class="pb pa">1</button><button class="pb">2</button><button class="pb">3</button><button class="pb">›</button></div></div>
+`,
+
+// ============ 02 CLIENT PROFILE ============
+s2: clientHeader('Профиль') + `
+<div class="content">
+<div class="section"><div class="section-title">Основные данные</div>
+<div class="fg">
+<div class="field"><div class="lbl">Фамилия</div><div class="val bold">Иванов</div></div>
+<div class="field"><div class="lbl">Имя</div><div class="val bold">Иван</div></div>
+<div class="field"><div class="lbl">Отчество</div><div class="val bold">Иванович</div></div>
+<div class="field"><div class="lbl">Тип клиента</div><div class="val">Физическое лицо</div></div>
+<div class="field"><div class="lbl">Признак резидентства</div><div class="val">Не резидент</div></div>
+<div class="field"><div class="lbl">Дата рождения</div><div class="val">15.03.1985</div></div>
+<div class="field"><div class="lbl">ИНН</div><div class="val mono">542110101011</div></div>
+<div class="field"><div class="lbl">ОГРНИП</div><div class="val mono">318784700012345</div></div>
+<div class="field"><div class="lbl">Признак инвестора</div><div class="val">Неквалифицированный</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Права использования</div>
+<div class="rights-row">
+<div class="right-card">
+<div class="right-icon money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+<div class="right-info">
+<div class="right-name">Право использования денежных средств</div>
+<div class="right-desc">Брокер вправе использовать денежные средства клиента</div>
+</div>
+<div class="toggle yes"><span class="toggle-dot"></span>Да</div>
+</div>
+<div class="right-card">
+<div class="right-icon secu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+<div class="right-info">
+<div class="right-name">Право использования ценных бумаг</div>
+<div class="right-desc">Брокер вправе использовать ЦБ клиента в сделках</div>
+</div>
+<div class="toggle no"><span class="toggle-dot"></span>Нет</div>
+</div>
+</div></div>
+
+<div class="section"><div class="section-title">Менеджер и агент</div>
+<div class="people-row">
+<div style="flex:1"><div class="plabel mgr">Менеджер</div><div class="person-card manager"><div class="pa mgr">ПА</div><div class="pi"><div class="pn">Петрова Анна Сергеевна</div><div class="pr">Старший клиентский менеджер</div><div class="pc">+7 812 300-00-01 · petrova@investica.ru</div></div></div></div>
+<div style="flex:1"><div class="plabel agt">Агент</div><div class="person-card agent"><div class="pa agt">СА</div><div class="pi"><div class="pn">Смирнов Алексей Петрович</div><div class="pr">ООО «ФинКонсалт Групп» · КА-000001</div><div class="pc">+7 495 555-12-34 · smirnov@finconsult.ru</div></div></div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Способ получения отчётов</div>
+<div class="report-methods">
+<div class="rm-card"><div class="rm-icon email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="rm-info"><div class="rm-name">Электронная почта</div><div class="rm-detail mono">ivanov@example.com</div></div><span class="badge b-on">Включён</span></div>
+<div class="rm-card"><div class="rm-icon lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div><div class="rm-info"><div class="rm-name">Личный кабинет</div><div class="rm-detail">Уведомления при загрузке отчёта</div></div><span class="badge b-off">Отключён</span></div>
+</div></div>
+
+<div class="section"><div class="section-title">Контактные данные</div>
+<div class="fg">
+<div class="field"><div class="lbl">Телефон</div><div class="val mono">+7 495 123-45-67</div></div>
+<div class="field"><div class="lbl">Доп. телефон</div><div class="val mono">+7 921 987-65-43</div></div>
+<div class="field"><div class="lbl">E-mail</div><div class="val mono">ivanov@example.com</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Адрес регистрации</div>
+<div class="fg">
+<div class="field"><div class="lbl">Страна</div><div class="val">Россия</div></div>
+<div class="field"><div class="lbl">Регион</div><div class="val">Коми</div></div>
+<div class="field"><div class="lbl">Район</div><div class="val">Ленинский</div></div>
+<div class="field"><div class="lbl">Город</div><div class="val">Сыктывкар</div></div>
+<div class="field"><div class="lbl">Индекс</div><div class="val mono">555002</div></div>
+<div class="field"><div class="lbl">Улица</div><div class="val">Гороховая</div></div>
+<div class="field"><div class="lbl">Дом</div><div class="val">13</div></div>
+<div class="field"><div class="lbl">Корпус</div><div class="val">2</div></div>
+<div class="field"><div class="lbl">Квартира</div><div class="val">2</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Банковские реквизиты</div>
+<div class="fg">
+<div class="field"><div class="lbl">Наименование банка</div><div class="val">ПАО Сбербанк</div></div>
+<div class="field"><div class="lbl">БИК</div><div class="val mono">044525225</div></div>
+<div class="field"><div class="lbl">Расчётный счёт</div><div class="val mono">40802810938000012345</div></div>
+<div class="field"><div class="lbl">Корр. счёт</div><div class="val mono">30101810400000000225</div></div>
+</div></div>
+</div>
+`,
+
+// ============ 03 CLIENT DOCUMENTS ============
+s3: clientHeader('Документы') + `
+<div class="content">
+<div class="doc-row"><div class="doc-type"><select><option>Паспорт</option></select></div><div class="doc-file"><div class="doc-icon pdf">PDF</div><span class="doc-fn">Паспорт_Иванов_ИИ.pdf</span><span class="doc-sz">2.4 МБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">15.01.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>СНИЛС</option></select></div><div class="doc-file"><div class="doc-icon pdf">PDF</div><span class="doc-fn">СНИЛС_Иванов.pdf</span><span class="doc-sz">1.1 МБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">15.01.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>Анкета клиента</option></select></div><div class="doc-file"><div class="doc-icon docx">DOCX</div><span class="doc-fn">ЗаполненнаяАнкета.docx</span><span class="doc-sz">345 КБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">18.02.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>Выписка из ЕГРИП</option></select></div><div class="doc-file"><div class="doc-icon pdf">PDF</div><span class="doc-fn">Выписка_ЕГРИП_2025.pdf</span><span class="doc-sz">890 КБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">22.03.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>Свидетельство ИНН</option></select></div><div class="doc-file"><div class="doc-icon jpg">JPG</div><span class="doc-fn">ИНН_скан.jpg</span><span class="doc-sz">1.8 МБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">15.01.2025</span></div>
+<div class="upload-zone"><div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="upload-text">Загрузить новый документ</div><div class="upload-hint">Перетащите файл или нажмите для выбора</div></div>
+</div>
+`,
+
+// ============ 04 CLIENT CONTRACTS & ACCOUNTS ============
+s4: clientHeader('Договоры и счета') + `
+<div class="content">
+<div class="section"><div class="section-header"><div class="section-title">Договоры</div><button class="btn-sm">+ Добавить договор</button></div>
+<table><thead><tr><th>Номер договора</th><th>Вид договора</th><th>Дата открытия</th><th>Дата закрытия</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td class="mono">BR-2025/00003</td><td><span class="tag">Брокерский</span></td><td>19.02.2025</td><td class="muted">—</td><td><span class="tag tag-active">Действующий</span></td></tr>
+<tr><td class="mono">DP-2025/00018</td><td><span class="tag">Депозитарный</span></td><td>19.02.2025</td><td class="muted">—</td><td><span class="tag tag-active">Действующий</span></td></tr>
+<tr><td class="mono">DU-2024/00142</td><td><span class="tag">Довер. управления</span></td><td>03.05.2024</td><td>12.12.2024</td><td><span class="tag tag-closed">Закрытый</span></td></tr>
+<tr><td class="mono">BR-2023/00891</td><td><span class="tag">Брокерский</span></td><td>19.02.2023</td><td>01.01.2025</td><td><span class="tag tag-closed">Закрытый</span></td></tr>
+</tbody></table></div>
+
+<div class="section"><div class="section-header"><div class="section-title">Счета</div><button class="btn-sm">+ Добавить счёт</button></div>
+<table><thead><tr><th>Номер счёта</th><th>Вид счёта</th><th>Дата открытия</th></tr></thead>
+<tbody>
+<tr><td class="mono">30-001-00003-BR</td><td><span class="tag">Брокерский</span></td><td>19.02.2025</td></tr>
+<tr><td class="mono">30-001-00003-DP</td><td><span class="tag">Депозитарный</span></td><td>19.02.2025</td></tr>
+<tr><td class="mono">30-001-00142-DU</td><td><span class="tag">Довер. управления</span></td><td>03.05.2024</td></tr>
+<tr><td class="mono">30-001-00003-ИИС</td><td><span class="tag">ИИС</span></td><td>19.02.2025</td></tr>
+<tr><td class="mono">30-001-00003-ИН</td><td><span class="tag">ИН</span></td><td>19.02.2025</td></tr>
+</tbody></table></div>
+</div>
+`,
+
+// ============ 05 CLIENT HISTORY ============
+s5: clientHeader('История') + `
+<div class="content" style="padding:0">
+<div style="padding:12px 24px;border-bottom:0.5px solid var(--border);background:var(--surface);display:flex;gap:8px;align-items:center">
+<input class="si" style="max-width:180px" placeholder="Поиск по полю..."/>
+<div class="fd" style="width:auto"><button class="fb" style="width:auto">Раздел: Все <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div>
+<div class="fd" style="width:auto"><button class="fb" style="width:auto">Пользователь: Все <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div>
+<button class="btn-sm" style="margin-left:auto">Экспорт</button>
+</div>
+<div style="padding:0 24px 20px;overflow:auto">
+<table><thead><tr><th>Дата и время</th><th>Субъект</th><th>Раздел</th><th>Поле</th><th>Изменение</th><th>Пользователь</th></tr></thead>
+<tbody>
+<tr><td class="mono">20.04.2026 11:34</td><td><div class="subj">ИП Иванов И.И.<span class="subj-code">INV00003</span></div></td><td><span class="tag">Профиль</span></td><td>Признак инвестора</td><td><span class="old-val">Квалифицированный</span><span class="arrow">→</span><span class="new-val">Неквалифицированный</span></td><td>Петрова А.С.</td></tr>
+<tr><td class="mono">18.04.2026 09:12</td><td><div class="subj">ИП Иванов И.И.<span class="subj-code">INV00003</span></div></td><td><span class="tag">Контакты</span></td><td>Телефон</td><td><span class="old-val">+7 495 111-22-33</span><span class="arrow">→</span><span class="new-val">+7 495 123-45-67</span></td><td>Иванов И.И.</td></tr>
+<tr><td class="mono">15.04.2026 14:20</td><td><div class="subj">ООО «Новые Решения»<span class="subj-code">INV00001</span></div></td><td><span class="tag">Реквизиты</span></td><td>Расчётный счёт</td><td><span class="old-val">40702810100000054321</span><span class="arrow">→</span><span class="new-val">40702810100000067890</span></td><td>Петрова А.С.</td></tr>
+<tr><td class="mono">15.04.2026 14:20</td><td><div class="subj">ИП Иванов И.И.<span class="subj-code">INV00003</span></div></td><td><span class="tag">Реквизиты</span></td><td>Банк</td><td><span class="old-val">АО Альфа-Банк</span><span class="arrow">→</span><span class="new-val">ПАО Сбербанк</span></td><td>Петрова А.С.</td></tr>
+<tr><td class="mono">10.04.2026 16:05</td><td><div class="subj">ООО «Горизонт Плюс»<span class="subj-code">INV00002</span></div></td><td><span class="tag">Профиль</span></td><td>Резидентство</td><td><span class="old-val">Нерезидент</span><span class="arrow">→</span><span class="new-val">Резидент</span></td><td>Петрова А.С.</td></tr>
+<tr><td class="mono">22.03.2025 10:05</td><td><div class="subj">ИП Иванов И.И.<span class="subj-code">INV00003</span></div></td><td><span class="tag">Документы</span></td><td>Выписка ЕГРИП</td><td><span class="new-val">Загружен: Выписка_ЕГРИП_2025.pdf</span></td><td>Иванов И.И.</td></tr>
+<tr><td class="mono">19.02.2025 16:40</td><td><div class="subj">ИП Иванов И.И.<span class="subj-code">INV00003</span></div></td><td><span class="tag">Договоры</span></td><td>BR-2025/00003</td><td><span class="new-val">Создан: Брокерский договор</span></td><td>Система</td></tr>
+<tr><td class="mono">19.02.2025 15:30</td><td><div class="subj">ПАО «РосТехноГрупп»<span class="subj-code">INV00004</span></div></td><td><span class="tag">Адрес</span></td><td>Город</td><td><span class="old-val">Москва</span><span class="arrow">→</span><span class="new-val">Санкт-Петербург</span></td><td>Иванов И.И.</td></tr>
+<tr><td class="mono">15.01.2025 12:00</td><td><div class="subj">ИП Иванов И.И.<span class="subj-code">INV00003</span></div></td><td><span class="tag">Профиль</span></td><td>Клиент</td><td><span class="new-val">Создан: ИП Иванов Иван Иванович</span></td><td>Система</td></tr>
+</tbody></table>
+</div>
+</div>
+`,
+
+// ============ 06 COUNTERPARTY LIST ============
+s6: `
+<div class="topbar"><h1>Контрагенты</h1><div class="tba"><button class="btn bg-btn">Экспорт</button><button class="btn bp">+ Добавить контрагента</button></div></div>
+<div style="flex:1;overflow:auto"><table>
+<colgroup><col style="width:24%"><col style="width:12%"><col style="width:11%"><col style="width:13%"><col style="width:11%"><col style="width:13%"><col style="width:16%"></colgroup>
+<thead><tr>
+<th><span class="tl">Наименование</span><div class="tf"><input class="si" placeholder="Поиск..."></div></th>
+<th><span class="tl">ИНН</span><div class="tf"><input class="si" placeholder="ИНН..."></div></th>
+<th><span class="tl">Тип</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Роль</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Резидентство</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Менеджер</span><div class="tf"><input class="si" placeholder="ФИО..."></div></th>
+<th><span class="tl">Статус</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+</tr></thead>
+<tbody>
+<tr><td class="cn">ООО «ФинКонсалт Групп»</td><td class="inn">770312345678</td><td><span class="tag">Юр. лицо</span></td><td><span class="role-tag">Агент</span></td><td class="res">Резидент</td><td class="res">Петрова А.С.</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="cn">Смирнов Алексей Петрович</td><td class="inn">781098765432</td><td><span class="tag">Физ. лицо</span></td><td><span class="role-tag">Агент</span></td><td class="res">Резидент</td><td class="res">Петрова А.С.</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="cn">ИП Козлова Мария Сергеевна</td><td class="inn">502345678901</td><td><span class="tag">ИП</span></td><td><span class="role-tag">Доверенное лицо</span></td><td class="res">Резидент</td><td class="res">Иванов И.И.</td><td><div class="st sr"><span class="sd"></span>На проверке</div></td></tr>
+<tr><td class="cn">Global Advisory Partners Ltd</td><td class="inn">—</td><td><span class="tag">Юр. лицо</span></td><td><span class="role-tag">Агент</span></td><td class="res">Нерезидент</td><td class="res">Петрова А.С.</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="cn">АО «Балтийский Реестр»</td><td class="inn">781501234567</td><td><span class="tag">Юр. лицо</span></td><td><span class="role-tag">Исполн. орган</span></td><td class="res">Резидент</td><td class="res">Иванов И.И.</td><td><div class="st sc"><span class="sd"></span>Закрытый</div></td></tr>
+<tr><td class="cn">Петров Дмитрий Николаевич</td><td class="inn">780987654321</td><td><span class="tag">Физ. лицо</span></td><td><span class="role-tag">Доверенное лицо</span></td><td class="res">Резидент</td><td class="res">Петрова А.С.</td><td><div class="st sf"><span class="sd"></span>Не прошёл проверку</div></td></tr>
+<tr><td class="cn">ООО «Юридический Альянс»</td><td class="inn">770456789012</td><td><span class="tag">Юр. лицо</span></td><td><span class="role-tag">Представитель</span></td><td class="res">Резидент</td><td class="res">Петрова А.С.</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+<tr><td class="cn">CrossBorder Trustees AG</td><td class="inn">—</td><td><span class="tag">Юр. лицо</span></td><td><span class="role-tag">Исполн. орган</span></td><td class="res">Нерезидент</td><td class="res">Петрова А.С.</td><td><div class="st sr"><span class="sd"></span>На проверке</div></td></tr>
+<tr><td class="cn">ИП Волков Андрей Игоревич</td><td class="inn">471234567890</td><td><span class="tag">ИП</span></td><td><span class="role-tag">Агент</span></td><td class="res">Резидент</td><td class="res">Иванов И.И.</td><td><div class="st sa"><span class="sd"></span>Активный</div></td></tr>
+</tbody></table></div>
+<div class="footer"><span>Показано 9 из 18 контрагентов</span><div class="pg"><button class="pb">‹</button><button class="pb pa">1</button><button class="pb">2</button><button class="pb">›</button></div></div>
+`,
+
+// ============ 07 COUNTERPARTY PROFILE ============
+s7: ckaHeader('Профиль') + `
+<div class="content">
+<div class="section"><div class="section-title">Основные данные</div>
+<div class="fg">
+<div class="field"><div class="lbl">Наименование</div><div class="val bold">ООО «ФинКонсалт Групп»</div></div>
+<div class="field"><div class="lbl">Тип</div><div class="val">Юридическое лицо</div></div>
+<div class="field"><div class="lbl">Признак резидентства</div><div class="val">Резидент</div></div>
+<div class="field"><div class="lbl">ИНН</div><div class="val mono">770312345678</div></div>
+<div class="field"><div class="lbl">ОГРН</div><div class="val mono">1177746012345</div></div>
+<div class="field"><div class="lbl">КПП</div><div class="val mono">770301001</div></div>
+<div class="field"><div class="lbl">Вид контрагента</div><div class="val"><span class="role-tag">Агент</span></div></div>
+<div class="field"><div class="lbl">Контактное лицо</div><div class="val bold">Сидоров Павел Викторович</div></div>
+<div class="field"><div class="lbl">Дата регистрации</div><div class="val">12.04.2017</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Менеджер</div>
+<div class="person-card manager" style="max-width:400px"><div class="pa mgr">ПА</div><div class="pi"><div class="pn">Петрова Анна Сергеевна</div><div class="pr">Старший клиентский менеджер</div><div class="pc">+7 812 300-00-01 · petrova@investica.ru</div></div></div>
+</div>
+
+<div class="section"><div class="section-title">Контактные данные</div>
+<div class="fg">
+<div class="field"><div class="lbl">Телефон</div><div class="val mono">+7 495 555-12-34</div></div>
+<div class="field"><div class="lbl">E-mail</div><div class="val mono">info@finconsult.ru</div></div>
+<div class="field"><div class="lbl">Сайт</div><div class="val mono">finconsult.ru</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Юридический адрес</div>
+<div class="fg">
+<div class="field"><div class="lbl">Страна</div><div class="val">Россия</div></div>
+<div class="field"><div class="lbl">Город</div><div class="val">Москва</div></div>
+<div class="field"><div class="lbl">Индекс</div><div class="val mono">119021</div></div>
+<div class="field"><div class="lbl">Улица</div><div class="val">Льва Толстого</div></div>
+<div class="field"><div class="lbl">Дом</div><div class="val">16</div></div>
+<div class="field"><div class="lbl">Офис</div><div class="val">412</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Банковские реквизиты</div>
+<div class="fg">
+<div class="field"><div class="lbl">Наименование банка</div><div class="val">АО «Тинькофф Банк»</div></div>
+<div class="field"><div class="lbl">БИК</div><div class="val mono">044525974</div></div>
+<div class="field"><div class="lbl">Расчётный счёт</div><div class="val mono">40702810710000012345</div></div>
+</div></div>
+</div>
+`,
+
+// ============ 08 COUNTERPARTY DOCUMENTS ============
+s8: ckaHeader('Документы') + `
+<div class="content">
+<div class="doc-row"><div class="doc-type"><select><option>Устав</option></select></div><div class="doc-file"><div class="doc-icon pdf">PDF</div><span class="doc-fn">Устав_ФинКонсалт_Групп.pdf</span><span class="doc-sz">3.1 МБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">10.01.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>Выписка ЕГРЮЛ</option></select></div><div class="doc-file"><div class="doc-icon pdf">PDF</div><span class="doc-fn">Выписка_ЕГРЮЛ_2025.pdf</span><span class="doc-sz">1.8 МБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">10.01.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>Доверенность</option></select></div><div class="doc-file"><div class="doc-icon docx">DOCX</div><span class="doc-fn">Доверенность_представитель.docx</span><span class="doc-sz">420 КБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">15.02.2025</span></div>
+<div class="doc-row"><div class="doc-type"><select><option>Свидетельство ИНН</option></select></div><div class="doc-file"><div class="doc-icon jpg">JPG</div><span class="doc-fn">Свидетельство_ИНН_скан.jpg</span><span class="doc-sz">2.2 МБ</span></div><span class="badge b-on">Загружен</span><span class="doc-dt">10.01.2025</span></div>
+<div class="upload-zone"><div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="upload-text">Загрузить новый документ</div><div class="upload-hint">Перетащите файл или нажмите для выбора</div></div>
+</div>
+`,
+
+// ============ 09 COUNTERPARTY CONTRACTS ============
+s9: ckaHeader('Договоры') + `
+<div class="content">
+<div class="section"><div class="section-header"><div class="section-title">Агентские договоры</div><button class="btn-sm">+ Добавить договор</button></div>
+<table><thead><tr><th>Номер договора</th><th>Вид договора</th><th>Дата открытия</th><th>Дата закрытия</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td class="mono">АГ-2025/00012</td><td><span class="tag">Агентский</span></td><td>19.02.2025</td><td class="muted">—</td><td><span class="tag tag-active">Действующий</span></td></tr>
+<tr><td class="mono">АГ-2024/00045</td><td><span class="tag">Агентский</span></td><td>10.06.2024</td><td>31.12.2024</td><td><span class="tag tag-closed">Закрытый</span></td></tr>
+<tr><td class="mono">АГ-2025/00078</td><td><span class="tag">Агентский</span></td><td>01.04.2025</td><td class="muted">—</td><td><span class="tag tag-active">Действующий</span></td></tr>
+</tbody></table>
+<div style="margin-top:16px;background:var(--bg);border-radius:8px;padding:14px 16px">
+<div style="font-size:11px;font-weight:500;color:var(--text1);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.3px">Условия расчётов · АГ-2025/00012</div>
+<div class="fg">
+<div class="field"><div class="lbl">Тип вознаграждения</div><div class="val">Процент от комиссии</div></div>
+<div class="field"><div class="lbl">Ставка</div><div class="val mono">15%</div></div>
+<div class="field"><div class="lbl">Периодичность</div><div class="val">Ежемесячно</div></div>
+<div class="field"><div class="lbl">Минимальная сумма</div><div class="val mono">10 000 ₽</div></div>
+<div class="field"><div class="lbl">Срок оплаты</div><div class="val">10 раб. дней после закрытия периода</div></div>
+<div class="field"><div class="lbl">Валюта</div><div class="val">RUB</div></div>
+</div>
+</div>
+</div>
+</div>
+`,
+
+// ============ 10 COUNTERPARTY LINKS ============
+s10: ckaHeader('Связи') + `
+<div class="content">
+<div class="section-header"><div class="section-title">Связи с клиентами</div><button class="btn-sm">+ Добавить связь</button></div>
+
+<div class="link-card"><div class="link-av">ИИ</div><div class="link-info"><div class="link-name">ИП Иванов Иван Иванович</div><div class="link-detail"><span>INV00003</span><span>Физ. лицо</span><span>Не резидент</span></div></div><span class="role-tag">Представитель</span><span class="link-date">с 19.02.2025</span></div>
+
+<div class="link-card"><div class="link-av">НР</div><div class="link-info"><div class="link-name">ООО «Новые Решения»</div><div class="link-detail"><span>INV00001</span><span>Юр. лицо</span><span>Резидент</span></div></div><span class="role-tag">Исполн. орган</span><span class="link-date">с 15.01.2025</span></div>
+
+<div class="link-card"><div class="link-av">ГП</div><div class="link-info"><div class="link-name">ООО «Горизонт Плюс»</div><div class="link-detail"><span>INV00002</span><span>Юр. лицо</span><span>Резидент</span></div></div><span class="role-tag">Агент</span><span class="link-date">с 03.02.2025</span></div>
+
+<div class="link-card"><div class="link-av">РТ</div><div class="link-info"><div class="link-name">ПАО «РосТехноГрупп»</div><div class="link-detail"><span>INV00004</span><span>Юр. лицо</span><span>Нерезидент</span></div></div><span class="role-tag">Доверенное лицо</span><span class="link-date">с 22.03.2025</span></div>
+</div>
+`,
+
+// ============ 11 COMPLIANCE KANBAN ============
+s11: `
+<div class="topbar"><h1>Комплаенс-проверки</h1></div>
+<div class="stats">
+<div class="stat-card s-new"><div class="stat-num">4</div><div class="stat-label">Новые заявки</div></div>
+<div class="stat-card s-review"><div class="stat-num">3</div><div class="stat-label">На проверке</div></div>
+<div class="stat-card s-fix"><div class="stat-num">2</div><div class="stat-label">На доработке</div></div>
+<div class="stat-card s-done"><div class="stat-num">12</div><div class="stat-label">Пройдено</div></div>
+<div class="stat-card s-reject"><div class="stat-num">1</div><div class="stat-label">Отклонено</div></div>
+</div>
+<div class="board">
+
+<div class="column">
+<div class="col-header ch-new"><span class="dot"></span>Новая заявка<span class="count">4</span></div>
+<div class="col-cards">
+<div class="card"><div class="card-name">ООО «БизнесПартнёр 24»</div><div class="card-code">INV00009</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Не назначен</span><span>14.07.25</span></div></div>
+<div class="card"><div class="card-name">Волков А.И.</div><div class="card-code">INV00012</div><div class="card-tags"><span class="ct-tag">Физ. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Не назначен</span><span>18.04.26</span></div></div>
+<div class="card"><div class="card-name">ИП Соколова Е.В.</div><div class="card-code">INV00014</div><div class="card-tags"><span class="ct-tag">ИП</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Не назначен</span><span>20.04.26</span></div></div>
+</div>
+</div>
+
+<div class="column">
+<div class="col-header ch-review"><span class="dot"></span>На проверке<span class="count">3</span></div>
+<div class="col-cards">
+<div class="card"><div class="card-name">ИП Иванов И.И.</div><div class="card-code">INV00003</div><div class="card-tags"><span class="ct-tag">Физ. лицо</span><span class="ct-tag ct-res-tag">Не резидент</span></div><div class="card-meta"><span>Петров П.П.</span><span>18.02.25</span></div></div>
+<div class="card"><div class="card-name">ООО «Сев. Логист. Компания»</div><div class="card-code">INV00006</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Не резидент</span></div><div class="card-meta"><span>Петров П.П.</span><span>05.05.25</span></div></div>
+<div class="card"><div class="card-name">CrossBorder Trustees AG</div><div class="card-code">КА-000008</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Не резидент</span></div><div class="card-meta"><span>Козлова А.М.</span><span>10.04.26</span></div></div>
+</div>
+</div>
+
+<div class="column">
+<div class="col-header ch-fix"><span class="dot"></span>На доработке<span class="count">2</span></div>
+<div class="col-cards">
+<div class="card"><div class="card-name">ПАО «РосТехноГрупп»</div><div class="card-code">INV00004</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Не резидент</span></div><div class="card-meta"><span>Петров П.П.</span><span>22.03.25</span></div><div class="card-return">Возврат: нет выписки ЕГРЮЛ <span class="card-iter">2-я</span></div></div>
+<div class="card"><div class="card-name">Карпов Д.О.</div><div class="card-code">INV00008</div><div class="card-tags"><span class="ct-tag">Физ. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Козлова А.М.</span><span>28.06.25</span></div><div class="card-return">Возврат: скан паспорта нечитаем <span class="card-iter">3-я</span></div></div>
+</div>
+</div>
+
+<div class="column">
+<div class="col-header ch-done"><span class="dot"></span>Пройдено<span class="count">3</span></div>
+<div class="col-cards">
+<div class="card"><div class="card-name">ООО «Новые Решения»</div><div class="card-code">INV00001</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Петров П.П.</span><span>11.04.26</span></div></div>
+<div class="card"><div class="card-name">ООО «Горизонт Плюс»</div><div class="card-code">INV00002</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Козлова А.М.</span><span>05.03.25</span></div></div>
+<div class="card"><div class="card-name">АО «ЦентрИнвест»</div><div class="card-code">INV00007</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Петров П.П.</span><span>15.04.26</span></div></div>
+</div>
+</div>
+
+<div class="column">
+<div class="col-header ch-reject"><span class="dot"></span>Отклонено<span class="count">1</span></div>
+<div class="col-cards">
+<div class="card"><div class="card-name">ЗАО «Альфа-Строй»</div><div class="card-code">INV00005</div><div class="card-tags"><span class="ct-tag">Юр. лицо</span><span class="ct-tag ct-res-tag">Резидент</span></div><div class="card-meta"><span>Петров П.П.</span><span>11.04.25</span></div><div class="card-issues">Причина: подозрение в отмывании</div></div>
+</div>
+</div>
+
+</div>
+`,
+
+// ============ 12 TRADING JOURNAL ============
+s12: `
+<div class="topbar"><h1>Трейдинг</h1><div class="tba"><button class="btn bg-btn">Экспорт</button></div></div>
+<div class="stats">
+<div class="stat-card s-all"><div class="stat-num">25</div><div class="stat-label">Всего клиентов</div></div>
+<div class="stat-card s-q"><div class="stat-num">6</div><div class="stat-label">Квалифициров.</div></div>
+<div class="stat-card s-nq"><div class="stat-num">19</div><div class="stat-label">Неквалифициров.</div></div>
+<div class="stat-card s-h"><div class="stat-num">3</div><div class="stat-label">Повышенный риск</div></div>
+</div>
+<div style="flex:1;overflow:auto"><table>
+<colgroup><col style="width:17%"><col style="width:9%"><col style="width:9%"><col style="width:11%"><col style="width:11%"><col style="width:12%"><col style="width:11%"><col style="width:10%"><col style="width:10%"></colgroup>
+<thead><tr>
+<th><span class="tl">Клиент</span><div class="tf"><input class="si" placeholder="Поиск..."></div></th>
+<th><span class="tl">Код</span><div class="tf"><input class="si" placeholder="INV..."></div></th>
+<th><span class="tl">Инвестор</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Риск</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Договор</span><div class="tf"><input class="si" placeholder="BR-..."></div></th>
+<th><span class="tl">Распорядитель</span><div class="tf"><input class="si" placeholder="ФИО..."></div></th>
+<th><span class="tl">Способ торговли</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+<th><span class="tl">Полномочия до</span><div class="tf"><input class="si" placeholder="дд.мм"></div></th>
+<th><span class="tl">Статус</span><div class="tf"><div class="fd"><button class="fb"><span>Все</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div></th>
+</tr></thead>
+<tbody>
+<tr><td class="cn">ООО «Новые Решения»</td><td class="code-cell">INV00001</td><td><span class="badge b-qual">Квал</span></td><td><span class="badge b-standard">Стандартный</span></td><td class="ct">BR-2025/00001</td><td>Сидоров П.В.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span><span class="m-tag m-voice">Голос</span></div></td><td class="dt">15.01.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">ООО «Горизонт Плюс»</td><td class="code-cell">INV00002</td><td><span class="badge b-qual">Квал</span></td><td><span class="badge b-standard">Стандартный</span></td><td class="ct">BR-2025/00002</td><td>Кузнецов А.Д.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span></div></td><td class="dt">03.02.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">ИП Иванов И.И.</td><td class="code-cell">INV00003</td><td><span class="badge b-noqual">Неквал</span></td><td><span class="badge b-standard">Стандартный</span></td><td class="ct">BR-2025/00003</td><td>Иванов И.И.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span><span class="m-tag m-voice">Голос</span></div></td><td class="dt">19.02.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">ПАО «РосТехноГрупп»</td><td class="code-cell">INV00004</td><td><span class="badge b-qual">Квал</span></td><td><span class="badge b-high">Повышенный</span></td><td class="ct">BR-2025/00004</td><td>Белов С.К.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span></div></td><td class="dt">22.03.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">ЗАО «Альфа-Строй»</td><td class="code-cell">INV00005</td><td><span class="badge b-noqual">Неквал</span></td><td><span class="badge b-start">Начальный</span></td><td class="ct">BR-2025/00005</td><td>Новиков Р.Е.</td><td><div class="methods-row"><span class="m-tag m-voice">Голос</span></div></td><td class="dt">11.04.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">ООО «Сев. Логист. Компания»</td><td class="code-cell">INV00006</td><td><span class="badge b-noqual">Неквал</span></td><td><span class="badge b-special">Особый</span></td><td class="ct">BR-2025/00006</td><td>Морозов В.А.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span></div></td><td class="dt">05.05.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">АО «ЦентрИнвест»</td><td class="code-cell">INV00007</td><td><span class="badge b-qual">Квал</span></td><td><span class="badge b-standard">Стандартный</span></td><td class="ct">BR-2025/00007</td><td>Лебедев Г.Н.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span><span class="m-tag m-voice">Голос</span></div></td><td class="dt">19.05.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+<tr><td class="cn">Карпов Д.О.</td><td class="code-cell">INV00008</td><td><span class="badge b-noqual">Неквал</span></td><td><span class="badge b-high">Повышенный</span></td><td class="ct">BR-2025/00008</td><td>Карпов Д.О.</td><td><div class="methods-row"><span class="m-tag m-voice">Голос</span></div></td><td class="dt">28.06.2025</td><td><span class="badge b-expired">Истёк</span></td></tr>
+<tr><td class="cn">ООО «БизнесПартнёр 24»</td><td class="code-cell">INV00009</td><td><span class="badge b-noqual">Неквал</span></td><td><span class="badge b-start">Начальный</span></td><td class="ct">BR-2025/00009</td><td>Тихонов О.М.</td><td><div class="methods-row"><span class="m-tag m-quik">QUIK</span></div></td><td class="dt">14.07.2026</td><td><span class="badge b-active">Активен</span></td></tr>
+</tbody></table></div>
+<div class="footer"><span>Показано 9 из 25 клиентов</span><div class="pg"><button class="pb">‹</button><button class="pb pa">1</button><button class="pb">2</button><button class="pb">3</button><button class="pb">›</button></div></div>
+`,
+
+// ============ 13 TRADING CARD ============
+s13: `
+<div class="header">
+<div class="ht"><div class="ci"><div class="av">ИИ</div><div class="cm"><h2>ИП Иванов Иван Иванович</h2><div class="cc">INV00003 · BR-2025/00003</div></div></div></div>
+<div class="tabs"><div class="tab active">Торговые параметры</div><div class="tab">Терминалы и подключения</div></div>
+</div>
+<div class="content">
+<div class="section"><div class="section-title">Квалификация и риск</div>
+<div class="fg">
+<div class="field"><div class="lbl">Признак инвестора</div><div class="val"><span class="badge b-noqual">Неквалифицированный</span></div></div>
+<div class="field"><div class="lbl">Уровень риска</div><div class="val"><span class="badge b-standard">Стандартный</span></div></div>
+<div class="field"><div class="lbl">Дата присвоения уровня</div><div class="val">19.02.2025</div></div>
+</div></div>
+
+<div class="section"><div class="section-title">Распорядитель счёта</div>
+<div class="disp-card">
+<div class="disp-av">ИИ</div>
+<div class="disp-info"><div class="disp-name">Иванов Иван Иванович</div><div class="disp-detail">Клиент (самостоятельное распоряжение) · Доверенность №Д-2025/003</div></div>
+<div class="disp-dates"><div><span class="dl">Полномочия с</span><div class="dv">19.02.2025</div></div><div style="margin-top:4px"><span class="dl">Полномочия до</span><div class="dv">19.02.2026</div></div></div>
+<span class="badge b-active" style="margin-left:12px">Действует</span>
+</div></div>
+
+<div class="section"><div class="section-title">Кодовое слово</div>
+<div class="code-word">••••••••</div>
+</div>
+
+<div class="section"><div class="section-title">Способы подачи поручений</div>
+<div class="method-card"><div class="method-icon quik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div><div class="method-info"><div class="method-name">QUIK</div><div class="method-desc">Торговый терминал · Логин: ivanov_003</div></div><span class="badge b-active">Активен</span></div>
+<div class="method-card"><div class="method-icon voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="method-info"><div class="method-name">Голосовые заявки</div><div class="method-desc">Телефон: +7 812 300-00-02 · Запись разговоров включена</div></div><span class="badge b-active">Активен</span></div>
+</div>
+
+<div class="section"><div class="section-header"><div class="section-title">Терминалы и подключения</div><button class="btn-sm">+ Выдать терминал</button></div>
+<div class="term-card"><div class="term-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div><div class="term-info"><div class="term-name">QUIK Desktop</div><div class="term-meta"><span>Логин: ivanov_003</span><span>Выдан: 19.02.2025</span><span>IP: 195.128.xx.xx</span></div></div><span class="badge b-active">Подключён</span></div>
+<div class="term-card"><div class="term-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div class="term-info"><div class="term-name">QUIK Mobile (Android)</div><div class="term-meta"><span>Логин: ivanov_003m</span><span>Выдан: 25.02.2025</span><span>Сертификат: до 25.02.2026</span></div></div><span class="badge b-active">Подключён</span></div>
+<div class="term-card"><div class="term-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></div><div class="term-info"><div class="term-name">WebQUIK</div><div class="term-meta"><span>Логин: ivanov_003w</span><span>Выдан: 01.03.2025</span></div></div><span class="badge b-expired">Отключён</span></div>
+</div>
+</div>
+`,
+
+// ============ 14 MIDDLE OFFICE ============
+s14: `
+<div class="topbar"><h1>Мидл-офис · Реестр отчётов</h1><div class="tba"><button class="btn bg-btn">Экспорт</button></div></div>
+<div class="stats">
+<div class="stat-card s-all"><div class="stat-num">142</div><div class="stat-label">Всего отчётов</div></div>
+<div class="stat-card s-g"><div class="stat-num">128</div><div class="stat-label">Доставлено</div></div>
+<div class="stat-card s-o"><div class="stat-num">11</div><div class="stat-label">Ожидают</div></div>
+<div class="stat-card s-r"><div class="stat-num">3</div><div class="stat-label">Ошибка</div></div>
+</div>
+<div class="mo-layout">
+<div class="list-panel">
+<div class="list-toolbar"><input class="si si-w" placeholder="Поиск по клиенту или отчёту..."/><div class="fd" style="width:auto"><button class="fb" style="width:auto">Статус: Все<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="fd" style="width:auto"><button class="fb" style="width:auto">Канал: Все<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button></div></div>
+<div class="list-scroll">
+<div class="msg selected"><div class="msg-icon sent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">ООО «Новые Решения»</span><span class="msg-time">20.04.26 09:00</span></div><div class="msg-subject">Брокерский отчёт за период 01.04–19.04.2026</div><div class="msg-tags"><span class="mt mt-email">E-mail</span><span class="mt mt-type">Брокерский отчёт</span></div></div></div>
+<div class="msg"><div class="msg-icon sent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">ООО «Новые Решения»</span><span class="msg-time">20.04.26 09:00</span></div><div class="msg-subject">Депозитарный отчёт за период 01.04–19.04.2026</div><div class="msg-tags"><span class="mt mt-lk">Личный кабинет</span><span class="mt mt-type">Депозитарный отчёт</span></div></div></div>
+<div class="msg"><div class="msg-icon pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">ИП Иванов И.И.</span><span class="msg-time">20.04.26 09:00</span></div><div class="msg-subject">Брокерский отчёт за период 01.04–19.04.2026</div><div class="msg-tags"><span class="mt mt-email">E-mail</span><span class="mt mt-type">Брокерский отчёт</span></div></div></div>
+<div class="msg"><div class="msg-icon failed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">ПАО «РосТехноГрупп»</span><span class="msg-time">20.04.26 09:01</span></div><div class="msg-subject">Отчёт ДУ за период 01.03–31.03.2026</div><div class="msg-tags"><span class="mt mt-email">E-mail</span><span class="mt mt-type">Отчёт ДУ</span></div></div></div>
+<div class="msg"><div class="msg-icon sent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">ООО «Горизонт Плюс»</span><span class="msg-time">19.04.26 18:00</span></div><div class="msg-subject">Брокерский отчёт за период 01.04–18.04.2026</div><div class="msg-tags"><span class="mt mt-email">E-mail</span><span class="mt mt-lk">Личный кабинет</span><span class="mt mt-type">Брокерский отчёт</span></div></div></div>
+<div class="msg"><div class="msg-icon sent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">АО «ЦентрИнвест»</span><span class="msg-time">19.04.26 18:00</span></div><div class="msg-subject">Депозитарный отчёт за период 01.04–18.04.2026</div><div class="msg-tags"><span class="mt mt-lk">Личный кабинет</span><span class="mt mt-type">Депозитарный отчёт</span></div></div></div>
+<div class="msg"><div class="msg-icon pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">Карпов Д.О.</span><span class="msg-time">19.04.26 18:00</span></div><div class="msg-subject">Налоговая справка за 2025 год</div><div class="msg-tags"><span class="mt mt-email">E-mail</span><span class="mt mt-type">Налоговая справка</span></div></div></div>
+<div class="msg"><div class="msg-icon failed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="msg-body"><div class="msg-top"><span class="msg-client">ЗАО «Альфа-Строй»</span><span class="msg-time">18.04.26 09:00</span></div><div class="msg-subject">Брокерский отчёт за период 01.04–17.04.2026</div><div class="msg-tags"><span class="mt mt-email">E-mail</span><span class="mt mt-type">Брокерский отчёт</span></div></div></div>
+</div>
+</div>
+<div class="preview">
+<div class="preview-header">
+<h3>Брокерский отчёт за период 01.04–19.04.2026</h3>
+<div class="preview-meta">
+<div class="pm"><div class="pl">Клиент</div><div class="pv" style="font-weight:500">ООО «Новые Решения»</div></div>
+<div class="pm"><div class="pl">Код клиента</div><div class="pv mono">INV00001</div></div>
+<div class="pm"><div class="pl">Тип отчёта</div><div class="pv">Брокерский отчёт</div></div>
+<div class="pm"><div class="pl">Период</div><div class="pv">01.04 – 19.04.2026</div></div>
+<div class="pm"><div class="pl">Способ отправки</div><div class="pv"><span class="badge" style="background:var(--tag-bg);color:var(--tag-text)">E-mail</span></div></div>
+<div class="pm"><div class="pl">Статус</div><div class="pv"><span class="badge b-on">Доставлен</span></div></div>
+<div class="pm"><div class="pl">Время отправки</div><div class="pv mono">20.04.2026 09:00:12</div></div>
+<div class="pm"><div class="pl">Адрес</div><div class="pv mono">info@new-solutions.ru</div></div>
+<div class="pm"><div class="pl">Договор</div><div class="pv mono">BR-2025/00001</div></div>
+<div class="pm"><div class="pl">Сформировал</div><div class="pv">Система (авто)</div></div>
+</div>
+</div>
+<div class="preview-attach">
+<div class="attach"><div class="attach-icon">PDF</div><div class="attach-info"><div class="attach-name">Broker_Report_INV00001.pdf</div><div class="attach-size">245 КБ</div></div></div>
+</div>
+<div class="preview-actions"><button class="btn bp">Отправить повторно</button><button class="btn bg-btn">Скачать</button></div>
+</div>
+</div>
+`
+};
+
+function switchScreen(id){
+  const nav = navFor[id] || 'clients';
+  document.getElementById('sidebar').innerHTML = buildNav(nav);
+  document.getElementById('mainContent').innerHTML = screens[id];
+  // Update counter
+  const num = parseInt(id.substr(1));
+  document.getElementById('counter').textContent = num + ' / 14';
+  document.getElementById('screenSelect').value = id;
+  // Scroll app area to top
+  document.querySelector('.app-wrap').scrollTop = 0;
+  // Update URL hash
+  history.replaceState(null,'','#'+id);
+}
+
+// Init
+const hash = window.location.hash.replace('#','') || 's1';
+switchScreen(hash in screens ? hash : 's1');
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  const current = parseInt(document.getElementById('counter').textContent);
+  if(e.key === 'ArrowRight' && current < 14) switchScreen('s' + (current + 1));
+  if(e.key === 'ArrowLeft' && current > 1) switchScreen('s' + (current - 1));
+});
+</script>
+
+</body>
+</html>
