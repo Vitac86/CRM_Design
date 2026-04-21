@@ -35,7 +35,7 @@ export interface Document {
   clientId: string;
   title: string;
   kind: string;
-  status: 'Принят' | 'На проверке' | 'Отклонен' | 'Истекает';
+  status: 'Действующий' | 'Не действующий' | 'Отклонена' | 'На подписи' | 'На проверке';
   date: string;
 }
 
