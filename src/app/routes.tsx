@@ -2,6 +2,7 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
 import { RoutePlaceholderPage } from '../pages/RoutePlaceholderPage';
 import { DashboardPage } from '../pages/DashboardPage';
+import { SubjectsPage } from '../pages/SubjectsPage';
 
 export const router = createBrowserRouter([
   {
@@ -10,7 +11,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'subjects', element: <RoutePlaceholderPage /> },
+      { path: 'subjects', element: <SubjectsPage /> },
       { path: 'subjects/:id', element: <RoutePlaceholderPage /> },
       { path: 'brokerage', element: <RoutePlaceholderPage /> },
       { path: 'trust-management', element: <RoutePlaceholderPage /> },
