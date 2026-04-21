@@ -9,6 +9,7 @@ export type ComplianceStatus =
   | 'ТРЕБУЕТ ДОКУМЕНТЫ';
 
 export type RiskCategory = 'Низкий' | 'Средний' | 'Высокий' | 'Повышенный';
+export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель';
 
 export interface Client {
   id: string;
@@ -20,6 +21,7 @@ export interface Client {
   complianceStatus: ComplianceStatus;
   fullDocumentSet: boolean;
   qualification: boolean;
+  roles: ClientRole[];
   riskCategory: RiskCategory;
   phone: string;
   email: string;
