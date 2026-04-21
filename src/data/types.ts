@@ -5,8 +5,8 @@ export type ResidencyStatus = 'Резидент РФ' | 'Нерезидент';
 export type ComplianceStatus =
   | 'ПРОЙДЕН'
   | 'НА ПРОВЕРКЕ'
-  | 'КРОМЕ ПРОЙДЕН'
-  | 'ТРЕБУЕТ ДОКУМЕНТЫ';
+  | 'НА ДОРАБОТКЕ'
+  | 'БАН';
 
 export type RiskCategory = 'Низкий' | 'Средний' | 'Высокий' | 'Повышенный';
 export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель';

@@ -4,11 +4,11 @@ import { clients } from '../data/clients';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
 
-const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | 'danger' | 'neutral'> = {
+const complianceBadgeVariant: Record<ComplianceStatus, 'success' | 'warning' | 'orange' | 'danger'> = {
   ПРОЙДЕН: 'success',
   'НА ПРОВЕРКЕ': 'warning',
-  'КРОМЕ ПРОЙДЕН': 'danger',
-  'ТРЕБУЕТ ДОКУМЕНТЫ': 'neutral',
+  'НА ДОРАБОТКЕ': 'orange',
+  БАН: 'danger',
 };
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];

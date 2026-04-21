@@ -8,6 +8,8 @@ import { TradingPage } from '../pages/TradingPage';
 import { TradingCardPage } from '../pages/TradingCardPage';
 import { SubjectProfilePage } from '../pages/SubjectProfilePage';
 import { RequestsPage } from '../pages/RequestsPage';
+import { CompliancePage } from '../pages/CompliancePage';
+import { ComplianceCardPage } from '../pages/ComplianceCardPage';
 
 export const router = createBrowserRouter([
   {
@@ -24,8 +26,8 @@ export const router = createBrowserRouter([
       { path: 'documents', element: <DocumentsPage /> },
       { path: 'archives', element: <RoutePlaceholderPage /> },
       { path: 'requests', element: <RequestsPage /> },
-      { path: 'compliance', element: <RoutePlaceholderPage /> },
-      { path: 'compliance/:id', element: <RoutePlaceholderPage /> },
+      { path: 'compliance', element: <CompliancePage /> },
+      { path: 'compliance/:id', element: <ComplianceCardPage /> },
       { path: 'middle-office', element: <RoutePlaceholderPage /> },
       { path: 'back-office', element: <RoutePlaceholderPage /> },
       { path: 'trading', element: <TradingPage /> },
