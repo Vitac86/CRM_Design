@@ -15,6 +15,7 @@ type DataTableProps<T extends { id?: string | number }> = {
   rowClassName?: (row: T, rowIndex: number) => string | undefined;
   getRowKey?: (row: T, rowIndex: number) => string | number;
   emptyMessage?: string;
+  onRowClick?: (row: T, rowIndex: number) => void;
 };
 
 export const DataTable = <T extends { id?: string | number }>({
@@ -23,6 +24,7 @@ export const DataTable = <T extends { id?: string | number }>({
   rowClassName,
   getRowKey,
   emptyMessage = 'Нет данных',
+  onRowClick,
 }: DataTableProps<T>) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -51,7 +53,12 @@ export const DataTable = <T extends { id?: string | number }>({
             rows.map((row, rowIndex) => (
               <tr
                 key={getRowKey ? getRowKey(row, rowIndex) : row.id ?? rowIndex}
-                className={cn('border-b border-slate-200 last:border-b-0 hover:bg-slate-50/70', rowClassName?.(row, rowIndex))}
+                className={cn(
+                  'border-b border-slate-200 last:border-b-0 hover:bg-slate-50/70',
+                  onRowClick && 'cursor-pointer',
+                  rowClassName?.(row, rowIndex),
+                )}
+                onClick={() => onRowClick?.(row, rowIndex)}
               >
                 {columns.map((column) => {
                   const cellValue = row[column.key as keyof T] as ReactNode;
