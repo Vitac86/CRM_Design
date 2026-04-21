@@ -11,11 +11,60 @@ export type ComplianceStatus =
 export type RiskCategory = 'Низкий' | 'Средний' | 'Высокий' | 'Повышенный';
 export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель';
 
+export interface ClientManager {
+  name: string;
+  role: string;
+  phone: string;
+  email: string;
+}
+
+export interface ClientAgent {
+  name: string;
+  company: string;
+  code: string;
+  phone: string;
+  email: string;
+}
+
+export interface ClientReportDelivery {
+  email: {
+    enabled: boolean;
+    address: string;
+  };
+  personalAccount: {
+    enabled: boolean;
+  };
+}
+
+export interface ClientRegistrationAddress {
+  country: string;
+  region: string;
+  district: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  house: string;
+  building: string;
+  apartment: string;
+}
+
+export interface ClientBankDetails {
+  bankName: string;
+  bik: string;
+  checkingAccount: string;
+  correspondentAccount: string;
+}
+
 export interface Client {
   id: string;
   code: string;
   name: string;
+  lastName: string;
+  firstName: string;
+  middleName: string;
   inn: string;
+  ogrnip: string;
+  birthDate: string;
   type: ClientType;
   residency: ResidencyStatus;
   complianceStatus: ComplianceStatus;
@@ -24,10 +73,18 @@ export interface Client {
   roles: ClientRole[];
   riskCategory: RiskCategory;
   phone: string;
+  secondaryPhone: string;
   email: string;
   address: string;
   representative: string;
   updatedAt: string;
+  canUseMoney: boolean;
+  canUseSecurities: boolean;
+  manager: ClientManager;
+  agent: ClientAgent;
+  reportDelivery: ClientReportDelivery;
+  registrationAddress: ClientRegistrationAddress;
+  bankDetails: ClientBankDetails;
 }
 
 export interface Document {

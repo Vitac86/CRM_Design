@@ -1,6 +1,26 @@
-import type { Client } from './types';
+import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, RiskCategory } from './types';
 
-export const clients: Client[] = [
+interface LegacyClient {
+  id: string;
+  code: string;
+  name: string;
+  inn: string;
+  type: ClientType;
+  residency: ResidencyStatus;
+  complianceStatus: ComplianceStatus;
+  fullDocumentSet: boolean;
+  qualification: boolean;
+  roles: ClientRole[];
+  riskCategory: RiskCategory;
+  phone: string;
+  email: string;
+  address: string;
+  representative: string;
+  updatedAt: string;
+}
+
+
+const legacyClients: LegacyClient[] = [
   {
     id: 'c-001',
     code: 'INV-1001',
@@ -434,6 +454,78 @@ export const clients: Client[] = [
     updatedAt: '2026-04-19 09:03'
   }
 ];
+
+const splitClientName = (name: string, type: ClientType) => {
+  if (type !== 'ФЛ' && type !== 'ИП') {
+    return { lastName: name, firstName: '—', middleName: '—' };
+  }
+
+  const normalized = name.replace(/^ИП\s+/i, '').trim();
+  const [lastName = '—', firstName = '—', middleName = '—'] = normalized.split(/\s+/);
+
+  return { lastName, firstName, middleName };
+};
+
+const buildRegistrationAddress = (address: string) => {
+  const cityMatch = address.match(/^(г\.\s*[^,]+)/);
+  const city = cityMatch?.[1] ?? '—';
+  const detail = address.replace(/^(г\.\s*[^,]+,?\s*)/, '').trim();
+
+  return {
+    country: 'Россия',
+    region: city.replace(/^г\.\s*/, ''),
+    district: '—',
+    city: city.replace(/^г\.\s*/, ''),
+    postalCode: '101000',
+    street: detail || '—',
+    house: '—',
+    building: '—',
+    apartment: '—',
+  };
+};
+
+const defaultManager = {
+  name: 'Петрова Анна Сергеевна',
+  role: 'Старший клиентский менеджер',
+  phone: '+7 (495) 300-00-01',
+  email: 'petrova@crm-design.local',
+};
+
+const defaultAgent = {
+  name: 'Смирнов Алексей Петрович',
+  company: 'ООО «ФинКонсалт Групп»',
+  code: 'АГ-000001',
+  phone: '+7 (495) 555-12-34',
+  email: 'smirnov@crm-design.local',
+};
+
+export const clients: Client[] = legacyClients.map((client) => {
+  const person = splitClientName(client.name, client.type);
+
+  return {
+    ...client,
+    ...person,
+    birthDate: client.type === 'ФЛ' || client.type === 'ИП' ? '1988-04-12' : '—',
+    ogrnip: client.type === 'ИП' ? `ОГРНИП-${client.code.slice(-4)}` : '—',
+    secondaryPhone: '+7 (495) 000-00-00',
+    canUseMoney: client.qualification,
+    canUseSecurities: client.riskCategory !== 'Низкий',
+    manager: defaultManager,
+    agent: { ...defaultAgent, code: `АГ-${client.code.slice(-4)}` },
+    reportDelivery: {
+      email: { enabled: true, address: client.email },
+      personalAccount: { enabled: client.fullDocumentSet },
+    },
+    registrationAddress: buildRegistrationAddress(client.address),
+    bankDetails: {
+      bankName: 'АО «ИнвестБанк»',
+      bik: '044525000',
+      checkingAccount: `40702810${client.code.slice(-4)}000000001`,
+      correspondentAccount: '30101810400000000000',
+    },
+  };
+});
+
 
 export const getClientById = (id: string): Client | undefined =>
   clients.find((client) => client.id === id);
