@@ -150,11 +150,12 @@ export interface Request {
 export interface Report {
   id: string;
   department: 'Мидл-офис' | 'Бэк-офис' | 'Депозитарий';
+  clientCode: string;
   fileName: string;
   sentAt: string;
-  reportType: string;
-  deliveryChannel: 'СБИС' | 'Диадок' | 'Email' | 'FTP';
-  deliveryResult: 'Доставлен' | 'Ошибка' | 'Ожидает подтверждения';
+  reportType: 'Ежедневный' | 'Годовой' | 'Месячный' | 'Квартальный' | 'Недельный';
+  deliveryChannel: 'Личный кабинет' | 'Почта';
+  deliveryResult: 'Доставлено' | 'Не доставлено';
 }
 
 export interface ComplianceCase {

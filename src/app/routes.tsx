@@ -10,6 +10,9 @@ import { SubjectProfilePage } from '../pages/SubjectProfilePage';
 import { RequestsPage } from '../pages/RequestsPage';
 import { CompliancePage } from '../pages/CompliancePage';
 import { ComplianceCardPage } from '../pages/ComplianceCardPage';
+import { MiddleOfficePage } from '../pages/MiddleOfficePage';
+import { BackOfficePage } from '../pages/BackOfficePage';
+import { DepositoryPage } from '../pages/DepositoryPage';
 
 export const router = createBrowserRouter([
   {
@@ -28,11 +31,11 @@ export const router = createBrowserRouter([
       { path: 'requests', element: <RequestsPage /> },
       { path: 'compliance', element: <CompliancePage /> },
       { path: 'compliance/:id', element: <ComplianceCardPage /> },
-      { path: 'middle-office', element: <RoutePlaceholderPage /> },
-      { path: 'back-office', element: <RoutePlaceholderPage /> },
+      { path: 'middle-office', element: <MiddleOfficePage /> },
+      { path: 'back-office', element: <BackOfficePage /> },
       { path: 'trading', element: <TradingPage /> },
       { path: 'trading/:id', element: <TradingCardPage /> },
-      { path: 'depository', element: <RoutePlaceholderPage /> },
+      { path: 'depository', element: <DepositoryPage /> },
       { path: 'administration', element: <RoutePlaceholderPage /> },
     ],
   },
