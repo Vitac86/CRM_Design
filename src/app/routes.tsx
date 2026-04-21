@@ -3,6 +3,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { RoutePlaceholderPage } from '../pages/RoutePlaceholderPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { SubjectsPage } from '../pages/SubjectsPage';
+import { DocumentsPage } from '../pages/DocumentsPage';
 
 export const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
       { path: 'brokerage', element: <RoutePlaceholderPage /> },
       { path: 'trust-management', element: <RoutePlaceholderPage /> },
       { path: 'agents', element: <RoutePlaceholderPage /> },
-      { path: 'documents', element: <RoutePlaceholderPage /> },
+      { path: 'documents', element: <DocumentsPage /> },
       { path: 'archives', element: <RoutePlaceholderPage /> },
       { path: 'requests', element: <RoutePlaceholderPage /> },
       { path: 'compliance', element: <RoutePlaceholderPage /> },
