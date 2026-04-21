@@ -84,6 +84,16 @@ export const legalEntityComplianceCards: LegalEntityComplianceCard[] = [
     riskNote: 'Выявлены операции с повышенным комплаенс-риском.'
   },
   {
+    clientId: 'c-016',
+    ogrn: '1143025002248',
+    kpp: '301701001',
+    registrationDate: '2014-04-17',
+    director: 'Фадеев Константин Андреевич',
+    beneficiaries: ['АО «Каспий Холдинг» (72%)', 'Артемьев Д. А. (28%)'],
+    activity: 'Портовая инфраструктура и терминальные услуги',
+    riskNote: 'Режим усиленного мониторинга операций и контрагентов.'
+  },
+  {
     clientId: 'c-023',
     ogrn: '1152468009988',
     kpp: '246501001',
@@ -96,6 +106,15 @@ export const legalEntityComplianceCards: LegalEntityComplianceCard[] = [
 ];
 
 export const individualComplianceCards: IndividualComplianceCard[] = [
+  {
+    clientId: 'c-002',
+    passportMasked: '45** ****66',
+    birthDate: '1986-11-02',
+    citizenship: 'Россия',
+    taxResidenceCountry: 'Россия',
+    incomeSource: 'Предпринимательская деятельность',
+    riskNote: 'Ожидается подтверждение фактического адреса ведения бизнеса.'
+  },
   {
     clientId: 'c-006',
     passportMasked: '45** ****21',
@@ -128,3 +147,13 @@ export const individualComplianceCards: IndividualComplianceCard[] = [
 export const getComplianceCaseByClientId = (
   clientId: string
 ): ComplianceCase | undefined => complianceCases.find((item) => item.clientId === clientId);
+
+export const getLegalEntityComplianceCardByClientId = (
+  clientId: string
+): LegalEntityComplianceCard | undefined =>
+  legalEntityComplianceCards.find((item) => item.clientId === clientId);
+
+export const getIndividualComplianceCardByClientId = (
+  clientId: string
+): IndividualComplianceCard | undefined =>
+  individualComplianceCards.find((item) => item.clientId === clientId);
