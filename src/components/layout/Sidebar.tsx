@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { isMenuGroup, sidebarMenu } from '../../data/menu';
+import { SidebarIcon } from './SidebarIcon';
 
 const linkBaseClass =
   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
@@ -41,7 +42,7 @@ export const Sidebar = () => {
                   }`}
                 >
                   <span className="flex items-center gap-3">
-                    <span aria-hidden="true">{item.icon}</span>
+                    <SidebarIcon name={item.icon} className="h-5 w-5 shrink-0" />
                     <span>{item.label}</span>
                   </span>
                   <span className={`text-xs transition-transform ${isFrontOfficeOpen ? 'rotate-180' : ''}`}>⌃</span>
@@ -61,7 +62,7 @@ export const Sidebar = () => {
                             }`
                           }
                         >
-                          <span aria-hidden="true">{child.icon}</span>
+                          <SidebarIcon name={child.icon} className="h-4 w-4 shrink-0" />
                           <span>{child.label}</span>
                         </NavLink>
                       </li>
@@ -82,7 +83,7 @@ export const Sidebar = () => {
                 }`
               }
             >
-              <span aria-hidden="true">{item.icon}</span>
+              <SidebarIcon name={item.icon} className="h-5 w-5 shrink-0" />
               <span>{item.label}</span>
             </NavLink>
           );
