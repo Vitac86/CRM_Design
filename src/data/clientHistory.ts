@@ -1,13 +1,4 @@
-export type ClientHistoryEvent = {
-  id: string;
-  clientId: string;
-  dateTime: string;
-  section: string;
-  field: string;
-  oldValue?: string;
-  newValue?: string;
-  user: string;
-};
+import type { ClientHistoryEvent } from './types';
 
 export const clientHistory: ClientHistoryEvent[] = [
   { id: 'hst-1', clientId: 'c-001', dateTime: '2026-04-20 09:14', section: 'Профиль', field: 'Телефон', oldValue: '+7 (900) 100-11-91', newValue: '+7 (900) 100-11-01', user: 'Иванов И.И.' },

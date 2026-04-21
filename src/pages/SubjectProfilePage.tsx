@@ -7,35 +7,17 @@ import { ProfileField } from '../components/crm/ProfileField';
 import { ProfileSection } from '../components/crm/ProfileSection';
 import { ReportMethodCard } from '../components/crm/ReportMethodCard';
 import { getClientById } from '../data/clients';
-import { EmptyState, Tabs } from '../components/ui';
+import { EmptyState } from '../components/ui';
+import { SubjectDocumentsTab } from '../components/crm/SubjectDocumentsTab';
+import { SubjectRelationsTab } from '../components/crm/SubjectRelationsTab';
+import { SubjectContractsTab } from '../components/crm/SubjectContractsTab';
+import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
+import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 
-type SubjectTab = 'profile' | 'documents' | 'contracts' | 'history';
-
-const tabs = [
-  { value: 'profile', label: 'Профиль' },
-  { value: 'documents', label: 'Документы' },
-  { value: 'contracts', label: 'Договоры и счета' },
-  { value: 'history', label: 'История' },
-];
-
-const renderPlaceholder = (tab: SubjectTab) => {
-  const titleByTab: Record<Exclude<SubjectTab, 'profile'>, string> = {
-    documents: 'Документы',
-    contracts: 'Договоры и счета',
-    history: 'История',
-  };
-
-  return (
-    <EmptyState
-      title="Раздел будет реализован позже"
-      description={`Вкладка «${titleByTab[tab as Exclude<SubjectTab, 'profile'>]}» пока недоступна.`}
-    />
-  );
-};
 
 export const SubjectProfilePage = () => {
   const { id } = useParams();
-  const [activeTab, setActiveTab] = useState<SubjectTab>('profile');
+  const [activeTab, setActiveTab] = useState<SubjectProfileTab>('profile');
 
   const client = useMemo(() => {
     if (!id) {
@@ -57,7 +39,7 @@ export const SubjectProfilePage = () => {
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <ClientProfileHeader client={client} />
 
-      <Tabs items={tabs} value={activeTab} onChange={(tab) => setActiveTab(tab as SubjectTab)} />
+      <SubjectProfileTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'profile' ? (
         <div className="space-y-4">
@@ -155,8 +137,16 @@ export const SubjectProfilePage = () => {
             </div>
           </ProfileSection>
         </div>
+      ) : activeTab === 'documents' ? (
+        <SubjectDocumentsTab clientId={client.id} />
+      ) : activeTab === 'relations' ? (
+        <SubjectRelationsTab clientId={client.id} />
+      ) : activeTab === 'contracts' ? (
+        <SubjectContractsTab clientId={client.id} />
+      ) : activeTab === 'history' ? (
+        <SubjectHistoryTab clientId={client.id} />
       ) : (
-        renderPlaceholder(activeTab)
+        <EmptyState title="Неизвестная вкладка" description="Выберите доступный раздел карточки клиента." />
       )}
     </div>
   );

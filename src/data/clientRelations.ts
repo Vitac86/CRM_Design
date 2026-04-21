@@ -1,13 +1,4 @@
-export type ClientRelation = {
-  id: string;
-  clientId: string;
-  relatedName: string;
-  relatedCode: string;
-  relatedType: string;
-  role: 'Представитель' | 'Агент' | 'Бенефициар' | 'Доверенное лицо' | 'Исполнительный орган';
-  dateFrom: string;
-  status: 'Активна' | 'Неактивна' | 'На проверке';
-};
+import type { ClientRelation } from './types';
 
 export const clientRelations: ClientRelation[] = [
   { id: 'rel-1', clientId: 'c-001', relatedName: 'Климов Роман Сергеевич', relatedCode: 'REL-7701', relatedType: 'Физическое лицо', role: 'Представитель', dateFrom: '2025-11-03', status: 'Активна' },

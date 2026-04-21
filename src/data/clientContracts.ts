@@ -1,11 +1,4 @@
-export type ClientContract = {
-  id: string;
-  clientId: string;
-  number: string;
-  signedAt: string;
-  contractType: 'Депозитарный' | 'Договор ДУ' | 'Договор БО' | 'Дилерский' | 'Брокерский';
-  status: 'Действующий' | 'Не действующий' | 'Закрытый' | 'На подписании';
-};
+import type { ClientContract } from './types';
 
 export const clientContracts: ClientContract[] = [
   { id: 'ctr-1', clientId: 'c-001', number: 'ДУ-2026/001', signedAt: '2026-01-18', contractType: 'Договор ДУ', status: 'Действующий' },

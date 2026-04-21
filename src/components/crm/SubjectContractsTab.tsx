@@ -1,5 +1,6 @@
 import { getContractsByClientId } from '../../data/clientContracts';
-import { Badge, Button, DataTable, EmptyState } from '../ui';
+import { Badge, Card, DataTable, EmptyState } from '../ui';
+import { cn } from '../ui/cn';
 
 type SubjectContractsTabProps = {
   clientId: string;
@@ -20,6 +21,11 @@ const contractStatusVariant: Record<string, 'success' | 'danger' | 'neutral' | '
   'На подписании': 'warning',
 };
 
+const innerTabs = [
+  { key: 'contracts', label: 'Договоры' },
+  { key: 'accounts', label: 'Счета' },
+];
+
 export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   const contracts = getContractsByClientId(clientId);
 
@@ -28,9 +34,22 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button onClick={() => { /* TODO: open create contract form */ }}>+ Добавить договор</Button>
+    <Card className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="flex border-b border-slate-200 bg-white px-4 pt-3">
+        {innerTabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            className={cn(
+              'border-b-2 px-4 py-2 text-sm font-semibold transition-colors',
+              tab.key === 'contracts'
+                ? 'border-brand text-brand-dark'
+                : 'border-transparent text-slate-500 hover:text-slate-700',
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <DataTable
@@ -52,6 +71,6 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
         ]}
         rows={contracts}
       />
-    </div>
+    </Card>
   );
 };

@@ -1,12 +1,4 @@
-export type ClientDocument = {
-  id: string;
-  clientId: string;
-  title: string;
-  documentType: string;
-  status: 'Действующий' | 'Не действующий' | 'На проверке' | 'На подписи' | 'Отклонена';
-  date: string;
-  fileName: string;
-};
+import type { ClientDocument } from './types';
 
 export const clientDocuments: ClientDocument[] = [
   { id: 'doc-1', clientId: 'c-001', title: 'Анкета клиента', documentType: 'Анкета', status: 'Действующий', date: '2026-03-14', fileName: 'anketa-c001.docx' },

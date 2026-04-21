@@ -96,6 +96,47 @@ export interface Document {
   date: string;
 }
 
+export interface ClientDocument {
+  id: string;
+  clientId: string;
+  title: string;
+  documentType: string;
+  status: 'Действующий' | 'Не действующий' | 'На проверке' | 'На подписи' | 'Отклонена';
+  date: string;
+  fileName: string;
+}
+
+export interface ClientRelation {
+  id: string;
+  clientId: string;
+  relatedName: string;
+  relatedCode: string;
+  relatedType: string;
+  role: 'Представитель' | 'Агент' | 'Бенефициар' | 'Доверенное лицо' | 'Исполнительный орган';
+  dateFrom: string;
+  status: 'Активна' | 'Неактивна' | 'На проверке';
+}
+
+export interface ClientContract {
+  id: string;
+  clientId: string;
+  number: string;
+  signedAt: string;
+  contractType: 'Депозитарный' | 'Договор ДУ' | 'Договор БО' | 'Дилерский' | 'Брокерский';
+  status: 'Действующий' | 'Не действующий' | 'Закрытый' | 'На подписании';
+}
+
+export interface ClientHistoryEvent {
+  id: string;
+  clientId: string;
+  dateTime: string;
+  section: string;
+  field: string;
+  oldValue?: string;
+  newValue?: string;
+  user: string;
+}
+
 export interface Request {
   id: string;
   clientId: string;
