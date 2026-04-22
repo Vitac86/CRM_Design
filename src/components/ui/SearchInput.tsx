@@ -5,7 +5,7 @@ type SearchInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
 export const SearchInput = ({ className, placeholder = 'Поиск', ...props }: SearchInputProps) => {
   return (
-    <label className="relative block min-w-[240px] flex-1">
+    <label className="relative block w-full">
       <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400/90">🔎</span>
       <input
         type="search"
