@@ -216,7 +216,7 @@ export const TradingPage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Трейдинг</h1>
       </header>
 
-      <div className="sticky top-4 z-20 rounded-2xl bg-slate-50/95 pb-3 backdrop-blur">
+      <div>
         <TableControlPanel
           search={
             <SearchInput

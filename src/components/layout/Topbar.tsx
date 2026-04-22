@@ -78,7 +78,7 @@ export const Topbar = () => {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur">
       {!hideGlobalSearch ? (
         <label ref={searchRef} className="relative block w-full max-w-xl">
           <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">🔎</span>
