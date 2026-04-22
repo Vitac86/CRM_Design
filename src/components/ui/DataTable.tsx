@@ -23,6 +23,8 @@ type DataTableProps<T extends { id?: string | number }> = {
   sortKey?: string | null;
   sortDirection?: SortDirection | null;
   onSortChange?: (sortKey: string) => void;
+  stickyHeader?: boolean;
+  stickyHeaderTopClassName?: string;
 };
 
 const SortIcon = ({ active, direction }: { active: boolean; direction: SortDirection | null | undefined }) => {
@@ -56,6 +58,8 @@ export const DataTable = <T extends { id?: string | number }>({
   sortKey,
   sortDirection,
   onSortChange,
+  stickyHeader = true,
+  stickyHeaderTopClassName = 'top-16',
 }: DataTableProps<T>) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -70,7 +74,12 @@ export const DataTable = <T extends { id?: string | number }>({
               return (
                 <th
                   key={String(column.key)}
-                  className={cn('px-4 py-3 text-xs font-semibold uppercase tracking-wide text-brand-dark', column.headerClassName)}
+                  className={cn(
+                    'px-4 py-3 text-xs font-semibold uppercase tracking-wide text-brand-dark',
+                    stickyHeader &&
+                      `sticky ${stickyHeaderTopClassName} z-10 border-b border-slate-200 bg-brand-light shadow-[0_1px_0_rgba(15,23,42,0.08)]`,
+                    column.headerClassName,
+                  )}
                 >
                   {isSortable ? (
                     <button

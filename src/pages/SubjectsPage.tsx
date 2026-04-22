@@ -167,7 +167,7 @@ export const SubjectsPage = () => {
         </Button>
       </header>
 
-      <div className="sticky top-4 z-20 rounded-2xl bg-slate-50/95 pb-3 backdrop-blur">
+      <div>
         <TableControlPanel
           search={
             <SearchInput

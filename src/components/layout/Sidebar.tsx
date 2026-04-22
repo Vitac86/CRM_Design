@@ -23,7 +23,7 @@ export const Sidebar = () => {
   const [isFrontOfficeOpen, setIsFrontOfficeOpen] = useState(true);
 
   return (
-    <aside className="flex h-screen w-[270px] shrink-0 flex-col border-r border-slate-200 bg-white">
+    <aside className="fixed left-0 top-0 flex h-screen w-[270px] shrink-0 flex-col border-r border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-5 py-4">
         <p className="text-xl font-semibold tracking-tight text-brand-dark">Инвестика</p>
         <p className="text-xs text-slate-500">CRM prototype</p>
