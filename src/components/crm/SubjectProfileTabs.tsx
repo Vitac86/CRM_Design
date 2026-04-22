@@ -1,6 +1,6 @@
 import { cn } from '../ui/cn';
 
-export type SubjectProfileTab = 'profile' | 'documents' | 'relations' | 'contracts' | 'history';
+export type SubjectProfileTab = 'profile' | 'bankAccounts' | 'documents' | 'relations' | 'contracts' | 'history';
 
 type TabItem = {
   value: SubjectProfileTab;
@@ -14,6 +14,7 @@ type SubjectProfileTabsProps = {
 
 const tabs: TabItem[] = [
   { value: 'profile', label: 'Профиль' },
+  { value: 'bankAccounts', label: 'Банковские реквизиты' },
   { value: 'documents', label: 'Документы' },
   { value: 'relations', label: 'Связи' },
   { value: 'contracts', label: 'Договоры' },

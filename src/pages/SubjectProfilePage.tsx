@@ -11,10 +11,11 @@ import { SubjectDocumentsTab } from '../components/crm/SubjectDocumentsTab';
 import { SubjectRelationsTab } from '../components/crm/SubjectRelationsTab';
 import { SubjectContractsTab } from '../components/crm/SubjectContractsTab';
 import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
+import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency } from '../utils/labels';
 import { useClientsStore } from '../app/ClientsStore';
-import type { Client, ClientType, ResidencyStatus } from '../data/types';
+import type { BankAccount, Client, ClientType, ResidencyStatus } from '../data/types';
 
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
 const residencyOptions: ResidencyStatus[] = ['Резидент РФ', 'Нерезидент'];
@@ -61,6 +62,7 @@ export const SubjectProfilePage = () => {
       return;
     }
 
+    setActiveTab('profile');
     setDraftClient({
       ...client,
       roles: [...client.roles],
@@ -72,6 +74,7 @@ export const SubjectProfilePage = () => {
       },
       registrationAddress: { ...client.registrationAddress },
       bankDetails: { ...client.bankDetails },
+      bankAccounts: client.bankAccounts ? [...client.bankAccounts] : undefined,
     });
     setValidationError(null);
     setShowAllClientCodes(false);
@@ -121,12 +124,24 @@ export const SubjectProfilePage = () => {
       normalizedClient.name = normalizedClient.type === 'ИП' ? `ИП ${fullName}` : fullName;
     }
 
-    updateClient(client.id, normalizedClient);
+    const { bankDetails: _bankDetails, bankAccounts: _bankAccounts, ...profilePatch } = normalizedClient;
+    updateClient(client.id, profilePatch);
     setIsEditing(false);
     setDraftClient(undefined);
     setValidationError(null);
     setShowAllClientCodes(false);
     setToastMessage('Данные клиента сохранены');
+  };
+
+  const handleAddBankAccount = (account: BankAccount) => {
+    if (!client) {
+      return;
+    }
+
+    updateClient(client.id, {
+      bankAccounts: [...(client.bankAccounts ?? []), account],
+    });
+    setToastMessage('Банковский счёт добавлен');
   };
 
   if (!client) {
@@ -151,7 +166,7 @@ export const SubjectProfilePage = () => {
       <ClientProfileHeader
         client={currentClient}
         actions={
-          isEditing ? (
+          isEditing && activeTab === 'profile' ? (
             <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm" onClick={handleCancelEdit}>
                 Отмена
@@ -668,61 +683,9 @@ export const SubjectProfilePage = () => {
             </div>
           </ProfileSection>
 
-          <ProfileSection title="Банковские реквизиты">
-            <div className="grid gap-4 md:grid-cols-2">
-              {isEditing ? (
-                <>
-                  <FormField
-                    label="Наименование банка"
-                    value={currentClient.bankDetails.bankName}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, bankDetails: { ...prev.bankDetails, bankName: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="БИК"
-                    value={currentClient.bankDetails.bik}
-                    mono
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, bankDetails: { ...prev.bankDetails, bik: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Расчётный счёт"
-                    value={currentClient.bankDetails.checkingAccount}
-                    mono
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, bankDetails: { ...prev.bankDetails, checkingAccount: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Корреспондентский счёт"
-                    value={currentClient.bankDetails.correspondentAccount}
-                    mono
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, bankDetails: { ...prev.bankDetails, correspondentAccount: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                </>
-              ) : (
-                <>
-                  <ProfileField label="Наименование банка" value={client.bankDetails.bankName} />
-                  <ProfileField label="БИК" value={client.bankDetails.bik} mono />
-                  <ProfileField label="Расчётный счёт" value={client.bankDetails.checkingAccount} mono />
-                  <ProfileField label="Корреспондентский счёт" value={client.bankDetails.correspondentAccount} mono />
-                </>
-              )}
-            </div>
-          </ProfileSection>
         </div>
+      ) : activeTab === 'bankAccounts' ? (
+        <SubjectBankAccountsTab client={client} onAddAccount={handleAddBankAccount} />
       ) : activeTab === 'documents' ? (
         <SubjectDocumentsTab clientId={client.id} />
       ) : activeTab === 'relations' ? (

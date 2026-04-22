@@ -1,4 +1,4 @@
-import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, RiskCategory } from './types';
+import type { BankAccount, Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, RiskCategory } from './types';
 
 interface LegacyClient {
   id: string;
@@ -524,6 +524,93 @@ const defaultAgent = {
   email: 'smirnov@crm-design.local',
 };
 
+
+const bankAccountsByClientId: Record<string, BankAccount[]> = {
+  'c-001': [
+    {
+      id: 'ba-1',
+      bankName: 'АО «ИнвестБанк»',
+      bik: '044525000',
+      accountNumber: '40702810900000000001',
+      correspondentAccount: '30101810400000000225',
+      currency: 'RUB',
+      purpose: 'Основной расчётный счёт',
+      status: 'Активен',
+      openedAt: '2025-02-19',
+    },
+    {
+      id: 'ba-2',
+      bankName: 'ПАО «Северный Банк»',
+      bik: '044525225',
+      accountNumber: '40702810900000000002',
+      correspondentAccount: '30101810000000000225',
+      currency: 'RUB',
+      purpose: 'Счёт для брокерских операций',
+      status: 'На проверке',
+      openedAt: '2025-03-11',
+    },
+  ],
+  'c-003': [
+    {
+      id: 'ba-3',
+      bankName: 'АО «ИнвестБанк»',
+      bik: '044525000',
+      accountNumber: '40702810900000001301',
+      correspondentAccount: '30101810400000000225',
+      currency: 'RUB',
+      purpose: 'Основной расчётный счёт',
+      status: 'Активен',
+      openedAt: '2024-11-05',
+    },
+    {
+      id: 'ba-4',
+      bankName: 'ПАО «Восточный Капитал»',
+      bik: '044525974',
+      accountNumber: '40702840900000001302',
+      correspondentAccount: '30101810200000000974',
+      currency: 'USD',
+      purpose: 'Валютный счёт для внешних расчётов',
+      status: 'Активен',
+      openedAt: '2025-01-14',
+    },
+    {
+      id: 'ba-5',
+      bankName: 'АО «Расчётный дом СЗФО»',
+      bik: '044030790',
+      accountNumber: '40702810900000001303',
+      correspondentAccount: '30101810900000000790',
+      currency: 'EUR',
+      purpose: 'Счёт для расчётов с иностранными контрагентами',
+      status: 'На проверке',
+      openedAt: '2025-03-22',
+    },
+    {
+      id: 'ba-6',
+      bankName: 'ПАО «ПромРесурс Банк»',
+      bik: '044525555',
+      accountNumber: '40702810900000001304',
+      correspondentAccount: '30101810600000000555',
+      currency: 'CNY',
+      purpose: 'Специальный счёт для импортных контрактов',
+      status: 'Закрыт',
+      openedAt: '2024-06-30',
+    },
+  ],
+  'c-005': [
+    {
+      id: 'ba-7',
+      bankName: 'АО «Орбита Банк»',
+      bik: '045004774',
+      accountNumber: '40702810900000000501',
+      correspondentAccount: '30101810300000000774',
+      currency: 'RUB',
+      purpose: 'Операционный счёт',
+      status: 'Активен',
+      openedAt: '2025-02-03',
+    },
+  ],
+};
+
 export const clients: Client[] = legacyClients.map((client) => {
   const person = splitClientName(client.name, client.type);
 
@@ -548,6 +635,7 @@ export const clients: Client[] = legacyClients.map((client) => {
       checkingAccount: `40702810${client.code.slice(-4)}000000001`,
       correspondentAccount: '30101810400000000000',
     },
+    bankAccounts: bankAccountsByClientId[client.id],
   };
 });
 
