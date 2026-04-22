@@ -19,6 +19,18 @@ const statusBadgeVariant = (status: 'Активен' | 'Истёк' | 'Подк�
   return 'neutral';
 };
 
+const amlBadgeVariant = (amlStatus: string) => {
+  if (amlStatus === 'АКТИВЕН') {
+    return 'success';
+  }
+
+  if (amlStatus === 'НА ПРОВЕРКЕ' || amlStatus === 'ЗАМОРОЖЕН') {
+    return 'warning';
+  }
+
+  return 'info';
+};
+
 const terminalIcon = (type: 'QUIK Desktop' | 'QUIK Mobile (Android)' | 'WebQUIK') => {
   if (type === 'QUIK Desktop') {
     return (
@@ -134,6 +146,40 @@ export const TradingCardPage = () => {
               </Card>
 
               <Card className="p-4">
+                <h2 className="mb-3 text-sm font-semibold text-slate-900">ПОД / ФТ</h2>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Статус</p>
+                    <div className="mt-1">
+                      <Badge variant={amlBadgeVariant(profile.amlStatus)}>{profile.amlStatus}</Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Причина блокировки / заморозки</p>
+                    <p className="mt-1 text-sm text-slate-900">{profile.amlFreezeReason || '—'}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-4">
+                <h2 className="mb-3 text-sm font-semibold text-slate-900">Контактные данные</h2>
+                <div className="grid gap-3 md:grid-cols-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Номера телефонов</p>
+                    <p className="mt-1 text-sm text-slate-900">{client.phone || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">E-mail</p>
+                    <p className="mt-1 text-sm text-slate-900">{client.email || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Адрес</p>
+                    <p className="mt-1 text-sm text-slate-900">{client.address || '—'}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-4">
                 <h2 className="mb-3 text-sm font-semibold text-slate-900">Распорядитель счёта</h2>
                 <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
                   <div className="flex items-start gap-3">
@@ -161,7 +207,7 @@ export const TradingCardPage = () => {
               <Card className="p-4">
                 <h2 className="mb-2 text-sm font-semibold text-slate-900">Кодовое слово</h2>
                 <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm tracking-wider text-slate-700">
-                  {profile.codeWordMasked}
+                  {profile.codeWord}
                 </div>
               </Card>
 

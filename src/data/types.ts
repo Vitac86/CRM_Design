@@ -224,7 +224,9 @@ export interface TradingProfile {
   tradingMethods: TradingMethod[];
   authorityUntil: string;
   tradingStatus: TradingStatus;
-  codeWordMasked: string;
+  amlStatus: string;
+  amlFreezeReason: string;
+  codeWord: string;
   orderMethods: TradingOrderMethod[];
   terminals: TradingTerminal[];
   riskCategory: RiskCategory;
