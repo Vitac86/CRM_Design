@@ -1,4 +1,4 @@
-import { Badge, Button, EmptyState } from '../ui';
+import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon } from '../ui';
 import type { Report } from '../../data/types';
 
 const statusBadgeVariantMap: Record<Report['deliveryStatus'], 'success' | 'warning' | 'danger'> = {
@@ -51,8 +51,8 @@ export const MiddleOfficeReportDetails = ({ report, onResend, onDownload }: Midd
 
       <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3">
         <div className="flex items-center gap-3">
-          <span className="text-xl" aria-hidden="true">
-            📄
+          <span className="rounded-md bg-slate-100 p-2 text-slate-500" aria-hidden="true">
+            <FileIcon className="h-5 w-5" />
           </span>
           <div>
             <p className="text-sm font-medium text-slate-800">{report.fileName}</p>
@@ -63,9 +63,13 @@ export const MiddleOfficeReportDetails = ({ report, onResend, onDownload }: Midd
 
       <div className="flex flex-wrap gap-2">
         <Button variant="secondary" onClick={onResend}>
+          <RefreshIcon className="h-4 w-4" />
           Отправить повторно
         </Button>
-        <Button onClick={onDownload}>Скачать</Button>
+        <Button onClick={onDownload}>
+          <DownloadIcon className="h-4 w-4" />
+          Скачать
+        </Button>
       </div>
     </div>
   );

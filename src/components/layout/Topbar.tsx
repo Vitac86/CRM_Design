@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { clients } from '../../data/clients';
 import type { Client } from '../../data/types';
 import { formatClientType, formatComplianceStatus, getComplianceBadgeVariant } from '../../utils/labels';
+import { SearchIcon } from '../ui/icons';
 
 const complianceBadgeClassMap = {
   success: 'bg-emerald-100 text-emerald-700',
@@ -81,7 +82,7 @@ export const Topbar = () => {
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur">
       {!hideGlobalSearch ? (
         <label ref={searchRef} className="relative block w-full max-w-xl">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">🔎</span>
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400"><SearchIcon className="h-4 w-4" /></span>
           <input
             type="search"
             placeholder="Глобальный поиск"

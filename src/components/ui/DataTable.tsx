@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from './cn';
+import { ChevronDownIcon, ChevronUpIcon, SortIcon as BaseSortIcon } from './icons';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -30,21 +31,14 @@ type DataTableProps<T extends { id?: string | number }> = {
 const SortIcon = ({ active, direction }: { active: boolean; direction: SortDirection | null | undefined }) => {
   if (!active || !direction) {
     return (
-      <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <path d="M6 8L10 4L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M6 12L10 16L14 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <BaseSortIcon className="h-3.5 w-3.5 text-slate-400" />
     );
   }
 
   return direction === 'asc' ? (
-    <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M6 12L10 8L14 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <ChevronUpIcon className="h-3.5 w-3.5" />
   ) : (
-    <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <ChevronDownIcon className="h-3.5 w-3.5" />
   );
 };
 
@@ -59,7 +53,7 @@ export const DataTable = <T extends { id?: string | number }>({
   sortDirection,
   onSortChange,
   stickyHeader = true,
-  stickyHeaderTopClassName = 'top-16',
+  stickyHeaderTopClassName = 'top-0',
 }: DataTableProps<T>) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">

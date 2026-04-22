@@ -15,3 +15,5 @@ export * from './TableControlPanel';
 export * from './FormField';
 export * from './BooleanSelect';
 export * from './PageSizeSelector';
+
+export * from './icons';
