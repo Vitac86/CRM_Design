@@ -1,6 +1,9 @@
+import type { ComponentType } from 'react';
+import { ClockIcon, FileIcon, ShieldIcon, UsersIcon } from '../components/ui/icons';
+
 export interface DashboardMetric {
   id: string;
-  icon: string;
+  icon: ComponentType<{ className?: string }>;
   value: number;
   label: string;
   trendLabel: string;
@@ -23,7 +26,7 @@ export interface DashboardRequest {
 export const dashboardMetrics: DashboardMetric[] = [
   {
     id: 'metric-01',
-    icon: '👤',
+    icon: UsersIcon,
     value: 17,
     label: 'новых субъектов',
     trendLabel: '+6.2%',
@@ -31,7 +34,7 @@ export const dashboardMetrics: DashboardMetric[] = [
   },
   {
     id: 'metric-02',
-    icon: '🛡️',
+    icon: ShieldIcon,
     value: 43,
     label: 'очередь комплаенса',
     trendLabel: '+4.1%',
@@ -39,7 +42,7 @@ export const dashboardMetrics: DashboardMetric[] = [
   },
   {
     id: 'metric-03',
-    icon: '📝',
+    icon: FileIcon,
     value: 24,
     label: 'новые заявки',
     trendLabel: '+8.7%',
@@ -47,7 +50,7 @@ export const dashboardMetrics: DashboardMetric[] = [
   },
   {
     id: 'metric-04',
-    icon: '⏰',
+    icon: ClockIcon,
     value: 12,
     label: 'задач просрочено',
     trendLabel: '-2.4%',
