@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useClientsStore } from '../app/ClientsStore';
 import { Button } from '../components/ui';
 import { IndividualRegistrationForm, type IndividualFormData } from '../components/crm/registration/IndividualRegistrationForm';
 import { LegalEntityRegistrationForm, type LegalEntityFormData } from '../components/crm/registration/LegalEntityRegistrationForm';
@@ -7,6 +8,7 @@ import { RegistrationOptionCard } from '../components/crm/registration/Registrat
 import { RegistrationResult } from '../components/crm/registration/RegistrationResult';
 import { RegistrationStepHeader } from '../components/crm/registration/RegistrationStepHeader';
 import { RegistrationWizardLayout } from '../components/crm/registration/RegistrationWizardLayout';
+import type { Client, ClientType, ResidencyStatus } from '../data/types';
 
 type SubjectType = 'individual' | 'legal' | null;
 type RegistrationMethod = 'manual' | 'cabinet' | 'inn' | null;
@@ -74,6 +76,7 @@ const initialLegalEntityForm: LegalEntityFormData = {
 
 export const ClientRegistrationWizardPage = () => {
   const navigate = useNavigate();
+  const { addClient } = useClientsStore();
   const [step, setStep] = useState(1);
   const [subjectType, setSubjectType] = useState<SubjectType>(null);
   const [registrationMethod, setRegistrationMethod] = useState<RegistrationMethod>(null);
@@ -82,6 +85,24 @@ export const ClientRegistrationWizardPage = () => {
   const [validationError, setValidationError] = useState('');
   const [draftMessage, setDraftMessage] = useState('');
   const [result, setResult] = useState<RegistrationResultState | null>(null);
+
+  const resolveResidency = (value: string): ResidencyStatus => (value === 'no' ? 'Нерезидент' : 'Резидент РФ');
+
+  const resolveLegalType = (name: string): ClientType => {
+    const normalized = name.trim().toUpperCase();
+
+    if (normalized.startsWith('ПАО')) return 'ПАО';
+    if (normalized.startsWith('ЗАО')) return 'ЗАО';
+    if (normalized.startsWith('АО')) return 'АО';
+    if (normalized.startsWith('ООО')) return 'ООО';
+
+    return 'ООО';
+  };
+
+  const resolveIndividualType = (form: IndividualFormData): ClientType => {
+    const typeHint = [form.services, form.sourceOfFunds].join(' ').toLowerCase();
+    return typeHint.includes('ип') ? 'ИП' : 'ФЛ';
+  };
 
   const subjectTypeLabel = useMemo(() => {
     if (subjectType === 'individual') {
@@ -138,10 +159,137 @@ export const ClientRegistrationWizardPage = () => {
     }
 
     const timestamp = Date.now();
+    const id = `c-${timestamp}`;
+    const code = `INV-${String(timestamp).slice(-6)}`;
+    const registrationDate = new Date().toLocaleDateString('ru-RU');
+    const now = new Date();
+    const updatedAt = `${now.toISOString().slice(0, 10)} ${now.toISOString().slice(11, 16)}`;
+
+    const baseClient: Omit<Client, 'name' | 'lastName' | 'firstName' | 'middleName' | 'inn' | 'birthDate' | 'type' | 'residency' | 'phone' | 'email' | 'address' | 'registrationAddress'> = {
+      id,
+      code,
+      ogrnip: '—',
+      complianceStatus: 'НА ПРОВЕРКЕ',
+      fullDocumentSet: false,
+      qualification: false,
+      roles: ['Клиент'],
+      riskCategory: 'Средний',
+      secondaryPhone: '',
+      representative: 'Самостоятельно',
+      updatedAt,
+      canUseMoney: false,
+      canUseSecurities: false,
+      manager: {
+        name: 'Не назначен',
+        role: 'Менеджер',
+        phone: '',
+        email: '',
+      },
+      agent: {
+        name: 'Не назначен',
+        company: '—',
+        code: `АГ-${String(timestamp).slice(-4)}`,
+        phone: '',
+        email: '',
+      },
+      reportDelivery: {
+        email: {
+          enabled: true,
+          address: '',
+        },
+        personalAccount: {
+          enabled: false,
+        },
+      },
+      bankDetails: {
+        bankName: 'Не указано',
+        bik: '',
+        checkingAccount: '',
+        correspondentAccount: '',
+      },
+      bankAccounts: [],
+    };
+
+    const client: Client =
+      subjectType === 'individual'
+        ? {
+            ...baseClient,
+            name: [individualForm.lastName, individualForm.firstName, individualForm.middleName].filter(Boolean).join(' '),
+            lastName: individualForm.lastName.trim(),
+            firstName: individualForm.firstName.trim(),
+            middleName: individualForm.middleName.trim(),
+            inn: individualForm.inn.trim(),
+            birthDate: individualForm.birthDate || '—',
+            type: resolveIndividualType(individualForm),
+            residency: resolveResidency(individualForm.taxResident),
+            phone: individualForm.phones.trim(),
+            email: individualForm.email.trim(),
+            address: individualForm.actualAddressMatches === 'yes' ? individualForm.registrationAddress.trim() : '',
+            registrationAddress: {
+              country: 'Россия',
+              region: '',
+              district: '',
+              city: '',
+              postalCode: '',
+              street: individualForm.registrationAddress.trim(),
+              house: '',
+              building: '',
+              apartment: '',
+            },
+            reportDelivery: {
+              ...baseClient.reportDelivery,
+              email: {
+                enabled: Boolean(individualForm.email.trim()),
+                address: individualForm.email.trim(),
+              },
+            },
+            canUseMoney: individualForm.cashPermission === 'yes',
+            canUseSecurities: individualForm.securitiesPermission === 'yes',
+            qualification: individualForm.qualifiedInvestor === 'yes',
+            ogrnip: resolveIndividualType(individualForm) === 'ИП' ? `ОГРНИП-${String(timestamp).slice(-6)}` : '—',
+          }
+        : {
+            ...baseClient,
+            name: legalEntityForm.clientName.trim(),
+            lastName: '',
+            firstName: '',
+            middleName: '',
+            inn: legalEntityForm.inn.trim(),
+            birthDate: '—',
+            type: resolveLegalType(legalEntityForm.clientName),
+            residency: resolveResidency(legalEntityForm.residency),
+            phone: legalEntityForm.phones.trim(),
+            email: legalEntityForm.email.trim(),
+            address: legalEntityForm.address.trim(),
+            representative: legalEntityForm.representative.trim() || 'Самостоятельно',
+            registrationAddress: {
+              country: 'Россия',
+              region: '',
+              district: '',
+              city: '',
+              postalCode: '',
+              street: legalEntityForm.address.trim(),
+              house: '',
+              building: '',
+              apartment: '',
+            },
+            reportDelivery: {
+              ...baseClient.reportDelivery,
+              email: {
+                enabled: Boolean(legalEntityForm.email.trim()),
+                address: legalEntityForm.email.trim(),
+              },
+            },
+            canUseMoney: legalEntityForm.cashPermission === 'yes',
+            canUseSecurities: legalEntityForm.securitiesPermission === 'yes',
+            qualification: legalEntityForm.qualifiedInvestor === 'yes',
+          };
+
+    addClient(client);
     setResult({
-      id: `draft-${timestamp}`,
-      code: `INV-${String(timestamp).slice(-4)}`,
-      registrationDate: new Date().toLocaleDateString('ru-RU'),
+      id,
+      code,
+      registrationDate,
     });
     setValidationError('');
     setDraftMessage('');
@@ -258,11 +406,11 @@ export const ClientRegistrationWizardPage = () => {
           displayName={displayName}
           registrationDate={result.registrationDate}
           onFinish={() => navigate('/subjects')}
-          onOpenCard={() => navigate('/subjects')}
+          onOpenCard={() => navigate(`/subjects/${result.id}`)}
         />
       ) : null}
 
-      {step === 4 && result ? <p className="mt-2 text-xs text-slate-500">Черновик: {result.id}</p> : null}
+      {step === 4 && result ? <p className="mt-2 text-xs text-slate-500">ID клиента: {result.id}</p> : null}
     </RegistrationWizardLayout>
   );
 };
