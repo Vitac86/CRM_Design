@@ -35,21 +35,23 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
 
   return (
     <Card className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-      <div className="flex border-b border-slate-200 bg-white px-4 pt-3">
-        {innerTabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            className={cn(
-              'border-b-2 px-4 py-2 text-sm font-semibold transition-colors',
-              tab.key === 'contracts'
-                ? 'border-brand text-brand-dark'
-                : 'border-transparent text-slate-500 hover:text-slate-700',
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="overflow-x-auto">
+        <div className="flex min-w-max border-b border-slate-100 px-1">
+          {innerTabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              className={cn(
+                'relative px-5 py-3 text-sm font-medium transition-colors',
+                tab.key === 'contracts'
+                  ? 'bg-brand-light/20 font-semibold text-brand-dark after:absolute after:right-4 after:bottom-0 after:left-4 after:h-0.5 after:rounded-full after:bg-brand'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900',
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <DataTable

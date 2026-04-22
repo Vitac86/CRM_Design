@@ -22,8 +22,9 @@ const TabButton = ({ active = false, className, ...props }: TabButtonProps) => (
   <button
     type="button"
     className={cn(
-      'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-      active ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+      'relative px-4 py-3 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900',
+      active &&
+        'bg-brand-light/20 font-semibold text-brand-dark after:absolute after:right-3 after:bottom-0 after:left-3 after:h-0.5 after:rounded-full after:bg-brand',
       className,
     )}
     {...props}
@@ -32,17 +33,19 @@ const TabButton = ({ active = false, className, ...props }: TabButtonProps) => (
 
 export const Tabs = ({ items, value, onChange, className }: TabsProps) => {
   return (
-    <div className={cn('inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1', className)}>
-      {items.map((item) => (
-        <TabButton
-          key={item.value}
-          active={item.value === value}
-          disabled={item.disabled}
-          onClick={() => onChange(item.value)}
-        >
-          {item.label}
-        </TabButton>
-      ))}
+    <div className={cn('overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm', className)}>
+      <div className="inline-flex min-w-max items-center border-b border-slate-100">
+        {items.map((item) => (
+          <TabButton
+            key={item.value}
+            active={item.value === value}
+            disabled={item.disabled}
+            onClick={() => onChange(item.value)}
+          >
+            {item.label}
+          </TabButton>
+        ))}
+      </div>
     </div>
   );
 };

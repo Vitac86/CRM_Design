@@ -23,8 +23,8 @@ const tabs: TabItem[] = [
 
 export const SubjectProfileTabs = ({ activeTab, onChange }: SubjectProfileTabsProps) => {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <div className="flex min-w-max items-stretch">
+    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex min-w-max items-stretch border-b border-slate-100">
         {tabs.map((tab) => {
           const active = tab.value === activeTab;
 
@@ -34,8 +34,9 @@ export const SubjectProfileTabs = ({ activeTab, onChange }: SubjectProfileTabsPr
               type="button"
               onClick={() => onChange(tab.value)}
               className={cn(
-                'border-r border-slate-200 px-5 py-4 text-left text-lg font-semibold text-slate-600 transition-colors last:border-r-0',
-                active && 'bg-brand-light/40 text-brand-dark shadow-[inset_0_-3px_0_0_#2E7D5A]',
+                'relative px-5 py-3 text-left text-base font-medium text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900',
+                active &&
+                  'bg-brand-light/20 font-semibold text-brand-dark after:absolute after:right-4 after:bottom-0 after:left-4 after:h-0.5 after:rounded-full after:bg-brand',
               )}
             >
               {tab.label}
