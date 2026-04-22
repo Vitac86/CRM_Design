@@ -5,7 +5,7 @@ import type { Report } from '../../data/types';
 
 const pageSize = 10;
 
-const reportTypeBadgeVariant: Record<Report['reportType'], 'info' | 'success' | 'neutral' | 'orange'> = {
+const reportTypeBadgeVariant: Partial<Record<Report['reportType'], 'info' | 'success' | 'neutral' | 'orange'>> = {
   'Ежедневный': 'info',
   'Годовой': 'success',
   'Месячный': 'neutral',
@@ -13,12 +13,12 @@ const reportTypeBadgeVariant: Record<Report['reportType'], 'info' | 'success' | 
   'Недельный': 'info',
 };
 
-const deliveryChannelBadgeVariant: Record<Report['deliveryChannel'], 'purple' | 'info'> = {
+const deliveryChannelBadgeVariant: Partial<Record<Report['deliveryChannel'], 'purple' | 'info'>> = {
   'Личный кабинет': 'purple',
   'Почта': 'info',
 };
 
-const deliveryResultBadgeVariant: Record<Report['deliveryResult'], 'success' | 'warning'> = {
+const deliveryResultBadgeVariant: Record<'Доставлено' | 'Не доставлено', 'success' | 'warning'> = {
   'Доставлено': 'success',
   'Не доставлено': 'warning',
 };
@@ -32,7 +32,7 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
   const [clientCodeFilter, setClientCodeFilter] = useState('');
   const [reportTypeFilter, setReportTypeFilter] = useState<Report['reportType'] | 'all'>('all');
   const [deliveryChannelFilter, setDeliveryChannelFilter] = useState<Report['deliveryChannel'] | 'all'>('all');
-  const [deliveryResultFilter, setDeliveryResultFilter] = useState<Report['deliveryResult'] | 'all'>('all');
+  const [deliveryResultFilter, setDeliveryResultFilter] = useState<'Доставлено' | 'Не доставлено' | 'all'>('all');
   const [dateFromFilter, setDateFromFilter] = useState('');
   const [dateToFilter, setDateToFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -59,7 +59,7 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
         return false;
       }
 
-      if (deliveryResultFilter !== 'all' && report.deliveryResult !== deliveryResultFilter) {
+      if (deliveryResultFilter !== 'all' && (report.deliveryResult ?? 'Не доставлено') !== deliveryResultFilter) {
         return false;
       }
 
@@ -154,7 +154,7 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
 
         <SelectFilter
           value={deliveryResultFilter}
-          onChange={(event) => setDeliveryResultFilter(event.target.value as Report['deliveryResult'] | 'all')}
+          onChange={(event) => setDeliveryResultFilter(event.target.value as 'Доставлено' | 'Не доставлено' | 'all')}
         >
           <option value="all">Результат доставки</option>
           <option value="Доставлено">Доставлено</option>
@@ -174,22 +174,24 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
             key: 'reportType',
             header: 'Вид отчёта',
             render: (report) => (
-              <Badge variant={reportTypeBadgeVariant[report.reportType]}>{report.reportType}</Badge>
+              <Badge variant={reportTypeBadgeVariant[report.reportType] ?? 'neutral'}>{report.reportType}</Badge>
             ),
           },
           {
             key: 'deliveryChannel',
             header: 'Канал отправки',
             render: (report) => (
-              <Badge variant={deliveryChannelBadgeVariant[report.deliveryChannel]}>{report.deliveryChannel}</Badge>
+              <Badge variant={deliveryChannelBadgeVariant[report.deliveryChannel] ?? 'neutral'}>{report.deliveryChannel}</Badge>
             ),
           },
           {
             key: 'deliveryResult',
             header: 'Результат доставки',
-            render: (report) => (
-              <Badge variant={deliveryResultBadgeVariant[report.deliveryResult]}>{report.deliveryResult}</Badge>
-            ),
+            render: (report) => {
+              const result = report.deliveryResult ?? 'Не доставлено';
+
+              return <Badge variant={deliveryResultBadgeVariant[result]}>{result}</Badge>;
+            },
           },
         ]}
         rows={paginatedReports}

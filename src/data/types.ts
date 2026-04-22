@@ -147,15 +147,37 @@ export interface Request {
   source: 'Личный кабинет' | 'Почта';
 }
 
+export type ReportDepartment = 'Мидл-офис' | 'Бэк-офис' | 'Депозитарий';
+export type ReportType =
+  | 'Ежедневный'
+  | 'Годовой'
+  | 'Месячный'
+  | 'Квартальный'
+  | 'Недельный'
+  | 'Брокерский отчёт'
+  | 'Депозитарный отчёт'
+  | 'Отчёт ДУ'
+  | 'Налоговая справка';
+export type ReportDeliveryChannel = 'Личный кабинет' | 'Почта' | 'E-mail';
+export type ReportDeliveryStatus = 'Доставлен' | 'Ожидает' | 'Ошибка';
+
 export interface Report {
   id: string;
-  department: 'Мидл-офис' | 'Бэк-офис' | 'Депозитарий';
+  department: ReportDepartment;
+  clientName: string;
   clientCode: string;
-  fileName: string;
+  reportTitle: string;
+  reportType: ReportType;
+  period: string;
+  deliveryChannel: ReportDeliveryChannel;
+  deliveryStatus: ReportDeliveryStatus;
   sentAt: string;
-  reportType: 'Ежедневный' | 'Годовой' | 'Месячный' | 'Квартальный' | 'Недельный';
-  deliveryChannel: 'Личный кабинет' | 'Почта';
-  deliveryResult: 'Доставлено' | 'Не доставлено';
+  address: string;
+  contractNumber: string;
+  createdBy: string;
+  fileName: string;
+  fileSize: string;
+  deliveryResult?: 'Доставлено' | 'Не доставлено';
 }
 
 export interface ComplianceCase {
