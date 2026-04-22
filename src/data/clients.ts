@@ -3,6 +3,7 @@ import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus,
 interface LegacyClient {
   id: string;
   code: string;
+  clientCodes?: string[];
   name: string;
   inn: string;
   type: ClientType;
@@ -60,6 +61,30 @@ const legacyClients: LegacyClient[] = [
   {
     id: 'c-003',
     code: 'INV-1003',
+    clientCodes: [
+      'INV-1003',
+      'BR-2025/0003',
+      'DEP-2025/0003',
+      'TRD-2025/0003',
+      'DU-2025/0003',
+      'SUB-1003-A1',
+      'SUB-1003-A2',
+      'SUB-1003-A3',
+      'SUB-1003-A4',
+      'AML-1003-01',
+      'AML-1003-02',
+      'KYC-1003-01',
+      'KYC-1003-02',
+      'RPT-2025-1003-01',
+      'RPT-2025-1003-02',
+      'RPT-2025-1003-03',
+      'OPS-1003-01',
+      'OPS-1003-02',
+      'OPS-1003-03',
+      'DOC-1003-01',
+      'DOC-1003-02',
+      'DOC-1003-03',
+    ],
     name: 'ПАО «НеоЭнергоСбыт»',
     inn: '7813456789',
     type: 'ПАО',

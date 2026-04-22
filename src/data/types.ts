@@ -58,6 +58,7 @@ export interface ClientBankDetails {
 export interface Client {
   id: string;
   code: string;
+  clientCodes?: string[];
   name: string;
   lastName: string;
   firstName: string;
