@@ -1,9 +1,12 @@
+import type { ReactNode } from 'react';
 import type { Client } from '../../data/types';
-import { Badge, Button, Card } from '../ui';
+import { Badge, Card } from '../ui';
 import { formatClientType, formatResidency, getClientTypeBadgeVariant, getResidencyBadgeVariant } from '../../utils/labels';
 
 type ClientProfileHeaderProps = {
   client: Client;
+  actions?: ReactNode;
+  isEditing?: boolean;
 };
 
 const getInitials = (client: Client) => {
@@ -20,7 +23,7 @@ const getInitials = (client: Client) => {
     .join('');
 };
 
-export const ClientProfileHeader = ({ client }: ClientProfileHeaderProps) => {
+export const ClientProfileHeader = ({ client, actions, isEditing = false }: ClientProfileHeaderProps) => {
   return (
     <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
       <div className="flex items-center gap-3">
@@ -34,13 +37,12 @@ export const ClientProfileHeader = ({ client }: ClientProfileHeaderProps) => {
             <span className="font-mono text-xs text-slate-500">{client.code}</span>
             <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
             <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
+            {isEditing ? <Badge variant="brand">Режим редактирования</Badge> : null}
           </div>
         </div>
       </div>
 
-      <Button variant="secondary" size="sm">
-        Редактировать
-      </Button>
+      {actions}
     </Card>
   );
 };
