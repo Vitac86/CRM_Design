@@ -21,7 +21,7 @@ export const SubjectHeader = ({ client }: SubjectHeaderProps) => {
             <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
             <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
             {isRepresentative ? <Badge variant="purple">ПРЕДСТАВИТЕЛЬ</Badge> : null}
-            <Badge variant={client.qualification ? 'success' : 'danger'}>
+            <Badge variant={client.qualification ? 'success' : 'warning'}>
               {client.qualification ? 'КВАЛИФИЦИРОВАН' : 'НЕ КВАЛИФИЦИРОВАН'}
             </Badge>
           </div>

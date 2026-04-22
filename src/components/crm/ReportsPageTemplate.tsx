@@ -5,10 +5,10 @@ import type { Report } from '../../data/types';
 
 const pageSize = 10;
 
-const reportTypeBadgeVariant: Record<Report['reportType'], 'info' | 'success' | 'danger' | 'orange'> = {
+const reportTypeBadgeVariant: Record<Report['reportType'], 'info' | 'success' | 'neutral' | 'orange'> = {
   'Ежедневный': 'info',
   'Годовой': 'success',
-  'Месячный': 'danger',
+  'Месячный': 'neutral',
   'Квартальный': 'orange',
   'Недельный': 'info',
 };
@@ -18,9 +18,9 @@ const deliveryChannelBadgeVariant: Record<Report['deliveryChannel'], 'purple' | 
   'Почта': 'info',
 };
 
-const deliveryResultBadgeVariant: Record<Report['deliveryResult'], 'success' | 'danger'> = {
+const deliveryResultBadgeVariant: Record<Report['deliveryResult'], 'success' | 'warning'> = {
   'Доставлено': 'success',
-  'Не доставлено': 'danger',
+  'Не доставлено': 'warning',
 };
 
 type ReportsPageTemplateProps = {

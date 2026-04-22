@@ -98,13 +98,13 @@ export const TradingCardPage = () => {
                 <p className="font-medium text-slate-900">{profile.riskCategory}</p>
 
                 <p className="text-slate-600">Признак квалифицированного инвестора</p>
-                <Badge variant={profile.qualifiedInvestor ? 'success' : 'danger'}>{toYesNo(profile.qualifiedInvestor)}</Badge>
+                <Badge variant={profile.qualifiedInvestor ? 'success' : 'warning'}>{toYesNo(profile.qualifiedInvestor)}</Badge>
 
                 <p className="text-slate-600">Разрешение на использование денежных средств</p>
-                <Badge variant={profile.allowCashUsage ? 'success' : 'danger'}>{toYesNo(profile.allowCashUsage)}</Badge>
+                <Badge variant={profile.allowCashUsage ? 'success' : 'warning'}>{toYesNo(profile.allowCashUsage)}</Badge>
 
                 <p className="text-slate-600">Разрешение на использование ценных бумаг</p>
-                <Badge variant={profile.allowSecuritiesUsage ? 'success' : 'danger'}>{toYesNo(profile.allowSecuritiesUsage)}</Badge>
+                <Badge variant={profile.allowSecuritiesUsage ? 'success' : 'warning'}>{toYesNo(profile.allowSecuritiesUsage)}</Badge>
 
                 <p className="text-slate-600">Представитель</p>
                 <p className="font-medium text-slate-900">{client.representative}</p>
