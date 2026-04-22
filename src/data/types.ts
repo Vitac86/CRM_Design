@@ -61,6 +61,7 @@ export type BankAccount = {
   purpose: string;
   status: BankAccountStatus;
   openedAt: string;
+  isPrimary?: boolean;
 };
 
 export interface ClientBankDetails {

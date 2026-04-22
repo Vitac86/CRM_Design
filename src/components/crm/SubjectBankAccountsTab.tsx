@@ -5,9 +5,10 @@ import { Badge, Button } from '../ui';
 type SubjectBankAccountsTabProps = {
   client: Client;
   onAddAccount?: (account: BankAccount) => void;
+  onUpdateAccounts?: (accounts: BankAccount[]) => void;
 };
 
-type NewAccountForm = Omit<BankAccount, 'id'>;
+type AccountForm = Omit<BankAccount, 'id'>;
 
 const statusVariantMap: Record<BankAccountStatus, 'success' | 'warning' | 'neutral'> = {
   Активен: 'success',
@@ -15,7 +16,7 @@ const statusVariantMap: Record<BankAccountStatus, 'success' | 'warning' | 'neutr
   Закрыт: 'neutral',
 };
 
-const defaultFormState: NewAccountForm = {
+const defaultFormState: AccountForm = {
   bankName: '',
   bik: '',
   accountNumber: '',
@@ -24,22 +25,41 @@ const defaultFormState: NewAccountForm = {
   purpose: '',
   status: 'Активен',
   openedAt: '',
+  isPrimary: false,
 };
 
-export const SubjectBankAccountsTab = ({ client, onAddAccount }: SubjectBankAccountsTabProps) => {
+const buildFormFromAccount = (account: BankAccount): AccountForm => ({
+  bankName: account.bankName,
+  bik: account.bik,
+  accountNumber: account.accountNumber,
+  correspondentAccount: account.correspondentAccount,
+  currency: account.currency,
+  purpose: account.purpose,
+  status: account.status,
+  openedAt: account.openedAt,
+  isPrimary: account.isPrimary ?? false,
+});
+
+const isFormValid = (formData: AccountForm) =>
+  Boolean(formData.bankName.trim() && formData.bik.trim() && formData.accountNumber.trim() && formData.correspondentAccount.trim());
+
+export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts }: SubjectBankAccountsTabProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<NewAccountForm>(defaultFormState);
+  const [formData, setFormData] = useState<AccountForm>(defaultFormState);
+  const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+  const [editingFormData, setEditingFormData] = useState<AccountForm>(defaultFormState);
+  const [editingValidationError, setEditingValidationError] = useState<string | null>(null);
   const accounts = useMemo(() => client.bankAccounts ?? [], [client.bankAccounts]);
 
-  const handleCancel = () => {
+  const handleCancelAdd = () => {
     setShowAddForm(false);
     setValidationError(null);
     setFormData(defaultFormState);
   };
 
-  const handleSubmit = () => {
-    if (!formData.bankName.trim() || !formData.bik.trim() || !formData.accountNumber.trim() || !formData.correspondentAccount.trim()) {
+  const handleSubmitAdd = () => {
+    if (!isFormValid(formData)) {
       setValidationError('Заполните обязательные поля');
       return;
     }
@@ -49,9 +69,71 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount }: SubjectBankAcco
       id: `ba-${Date.now()}`,
       openedAt: formData.openedAt || new Date().toISOString().slice(0, 10),
       purpose: formData.purpose.trim() || 'Без назначения',
+      isPrimary: formData.isPrimary ?? false,
     });
 
-    handleCancel();
+    handleCancelAdd();
+  };
+
+  const handleStartEdit = (account: BankAccount) => {
+    setEditingAccountId(account.id);
+    setEditingValidationError(null);
+    setEditingFormData(buildFormFromAccount(account));
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAccountId(null);
+    setEditingValidationError(null);
+    setEditingFormData(defaultFormState);
+  };
+
+  const handleSaveEdit = (accountId: string) => {
+    if (!isFormValid(editingFormData)) {
+      setEditingValidationError('Заполните обязательные поля');
+      return;
+    }
+
+    onUpdateAccounts?.(
+      accounts.map((account) =>
+        account.id === accountId
+          ? {
+              ...account,
+              ...editingFormData,
+              openedAt: editingFormData.openedAt || account.openedAt || new Date().toISOString().slice(0, 10),
+              purpose: editingFormData.purpose.trim() || 'Без назначения',
+            }
+          : account,
+      ),
+    );
+
+    handleCancelEdit();
+  };
+
+  const handleSetPrimary = (accountId: string) => {
+    onUpdateAccounts?.(
+      accounts.map((account) => ({
+        ...account,
+        isPrimary: account.id === accountId,
+      })),
+    );
+  };
+
+  const handleCloseAccount = (accountId: string) => {
+    onUpdateAccounts?.(
+      accounts.map((account) =>
+        account.id === accountId
+          ? {
+              ...account,
+              status: 'Закрыт',
+              isPrimary: false,
+            }
+          : account,
+      ),
+    );
+
+    if (editingAccountId === accountId) {
+      handleCancelEdit();
+    }
   };
 
   return (
@@ -93,7 +175,7 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount }: SubjectBankAcco
               <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Валюта *</span>
               <select
                 value={formData.currency}
-                onChange={(event) => setFormData((prev) => ({ ...prev, currency: event.target.value as NewAccountForm['currency'] }))}
+                onChange={(event) => setFormData((prev) => ({ ...prev, currency: event.target.value as AccountForm['currency'] }))}
                 className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="RUB">RUB</option>
@@ -150,10 +232,10 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount }: SubjectBankAcco
           </div>
 
           <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" size="sm" onClick={handleCancel}>
+            <Button variant="secondary" size="sm" onClick={handleCancelAdd}>
               Отмена
             </Button>
-            <Button size="sm" onClick={handleSubmit}>
+            <Button size="sm" onClick={handleSubmitAdd}>
               Добавить
             </Button>
           </div>
@@ -172,39 +254,159 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount }: SubjectBankAcco
         </div>
       ) : (
         <div className="grid gap-4">
-          {accounts.map((account) => (
-            <article key={account.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-base font-semibold text-slate-900">{account.bankName}</h3>
-                  <p className="text-sm text-slate-600">{account.purpose}</p>
+          {accounts.map((account) => {
+            const isEditing = editingAccountId === account.id;
+
+            return (
+              <article key={account.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900">{account.bankName}</h3>
+                    <p className="text-sm text-slate-600">{account.purpose}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {account.isPrimary ? <Badge variant="brand">Основной</Badge> : null}
+                    <Badge variant={statusVariantMap[account.status]}>{account.status}</Badge>
+                  </div>
                 </div>
-                <Badge variant={statusVariantMap[account.status]}>{account.status}</Badge>
-              </div>
-              <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-                <div>
-                  <dt className="text-slate-500">БИК</dt>
-                  <dd className="font-mono text-slate-900">{account.bik}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">Валюта</dt>
-                  <dd className="text-slate-900">{account.currency}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">Расчётный счёт</dt>
-                  <dd className="font-mono text-slate-900">{account.accountNumber}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">Дата открытия</dt>
-                  <dd className="text-slate-900">{account.openedAt}</dd>
-                </div>
-                <div className="md:col-span-2">
-                  <dt className="text-slate-500">Корреспондентский счёт</dt>
-                  <dd className="font-mono text-slate-900">{account.correspondentAccount}</dd>
-                </div>
-              </dl>
-            </article>
-          ))}
+
+                {isEditing ? (
+                  <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
+                    {editingValidationError ? (
+                      <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{editingValidationError}</div>
+                    ) : null}
+
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      <label className="space-y-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Наименование банка *</span>
+                        <input
+                          value={editingFormData.bankName}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, bankName: event.target.value }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">БИК *</span>
+                        <input
+                          value={editingFormData.bik}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, bik: event.target.value }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Валюта *</span>
+                        <select
+                          value={editingFormData.currency}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, currency: event.target.value as AccountForm['currency'] }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        >
+                          <option value="RUB">RUB</option>
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="CNY">CNY</option>
+                        </select>
+                      </label>
+                      <label className="space-y-1 md:col-span-2 xl:col-span-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Расчётный счёт *</span>
+                        <input
+                          value={editingFormData.accountNumber}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, accountNumber: event.target.value }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        />
+                      </label>
+                      <label className="space-y-1 md:col-span-2 xl:col-span-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Корреспондентский счёт *</span>
+                        <input
+                          value={editingFormData.correspondentAccount}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Статус</span>
+                        <select
+                          value={editingFormData.status}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, status: event.target.value as BankAccountStatus }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        >
+                          <option value="Активен">Активен</option>
+                          <option value="На проверке">На проверке</option>
+                          <option value="Закрыт">Закрыт</option>
+                        </select>
+                      </label>
+                      <label className="space-y-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Дата открытия</span>
+                        <input
+                          type="date"
+                          value={editingFormData.openedAt}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, openedAt: event.target.value }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        />
+                      </label>
+                      <label className="space-y-1 md:col-span-2 xl:col-span-3">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Назначение</span>
+                        <input
+                          value={editingFormData.purpose}
+                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, purpose: event.target.value }))}
+                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="secondary" size="sm" onClick={handleCancelEdit}>
+                        Отмена
+                      </Button>
+                      <Button size="sm" onClick={() => handleSaveEdit(account.id)}>
+                        Сохранить
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+                      <div>
+                        <dt className="text-slate-500">БИК</dt>
+                        <dd className="font-mono text-slate-900">{account.bik}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Валюта</dt>
+                        <dd className="text-slate-900">{account.currency}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Расчётный счёт</dt>
+                        <dd className="font-mono text-slate-900">{account.accountNumber}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Дата открытия</dt>
+                        <dd className="text-slate-900">{account.openedAt}</dd>
+                      </div>
+                      <div className="md:col-span-2">
+                        <dt className="text-slate-500">Корреспондентский счёт</dt>
+                        <dd className="font-mono text-slate-900">{account.correspondentAccount}</dd>
+                      </div>
+                    </dl>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3">
+                      <Button variant="secondary" size="sm" onClick={() => handleStartEdit(account)}>
+                        Редактировать
+                      </Button>
+                      {!account.isPrimary ? (
+                        <Button variant="secondary" size="sm" onClick={() => handleSetPrimary(account.id)}>
+                          Сделать основным
+                        </Button>
+                      ) : null}
+                      {account.status !== 'Закрыт' ? (
+                        <Button variant="secondary" size="sm" onClick={() => handleCloseAccount(account.id)}>
+                          Закрыть счёт
+                        </Button>
+                      ) : null}
+                    </div>
+                  </>
+                )}
+              </article>
+            );
+          })}
         </div>
       )}
     </div>

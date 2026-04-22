@@ -144,6 +144,15 @@ export const SubjectProfilePage = () => {
     setToastMessage('Банковский счёт добавлен');
   };
 
+  const handleUpdateBankAccounts = (bankAccounts: BankAccount[]) => {
+    if (!client) {
+      return;
+    }
+
+    updateClient(client.id, { bankAccounts: [...bankAccounts] });
+    setToastMessage('Банковские реквизиты обновлены');
+  };
+
   if (!client) {
     return (
       <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -685,7 +694,7 @@ export const SubjectProfilePage = () => {
 
         </div>
       ) : activeTab === 'bankAccounts' ? (
-        <SubjectBankAccountsTab client={client} onAddAccount={handleAddBankAccount} />
+        <SubjectBankAccountsTab client={client} onAddAccount={handleAddBankAccount} onUpdateAccounts={handleUpdateBankAccounts} />
       ) : activeTab === 'documents' ? (
         <SubjectDocumentsTab clientId={client.id} />
       ) : activeTab === 'relations' ? (
