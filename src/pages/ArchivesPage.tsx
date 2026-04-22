@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Badge, DataTable, FilterChipSelect } from '../components/ui';
+import { Badge, DataTable, FilterChipSelect, TableControlPanel } from '../components/ui';
 import { archiveRecords, type ArchiveRecord, type ArchiveRecordStatus, type ArchiveType } from '../data/archives';
 
 const typeBadge: Record<ArchiveType, 'info' | 'purple'> = {
@@ -25,28 +25,34 @@ export const ArchivesPage = () => {
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Архивы / ЧС</h1>
-        <FilterChipSelect
-          label="Тип"
-          value={typeFilter}
-          displayValue={typeFilter === 'all' ? 'Все' : typeFilter}
-          onChange={(value) => setTypeFilter(value as ArchiveType | 'all')}
-          options={[
-            { value: 'all', label: 'Все' },
-            { value: 'Архив', label: 'Архив' },
-            { value: 'ЧС', label: 'ЧС' },
-          ]}
-        />
       </header>
+
+      <TableControlPanel
+        search={<div />}
+        filters={
+          <FilterChipSelect
+            label="Тип"
+            value={typeFilter}
+            displayValue={typeFilter === 'all' ? 'Все' : typeFilter}
+            onChange={(value) => setTypeFilter(value as ArchiveType | 'all')}
+            options={[
+              { value: 'all', label: 'Все' },
+              { value: 'Архив', label: 'Архив' },
+              { value: 'ЧС', label: 'ЧС' },
+            ]}
+          />
+        }
+      />
 
       <DataTable<ArchiveRecord>
         columns={[
           { key: 'object', header: 'Объект', className: 'font-medium text-slate-800' },
-          { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
           {
             key: 'type',
             header: 'Тип',
             render: (record) => <Badge variant={typeBadge[record.type]}>{record.type}</Badge>,
           },
+          { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
           {
             key: 'status',
             header: 'Статус',
