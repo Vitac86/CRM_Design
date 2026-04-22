@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
 import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
 import type { TradingMethod, TradingProfile, TradingRiskLevel } from '../data/types';
@@ -25,11 +25,12 @@ const riskBadgeByLevel: Record<TradingRiskLevel, 'success' | 'info' | 'warning' 
 export const TradingPage = () => {
   const navigate = useNavigate();
 
+  const [search, setSearch] = useState('');
   const [qualificationFilter, setQualificationFilter] = useState<BooleanFilter>('all');
   const [podFtFilter, setPodFtFilter] = useState<BooleanFilter>('all');
   const [page, setPage] = useState(1);
 
-  const rows = useMemo<TradingRow[]>(
+  const tradingRows = useMemo<TradingRow[]>(
     () =>
       tradingProfiles.flatMap((profile) => {
         const client = getClientById(profile.clientId);
@@ -50,9 +51,24 @@ export const TradingPage = () => {
     [],
   );
 
+  const normalizedSearch = search.trim().toLowerCase();
+
   const filteredRows = useMemo(
     () =>
-      rows.filter((row) => {
+      tradingRows.filter((row) => {
+        if (normalizedSearch) {
+          const isMatched = [
+            row.clientName,
+            row.clientCode,
+            row.brokerContractNumber,
+            row.accountDisposer.name,
+          ].some((value) => value.toLowerCase().includes(normalizedSearch));
+
+          if (!isMatched) {
+            return false;
+          }
+        }
+
         if (qualificationFilter === 'yes' && !row.qualifiedInvestor) {
           return false;
         }
@@ -71,14 +87,14 @@ export const TradingPage = () => {
 
         return true;
       }),
-    [podFtFilter, qualificationFilter, rows],
+    [normalizedSearch, podFtFilter, qualificationFilter, tradingRows],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
 
   useEffect(() => {
     setPage(1);
-  }, [qualificationFilter, podFtFilter]);
+  }, [search, qualificationFilter, podFtFilter]);
 
   useEffect(() => {
     if (page > totalPages) {
@@ -93,8 +109,10 @@ export const TradingPage = () => {
   }, [filteredRows, page]);
 
   const resetFilters = () => {
+    setSearch('');
     setQualificationFilter('all');
     setPodFtFilter('all');
+    setPage(1);
   };
 
   return (
@@ -104,6 +122,12 @@ export const TradingPage = () => {
       </header>
 
       <FilterBar>
+        <SearchInput
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Поиск по клиенту, коду или договору"
+        />
+
         <SelectFilter
           value={qualificationFilter}
           onChange={(event) => setQualificationFilter(event.target.value as BooleanFilter)}
