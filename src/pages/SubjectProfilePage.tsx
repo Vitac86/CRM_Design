@@ -26,6 +26,7 @@ export const SubjectProfilePage = () => {
   const [draftClient, setDraftClient] = useState<Client | undefined>();
   const [validationError, setValidationError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showAllClientCodes, setShowAllClientCodes] = useState(false);
   const { getClientById, updateClient } = useClientsStore();
 
   const client = useMemo(() => {
@@ -47,6 +48,7 @@ export const SubjectProfilePage = () => {
 
   const handleTabChange = (nextTab: SubjectProfileTab) => {
     setActiveTab(nextTab);
+    setShowAllClientCodes(false);
     if (nextTab !== 'profile' && isEditing) {
       setIsEditing(false);
       setDraftClient(undefined);
@@ -72,6 +74,7 @@ export const SubjectProfilePage = () => {
       bankDetails: { ...client.bankDetails },
     });
     setValidationError(null);
+    setShowAllClientCodes(false);
     setIsEditing(true);
   };
 
@@ -79,6 +82,7 @@ export const SubjectProfilePage = () => {
     setDraftClient(undefined);
     setValidationError(null);
     setIsEditing(false);
+    setShowAllClientCodes(false);
   };
 
   const handleSaveEdit = () => {
@@ -121,6 +125,7 @@ export const SubjectProfilePage = () => {
     setIsEditing(false);
     setDraftClient(undefined);
     setValidationError(null);
+    setShowAllClientCodes(false);
     setToastMessage('Данные клиента сохранены');
   };
 
@@ -136,12 +141,15 @@ export const SubjectProfilePage = () => {
   if (!currentClient) {
     return null;
   }
+  const uniqueClientCodes = Array.from(new Set([currentClient.code, ...(currentClient.clientCodes ?? [])]));
+  const additionalClientCodes = uniqueClientCodes.filter((code) => code !== currentClient.code);
+  const hasExtraClientCodes = (currentClient.clientCodes?.length ?? 0) > 1 && additionalClientCodes.length > 0;
+  const visibleAdditionalCodes = showAllClientCodes ? additionalClientCodes : additionalClientCodes.slice(0, 8);
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <ClientProfileHeader
         client={currentClient}
-        isEditing={isEditing}
         actions={
           isEditing ? (
             <div className="flex items-center gap-2">
@@ -160,12 +168,67 @@ export const SubjectProfilePage = () => {
         }
       />
 
+      {isEditing && activeTab === 'profile' ? (
+        <div className="flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="flex items-start gap-2">
+            <svg viewBox="0 0 20 20" fill="none" className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true">
+              <path
+                d="M12.083 3.125a1.768 1.768 0 012.5 2.5l-7.5 7.5-3.333.833.833-3.333 7.5-7.5z"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path d="M10.417 4.792l4.791 4.791" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            </svg>
+            <div>
+              <p className="font-semibold">Вы редактируете данные клиента</p>
+              <p className="text-amber-800/90">Изменения сохранятся локально после нажатия «Сохранить».</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold uppercase tracking-wide text-amber-800">Режим редактирования</span>
+        </div>
+      ) : null}
+
       <SubjectProfileTabs activeTab={activeTab} onChange={handleTabChange} />
 
       {activeTab === 'profile' ? (
         <div className="space-y-4">
           {validationError ? (
             <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{validationError}</div>
+          ) : null}
+
+          {hasExtraClientCodes ? (
+            <ProfileSection title="Идентификаторы клиента">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm">
+                  <span className="text-slate-500">Основной код</span>
+                  <span className="font-mono font-semibold text-slate-900">{currentClient.code}</span>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Дополнительные коды</p>
+                  <div className="flex flex-wrap gap-2">
+                    {visibleAdditionalCodes.map((code) => (
+                      <span
+                        key={code}
+                        className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-mono text-slate-700"
+                      >
+                        {code}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {additionalClientCodes.length > 8 ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllClientCodes((current) => !current)}
+                    className="text-xs font-medium text-slate-600 transition hover:text-slate-900"
+                  >
+                    {showAllClientCodes ? 'Скрыть' : 'Показать все коды'}
+                  </button>
+                ) : null}
+              </div>
+            </ProfileSection>
           ) : null}
 
           <ProfileSection title="Основные данные">
