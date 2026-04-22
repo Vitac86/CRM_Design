@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clients } from '../data/clients';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
-import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
 import {
   formatClientType,
   formatComplianceStatus,
@@ -23,6 +23,7 @@ export const SubjectsPage = () => {
   const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>('all');
   const [qualificationFilter, setQualificationFilter] = useState<'all' | 'qualified' | 'not-qualified'>('all');
   const [roleFilter, setRoleFilter] = useState<ClientRole | 'all'>('all');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
   const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], []);
@@ -32,6 +33,17 @@ export const SubjectsPage = () => {
   const filteredClients = useMemo(
     () =>
       clients.filter((client) => {
+        const normalizedSearch = search.trim().toLowerCase();
+
+        if (
+          normalizedSearch &&
+          ![client.name, client.code, client.inn, client.email, client.phone].some((value) =>
+            value.toLowerCase().includes(normalizedSearch),
+          )
+        ) {
+          return false;
+        }
+
         if (typeFilter !== 'all' && client.type !== typeFilter) {
           return false;
         }
@@ -58,7 +70,7 @@ export const SubjectsPage = () => {
 
         return true;
       }),
-    [typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
+    [search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredClients.length / pageSize));
@@ -74,6 +86,7 @@ export const SubjectsPage = () => {
   }, [page, totalPages]);
 
   const resetFilters = () => {
+    setSearch('');
     setTypeFilter('all');
     setResidencyFilter('all');
     setComplianceFilter('all');
@@ -81,6 +94,10 @@ export const SubjectsPage = () => {
     setRoleFilter('all');
     setPage(1);
   };
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -92,6 +109,13 @@ export const SubjectsPage = () => {
       </header>
 
       <FilterBar>
+        <SearchInput
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Поиск по клиенту, коду, ИНН или email"
+          className="w-full min-w-[220px] sm:w-72"
+        />
+
         <SelectFilter value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}>
           <option value="all">Типы</option>
           {typeOptions.map((type) => (

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
 import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
 import type { TradingMethod, TradingProfile, TradingRiskLevel } from '../data/types';
@@ -27,6 +27,7 @@ export const TradingPage = () => {
 
   const [qualificationFilter, setQualificationFilter] = useState<BooleanFilter>('all');
   const [podFtFilter, setPodFtFilter] = useState<BooleanFilter>('all');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
   const rows = useMemo<TradingRow[]>(
@@ -53,6 +54,17 @@ export const TradingPage = () => {
   const filteredRows = useMemo(
     () =>
       rows.filter((row) => {
+        const normalizedSearch = search.trim().toLowerCase();
+
+        if (
+          normalizedSearch &&
+          ![row.clientName, row.clientCode, row.brokerContractNumber, row.accountDisposer.name].some((value) =>
+            value.toLowerCase().includes(normalizedSearch),
+          )
+        ) {
+          return false;
+        }
+
         if (qualificationFilter === 'yes' && !row.qualifiedInvestor) {
           return false;
         }
@@ -71,14 +83,14 @@ export const TradingPage = () => {
 
         return true;
       }),
-    [podFtFilter, qualificationFilter, rows],
+    [podFtFilter, qualificationFilter, rows, search],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
 
   useEffect(() => {
     setPage(1);
-  }, [qualificationFilter, podFtFilter]);
+  }, [qualificationFilter, podFtFilter, search]);
 
   useEffect(() => {
     if (page > totalPages) {
@@ -93,8 +105,10 @@ export const TradingPage = () => {
   }, [filteredRows, page]);
 
   const resetFilters = () => {
+    setSearch('');
     setQualificationFilter('all');
     setPodFtFilter('all');
+    setPage(1);
   };
 
   return (
@@ -104,6 +118,13 @@ export const TradingPage = () => {
       </header>
 
       <FilterBar>
+        <SearchInput
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Поиск по клиенту, коду или договору"
+          className="w-full min-w-[220px] sm:w-72"
+        />
+
         <SelectFilter
           value={qualificationFilter}
           onChange={(event) => setQualificationFilter(event.target.value as BooleanFilter)}
