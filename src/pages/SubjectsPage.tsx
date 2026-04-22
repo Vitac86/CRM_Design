@@ -2,7 +2,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clients } from '../data/clients';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
-import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter } from '../components/ui';
+import {
+  ActiveFilterChip,
+  Badge,
+  Button,
+  DataTable,
+  FilterChipSelect,
+  Pagination,
+  SearchInput,
+  TableControlPanel,
+  type SortDirection,
+} from '../components/ui';
 import {
   formatClientType,
   formatComplianceStatus,
@@ -15,6 +25,8 @@ import {
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
 const pageSize = 10;
 
+type SubjectsSortKey = 'code' | 'name' | 'inn' | 'type' | 'residency' | 'complianceStatus' | 'fullDocumentSet';
+
 export const SubjectsPage = () => {
   const navigate = useNavigate();
 
@@ -25,6 +37,8 @@ export const SubjectsPage = () => {
   const [roleFilter, setRoleFilter] = useState<ClientRole | 'all'>('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [sortKey, setSortKey] = useState<SubjectsSortKey>('code');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], []);
   const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], []);
@@ -73,10 +87,29 @@ export const SubjectsPage = () => {
     [search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredClients.length / pageSize));
+  const sortedClients = useMemo(() => {
+    const list = [...filteredClients];
+
+    list.sort((a, b) => {
+      const direction = sortDirection === 'asc' ? 1 : -1;
+
+      if (sortKey === 'fullDocumentSet') {
+        return (Number(a.fullDocumentSet) - Number(b.fullDocumentSet)) * direction;
+      }
+
+      const left = String(a[sortKey]);
+      const right = String(b[sortKey]);
+
+      return left.localeCompare(right, 'ru') * direction;
+    });
+
+    return list;
+  }, [filteredClients, sortDirection, sortKey]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedClients.length / pageSize));
   const paginatedClients = useMemo(
-    () => filteredClients.slice((page - 1) * pageSize, page * pageSize),
-    [filteredClients, page],
+    () => sortedClients.slice((page - 1) * pageSize, page * pageSize),
+    [sortedClients, page],
   );
 
   useEffect(() => {
@@ -84,6 +117,21 @@ export const SubjectsPage = () => {
       setPage(1);
     }
   }, [page, totalPages]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter]);
+
+  const handleSort = (nextSortKey: string) => {
+    if (nextSortKey === sortKey) {
+      setSortDirection((currentDirection) => (currentDirection === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(nextSortKey as SubjectsSortKey);
+      setSortDirection('asc');
+    }
+
+    setPage(1);
+  };
 
   const resetFilters = () => {
     setSearch('');
@@ -95,9 +143,19 @@ export const SubjectsPage = () => {
     setPage(1);
   };
 
-  useEffect(() => {
-    setPage(1);
-  }, [search]);
+  const hasActiveConditions =
+    search.trim().length > 0 ||
+    typeFilter !== 'all' ||
+    residencyFilter !== 'all' ||
+    complianceFilter !== 'all' ||
+    qualificationFilter !== 'all' ||
+    roleFilter !== 'all';
+
+  const qualificationLabelByValue: Record<'all' | 'qualified' | 'not-qualified', string> = {
+    all: 'Все',
+    qualified: 'Квалифицированный',
+    'not-qualified': 'Неквалифицированный',
+  };
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -108,92 +166,128 @@ export const SubjectsPage = () => {
         </Button>
       </header>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <SearchInput
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Поиск по клиенту, коду, ИНН или email"
-          className="w-full"
-        />
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <SelectFilter
-            value={typeFilter}
-            onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}
-          >
-            <option value="all">Типы</option>
-            {typeOptions.map((type) => (
-              <option key={type} value={type}>
-                {formatClientType(type)}
-              </option>
-            ))}
-          </SelectFilter>
+      <TableControlPanel
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по клиенту, коду, ИНН или email"
+            className="w-full"
+          />
+        }
+        filters={
+          <>
+            <FilterChipSelect
+              label="Тип"
+              value={typeFilter}
+              displayValue={typeFilter === 'all' ? 'Все' : formatClientType(typeFilter)}
+              onChange={(value) => setTypeFilter(value as ClientType | 'all')}
+              active={typeFilter !== 'all'}
+              options={[{ value: 'all', label: 'Все' }, ...typeOptions.map((type) => ({ value: type, label: formatClientType(type) }))]}
+            />
 
-          <SelectFilter
-            value={residencyFilter}
-            onChange={(event) => setResidencyFilter(event.target.value as ResidencyStatus | 'all')}
-          >
-            <option value="all">Признак резидентства</option>
-            {residencyOptions.map((residency) => (
-              <option key={residency} value={residency}>
-                {formatResidency(residency)}
-              </option>
-            ))}
-          </SelectFilter>
+            <FilterChipSelect
+              label="Резидентство"
+              value={residencyFilter}
+              displayValue={residencyFilter === 'all' ? 'Все' : formatResidency(residencyFilter)}
+              onChange={(value) => setResidencyFilter(value as ResidencyStatus | 'all')}
+              active={residencyFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                ...residencyOptions.map((residency) => ({ value: residency, label: formatResidency(residency) })),
+              ]}
+            />
 
-          <SelectFilter
-            value={complianceFilter}
-            onChange={(event) => setComplianceFilter(event.target.value as ComplianceStatus | 'all')}
-          >
-            <option value="all">Статус комплаенса</option>
-            {complianceOptions.map((status) => (
-              <option key={status} value={status}>
-                {formatComplianceStatus(status)}
-              </option>
-            ))}
-          </SelectFilter>
+            <FilterChipSelect
+              label="Комплаенс"
+              value={complianceFilter}
+              displayValue={complianceFilter === 'all' ? 'Все' : formatComplianceStatus(complianceFilter)}
+              onChange={(value) => setComplianceFilter(value as ComplianceStatus | 'all')}
+              active={complianceFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                ...complianceOptions.map((status) => ({ value: status, label: formatComplianceStatus(status) })),
+              ]}
+            />
 
-          <SelectFilter
-            value={roleFilter}
-            onChange={(event) => setRoleFilter(event.target.value as ClientRole | 'all')}
-          >
-            <option value="all">Роли</option>
-            {allRoles.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </SelectFilter>
+            <FilterChipSelect
+              label="Роль"
+              value={roleFilter}
+              displayValue={roleFilter === 'all' ? 'Все' : roleFilter}
+              onChange={(value) => setRoleFilter(value as ClientRole | 'all')}
+              active={roleFilter !== 'all'}
+              options={[{ value: 'all', label: 'Все' }, ...allRoles.map((role) => ({ value: role, label: role }))]}
+            />
 
-          <SelectFilter
-            value={qualificationFilter}
-            onChange={(event) =>
-              setQualificationFilter(event.target.value as 'all' | 'qualified' | 'not-qualified')
-            }
-          >
-            <option value="all">Квалификация</option>
-            <option value="qualified">Квалифицированный</option>
-            <option value="not-qualified">Неквалифицированный</option>
-          </SelectFilter>
-
-          <Button variant="secondary" onClick={resetFilters}>
-            Очистить фильтры
-          </Button>
-        </div>
-      </div>
+            <FilterChipSelect
+              label="Квалификация"
+              value={qualificationFilter}
+              displayValue={qualificationLabelByValue[qualificationFilter]}
+              onChange={(value) => setQualificationFilter(value as 'all' | 'qualified' | 'not-qualified')}
+              active={qualificationFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                { value: 'qualified', label: 'Квалифицированный' },
+                { value: 'not-qualified', label: 'Неквалифицированный' },
+              ]}
+            />
+          </>
+        }
+        activeFilters={
+          hasActiveConditions ? (
+            <div className="space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Активно</div>
+              <div className="flex flex-wrap items-center gap-2">
+                {search.trim() ? <ActiveFilterChip label="Поиск" value={search.trim()} onRemove={() => setSearch('')} /> : null}
+                {typeFilter !== 'all' ? (
+                  <ActiveFilterChip label="Тип" value={formatClientType(typeFilter)} onRemove={() => setTypeFilter('all')} />
+                ) : null}
+                {residencyFilter !== 'all' ? (
+                  <ActiveFilterChip
+                    label="Резидентство"
+                    value={formatResidency(residencyFilter)}
+                    onRemove={() => setResidencyFilter('all')}
+                  />
+                ) : null}
+                {complianceFilter !== 'all' ? (
+                  <ActiveFilterChip
+                    label="Комплаенс"
+                    value={formatComplianceStatus(complianceFilter)}
+                    onRemove={() => setComplianceFilter('all')}
+                  />
+                ) : null}
+                {roleFilter !== 'all' ? <ActiveFilterChip label="Роль" value={roleFilter} onRemove={() => setRoleFilter('all')} /> : null}
+                {qualificationFilter !== 'all' ? (
+                  <ActiveFilterChip
+                    label="Квалификация"
+                    value={qualificationLabelByValue[qualificationFilter]}
+                    onRemove={() => setQualificationFilter('all')}
+                  />
+                ) : null}
+                <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto">
+                  Сбросить всё
+                </Button>
+              </div>
+            </div>
+          ) : null
+        }
+      />
 
       <DataTable<Client>
         columns={[
-          { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800' },
-          { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]' },
-          { key: 'inn', header: 'ИНН' },
+          { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800', sortable: true },
+          { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]', sortable: true },
+          { key: 'inn', header: 'ИНН', sortable: true },
           {
             key: 'type',
             header: 'Тип',
+            sortable: true,
             render: (client) => <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>,
           },
           {
             key: 'residency',
             header: 'Резидент',
+            sortable: true,
             render: (client) => (
               <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
             ),
@@ -201,6 +295,7 @@ export const SubjectsPage = () => {
           {
             key: 'complianceStatus',
             header: 'Статус комплаенса',
+            sortable: true,
             render: (client) => (
               <Badge variant={getComplianceBadgeVariant(client.complianceStatus)}>
                 {formatComplianceStatus(client.complianceStatus)}
@@ -210,10 +305,9 @@ export const SubjectsPage = () => {
           {
             key: 'fullDocumentSet',
             header: 'Полный комплект',
+            sortable: true,
             render: (client) => (
-              <Badge variant={client.fullDocumentSet ? 'success' : 'warning'}>
-                {client.fullDocumentSet ? 'Да' : 'Нет'}
-              </Badge>
+              <Badge variant={client.fullDocumentSet ? 'success' : 'warning'}>{client.fullDocumentSet ? 'Да' : 'Нет'}</Badge>
             ),
           },
         ]}
@@ -221,6 +315,9 @@ export const SubjectsPage = () => {
         emptyMessage="По выбранным фильтрам данных нет"
         rowClassName={() => 'cursor-pointer'}
         onRowClick={(client) => navigate(`/subjects/${client.id}`)}
+        sortKey={sortKey}
+        sortDirection={sortDirection}
+        onSortChange={handleSort}
       />
 
       <div className="flex justify-end">

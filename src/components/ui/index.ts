@@ -9,3 +9,6 @@ export * from './SearchInput';
 export * from './SelectFilter';
 export * from './Tabs';
 export * from './statusBadge';
+export * from './ActiveFilterChip';
+export * from './FilterChipSelect';
+export * from './TableControlPanel';
