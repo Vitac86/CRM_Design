@@ -19,7 +19,9 @@ export const tradingProfiles: TradingProfile[] = [
     tradingMethods: ['QUIK', 'Голос'],
     authorityUntil: '19.02.2026',
     tradingStatus: 'Активен',
-    codeWordMasked: '••••••••',
+    amlStatus: 'ЗАМОРОЖЕН',
+    amlFreezeReason: 'По просьбе клиента',
+    codeWord: 'Ленинский',
     orderMethods: [
       {
         id: 'om-001-quik',
@@ -88,7 +90,9 @@ export const tradingProfiles: TradingProfile[] = [
     tradingMethods: ['QUIK'],
     authorityUntil: '22.02.2026',
     tradingStatus: 'Активен',
-    codeWordMasked: '••••••••',
+    amlStatus: 'АКТИВЕН',
+    amlFreezeReason: 'Ограничения отсутствуют',
+    codeWord: 'Нева',
     orderMethods: [
       {
         id: 'om-002-quik',
@@ -151,7 +155,9 @@ export const tradingProfiles: TradingProfile[] = [
     tradingMethods: ['QUIK', 'Голос'],
     authorityUntil: '18.02.2026',
     tradingStatus: 'Активен',
-    codeWordMasked: '••••••••',
+    amlStatus: 'НА ПРОВЕРКЕ',
+    amlFreezeReason: 'Плановый мониторинг операций',
+    codeWord: 'Орион',
     orderMethods: [
       {
         id: 'om-003-quik',
@@ -220,7 +226,9 @@ export const tradingProfiles: TradingProfile[] = [
     tradingMethods: ['QUIK'],
     authorityUntil: '25.02.2026',
     tradingStatus: 'Активен',
-    codeWordMasked: '••••••••',
+    amlStatus: 'АКТИВЕН',
+    amlFreezeReason: 'Ограничения отсутствуют',
+    codeWord: 'Балтика',
     orderMethods: [
       {
         id: 'om-004-quik',
@@ -283,7 +291,9 @@ export const tradingProfiles: TradingProfile[] = [
     tradingMethods: ['QUIK', 'Голос'],
     authorityUntil: '20.02.2026',
     tradingStatus: 'Активен',
-    codeWordMasked: '••••••••',
+    amlStatus: 'ЗАМОРОЖЕН',
+    amlFreezeReason: 'Временная блокировка до уточнения реквизитов',
+    codeWord: 'Волга',
     orderMethods: [
       {
         id: 'om-005-quik',
@@ -352,7 +362,9 @@ export const tradingProfiles: TradingProfile[] = [
     tradingMethods: ['QUIK'],
     authorityUntil: '19.02.2026',
     tradingStatus: 'Истёк',
-    codeWordMasked: '••••••••',
+    amlStatus: 'НА ПРОВЕРКЕ',
+    amlFreezeReason: 'Проверка источника происхождения средств',
+    codeWord: 'Север',
     orderMethods: [
       {
         id: 'om-006-quik',
