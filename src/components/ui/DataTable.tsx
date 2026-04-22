@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react';
 import { cn } from './cn';
 
+export type SortDirection = 'asc' | 'desc';
+
 export type DataTableColumn<T> = {
   key: keyof T | string;
   header: ReactNode;
   className?: string;
   headerClassName?: string;
   render?: (row: T, rowIndex: number) => ReactNode;
+  sortable?: boolean;
+  sortKey?: string;
 };
 
 type DataTableProps<T extends { id?: string | number }> = {
@@ -16,6 +20,30 @@ type DataTableProps<T extends { id?: string | number }> = {
   getRowKey?: (row: T, rowIndex: number) => string | number;
   emptyMessage?: string;
   onRowClick?: (row: T, rowIndex: number) => void;
+  sortKey?: string | null;
+  sortDirection?: SortDirection | null;
+  onSortChange?: (sortKey: string) => void;
+};
+
+const SortIcon = ({ active, direction }: { active: boolean; direction: SortDirection | null | undefined }) => {
+  if (!active || !direction) {
+    return (
+      <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M6 8L10 4L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6 12L10 16L14 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  return direction === 'asc' ? (
+    <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M6 12L10 8L14 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 };
 
 export const DataTable = <T extends { id?: string | number }>({
@@ -25,20 +53,43 @@ export const DataTable = <T extends { id?: string | number }>({
   getRowKey,
   emptyMessage = 'Нет данных',
   onRowClick,
+  sortKey,
+  sortDirection,
+  onSortChange,
 }: DataTableProps<T>) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
       <table className="min-w-full text-left text-sm text-slate-700">
         <thead className="bg-brand-light/70">
           <tr>
-            {columns.map((column) => (
-              <th
-                key={String(column.key)}
-                className={cn('px-4 py-3 text-xs font-semibold uppercase tracking-wide text-brand-dark', column.headerClassName)}
-              >
-                {column.header}
-              </th>
-            ))}
+            {columns.map((column) => {
+              const currentSortKey = column.sortKey ?? String(column.key);
+              const isSortable = Boolean(column.sortable && onSortChange);
+              const isActiveSort = isSortable && sortKey === currentSortKey;
+
+              return (
+                <th
+                  key={String(column.key)}
+                  className={cn('px-4 py-3 text-xs font-semibold uppercase tracking-wide text-brand-dark', column.headerClassName)}
+                >
+                  {isSortable ? (
+                    <button
+                      type="button"
+                      onClick={() => onSortChange?.(currentSortKey)}
+                      className={cn(
+                        'inline-flex items-center gap-1.5 rounded-sm transition-colors cursor-pointer hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20',
+                        isActiveSort ? 'text-brand-dark' : 'text-brand-dark/80',
+                      )}
+                    >
+                      <span>{column.header}</span>
+                      <SortIcon active={isActiveSort} direction={sortDirection} />
+                    </button>
+                  ) : (
+                    column.header
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
 

@@ -1,9 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter } from '../components/ui';
+import {
+  ActiveFilterChip,
+  Badge,
+  Button,
+  DataTable,
+  FilterChipSelect,
+  Pagination,
+  SearchInput,
+  TableControlPanel,
+  type SortDirection,
+} from '../components/ui';
 import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
-import type { TradingMethod, TradingProfile, TradingRiskLevel } from '../data/types';
+import type { TradingMethod, TradingProfile, TradingRiskLevel, TradingStatus } from '../data/types';
 
 type BooleanFilter = 'all' | 'yes' | 'no';
 
@@ -11,7 +21,18 @@ type TradingRow = TradingProfile & {
   podFt: boolean;
   clientCode: string;
   clientName: string;
+  accountDisposerName: string;
 };
+
+type TradingSortKey =
+  | 'clientName'
+  | 'clientCode'
+  | 'investorStatus'
+  | 'riskLevel'
+  | 'brokerContractNumber'
+  | 'accountDisposerName'
+  | 'authorityUntil'
+  | 'tradingStatus';
 
 const PAGE_SIZE = 10;
 
@@ -22,6 +43,33 @@ const riskBadgeByLevel: Record<TradingRiskLevel, 'success' | 'info' | 'warning' 
   Особый: 'orange',
 };
 
+const riskOrder: Record<TradingRiskLevel, number> = {
+  Стандартный: 0,
+  Начальный: 1,
+  Повышенный: 2,
+  Особый: 3,
+};
+
+const tradingStatusOrder: Record<TradingStatus, number> = {
+  Активен: 0,
+  Истёк: 1,
+};
+
+const investorOrder: Record<'Квал' | 'Неквал', number> = {
+  Неквал: 0,
+  Квал: 1,
+};
+
+const parseRuDate = (value: string) => {
+  const [day, month, year] = value.split('.').map(Number);
+
+  if (!day || !month || !year) {
+    return Number.NaN;
+  }
+
+  return new Date(year, month - 1, day).getTime();
+};
+
 export const TradingPage = () => {
   const navigate = useNavigate();
 
@@ -29,6 +77,8 @@ export const TradingPage = () => {
   const [podFtFilter, setPodFtFilter] = useState<BooleanFilter>('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [sortKey, setSortKey] = useState<TradingSortKey>('clientName');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const rows = useMemo<TradingRow[]>(
     () =>
@@ -46,6 +96,7 @@ export const TradingPage = () => {
           podFt,
           clientCode: client.code,
           clientName: client.name,
+          accountDisposerName: profile.accountDisposer.name,
         };
       }),
     [],
@@ -86,7 +137,39 @@ export const TradingPage = () => {
     [podFtFilter, qualificationFilter, rows, search],
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const sortedRows = useMemo(() => {
+    const list = [...filteredRows];
+    const direction = sortDirection === 'asc' ? 1 : -1;
+
+    list.sort((a, b) => {
+      switch (sortKey) {
+        case 'riskLevel':
+          return (riskOrder[a.riskLevel] - riskOrder[b.riskLevel]) * direction;
+        case 'tradingStatus':
+          return (tradingStatusOrder[a.tradingStatus] - tradingStatusOrder[b.tradingStatus]) * direction;
+        case 'investorStatus':
+          return (investorOrder[a.investorStatus] - investorOrder[b.investorStatus]) * direction;
+        case 'authorityUntil': {
+          const leftDate = parseRuDate(a.authorityUntil);
+          const rightDate = parseRuDate(b.authorityUntil);
+
+          if (!Number.isNaN(leftDate) && !Number.isNaN(rightDate)) {
+            return (leftDate - rightDate) * direction;
+          }
+
+          return a.authorityUntil.localeCompare(b.authorityUntil, 'ru') * direction;
+        }
+        case 'accountDisposerName':
+          return a.accountDisposer.name.localeCompare(b.accountDisposer.name, 'ru') * direction;
+        default:
+          return String(a[sortKey]).localeCompare(String(b[sortKey]), 'ru') * direction;
+      }
+    });
+
+    return list;
+  }, [filteredRows, sortDirection, sortKey]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
 
   useEffect(() => {
     setPage(1);
@@ -101,8 +184,8 @@ export const TradingPage = () => {
   const paginatedRows = useMemo(() => {
     const startIndex = (page - 1) * PAGE_SIZE;
 
-    return filteredRows.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [filteredRows, page]);
+    return sortedRows.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [sortedRows, page]);
 
   const resetFilters = () => {
     setSearch('');
@@ -111,64 +194,115 @@ export const TradingPage = () => {
     setPage(1);
   };
 
+  const handleSort = (nextSortKey: string) => {
+    if (nextSortKey === sortKey) {
+      setSortDirection((currentDirection) => (currentDirection === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(nextSortKey as TradingSortKey);
+      setSortDirection('asc');
+    }
+
+    setPage(1);
+  };
+
+  const hasActiveConditions = search.trim().length > 0 || qualificationFilter !== 'all' || podFtFilter !== 'all';
+
+  const qualificationLabel = qualificationFilter === 'all' ? 'Все' : qualificationFilter === 'yes' ? 'Да' : 'Нет';
+  const podFtLabel = podFtFilter === 'all' ? 'Все' : podFtFilter === 'yes' ? 'Да' : 'Нет';
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header>
         <h1 className="text-2xl font-semibold text-slate-900">Трейдинг</h1>
       </header>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <SearchInput
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Поиск по клиенту, коду или договору"
-          className="w-full"
-        />
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <SelectFilter
-            value={qualificationFilter}
-            onChange={(event) => setQualificationFilter(event.target.value as BooleanFilter)}
-          >
-            <option value="all">Квалификация</option>
-            <option value="yes">Да</option>
-            <option value="no">Нет</option>
-          </SelectFilter>
+      <TableControlPanel
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по клиенту, коду, договору или распорядителю"
+            className="w-full"
+          />
+        }
+        filters={
+          <>
+            <FilterChipSelect
+              label="Квалификация"
+              value={qualificationFilter}
+              displayValue={qualificationLabel}
+              onChange={(value) => setQualificationFilter(value as BooleanFilter)}
+              active={qualificationFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                { value: 'yes', label: 'Да' },
+                { value: 'no', label: 'Нет' },
+              ]}
+            />
 
-          <SelectFilter value={podFtFilter} onChange={(event) => setPodFtFilter(event.target.value as BooleanFilter)}>
-            <option value="all">ПОД / ФТ</option>
-            <option value="yes">Да</option>
-            <option value="no">Нет</option>
-          </SelectFilter>
-
-          <Button variant="secondary" onClick={resetFilters}>
-            Очистить фильтры
-          </Button>
-        </div>
-      </div>
+            <FilterChipSelect
+              label="ПОД / ФТ"
+              value={podFtFilter}
+              displayValue={podFtLabel}
+              onChange={(value) => setPodFtFilter(value as BooleanFilter)}
+              active={podFtFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                { value: 'yes', label: 'Да' },
+                { value: 'no', label: 'Нет' },
+              ]}
+            />
+          </>
+        }
+        activeFilters={
+          hasActiveConditions ? (
+            <div className="space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Активно</div>
+              <div className="flex flex-wrap items-center gap-2">
+                {search.trim() ? <ActiveFilterChip label="Поиск" value={search.trim()} onRemove={() => setSearch('')} /> : null}
+                {qualificationFilter !== 'all' ? (
+                  <ActiveFilterChip label="Квалификация" value={qualificationLabel} onRemove={() => setQualificationFilter('all')} />
+                ) : null}
+                {podFtFilter !== 'all' ? (
+                  <ActiveFilterChip label="ПОД / ФТ" value={podFtLabel} onRemove={() => setPodFtFilter('all')} />
+                ) : null}
+                <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto">
+                  Сбросить всё
+                </Button>
+              </div>
+            </div>
+          ) : null
+        }
+      />
 
       <DataTable<TradingRow>
         columns={[
-          { key: 'clientName', header: 'Клиент', className: 'min-w-[240px] max-w-[300px] truncate' },
-          { key: 'clientCode', header: 'Код', className: 'font-medium text-slate-800 whitespace-nowrap' },
+          { key: 'clientName', header: 'Клиент', className: 'min-w-[240px] max-w-[300px] truncate', sortable: true },
+          { key: 'clientCode', header: 'Код', className: 'font-medium text-slate-800 whitespace-nowrap', sortable: true },
           {
             key: 'investorStatus',
             header: 'Инвестор',
+            sortable: true,
             render: (row) => <Badge variant={row.investorStatus === 'Квал' ? 'brand' : 'neutral'}>{row.investorStatus}</Badge>,
           },
           {
             key: 'riskLevel',
             header: 'Риск',
+            sortable: true,
             render: (row) => <Badge variant={riskBadgeByLevel[row.riskLevel]}>{row.riskLevel}</Badge>,
           },
           {
             key: 'brokerContractNumber',
             header: 'Договор',
             className: 'whitespace-nowrap',
+            sortable: true,
           },
           {
             key: 'accountDisposer',
+            sortKey: 'accountDisposerName',
             header: 'Распорядитель',
             className: 'whitespace-nowrap',
+            sortable: true,
             render: (row) => row.accountDisposer.name,
           },
           {
@@ -189,16 +323,21 @@ export const TradingPage = () => {
             key: 'authorityUntil',
             header: 'Полномочия до',
             className: 'whitespace-nowrap',
+            sortable: true,
           },
           {
             key: 'tradingStatus',
             header: 'Статус',
+            sortable: true,
             render: (row) => <Badge variant={row.tradingStatus === 'Активен' ? 'success' : 'danger'}>{row.tradingStatus}</Badge>,
           },
         ]}
         rows={paginatedRows}
         emptyMessage="По выбранным фильтрам данных нет"
         onRowClick={(row) => navigate(`/trading/${row.clientId}`)}
+        sortKey={sortKey}
+        sortDirection={sortDirection}
+        onSortChange={handleSort}
       />
 
       <Pagination
