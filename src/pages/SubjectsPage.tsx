@@ -84,8 +84,11 @@ export const SubjectsPage = () => {
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <header>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold text-slate-900">Субъекты</h1>
+        <Button className="w-full sm:w-auto" onClick={() => navigate('/subjects/register')}>
+          + Добавить
+        </Button>
       </header>
 
       <FilterBar>
@@ -145,7 +148,6 @@ export const SubjectsPage = () => {
         <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
           Очистить фильтры
         </Button>
-        <Button onClick={() => navigate('/subjects/register')}>+ Добавить</Button>
       </FilterBar>
 
       <DataTable<Client>
