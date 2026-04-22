@@ -48,6 +48,21 @@ export interface ClientRegistrationAddress {
   apartment: string;
 }
 
+
+export type BankAccountStatus = 'Активен' | 'Закрыт' | 'На проверке';
+
+export type BankAccount = {
+  id: string;
+  bankName: string;
+  bik: string;
+  accountNumber: string;
+  correspondentAccount: string;
+  currency: 'RUB' | 'USD' | 'EUR' | 'CNY';
+  purpose: string;
+  status: BankAccountStatus;
+  openedAt: string;
+};
+
 export interface ClientBankDetails {
   bankName: string;
   bik: string;
@@ -86,6 +101,7 @@ export interface Client {
   reportDelivery: ClientReportDelivery;
   registrationAddress: ClientRegistrationAddress;
   bankDetails: ClientBankDetails;
+  bankAccounts?: BankAccount[];
 }
 
 export interface Document {

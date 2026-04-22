@@ -23,6 +23,7 @@ const cloneClient = (client: Client): Client => ({
   },
   registrationAddress: { ...client.registrationAddress },
   bankDetails: { ...client.bankDetails },
+  bankAccounts: client.bankAccounts ? client.bankAccounts.map((account) => ({ ...account })) : undefined,
 });
 
 export const ClientsProvider = ({ children }: { children: ReactNode }) => {
