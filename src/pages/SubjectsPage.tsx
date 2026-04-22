@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clients } from '../data/clients';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
-import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter } from '../components/ui';
 import {
   formatClientType,
   formatComplianceStatus,
@@ -108,71 +108,78 @@ export const SubjectsPage = () => {
         </Button>
       </header>
 
-      <FilterBar>
+      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <SearchInput
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Поиск по клиенту, коду, ИНН или email"
-          className="w-full min-w-[220px] sm:w-72"
+          className="w-full"
         />
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <SelectFilter
+            value={typeFilter}
+            onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}
+          >
+            <option value="all">Типы</option>
+            {typeOptions.map((type) => (
+              <option key={type} value={type}>
+                {formatClientType(type)}
+              </option>
+            ))}
+          </SelectFilter>
 
-        <SelectFilter value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}>
-          <option value="all">Типы</option>
-          {typeOptions.map((type) => (
-            <option key={type} value={type}>
-              {formatClientType(type)}
-            </option>
-          ))}
-        </SelectFilter>
+          <SelectFilter
+            value={residencyFilter}
+            onChange={(event) => setResidencyFilter(event.target.value as ResidencyStatus | 'all')}
+          >
+            <option value="all">Признак резидентства</option>
+            {residencyOptions.map((residency) => (
+              <option key={residency} value={residency}>
+                {formatResidency(residency)}
+              </option>
+            ))}
+          </SelectFilter>
 
-        <SelectFilter
-          value={residencyFilter}
-          onChange={(event) => setResidencyFilter(event.target.value as ResidencyStatus | 'all')}
-        >
-          <option value="all">Признак резидентства</option>
-          {residencyOptions.map((residency) => (
-            <option key={residency} value={residency}>
-              {formatResidency(residency)}
-            </option>
-          ))}
-        </SelectFilter>
+          <SelectFilter
+            value={complianceFilter}
+            onChange={(event) => setComplianceFilter(event.target.value as ComplianceStatus | 'all')}
+          >
+            <option value="all">Статус комплаенса</option>
+            {complianceOptions.map((status) => (
+              <option key={status} value={status}>
+                {formatComplianceStatus(status)}
+              </option>
+            ))}
+          </SelectFilter>
 
-        <SelectFilter
-          value={complianceFilter}
-          onChange={(event) => setComplianceFilter(event.target.value as ComplianceStatus | 'all')}
-        >
-          <option value="all">Статус комплаенса</option>
-          {complianceOptions.map((status) => (
-            <option key={status} value={status}>
-              {formatComplianceStatus(status)}
-            </option>
-          ))}
-        </SelectFilter>
+          <SelectFilter
+            value={roleFilter}
+            onChange={(event) => setRoleFilter(event.target.value as ClientRole | 'all')}
+          >
+            <option value="all">Роли</option>
+            {allRoles.map((role) => (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            ))}
+          </SelectFilter>
 
-        <SelectFilter value={roleFilter} onChange={(event) => setRoleFilter(event.target.value as ClientRole | 'all')}>
-          <option value="all">Роли</option>
-          {allRoles.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
-          ))}
-        </SelectFilter>
+          <SelectFilter
+            value={qualificationFilter}
+            onChange={(event) =>
+              setQualificationFilter(event.target.value as 'all' | 'qualified' | 'not-qualified')
+            }
+          >
+            <option value="all">Квалификация</option>
+            <option value="qualified">Квалифицированный</option>
+            <option value="not-qualified">Неквалифицированный</option>
+          </SelectFilter>
 
-        <SelectFilter
-          value={qualificationFilter}
-          onChange={(event) =>
-            setQualificationFilter(event.target.value as 'all' | 'qualified' | 'not-qualified')
-          }
-        >
-          <option value="all">Квалификация</option>
-          <option value="qualified">Квалифицированный</option>
-          <option value="not-qualified">Неквалифицированный</option>
-        </SelectFilter>
-
-        <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
-          Очистить фильтры
-        </Button>
-      </FilterBar>
+          <Button variant="secondary" onClick={resetFilters}>
+            Очистить фильтры
+          </Button>
+        </div>
+      </div>
 
       <DataTable<Client>
         columns={[

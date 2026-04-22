@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter } from '../components/ui';
 import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
 import type { TradingMethod, TradingProfile, TradingRiskLevel } from '../data/types';
@@ -117,33 +117,34 @@ export const TradingPage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Трейдинг</h1>
       </header>
 
-      <FilterBar>
+      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <SearchInput
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Поиск по клиенту, коду или договору"
-          className="w-full min-w-[220px] sm:w-72"
+          className="w-full"
         />
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <SelectFilter
+            value={qualificationFilter}
+            onChange={(event) => setQualificationFilter(event.target.value as BooleanFilter)}
+          >
+            <option value="all">Квалификация</option>
+            <option value="yes">Да</option>
+            <option value="no">Нет</option>
+          </SelectFilter>
 
-        <SelectFilter
-          value={qualificationFilter}
-          onChange={(event) => setQualificationFilter(event.target.value as BooleanFilter)}
-        >
-          <option value="all">Квалификация</option>
-          <option value="yes">Да</option>
-          <option value="no">Нет</option>
-        </SelectFilter>
+          <SelectFilter value={podFtFilter} onChange={(event) => setPodFtFilter(event.target.value as BooleanFilter)}>
+            <option value="all">ПОД / ФТ</option>
+            <option value="yes">Да</option>
+            <option value="no">Нет</option>
+          </SelectFilter>
 
-        <SelectFilter value={podFtFilter} onChange={(event) => setPodFtFilter(event.target.value as BooleanFilter)}>
-          <option value="all">ПОД / ФТ</option>
-          <option value="yes">Да</option>
-          <option value="no">Нет</option>
-        </SelectFilter>
-
-        <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
-          Очистить фильтры
-        </Button>
-      </FilterBar>
+          <Button variant="secondary" onClick={resetFilters}>
+            Очистить фильтры
+          </Button>
+        </div>
+      </div>
 
       <DataTable<TradingRow>
         columns={[
