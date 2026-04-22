@@ -14,3 +14,4 @@ export * from './FilterChipSelect';
 export * from './TableControlPanel';
 export * from './FormField';
 export * from './BooleanSelect';
+export * from './PageSizeSelector';

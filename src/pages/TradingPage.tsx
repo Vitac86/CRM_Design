@@ -6,6 +6,7 @@ import {
   Button,
   DataTable,
   FilterChipSelect,
+  PageSizeSelector,
   Pagination,
   SearchInput,
   TableControlPanel,
@@ -33,8 +34,6 @@ type TradingSortKey =
   | 'accountDisposerName'
   | 'authorityUntil'
   | 'tradingStatus';
-
-const PAGE_SIZE = 10;
 
 const riskBadgeByLevel: Record<TradingRiskLevel, 'success' | 'info' | 'warning' | 'orange'> = {
   Стандартный: 'success',
@@ -77,6 +76,7 @@ export const TradingPage = () => {
   const [podFtFilter, setPodFtFilter] = useState<BooleanFilter>('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [sortKey, setSortKey] = useState<TradingSortKey>('clientName');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -169,7 +169,7 @@ export const TradingPage = () => {
     return list;
   }, [filteredRows, sortDirection, sortKey]);
 
-  const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize));
 
   useEffect(() => {
     setPage(1);
@@ -182,10 +182,10 @@ export const TradingPage = () => {
   }, [page, totalPages]);
 
   const paginatedRows = useMemo(() => {
-    const startIndex = (page - 1) * PAGE_SIZE;
+    const startIndex = (page - 1) * pageSize;
 
-    return sortedRows.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [sortedRows, page]);
+    return sortedRows.slice(startIndex, startIndex + pageSize);
+  }, [sortedRows, page, pageSize]);
 
   const resetFilters = () => {
     setSearch('');
@@ -216,64 +216,66 @@ export const TradingPage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Трейдинг</h1>
       </header>
 
-      <TableControlPanel
-        search={
-          <SearchInput
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по клиенту, коду, договору или распорядителю"
-            className="w-full"
-          />
-        }
-        filters={
-          <>
-            <FilterChipSelect
-              label="Квалификация"
-              value={qualificationFilter}
-              displayValue={qualificationLabel}
-              onChange={(value) => setQualificationFilter(value as BooleanFilter)}
-              active={qualificationFilter !== 'all'}
-              options={[
-                { value: 'all', label: 'Все' },
-                { value: 'yes', label: 'Да' },
-                { value: 'no', label: 'Нет' },
-              ]}
+      <div className="sticky top-4 z-20 rounded-2xl bg-slate-50/95 pb-3 backdrop-blur">
+        <TableControlPanel
+          search={
+            <SearchInput
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Поиск по клиенту, коду, договору или распорядителю"
+              className="w-full"
             />
+          }
+          filters={
+            <>
+              <FilterChipSelect
+                label="Квалификация"
+                value={qualificationFilter}
+                displayValue={qualificationLabel}
+                onChange={(value) => setQualificationFilter(value as BooleanFilter)}
+                active={qualificationFilter !== 'all'}
+                options={[
+                  { value: 'all', label: 'Все' },
+                  { value: 'yes', label: 'Да' },
+                  { value: 'no', label: 'Нет' },
+                ]}
+              />
 
-            <FilterChipSelect
-              label="ПОД / ФТ"
-              value={podFtFilter}
-              displayValue={podFtLabel}
-              onChange={(value) => setPodFtFilter(value as BooleanFilter)}
-              active={podFtFilter !== 'all'}
-              options={[
-                { value: 'all', label: 'Все' },
-                { value: 'yes', label: 'Да' },
-                { value: 'no', label: 'Нет' },
-              ]}
-            />
-          </>
-        }
-        activeFilters={
-          hasActiveConditions ? (
-            <div className="space-y-2">
-              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Активно</div>
-              <div className="flex flex-wrap items-center gap-2">
-                {search.trim() ? <ActiveFilterChip label="Поиск" value={search.trim()} onRemove={() => setSearch('')} /> : null}
-                {qualificationFilter !== 'all' ? (
-                  <ActiveFilterChip label="Квалификация" value={qualificationLabel} onRemove={() => setQualificationFilter('all')} />
-                ) : null}
-                {podFtFilter !== 'all' ? (
-                  <ActiveFilterChip label="ПОД / ФТ" value={podFtLabel} onRemove={() => setPodFtFilter('all')} />
-                ) : null}
-                <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto">
-                  Сбросить всё
-                </Button>
+              <FilterChipSelect
+                label="ПОД / ФТ"
+                value={podFtFilter}
+                displayValue={podFtLabel}
+                onChange={(value) => setPodFtFilter(value as BooleanFilter)}
+                active={podFtFilter !== 'all'}
+                options={[
+                  { value: 'all', label: 'Все' },
+                  { value: 'yes', label: 'Да' },
+                  { value: 'no', label: 'Нет' },
+                ]}
+              />
+            </>
+          }
+          activeFilters={
+            hasActiveConditions ? (
+              <div className="space-y-2">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Активно</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {search.trim() ? <ActiveFilterChip label="Поиск" value={search.trim()} onRemove={() => setSearch('')} /> : null}
+                  {qualificationFilter !== 'all' ? (
+                    <ActiveFilterChip label="Квалификация" value={qualificationLabel} onRemove={() => setQualificationFilter('all')} />
+                  ) : null}
+                  {podFtFilter !== 'all' ? (
+                    <ActiveFilterChip label="ПОД / ФТ" value={podFtLabel} onRemove={() => setPodFtFilter('all')} />
+                  ) : null}
+                  <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto">
+                    Сбросить всё
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : null
-        }
-      />
+            ) : null
+          }
+        />
+      </div>
 
       <DataTable<TradingRow>
         columns={[
@@ -340,13 +342,22 @@ export const TradingPage = () => {
         onSortChange={handleSort}
       />
 
-      <Pagination
-        className="justify-end"
-        page={page}
-        totalPages={totalPages}
-        onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
-        onNext={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <PageSizeSelector
+          value={pageSize}
+          onChange={(value) => {
+            setPageSize(value);
+            setPage(1);
+          }}
+        />
+        <Pagination
+          className="justify-end"
+          page={page}
+          totalPages={totalPages}
+          onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
+          onNext={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+        />
+      </div>
     </div>
   );
 };
