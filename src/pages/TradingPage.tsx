@@ -24,7 +24,7 @@ const riskCategoryToCode: Record<RiskCategory, TradingRiskCode> = {
   Высокий: 'КОУР',
 };
 
-const booleanBadgeVariant = (value: boolean): 'success' | 'danger' => (value ? 'success' : 'danger');
+const booleanBadgeVariant = (value: boolean): 'success' | 'warning' => (value ? 'success' : 'warning');
 
 const toYesNo = (value: boolean) => (value ? 'Да' : 'Нет');
 

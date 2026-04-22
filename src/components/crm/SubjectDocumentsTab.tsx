@@ -7,9 +7,9 @@ type SubjectDocumentsTabProps = {
 
 const documentStatusVariant: Record<string, 'success' | 'danger' | 'warning' | 'neutral'> = {
   Действующий: 'success',
-  'Не действующий': 'danger',
+  'Не действующий': 'neutral',
   'На проверке': 'warning',
-  'На подписи': 'neutral',
+  'На подписи': 'warning',
   Отклонена: 'danger',
 };
 

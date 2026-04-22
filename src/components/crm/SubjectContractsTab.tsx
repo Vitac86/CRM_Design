@@ -16,7 +16,7 @@ const contractTypeVariant: Record<string, 'orange' | 'info' | 'success' | 'purpl
 
 const contractStatusVariant: Record<string, 'success' | 'danger' | 'neutral' | 'warning'> = {
   Действующий: 'success',
-  'Не действующий': 'danger',
+  'Не действующий': 'neutral',
   Закрытый: 'neutral',
   'На подписании': 'warning',
 };
