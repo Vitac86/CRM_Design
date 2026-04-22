@@ -145,7 +145,7 @@ export const SubjectsPage = () => {
         <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
           Очистить фильтры
         </Button>
-        <Button>{/* TODO: open create client modal */}+ Добавить</Button>
+        <Button onClick={() => navigate('/subjects/register')}>+ Добавить</Button>
       </FilterBar>
 
       <DataTable<Client>
