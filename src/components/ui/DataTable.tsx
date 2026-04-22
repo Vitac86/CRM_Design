@@ -51,7 +51,7 @@ export const DataTable = <T extends { id?: string | number }>({
   sortKey,
   sortDirection,
   onSortChange,
-  stickyHeader = true,
+  stickyHeader = false,
 }: DataTableProps<T>) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
