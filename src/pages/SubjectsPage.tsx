@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { clients } from '../data/clients';
+import { useClientsStore } from '../app/ClientsStore';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
   ActiveFilterChip,
@@ -29,6 +29,7 @@ type SubjectsSortKey = 'code' | 'name' | 'inn' | 'type' | 'residency' | 'complia
 
 export const SubjectsPage = () => {
   const navigate = useNavigate();
+  const { clients } = useClientsStore();
 
   const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>('all');
   const [residencyFilter, setResidencyFilter] = useState<ResidencyStatus | 'all'>('all');
@@ -40,9 +41,9 @@ export const SubjectsPage = () => {
   const [sortKey, setSortKey] = useState<SubjectsSortKey>('code');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], []);
-  const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], []);
-  const complianceOptions = useMemo(() => [...new Set(clients.map((client) => client.complianceStatus))], []);
+  const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], [clients]);
+  const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], [clients]);
+  const complianceOptions = useMemo(() => [...new Set(clients.map((client) => client.complianceStatus))], [clients]);
 
   const filteredClients = useMemo(
     () =>
