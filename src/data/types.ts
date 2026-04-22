@@ -216,6 +216,17 @@ export interface IndividualComplianceCard {
 export interface TradingProfile {
   id: string;
   clientId: string;
+  investorStatus: TradingInvestorStatus;
+  riskLevel: TradingRiskLevel;
+  riskAssignedAt: string;
+  brokerContractNumber: string;
+  accountDisposer: TradingAccountDisposer;
+  tradingMethods: TradingMethod[];
+  authorityUntil: string;
+  tradingStatus: TradingStatus;
+  codeWordMasked: string;
+  orderMethods: TradingOrderMethod[];
+  terminals: TradingTerminal[];
   riskCategory: RiskCategory;
   qualifiedInvestor: boolean;
   allowCashUsage: boolean;
@@ -223,6 +234,45 @@ export interface TradingProfile {
   strategy: 'Консервативная' | 'Сбалансированная' | 'Агрессивная';
   leverageAllowed: boolean;
   updatedAt: string;
+}
+
+export type TradingInvestorStatus = 'Квал' | 'Неквал';
+
+export type TradingRiskLevel = 'Стандартный' | 'Начальный' | 'Повышенный' | 'Особый';
+
+export type TradingStatus = 'Активен' | 'Истёк';
+
+export type TradingMethod = 'QUIK' | 'Голос';
+
+export type TradingTerminalStatus = 'Подключён' | 'Отключён';
+
+export type TradingTerminalType = 'QUIK Desktop' | 'QUIK Mobile (Android)' | 'WebQUIK';
+
+export interface TradingAccountDisposer {
+  name: string;
+  role: string;
+  powerOfAttorney: string;
+  authorityFrom: string;
+  authorityUntil: string;
+  status: TradingStatus;
+}
+
+export interface TradingOrderMethod {
+  id: string;
+  title: string;
+  description: string;
+  status: TradingStatus;
+}
+
+export interface TradingTerminal {
+  id: string;
+  type: TradingTerminalType;
+  login: string;
+  uid: string;
+  issuedAt: string;
+  ip?: string;
+  certificateUntil?: string;
+  status: TradingTerminalStatus;
 }
 
 export interface TradingClientCard {

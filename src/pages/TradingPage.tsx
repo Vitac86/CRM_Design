@@ -3,30 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../components/ui';
 import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
-import type { RiskCategory, TradingProfile } from '../data/types';
+import type { TradingMethod, TradingProfile, TradingRiskLevel } from '../data/types';
 
-type TradingRiskCode = 'КНУР' | 'КСУР' | 'КПУР' | 'КОУР';
 type BooleanFilter = 'all' | 'yes' | 'no';
 
 type TradingRow = TradingProfile & {
   podFt: boolean;
   clientCode: string;
   clientName: string;
-  riskCode: TradingRiskCode;
 };
 
 const PAGE_SIZE = 10;
 
-const riskCategoryToCode: Record<RiskCategory, TradingRiskCode> = {
-  Низкий: 'КНУР',
-  Средний: 'КСУР',
-  Повышенный: 'КПУР',
-  Высокий: 'КОУР',
+const riskBadgeByLevel: Record<TradingRiskLevel, 'success' | 'info' | 'warning' | 'orange'> = {
+  Стандартный: 'success',
+  Начальный: 'info',
+  Повышенный: 'warning',
+  Особый: 'orange',
 };
-
-const booleanBadgeVariant = (value: boolean): 'success' | 'warning' => (value ? 'success' : 'warning');
-
-const toYesNo = (value: boolean) => (value ? 'Да' : 'Нет');
 
 export const TradingPage = () => {
   const navigate = useNavigate();
@@ -51,7 +45,6 @@ export const TradingPage = () => {
           podFt,
           clientCode: client.code,
           clientName: client.name,
-          riskCode: riskCategoryToCode[profile.riskCategory],
         };
       }),
     [],
@@ -133,31 +126,52 @@ export const TradingPage = () => {
 
       <DataTable<TradingRow>
         columns={[
-          { key: 'clientCode', header: 'Код клиента', className: 'font-medium text-slate-800 whitespace-nowrap' },
-          { key: 'clientName', header: 'Наименование клиента', className: 'min-w-[220px]' },
+          { key: 'clientName', header: 'Клиент', className: 'min-w-[240px] max-w-[300px] truncate' },
+          { key: 'clientCode', header: 'Код', className: 'font-medium text-slate-800 whitespace-nowrap' },
           {
-            key: 'riskCategory',
-            header: 'Категория риска',
-            render: (row) => <Badge variant="warning">{row.riskCode}</Badge>,
+            key: 'investorStatus',
+            header: 'Инвестор',
+            render: (row) => <Badge variant={row.investorStatus === 'Квал' ? 'brand' : 'neutral'}>{row.investorStatus}</Badge>,
           },
           {
-            key: 'qualifiedInvestor',
-            header: 'Признак квалифицированного инвестора',
+            key: 'riskLevel',
+            header: 'Риск',
+            render: (row) => <Badge variant={riskBadgeByLevel[row.riskLevel]}>{row.riskLevel}</Badge>,
+          },
+          {
+            key: 'brokerContractNumber',
+            header: 'Договор',
+            className: 'whitespace-nowrap',
+          },
+          {
+            key: 'accountDisposer',
+            header: 'Распорядитель',
+            className: 'whitespace-nowrap',
+            render: (row) => row.accountDisposer.name,
+          },
+          {
+            key: 'tradingMethods',
+            header: 'Способ торговли',
+            className: 'min-w-[180px]',
             render: (row) => (
-              <Badge variant={booleanBadgeVariant(row.qualifiedInvestor)}>{toYesNo(row.qualifiedInvestor)}</Badge>
+              <div className="flex flex-wrap gap-1.5">
+                {row.tradingMethods.map((method: TradingMethod) => (
+                  <Badge key={method} variant={method === 'QUIK' ? 'info' : 'purple'}>
+                    {method}
+                  </Badge>
+                ))}
+              </div>
             ),
           },
           {
-            key: 'allowCashUsage',
-            header: 'Разрешение на использование денежных средств',
-            render: (row) => <Badge variant={booleanBadgeVariant(row.allowCashUsage)}>{toYesNo(row.allowCashUsage)}</Badge>,
+            key: 'authorityUntil',
+            header: 'Полномочия до',
+            className: 'whitespace-nowrap',
           },
           {
-            key: 'allowSecuritiesUsage',
-            header: 'Разрешение на использование ценных бумаг',
-            render: (row) => (
-              <Badge variant={booleanBadgeVariant(row.allowSecuritiesUsage)}>{toYesNo(row.allowSecuritiesUsage)}</Badge>
-            ),
+            key: 'tradingStatus',
+            header: 'Статус',
+            render: (row) => <Badge variant={row.tradingStatus === 'Активен' ? 'success' : 'danger'}>{row.tradingStatus}</Badge>,
           },
         ]}
         rows={paginatedRows}
