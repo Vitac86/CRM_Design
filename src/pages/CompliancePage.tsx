@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, DataTable, EmptyState, FilterBar, SelectFilter } from '../components/ui';
-import { clients } from '../data/clients';
+import { useClientsStore } from '../app/ClientsStore';
 import type { ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
   formatClientType,
@@ -25,10 +26,21 @@ type ComplianceRow = {
 
 export const CompliancePage = () => {
   const navigate = useNavigate();
+  const { clients } = useClientsStore();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>('all');
-  const [residencyFilter, setResidencyFilter] = useState<ResidencyStatus | 'all'>('all');
-  const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>(() => {
+    const value = searchParams.get('type');
+    return value === 'ООО' || value === 'ИП' || value === 'ПАО' || value === 'ЗАО' || value === 'АО' || value === 'ФЛ' ? value : 'all';
+  });
+  const [residencyFilter, setResidencyFilter] = useState<ResidencyStatus | 'all'>(() => {
+    const value = searchParams.get('residency');
+    return value === 'Резидент РФ' || value === 'Нерезидент' ? value : 'all';
+  });
+  const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>(() => {
+    const value = searchParams.get('complianceStatus');
+    return value === 'ПРОЙДЕН' || value === 'НА ПРОВЕРКЕ' || value === 'НА ДОРАБОТКЕ' || value === 'ЗАБЛОКИРОВАН' ? value : 'all';
+  });
 
   const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], []);
   const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], []);
@@ -74,6 +86,22 @@ export const CompliancePage = () => {
     setResidencyFilter('all');
     setComplianceFilter('all');
   };
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+
+    if (typeFilter !== 'all') {
+      nextParams.set('type', typeFilter);
+    }
+    if (residencyFilter !== 'all') {
+      nextParams.set('residency', residencyFilter);
+    }
+    if (complianceFilter !== 'all') {
+      nextParams.set('complianceStatus', complianceFilter);
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [typeFilter, residencyFilter, complianceFilter, setSearchParams]);
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">

@@ -1,4 +1,4 @@
-import type { BankAccount, Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, RiskCategory } from './types';
+import type { BankAccount, Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, RiskCategory, SubjectStatus } from './types';
 
 interface LegacyClient {
   id: string;
@@ -19,6 +19,22 @@ interface LegacyClient {
   representative: string;
   updatedAt: string;
 }
+
+const resolveSubjectStatus = (client: LegacyClient): SubjectStatus => {
+  if (client.complianceStatus === 'НА ПРОВЕРКЕ') {
+    return 'На комплаенсе';
+  }
+
+  if (!client.fullDocumentSet) {
+    return 'Регистрация';
+  }
+
+  if (client.complianceStatus === 'ПРОЙДЕН') {
+    return 'Активный клиент';
+  }
+
+  return 'Данные заполнены';
+};
 
 
 const legacyClients: LegacyClient[] = [
@@ -697,6 +713,7 @@ export const clients: Client[] = legacyClients.map((client) => {
 
   return {
     ...client,
+    subjectStatus: resolveSubjectStatus(client),
     ...person,
     isArchived: Boolean(archiveMeta),
     archivedAt: archiveMeta?.archivedAt,

@@ -8,19 +8,13 @@ export interface DashboardMetric {
   label: string;
   trendLabel: string;
   trendType: 'up' | 'down';
+  to?: string;
 }
 
 export interface SubjectChange {
   id: string;
   subject: string;
   change: string;
-}
-
-export interface DashboardRequest {
-  id: string;
-  requestNumber: string;
-  status: 'Новая' | 'В работе' | 'Требует уточнения' | 'Исполнена';
-  date: string;
 }
 
 export const dashboardMetrics: DashboardMetric[] = [
@@ -31,6 +25,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     label: 'новых субъектов',
     trendLabel: '+6.2%',
     trendType: 'up',
+    to: '/subjects?subjectStatus=Регистрация',
   },
   {
     id: 'metric-02',
@@ -39,6 +34,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     label: 'очередь комплаенса',
     trendLabel: '+4.1%',
     trendType: 'up',
+    to: '/compliance?complianceStatus=НА%20ПРОВЕРКЕ',
   },
   {
     id: 'metric-03',
@@ -47,6 +43,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     label: 'новые поручения',
     trendLabel: '+8.7%',
     trendType: 'up',
+    to: '/requests?status=Ожидает',
   },
   {
     id: 'metric-04',
@@ -78,32 +75,5 @@ export const subjectChanges: SubjectChange[] = [
     id: 'change-04',
     subject: 'ООО «Бета Трейд»',
     change: 'В карточке субъекта добавлен новый банковский счёт',
-  },
-];
-
-export const latestRequests: DashboardRequest[] = [
-  {
-    id: 'req-01',
-    requestNumber: 'REQ-2026-0418',
-    status: 'Новая',
-    date: '21.04.2026',
-  },
-  {
-    id: 'req-02',
-    requestNumber: 'REQ-2026-0411',
-    status: 'В работе',
-    date: '21.04.2026',
-  },
-  {
-    id: 'req-03',
-    requestNumber: 'REQ-2026-0398',
-    status: 'Требует уточнения',
-    date: '20.04.2026',
-  },
-  {
-    id: 'req-04',
-    requestNumber: 'REQ-2026-0374',
-    status: 'Исполнена',
-    date: '20.04.2026',
   },
 ];

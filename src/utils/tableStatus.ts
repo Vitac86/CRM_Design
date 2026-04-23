@@ -2,6 +2,7 @@ import type {
   ClientType,
   ComplianceStatus,
   ResidencyStatus,
+  SubjectStatus,
   TradingInvestorStatus,
   TradingMethod,
   TradingRiskLevel,
@@ -32,6 +33,12 @@ export const subjectStatusTone = {
     ФЛ: 'subtle',
     ИП: 'subtle',
   } satisfies Record<ClientType, TableStatusTone>,
+  subject: {
+    Регистрация: 'warning',
+    'Активный клиент': 'neutral',
+    'На комплаенсе': 'warning',
+    'Данные заполнены': 'subtle',
+  } satisfies Record<SubjectStatus, TableStatusTone>,
 };
 
 export const tradingStatusTone = {
