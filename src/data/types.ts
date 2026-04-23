@@ -10,7 +10,7 @@ export type ComplianceStatus =
 export type SubjectStatus = 'Регистрация' | 'Активный клиент' | 'На комплаенсе' | 'Данные заполнены';
 
 export type RiskCategory = 'Низкий' | 'Средний' | 'Высокий' | 'Повышенный';
-export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель';
+export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель' | 'Агент';
 
 export interface ClientManager {
   name: string;
