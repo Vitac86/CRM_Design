@@ -1,5 +1,8 @@
 import type { Request } from './types';
 
+export const NEW_REQUEST_STATUS: Request['status'] = 'Ожидает';
+export const REQUESTS_DASHBOARD_LIMIT = 10;
+
 export const requests: Request[] = [
   {
     id: 'r-001',
@@ -185,3 +188,12 @@ export const requests: Request[] = [
 
 export const getRequestsByClientId = (clientId: string): Request[] =>
   requests.filter((request) => request.clientId === clientId);
+
+export const getLatestRequests = (limit = REQUESTS_DASHBOARD_LIMIT): Request[] =>
+  [...requests]
+    .sort((left, right) => {
+      const leftDateTime = new Date(`${left.date}T${left.time}:00`).getTime();
+      const rightDateTime = new Date(`${right.date}T${right.time}:00`).getTime();
+      return rightDateTime - leftDateTime;
+    })
+    .slice(0, limit);

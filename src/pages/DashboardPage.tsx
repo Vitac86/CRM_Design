@@ -1,21 +1,22 @@
+import { Link } from 'react-router-dom';
 import { DashboardTable } from '../components/crm/DashboardTable';
 import { MetricCard } from '../components/crm/MetricCard';
-import { latestRequests, dashboardMetrics, subjectChanges } from '../data/dashboard';
+import { dashboardMetrics, subjectChanges } from '../data/dashboard';
+import { getLatestRequests } from '../data/requests';
 
 const requestStatusClass: Record<string, string> = {
-  Новая: 'bg-emerald-100 text-emerald-700',
-  'В работе': 'bg-amber-100 text-amber-700',
-  'Требует уточнения': 'bg-rose-100 text-rose-700',
-  Исполнена: 'bg-slate-100 text-slate-700',
+  Ожидает: 'bg-amber-100 text-amber-700',
+  Принято: 'bg-sky-100 text-sky-700',
+  Отклонено: 'bg-rose-100 text-rose-700',
 };
 
 export const DashboardPage = () => {
   const subjectRows = subjectChanges.map((item) => [item.subject, item.change]);
 
-  const requestRows = latestRequests.map((item) => [
-    item.requestNumber,
+  const requestRows = getLatestRequests().map((item) => [
+    item.number,
     item.status,
-    item.date,
+    new Date(item.date).toLocaleDateString('ru-RU'),
   ]);
 
   return (
@@ -38,8 +39,11 @@ export const DashboardPage = () => {
         />
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <header className="border-b border-slate-200 px-4 py-3">
+          <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
             <h2 className="text-sm font-semibold text-slate-900">Последние поручения</h2>
+            <Link to="/requests" className="text-sm font-medium text-brand transition hover:text-brand-hover">
+              Все поручения
+            </Link>
           </header>
 
           <div className="overflow-x-auto">

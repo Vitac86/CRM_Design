@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Badge, Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination } from '../components/ui';
-import { requests } from '../data/requests';
+import { NEW_REQUEST_STATUS, requests } from '../data/requests';
 import type { Request } from '../data/types';
 
 const pageSize = 10;
@@ -12,11 +13,18 @@ const requestStatusBadgeVariant: Record<Request['status'], 'warning' | 'info' | 
 };
 
 export const RequestsPage = () => {
-  const [search, setSearch] = useState('');
-  const [clientCodeFilter, setClientCodeFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<Request['source'] | 'all'>('all');
-  const [statusFilter, setStatusFilter] = useState<Request['status'] | 'all'>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
+  const [clientCodeFilter, setClientCodeFilter] = useState(() => searchParams.get('clientCode') ?? '');
+  const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') ?? '');
+  const [sourceFilter, setSourceFilter] = useState<Request['source'] | 'all'>(() => {
+    const source = searchParams.get('source');
+    return source === 'Личный кабинет' || source === 'Почта' ? source : 'all';
+  });
+  const [statusFilter, setStatusFilter] = useState<Request['status'] | 'all'>(() => {
+    const status = searchParams.get('status');
+    return status === 'Ожидает' || status === 'Принято' || status === 'Отклонено' ? status : 'all';
+  });
   const [page, setPage] = useState(1);
 
   const sourceOptions = useMemo(
@@ -79,6 +87,28 @@ export const RequestsPage = () => {
     }
   }, [page, totalPages]);
 
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+
+    if (search.trim()) {
+      nextParams.set('search', search.trim());
+    }
+    if (clientCodeFilter.trim()) {
+      nextParams.set('clientCode', clientCodeFilter.trim());
+    }
+    if (dateFilter) {
+      nextParams.set('date', dateFilter);
+    }
+    if (sourceFilter !== 'all') {
+      nextParams.set('source', sourceFilter);
+    }
+    if (statusFilter !== 'all') {
+      nextParams.set('status', statusFilter);
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [search, clientCodeFilter, dateFilter, sourceFilter, statusFilter, setSearchParams]);
+
   const resetFilters = () => {
     setSearch('');
     setClientCodeFilter('');
@@ -136,7 +166,7 @@ export const RequestsPage = () => {
             <option value="all">Статус</option>
             {statusOptions.map((status) => (
               <option key={status} value={status}>
-                {status}
+                {status === NEW_REQUEST_STATUS ? 'Ожидает (новые)' : status}
               </option>
             ))}
           </SelectFilter>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { DashboardMetric } from '../../data/dashboard';
 
 interface MetricCardProps {
@@ -8,7 +9,7 @@ export const MetricCard = ({ metric }: MetricCardProps) => {
   const trendClass = metric.trendType === 'up' ? 'text-brand' : 'text-rose-600';
   const IconComponent = metric.icon;
 
-  return (
+  const card = (
     <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand/5 text-brand" aria-hidden="true">
@@ -20,5 +21,15 @@ export const MetricCard = ({ metric }: MetricCardProps) => {
       <p className="text-2xl font-semibold text-slate-900">{metric.value}</p>
       <p className="mt-1 text-sm text-slate-600">{metric.label}</p>
     </article>
+  );
+
+  if (!metric.to) {
+    return card;
+  }
+
+  return (
+    <Link className="block rounded-xl transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20" to={metric.to}>
+      {card}
+    </Link>
   );
 };

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useClientsStore } from '../app/ClientsStore';
-import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
+import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, SubjectStatus } from '../data/types';
 import {
   Button,
   DataTable,
@@ -13,22 +13,44 @@ import {
   TableStatusText,
   type SortDirection,
 } from '../components/ui';
-import { formatClientType, formatComplianceStatus, formatResidency } from '../utils/labels';
+import { formatClientType, formatComplianceStatus, formatResidency, formatSubjectStatus } from '../utils/labels';
 import { subjectStatusTone } from '../utils/tableStatus';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
-type SubjectsSortKey = 'name' | 'inn' | 'type' | 'residency' | 'complianceStatus' | 'fullDocumentSet';
+type SubjectsSortKey = 'name' | 'inn' | 'type' | 'residency' | 'subjectStatus' | 'complianceStatus' | 'fullDocumentSet';
 
 export const SubjectsPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { clients } = useClientsStore();
 
-  const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>('all');
-  const [residencyFilter, setResidencyFilter] = useState<ResidencyStatus | 'all'>('all');
-  const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>('all');
-  const [qualificationFilter, setQualificationFilter] = useState<'all' | 'qualified' | 'not-qualified'>('all');
-  const [roleFilter, setRoleFilter] = useState<ClientRole | 'all'>('all');
-  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>(() => {
+    const value = searchParams.get('type');
+    return value === 'ООО' || value === 'ИП' || value === 'ПАО' || value === 'ЗАО' || value === 'АО' || value === 'ФЛ' ? value : 'all';
+  });
+  const [residencyFilter, setResidencyFilter] = useState<ResidencyStatus | 'all'>(() => {
+    const value = searchParams.get('residency');
+    return value === 'Резидент РФ' || value === 'Нерезидент' ? value : 'all';
+  });
+  const [subjectStatusFilter, setSubjectStatusFilter] = useState<SubjectStatus | 'all'>(() => {
+    const value = searchParams.get('subjectStatus');
+    return value === 'Регистрация' || value === 'Активный клиент' || value === 'На комплаенсе' || value === 'Данные заполнены'
+      ? value
+      : 'all';
+  });
+  const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>(() => {
+    const value = searchParams.get('complianceStatus');
+    return value === 'ПРОЙДЕН' || value === 'НА ПРОВЕРКЕ' || value === 'НА ДОРАБОТКЕ' || value === 'ЗАБЛОКИРОВАН' ? value : 'all';
+  });
+  const [qualificationFilter, setQualificationFilter] = useState<'all' | 'qualified' | 'not-qualified'>(() => {
+    const value = searchParams.get('qualification');
+    return value === 'qualified' || value === 'not-qualified' ? value : 'all';
+  });
+  const [roleFilter, setRoleFilter] = useState<ClientRole | 'all'>(() => {
+    const value = searchParams.get('role');
+    return value === 'Клиент' || value === 'Бенефициар' || value === 'Представитель' ? value : 'all';
+  });
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortKey, setSortKey] = useState<SubjectsSortKey>('name');
@@ -38,6 +60,7 @@ export const SubjectsPage = () => {
   const typeOptions = useMemo(() => [...new Set(activeClients.map((client) => client.type))], [activeClients]);
   const residencyOptions = useMemo(() => [...new Set(activeClients.map((client) => client.residency))], [activeClients]);
   const complianceOptions = useMemo(() => [...new Set(activeClients.map((client) => client.complianceStatus))], [activeClients]);
+  const subjectStatusOptions = useMemo(() => [...new Set(activeClients.map((client) => client.subjectStatus))], [activeClients]);
 
   const filteredClients = useMemo(
     () =>
@@ -64,6 +87,9 @@ export const SubjectsPage = () => {
         if (complianceFilter !== 'all' && client.complianceStatus !== complianceFilter) {
           return false;
         }
+        if (subjectStatusFilter !== 'all' && client.subjectStatus !== subjectStatusFilter) {
+          return false;
+        }
 
         if (qualificationFilter === 'qualified' && !client.qualification) {
           return false;
@@ -79,7 +105,7 @@ export const SubjectsPage = () => {
 
         return true;
       }),
-    [activeClients, search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
+    [activeClients, search, typeFilter, residencyFilter, subjectStatusFilter, complianceFilter, qualificationFilter, roleFilter],
   );
 
   const sortedClients = useMemo(() => {
@@ -115,7 +141,44 @@ export const SubjectsPage = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter]);
+  }, [search, typeFilter, residencyFilter, subjectStatusFilter, complianceFilter, qualificationFilter, roleFilter]);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+
+    if (search.trim()) {
+      nextParams.set('search', search.trim());
+    }
+    if (typeFilter !== 'all') {
+      nextParams.set('type', typeFilter);
+    }
+    if (residencyFilter !== 'all') {
+      nextParams.set('residency', residencyFilter);
+    }
+    if (subjectStatusFilter !== 'all') {
+      nextParams.set('subjectStatus', subjectStatusFilter);
+    }
+    if (complianceFilter !== 'all') {
+      nextParams.set('complianceStatus', complianceFilter);
+    }
+    if (qualificationFilter !== 'all') {
+      nextParams.set('qualification', qualificationFilter);
+    }
+    if (roleFilter !== 'all') {
+      nextParams.set('role', roleFilter);
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [
+    search,
+    typeFilter,
+    residencyFilter,
+    subjectStatusFilter,
+    complianceFilter,
+    qualificationFilter,
+    roleFilter,
+    setSearchParams,
+  ]);
 
   const handleSort = (nextSortKey: string) => {
     if (nextSortKey === sortKey) {
@@ -132,6 +195,7 @@ export const SubjectsPage = () => {
     setSearch('');
     setTypeFilter('all');
     setResidencyFilter('all');
+    setSubjectStatusFilter('all');
     setComplianceFilter('all');
     setQualificationFilter('all');
     setRoleFilter('all');
@@ -142,6 +206,7 @@ export const SubjectsPage = () => {
     search.trim().length > 0 ||
     typeFilter !== 'all' ||
     residencyFilter !== 'all' ||
+    subjectStatusFilter !== 'all' ||
     complianceFilter !== 'all' ||
     qualificationFilter !== 'all' ||
     roleFilter !== 'all';
@@ -191,6 +256,18 @@ export const SubjectsPage = () => {
                 options={[
                   { value: 'all', label: 'Все' },
                   ...residencyOptions.map((residency) => ({ value: residency, label: formatResidency(residency) })),
+                ]}
+              />
+
+              <FilterChipSelect
+                label="Статус субъекта"
+                value={subjectStatusFilter}
+                displayValue={subjectStatusFilter === 'all' ? 'Все' : formatSubjectStatus(subjectStatusFilter)}
+                onChange={(value) => setSubjectStatusFilter(value as SubjectStatus | 'all')}
+                active={subjectStatusFilter !== 'all'}
+                options={[
+                  { value: 'all', label: 'Все' },
+                  ...subjectStatusOptions.map((status) => ({ value: status, label: formatSubjectStatus(status) })),
                 ]}
               />
 
@@ -255,6 +332,16 @@ export const SubjectsPage = () => {
             render: (client) => (
               <TableStatusText tone={subjectStatusTone.residency[client.residency]}>
                 {formatResidency(client.residency)}
+              </TableStatusText>
+            ),
+          },
+          {
+            key: 'subjectStatus',
+            header: 'Статус субъекта',
+            sortable: true,
+            render: (client) => (
+              <TableStatusText tone={subjectStatusTone.subject[client.subjectStatus]}>
+                {formatSubjectStatus(client.subjectStatus)}
               </TableStatusText>
             ),
           },

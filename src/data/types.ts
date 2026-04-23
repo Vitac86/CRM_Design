@@ -7,6 +7,7 @@ export type ComplianceStatus =
   | 'НА ПРОВЕРКЕ'
   | 'НА ДОРАБОТКЕ'
   | 'ЗАБЛОКИРОВАН';
+export type SubjectStatus = 'Регистрация' | 'Активный клиент' | 'На комплаенсе' | 'Данные заполнены';
 
 export type RiskCategory = 'Низкий' | 'Средний' | 'Высокий' | 'Повышенный';
 export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель';
@@ -139,6 +140,7 @@ export interface Client {
   birthDate: string;
   type: ClientType;
   residency: ResidencyStatus;
+  subjectStatus: SubjectStatus;
   complianceStatus: ComplianceStatus;
   complianceComment?: string;
   complianceOfficer?: string;

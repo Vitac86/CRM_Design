@@ -1,5 +1,5 @@
 import type { BadgeVariant } from '../components/ui/Badge';
-import type { ClientType, ComplianceStatus, ResidencyStatus, RiskCategory } from '../data/types';
+import type { ClientType, ComplianceStatus, ResidencyStatus, RiskCategory, SubjectStatus } from '../data/types';
 
 type ComplianceBadgeVariant = Extract<BadgeVariant, 'success' | 'warning' | 'orange' | 'danger'>;
 
@@ -58,6 +58,13 @@ const riskCategoryVariantMap: Record<RiskCategory, BadgeVariant> = {
   Высокий: 'danger',
 };
 
+const subjectStatusLabelMap: Record<SubjectStatus, string> = {
+  Регистрация: 'Регистрация',
+  'Активный клиент': 'Активный клиент',
+  'На комплаенсе': 'На комплаенсе',
+  'Данные заполнены': 'Данные заполнены',
+};
+
 export const formatClientType = (type: ClientType): string => clientTypeLabelMap[type];
 
 export const formatResidency = (residency: ResidencyStatus): string => residencyLabelMap[residency];
@@ -71,5 +78,6 @@ export const getClientTypeBadgeVariant = (type: ClientType): BadgeVariant => cli
 export const getResidencyBadgeVariant = (residency: ResidencyStatus): BadgeVariant => residencyVariantMap[residency];
 
 export const formatRiskCategoryForHeader = (riskCategory: RiskCategory): string => riskCategoryLabelMap[riskCategory];
+export const formatSubjectStatus = (status: SubjectStatus): string => subjectStatusLabelMap[status];
 
 export const getRiskCategoryBadgeVariant = (riskCategory: RiskCategory): BadgeVariant => riskCategoryVariantMap[riskCategory];

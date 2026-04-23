@@ -187,6 +187,7 @@ export const ClientRegistrationWizardPage = () => {
       id,
       code,
       ogrnip: '—',
+      subjectStatus: 'Регистрация',
       complianceStatus: 'НА ПРОВЕРКЕ',
       fullDocumentSet: false,
       qualification: false,
