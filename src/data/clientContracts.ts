@@ -55,6 +55,33 @@ export const clientContracts: ClientContract[] = [
     closeDate: null,
     status: 'active',
   },
+  {
+    id: 'ctr-7',
+    clientId: 'c-014',
+    number: 'BR-2025/00114',
+    type: 'broker',
+    openDate: '2025-06-19',
+    closeDate: null,
+    status: 'active',
+  },
+  {
+    id: 'ctr-8',
+    clientId: 'c-016',
+    number: 'DP-2026/00041',
+    type: 'depository',
+    openDate: '2026-01-28',
+    closeDate: null,
+    status: 'active',
+  },
+  {
+    id: 'ctr-9',
+    clientId: 'c-023',
+    number: 'DU-2026/00023',
+    type: 'trust',
+    openDate: '2026-03-03',
+    closeDate: null,
+    status: 'active',
+  },
 ];
 
 export const getContractsByClientId = (clientId: string) => clientContracts.filter((contract) => contract.clientId === clientId);

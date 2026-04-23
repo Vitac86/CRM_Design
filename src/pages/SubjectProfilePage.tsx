@@ -1032,26 +1032,14 @@ export const SubjectProfilePage = () => {
                         onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, email: event.target.value } : prev))}
                       />
                       <FormField
-                        label="Выгодоприобретатель"
-                        value={currentClient.legalEntityDetails?.beneficiary ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, beneficiary: event.target.value } }
-                              : prev,
-                          )
-                        }
+                        label="Адрес"
+                        value={currentClient.address}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
                       />
                       <FormField
-                        label="Лица, действующие без доверенности"
-                        value={currentClient.legalEntityDetails?.authorizedPersons ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, authorizedPersons: event.target.value } }
-                              : prev,
-                          )
-                        }
+                        label="Представитель"
+                        value={currentClient.representative}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, representative: event.target.value } : prev))}
                       />
                     </>
                   ) : (
@@ -1059,8 +1047,8 @@ export const SubjectProfilePage = () => {
                       <ProfileField label="Телефон" value={client.phone} mono />
                       <ProfileField label="Дополнительный телефон" value={client.secondaryPhone} mono />
                       <ProfileField label="Email" value={client.email} />
-                      <ProfileField label="Выгодоприобретатель" value={client.legalEntityDetails?.beneficiary ?? '—'} />
-                      <ProfileField label="Лица, действующие без доверенности" value={client.legalEntityDetails?.authorizedPersons ?? '—'} />
+                      <ProfileField label="Адрес" value={client.address} />
+                      <ProfileField label="Представитель" value={client.representative} />
                     </>
                   )}
                 </div>

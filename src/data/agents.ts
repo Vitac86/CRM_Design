@@ -48,4 +48,22 @@ export const agentClientLinks: AgentClientLink[] = [
     clientSubjectId: 'c-010',
     createdAt: '2026-02-22',
   },
+  {
+    id: 'agent-client-4',
+    agentSubjectId: 'c-014',
+    clientSubjectId: 'c-008',
+    createdAt: '2026-03-01',
+  },
+  {
+    id: 'agent-client-5',
+    agentSubjectId: 'c-005',
+    clientSubjectId: 'c-016',
+    createdAt: '2026-04-04',
+  },
+  {
+    id: 'agent-client-6',
+    agentSubjectId: 'c-003',
+    clientSubjectId: 'c-023',
+    createdAt: '2026-04-12',
+  },
 ];
