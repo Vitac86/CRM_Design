@@ -1,41 +1,51 @@
-export type AgentStatus = 'Активен' | 'На проверке' | 'Неактивен';
+export interface AgentProfile {
+  subjectId: string;
+  contractNumber: string;
+  commission: string;
+}
 
-export type Agent = {
+export interface AgentClientLink {
   id: string;
-  fullName: string;
-  company: string;
-  agentCode: string;
-  phone: string;
-  email: string;
-  status: AgentStatus;
-};
+  agentSubjectId: string;
+  clientSubjectId: string;
+  createdAt: string;
+}
 
-export const agents: Agent[] = [
+export const agents: AgentProfile[] = [
   {
-    id: 'ag-001',
-    fullName: 'Куликов Артём Сергеевич',
-    company: 'ООО «Бизнес Партнёр»',
-    agentCode: 'AG-2041',
-    phone: '+7 (495) 234-18-11',
-    email: 'kulikov@partner.ru',
-    status: 'Активен',
+    subjectId: 'c-003',
+    contractNumber: 'AG-2041',
+    commission: '1.25%',
   },
   {
-    id: 'ag-002',
-    fullName: 'Горбунова Елена Игоревна',
-    company: 'АО «Регион Инвест»',
-    agentCode: 'AG-1988',
-    phone: '+7 (812) 330-21-09',
-    email: 'gorbunova@regioninvest.ru',
-    status: 'На проверке',
+    subjectId: 'c-005',
+    contractNumber: 'AG-1988',
+    commission: '2.00%',
   },
   {
-    id: 'ag-003',
-    fullName: 'Сысоев Михаил Валентинович',
-    company: 'ООО «ФинПроводник»',
-    agentCode: 'AG-1760',
-    phone: '+7 (343) 379-44-70',
-    email: 'sysoev@finprov.ru',
-    status: 'Неактивен',
+    subjectId: 'c-014',
+    contractNumber: 'AG-1760',
+    commission: '0.90%',
+  },
+];
+
+export const agentClientLinks: AgentClientLink[] = [
+  {
+    id: 'agent-client-1',
+    agentSubjectId: 'c-003',
+    clientSubjectId: 'c-001',
+    createdAt: '2026-03-18',
+  },
+  {
+    id: 'agent-client-2',
+    agentSubjectId: 'c-003',
+    clientSubjectId: 'c-006',
+    createdAt: '2026-04-06',
+  },
+  {
+    id: 'agent-client-3',
+    agentSubjectId: 'c-005',
+    clientSubjectId: 'c-010',
+    createdAt: '2026-02-22',
   },
 ];

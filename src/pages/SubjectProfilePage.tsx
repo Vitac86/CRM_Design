@@ -43,6 +43,7 @@ export const SubjectProfilePage = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showAllClientCodes, setShowAllClientCodes] = useState(false);
+  const [showAdditionalAddresses, setShowAdditionalAddresses] = useState(false);
   const [isRepresentativeModalOpen, setIsRepresentativeModalOpen] = useState(false);
   const [representativeQuery, setRepresentativeQuery] = useState('');
   const [newRepresentativeSubjectId, setNewRepresentativeSubjectId] = useState('');
@@ -677,7 +678,13 @@ export const SubjectProfilePage = () => {
                 </div>
               </div>
 
-              {(['location', 'mailing'] as const).map((kind) => {
+              <div className="flex items-center justify-end">
+                <Button variant="secondary" size="sm" onClick={() => setShowAdditionalAddresses((prev) => !prev)}>
+                  {showAdditionalAddresses ? 'Скрыть остальные адреса' : 'Показать остальные адреса'}
+                </Button>
+              </div>
+
+              {showAdditionalAddresses ? (['location', 'mailing'] as const).map((kind) => {
                 const isLocation = kind === 'location';
                 const synced = isLocation ? currentClient.addresses.locationMatchesRegistration : currentClient.addresses.mailingMatchesRegistration;
                 const address = isLocation ? locationAddress : mailingAddress;
@@ -715,7 +722,7 @@ export const SubjectProfilePage = () => {
                     </div>
                   </div>
                 );
-              })}
+              }) : null}
             </div>
           </ProfileSection>
 
