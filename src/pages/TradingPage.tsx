@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ActiveFilterChip,
-  Badge,
   Button,
   DataTable,
   FilterChipSelect,
@@ -10,11 +9,13 @@ import {
   Pagination,
   SearchInput,
   TableControlPanel,
+  TableStatusText,
   type SortDirection,
 } from '../components/ui';
 import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
 import type { TradingMethod, TradingProfile, TradingRiskLevel, TradingStatus } from '../data/types';
+import { tradingStatusTone } from '../utils/tableStatus';
 
 type BooleanFilter = 'all' | 'yes' | 'no';
 
@@ -34,13 +35,6 @@ type TradingSortKey =
   | 'accountDisposerName'
   | 'authorityUntil'
   | 'tradingStatus';
-
-const riskBadgeByLevel: Record<TradingRiskLevel, 'success' | 'info' | 'warning' | 'orange'> = {
-  Стандартный: 'success',
-  Начальный: 'info',
-  Повышенный: 'warning',
-  Особый: 'orange',
-};
 
 const riskOrder: Record<TradingRiskLevel, number> = {
   Стандартный: 0,
@@ -285,13 +279,15 @@ export const TradingPage = () => {
             key: 'investorStatus',
             header: 'Инвестор',
             sortable: true,
-            render: (row) => <Badge variant={row.investorStatus === 'Квал' ? 'brand' : 'neutral'}>{row.investorStatus}</Badge>,
+            render: (row) => (
+              <TableStatusText tone={tradingStatusTone.investor[row.investorStatus]}>{row.investorStatus}</TableStatusText>
+            ),
           },
           {
             key: 'riskLevel',
             header: 'Риск',
             sortable: true,
-            render: (row) => <Badge variant={riskBadgeByLevel[row.riskLevel]}>{row.riskLevel}</Badge>,
+            render: (row) => <TableStatusText tone={tradingStatusTone.risk[row.riskLevel]}>{row.riskLevel}</TableStatusText>,
           },
           {
             key: 'brokerContractNumber',
@@ -312,11 +308,11 @@ export const TradingPage = () => {
             header: 'Способ торговли',
             className: 'min-w-[180px]',
             render: (row) => (
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-x-2 gap-y-1">
                 {row.tradingMethods.map((method: TradingMethod) => (
-                  <Badge key={method} variant={method === 'QUIK' ? 'info' : 'purple'}>
+                  <TableStatusText key={method} tone={tradingStatusTone.method[method]}>
                     {method}
-                  </Badge>
+                  </TableStatusText>
                 ))}
               </div>
             ),
@@ -331,7 +327,9 @@ export const TradingPage = () => {
             key: 'tradingStatus',
             header: 'Статус',
             sortable: true,
-            render: (row) => <Badge variant={row.tradingStatus === 'Активен' ? 'success' : 'danger'}>{row.tradingStatus}</Badge>,
+            render: (row) => (
+              <TableStatusText tone={tradingStatusTone.tradingStatus[row.tradingStatus]}>{row.tradingStatus}</TableStatusText>
+            ),
           },
         ]}
         rows={paginatedRows}
