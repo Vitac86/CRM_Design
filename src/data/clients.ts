@@ -509,6 +509,41 @@ const buildRegistrationAddress = (address: string) => {
   };
 };
 
+const buildIndividualDetails = (client: LegacyClient, person: ReturnType<typeof splitClientName>) => ({
+  birthPlace: `г. ${person.firstName !== '—' ? 'Москва' : '—'}`,
+  snils: `112-233-${client.code.slice(-3)} 9${client.code.slice(-1)}`,
+  actualAddressMatches: true,
+  services: client.type === 'ИП' ? 'Брокерское обслуживание ИП' : 'Брокерское обслуживание',
+  sourceOfFunds: client.type === 'ИП' ? 'Доходы от предпринимательской деятельности' : 'Заработная плата',
+  taxResident: client.residency === 'Резидент РФ',
+  legalCapacity: 'Полная' as const,
+});
+
+const buildLegalEntityDetails = (client: LegacyClient) => ({
+  shortName: client.name,
+  fullName: `${client.name} (полное наименование)`,
+  englishName: client.name.replace(/[«»]/g, '').replace(/\s+/g, ' ').trim(),
+  englishFullName: `${client.name.replace(/[«»]/g, '').replace(/\s+/g, ' ').trim()} LLC`,
+  parentCompany: '—',
+  kpp: `77${client.code.slice(-4)}001`,
+  ogrn: `10277${client.code.slice(-6)}1234`,
+  registrationDate: '2014-05-18',
+  registrationAuthority: 'Межрайонная ИФНС России № 46 по г. Москве',
+  authorizedCapital: '10 000 000 ₽',
+  registrarName: 'АО «Регистратор Плюс»',
+  taxName: 'ИФНС России № 10',
+  taxCode: `77${client.code.slice(-2)}`,
+  fssNumber: `7734${client.code.slice(-4)}`,
+  pfrNumber: `087-10${client.code.slice(-4)}`,
+  beneficiary: 'Иванов Иван Иванович',
+  authorizedPersons: 'Генеральный директор',
+  okato: `45286${client.code.slice(-3)}000`,
+  oktmo: `4538${client.code.slice(-4)}`,
+  okpo: `58${client.code.slice(-6)}`,
+  okfs: '16',
+  okogu: '4210014',
+});
+
 const defaultManager = {
   name: 'Петрова Анна Сергеевна',
   role: 'Старший клиентский менеджер',
@@ -636,6 +671,8 @@ export const clients: Client[] = legacyClients.map((client) => {
       correspondentAccount: '30101810400000000000',
     },
     bankAccounts: bankAccountsByClientId[client.id],
+    individualDetails: client.type === 'ФЛ' || client.type === 'ИП' ? buildIndividualDetails(client, person) : undefined,
+    legalEntityDetails: client.type === 'ФЛ' || client.type === 'ИП' ? undefined : buildLegalEntityDetails(client),
   };
 });
 

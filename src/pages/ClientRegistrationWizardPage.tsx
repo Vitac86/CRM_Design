@@ -8,7 +8,7 @@ import { RegistrationOptionCard } from '../components/crm/registration/Registrat
 import { RegistrationResult } from '../components/crm/registration/RegistrationResult';
 import { RegistrationStepHeader } from '../components/crm/registration/RegistrationStepHeader';
 import { RegistrationWizardLayout } from '../components/crm/registration/RegistrationWizardLayout';
-import type { Client, ClientType, ResidencyStatus } from '../data/types';
+import type { Client, ClientType, IndividualClientDetails, ResidencyStatus } from '../data/types';
 
 type SubjectType = 'individual' | 'legal' | null;
 type RegistrationMethod = 'manual' | 'cabinet' | 'inn' | null;
@@ -102,6 +102,13 @@ export const ClientRegistrationWizardPage = () => {
   const resolveIndividualType = (form: IndividualFormData): ClientType => {
     const typeHint = [form.services, form.sourceOfFunds].join(' ').toLowerCase();
     return typeHint.includes('ип') ? 'ИП' : 'ФЛ';
+  };
+
+  const resolveLegalCapacity = (value: IndividualFormData['legalCapacity']): IndividualClientDetails['legalCapacity'] => {
+    if (value === 'full') return 'Полная';
+    if (value === 'limited') return 'Ограниченная';
+    if (value === 'none') return 'Недееспособен';
+    return '';
   };
 
   const subjectTypeLabel = useMemo(() => {
@@ -247,6 +254,17 @@ export const ClientRegistrationWizardPage = () => {
             canUseSecurities: individualForm.securitiesPermission === 'yes',
             qualification: individualForm.qualifiedInvestor === 'yes',
             ogrnip: resolveIndividualType(individualForm) === 'ИП' ? `ОГРНИП-${String(timestamp).slice(-6)}` : '—',
+            individualDetails: {
+              birthPlace: individualForm.birthPlace.trim(),
+              snils: individualForm.snils.trim(),
+              actualAddressMatches:
+                individualForm.actualAddressMatches === 'yes' ? true : individualForm.actualAddressMatches === 'no' ? false : null,
+              services: individualForm.services.trim(),
+              sourceOfFunds: individualForm.sourceOfFunds.trim(),
+              taxResident: individualForm.taxResident === 'yes' ? true : individualForm.taxResident === 'no' ? false : null,
+              legalCapacity: resolveLegalCapacity(individualForm.legalCapacity),
+            },
+            legalEntityDetails: undefined,
           }
         : {
             ...baseClient,
@@ -283,6 +301,31 @@ export const ClientRegistrationWizardPage = () => {
             canUseMoney: legalEntityForm.cashPermission === 'yes',
             canUseSecurities: legalEntityForm.securitiesPermission === 'yes',
             qualification: legalEntityForm.qualifiedInvestor === 'yes',
+            individualDetails: undefined,
+            legalEntityDetails: {
+              shortName: legalEntityForm.clientName.trim(),
+              fullName: legalEntityForm.fullName.trim(),
+              englishName: legalEntityForm.englishName.trim(),
+              englishFullName: legalEntityForm.englishFullName.trim(),
+              parentCompany: legalEntityForm.parentCompany.trim(),
+              kpp: legalEntityForm.kpp.trim(),
+              ogrn: legalEntityForm.ogrn.trim(),
+              registrationDate: legalEntityForm.registrationDate.trim(),
+              registrationAuthority: legalEntityForm.registrationAuthority.trim(),
+              authorizedCapital: legalEntityForm.authorizedCapital.trim(),
+              registrarName: legalEntityForm.registrarName.trim(),
+              taxName: legalEntityForm.taxName.trim(),
+              taxCode: legalEntityForm.taxCode.trim(),
+              fssNumber: legalEntityForm.fssNumber.trim(),
+              pfrNumber: legalEntityForm.pfrNumber.trim(),
+              beneficiary: legalEntityForm.beneficiary.trim(),
+              authorizedPersons: legalEntityForm.authorizedPersons.trim(),
+              okato: legalEntityForm.okato.trim(),
+              oktmo: legalEntityForm.oktmo.trim(),
+              okpo: legalEntityForm.okpo.trim(),
+              okfs: legalEntityForm.okfs.trim(),
+              okogu: legalEntityForm.okogu.trim(),
+            },
           };
 
     addClient(client);

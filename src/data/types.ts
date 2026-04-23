@@ -49,6 +49,41 @@ export interface ClientRegistrationAddress {
 }
 
 
+export interface IndividualClientDetails {
+  birthPlace: string;
+  snils: string;
+  actualAddressMatches: boolean | null;
+  services: string;
+  sourceOfFunds: string;
+  taxResident: boolean | null;
+  legalCapacity: 'Полная' | 'Ограниченная' | 'Недееспособен' | '';
+}
+
+export interface LegalEntityClientDetails {
+  shortName: string;
+  fullName: string;
+  englishName: string;
+  englishFullName: string;
+  parentCompany: string;
+  kpp: string;
+  ogrn: string;
+  registrationDate: string;
+  registrationAuthority: string;
+  authorizedCapital: string;
+  registrarName: string;
+  taxName: string;
+  taxCode: string;
+  fssNumber: string;
+  pfrNumber: string;
+  beneficiary: string;
+  authorizedPersons: string;
+  okato: string;
+  oktmo: string;
+  okpo: string;
+  okfs: string;
+  okogu: string;
+}
+
 export type BankAccountStatus = 'Активен' | 'Закрыт' | 'На проверке';
 
 export type BankAccount = {
@@ -103,6 +138,8 @@ export interface Client {
   registrationAddress: ClientRegistrationAddress;
   bankDetails: ClientBankDetails;
   bankAccounts?: BankAccount[];
+  individualDetails?: IndividualClientDetails;
+  legalEntityDetails?: LegalEntityClientDetails;
 }
 
 export interface Document {

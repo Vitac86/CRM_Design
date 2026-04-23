@@ -75,6 +75,8 @@ export const SubjectProfilePage = () => {
       registrationAddress: { ...client.registrationAddress },
       bankDetails: { ...client.bankDetails },
       bankAccounts: client.bankAccounts ? [...client.bankAccounts] : undefined,
+      individualDetails: client.individualDetails ? { ...client.individualDetails } : undefined,
+      legalEntityDetails: client.legalEntityDetails ? { ...client.legalEntityDetails } : undefined,
     });
     setValidationError(null);
     setShowAllClientCodes(false);
@@ -122,6 +124,8 @@ export const SubjectProfilePage = () => {
         .filter(Boolean)
         .join(' ');
       normalizedClient.name = normalizedClient.type === 'ИП' ? `ИП ${fullName}` : fullName;
+    } else {
+      normalizedClient.name = normalizedClient.legalEntityDetails?.shortName?.trim() || normalizedClient.name.trim();
     }
 
     const { bankDetails: _bankDetails, bankAccounts: _bankAccounts, ...profilePatch } = normalizedClient;
@@ -169,6 +173,7 @@ export const SubjectProfilePage = () => {
   const additionalClientCodes = uniqueClientCodes.filter((code) => code !== currentClient.code);
   const hasExtraClientCodes = (currentClient.clientCodes?.length ?? 0) > 1 && additionalClientCodes.length > 0;
   const visibleAdditionalCodes = showAllClientCodes ? additionalClientCodes : additionalClientCodes.slice(0, 8);
+  const isIndividualClient = currentClient.type === 'ФЛ' || currentClient.type === 'ИП';
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -259,21 +264,88 @@ export const SubjectProfilePage = () => {
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {isEditing ? (
                 <>
-                  <FormField
-                    label="Фамилия"
-                    value={currentClient.lastName}
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, lastName: event.target.value } : prev))}
-                  />
-                  <FormField
-                    label="Имя"
-                    value={currentClient.firstName}
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, firstName: event.target.value } : prev))}
-                  />
-                  <FormField
-                    label="Отчество"
-                    value={currentClient.middleName}
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, middleName: event.target.value } : prev))}
-                  />
+                  {isIndividualClient ? (
+                    <>
+                      <FormField
+                        label="Фамилия"
+                        value={currentClient.lastName}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, lastName: event.target.value } : prev))}
+                      />
+                      <FormField
+                        label="Имя"
+                        value={currentClient.firstName}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, firstName: event.target.value } : prev))}
+                      />
+                      <FormField
+                        label="Отчество"
+                        value={currentClient.middleName}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, middleName: event.target.value } : prev))}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <FormField
+                        label="Наименование клиента"
+                        value={currentClient.legalEntityDetails?.shortName ?? currentClient.name}
+                        onChange={(event) =>
+                          setDraftClient((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  name: event.target.value,
+                                  legalEntityDetails: {
+                                    shortName: event.target.value,
+                                    fullName: prev.legalEntityDetails?.fullName ?? '',
+                                    englishName: prev.legalEntityDetails?.englishName ?? '',
+                                    englishFullName: prev.legalEntityDetails?.englishFullName ?? '',
+                                    parentCompany: prev.legalEntityDetails?.parentCompany ?? '',
+                                    kpp: prev.legalEntityDetails?.kpp ?? '',
+                                    ogrn: prev.legalEntityDetails?.ogrn ?? '',
+                                    registrationDate: prev.legalEntityDetails?.registrationDate ?? '',
+                                    registrationAuthority: prev.legalEntityDetails?.registrationAuthority ?? '',
+                                    authorizedCapital: prev.legalEntityDetails?.authorizedCapital ?? '',
+                                    registrarName: prev.legalEntityDetails?.registrarName ?? '',
+                                    taxName: prev.legalEntityDetails?.taxName ?? '',
+                                    taxCode: prev.legalEntityDetails?.taxCode ?? '',
+                                    fssNumber: prev.legalEntityDetails?.fssNumber ?? '',
+                                    pfrNumber: prev.legalEntityDetails?.pfrNumber ?? '',
+                                    beneficiary: prev.legalEntityDetails?.beneficiary ?? '',
+                                    authorizedPersons: prev.legalEntityDetails?.authorizedPersons ?? '',
+                                    okato: prev.legalEntityDetails?.okato ?? '',
+                                    oktmo: prev.legalEntityDetails?.oktmo ?? '',
+                                    okpo: prev.legalEntityDetails?.okpo ?? '',
+                                    okfs: prev.legalEntityDetails?.okfs ?? '',
+                                    okogu: prev.legalEntityDetails?.okogu ?? '',
+                                  },
+                                }
+                              : prev,
+                          )
+                        }
+                      />
+                      <FormField
+                        label="Полное наименование"
+                        value={currentClient.legalEntityDetails?.fullName ?? ''}
+                        onChange={(event) =>
+                          setDraftClient((prev) =>
+                            prev && prev.legalEntityDetails
+                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, fullName: event.target.value } }
+                              : prev,
+                          )
+                        }
+                      />
+                      <FormField
+                        label="Английское наименование"
+                        value={currentClient.legalEntityDetails?.englishName ?? ''}
+                        onChange={(event) =>
+                          setDraftClient((prev) =>
+                            prev && prev.legalEntityDetails
+                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, englishName: event.target.value } }
+                              : prev,
+                          )
+                        }
+                      />
+                    </>
+                  )}
                   <label className="space-y-1">
                     <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Тип клиента</span>
                     <select
@@ -306,24 +378,72 @@ export const SubjectProfilePage = () => {
                       ))}
                     </select>
                   </label>
-                  <FormField
-                    label="Дата рождения"
-                    type="date"
-                    value={currentClient.birthDate === '—' ? '' : currentClient.birthDate}
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, birthDate: event.target.value || '—' } : prev))}
-                  />
+                  {isIndividualClient ? (
+                    <FormField
+                      label="Дата рождения"
+                      type="date"
+                      value={currentClient.birthDate === '—' ? '' : currentClient.birthDate}
+                      onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, birthDate: event.target.value || '—' } : prev))}
+                    />
+                  ) : null}
                   <FormField
                     label="ИНН"
                     value={currentClient.inn}
                     mono
                     onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, inn: event.target.value } : prev))}
                   />
-                  <FormField
-                    label="ОГРНИП"
-                    value={currentClient.ogrnip}
-                    mono
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, ogrnip: event.target.value } : prev))}
-                  />
+                  {isIndividualClient ? (
+                    <FormField
+                      label="СНИЛС"
+                      value={currentClient.individualDetails?.snils ?? ''}
+                      mono
+                      onChange={(event) =>
+                        setDraftClient((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                individualDetails: {
+                                  birthPlace: prev.individualDetails?.birthPlace ?? '',
+                                  snils: event.target.value,
+                                  actualAddressMatches: prev.individualDetails?.actualAddressMatches ?? null,
+                                  services: prev.individualDetails?.services ?? '',
+                                  sourceOfFunds: prev.individualDetails?.sourceOfFunds ?? '',
+                                  taxResident: prev.individualDetails?.taxResident ?? null,
+                                  legalCapacity: prev.individualDetails?.legalCapacity ?? '',
+                                },
+                              }
+                            : prev,
+                        )
+                      }
+                    />
+                  ) : (
+                    <>
+                      <FormField
+                        label="КПП"
+                        value={currentClient.legalEntityDetails?.kpp ?? ''}
+                        mono
+                        onChange={(event) =>
+                          setDraftClient((prev) =>
+                            prev && prev.legalEntityDetails
+                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, kpp: event.target.value } }
+                              : prev,
+                          )
+                        }
+                      />
+                      <FormField
+                        label="ОГРН"
+                        value={currentClient.legalEntityDetails?.ogrn ?? ''}
+                        mono
+                        onChange={(event) =>
+                          setDraftClient((prev) =>
+                            prev && prev.legalEntityDetails
+                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, ogrn: event.target.value } }
+                              : prev,
+                          )
+                        }
+                      />
+                    </>
+                  )}
                   <label className="space-y-1">
                     <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Признак инвестора</span>
                     <select
@@ -340,14 +460,31 @@ export const SubjectProfilePage = () => {
                 </>
               ) : (
                 <>
-                  <ProfileField label="Фамилия" value={client.lastName} />
-                  <ProfileField label="Имя" value={client.firstName} />
-                  <ProfileField label="Отчество" value={client.middleName} />
+                  {isIndividualClient ? (
+                    <>
+                      <ProfileField label="Фамилия" value={client.lastName} />
+                      <ProfileField label="Имя" value={client.firstName} />
+                      <ProfileField label="Отчество" value={client.middleName} />
+                    </>
+                  ) : (
+                    <>
+                      <ProfileField label="Наименование клиента" value={client.legalEntityDetails?.shortName ?? client.name} />
+                      <ProfileField label="Полное наименование" value={client.legalEntityDetails?.fullName ?? '—'} />
+                      <ProfileField label="Английское наименование" value={client.legalEntityDetails?.englishName ?? '—'} />
+                    </>
+                  )}
                   <ProfileField label="Тип клиента" value={formatClientType(client.type)} />
                   <ProfileField label="Признак резидентства" value={formatResidency(client.residency)} />
-                  <ProfileField label="Дата рождения" value={client.birthDate} />
+                  {isIndividualClient ? <ProfileField label="Дата рождения" value={client.birthDate} /> : null}
                   <ProfileField label="ИНН" value={client.inn} mono />
-                  <ProfileField label="ОГРНИП" value={client.ogrnip} mono />
+                  {isIndividualClient ? (
+                    <ProfileField label="СНИЛС" value={client.individualDetails?.snils ?? '—'} mono />
+                  ) : (
+                    <>
+                      <ProfileField label="КПП" value={client.legalEntityDetails?.kpp ?? '—'} mono />
+                      <ProfileField label="ОГРН" value={client.legalEntityDetails?.ogrn ?? '—'} mono />
+                    </>
+                  )}
                   <ProfileField label="Признак инвестора" value={client.qualification ? 'Квалифицированный' : 'Неквалифицированный'} />
                 </>
               )}
@@ -578,17 +715,36 @@ export const SubjectProfilePage = () => {
                     value={currentClient.email}
                     onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, email: event.target.value } : prev))}
                   />
+                  {!isIndividualClient ? (
+                    <>
+                      <FormField
+                        label="Адрес"
+                        value={currentClient.address}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
+                      />
+                      <FormField
+                        label="Представитель"
+                        value={currentClient.representative}
+                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, representative: event.target.value } : prev))}
+                      />
+                    </>
+                  ) : null}
                 </>
               ) : (
                 <>
                   <ProfileField label="Телефон" value={client.phone} mono />
                   <ProfileField label="Дополнительный телефон" value={client.secondaryPhone} mono />
                   <ProfileField label="Email" value={client.email} />
+                  {!isIndividualClient ? <ProfileField label="Адрес" value={client.address} /> : null}
+                  {!isIndividualClient ? <ProfileField label="Представитель" value={client.representative} /> : null}
+                  {!isIndividualClient ? <ProfileField label="Выгодоприобретатель" value={client.legalEntityDetails?.beneficiary ?? '—'} /> : null}
+                  {!isIndividualClient ? <ProfileField label="Лица, действующие без доверенности" value={client.legalEntityDetails?.authorizedPersons ?? '—'} /> : null}
                 </>
               )}
             </div>
           </ProfileSection>
 
+          {isIndividualClient ? (
           <ProfileSection title="Адрес регистрации">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {isEditing ? (
@@ -691,6 +847,101 @@ export const SubjectProfilePage = () => {
               )}
             </div>
           </ProfileSection>
+          ) : null}
+
+          {isIndividualClient ? (
+            <ProfileSection title="Дополнительные данные">
+              <div className="grid gap-4 md:grid-cols-2">
+                {isEditing ? (
+                  <>
+                    <FormField
+                      label="Место рождения"
+                      value={currentClient.individualDetails?.birthPlace ?? ''}
+                      onChange={(event) =>
+                        setDraftClient((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                individualDetails: {
+                                  birthPlace: event.target.value,
+                                  snils: prev.individualDetails?.snils ?? '',
+                                  actualAddressMatches: prev.individualDetails?.actualAddressMatches ?? null,
+                                  services: prev.individualDetails?.services ?? '',
+                                  sourceOfFunds: prev.individualDetails?.sourceOfFunds ?? '',
+                                  taxResident: prev.individualDetails?.taxResident ?? null,
+                                  legalCapacity: prev.individualDetails?.legalCapacity ?? '',
+                                },
+                              }
+                            : prev,
+                        )
+                      }
+                    />
+                    <FormField
+                      label="Услуги"
+                      value={currentClient.individualDetails?.services ?? ''}
+                      onChange={(event) =>
+                        setDraftClient((prev) =>
+                          prev && prev.individualDetails
+                            ? { ...prev, individualDetails: { ...prev.individualDetails, services: event.target.value } }
+                            : prev,
+                        )
+                      }
+                    />
+                    <FormField
+                      label="Источник средств"
+                      value={currentClient.individualDetails?.sourceOfFunds ?? ''}
+                      onChange={(event) =>
+                        setDraftClient((prev) =>
+                          prev && prev.individualDetails
+                            ? { ...prev, individualDetails: { ...prev.individualDetails, sourceOfFunds: event.target.value } }
+                            : prev,
+                        )
+                      }
+                    />
+                  </>
+                ) : (
+                  <>
+                    <ProfileField label="Место рождения" value={client.individualDetails?.birthPlace ?? '—'} />
+                    <ProfileField label="Услуги" value={client.individualDetails?.services ?? '—'} />
+                    <ProfileField label="Источник средств" value={client.individualDetails?.sourceOfFunds ?? '—'} />
+                    <ProfileField
+                      label="Налоговый резидент"
+                      value={client.individualDetails?.taxResident == null ? '—' : client.individualDetails.taxResident ? 'Да' : 'Нет'}
+                    />
+                    <ProfileField label="Дееспособность" value={client.individualDetails?.legalCapacity || '—'} />
+                  </>
+                )}
+              </div>
+            </ProfileSection>
+          ) : (
+            <>
+              <ProfileSection title="Регистрационные данные">
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <ProfileField label="Дата регистрации" value={client.legalEntityDetails?.registrationDate ?? '—'} />
+                  <ProfileField label="Регистрирующий орган" value={client.legalEntityDetails?.registrationAuthority ?? '—'} />
+                  <ProfileField label="Уставный капитал" value={client.legalEntityDetails?.authorizedCapital ?? '—'} />
+                  <ProfileField label="Наименование регистратора" value={client.legalEntityDetails?.registrarName ?? '—'} />
+                </div>
+              </ProfileSection>
+              <ProfileSection title="Налоговые данные">
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <ProfileField label="Наименование налоговой" value={client.legalEntityDetails?.taxName ?? '—'} />
+                  <ProfileField label="Код налоговой" value={client.legalEntityDetails?.taxCode ?? '—'} />
+                  <ProfileField label="Номер ФСС" value={client.legalEntityDetails?.fssNumber ?? '—'} />
+                  <ProfileField label="Номер ПФР" value={client.legalEntityDetails?.pfrNumber ?? '—'} />
+                </div>
+              </ProfileSection>
+              <ProfileSection title="Коды классификаторов">
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <ProfileField label="ОКАТО" value={client.legalEntityDetails?.okato ?? '—'} />
+                  <ProfileField label="ОКТМО" value={client.legalEntityDetails?.oktmo ?? '—'} />
+                  <ProfileField label="ОКПО" value={client.legalEntityDetails?.okpo ?? '—'} />
+                  <ProfileField label="ОКФС" value={client.legalEntityDetails?.okfs ?? '—'} />
+                  <ProfileField label="ОКОГУ" value={client.legalEntityDetails?.okogu ?? '—'} />
+                </div>
+              </ProfileSection>
+            </>
+          )}
 
         </div>
       ) : activeTab === 'bankAccounts' ? (
