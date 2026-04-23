@@ -1341,7 +1341,7 @@ export const SubjectProfilePage = () => {
       ) : activeTab === 'relations' ? (
         <SubjectRelationsTab clientId={client.id} />
       ) : activeTab === 'contracts' ? (
-        <SubjectContractsTab client={client} />
+        <SubjectContractsTab clientId={client.id} />
       ) : activeTab === 'history' ? (
         <SubjectHistoryTab clientId={client.id} />
       ) : (
