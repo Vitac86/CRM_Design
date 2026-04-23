@@ -1,17 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { MiddleOfficeReportDetails } from '../components/crm/MiddleOfficeReportDetails';
 import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList';
-import { MiddleOfficeStats } from '../components/crm/MiddleOfficeStats';
 import { reports } from '../data/reports';
 import type { Report } from '../data/types';
 import { Button, SearchInput, SelectFilter } from '../components/ui';
-
-const middleOfficeStats = {
-  total: 142,
-  delivered: 128,
-  waiting: 11,
-  error: 3,
-};
 
 export const MiddleOfficePage = () => {
   const [search, setSearch] = useState('');
@@ -81,15 +73,6 @@ export const MiddleOfficePage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис · Реестр отчётов</h1>
         <Button variant="secondary">Экспорт</Button>
       </header>
-
-      <MiddleOfficeStats
-        stats={[
-          { label: 'Всего отчётов', value: middleOfficeStats.total },
-          { label: 'Доставлено', value: middleOfficeStats.delivered },
-          { label: 'Ожидают', value: middleOfficeStats.waiting },
-          { label: 'Ошибка', value: middleOfficeStats.error },
-        ]}
-      />
 
       <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
         <div className="space-y-3">

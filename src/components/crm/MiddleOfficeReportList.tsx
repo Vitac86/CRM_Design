@@ -32,7 +32,7 @@ export const MiddleOfficeReportList = ({ reports, selectedReportId, onSelect }: 
   }
 
   return (
-    <div className="max-h-[560px] space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-white p-3">
+    <div className="max-h-[560px] space-y-1.5 overflow-y-auto rounded-lg border border-slate-200 bg-white p-2.5">
       {reports.map((report) => {
         const isActive = report.id === selectedReportId;
 
@@ -42,28 +42,34 @@ export const MiddleOfficeReportList = ({ reports, selectedReportId, onSelect }: 
             key={report.id}
             onClick={() => onSelect(report.id)}
             className={cn(
-              'w-full rounded-lg border px-3 py-3 text-left transition',
+              'w-full rounded-lg border px-2.5 py-2 text-left transition',
               isActive
                 ? 'border-emerald-200 bg-emerald-50/70 shadow-sm'
                 : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/30',
             )}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 gap-3">
-                <span className={cn('mt-0.5 text-base', statusIconStyleMap[report.deliveryStatus])} aria-hidden="true">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex min-w-0 gap-2.5">
+                <span className={cn('mt-0.5 text-sm', statusIconStyleMap[report.deliveryStatus])} aria-hidden="true">
                   {statusIconMap[report.deliveryStatus]}
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-slate-900">{report.clientName}</p>
-                  <p className="mt-0.5 text-sm text-slate-700">{report.reportTitle}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Badge variant="info">{report.deliveryChannel}</Badge>
-                    <Badge variant="neutral">{report.reportType}</Badge>
-                    <Badge variant={statusBadgeVariantMap[report.deliveryStatus]}>{report.deliveryStatus}</Badge>
+                  <p className="mt-0.5 text-xs text-slate-700">{report.reportTitle}</p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <Badge className="px-1.5 py-0 leading-4" variant="info">
+                      {report.deliveryChannel}
+                    </Badge>
+                    <Badge className="px-1.5 py-0 leading-4" variant="neutral">
+                      {report.reportType}
+                    </Badge>
+                    <Badge className="px-1.5 py-0 leading-4" variant={statusBadgeVariantMap[report.deliveryStatus]}>
+                      {report.deliveryStatus}
+                    </Badge>
                   </div>
                 </div>
               </div>
-              <span className="shrink-0 text-xs text-slate-500">{report.sentAt}</span>
+              <span className="shrink-0 pt-0.5 text-[11px] leading-4 text-slate-500">{report.sentAt}</span>
             </div>
           </button>
         );
