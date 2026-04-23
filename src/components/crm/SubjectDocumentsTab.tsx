@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getDocumentsByClientId } from '../../data/clientDocuments';
 import type { ClientDocument } from '../../data/types';
-import { Badge, Button, DataTable, EmptyState, PrintIcon } from '../ui';
+import { Badge, Button, DataTable, DownloadIcon, EmptyState, PrintIcon } from '../ui';
 
 type SubjectDocumentsTabProps = {
   clientId: string;
@@ -86,6 +86,90 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
     window.print();
   };
 
+  const sanitizeFileName = (rawName: string) => {
+    const transliterationMap: Record<string, string> = {
+      а: 'a',
+      б: 'b',
+      в: 'v',
+      г: 'g',
+      д: 'd',
+      е: 'e',
+      ё: 'e',
+      ж: 'zh',
+      з: 'z',
+      и: 'i',
+      й: 'y',
+      к: 'k',
+      л: 'l',
+      м: 'm',
+      н: 'n',
+      о: 'o',
+      п: 'p',
+      р: 'r',
+      с: 's',
+      т: 't',
+      у: 'u',
+      ф: 'f',
+      х: 'h',
+      ц: 'ts',
+      ч: 'ch',
+      ш: 'sh',
+      щ: 'sch',
+      ъ: '',
+      ы: 'y',
+      ь: '',
+      э: 'e',
+      ю: 'yu',
+      я: 'ya',
+    };
+
+    const transliterated = rawName
+      .toLowerCase()
+      .split('')
+      .map((char) => transliterationMap[char] ?? char)
+      .join('');
+
+    return transliterated
+      .replace(/[^a-z0-9._\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '_')
+      .replace(/_+/g, '_');
+  };
+
+  const resolveDownloadFileName = (doc: ClientDocument) => {
+    const sourceName = doc.fileName?.trim() || doc.title.trim();
+    const normalizedName = sanitizeFileName(sourceName);
+
+    if (!normalizedName) {
+      return 'document.txt';
+    }
+
+    return /\.[a-z0-9]{2,5}$/i.test(normalizedName) ? normalizedName : `${normalizedName}.txt`;
+  };
+
+  const handleDownloadDocument = (doc: ClientDocument) => {
+    const fileName = resolveDownloadFileName(doc);
+    const content = [
+      `Название документа: ${doc.title}`,
+      `Тип документа: ${doc.documentType}`,
+      `Статус: ${doc.status}`,
+      `Дата: ${doc.date}`,
+      `Клиент: ${doc.clientId}`,
+      '',
+      'Это mock-файл, сгенерированный в интерфейсе CRM.',
+    ].join('\n');
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = fileName;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(objectUrl);
+  };
+
   const table = useMemo(
     () => (
       <DataTable
@@ -102,14 +186,26 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
           {
             key: 'actions',
             header: 'Действия',
-            className: 'w-20',
+            className: 'w-28',
             headerClassName: 'text-right',
             render: (row) => (
-              <div className="flex justify-end">
+              <div className="flex items-center justify-end gap-2">
                 <button
                   type="button"
                   className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20"
-                  aria-label="Распечатать"
+                  aria-label="Скачать документ"
+                  title="Скачать"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleDownloadDocument(row);
+                  }}
+                >
+                  <DownloadIcon className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20"
+                  aria-label="Распечатать документ"
                   title="Распечатать"
                   onClick={(event) => {
                     event.stopPropagation();
