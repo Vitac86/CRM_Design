@@ -17,6 +17,7 @@ import { TrustManagementPage } from '../pages/TrustManagementPage';
 import { AgentsPage } from '../pages/AgentsPage';
 import { ArchivesPage } from '../pages/ArchivesPage';
 import { AdministrationPage } from '../pages/AdministrationPage';
+import { ContractWizardPage } from '../pages/ContractWizardPage';
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: 'subjects', element: <SubjectsPage /> },
       { path: 'subjects/register', element: <ClientRegistrationWizardPage /> },
       { path: 'subjects/:id', element: <SubjectProfilePage /> },
+      { path: 'subjects/:subjectId/contract-wizard', element: <ContractWizardPage /> },
       { path: 'brokerage', element: <BrokeragePage /> },
       { path: 'trust-management', element: <TrustManagementPage /> },
       { path: 'agents', element: <AgentsPage /> },

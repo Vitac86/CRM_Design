@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ClientProfileHeader } from '../components/crm/ClientProfileHeader';
 import { PermissionCard } from '../components/crm/PermissionCard';
 import { PersonCard } from '../components/crm/PersonCard';
@@ -35,6 +35,8 @@ const shouldShowSendToComplianceButton = (status: string) => {
 export const SubjectProfilePage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<SubjectProfileTab>('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [draftClient, setDraftClient] = useState<Client | undefined>();
@@ -42,6 +44,23 @@ export const SubjectProfilePage = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showAllClientCodes, setShowAllClientCodes] = useState(false);
   const { getClientById, updateClient, archiveClient } = useClientsStore();
+
+  useEffect(() => {
+    const requestedTab = searchParams.get('tab');
+    if (requestedTab === 'contracts' || requestedTab === 'profile' || requestedTab === 'bankAccounts' || requestedTab === 'documents' || requestedTab === 'relations' || requestedTab === 'history') {
+      setActiveTab(requestedTab);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const state = location.state as { toastMessage?: string } | null;
+    if (!state?.toastMessage) {
+      return;
+    }
+
+    setToastMessage(state.toastMessage);
+    navigate(location.pathname + location.search, { replace: true, state: null });
+  }, [location.pathname, location.search, location.state, navigate]);
 
   const client = useMemo(() => {
     if (!id) {
@@ -199,8 +218,12 @@ export const SubjectProfilePage = () => {
     setToastMessage('Субъект отправлен на комплаенс');
   };
 
-  const handleOpenContractTab = () => {
-    handleTabChange('contracts');
+  const handleOpenContractWizard = () => {
+    if (!client) {
+      return;
+    }
+
+    navigate(`/subjects/${client.id}/contract-wizard`);
   };
 
   if (!client) {
@@ -245,7 +268,7 @@ export const SubjectProfilePage = () => {
               <Button variant="secondary" size="sm" onClick={handleStartEdit}>
                 Редактировать
               </Button>
-              <Button size="sm" onClick={handleOpenContractTab}>
+              <Button size="sm" onClick={handleOpenContractWizard}>
                 Оформить договор
               </Button>
             </div>

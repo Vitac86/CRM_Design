@@ -1,4 +1,4 @@
-import type { ClientContract } from './types';
+import type { ClientContract, ContractProductType } from './types';
 
 export const clientContracts: ClientContract[] = [
   {
@@ -58,3 +58,42 @@ export const clientContracts: ClientContract[] = [
 ];
 
 export const getContractsByClientId = (clientId: string) => clientContracts.filter((contract) => contract.clientId === clientId);
+
+const contractTypePrefixMap: Record<ContractProductType, string> = {
+  broker: 'BR',
+  depository: 'DP',
+  trust: 'DU',
+  iis: 'IIS',
+  other: 'IN',
+};
+
+export const generateContractNumber = (type: ContractProductType = 'broker') => {
+  const year = new Date().getFullYear();
+  const nextIndex = clientContracts.length + 1;
+  const serial = String(nextIndex).padStart(5, '0');
+
+  return `${contractTypePrefixMap[type]}-${year}/${serial}`;
+};
+
+export const createClientContract = (payload: {
+  clientId: string;
+  type?: ContractProductType;
+  number?: string;
+  openDate?: string;
+  closeDate?: string | null;
+  status?: ClientContract['status'];
+}) => {
+  const type = payload.type ?? 'broker';
+  const contract: ClientContract = {
+    id: `ctr-${Date.now()}`,
+    clientId: payload.clientId,
+    number: payload.number?.trim() || generateContractNumber(type),
+    type,
+    openDate: payload.openDate ?? new Date().toISOString().slice(0, 10),
+    closeDate: payload.closeDate ?? null,
+    status: payload.status ?? 'active',
+  };
+
+  clientContracts.unshift(contract);
+  return contract;
+};
