@@ -18,7 +18,7 @@ export const subjectStatusTone = {
     ПРОЙДЕН: 'neutral',
     'НА ПРОВЕРКЕ': 'warning',
     'НА ДОРАБОТКЕ': 'warning',
-    БАН: 'danger',
+    ЗАБЛОКИРОВАН: 'danger',
   } satisfies Record<ComplianceStatus, TableStatusTone>,
   fullDocumentSet: {
     true: 'neutral',

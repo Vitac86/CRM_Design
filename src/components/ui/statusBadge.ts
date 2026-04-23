@@ -8,7 +8,7 @@ export const statusBadgeVariantMap: Record<string, BadgeVariant> = {
   'ПРОЙДЕН': 'success',
   'НА ПРОВЕРКЕ': 'warning',
   'НА ДОРАБОТКЕ': 'orange',
-  'БАН': 'danger',
+  'ЗАБЛОКИРОВАН': 'danger',
   'ДЕЙСТВУЮЩИЙ': 'success',
   'НЕ ДЕЙСТВУЮЩИЙ': 'neutral',
   'ОЖИДАЕТ': 'warning',

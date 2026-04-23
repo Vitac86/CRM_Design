@@ -21,7 +21,13 @@ const complianceVariantMap: Record<ComplianceStatus, ComplianceBadgeVariant> = {
   ПРОЙДЕН: 'success',
   'НА ПРОВЕРКЕ': 'warning',
   'НА ДОРАБОТКЕ': 'orange',
-  БАН: 'danger',
+  ЗАБЛОКИРОВАН: 'danger',
+};
+const complianceLabelMap: Record<ComplianceStatus, string> = {
+  ПРОЙДЕН: 'ПРОЙДЕН',
+  'НА ПРОВЕРКЕ': 'НА ПРОВЕРКЕ',
+  'НА ДОРАБОТКЕ': 'НА ДОРАБОТКЕ',
+  ЗАБЛОКИРОВАН: 'Заблокирован',
 };
 
 const clientTypeVariantMap: Record<ClientType, BadgeVariant> = {
@@ -56,7 +62,7 @@ export const formatClientType = (type: ClientType): string => clientTypeLabelMap
 
 export const formatResidency = (residency: ResidencyStatus): string => residencyLabelMap[residency];
 
-export const formatComplianceStatus = (status: ComplianceStatus): string => status;
+export const formatComplianceStatus = (status: ComplianceStatus): string => complianceLabelMap[status];
 
 export const getComplianceBadgeVariant = (status: ComplianceStatus): ComplianceBadgeVariant => complianceVariantMap[status];
 
