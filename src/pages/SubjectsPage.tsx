@@ -12,16 +12,11 @@ import {
   Pagination,
   SearchInput,
   TableControlPanel,
+  TableStatusText,
   type SortDirection,
 } from '../components/ui';
-import {
-  formatClientType,
-  formatComplianceStatus,
-  formatResidency,
-  getClientTypeBadgeVariant,
-  getComplianceBadgeVariant,
-  getResidencyBadgeVariant,
-} from '../utils/labels';
+import { formatClientType, formatComplianceStatus, formatResidency } from '../utils/labels';
+import { subjectStatusTone } from '../utils/tableStatus';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
 type SubjectsSortKey = 'code' | 'name' | 'inn' | 'type' | 'residency' | 'complianceStatus' | 'fullDocumentSet';
@@ -301,14 +296,18 @@ export const SubjectsPage = () => {
             key: 'type',
             header: 'Тип',
             sortable: true,
-            render: (client) => <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>,
+            render: (client) => (
+              <TableStatusText tone={subjectStatusTone.clientType[client.type]}>{formatClientType(client.type)}</TableStatusText>
+            ),
           },
           {
             key: 'residency',
             header: 'Резидент',
             sortable: true,
             render: (client) => (
-              <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
+              <TableStatusText tone={subjectStatusTone.residency[client.residency]}>
+                {formatResidency(client.residency)}
+              </TableStatusText>
             ),
           },
           {
@@ -316,9 +315,9 @@ export const SubjectsPage = () => {
             header: 'Статус комплаенса',
             sortable: true,
             render: (client) => (
-              <Badge variant={getComplianceBadgeVariant(client.complianceStatus)}>
+              <TableStatusText tone={subjectStatusTone.compliance[client.complianceStatus]}>
                 {formatComplianceStatus(client.complianceStatus)}
-              </Badge>
+              </TableStatusText>
             ),
           },
           {
@@ -326,7 +325,9 @@ export const SubjectsPage = () => {
             header: 'Полный комплект',
             sortable: true,
             render: (client) => (
-              <Badge variant={client.fullDocumentSet ? 'success' : 'warning'}>{client.fullDocumentSet ? 'Да' : 'Нет'}</Badge>
+              <TableStatusText tone={subjectStatusTone.fullDocumentSet[String(client.fullDocumentSet) as 'true' | 'false']}>
+                {client.fullDocumentSet ? 'Да' : 'Нет'}
+              </TableStatusText>
             ),
           },
         ]}
