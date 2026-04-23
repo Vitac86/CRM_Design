@@ -17,7 +17,21 @@ import { formatClientType, formatComplianceStatus, formatResidency, formatSubjec
 import { subjectStatusTone } from '../utils/tableStatus';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
+const subjectStatusValues: SubjectStatus[] = ['Регистрация', 'Активный клиент', 'На комплаенсе', 'Данные заполнены'];
 type SubjectsSortKey = 'name' | 'inn' | 'type' | 'residency' | 'subjectStatus' | 'complianceStatus' | 'fullDocumentSet';
+
+const normalizeSubjectStatus = (value: string) => value.trim().replace(/\s+/g, ' ').toLowerCase();
+
+const parseSubjectStatus = (value: string | null): SubjectStatus | 'all' => {
+  if (!value) {
+    return 'all';
+  }
+
+  const normalizedValue = normalizeSubjectStatus(value);
+  const matchedValue = subjectStatusValues.find((status) => normalizeSubjectStatus(status) === normalizedValue);
+
+  return matchedValue ?? 'all';
+};
 
 export const SubjectsPage = () => {
   const navigate = useNavigate();
@@ -34,9 +48,7 @@ export const SubjectsPage = () => {
   });
   const [subjectStatusFilter, setSubjectStatusFilter] = useState<SubjectStatus | 'all'>(() => {
     const value = searchParams.get('subjectStatus');
-    return value === 'Регистрация' || value === 'Активный клиент' || value === 'На комплаенсе' || value === 'Данные заполнены'
-      ? value
-      : 'all';
+    return parseSubjectStatus(value);
   });
   const [complianceFilter, setComplianceFilter] = useState<ComplianceStatus | 'all'>(() => {
     const value = searchParams.get('complianceStatus');
@@ -87,7 +99,10 @@ export const SubjectsPage = () => {
         if (complianceFilter !== 'all' && client.complianceStatus !== complianceFilter) {
           return false;
         }
-        if (subjectStatusFilter !== 'all' && client.subjectStatus !== subjectStatusFilter) {
+        if (
+          subjectStatusFilter !== 'all' &&
+          normalizeSubjectStatus(client.subjectStatus) !== normalizeSubjectStatus(subjectStatusFilter)
+        ) {
           return false;
         }
 
