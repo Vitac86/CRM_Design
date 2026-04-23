@@ -76,9 +76,10 @@ export const TradingCardPage = () => {
 
   const [activeTab, setActiveTab] = useState<TradingTab>('params');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [confirmTerminalId, setConfirmTerminalId] = useState<string | null>(null);
+  const [passwordResetTerminalId, setPasswordResetTerminalId] = useState<string | null>(null);
 
   const isQuikMobileTerminal = (terminalType: string) => terminalType.toLowerCase().includes('quik mobile');
+  const selectedTerminal = profile?.terminals.find((terminal) => terminal.id === passwordResetTerminalId);
 
   useEffect(() => {
     if (!toastMessage) {
@@ -259,52 +260,16 @@ export const TradingCardPage = () => {
                     </div>
                     <div className="flex flex-col items-start gap-2 md:items-end">
                       <Badge variant={statusBadgeVariant(terminal.status)}>{terminal.status}</Badge>
-                      {isQuikMobileTerminal(terminal.type) &&
-                        (confirmTerminalId === terminal.id ? (
-                          <div
-                            className="w-full max-w-xs rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700 md:text-right"
-                            role="alertdialog"
-                            aria-labelledby={`confirm-title-${terminal.id}`}
-                            aria-describedby={`confirm-description-${terminal.id}`}
-                          >
-                            <p id={`confirm-title-${terminal.id}`} className="text-sm font-semibold text-slate-900">
-                              Обновить пароль?
-                            </p>
-                            <p id={`confirm-description-${terminal.id}`} className="mt-1">
-                              Вы уверены, что хотите обновить пароль для QUIK Mobile?
-                            </p>
-                            <div className="mt-3 flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="secondary"
-                                onClick={() => {
-                                  setToastMessage('Пароль для QUIK Mobile обновлён');
-                                  setConfirmTerminalId(null);
-                                }}
-                                aria-label="Подтвердить обновление пароля для QUIK Mobile"
-                              >
-                                Обновить
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setConfirmTerminalId(null)}
-                                aria-label="Отменить обновление пароля для QUIK Mobile"
-                              >
-                                Отмена
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => setConfirmTerminalId(terminal.id)}
-                            aria-label="Обновить пароль для QUIK Mobile"
-                          >
-                            Обновить пароль
-                          </Button>
-                        ))}
+                      {isQuikMobileTerminal(terminal.type) && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setPasswordResetTerminalId(terminal.id)}
+                          aria-label="Обновить пароль для QUIK Mobile"
+                        >
+                          Обновить пароль
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -316,6 +281,45 @@ export const TradingCardPage = () => {
 
       {toastMessage && (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
+      )}
+
+      {selectedTerminal && isQuikMobileTerminal(selectedTerminal.type) && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
+          <div
+            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-5 shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-password-modal-title"
+            aria-describedby="reset-password-modal-description"
+          >
+            <h3 id="reset-password-modal-title" className="text-base font-semibold text-slate-900">
+              Обновить пароль?
+            </h3>
+            <p id="reset-password-modal-description" className="mt-2 text-sm text-slate-600">
+              Вы уверены, что хотите обновить пароль для QUIK Mobile?
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setPasswordResetTerminalId(null)}
+                aria-label="Отмена обновления пароля для QUIK Mobile"
+              >
+                Отмена
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setToastMessage('Пароль обновлён');
+                  setPasswordResetTerminalId(null);
+                }}
+                aria-label="Подтвердить обновление пароля для QUIK Mobile"
+              >
+                Обновить
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
