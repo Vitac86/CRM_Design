@@ -8,7 +8,7 @@ import { RegistrationOptionCard } from '../components/crm/registration/Registrat
 import { RegistrationResult } from '../components/crm/registration/RegistrationResult';
 import { RegistrationStepHeader } from '../components/crm/registration/RegistrationStepHeader';
 import { RegistrationWizardLayout } from '../components/crm/registration/RegistrationWizardLayout';
-import type { Client, ClientType, IndividualClientDetails, ResidencyStatus } from '../data/types';
+import type { Client, ClientType, IndividualClientDetails, LegalRepresentative, ResidencyStatus } from '../data/types';
 
 type SubjectType = 'individual' | 'legal' | null;
 type RegistrationMethod = 'manual' | 'cabinet' | 'inn' | null;
@@ -38,6 +38,7 @@ const initialIndividualForm: IndividualFormData = {
   sourceOfFunds: '',
   taxResident: '',
   legalCapacity: '',
+  bankAccounts: [],
 };
 
 const initialLegalEntityForm: LegalEntityFormData = {
@@ -64,7 +65,6 @@ const initialLegalEntityForm: LegalEntityFormData = {
   phones: '',
   email: '',
   address: '',
-  representative: '',
   beneficiary: '',
   authorizedPersons: '',
   okato: '',
@@ -72,6 +72,17 @@ const initialLegalEntityForm: LegalEntityFormData = {
   okpo: '',
   okfs: '',
   okogu: '',
+  bankAccounts: [],
+  representativeFullName: '',
+  representativePosition: '',
+  representativeBirthDate: '',
+  representativeDocumentType: 'passport_rf',
+  representativeDocumentTitle: '',
+  representativeDocumentSeries: '',
+  representativeDocumentNumber: '',
+  representativeDocumentIssuedBy: '',
+  representativeDocumentIssuedAt: '',
+  representativeDocumentDivisionCode: '',
 };
 
 export const ClientRegistrationWizardPage = () => {
@@ -214,7 +225,22 @@ export const ClientRegistrationWizardPage = () => {
         checkingAccount: '',
         correspondentAccount: '',
       },
-      bankAccounts: [],
+      bankAccounts: subjectType === 'individual' ? individualForm.bankAccounts : legalEntityForm.bankAccounts,
+    };
+
+    const legalRepresentative: LegalRepresentative = {
+      fullName: legalEntityForm.representativeFullName.trim(),
+      position: legalEntityForm.representativePosition.trim(),
+      birthDate: legalEntityForm.representativeBirthDate.trim(),
+      document: {
+        type: legalEntityForm.representativeDocumentType,
+        title: legalEntityForm.representativeDocumentType === 'other' ? legalEntityForm.representativeDocumentTitle.trim() : undefined,
+        series: legalEntityForm.representativeDocumentSeries.trim(),
+        number: legalEntityForm.representativeDocumentNumber.trim(),
+        issuedBy: legalEntityForm.representativeDocumentType === 'id_card' ? '' : legalEntityForm.representativeDocumentIssuedBy.trim(),
+        issuedAt: legalEntityForm.representativeDocumentIssuedAt.trim(),
+        divisionCode: legalEntityForm.representativeDocumentType === 'passport_rf' ? legalEntityForm.representativeDocumentDivisionCode.trim() : '',
+      },
     };
 
     const client: Client =
@@ -279,7 +305,7 @@ export const ClientRegistrationWizardPage = () => {
             phone: legalEntityForm.phones.trim(),
             email: legalEntityForm.email.trim(),
             address: legalEntityForm.address.trim(),
-            representative: legalEntityForm.representative.trim() || 'Самостоятельно',
+            representative: legalRepresentative.fullName || 'Самостоятельно',
             registrationAddress: {
               country: 'Россия',
               region: '',
@@ -325,6 +351,7 @@ export const ClientRegistrationWizardPage = () => {
               okpo: legalEntityForm.okpo.trim(),
               okfs: legalEntityForm.okfs.trim(),
               okogu: legalEntityForm.okogu.trim(),
+              representativeDetails: legalRepresentative.fullName ? legalRepresentative : undefined,
             },
           };
 

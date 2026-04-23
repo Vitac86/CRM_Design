@@ -59,6 +59,23 @@ export interface IndividualClientDetails {
   legalCapacity: 'Полная' | 'Ограниченная' | 'Недееспособен' | '';
 }
 
+export interface RepresentativeDocument {
+  type: 'passport_rf' | 'id_card' | 'other';
+  title?: string;
+  series: string;
+  number: string;
+  issuedBy: string;
+  issuedAt: string;
+  divisionCode: string;
+}
+
+export interface LegalRepresentative {
+  fullName: string;
+  position: string;
+  birthDate: string;
+  document: RepresentativeDocument;
+}
+
 export interface LegalEntityClientDetails {
   shortName: string;
   fullName: string;
@@ -82,6 +99,7 @@ export interface LegalEntityClientDetails {
   okpo: string;
   okfs: string;
   okogu: string;
+  representativeDetails?: LegalRepresentative;
 }
 
 export type BankAccountStatus = 'Активен' | 'Закрыт' | 'На проверке';

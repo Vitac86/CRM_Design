@@ -77,7 +77,17 @@ export const SubjectProfilePage = () => {
       bankDetails: { ...client.bankDetails },
       bankAccounts: client.bankAccounts ? [...client.bankAccounts] : undefined,
       individualDetails: client.individualDetails ? { ...client.individualDetails } : undefined,
-      legalEntityDetails: client.legalEntityDetails ? { ...client.legalEntityDetails } : undefined,
+      legalEntityDetails: client.legalEntityDetails
+        ? {
+            ...client.legalEntityDetails,
+            representativeDetails: client.legalEntityDetails.representativeDetails
+              ? {
+                  ...client.legalEntityDetails.representativeDetails,
+                  document: { ...client.legalEntityDetails.representativeDetails.document },
+                }
+              : undefined,
+          }
+        : undefined,
     });
     setValidationError(null);
     setShowAllClientCodes(false);
@@ -761,6 +771,45 @@ export const SubjectProfilePage = () => {
               )}
             </div>
           </ProfileSection>
+
+
+
+          {!isIndividualClient && client.legalEntityDetails?.representativeDetails ? (
+            <ProfileSection title="Представитель">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <ProfileField label="ФИО" value={client.legalEntityDetails.representativeDetails.fullName} />
+                <ProfileField label="Должность" value={client.legalEntityDetails.representativeDetails.position} />
+                <ProfileField label="Дата рождения" value={client.legalEntityDetails.representativeDetails.birthDate} />
+                <ProfileField
+                  label="Тип документа"
+                  value={
+                    client.legalEntityDetails.representativeDetails.document.type === 'passport_rf'
+                      ? 'Паспорт РФ'
+                      : client.legalEntityDetails.representativeDetails.document.type === 'id_card'
+                        ? 'ID'
+                        : 'Иной документ'
+                  }
+                />
+                <ProfileField
+                  label="Реквизиты документа"
+                  value={[
+                    client.legalEntityDetails.representativeDetails.document.title,
+                    client.legalEntityDetails.representativeDetails.document.series &&
+                      `серия ${client.legalEntityDetails.representativeDetails.document.series}`,
+                    client.legalEntityDetails.representativeDetails.document.number &&
+                      `№ ${client.legalEntityDetails.representativeDetails.document.number}`,
+                    client.legalEntityDetails.representativeDetails.document.issuedBy,
+                    client.legalEntityDetails.representativeDetails.document.issuedAt &&
+                      `от ${client.legalEntityDetails.representativeDetails.document.issuedAt}`,
+                    client.legalEntityDetails.representativeDetails.document.divisionCode &&
+                      `код подразделения ${client.legalEntityDetails.representativeDetails.document.divisionCode}`,
+                  ]
+                    .filter(Boolean)
+                    .join(', ')}
+                />
+              </div>
+            </ProfileSection>
+          ) : null}
 
           {isIndividualClient ? (
           <ProfileSection title="Адрес регистрации">
