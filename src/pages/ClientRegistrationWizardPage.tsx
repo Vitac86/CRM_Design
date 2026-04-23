@@ -158,7 +158,7 @@ export const ClientRegistrationWizardPage = () => {
     setDraftMessage('');
   };
 
-  const handleProceedFromStepThree = () => {
+  const handleProceedFromStepTwo = () => {
     if (subjectType === 'individual') {
       const hasBase = individualForm.lastName.trim() && individualForm.firstName.trim();
       const hasInnOrPhone = individualForm.inn.trim() || individualForm.phones.trim();
@@ -363,34 +363,72 @@ export const ClientRegistrationWizardPage = () => {
     });
     setValidationError('');
     setDraftMessage('');
-    setStep(4);
+    setStep(3);
   };
 
   return (
     <RegistrationWizardLayout step={step}>
       {step === 1 ? (
         <div>
-          <RegistrationStepHeader title="Выберите тип субъекта" />
-          <div className="grid gap-3 md:grid-cols-2">
-            <RegistrationOptionCard
-              title="Физическое лицо"
-              selected={subjectType === 'individual'}
-              onClick={() => {
-                setSubjectType('individual');
-                setValidationError('');
-              }}
-            />
-            <RegistrationOptionCard
-              title="Юридическое лицо"
-              selected={subjectType === 'legal'}
-              onClick={() => {
-                setSubjectType('legal');
-                setValidationError('');
-              }}
-            />
+          <div className="space-y-5">
+            <div>
+              <RegistrationStepHeader title="Выберите тип субъекта" />
+              <div className="grid gap-3 md:grid-cols-2">
+                <RegistrationOptionCard
+                  title="Физическое лицо"
+                  selected={subjectType === 'individual'}
+                  onClick={() => {
+                    setSubjectType('individual');
+                    setValidationError('');
+                  }}
+                />
+                <RegistrationOptionCard
+                  title="Юридическое лицо"
+                  selected={subjectType === 'legal'}
+                  onClick={() => {
+                    setSubjectType('legal');
+                    setValidationError('');
+                  }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <RegistrationStepHeader title="Выберите способ" />
+              <div className="grid gap-3 md:grid-cols-3">
+                <RegistrationOptionCard
+                  title="Ручной ввод"
+                  description="Основной сценарий заполнения данных клиента."
+                  selected={registrationMethod === 'manual'}
+                  onClick={() => {
+                    setRegistrationMethod('manual');
+                    setValidationError('');
+                  }}
+                />
+                <RegistrationOptionCard
+                  title="Загрузить из ЛК"
+                  description="Скоро будет доступно."
+                  selected={registrationMethod === 'cabinet'}
+                  onClick={() => {
+                    setRegistrationMethod('cabinet');
+                    setValidationError('');
+                  }}
+                />
+                <RegistrationOptionCard
+                  title="Загрузить по ИНН"
+                  description="Скоро будет доступно."
+                  selected={registrationMethod === 'inn'}
+                  onClick={() => {
+                    setRegistrationMethod('inn');
+                    setValidationError('');
+                  }}
+                />
+              </div>
+            </div>
           </div>
+
           <div className="mt-5 flex justify-end">
-            <Button disabled={!subjectType} onClick={() => setStep(2)}>
+            <Button disabled={!subjectType || !registrationMethod} onClick={() => setStep(2)}>
               Далее
             </Button>
           </div>
@@ -398,50 +436,6 @@ export const ClientRegistrationWizardPage = () => {
       ) : null}
 
       {step === 2 ? (
-        <div>
-          <RegistrationStepHeader title="Выберите способ" />
-          <div className="grid gap-3 md:grid-cols-3">
-            <RegistrationOptionCard
-              title="Ручной ввод"
-              description="Основной сценарий заполнения данных клиента."
-              selected={registrationMethod === 'manual'}
-              onClick={() => {
-                setRegistrationMethod('manual');
-                setValidationError('');
-              }}
-            />
-            <RegistrationOptionCard
-              title="Загрузить из ЛК"
-              description="Скоро будет доступно."
-              selected={registrationMethod === 'cabinet'}
-              onClick={() => {
-                setRegistrationMethod('cabinet');
-                setValidationError('');
-              }}
-            />
-            <RegistrationOptionCard
-              title="Загрузить по ИНН"
-              description="Скоро будет доступно."
-              selected={registrationMethod === 'inn'}
-              onClick={() => {
-                setRegistrationMethod('inn');
-                setValidationError('');
-              }}
-            />
-          </div>
-
-          <div className="mt-5 flex flex-wrap justify-between gap-2">
-            <Button variant="secondary" onClick={() => setStep(1)}>
-              Назад
-            </Button>
-            <Button disabled={!registrationMethod} onClick={() => setStep(3)}>
-              Далее
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
-      {step === 3 ? (
         <div>
           <RegistrationStepHeader title="Заполните данные" />
 
@@ -455,21 +449,21 @@ export const ClientRegistrationWizardPage = () => {
           {draftMessage ? <p className="mt-3 text-sm text-brand-dark">{draftMessage}</p> : null}
 
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button onClick={handleProceedFromStepThree}>Сохранить</Button>
+            <Button onClick={handleProceedFromStepTwo}>Сохранить</Button>
             <Button variant="secondary" onClick={() => setDraftMessage('Черновик сохранён локально')}>
               Сохранить как черновик
             </Button>
             <Button variant="ghost" onClick={() => navigate('/subjects')}>
               Отмена
             </Button>
-            <Button variant="secondary" onClick={() => setStep(2)} className="ml-auto">
+            <Button variant="secondary" onClick={() => setStep(1)} className="ml-auto">
               Назад
             </Button>
           </div>
         </div>
       ) : null}
 
-      {step === 4 && result ? (
+      {step === 3 && result ? (
         <RegistrationResult
           subjectTypeLabel={subjectTypeLabel}
           code={result.code}
@@ -480,7 +474,7 @@ export const ClientRegistrationWizardPage = () => {
         />
       ) : null}
 
-      {step === 4 && result ? <p className="mt-2 text-xs text-slate-500">ID клиента: {result.id}</p> : null}
+      {step === 3 && result ? <p className="mt-2 text-xs text-slate-500">ID клиента: {result.id}</p> : null}
     </RegistrationWizardLayout>
   );
 };
