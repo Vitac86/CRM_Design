@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, Button, DataTable, FilterBar, Pagination, SelectFilter } from '../ui';
+import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../ui';
 import { reports } from '../../data/reports';
 import type { Report } from '../../data/types';
 
@@ -26,9 +26,17 @@ const deliveryResultBadgeVariant: Record<'Доставлено' | 'Не дост
 type ReportsPageTemplateProps = {
   title: string;
   department: Report['department'];
+  separateSearchRow?: boolean;
+  searchPlaceholder?: string;
 };
 
-export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplateProps) => {
+export const ReportsPageTemplate = ({
+  title,
+  department,
+  separateSearchRow = false,
+  searchPlaceholder = 'Поиск по коду клиента, имени файла или отчёту',
+}: ReportsPageTemplateProps) => {
+  const [search, setSearch] = useState('');
   const [clientCodeFilter, setClientCodeFilter] = useState('');
   const [reportTypeFilter, setReportTypeFilter] = useState<Report['reportType'] | 'all'>('all');
   const [deliveryChannelFilter, setDeliveryChannelFilter] = useState<Report['deliveryChannel'] | 'all'>('all');
@@ -44,8 +52,20 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
 
   const filteredReports = useMemo(() => {
     return departmentReports.filter((report) => {
+      const normalizedSearch = search.trim().toLowerCase();
       const normalizedClientCodeFilter = clientCodeFilter.trim().toLowerCase();
       const reportDate = report.sentAt.slice(0, 10);
+
+      if (normalizedSearch.length > 0) {
+        const hasSearchHit =
+          report.clientCode.toLowerCase().includes(normalizedSearch) ||
+          report.fileName.toLowerCase().includes(normalizedSearch) ||
+          report.reportTitle.toLowerCase().includes(normalizedSearch);
+
+        if (!hasSearchHit) {
+          return false;
+        }
+      }
 
       if (normalizedClientCodeFilter.length > 0 && !report.clientCode.toLowerCase().includes(normalizedClientCodeFilter)) {
         return false;
@@ -73,7 +93,7 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
 
       return true;
     });
-  }, [clientCodeFilter, dateFromFilter, dateToFilter, deliveryChannelFilter, deliveryResultFilter, departmentReports, reportTypeFilter]);
+  }, [clientCodeFilter, dateFromFilter, dateToFilter, deliveryChannelFilter, deliveryResultFilter, departmentReports, reportTypeFilter, search]);
 
   const totalPages = Math.max(1, Math.ceil(filteredReports.length / pageSize));
 
@@ -89,6 +109,7 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
   }, [page, totalPages]);
 
   const resetFilters = () => {
+    setSearch('');
     setClientCodeFilter('');
     setReportTypeFilter('all');
     setDeliveryChannelFilter('all');
@@ -104,67 +125,147 @@ export const ReportsPageTemplate = ({ title, department }: ReportsPageTemplatePr
         <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
       </header>
 
-      <FilterBar>
-        <input
-          value={clientCodeFilter}
-          onChange={(event) => setClientCodeFilter(event.target.value)}
-          placeholder="Код клиента"
-          className="h-10 w-[190px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
-          aria-label="Фильтр по коду клиента"
-        />
+      {separateSearchRow ? (
+        <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder={searchPlaceholder}
+            aria-label="Поиск по отчётам депозитария"
+          />
 
-        <input
-          type="date"
-          value={dateFromFilter}
-          onChange={(event) => setDateFromFilter(event.target.value)}
-          className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
-          aria-label="Дата с"
-          title="Дата с"
-        />
+          <FilterBar className="rounded-xl border-none bg-slate-50/75 p-0 shadow-none">
+            <input
+              value={clientCodeFilter}
+              onChange={(event) => setClientCodeFilter(event.target.value)}
+              placeholder="Код клиента"
+              className="h-10 w-[190px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              aria-label="Фильтр по коду клиента"
+            />
 
-        <input
-          type="date"
-          value={dateToFilter}
-          onChange={(event) => setDateToFilter(event.target.value)}
-          className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
-          aria-label="Дата по"
-          title="Дата по"
-        />
+            <input
+              type="date"
+              value={dateFromFilter}
+              onChange={(event) => setDateFromFilter(event.target.value)}
+              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              aria-label="Дата с"
+              title="Дата с"
+            />
 
-        <SelectFilter
-          value={reportTypeFilter}
-          onChange={(event) => setReportTypeFilter(event.target.value as Report['reportType'] | 'all')}
-        >
-          <option value="all">Вид отчёта</option>
-          <option value="Ежедневный">Ежедневный</option>
-          <option value="Годовой">Годовой</option>
-          <option value="Месячный">Месячный</option>
-          <option value="Квартальный">Квартальный</option>
-          <option value="Недельный">Недельный</option>
-        </SelectFilter>
+            <input
+              type="date"
+              value={dateToFilter}
+              onChange={(event) => setDateToFilter(event.target.value)}
+              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              aria-label="Дата по"
+              title="Дата по"
+            />
 
-        <SelectFilter
-          value={deliveryChannelFilter}
-          onChange={(event) => setDeliveryChannelFilter(event.target.value as Report['deliveryChannel'] | 'all')}
-        >
-          <option value="all">Канал отправки</option>
-          <option value="Личный кабинет">Личный кабинет</option>
-          <option value="Почта">Почта</option>
-        </SelectFilter>
+            <SelectFilter
+              value={reportTypeFilter}
+              onChange={(event) => setReportTypeFilter(event.target.value as Report['reportType'] | 'all')}
+            >
+              <option value="all">Вид отчёта</option>
+              <option value="Ежедневный">Ежедневный</option>
+              <option value="Годовой">Годовой</option>
+              <option value="Месячный">Месячный</option>
+              <option value="Квартальный">Квартальный</option>
+              <option value="Недельный">Недельный</option>
+            </SelectFilter>
 
-        <SelectFilter
-          value={deliveryResultFilter}
-          onChange={(event) => setDeliveryResultFilter(event.target.value as 'Доставлено' | 'Не доставлено' | 'all')}
-        >
-          <option value="all">Результат доставки</option>
-          <option value="Доставлено">Доставлено</option>
-          <option value="Не доставлено">Не доставлено</option>
-        </SelectFilter>
+            <SelectFilter
+              value={deliveryChannelFilter}
+              onChange={(event) => setDeliveryChannelFilter(event.target.value as Report['deliveryChannel'] | 'all')}
+            >
+              <option value="all">Канал отправки</option>
+              <option value="Личный кабинет">Личный кабинет</option>
+              <option value="Почта">Почта</option>
+            </SelectFilter>
 
-        <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
-          Очистить фильтры
-        </Button>
-      </FilterBar>
+            <SelectFilter
+              value={deliveryResultFilter}
+              onChange={(event) => setDeliveryResultFilter(event.target.value as 'Доставлено' | 'Не доставлено' | 'all')}
+            >
+              <option value="all">Результат доставки</option>
+              <option value="Доставлено">Доставлено</option>
+              <option value="Не доставлено">Не доставлено</option>
+            </SelectFilter>
+
+            <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
+              Очистить фильтры
+            </Button>
+          </FilterBar>
+        </section>
+      ) : (
+        <FilterBar>
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по коду клиента, имени файла или отчёту"
+            className="h-10 w-[300px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            aria-label="Поиск по отчётам"
+          />
+          <input
+            value={clientCodeFilter}
+            onChange={(event) => setClientCodeFilter(event.target.value)}
+            placeholder="Код клиента"
+            className="h-10 w-[190px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            aria-label="Фильтр по коду клиента"
+          />
+
+          <input
+            type="date"
+            value={dateFromFilter}
+            onChange={(event) => setDateFromFilter(event.target.value)}
+            className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            aria-label="Дата с"
+            title="Дата с"
+          />
+
+          <input
+            type="date"
+            value={dateToFilter}
+            onChange={(event) => setDateToFilter(event.target.value)}
+            className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            aria-label="Дата по"
+            title="Дата по"
+          />
+
+          <SelectFilter
+            value={reportTypeFilter}
+            onChange={(event) => setReportTypeFilter(event.target.value as Report['reportType'] | 'all')}
+          >
+            <option value="all">Вид отчёта</option>
+            <option value="Ежедневный">Ежедневный</option>
+            <option value="Годовой">Годовой</option>
+            <option value="Месячный">Месячный</option>
+            <option value="Квартальный">Квартальный</option>
+            <option value="Недельный">Недельный</option>
+          </SelectFilter>
+
+          <SelectFilter
+            value={deliveryChannelFilter}
+            onChange={(event) => setDeliveryChannelFilter(event.target.value as Report['deliveryChannel'] | 'all')}
+          >
+            <option value="all">Канал отправки</option>
+            <option value="Личный кабинет">Личный кабинет</option>
+            <option value="Почта">Почта</option>
+          </SelectFilter>
+
+          <SelectFilter
+            value={deliveryResultFilter}
+            onChange={(event) => setDeliveryResultFilter(event.target.value as 'Доставлено' | 'Не доставлено' | 'all')}
+          >
+            <option value="all">Результат доставки</option>
+            <option value="Доставлено">Доставлено</option>
+            <option value="Не доставлено">Не доставлено</option>
+          </SelectFilter>
+
+          <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
+            Очистить фильтры
+          </Button>
+        </FilterBar>
+      )}
 
       <DataTable<Report>
         columns={[
