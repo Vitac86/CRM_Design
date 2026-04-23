@@ -183,7 +183,7 @@ export const ClientRegistrationWizardPage = () => {
     const now = new Date();
     const updatedAt = `${now.toISOString().slice(0, 10)} ${now.toISOString().slice(11, 16)}`;
 
-    const baseClient: Omit<Client, 'name' | 'lastName' | 'firstName' | 'middleName' | 'inn' | 'birthDate' | 'type' | 'residency' | 'phone' | 'email' | 'address' | 'registrationAddress'> = {
+    const baseClient: Omit<Client, 'name' | 'lastName' | 'firstName' | 'middleName' | 'inn' | 'birthDate' | 'type' | 'residency' | 'phone' | 'email' | 'address' | 'registrationAddress' | 'addresses' | 'representatives'> = {
       id,
       code,
       ogrnip: '—',
@@ -270,6 +270,44 @@ export const ClientRegistrationWizardPage = () => {
               building: '',
               apartment: '',
             },
+            addresses: {
+              registration: {
+                country: 'Россия',
+                region: '',
+                district: '',
+                city: '',
+                postalCode: '',
+                street: individualForm.registrationAddress.trim(),
+                house: '',
+                building: '',
+                apartment: '',
+              },
+              location: {
+                country: 'Россия',
+                region: '',
+                district: '',
+                city: '',
+                postalCode: '',
+                street: individualForm.registrationAddress.trim(),
+                house: '',
+                building: '',
+                apartment: '',
+              },
+              mailing: {
+                country: 'Россия',
+                region: '',
+                district: '',
+                city: '',
+                postalCode: '',
+                street: individualForm.registrationAddress.trim(),
+                house: '',
+                building: '',
+                apartment: '',
+              },
+              locationMatchesRegistration: true,
+              mailingMatchesRegistration: true,
+            },
+            representatives: [],
             reportDelivery: {
               ...baseClient.reportDelivery,
               email: {
@@ -318,6 +356,44 @@ export const ClientRegistrationWizardPage = () => {
               building: '',
               apartment: '',
             },
+            addresses: {
+              registration: {
+                country: 'Россия',
+                region: '',
+                district: '',
+                city: '',
+                postalCode: '',
+                street: legalEntityForm.address.trim(),
+                house: '',
+                building: '',
+                apartment: '',
+              },
+              location: {
+                country: 'Россия',
+                region: '',
+                district: '',
+                city: '',
+                postalCode: '',
+                street: legalEntityForm.address.trim(),
+                house: '',
+                building: '',
+                apartment: '',
+              },
+              mailing: {
+                country: 'Россия',
+                region: '',
+                district: '',
+                city: '',
+                postalCode: '',
+                street: legalEntityForm.address.trim(),
+                house: '',
+                building: '',
+                apartment: '',
+              },
+              locationMatchesRegistration: true,
+              mailingMatchesRegistration: true,
+            },
+            representatives: [],
             reportDelivery: {
               ...baseClient.reportDelivery,
               email: {

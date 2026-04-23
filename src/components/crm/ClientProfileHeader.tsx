@@ -47,7 +47,7 @@ export const ClientProfileHeader = ({ client, actions }: ClientProfileHeaderProp
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
               <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
-              {client.representative !== 'Самостоятельно' ? <Badge variant="neutral">Представитель</Badge> : null}
+              {client.representatives.length > 0 ? <Badge variant="neutral">Представитель</Badge> : null}
               <Badge variant={client.qualification ? 'brand' : 'neutral'}>
                 {client.qualification ? 'Квалифицированный' : 'Неквалифицированный'}
               </Badge>

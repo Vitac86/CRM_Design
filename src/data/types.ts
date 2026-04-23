@@ -49,6 +49,25 @@ export interface ClientRegistrationAddress {
   apartment: string;
 }
 
+export type ClientRepresentativeRole = 'Генеральный директор' | 'Представитель';
+
+export interface ClientRepresentative {
+  id: string;
+  subjectId: string;
+  role: ClientRepresentativeRole;
+  authorityBasis: string;
+  authorityValidUntil: string | null;
+  authorityWithoutExpiration: boolean;
+}
+
+export interface ClientAddresses {
+  registration: ClientRegistrationAddress;
+  location: ClientRegistrationAddress;
+  mailing: ClientRegistrationAddress;
+  locationMatchesRegistration: boolean;
+  mailingMatchesRegistration: boolean;
+}
+
 
 export interface IndividualClientDetails {
   birthPlace: string;
@@ -88,18 +107,18 @@ export interface LegalEntityClientDetails {
   registrationDate: string;
   registrationAuthority: string;
   authorizedCapital: string;
-  registrarName: string;
-  taxName: string;
-  taxCode: string;
-  fssNumber: string;
-  pfrNumber: string;
+  registrarName?: string;
+  taxName?: string;
+  taxCode?: string;
+  fssNumber?: string;
+  pfrNumber?: string;
   beneficiary: string;
   authorizedPersons: string;
-  okato: string;
-  oktmo: string;
-  okpo: string;
-  okfs: string;
-  okogu: string;
+  okato?: string;
+  oktmo?: string;
+  okpo?: string;
+  okfs?: string;
+  okogu?: string;
   representativeDetails?: LegalRepresentative;
 }
 
@@ -113,7 +132,7 @@ export type BankAccount = {
   correspondentAccount: string;
   currency: 'RUB' | 'USD' | 'EUR' | 'CNY';
   purpose: string;
-  status: BankAccountStatus;
+  status?: BankAccountStatus;
   openedAt: string;
   isPrimary?: boolean;
 };
@@ -162,6 +181,8 @@ export interface Client {
   agent: ClientAgent;
   reportDelivery: ClientReportDelivery;
   registrationAddress: ClientRegistrationAddress;
+  addresses: ClientAddresses;
+  representatives: ClientRepresentative[];
   bankDetails: ClientBankDetails;
   bankAccounts?: BankAccount[];
   individualDetails?: IndividualClientDetails;
@@ -191,11 +212,10 @@ export interface ClientRelation {
   id: string;
   clientId: string;
   relatedName: string;
-  relatedCode: string;
+  relatedClientId?: string;
   relatedType: string;
   role: 'Представитель' | 'Агент' | 'Бенефициар' | 'Доверенное лицо' | 'Исполнительный орган';
   dateFrom: string;
-  status: 'Активна' | 'Неактивна' | 'На проверке';
 }
 
 export type ContractProductType = 'broker' | 'depository' | 'trust' | 'iis' | 'other';

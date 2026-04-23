@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { BankAccount, BankAccountStatus, Client } from '../../data/types';
+import type { BankAccount, Client } from '../../data/types';
 import { Badge, Button } from '../ui';
 
 type SubjectBankAccountsTabProps = {
@@ -10,12 +10,6 @@ type SubjectBankAccountsTabProps = {
 
 type AccountForm = Omit<BankAccount, 'id'>;
 
-const statusVariantMap: Record<BankAccountStatus, 'success' | 'warning' | 'neutral'> = {
-  Активен: 'success',
-  'На проверке': 'warning',
-  Закрыт: 'neutral',
-};
-
 const defaultFormState: AccountForm = {
   bankName: '',
   bik: '',
@@ -23,7 +17,6 @@ const defaultFormState: AccountForm = {
   correspondentAccount: '',
   currency: 'RUB',
   purpose: '',
-  status: 'Активен',
   openedAt: '',
   isPrimary: false,
 };
@@ -35,7 +28,6 @@ const buildFormFromAccount = (account: BankAccount): AccountForm => ({
   correspondentAccount: account.correspondentAccount,
   currency: account.currency,
   purpose: account.purpose,
-  status: account.status,
   openedAt: account.openedAt,
   isPrimary: account.isPrimary ?? false,
 });
@@ -118,24 +110,6 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
     );
   };
 
-  const handleCloseAccount = (accountId: string) => {
-    onUpdateAccounts?.(
-      accounts.map((account) =>
-        account.id === accountId
-          ? {
-              ...account,
-              status: 'Закрыт',
-              isPrimary: false,
-            }
-          : account,
-      ),
-    );
-
-    if (editingAccountId === accountId) {
-      handleCancelEdit();
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -201,18 +175,6 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
               />
             </label>
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Статус</span>
-              <select
-                value={formData.status}
-                onChange={(event) => setFormData((prev) => ({ ...prev, status: event.target.value as BankAccountStatus }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
-              >
-                <option value="Активен">Активен</option>
-                <option value="На проверке">На проверке</option>
-                <option value="Закрыт">Закрыт</option>
-              </select>
-            </label>
-            <label className="space-y-1">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Дата открытия</span>
               <input
                 type="date"
@@ -266,7 +228,6 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {account.isPrimary ? <Badge variant="brand">Основной</Badge> : null}
-                    <Badge variant={statusVariantMap[account.status]}>{account.status}</Badge>
                   </div>
                 </div>
 
@@ -321,18 +282,6 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
                           className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
-                      </label>
-                      <label className="space-y-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Статус</span>
-                        <select
-                          value={editingFormData.status}
-                          onChange={(event) => setEditingFormData((prev) => ({ ...prev, status: event.target.value as BankAccountStatus }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
-                        >
-                          <option value="Активен">Активен</option>
-                          <option value="На проверке">На проверке</option>
-                          <option value="Закрыт">Закрыт</option>
-                        </select>
                       </label>
                       <label className="space-y-1">
                         <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Дата открытия</span>
@@ -394,11 +343,6 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
                       {!account.isPrimary ? (
                         <Button variant="secondary" size="sm" onClick={() => handleSetPrimary(account.id)}>
                           Сделать основным
-                        </Button>
-                      ) : null}
-                      {account.status !== 'Закрыт' ? (
-                        <Button variant="secondary" size="sm" onClick={() => handleCloseAccount(account.id)}>
-                          Закрыть счёт
                         </Button>
                       ) : null}
                     </div>
