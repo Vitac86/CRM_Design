@@ -229,8 +229,11 @@ export interface Request {
   clientId: string;
   number: string;
   requestType: string;
+  clientName: string;
+  clientCode: string;
   status: 'Ожидает' | 'Принято' | 'Отклонено';
   date: string;
+  time: string;
   source: 'Личный кабинет' | 'Почта';
 }
 
