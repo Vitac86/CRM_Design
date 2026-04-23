@@ -44,7 +44,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     id: 'metric-03',
     icon: FileIcon,
     value: 24,
-    label: 'новые заявки',
+    label: 'новые поручения',
     trendLabel: '+8.7%',
     trendType: 'up',
   },
