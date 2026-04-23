@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ActiveFilterChip,
   Button,
   DataTable,
   FilterChipSelect,
@@ -247,26 +246,11 @@ export const TradingPage = () => {
                   { value: 'no', label: 'Нет' },
                 ]}
               />
+
+              <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto" disabled={!hasActiveConditions}>
+                Сбросить всё
+              </Button>
             </>
-          }
-          activeFilters={
-            hasActiveConditions ? (
-              <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Активно</div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {search.trim() ? <ActiveFilterChip label="Поиск" value={search.trim()} onRemove={() => setSearch('')} /> : null}
-                  {qualificationFilter !== 'all' ? (
-                    <ActiveFilterChip label="Квалификация" value={qualificationLabel} onRemove={() => setQualificationFilter('all')} />
-                  ) : null}
-                  {podFtFilter !== 'all' ? (
-                    <ActiveFilterChip label="ПОД / ФТ" value={podFtLabel} onRemove={() => setPodFtFilter('all')} />
-                  ) : null}
-                  <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto">
-                    Сбросить всё
-                  </Button>
-                </div>
-              </div>
-            ) : null
           }
         />
       </div>
