@@ -211,19 +211,15 @@ export const ContractWizardPage = () => {
             <p className="font-medium text-slate-900">{client.name}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Код клиента</p>
-            <p className="font-mono font-medium text-slate-900">{client.code}</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">ИНН</p>
+            <p className="font-mono font-medium text-slate-900">{client.inn?.trim() || '—'}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Тип клиента</p>
-            <p className="font-medium text-slate-900">{client.type}</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Email</p>
+            <p className="font-medium text-slate-900">{client.email?.trim() || '—'}</p>
           </div>
         </div>
       </Card>
-
-      <Section title="Список документов клиента">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">Заявление о присоединении</div>
-      </Section>
 
       <Section title="Присоединяется согласно ст. 428 ГК РФ">
         <div className="space-y-3">
