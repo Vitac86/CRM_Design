@@ -1,20 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter } from '../components/ui';
+import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText } from '../components/ui';
 import { cn } from '../components/ui/cn';
 import { reports } from '../data/reports';
 import type { Report } from '../data/types';
 
-const reportTypeBadgeVariant: Partial<Record<Report['reportType'], 'info' | 'success' | 'neutral' | 'orange'>> = {
-  'Ежедневный': 'info',
-  'Недельный': 'neutral',
-  'Месячный': 'neutral',
-  'Квартальный': 'orange',
-  'Годовой': 'success',
-};
-
-const deliveryResultBadgeVariant: Record<'Доставлено' | 'Не доставлено', 'success' | 'warning'> = {
-  'Доставлено': 'success',
-  'Не доставлено': 'warning',
+const deliveryResultToneMap: Record<'Доставлено' | 'Не доставлено', 'neutral' | 'danger'> = {
+  'Доставлено': 'neutral',
+  'Не доставлено': 'danger',
 };
 
 const deliveryChannelBadgeVariant: Partial<Record<Report['deliveryChannel'], 'purple' | 'info' | 'neutral'>> = {
@@ -257,12 +249,9 @@ export const DepositoryPage = () => {
                     <Badge className="px-1.5 py-0 leading-4" variant={deliveryChannelBadgeVariant[report.deliveryChannel] ?? 'neutral'}>
                       {report.deliveryChannel}
                     </Badge>
-                    <Badge className="px-1.5 py-0 leading-4" variant={reportTypeBadgeVariant[report.reportType] ?? 'neutral'}>
-                      {report.reportType}
-                    </Badge>
-                    <Badge className="px-1.5 py-0 leading-4" variant={deliveryResultBadgeVariant[deliveryResult]}>
+                    <TableStatusText tone={deliveryResultToneMap[deliveryResult]} className="text-xs">
                       {deliveryResult}
-                    </Badge>
+                    </TableStatusText>
                   </div>
                 </button>
               );
@@ -285,9 +274,9 @@ export const DepositoryPage = () => {
                 <DetailField label="Способ отправки" value={selectedReport.deliveryChannel} />
                 <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                   <p className="text-xs text-slate-500">Статус / результат доставки</p>
-                  <Badge className="mt-1" variant={deliveryResultBadgeVariant[selectedReportResult ?? 'Не доставлено']}>
+                  <TableStatusText tone={deliveryResultToneMap[selectedReportResult ?? 'Не доставлено']} className="mt-1 block">
                     {selectedReportResult ?? '—'}
-                  </Badge>
+                  </TableStatusText>
                 </div>
                 <DetailField label="Время отправки" value={selectedReport.sentAt} />
                 <DetailField label="Адрес" value={selectedReport.address} />

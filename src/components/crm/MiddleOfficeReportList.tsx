@@ -1,4 +1,4 @@
-import { Badge, EmptyState } from '../ui';
+import { Badge, EmptyState, TableStatusText } from '../ui';
 import type { Report } from '../../data/types';
 import { cn } from '../ui/cn';
 
@@ -14,8 +14,8 @@ const statusIconStyleMap: Record<Report['deliveryStatus'], string> = {
   'Ошибка': 'text-rose-600',
 };
 
-const statusBadgeVariantMap: Record<Report['deliveryStatus'], 'success' | 'warning' | 'danger'> = {
-  'Доставлен': 'success',
+const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'warning' | 'danger'> = {
+  'Доставлен': 'neutral',
   'Ожидает': 'warning',
   'Ошибка': 'danger',
 };
@@ -63,9 +63,9 @@ export const MiddleOfficeReportList = ({ reports, selectedReportId, onSelect }: 
                     <Badge className="px-1.5 py-0 leading-4" variant="neutral">
                       {report.reportType}
                     </Badge>
-                    <Badge className="px-1.5 py-0 leading-4" variant={statusBadgeVariantMap[report.deliveryStatus]}>
+                    <TableStatusText tone={statusToneMap[report.deliveryStatus]} className="text-xs">
                       {report.deliveryStatus}
-                    </Badge>
+                    </TableStatusText>
                   </div>
                 </div>
               </div>
