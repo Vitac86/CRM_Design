@@ -16,13 +16,13 @@ import {
   getComplianceBadgeVariant,
 } from '../utils/labels';
 
-type DecisionStatus = Extract<ComplianceStatus, 'ПРОЙДЕН' | 'НА ДОРАБОТКЕ' | 'БАН'>;
+type DecisionStatus = Extract<ComplianceStatus, 'ПРОЙДЕН' | 'НА ДОРАБОТКЕ' | 'ЗАБЛОКИРОВАН'>;
 type CardTab = 'profile' | 'data';
 
 const decisionOptions: Array<{ value: DecisionStatus; label: string; variant: 'primary' | 'secondary' | 'danger' }> = [
   { value: 'ПРОЙДЕН', label: 'Одобрить', variant: 'primary' },
   { value: 'НА ДОРАБОТКЕ', label: 'На доработку', variant: 'secondary' },
-  { value: 'БАН', label: 'Забанить', variant: 'danger' },
+  { value: 'ЗАБЛОКИРОВАН', label: 'Заблокировать', variant: 'danger' },
 ];
 
 export const ComplianceCardPage = () => {
@@ -83,7 +83,7 @@ export const ComplianceCardPage = () => {
     updateClient(client.id, {
       complianceStatus: selectedDecision,
     });
-    setToastMessage(`Финальное решение принято. Новый статус: ${selectedDecision}.`);
+    setToastMessage(`Финальное решение принято. Новый статус: ${formatComplianceStatus(selectedDecision)}.`);
   };
 
   const handleDecisionClick = (decision: DecisionStatus) => {

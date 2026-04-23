@@ -6,7 +6,7 @@ export type ComplianceStatus =
   | 'ПРОЙДЕН'
   | 'НА ПРОВЕРКЕ'
   | 'НА ДОРАБОТКЕ'
-  | 'БАН';
+  | 'ЗАБЛОКИРОВАН';
 
 export type RiskCategory = 'Низкий' | 'Средний' | 'Высокий' | 'Повышенный';
 export type ClientRole = 'Клиент' | 'Бенефициар' | 'Представитель';
