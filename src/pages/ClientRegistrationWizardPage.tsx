@@ -9,6 +9,7 @@ import { RegistrationResult } from '../components/crm/registration/RegistrationR
 import { RegistrationStepHeader } from '../components/crm/registration/RegistrationStepHeader';
 import { RegistrationWizardLayout } from '../components/crm/registration/RegistrationWizardLayout';
 import type { Client, ClientType, IndividualClientDetails, LegalRepresentative, ResidencyStatus } from '../data/types';
+import { normalizePhoneInput } from '../utils/phone';
 
 type SubjectType = 'individual' | 'legal' | null;
 type RegistrationMethod = 'manual' | 'cabinet' | 'inn' | null;
@@ -147,13 +148,19 @@ export const ClientRegistrationWizardPage = () => {
   }, [individualForm.firstName, individualForm.lastName, individualForm.middleName, legalEntityForm.clientName, subjectType]);
 
   const handleIndividualChange = <K extends keyof IndividualFormData>(field: K, value: IndividualFormData[K]) => {
-    setIndividualForm((current) => ({ ...current, [field]: value }));
+    setIndividualForm((current) => ({
+      ...current,
+      [field]: field === 'phones' ? normalizePhoneInput(String(value)) : value,
+    }));
     setValidationError('');
     setDraftMessage('');
   };
 
   const handleLegalChange = <K extends keyof LegalEntityFormData>(field: K, value: LegalEntityFormData[K]) => {
-    setLegalEntityForm((current) => ({ ...current, [field]: value }));
+    setLegalEntityForm((current) => ({
+      ...current,
+      [field]: field === 'phones' ? normalizePhoneInput(String(value)) : value,
+    }));
     setValidationError('');
     setDraftMessage('');
   };
@@ -256,7 +263,7 @@ export const ClientRegistrationWizardPage = () => {
             birthDate: individualForm.birthDate || '—',
             type: resolveIndividualType(individualForm),
             residency: resolveResidency(individualForm.taxResident),
-            phone: individualForm.phones.trim(),
+            phone: normalizePhoneInput(individualForm.phones),
             email: individualForm.email.trim(),
             address: individualForm.actualAddressMatches === 'yes' ? individualForm.registrationAddress.trim() : '',
             registrationAddress: {
@@ -341,7 +348,7 @@ export const ClientRegistrationWizardPage = () => {
             birthDate: '—',
             type: resolveLegalType(legalEntityForm.clientName),
             residency: resolveResidency(legalEntityForm.residency),
-            phone: legalEntityForm.phones.trim(),
+            phone: normalizePhoneInput(legalEntityForm.phones),
             email: legalEntityForm.email.trim(),
             address: legalEntityForm.address.trim(),
             representative: legalRepresentative.fullName || 'Самостоятельно',

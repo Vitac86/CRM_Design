@@ -14,6 +14,7 @@ import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency } from '../utils/labels';
+import { normalizePhoneInput } from '../utils/phone';
 import { useClientsStore } from '../app/ClientsStore';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
@@ -175,7 +176,11 @@ export const SubjectProfilePage = () => {
       return;
     }
 
-    const normalizedClient = { ...draftClient };
+    const normalizedClient = {
+      ...draftClient,
+      phone: normalizePhoneInput(draftClient.phone),
+      secondaryPhone: normalizePhoneInput(draftClient.secondaryPhone),
+    };
     if (normalizedClient.type === 'ФЛ' || normalizedClient.type === 'ИП') {
       const fullName = [normalizedClient.lastName, normalizedClient.firstName, normalizedClient.middleName]
         .map((value) => value.trim())
@@ -293,6 +298,11 @@ export const SubjectProfilePage = () => {
       }
       return { ...prev, addresses: nextAddresses };
     });
+  };
+
+  const handleDraftPhoneChange = (field: 'phone' | 'secondaryPhone', value: string) => {
+    const normalizedValue = normalizePhoneInput(value);
+    setDraftClient((prev) => (prev ? { ...prev, [field]: normalizedValue } : prev));
   };
 
   const handleAddRepresentative = () => {
@@ -767,14 +777,14 @@ export const SubjectProfilePage = () => {
                     type="tel"
                     value={currentClient.phone}
                     mono
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                    onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                   />
                   <FormField
                     label="Дополнительный телефон"
                     type="tel"
                     value={currentClient.secondaryPhone}
                     mono
-                    onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, secondaryPhone: event.target.value } : prev))}
+                    onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                   />
                   <FormField
                     label="Email"
@@ -1006,14 +1016,14 @@ export const SubjectProfilePage = () => {
                         type="tel"
                         value={currentClient.phone}
                         mono
-                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, phone: event.target.value } : prev))}
+                        onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                       />
                       <FormField
                         label="Дополнительный телефон"
                         type="tel"
                         value={currentClient.secondaryPhone}
                         mono
-                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, secondaryPhone: event.target.value } : prev))}
+                        onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                       />
                       <FormField
                         label="Email"

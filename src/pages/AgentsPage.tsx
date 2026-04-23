@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge, Button, DataTable, FormField, SearchInput } from '../components/ui';
 import { useClientsStore } from '../app/ClientsStore';
 
@@ -15,6 +16,7 @@ type AgentTableRow = {
 };
 
 export const AgentsPage = () => {
+  const navigate = useNavigate();
   const { clients, agents, addAgent } = useClientsStore();
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -108,7 +110,16 @@ export const AgentsPage = () => {
 
       <DataTable<AgentTableRow>
         columns={[
-          { key: 'fullName', header: 'Субъект', className: 'font-medium text-slate-800' },
+          {
+            key: 'fullName',
+            header: 'Субъект',
+            className: 'font-medium text-slate-800',
+            render: (row) => (
+              <button type="button" className="text-left text-brand hover:underline" onClick={() => navigate(`/subjects/${row.subjectId}`)}>
+                {row.fullName}
+              </button>
+            ),
+          },
           { key: 'company', header: 'Компания' },
           { key: 'contractNumber', header: 'Номер договора', className: 'whitespace-nowrap' },
           { key: 'commission', header: 'Комиссия', className: 'whitespace-nowrap' },
