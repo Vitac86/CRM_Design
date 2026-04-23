@@ -140,6 +140,7 @@ export interface Client {
   type: ClientType;
   residency: ResidencyStatus;
   complianceStatus: ComplianceStatus;
+  complianceComment?: string;
   fullDocumentSet: boolean;
   qualification: boolean;
   roles: ClientRole[];
