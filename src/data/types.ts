@@ -141,6 +141,8 @@ export interface Client {
   residency: ResidencyStatus;
   complianceStatus: ComplianceStatus;
   complianceComment?: string;
+  complianceOfficer?: string;
+  complianceDate?: string;
   managerComment?: string;
   fullDocumentSet: boolean;
   qualification: boolean;

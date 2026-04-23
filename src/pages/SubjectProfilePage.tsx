@@ -6,7 +6,7 @@ import { PersonCard } from '../components/crm/PersonCard';
 import { ProfileField } from '../components/crm/ProfileField';
 import { ProfileSection } from '../components/crm/ProfileSection';
 import { ReportMethodCard } from '../components/crm/ReportMethodCard';
-import { EmptyState, Button, FormField } from '../components/ui';
+import { EmptyState, Button, FormField, Badge } from '../components/ui';
 import { SubjectDocumentsTab } from '../components/crm/SubjectDocumentsTab';
 import { SubjectRelationsTab } from '../components/crm/SubjectRelationsTab';
 import { SubjectContractsTab } from '../components/crm/SubjectContractsTab';
@@ -19,6 +19,18 @@ import type { BankAccount, Client, ClientType, ResidencyStatus } from '../data/t
 
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
 const residencyOptions: ResidencyStatus[] = ['Резидент РФ', 'Нерезидент'];
+
+const complianceBadgeVariantMap: Record<Client['complianceStatus'], 'success' | 'warning' | 'danger' | 'orange'> = {
+  ПРОЙДЕН: 'success',
+  'НА ПРОВЕРКЕ': 'warning',
+  'НА ДОРАБОТКЕ': 'orange',
+  ЗАБЛОКИРОВАН: 'danger',
+};
+
+const shouldShowSendToComplianceButton = (status: string) => {
+  const normalized = status.trim().toUpperCase();
+  return normalized === 'НА ДОРАБОТКЕ' || normalized === 'ЧЕРНОВИК' || normalized === 'НЕ ОТПРАВЛЕН';
+};
 
 export const SubjectProfilePage = () => {
   const navigate = useNavigate();
@@ -176,6 +188,15 @@ export const SubjectProfilePage = () => {
     archiveClient(client.id);
     setToastMessage('Субъект перемещён в архив');
     window.setTimeout(() => navigate('/archives'), 300);
+  };
+
+  const handleSendToCompliance = () => {
+    if (!client) {
+      return;
+    }
+
+    updateClient(client.id, { complianceStatus: 'НА ПРОВЕРКЕ' });
+    setToastMessage('Субъект отправлен на комплаенс');
   };
 
   const handleOpenContractTab = () => {
@@ -1216,6 +1237,37 @@ export const SubjectProfilePage = () => {
 
           {!isEditing ? (
             <>
+              <ProfileSection title="Комплаенс">
+                <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold text-slate-900">Комплаенс</h4>
+                    <p className="text-sm text-slate-500">Текущая информация по статусу</p>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Статус комплаенса</p>
+                      <Badge variant={complianceBadgeVariantMap[client.complianceStatus]}>{client.complianceStatus}</Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Комментарий</p>
+                      <p className="text-sm text-slate-700">{client.complianceComment?.trim() || '—'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Дата прохождения</p>
+                      <p className="text-sm text-slate-700">{client.complianceDate || '—'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Комплаенс офицер</p>
+                      <p className="text-sm text-slate-700">{client.complianceOfficer?.trim() || '—'}</p>
+                    </div>
+                  </div>
+                  {shouldShowSendToComplianceButton(client.complianceStatus) ? (
+                    <Button className="w-full md:w-auto" onClick={handleSendToCompliance}>
+                      Отправить на комплаенс
+                    </Button>
+                  ) : null}
+                </div>
+              </ProfileSection>
               <ProfileSection title="Права использования">
                 <div className="grid gap-3 lg:grid-cols-2">
                   <PermissionCard
