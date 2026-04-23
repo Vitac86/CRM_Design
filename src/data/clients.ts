@@ -504,6 +504,24 @@ const legacyClients: LegacyClient[] = [
     address: 'г. Воронеж, ул. Кирова, д. 35',
     representative: 'Самостоятельно',
     updatedAt: '2026-04-19 09:03'
+  },
+  {
+    id: 'c-025',
+    code: 'INV-1025',
+    name: 'ООО «Ладога Логистик Групп»',
+    inn: '7842195061',
+    type: 'ООО',
+    residency: 'Резидент РФ',
+    complianceStatus: 'НА ДОРАБОТКЕ',
+    fullDocumentSet: false,
+    qualification: false,
+    roles: ['Клиент'],
+    riskCategory: 'Средний',
+    phone: '+7 (900) 100-11-25',
+    email: 'onboarding@ladoga-logistics.test',
+    address: 'г. Санкт-Петербург, Лиговский пр., д. 140',
+    representative: 'Кравцов Денис Викторович',
+    updatedAt: '2026-04-22 14:27'
   }
 ];
 
