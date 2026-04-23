@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ClientProfileHeader } from '../components/crm/ClientProfileHeader';
 import { PermissionCard } from '../components/crm/PermissionCard';
 import { PersonCard } from '../components/crm/PersonCard';
@@ -21,6 +21,7 @@ const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', '
 const residencyOptions: ResidencyStatus[] = ['Резидент РФ', 'Нерезидент'];
 
 export const SubjectProfilePage = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState<SubjectProfileTab>('profile');
   const [isEditing, setIsEditing] = useState(false);
@@ -28,7 +29,7 @@ export const SubjectProfilePage = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showAllClientCodes, setShowAllClientCodes] = useState(false);
-  const { getClientById, updateClient } = useClientsStore();
+  const { getClientById, updateClient, archiveClient } = useClientsStore();
 
   const client = useMemo(() => {
     if (!id) {
@@ -157,6 +158,16 @@ export const SubjectProfilePage = () => {
     setToastMessage('Банковские реквизиты обновлены');
   };
 
+  const handleArchiveClient = () => {
+    if (!client) {
+      return;
+    }
+
+    archiveClient(client.id);
+    setToastMessage('Субъект перемещён в архив');
+    window.setTimeout(() => navigate('/archives'), 300);
+  };
+
   if (!client) {
     return (
       <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -190,9 +201,16 @@ export const SubjectProfilePage = () => {
               </Button>
             </div>
           ) : (
-            <Button variant="secondary" size="sm" onClick={handleStartEdit}>
-              Редактировать
-            </Button>
+            <div className="flex items-center gap-2">
+              {!client.isArchived ? (
+                <Button variant="secondary" size="sm" onClick={handleArchiveClient}>
+                  В архив
+                </Button>
+              ) : null}
+              <Button variant="secondary" size="sm" onClick={handleStartEdit}>
+                Редактировать
+              </Button>
+            </div>
           )
         }
       />

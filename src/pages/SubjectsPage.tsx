@@ -36,13 +36,14 @@ export const SubjectsPage = () => {
   const [sortKey, setSortKey] = useState<SubjectsSortKey>('code');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], [clients]);
-  const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], [clients]);
-  const complianceOptions = useMemo(() => [...new Set(clients.map((client) => client.complianceStatus))], [clients]);
+  const activeClients = useMemo(() => clients.filter((client) => client.isArchived !== true), [clients]);
+  const typeOptions = useMemo(() => [...new Set(activeClients.map((client) => client.type))], [activeClients]);
+  const residencyOptions = useMemo(() => [...new Set(activeClients.map((client) => client.residency))], [activeClients]);
+  const complianceOptions = useMemo(() => [...new Set(activeClients.map((client) => client.complianceStatus))], [activeClients]);
 
   const filteredClients = useMemo(
     () =>
-      clients.filter((client) => {
+      activeClients.filter((client) => {
         const normalizedSearch = search.trim().toLowerCase();
 
         if (
@@ -80,7 +81,7 @@ export const SubjectsPage = () => {
 
         return true;
       }),
-    [search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
+    [activeClients, search, typeFilter, residencyFilter, complianceFilter, qualificationFilter, roleFilter],
   );
 
   const sortedClients = useMemo(() => {
