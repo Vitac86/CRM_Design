@@ -24,18 +24,20 @@ const cloneClient = (client: Client): Client => ({
     personalAccount: { ...client.reportDelivery.personalAccount },
   },
   registrationAddress: { ...client.registrationAddress },
+  addresses: {
+    registration: { ...client.addresses.registration },
+    location: { ...client.addresses.location },
+    mailing: { ...client.addresses.mailing },
+    locationMatchesRegistration: client.addresses.locationMatchesRegistration,
+    mailingMatchesRegistration: client.addresses.mailingMatchesRegistration,
+  },
+  representatives: client.representatives.map((representative) => ({ ...representative })),
   bankDetails: { ...client.bankDetails },
   bankAccounts: client.bankAccounts ? client.bankAccounts.map((account) => ({ ...account })) : undefined,
   individualDetails: client.individualDetails ? { ...client.individualDetails } : undefined,
   legalEntityDetails: client.legalEntityDetails
     ? {
         ...client.legalEntityDetails,
-        representativeDetails: client.legalEntityDetails.representativeDetails
-          ? {
-              ...client.legalEntityDetails.representativeDetails,
-              document: { ...client.legalEntityDetails.representativeDetails.document },
-            }
-          : undefined,
       }
     : undefined,
 });

@@ -1,4 +1,15 @@
-import type { BankAccount, Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, RiskCategory, SubjectStatus } from './types';
+import type {
+  BankAccount,
+  Client,
+  ClientRegistrationAddress,
+  ClientRepresentative,
+  ClientRole,
+  ClientType,
+  ComplianceStatus,
+  ResidencyStatus,
+  RiskCategory,
+  SubjectStatus,
+} from './types';
 
 interface LegacyClient {
   id: string;
@@ -546,19 +557,44 @@ const buildLegalEntityDetails = (client: LegacyClient) => ({
   registrationDate: '2014-05-18',
   registrationAuthority: 'Межрайонная ИФНС России № 46 по г. Москве',
   authorizedCapital: '10 000 000 ₽',
-  registrarName: 'АО «Регистратор Плюс»',
-  taxName: 'ИФНС России № 10',
-  taxCode: `77${client.code.slice(-2)}`,
-  fssNumber: `7734${client.code.slice(-4)}`,
-  pfrNumber: `087-10${client.code.slice(-4)}`,
   beneficiary: 'Иванов Иван Иванович',
   authorizedPersons: 'Генеральный директор',
-  okato: `45286${client.code.slice(-3)}000`,
-  oktmo: `4538${client.code.slice(-4)}`,
-  okpo: `58${client.code.slice(-6)}`,
-  okfs: '16',
-  okogu: '4210014',
 });
+
+const cloneAddress = (address: ClientRegistrationAddress): ClientRegistrationAddress => ({ ...address });
+
+const buildClientAddresses = (registrationAddress: ClientRegistrationAddress) => ({
+  registration: cloneAddress(registrationAddress),
+  location: cloneAddress(registrationAddress),
+  mailing: cloneAddress(registrationAddress),
+  locationMatchesRegistration: true,
+  mailingMatchesRegistration: true,
+});
+
+const defaultRepresentativeByClientId: Record<string, string[]> = {
+  'c-001': ['c-006', 'c-009'],
+  'c-003': ['c-011', 'c-012'],
+  'c-004': ['c-014'],
+  'c-005': ['c-016', 'c-017'],
+  'c-007': ['c-018'],
+  'c-010': ['c-020'],
+  'c-013': ['c-021'],
+  'c-015': ['c-022'],
+  'c-019': ['c-023'],
+  'c-024': ['c-002'],
+};
+
+const buildRepresentatives = (client: LegacyClient): ClientRepresentative[] => {
+  const representativeIds = defaultRepresentativeByClientId[client.id] ?? [];
+  return representativeIds.map((subjectId, index) => ({
+    id: `${client.id}-rep-${index + 1}`,
+    subjectId,
+    role: index === 0 && client.type !== 'ФЛ' && client.type !== 'ИП' ? 'Генеральный директор' : 'Представитель',
+    authorityBasis: index === 0 && client.type !== 'ФЛ' && client.type !== 'ИП' ? 'Устав общества' : 'Доверенность',
+    authorityValidUntil: index === 0 && client.type !== 'ФЛ' && client.type !== 'ИП' ? null : '2027-12-31',
+    authorityWithoutExpiration: index === 0 && client.type !== 'ФЛ' && client.type !== 'ИП',
+  }));
+};
 
 const defaultManager = {
   name: 'Петрова Анна Сергеевна',
@@ -586,7 +622,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810400000000225',
       currency: 'RUB',
       purpose: 'Основной расчётный счёт',
-      status: 'Активен',
       openedAt: '2025-02-19',
     },
     {
@@ -597,7 +632,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810000000000225',
       currency: 'RUB',
       purpose: 'Счёт для брокерских операций',
-      status: 'На проверке',
       openedAt: '2025-03-11',
     },
   ],
@@ -610,7 +644,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810400000000225',
       currency: 'RUB',
       purpose: 'Основной расчётный счёт',
-      status: 'Активен',
       openedAt: '2024-11-05',
     },
     {
@@ -621,7 +654,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810200000000974',
       currency: 'USD',
       purpose: 'Валютный счёт для внешних расчётов',
-      status: 'Активен',
       openedAt: '2025-01-14',
     },
     {
@@ -632,7 +664,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810900000000790',
       currency: 'EUR',
       purpose: 'Счёт для расчётов с иностранными контрагентами',
-      status: 'На проверке',
       openedAt: '2025-03-22',
     },
     {
@@ -643,7 +674,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810600000000555',
       currency: 'CNY',
       purpose: 'Специальный счёт для импортных контрактов',
-      status: 'Закрыт',
       openedAt: '2024-06-30',
     },
   ],
@@ -656,7 +686,6 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
       correspondentAccount: '30101810300000000774',
       currency: 'RUB',
       purpose: 'Операционный счёт',
-      status: 'Активен',
       openedAt: '2025-02-03',
     },
   ],
@@ -710,6 +739,7 @@ export const clients: Client[] = legacyClients.map((client) => {
   const person = splitClientName(client.name, client.type);
   const archiveMeta = archivedClientMeta[client.id];
   const complianceMeta = complianceMetaByClientId[client.id];
+  const registrationAddress = buildRegistrationAddress(client.address);
 
   return {
     ...client,
@@ -732,7 +762,9 @@ export const clients: Client[] = legacyClients.map((client) => {
     complianceOfficer: complianceMeta?.officer,
     complianceDate: complianceMeta?.date,
     managerComment: managerCommentsByClientId[client.id],
-    registrationAddress: buildRegistrationAddress(client.address),
+    registrationAddress,
+    addresses: buildClientAddresses(registrationAddress),
+    representatives: buildRepresentatives(client),
     bankDetails: {
       bankName: 'АО «ИнвестБанк»',
       bik: '044525000',

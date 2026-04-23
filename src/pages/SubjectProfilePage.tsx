@@ -15,7 +15,7 @@ import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency } from '../utils/labels';
 import { useClientsStore } from '../app/ClientsStore';
-import type { BankAccount, Client, ClientType, ResidencyStatus } from '../data/types';
+import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
 const residencyOptions: ResidencyStatus[] = ['Резидент РФ', 'Нерезидент'];
@@ -43,7 +43,14 @@ export const SubjectProfilePage = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showAllClientCodes, setShowAllClientCodes] = useState(false);
-  const { getClientById, updateClient, archiveClient } = useClientsStore();
+  const [isRepresentativeModalOpen, setIsRepresentativeModalOpen] = useState(false);
+  const [representativeQuery, setRepresentativeQuery] = useState('');
+  const [newRepresentativeSubjectId, setNewRepresentativeSubjectId] = useState('');
+  const [newRepresentativeRole, setNewRepresentativeRole] = useState<ClientRepresentativeRole>('Представитель');
+  const [newRepresentativeAuthorityBasis, setNewRepresentativeAuthorityBasis] = useState('');
+  const [newRepresentativeAuthorityValidUntil, setNewRepresentativeAuthorityValidUntil] = useState('');
+  const [newRepresentativeWithoutExpiration, setNewRepresentativeWithoutExpiration] = useState(false);
+  const { clients, getClientById, updateClient, archiveClient } = useClientsStore();
 
   useEffect(() => {
     const requestedTab = searchParams.get('tab');
@@ -105,6 +112,14 @@ export const SubjectProfilePage = () => {
         personalAccount: { ...client.reportDelivery.personalAccount },
       },
       registrationAddress: { ...client.registrationAddress },
+      addresses: {
+        registration: { ...client.addresses.registration },
+        location: { ...client.addresses.location },
+        mailing: { ...client.addresses.mailing },
+        locationMatchesRegistration: client.addresses.locationMatchesRegistration,
+        mailingMatchesRegistration: client.addresses.mailingMatchesRegistration,
+      },
+      representatives: client.representatives.map((representative) => ({ ...representative })),
       bankDetails: { ...client.bankDetails },
       bankAccounts: client.bankAccounts ? [...client.bankAccounts] : undefined,
       individualDetails: client.individualDetails ? { ...client.individualDetails } : undefined,
@@ -243,6 +258,71 @@ export const SubjectProfilePage = () => {
   const hasExtraClientCodes = (currentClient.clientCodes?.length ?? 0) > 1 && additionalClientCodes.length > 0;
   const visibleAdditionalCodes = showAllClientCodes ? additionalClientCodes : additionalClientCodes.slice(0, 8);
   const isIndividualClient = currentClient.type === 'ФЛ' || currentClient.type === 'ИП';
+  const hasGeneralDirector = currentClient.representatives.some((item) => item.role === 'Генеральный директор');
+  const availableRepresentativeRoles: ClientRepresentativeRole[] = isIndividualClient
+    ? ['Представитель']
+    : hasGeneralDirector
+      ? ['Представитель']
+      : ['Генеральный директор', 'Представитель'];
+  const representativesWithSubjects = currentClient.representatives.map((item) => ({
+    ...item,
+    subject: getClientById(item.subjectId),
+  }));
+  const selectableSubjects = clients.filter((candidate) => candidate.id !== currentClient.id)
+    .filter((candidate) => candidate.name.toLowerCase().includes(representativeQuery.toLowerCase()) || candidate.code.toLowerCase().includes(representativeQuery.toLowerCase()));
+
+  const locationAddress = currentClient.addresses.locationMatchesRegistration ? currentClient.addresses.registration : currentClient.addresses.location;
+  const mailingAddress = currentClient.addresses.mailingMatchesRegistration ? currentClient.addresses.registration : currentClient.addresses.mailing;
+
+  const handleAddressSyncToggle = (key: 'locationMatchesRegistration' | 'mailingMatchesRegistration', checked: boolean) => {
+    if (!isEditing) {
+      return;
+    }
+    setDraftClient((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      const nextAddresses = { ...prev.addresses, [key]: checked };
+      if (checked) {
+        if (key === 'locationMatchesRegistration') {
+          nextAddresses.location = { ...prev.addresses.registration };
+        } else {
+          nextAddresses.mailing = { ...prev.addresses.registration };
+        }
+      }
+      return { ...prev, addresses: nextAddresses };
+    });
+  };
+
+  const handleAddRepresentative = () => {
+    if (!newRepresentativeSubjectId || !newRepresentativeAuthorityBasis.trim()) {
+      return;
+    }
+    if (!isIndividualClient && newRepresentativeRole === 'Генеральный директор' && hasGeneralDirector) {
+      return;
+    }
+    const nextRepresentative = {
+      id: `rep-${Date.now()}`,
+      subjectId: newRepresentativeSubjectId,
+      role: newRepresentativeRole,
+      authorityBasis: newRepresentativeAuthorityBasis.trim(),
+      authorityValidUntil: newRepresentativeWithoutExpiration ? null : newRepresentativeAuthorityValidUntil || null,
+      authorityWithoutExpiration: newRepresentativeWithoutExpiration,
+    } as const;
+
+    if (isEditing) {
+      setDraftClient((prev) => (prev ? { ...prev, representatives: [...prev.representatives, nextRepresentative] } : prev));
+    } else {
+      updateClient(currentClient.id, { representatives: [...currentClient.representatives, nextRepresentative] });
+    }
+    setIsRepresentativeModalOpen(false);
+    setRepresentativeQuery('');
+    setNewRepresentativeSubjectId('');
+    setNewRepresentativeRole(isIndividualClient ? 'Представитель' : 'Генеральный директор');
+    setNewRepresentativeAuthorityBasis('');
+    setNewRepresentativeAuthorityValidUntil('');
+    setNewRepresentativeWithoutExpiration(false);
+  };
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -570,6 +650,106 @@ export const SubjectProfilePage = () => {
             </div>
           </ProfileSection>
 
+          <ProfileSection title="Адреса">
+            <div className="space-y-5">
+              <div>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Адрес регистрации</p>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {isEditing ? (
+                    <>
+                      <FormField label="Страна" value={currentClient.addresses.registration.country} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, registration: { ...prev.addresses.registration, country: event.target.value } } }) : prev)} />
+                      <FormField label="Регион" value={currentClient.addresses.registration.region} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, registration: { ...prev.addresses.registration, region: event.target.value } } }) : prev)} />
+                      <FormField label="Город" value={currentClient.addresses.registration.city} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, registration: { ...prev.addresses.registration, city: event.target.value } } }) : prev)} />
+                      <FormField label="Улица" value={currentClient.addresses.registration.street} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, registration: { ...prev.addresses.registration, street: event.target.value } } }) : prev)} />
+                      <FormField label="Дом" value={currentClient.addresses.registration.house} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, registration: { ...prev.addresses.registration, house: event.target.value } } }) : prev)} />
+                      <FormField label="Индекс" value={currentClient.addresses.registration.postalCode} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, registration: { ...prev.addresses.registration, postalCode: event.target.value } } }) : prev)} />
+                    </>
+                  ) : (
+                    <>
+                      <ProfileField label="Страна" value={currentClient.addresses.registration.country} />
+                      <ProfileField label="Регион" value={currentClient.addresses.registration.region} />
+                      <ProfileField label="Город" value={currentClient.addresses.registration.city} />
+                      <ProfileField label="Улица" value={currentClient.addresses.registration.street} />
+                      <ProfileField label="Дом" value={currentClient.addresses.registration.house} />
+                      <ProfileField label="Индекс" value={currentClient.addresses.registration.postalCode} />
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {(['location', 'mailing'] as const).map((kind) => {
+                const isLocation = kind === 'location';
+                const synced = isLocation ? currentClient.addresses.locationMatchesRegistration : currentClient.addresses.mailingMatchesRegistration;
+                const address = isLocation ? locationAddress : mailingAddress;
+                return (
+                  <div key={kind}>
+                    <div className="mb-3 flex items-center justify-between gap-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{isLocation ? 'Адрес местонахождения' : 'Почтовый адрес'}</p>
+                      {isEditing ? (
+                        <label className="inline-flex items-center gap-2 text-xs text-slate-700">
+                          <input type="checkbox" checked={synced} onChange={(event) => handleAddressSyncToggle(isLocation ? 'locationMatchesRegistration' : 'mailingMatchesRegistration', event.target.checked)} />
+                          Совпадает с адресом регистрации
+                        </label>
+                      ) : null}
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      {isEditing ? (
+                        <>
+                          <FormField label="Страна" value={address.country} disabled={synced} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, [kind]: { ...prev.addresses[kind], country: event.target.value } } }) : prev)} />
+                          <FormField label="Регион" value={address.region} disabled={synced} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, [kind]: { ...prev.addresses[kind], region: event.target.value } } }) : prev)} />
+                          <FormField label="Город" value={address.city} disabled={synced} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, [kind]: { ...prev.addresses[kind], city: event.target.value } } }) : prev)} />
+                          <FormField label="Улица" value={address.street} disabled={synced} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, [kind]: { ...prev.addresses[kind], street: event.target.value } } }) : prev)} />
+                          <FormField label="Дом" value={address.house} disabled={synced} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, [kind]: { ...prev.addresses[kind], house: event.target.value } } }) : prev)} />
+                          <FormField label="Индекс" value={address.postalCode} disabled={synced} onChange={(event) => setDraftClient((prev) => prev ? ({ ...prev, addresses: { ...prev.addresses, [kind]: { ...prev.addresses[kind], postalCode: event.target.value } } }) : prev)} />
+                        </>
+                      ) : (
+                        <>
+                          <ProfileField label="Страна" value={address.country} />
+                          <ProfileField label="Регион" value={address.region} />
+                          <ProfileField label="Город" value={address.city} />
+                          <ProfileField label="Улица" value={address.street} />
+                          <ProfileField label="Дом" value={address.house} />
+                          <ProfileField label="Индекс" value={address.postalCode} />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ProfileSection>
+
+          <ProfileSection title="Представители">
+            <div className="space-y-3">
+              <div className="flex justify-end">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setNewRepresentativeRole(isIndividualClient ? 'Представитель' : 'Генеральный директор');
+                    setIsRepresentativeModalOpen(true);
+                  }}
+                >
+                  + Добавить представителя
+                </Button>
+              </div>
+              {representativesWithSubjects.length === 0 ? (
+                <p className="text-sm text-slate-500">Представители не добавлены.</p>
+              ) : (
+                representativesWithSubjects.map((representative) => (
+                  <div key={representative.id} className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm md:grid-cols-4">
+                    <p className="text-slate-500">{representative.role}</p>
+                    <button type="button" className="text-left font-medium text-brand hover:underline" onClick={() => representative.subject && navigate(`/subjects/${representative.subject.id}`)}>
+                      {representative.subject?.name ?? '—'}
+                    </button>
+                    <p>{representative.authorityBasis || '—'}</p>
+                    <p>{representative.authorityWithoutExpiration ? 'Без срока действия' : representative.authorityValidUntil || '—'}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </ProfileSection>
+
           {isIndividualClient ? (
             <ProfileSection title="Контактные данные">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -597,16 +777,6 @@ export const SubjectProfilePage = () => {
                   />
                   {!isIndividualClient ? (
                     <>
-                      <FormField
-                        label="Адрес"
-                        value={currentClient.address}
-                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
-                      />
-                      <FormField
-                        label="Представитель"
-                        value={currentClient.representative}
-                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, representative: event.target.value } : prev))}
-                      />
                       <FormField
                         label="Выгодоприобретатель"
                         value={currentClient.legalEntityDetails?.beneficiary ?? ''}
@@ -645,229 +815,6 @@ export const SubjectProfilePage = () => {
               )}
             </div>
             </ProfileSection>
-          ) : null}
-
-
-
-          {!isIndividualClient && currentClient.legalEntityDetails?.representativeDetails ? (
-            <ProfileSection title="Представитель">
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {isEditing ? (
-                  <>
-                    <FormField
-                      label="ФИО"
-                      value={currentClient.legalEntityDetails.representativeDetails.fullName}
-                      onChange={(event) =>
-                        setDraftClient((prev) =>
-                          prev && prev.legalEntityDetails?.representativeDetails
-                            ? {
-                                ...prev,
-                                legalEntityDetails: {
-                                  ...prev.legalEntityDetails,
-                                  representativeDetails: { ...prev.legalEntityDetails.representativeDetails, fullName: event.target.value },
-                                },
-                              }
-                            : prev,
-                        )
-                      }
-                    />
-                    <FormField
-                      label="Должность"
-                      value={currentClient.legalEntityDetails.representativeDetails.position}
-                      onChange={(event) =>
-                        setDraftClient((prev) =>
-                          prev && prev.legalEntityDetails?.representativeDetails
-                            ? {
-                                ...prev,
-                                legalEntityDetails: {
-                                  ...prev.legalEntityDetails,
-                                  representativeDetails: { ...prev.legalEntityDetails.representativeDetails, position: event.target.value },
-                                },
-                              }
-                            : prev,
-                        )
-                      }
-                    />
-                    <FormField
-                      label="Дата рождения"
-                      type="date"
-                      value={currentClient.legalEntityDetails.representativeDetails.birthDate}
-                      onChange={(event) =>
-                        setDraftClient((prev) =>
-                          prev && prev.legalEntityDetails?.representativeDetails
-                            ? {
-                                ...prev,
-                                legalEntityDetails: {
-                                  ...prev.legalEntityDetails,
-                                  representativeDetails: { ...prev.legalEntityDetails.representativeDetails, birthDate: event.target.value },
-                                },
-                              }
-                            : prev,
-                        )
-                      }
-                    />
-                    <FormField
-                      label="Документ"
-                      value={currentClient.legalEntityDetails.representativeDetails.document.title ?? ''}
-                      onChange={(event) =>
-                        setDraftClient((prev) =>
-                          prev && prev.legalEntityDetails?.representativeDetails
-                            ? {
-                                ...prev,
-                                legalEntityDetails: {
-                                  ...prev.legalEntityDetails,
-                                  representativeDetails: {
-                                    ...prev.legalEntityDetails.representativeDetails,
-                                    document: { ...prev.legalEntityDetails.representativeDetails.document, title: event.target.value },
-                                  },
-                                },
-                              }
-                            : prev,
-                        )
-                      }
-                    />
-                  </>
-                ) : (
-                  <>
-                    <ProfileField label="ФИО" value={currentClient.legalEntityDetails.representativeDetails.fullName} />
-                    <ProfileField label="Должность" value={currentClient.legalEntityDetails.representativeDetails.position} />
-                    <ProfileField label="Дата рождения" value={currentClient.legalEntityDetails.representativeDetails.birthDate} />
-                    <ProfileField
-                      label="Тип документа"
-                      value={
-                        currentClient.legalEntityDetails.representativeDetails.document.type === 'passport_rf'
-                          ? 'Паспорт РФ'
-                          : currentClient.legalEntityDetails.representativeDetails.document.type === 'id_card'
-                            ? 'ID'
-                            : 'Иной документ'
-                      }
-                    />
-                    <ProfileField
-                      label="Реквизиты документа"
-                      value={[
-                        currentClient.legalEntityDetails.representativeDetails.document.title,
-                        currentClient.legalEntityDetails.representativeDetails.document.series &&
-                          `серия ${currentClient.legalEntityDetails.representativeDetails.document.series}`,
-                        currentClient.legalEntityDetails.representativeDetails.document.number &&
-                          `№ ${currentClient.legalEntityDetails.representativeDetails.document.number}`,
-                        currentClient.legalEntityDetails.representativeDetails.document.issuedBy,
-                        currentClient.legalEntityDetails.representativeDetails.document.issuedAt &&
-                          `от ${currentClient.legalEntityDetails.representativeDetails.document.issuedAt}`,
-                        currentClient.legalEntityDetails.representativeDetails.document.divisionCode &&
-                          `код подразделения ${currentClient.legalEntityDetails.representativeDetails.document.divisionCode}`,
-                      ]
-                        .filter(Boolean)
-                        .join(', ')}
-                    />
-                  </>
-                )}
-              </div>
-            </ProfileSection>
-          ) : null}
-
-          {isIndividualClient ? (
-          <ProfileSection title="Адрес регистрации">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {isEditing ? (
-                <>
-                  <FormField
-                    label="Страна"
-                    value={currentClient.registrationAddress.country}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, country: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Регион"
-                    value={currentClient.registrationAddress.region}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, region: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Район"
-                    value={currentClient.registrationAddress.district}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, district: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Город"
-                    value={currentClient.registrationAddress.city}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, city: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Индекс"
-                    value={currentClient.registrationAddress.postalCode}
-                    mono
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, postalCode: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Улица"
-                    value={currentClient.registrationAddress.street}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, street: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Дом"
-                    value={currentClient.registrationAddress.house}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, house: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Корпус"
-                    value={currentClient.registrationAddress.building}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, building: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                  <FormField
-                    label="Квартира"
-                    value={currentClient.registrationAddress.apartment}
-                    onChange={(event) =>
-                      setDraftClient((prev) =>
-                        prev ? { ...prev, registrationAddress: { ...prev.registrationAddress, apartment: event.target.value } } : prev,
-                      )
-                    }
-                  />
-                </>
-              ) : (
-                <>
-                  <ProfileField label="Страна" value={client.registrationAddress.country} />
-                  <ProfileField label="Регион" value={client.registrationAddress.region} />
-                  <ProfileField label="Район" value={client.registrationAddress.district} />
-                  <ProfileField label="Город" value={client.registrationAddress.city} />
-                  <ProfileField label="Индекс" value={client.registrationAddress.postalCode} mono />
-                  <ProfileField label="Улица" value={client.registrationAddress.street} />
-                  <ProfileField label="Дом" value={client.registrationAddress.house} />
-                  <ProfileField label="Корпус" value={client.registrationAddress.building} />
-                  <ProfileField label="Квартира" value={client.registrationAddress.apartment} />
-                </>
-              )}
-            </div>
-          </ProfileSection>
           ) : null}
 
           {isIndividualClient ? (
@@ -1033,83 +980,12 @@ export const SubjectProfilePage = () => {
                           )
                         }
                       />
-                      <FormField
-                        label="Наименование регистратора"
-                        value={currentClient.legalEntityDetails?.registrarName ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, registrarName: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
                     </>
                   ) : (
                     <>
                       <ProfileField label="Дата регистрации" value={client.legalEntityDetails?.registrationDate ?? '—'} />
                       <ProfileField label="Регистрирующий орган" value={client.legalEntityDetails?.registrationAuthority ?? '—'} />
                       <ProfileField label="Уставный капитал" value={client.legalEntityDetails?.authorizedCapital ?? '—'} />
-                      <ProfileField label="Наименование регистратора" value={client.legalEntityDetails?.registrarName ?? '—'} />
-                    </>
-                  )}
-                </div>
-              </ProfileSection>
-              <ProfileSection title="Налоговые данные">
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {isEditing ? (
-                    <>
-                      <FormField
-                        label="Наименование налоговой"
-                        value={currentClient.legalEntityDetails?.taxName ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, taxName: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="Код налоговой"
-                        value={currentClient.legalEntityDetails?.taxCode ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, taxCode: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="Номер ФСС"
-                        value={currentClient.legalEntityDetails?.fssNumber ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, fssNumber: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="Номер ПФР"
-                        value={currentClient.legalEntityDetails?.pfrNumber ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, pfrNumber: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <ProfileField label="Наименование налоговой" value={client.legalEntityDetails?.taxName ?? '—'} />
-                      <ProfileField label="Код налоговой" value={client.legalEntityDetails?.taxCode ?? '—'} />
-                      <ProfileField label="Номер ФСС" value={client.legalEntityDetails?.fssNumber ?? '—'} />
-                      <ProfileField label="Номер ПФР" value={client.legalEntityDetails?.pfrNumber ?? '—'} />
                     </>
                   )}
                 </div>
@@ -1139,16 +1015,6 @@ export const SubjectProfilePage = () => {
                         onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, email: event.target.value } : prev))}
                       />
                       <FormField
-                        label="Адрес"
-                        value={currentClient.address}
-                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, address: event.target.value } : prev))}
-                      />
-                      <FormField
-                        label="Представитель"
-                        value={currentClient.representative}
-                        onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, representative: event.target.value } : prev))}
-                      />
-                      <FormField
                         label="Выгодоприобретатель"
                         value={currentClient.legalEntityDetails?.beneficiary ?? ''}
                         onChange={(event) =>
@@ -1176,81 +1042,8 @@ export const SubjectProfilePage = () => {
                       <ProfileField label="Телефон" value={client.phone} mono />
                       <ProfileField label="Дополнительный телефон" value={client.secondaryPhone} mono />
                       <ProfileField label="Email" value={client.email} />
-                      <ProfileField label="Адрес" value={client.address} />
-                      <ProfileField label="Представитель" value={client.representative} />
                       <ProfileField label="Выгодоприобретатель" value={client.legalEntityDetails?.beneficiary ?? '—'} />
                       <ProfileField label="Лица, действующие без доверенности" value={client.legalEntityDetails?.authorizedPersons ?? '—'} />
-                    </>
-                  )}
-                </div>
-              </ProfileSection>
-              <ProfileSection title="Коды классификаторов">
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {isEditing ? (
-                    <>
-                      <FormField
-                        label="ОКАТО"
-                        value={currentClient.legalEntityDetails?.okato ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, okato: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="ОКТМО"
-                        value={currentClient.legalEntityDetails?.oktmo ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, oktmo: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="ОКПО"
-                        value={currentClient.legalEntityDetails?.okpo ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, okpo: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="ОКФС"
-                        value={currentClient.legalEntityDetails?.okfs ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, okfs: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                      <FormField
-                        label="ОКОГУ"
-                        value={currentClient.legalEntityDetails?.okogu ?? ''}
-                        onChange={(event) =>
-                          setDraftClient((prev) =>
-                            prev && prev.legalEntityDetails
-                              ? { ...prev, legalEntityDetails: { ...prev.legalEntityDetails, okogu: event.target.value } }
-                              : prev,
-                          )
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <ProfileField label="ОКАТО" value={client.legalEntityDetails?.okato ?? '—'} />
-                      <ProfileField label="ОКТМО" value={client.legalEntityDetails?.oktmo ?? '—'} />
-                      <ProfileField label="ОКПО" value={client.legalEntityDetails?.okpo ?? '—'} />
-                      <ProfileField label="ОКФС" value={client.legalEntityDetails?.okfs ?? '—'} />
-                      <ProfileField label="ОКОГУ" value={client.legalEntityDetails?.okogu ?? '—'} />
                     </>
                   )}
                 </div>
@@ -1370,6 +1163,56 @@ export const SubjectProfilePage = () => {
       ) : (
         <EmptyState title="Неизвестная вкладка" description="Выберите доступный раздел карточки клиента." />
       )}
+
+      {isRepresentativeModalOpen ? (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-slate-900">Добавить представителя</h3>
+              <Button variant="secondary" size="sm" onClick={() => setIsRepresentativeModalOpen(false)}>
+                Закрыть
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <FormField label="Поиск субъекта" value={representativeQuery} onChange={(event) => setRepresentativeQuery(event.target.value)} placeholder="Введите ФИО или код" />
+              <label className="space-y-1">
+                <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Субъект</span>
+                <select value={newRepresentativeSubjectId} onChange={(event) => setNewRepresentativeSubjectId(event.target.value)} className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm">
+                  <option value="">Выберите субъекта</option>
+                  {selectableSubjects.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} ({item.code})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-1">
+                  <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Роль</span>
+                  <select value={newRepresentativeRole} onChange={(event) => setNewRepresentativeRole(event.target.value as ClientRepresentativeRole)} className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm">
+                    {availableRepresentativeRoles.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <FormField label="Основание полномочий" value={newRepresentativeAuthorityBasis} onChange={(event) => setNewRepresentativeAuthorityBasis(event.target.value)} />
+                <FormField label="Срок действия полномочий" type="date" value={newRepresentativeAuthorityValidUntil} disabled={newRepresentativeWithoutExpiration} onChange={(event) => setNewRepresentativeAuthorityValidUntil(event.target.value)} />
+                <label className="inline-flex items-center gap-2 pt-6 text-sm text-slate-700">
+                  <input type="checkbox" checked={newRepresentativeWithoutExpiration} onChange={(event) => setNewRepresentativeWithoutExpiration(event.target.checked)} />
+                  Без срока действия
+                </label>
+              </div>
+              <div className="flex justify-end">
+                <Button size="sm" onClick={handleAddRepresentative}>
+                  Сохранить
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {toastMessage && (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
