@@ -658,9 +658,42 @@ const managerCommentsByClientId: Record<string, string> = {
   'c-006': 'Предпочтительный канал коммуникации — личный кабинет.',
 };
 
+const complianceMetaByClientId: Record<
+  string,
+  {
+    comment?: string;
+    officer?: string;
+    date?: string;
+  }
+> = {
+  'c-001': {
+    comment: 'Проверка завершена без замечаний.',
+    officer: 'Иванова Мария Павловна',
+    date: '2026-04-20',
+  },
+  'c-004': {
+    comment: 'Требуется обновить подтверждение источника происхождения средств.',
+    officer: 'Сидоров Артём Викторович',
+  },
+  'c-007': {
+    comment: 'Операции ограничены до завершения внутреннего расследования.',
+    officer: 'Фролова Виктория Андреевна',
+    date: '2026-04-17',
+  },
+  'c-010': {
+    comment: 'Не загружен актуальный пакет учредительных документов.',
+    officer: 'Ким Елена Игоревна',
+  },
+  'c-019': {
+    comment: 'Нужно предоставить уточнение по бенефициарным владельцам.',
+    officer: 'Голубев Олег Сергеевич',
+  },
+};
+
 export const clients: Client[] = legacyClients.map((client) => {
   const person = splitClientName(client.name, client.type);
   const archiveMeta = archivedClientMeta[client.id];
+  const complianceMeta = complianceMetaByClientId[client.id];
 
   return {
     ...client,
@@ -678,6 +711,9 @@ export const clients: Client[] = legacyClients.map((client) => {
       email: { enabled: true, address: client.email },
       personalAccount: { enabled: client.fullDocumentSet },
     },
+    complianceComment: complianceMeta?.comment,
+    complianceOfficer: complianceMeta?.officer,
+    complianceDate: complianceMeta?.date,
     managerComment: managerCommentsByClientId[client.id],
     registrationAddress: buildRegistrationAddress(client.address),
     bankDetails: {
