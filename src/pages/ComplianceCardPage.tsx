@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useClientsStore } from '../app/ClientsStore';
 import { Badge, Button, Card, EmptyState, Tabs } from '../components/ui';
-import { getClientById } from '../data/clients';
 import {
   getComplianceCaseByClientId,
   getIndividualComplianceCardByClientId,
@@ -27,6 +27,7 @@ const decisionOptions: Array<{ value: DecisionStatus; label: string; variant: 'p
 
 export const ComplianceCardPage = () => {
   const { id } = useParams();
+  const { getClientById, updateClient } = useClientsStore();
 
   const client = useMemo(() => (id ? getClientById(id) : undefined), [id]);
   const complianceCase = useMemo(() => (client ? getComplianceCaseByClientId(client.id) : undefined), [client]);
@@ -36,6 +37,9 @@ export const ComplianceCardPage = () => {
   const [activeTab, setActiveTab] = useState<CardTab>('profile');
   const [currentStatus, setCurrentStatus] = useState<ComplianceStatus>('НА ПРОВЕРКЕ');
   const [selectedDecision, setSelectedDecision] = useState<DecisionStatus>('ПРОЙДЕН');
+  const [isReworkCommentOpen, setIsReworkCommentOpen] = useState(false);
+  const [reworkComment, setReworkComment] = useState('');
+  const [reworkCommentError, setReworkCommentError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,7 +49,10 @@ export const ComplianceCardPage = () => {
 
     setCurrentStatus(client.complianceStatus);
     setSelectedDecision(client.complianceStatus === 'НА ПРОВЕРКЕ' ? 'ПРОЙДЕН' : client.complianceStatus);
-  }, [client]);
+    setReworkComment(client.complianceComment ?? complianceCase?.comment ?? '');
+    setIsReworkCommentOpen(false);
+    setReworkCommentError(null);
+  }, [client, complianceCase]);
 
   useEffect(() => {
     if (!toastMessage) {
@@ -68,8 +75,57 @@ export const ComplianceCardPage = () => {
   const isEntity = client.type !== 'ФЛ' && client.type !== 'ИП';
 
   const applyFinalDecision = () => {
+    if (!client) {
+      return;
+    }
+
     setCurrentStatus(selectedDecision);
+    updateClient(client.id, {
+      complianceStatus: selectedDecision,
+    });
     setToastMessage(`Финальное решение принято. Новый статус: ${selectedDecision}.`);
+  };
+
+  const handleDecisionClick = (decision: DecisionStatus) => {
+    setSelectedDecision(decision);
+    if (decision === 'НА ДОРАБОТКЕ') {
+      setReworkComment(client.complianceComment ?? complianceCase?.comment ?? '');
+      setReworkCommentError(null);
+      setIsReworkCommentOpen(true);
+      return;
+    }
+
+    setIsReworkCommentOpen(false);
+    setReworkCommentError(null);
+  };
+
+  const handleReworkCommentSave = () => {
+    if (!client) {
+      return;
+    }
+
+    const trimmedComment = reworkComment.trim();
+    if (!trimmedComment) {
+      setReworkCommentError('Введите комментарий для доработки');
+      return;
+    }
+
+    updateClient(client.id, {
+      complianceStatus: 'НА ДОРАБОТКЕ',
+      complianceComment: trimmedComment,
+    });
+    setCurrentStatus('НА ДОРАБОТКЕ');
+    setSelectedDecision('НА ДОРАБОТКЕ');
+    setReworkComment(trimmedComment);
+    setReworkCommentError(null);
+    setIsReworkCommentOpen(false);
+    setToastMessage('Комментарий сохранён');
+  };
+
+  const handleReworkCommentCancel = () => {
+    setReworkComment(client.complianceComment ?? complianceCase?.comment ?? '');
+    setReworkCommentError(null);
+    setIsReworkCommentOpen(false);
   };
 
   return (
@@ -121,7 +177,12 @@ export const ComplianceCardPage = () => {
                 <p className="text-sm text-slate-700">PEP-флаг: {complianceCase?.pepFlag ? 'Да' : 'Нет'}</p>
                 <p className="text-sm text-slate-700">Санкционный флаг: {complianceCase?.sanctionsFlag ? 'Да' : 'Нет'}</p>
                 <p className="text-sm text-slate-700">Аналитик: {complianceCase?.analyst ?? '—'}</p>
-                <p className="text-sm text-slate-700">Комментарий: {complianceCase?.comment ?? '—'}</p>
+                <p className="text-sm text-slate-700">
+                  Комментарий:{' '}
+                  <span className={client.complianceComment || complianceCase?.comment ? 'text-slate-800' : 'text-slate-500'}>
+                    {client.complianceComment ?? complianceCase?.comment ?? '—'}
+                  </span>
+                </p>
               </Card>
             </div>
           ) : isEntity ? (
@@ -158,12 +219,41 @@ export const ComplianceCardPage = () => {
                 key={option.value}
                 variant={selectedDecision === option.value ? option.variant : 'secondary'}
                 className="w-full justify-start"
-                onClick={() => setSelectedDecision(option.value)}
+                onClick={() => handleDecisionClick(option.value)}
               >
                 {option.label}
               </Button>
             ))}
           </div>
+
+          {isReworkCommentOpen && (
+            <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+              <label htmlFor="rework-comment" className="text-sm font-medium text-slate-800">
+                Комментарий
+              </label>
+              <textarea
+                id="rework-comment"
+                value={reworkComment}
+                onChange={(event) => {
+                  setReworkComment(event.target.value);
+                  if (reworkCommentError) {
+                    setReworkCommentError(null);
+                  }
+                }}
+                className="min-h-24 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
+                placeholder="Укажите комментарий для доработки"
+              />
+              {reworkCommentError && <p className="text-xs text-red-600">{reworkCommentError}</p>}
+              <div className="flex gap-2">
+                <Button className="flex-1" onClick={handleReworkCommentSave}>
+                  Сохранить комментарий
+                </Button>
+                <Button variant="ghost" className="flex-1" onClick={handleReworkCommentCancel}>
+                  Отмена
+                </Button>
+              </div>
+            </div>
+          )}
 
           <Button className="w-full" onClick={applyFinalDecision}>
             Принять финальное решение
