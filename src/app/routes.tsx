@@ -2,7 +2,6 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
 import { DashboardPage } from '../pages/DashboardPage';
 import { SubjectsPage } from '../pages/SubjectsPage';
-import { DocumentsPage } from '../pages/DocumentsPage';
 import { TradingPage } from '../pages/TradingPage';
 import { TradingCardPage } from '../pages/TradingCardPage';
 import { SubjectProfilePage } from '../pages/SubjectProfilePage';
@@ -32,7 +31,6 @@ export const router = createBrowserRouter([
       { path: 'brokerage', element: <BrokeragePage /> },
       { path: 'trust-management', element: <TrustManagementPage /> },
       { path: 'agents', element: <AgentsPage /> },
-      { path: 'documents', element: <DocumentsPage /> },
       { path: 'archives', element: <ArchivesPage /> },
       { path: 'requests', element: <RequestsPage /> },
       { path: 'compliance', element: <CompliancePage /> },
