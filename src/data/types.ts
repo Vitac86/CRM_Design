@@ -193,13 +193,24 @@ export interface ClientRelation {
   status: 'Активна' | 'Неактивна' | 'На проверке';
 }
 
+export type ContractProductType = 'broker' | 'depository' | 'trust' | 'iis' | 'other';
+
 export interface ClientContract {
   id: string;
   clientId: string;
   number: string;
-  signedAt: string;
-  contractType: 'Депозитарный' | 'Договор ДУ' | 'Договор БО' | 'Дилерский' | 'Брокерский';
-  status: 'Действующий' | 'Не действующий' | 'Закрытый' | 'На подписании';
+  type: ContractProductType;
+  openDate: string;
+  closeDate?: string | null;
+  status: 'active' | 'closed';
+}
+
+export interface ClientAccount {
+  id: string;
+  clientId: string;
+  number: string;
+  type: ContractProductType;
+  openDate: string;
 }
 
 export interface ClientHistoryEvent {

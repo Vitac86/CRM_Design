@@ -17,7 +17,7 @@ const tabs: TabItem[] = [
   { value: 'bankAccounts', label: 'Банковские реквизиты' },
   { value: 'documents', label: 'Документы' },
   { value: 'relations', label: 'Связи' },
-  { value: 'contracts', label: 'Договоры' },
+  { value: 'contracts', label: 'Договоры / Счета' },
   { value: 'history', label: 'История' },
 ];
 
