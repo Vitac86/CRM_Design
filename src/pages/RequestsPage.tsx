@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Badge, Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination } from '../components/ui';
+import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
 import { NEW_REQUEST_STATUS, requests } from '../data/requests';
 import type { Request } from '../data/types';
 
 const pageSize = 10;
 
-const requestStatusBadgeVariant: Record<Request['status'], 'warning' | 'info' | 'danger'> = {
+const requestStatusTone: Record<Request['status'], 'neutral' | 'warning' | 'danger'> = {
   'Ожидает': 'warning',
-  'Принято': 'info',
+  'Принято': 'neutral',
   'Отклонено': 'danger',
 };
 
@@ -186,9 +186,7 @@ export const RequestsPage = () => {
           {
             key: 'status',
             header: 'Статус',
-            render: (request) => (
-              <Badge variant={requestStatusBadgeVariant[request.status]}>{request.status}</Badge>
-            ),
+            render: (request) => <TableStatusText tone={requestStatusTone[request.status]}>{request.status}</TableStatusText>,
           },
           { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
           { key: 'time', header: 'Время', className: 'whitespace-nowrap' },

@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
 import { DashboardTable } from '../components/crm/DashboardTable';
 import { MetricCard } from '../components/crm/MetricCard';
+import { TableStatusText } from '../components/ui';
 import { dashboardMetrics, subjectChanges } from '../data/dashboard';
 import { getLatestRequests } from '../data/requests';
 
-const requestStatusClass: Record<string, string> = {
-  Ожидает: 'bg-amber-100 text-amber-700',
-  Принято: 'bg-sky-100 text-sky-700',
-  Отклонено: 'bg-rose-100 text-rose-700',
+const requestStatusTone: Record<string, 'neutral' | 'warning' | 'danger'> = {
+  Ожидает: 'warning',
+  Принято: 'neutral',
+  Отклонено: 'danger',
 };
 
 export const DashboardPage = () => {
@@ -60,11 +61,9 @@ export const DashboardPage = () => {
                   <tr key={`request-${rowIndex}`} className="border-t border-slate-100 align-top text-slate-700">
                     <td className="px-4 py-3 font-medium text-slate-800">{requestNumber}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${requestStatusClass[status]}`}
-                      >
+                      <TableStatusText tone={requestStatusTone[status]}>
                         {status}
-                      </span>
+                      </TableStatusText>
                     </td>
                     <td className="px-4 py-3">{date}</td>
                   </tr>
