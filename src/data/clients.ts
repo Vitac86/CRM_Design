@@ -652,6 +652,12 @@ const archivedClientMeta: Record<string, { archivedAt: string }> = {
   'c-019': { archivedAt: '2026-04-18' },
 };
 
+const managerCommentsByClientId: Record<string, string> = {
+  'c-001': 'Клиент предпочитает контакт через email.',
+  'c-003': 'Оформление новых договоров согласовывать через представителя.',
+  'c-006': 'Предпочтительный канал коммуникации — личный кабинет.',
+};
+
 export const clients: Client[] = legacyClients.map((client) => {
   const person = splitClientName(client.name, client.type);
   const archiveMeta = archivedClientMeta[client.id];
@@ -672,6 +678,7 @@ export const clients: Client[] = legacyClients.map((client) => {
       email: { enabled: true, address: client.email },
       personalAccount: { enabled: client.fullDocumentSet },
     },
+    managerComment: managerCommentsByClientId[client.id],
     registrationAddress: buildRegistrationAddress(client.address),
     bankDetails: {
       bankName: 'АО «ИнвестБанк»',
