@@ -1,6 +1,8 @@
 import { Card } from '../../ui';
+import type { BankAccount } from '../../../data/types';
 import { RegistrationCheckboxGroup } from './RegistrationCheckboxGroup';
 import { RegistrationTextField } from './RegistrationTextField';
+import { RegistrationBankAccountsSection } from './RegistrationBankAccountsSection';
 
 type IndividualFormData = {
   lastName: string;
@@ -21,6 +23,7 @@ type IndividualFormData = {
   sourceOfFunds: string;
   taxResident: string;
   legalCapacity: string;
+  bankAccounts: BankAccount[];
 };
 
 type IndividualRegistrationFormProps = {
@@ -98,6 +101,9 @@ export const IndividualRegistrationForm = ({ formData, onChange }: IndividualReg
           <RegistrationTextField label="E-mail" value={formData.email} onChange={(event) => onChange('email', event.target.value)} />
         </div>
       </Card>
+
+
+      <RegistrationBankAccountsSection accounts={formData.bankAccounts} onChange={(accounts) => onChange('bankAccounts', accounts)} />
 
       <Card className="p-4">
         <h3 className="mb-3 text-base font-semibold text-slate-900">Дополнительные данные</h3>

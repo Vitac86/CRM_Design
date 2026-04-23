@@ -1,4 +1,6 @@
+import type { BankAccount, RepresentativeDocument } from '../../../data/types';
 import { Card } from '../../ui';
+import { RegistrationBankAccountsSection } from './RegistrationBankAccountsSection';
 import { RegistrationCheckboxGroup } from './RegistrationCheckboxGroup';
 import { RegistrationTextField } from './RegistrationTextField';
 
@@ -26,7 +28,6 @@ type LegalEntityFormData = {
   phones: string;
   email: string;
   address: string;
-  representative: string;
   beneficiary: string;
   authorizedPersons: string;
   okato: string;
@@ -34,6 +35,17 @@ type LegalEntityFormData = {
   okpo: string;
   okfs: string;
   okogu: string;
+  bankAccounts: BankAccount[];
+  representativeFullName: string;
+  representativePosition: string;
+  representativeBirthDate: string;
+  representativeDocumentType: RepresentativeDocument['type'];
+  representativeDocumentTitle: string;
+  representativeDocumentSeries: string;
+  representativeDocumentNumber: string;
+  representativeDocumentIssuedBy: string;
+  representativeDocumentIssuedAt: string;
+  representativeDocumentDivisionCode: string;
 };
 
 type LegalEntityRegistrationFormProps = {
@@ -47,6 +59,10 @@ const yesNoOptions = [
 ];
 
 export const LegalEntityRegistrationForm = ({ formData, onChange }: LegalEntityRegistrationFormProps) => {
+  const isPassport = formData.representativeDocumentType === 'passport_rf';
+  const isIdCard = formData.representativeDocumentType === 'id_card';
+  const isOther = formData.representativeDocumentType === 'other';
+
   return (
     <div className="space-y-4">
       <Card className="p-4">
@@ -148,11 +164,6 @@ export const LegalEntityRegistrationForm = ({ formData, onChange }: LegalEntityR
           <RegistrationTextField label="E-mail" value={formData.email} onChange={(event) => onChange('email', event.target.value)} />
           <RegistrationTextField label="Адрес" value={formData.address} onChange={(event) => onChange('address', event.target.value)} />
           <RegistrationTextField
-            label="Представитель"
-            value={formData.representative}
-            onChange={(event) => onChange('representative', event.target.value)}
-          />
-          <RegistrationTextField
             label="Выгодоприобретатель"
             value={formData.beneficiary}
             onChange={(event) => onChange('beneficiary', event.target.value)}
@@ -164,6 +175,84 @@ export const LegalEntityRegistrationForm = ({ formData, onChange }: LegalEntityR
           />
         </div>
       </Card>
+
+      <Card className="p-4">
+        <h3 className="mb-3 text-base font-semibold text-slate-900">Представитель</h3>
+        <div className="grid gap-3 md:grid-cols-2">
+          <RegistrationTextField
+            label="ФИО представителя"
+            value={formData.representativeFullName}
+            onChange={(event) => onChange('representativeFullName', event.target.value)}
+          />
+          <RegistrationTextField
+            label="Должность"
+            value={formData.representativePosition}
+            onChange={(event) => onChange('representativePosition', event.target.value)}
+          />
+          <RegistrationTextField
+            label="Дата рождения"
+            type="date"
+            value={formData.representativeBirthDate}
+            onChange={(event) => onChange('representativeBirthDate', event.target.value)}
+          />
+          <label className="space-y-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Удостоверяющий документ</span>
+            <select
+              value={formData.representativeDocumentType}
+              onChange={(event) => onChange('representativeDocumentType', event.target.value as RepresentativeDocument['type'])}
+              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            >
+              <option value="passport_rf">Паспорт РФ</option>
+              <option value="id_card">ID</option>
+              <option value="other">Иной документ</option>
+            </select>
+          </label>
+
+          {isOther ? (
+            <RegistrationTextField
+              label="Наименование документа"
+              value={formData.representativeDocumentTitle}
+              onChange={(event) => onChange('representativeDocumentTitle', event.target.value)}
+            />
+          ) : null}
+
+          <RegistrationTextField
+            label="Серия"
+            value={formData.representativeDocumentSeries}
+            onChange={(event) => onChange('representativeDocumentSeries', event.target.value)}
+          />
+          <RegistrationTextField
+            label="Номер"
+            value={formData.representativeDocumentNumber}
+            onChange={(event) => onChange('representativeDocumentNumber', event.target.value)}
+          />
+
+          {!isIdCard ? (
+            <RegistrationTextField
+              label="Кем выдан"
+              value={formData.representativeDocumentIssuedBy}
+              onChange={(event) => onChange('representativeDocumentIssuedBy', event.target.value)}
+            />
+          ) : null}
+
+          <RegistrationTextField
+            label="Когда выдан"
+            type="date"
+            value={formData.representativeDocumentIssuedAt}
+            onChange={(event) => onChange('representativeDocumentIssuedAt', event.target.value)}
+          />
+
+          {isPassport ? (
+            <RegistrationTextField
+              label="Код подразделения"
+              value={formData.representativeDocumentDivisionCode}
+              onChange={(event) => onChange('representativeDocumentDivisionCode', event.target.value)}
+            />
+          ) : null}
+        </div>
+      </Card>
+
+      <RegistrationBankAccountsSection accounts={formData.bankAccounts} onChange={(accounts) => onChange('bankAccounts', accounts)} />
 
       <Card className="p-4">
         <h3 className="mb-3 text-base font-semibold text-slate-900">Коды классификаторов</h3>
