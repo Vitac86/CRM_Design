@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useClientsStore } from '../app/ClientsStore';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
-  Badge,
   Button,
   DataTable,
   FilterChipSelect,
@@ -18,7 +17,7 @@ import { formatClientType, formatComplianceStatus, formatResidency } from '../ut
 import { subjectStatusTone } from '../utils/tableStatus';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
-type SubjectsSortKey = 'code' | 'name' | 'inn' | 'type' | 'residency' | 'complianceStatus' | 'fullDocumentSet';
+type SubjectsSortKey = 'name' | 'inn' | 'type' | 'residency' | 'complianceStatus' | 'fullDocumentSet';
 
 export const SubjectsPage = () => {
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ export const SubjectsPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [sortKey, setSortKey] = useState<SubjectsSortKey>('code');
+  const [sortKey, setSortKey] = useState<SubjectsSortKey>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const activeClients = useMemo(() => clients.filter((client) => client.isArchived !== true), [clients]);
@@ -239,23 +238,6 @@ export const SubjectsPage = () => {
 
       <DataTable<Client>
         columns={[
-          {
-            key: 'code',
-            header: 'Код клиента',
-            className: 'font-medium text-slate-800',
-            sortable: true,
-            render: (client) => {
-              const totalCodes = client.clientCodes?.length ?? 1;
-              const extraCodes = Math.max(0, totalCodes - 1);
-
-              return (
-                <div className="inline-flex items-center gap-2 whitespace-nowrap" title={`${totalCodes} кодов клиента`}>
-                  <span>{client.code}</span>
-                  {extraCodes > 0 ? <Badge variant="neutral">+{extraCodes}</Badge> : null}
-                </div>
-              );
-            },
-          },
           { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]', sortable: true },
           { key: 'inn', header: 'ИНН', sortable: true },
           {

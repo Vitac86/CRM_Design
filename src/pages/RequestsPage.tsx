@@ -91,7 +91,7 @@ export const RequestsPage = () => {
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Заявки</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">Поручения</h1>
       </header>
 
       <FilterBar className="flex-col items-stretch gap-3">
@@ -99,9 +99,9 @@ export const RequestsPage = () => {
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="По номеру, виду заявки, клиенту или коду"
+            placeholder="По номеру, виду поручения, клиенту или коду"
             className="w-full md:w-[520px]"
-            aria-label="Поиск по номеру, виду заявки, клиенту или коду"
+            aria-label="Поиск по номеру, виду поручения, клиенту или коду"
           />
         </div>
 
@@ -149,8 +149,8 @@ export const RequestsPage = () => {
 
       <DataTable<Request>
         columns={[
-          { key: 'number', header: 'Номер заявки', className: 'font-medium text-slate-800 whitespace-nowrap' },
-          { key: 'requestType', header: 'Вид заявки', className: 'min-w-[220px]' },
+          { key: 'number', header: 'Номер поручения', className: 'font-medium text-slate-800 whitespace-nowrap' },
+          { key: 'requestType', header: 'Вид поручения', className: 'min-w-[220px]' },
           { key: 'clientName', header: 'Клиент', className: 'min-w-[260px]' },
           { key: 'clientCode', header: 'Код клиента', className: 'whitespace-nowrap' },
           {
@@ -165,7 +165,7 @@ export const RequestsPage = () => {
           { key: 'source', header: 'Источник' },
         ]}
         rows={paginatedRequests}
-        emptyMessage="По выбранным фильтрам заявок нет"
+        emptyMessage="По выбранным фильтрам поручений нет"
       />
 
       <div className="flex justify-end">

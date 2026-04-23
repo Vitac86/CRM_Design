@@ -31,7 +31,7 @@ export const tradingProfiles: TradingProfile[] = [
       },
       {
         id: 'om-001-voice',
-        title: 'Голосовые заявки',
+        title: 'Голосовые поручения',
         description: 'Телефон: +7 812 300-00-02 · Запись разговоров включена',
         status: 'Активен',
       },
@@ -167,7 +167,7 @@ export const tradingProfiles: TradingProfile[] = [
       },
       {
         id: 'om-003-voice',
-        title: 'Голосовые заявки',
+        title: 'Голосовые поручения',
         description: 'Телефон: +7 812 300-00-11 · Запись разговоров включена',
         status: 'Активен',
       },
@@ -303,7 +303,7 @@ export const tradingProfiles: TradingProfile[] = [
       },
       {
         id: 'om-005-voice',
-        title: 'Голосовые заявки',
+        title: 'Голосовые поручения',
         description: 'Телефон: +7 812 300-00-25 · Запись разговоров включена',
         status: 'Активен',
       },

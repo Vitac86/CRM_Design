@@ -39,14 +39,14 @@ export const DashboardPage = () => {
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           <header className="border-b border-slate-200 px-4 py-3">
-            <h2 className="text-sm font-semibold text-slate-900">Последние заявки</h2>
+            <h2 className="text-sm font-semibold text-slate-900">Последние поручения</h2>
           </header>
 
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-brand-light/70 text-left text-xs uppercase tracking-wide text-slate-600">
                 <tr>
-                  <th className="px-4 py-2.5 font-semibold">Номер заявки</th>
+                  <th className="px-4 py-2.5 font-semibold">Номер поручения</th>
                   <th className="px-4 py-2.5 font-semibold">Статус</th>
                   <th className="px-4 py-2.5 font-semibold">Дата</th>
                 </tr>
