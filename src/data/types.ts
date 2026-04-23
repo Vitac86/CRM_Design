@@ -177,7 +177,7 @@ export interface ClientDocument {
   clientId: string;
   title: string;
   documentType: string;
-  status: 'Действующий' | 'Не действующий' | 'На проверке' | 'На подписи' | 'Отклонена';
+  status: 'Действующий' | 'Не действующий' | 'На проверке' | 'На подписи' | 'Отклонена' | 'Архивный' | 'Черновик';
   date: string;
   fileName: string;
 }
