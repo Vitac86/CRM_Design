@@ -1,68 +1,152 @@
-import { useMemo, useState } from 'react';
-import { Badge, DataTable, FilterChipSelect, TableControlPanel } from '../components/ui';
-import { archiveRecords, type ArchiveRecord, type ArchiveRecordStatus, type ArchiveType } from '../data/archives';
-
-const typeBadge: Record<ArchiveType, 'info' | 'purple'> = {
-  Архив: 'info',
-  ЧС: 'purple',
-};
-
-const statusBadge: Record<ArchiveRecordStatus, 'success' | 'warning' | 'orange'> = {
-  'Обработано': 'success',
-  'В работе': 'warning',
-  'Требует проверки': 'orange',
-};
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useClientsStore } from '../app/ClientsStore';
+import { Button, DataTable, EmptyState, FilterChipSelect, SearchInput, TableControlPanel, TableStatusText } from '../components/ui';
+import type { Client, ClientType } from '../data/types';
+import { formatClientType, formatComplianceStatus, formatResidency } from '../utils/labels';
+import { subjectStatusTone } from '../utils/tableStatus';
 
 export const ArchivesPage = () => {
-  const [typeFilter, setTypeFilter] = useState<ArchiveType | 'all'>('all');
+  const navigate = useNavigate();
+  const { clients, restoreClient } = useClientsStore();
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>('all');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const filteredRecords = useMemo(
-    () => archiveRecords.filter((record) => (typeFilter === 'all' ? true : record.type === typeFilter)),
-    [typeFilter],
-  );
+  const archivedClients = useMemo(() => clients.filter((client) => client.isArchived === true), [clients]);
+  const typeOptions = useMemo(() => [...new Set(archivedClients.map((client) => client.type))], [archivedClients]);
+  const filteredClients = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    return archivedClients.filter((client) => {
+      if (
+        normalizedSearch &&
+        ![client.name, client.code, client.inn, client.email].some((value) => value.toLowerCase().includes(normalizedSearch))
+      ) {
+        return false;
+      }
+
+      if (typeFilter !== 'all' && client.type !== typeFilter) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [archivedClients, search, typeFilter]);
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setToastMessage(null), 2200);
+    return () => window.clearTimeout(timer);
+  }, [toastMessage]);
+
+  const handleRestoreClient = (id: string) => {
+    restoreClient(id);
+    setToastMessage('Субъект восстановлен из архива');
+  };
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-slate-900">Архивы / ЧС</h1>
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold text-slate-900">Архив</h1>
+        <p className="text-sm text-slate-500">Субъекты, выведенные из активного списка</p>
       </header>
 
       <TableControlPanel
-        search={<div />}
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по клиенту, коду, ИНН или email"
+            className="w-full"
+          />
+        }
         filters={
           <FilterChipSelect
             label="Тип"
             value={typeFilter}
-            displayValue={typeFilter === 'all' ? 'Все' : typeFilter}
-            onChange={(value) => setTypeFilter(value as ArchiveType | 'all')}
+            displayValue={typeFilter === 'all' ? 'Все' : formatClientType(typeFilter)}
+            onChange={(value) => setTypeFilter(value as ClientType | 'all')}
+            active={typeFilter !== 'all'}
             options={[
               { value: 'all', label: 'Все' },
-              { value: 'Архив', label: 'Архив' },
-              { value: 'ЧС', label: 'ЧС' },
+              ...typeOptions.map((type) => ({ value: type, label: formatClientType(type) })),
             ]}
           />
         }
       />
 
-      <DataTable<ArchiveRecord>
-        columns={[
-          { key: 'object', header: 'Объект', className: 'font-medium text-slate-800' },
-          {
-            key: 'type',
-            header: 'Тип',
-            render: (record) => <Badge variant={typeBadge[record.type]}>{record.type}</Badge>,
-          },
-          { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
-          {
-            key: 'status',
-            header: 'Статус',
-            render: (record) => <Badge variant={statusBadge[record.status]}>{record.status}</Badge>,
-          },
-          { key: 'owner', header: 'Ответственный', className: 'whitespace-nowrap' },
-        ]}
-        rows={filteredRecords}
-        emptyMessage="Архивные записи отсутствуют"
-      />
+      {archivedClients.length === 0 ? (
+        <EmptyState
+          title="Архив пуст"
+          description="В архиве пока нет субъектов"
+          action={
+            <Button variant="secondary" size="sm" onClick={() => navigate('/subjects')}>
+              Вернуться к субъектам
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable<Client>
+          columns={[
+            { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800 whitespace-nowrap' },
+            { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]' },
+            { key: 'inn', header: 'ИНН' },
+            {
+              key: 'type',
+              header: 'Тип',
+              render: (client) => (
+                <TableStatusText tone={subjectStatusTone.clientType[client.type]}>{formatClientType(client.type)}</TableStatusText>
+              ),
+            },
+            {
+              key: 'residency',
+              header: 'Резидент',
+              render: (client) => (
+                <TableStatusText tone={subjectStatusTone.residency[client.residency]}>
+                  {formatResidency(client.residency)}
+                </TableStatusText>
+              ),
+            },
+            {
+              key: 'complianceStatus',
+              header: 'Статус комплаенса',
+              render: (client) => (
+                <TableStatusText tone={subjectStatusTone.compliance[client.complianceStatus]}>
+                  {formatComplianceStatus(client.complianceStatus)}
+                </TableStatusText>
+              ),
+            },
+            { key: 'archivedAt', header: 'Дата архивации', render: (client) => client.archivedAt ?? '—' },
+            {
+              key: 'actions',
+              header: 'Действия',
+              className: 'w-[150px]',
+              render: (client) => (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRestoreClient(client.id);
+                  }}
+                >
+                  Восстановить
+                </Button>
+              ),
+            },
+          ]}
+          rows={filteredClients}
+          emptyMessage="Нет архивных субъектов по выбранным условиям"
+        />
+      )}
+
+      {toastMessage ? (
+        <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
+      ) : null}
     </div>
   );
 };

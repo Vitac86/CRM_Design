@@ -8,6 +8,8 @@ type ClientsStoreValue = {
   getClientByCode: (code: string) => Client | undefined;
   addClient: (client: Client) => void;
   updateClient: (id: string, patch: Partial<Client>) => void;
+  archiveClient: (id: string) => void;
+  restoreClient: (id: string) => void;
 };
 
 const ClientsStoreContext = createContext<ClientsStoreValue | undefined>(undefined);
@@ -49,6 +51,37 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
             return {
               ...client,
               ...patch,
+            };
+          }),
+        );
+      },
+      archiveClient: (id: string) => {
+        const archivedAt = new Date().toISOString().slice(0, 10);
+        setClients((prev) =>
+          prev.map((client) => {
+            if (client.id !== id) {
+              return client;
+            }
+
+            return {
+              ...client,
+              isArchived: true,
+              archivedAt,
+            };
+          }),
+        );
+      },
+      restoreClient: (id: string) => {
+        setClients((prev) =>
+          prev.map((client) => {
+            if (client.id !== id) {
+              return client;
+            }
+
+            return {
+              ...client,
+              isArchived: false,
+              archivedAt: undefined,
             };
           }),
         );

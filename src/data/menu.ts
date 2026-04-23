@@ -37,7 +37,7 @@ export const sidebarMenu: SidebarItem[] = [
       },
       { id: 'agents', label: 'Агенты', to: '/agents', icon: 'agents' },
       { id: 'documents', label: 'Документы', to: '/documents', icon: 'documents' },
-      { id: 'archives-emergency', label: 'Архивы/ЧС', to: '/archives', icon: 'archives' },
+      { id: 'archives-emergency', label: 'Архив', to: '/archives', icon: 'archives' },
       { id: 'requests', label: 'Заявки', to: '/requests', icon: 'requests' },
       { id: 'compliance', label: 'Комплаенс', to: '/compliance', icon: 'compliance' },
     ],

@@ -646,12 +646,21 @@ const bankAccountsByClientId: Record<string, BankAccount[]> = {
   ],
 };
 
+const archivedClientMeta: Record<string, { archivedAt: string }> = {
+  'c-004': { archivedAt: '2026-04-18' },
+  'c-010': { archivedAt: '2026-04-15' },
+  'c-019': { archivedAt: '2026-04-18' },
+};
+
 export const clients: Client[] = legacyClients.map((client) => {
   const person = splitClientName(client.name, client.type);
+  const archiveMeta = archivedClientMeta[client.id];
 
   return {
     ...client,
     ...person,
+    isArchived: Boolean(archiveMeta),
+    archivedAt: archiveMeta?.archivedAt,
     birthDate: client.type === 'ФЛ' || client.type === 'ИП' ? '1988-04-12' : '—',
     ogrnip: client.type === 'ИП' ? `ОГРНИП-${client.code.slice(-4)}` : '—',
     secondaryPhone: '+7 (495) 000-00-00',

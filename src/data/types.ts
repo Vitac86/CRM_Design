@@ -109,6 +109,8 @@ export interface ClientBankDetails {
 export interface Client {
   id: string;
   code: string;
+  isArchived?: boolean;
+  archivedAt?: string;
   clientCodes?: string[];
   name: string;
   lastName: string;
