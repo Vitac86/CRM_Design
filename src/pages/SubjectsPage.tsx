@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useClientsStore } from '../app/ClientsStore';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
-  ActiveFilterChip,
   Badge,
   Button,
   DataTable,
@@ -229,45 +228,11 @@ export const SubjectsPage = () => {
                   { value: 'not-qualified', label: 'Неквалифицированный' },
                 ]}
               />
+
+              <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto" disabled={!hasActiveConditions}>
+                Сбросить всё
+              </Button>
             </>
-          }
-          activeFilters={
-            hasActiveConditions ? (
-              <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Активно</div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {search.trim() ? <ActiveFilterChip label="Поиск" value={search.trim()} onRemove={() => setSearch('')} /> : null}
-                  {typeFilter !== 'all' ? (
-                    <ActiveFilterChip label="Тип" value={formatClientType(typeFilter)} onRemove={() => setTypeFilter('all')} />
-                  ) : null}
-                  {residencyFilter !== 'all' ? (
-                    <ActiveFilterChip
-                      label="Резидентство"
-                      value={formatResidency(residencyFilter)}
-                      onRemove={() => setResidencyFilter('all')}
-                    />
-                  ) : null}
-                  {complianceFilter !== 'all' ? (
-                    <ActiveFilterChip
-                      label="Комплаенс"
-                      value={formatComplianceStatus(complianceFilter)}
-                      onRemove={() => setComplianceFilter('all')}
-                    />
-                  ) : null}
-                  {roleFilter !== 'all' ? <ActiveFilterChip label="Роль" value={roleFilter} onRemove={() => setRoleFilter('all')} /> : null}
-                  {qualificationFilter !== 'all' ? (
-                    <ActiveFilterChip
-                      label="Квалификация"
-                      value={qualificationLabelByValue[qualificationFilter]}
-                      onRemove={() => setQualificationFilter('all')}
-                    />
-                  ) : null}
-                  <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto">
-                    Сбросить всё
-                  </Button>
-                </div>
-              </div>
-            ) : null
           }
         />
       </div>
