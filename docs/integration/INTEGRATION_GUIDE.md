@@ -30,10 +30,12 @@
 
 - `RequestsPage` использует `useDataAccess().requests` и `useDataAccess().contracts`.
 - `DashboardPage` использует `useDataAccess().dashboard` и `useDataAccess().requests`.
+- `SubjectsPage` (read/list) использует `useDataAccess().clients.listClients()`.
 - `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
 - Создание поручений в demo-mode реализовано только в `src/features/requests/mock/mockRequestsRepository.ts`.
 - `src/data/requests.ts` используется только как источник immutable seed для mock-репозитория.
 - `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
+- Действия `ClientsStore` (mutations/actions) ещё не вынесены в data-access и будут переведены отдельным шагом для полного отказа от `ClientsStore`.
 
 ### Recommended next step
 

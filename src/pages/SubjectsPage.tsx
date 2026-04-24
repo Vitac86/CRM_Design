@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useClientsStore } from '../app/ClientsStore';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, SubjectStatus } from '../data/types';
 import {
   Button,
@@ -36,7 +36,10 @@ const parseSubjectStatus = (value: string | null): SubjectStatus | 'all' => {
 export const SubjectsPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { clients } = useClientsStore();
+  const { clients: clientsDataAccess } = useDataAccess();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>(() => {
     const value = searchParams.get('type');
@@ -147,6 +150,36 @@ export const SubjectsPage = () => {
     () => sortedClients.slice((page - 1) * pageSize, page * pageSize),
     [sortedClients, page, pageSize],
   );
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadClients = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const loadedClients = await clientsDataAccess.listClients();
+        if (!isCancelled) {
+          setClients(loadedClients);
+        }
+      } catch {
+        if (!isCancelled) {
+          setError('Не удалось загрузить список субъектов.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadClients();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [clientsDataAccess]);
 
   useEffect(() => {
     if (page > totalPages) {
@@ -389,6 +422,9 @@ export const SubjectsPage = () => {
         sortDirection={sortDirection}
         onSortChange={handleSort}
       />
+
+      {isLoading && <p className="text-sm text-slate-500">Загрузка списка субъектов…</p>}
+      {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <PageSizeSelector
