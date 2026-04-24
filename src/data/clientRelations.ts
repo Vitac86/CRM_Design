@@ -14,6 +14,3 @@ export const clientRelations: readonly ClientRelation[] = [
   { id: 'rel-11', clientId: 'c-020', relatedClientId: 'c-009', relatedName: 'Громова Алина Сергеевна', relatedType: 'Физическое лицо', role: 'Бенефициар', dateFrom: '2025-06-14' },
   { id: 'rel-12', clientId: 'c-023', relatedClientId: 'c-011', relatedName: 'АО «Восток Майнинг Системс»', relatedType: 'Юридическое лицо', role: 'Исполнительный орган', dateFrom: '2025-12-09' },
 ];
-
-export const getRelationsByClientId = (clientId: string) =>
-  clientRelations.filter((relation) => relation.clientId === clientId);

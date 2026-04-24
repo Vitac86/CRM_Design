@@ -143,17 +143,3 @@ export const individualComplianceCards: IndividualComplianceCard[] = [
     riskNote: 'Ожидается подтверждение источника средств.'
   }
 ];
-
-export const getComplianceCaseByClientId = (
-  clientId: string
-): ComplianceCase | undefined => complianceCases.find((item) => item.clientId === clientId);
-
-export const getLegalEntityComplianceCardByClientId = (
-  clientId: string
-): LegalEntityComplianceCard | undefined =>
-  legalEntityComplianceCards.find((item) => item.clientId === clientId);
-
-export const getIndividualComplianceCardByClientId = (
-  clientId: string
-): IndividualComplianceCard | undefined =>
-  individualComplianceCards.find((item) => item.clientId === clientId);
