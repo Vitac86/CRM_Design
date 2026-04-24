@@ -52,3 +52,25 @@
 ## Notes
 - Visual QA remains a manual step and must be executed for all viewport groups above.
 - If a route has a complex data table or modal flow, verify both empty and filled states.
+
+## Filter layout regression checks
+
+Проверить на 1440 / 1280 / 1024 / 768 / 390px:
+- [ ] `/requests`
+- [ ] `/subjects`
+- [ ] `/compliance`
+- [ ] `/middle-office/clients`
+- [ ] `/middle-office/reports`
+- [ ] `/depository`
+- [ ] `/trading`
+- [ ] `/documents`
+- [ ] `/brokerage`
+- [ ] `/trust-management`
+- [ ] `/archives`
+- [ ] `/agents`
+
+Критерии:
+- [ ] select/input filters не растягиваются на всю ширину на desktop.
+- [ ] filter card не становится чрезмерно высокой.
+- [ ] reset/export buttons не перекрывают поля.
+- [ ] mobile layout переносится в одну колонку без горизонтального overflow.
