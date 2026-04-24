@@ -1,9 +1,11 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { DashboardTable } from '../components/crm/DashboardTable';
 import { MetricCard } from '../components/crm/MetricCard';
 import { TableStatusText } from '../components/ui';
-import { dashboardMetrics, subjectChanges } from '../data/dashboard';
-import { getLatestRequests } from '../data/requests';
+import type { DashboardMetric, SubjectChange } from '../data/dashboard';
+import type { Request } from '../data/types';
 
 const requestStatusTone: Record<string, 'neutral' | 'warning' | 'danger'> = {
   Ожидает: 'warning',
@@ -11,14 +13,77 @@ const requestStatusTone: Record<string, 'neutral' | 'warning' | 'danger'> = {
   Отклонено: 'danger',
 };
 
-export const DashboardPage = () => {
-  const subjectRows = subjectChanges.map((item) => [item.subject, item.change]);
+const DASHBOARD_LATEST_REQUESTS_LIMIT = 10;
 
-  const requestRows = getLatestRequests().map((item) => [
-    item.number,
-    item.status,
-    new Date(item.date).toLocaleDateString('ru-RU'),
-  ]);
+export const DashboardPage = () => {
+  const { dashboard: dashboardDataAccess, requests: requestsDataAccess } = useDataAccess();
+  const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
+  const [subjectChanges, setSubjectChanges] = useState<SubjectChange[]>([]);
+  const [latestRequests, setLatestRequests] = useState<Request[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadDashboardData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const [loadedMetrics, loadedSubjectChanges, loadedRequests] = await Promise.all([
+          dashboardDataAccess.listDashboardMetrics(),
+          dashboardDataAccess.listSubjectChanges(),
+          requestsDataAccess.listRequests(),
+        ]);
+
+        if (isCancelled) {
+          return;
+        }
+
+        const latest = [...loadedRequests]
+          .sort((left, right) => {
+            const leftDateTime = new Date(`${left.date}T${left.time}:00`).getTime();
+            const rightDateTime = new Date(`${right.date}T${right.time}:00`).getTime();
+            return rightDateTime - leftDateTime;
+          })
+          .slice(0, DASHBOARD_LATEST_REQUESTS_LIMIT);
+
+        setMetrics(loadedMetrics);
+        setSubjectChanges(loadedSubjectChanges);
+        setLatestRequests(latest);
+      } catch {
+        if (!isCancelled) {
+          setError('Не удалось загрузить данные операционного обзора.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadDashboardData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [dashboardDataAccess, requestsDataAccess]);
+
+  const subjectRows = useMemo(
+    () => subjectChanges.map((item) => [item.subject, item.change]),
+    [subjectChanges],
+  );
+
+  const requestRows = useMemo(
+    () =>
+      latestRequests.map((item) => [
+        item.number,
+        item.status,
+        new Date(item.date).toLocaleDateString('ru-RU'),
+      ]),
+    [latestRequests],
+  );
 
   return (
     <div className="space-y-6 rounded-2xl bg-slate-100/80 p-5">
@@ -27,10 +92,18 @@ export const DashboardPage = () => {
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {dashboardMetrics.map((metric) => (
+        {metrics.map((metric) => (
           <MetricCard key={metric.id} metric={metric} />
         ))}
       </section>
+
+      {error && (
+        <p className="text-sm font-medium text-rose-600">{error}</p>
+      )}
+
+      {isLoading && (
+        <p className="text-sm text-slate-500">Загрузка данных...</p>
+      )}
 
       <section className="grid gap-5 xl:grid-cols-2">
         <DashboardTable
