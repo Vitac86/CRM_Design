@@ -39,51 +39,64 @@
 
 ---
 
-## 3) Прямые импорты из `src/data/*` внутри `src/pages` и `src/components`
+## 3) Импорты из `src/data/*` внутри `src/pages` и `src/components`
 
-Найдено большое количество прямых импортов mock/data-модулей из UI-слоя.
+Найдено большое количество прямых импортов mock/data-модулей из UI-слоя. Ниже разделение на группы.
 
-### Страницы (`src/pages`)
-Ключевые страницы с прямыми импортами `../data/*`:
-- `DashboardPage.tsx`
-- `MiddleOfficeClientsPage.tsx`
-- `DocumentsPage.tsx`
-- `ComplianceCardPage.tsx`
-- `AdministrationPage.tsx`
-- `MiddleOfficeReportsPage.tsx`
-- `MiddleOfficePage.tsx`
-- `CompliancePage.tsx` (типы)
-- `SubjectProfilePage.tsx`
-- `ArchivesPage.tsx` (типы)
-- `SubjectsPage.tsx` (типы)
-- `TradingPage.tsx`
-- `DepositoryPage.tsx`
-- `TradingCardPage.tsx`
-- `ClientRegistrationWizardPage.tsx` (типы)
-- `BrokeragePage.tsx`
-- `ContractWizardPage.tsx`
-- `RequestsPage.tsx`
-- `TrustManagementPage.tsx`
+### 3.1 Runtime/value imports
 
-### Компоненты (`src/components`)
-Ключевые компоненты с импортами `../../data/*` / `../../../data/*`:
-- `components/layout/Topbar.tsx`
-- `components/layout/Sidebar.tsx`
-- `components/crm/SubjectContractsTab.tsx`
-- `components/crm/SubjectHistoryTab.tsx`
-- `components/crm/SubjectRelationsTab.tsx`
-- `components/crm/SubjectDocumentsTab.tsx`
-- `components/crm/ReportsPageTemplate.tsx`
-- `components/crm/MetricCard.tsx`
-- `components/crm/MiddleOfficeReportList.tsx` (типы)
-- `components/crm/MiddleOfficeReportDetails.tsx` (типы)
-- `components/crm/SubjectHeader.tsx` (типы)
-- `components/crm/ClientProfileHeader.tsx` (типы)
-- `components/crm/SubjectBankAccountsTab.tsx` (типы)
-- `components/crm/registration/*` (типы)
+Файлы, где импортируются runtime-значения (включая смешанные `value + type` импорты):
+- `src/pages/AdministrationPage.tsx`
+- `src/pages/ComplianceCardPage.tsx`
+- `src/pages/DashboardPage.tsx`
+- `src/pages/DepositoryPage.tsx`
+- `src/pages/DocumentsPage.tsx`
+- `src/pages/BrokeragePage.tsx`
+- `src/pages/MiddleOfficeClientsPage.tsx`
+- `src/pages/MiddleOfficePage.tsx`
+- `src/pages/MiddleOfficeReportsPage.tsx`
+- `src/pages/RequestsPage.tsx`
+- `src/pages/SubjectProfilePage.tsx`
+- `src/pages/TradingCardPage.tsx`
+- `src/pages/TradingPage.tsx`
+- `src/pages/TrustManagementPage.tsx`
+- `src/components/layout/Sidebar.tsx`
+- `src/components/layout/Topbar.tsx`
+- `src/components/crm/ReportsPageTemplate.tsx`
+- `src/components/crm/SubjectContractsTab.tsx`
+- `src/components/crm/SubjectDocumentsTab.tsx`
+- `src/components/crm/SubjectHistoryTab.tsx`
+- `src/components/crm/SubjectRelationsTab.tsx`
+
+Краткий риск:
+- Высокая связанность UI с текущим mock-хранилищем и конкретными runtime-структурами в `src/data/*`.
+- Для API-перехода потребуется массовая замена источников данных в pages/components.
+- Выше вероятность неявных регрессий при изменении контрактов data-модулей.
+
+### 3.2 Type-only imports
+
+Файлы, где из `src/data/*` импортируются только типы (`import type ...`):
+- `src/pages/ArchivesPage.tsx`
+- `src/pages/ClientRegistrationWizardPage.tsx`
+- `src/pages/CompliancePage.tsx`
+- `src/pages/ContractWizardPage.tsx`
+- `src/pages/SubjectsPage.tsx`
+- `src/components/crm/ClientProfileHeader.tsx`
+- `src/components/crm/MetricCard.tsx`
+- `src/components/crm/MiddleOfficeReportDetails.tsx`
+- `src/components/crm/MiddleOfficeReportList.tsx`
+- `src/components/crm/SubjectBankAccountsTab.tsx`
+- `src/components/crm/SubjectHeader.tsx`
+- `src/components/crm/registration/IndividualRegistrationForm.tsx`
+- `src/components/crm/registration/LegalEntityRegistrationForm.tsx`
+- `src/components/crm/registration/RegistrationBankAccountsSection.tsx`
+
+Краткий риск:
+- Runtime-связь ниже, но есть зависимость UI-слоя от доменных типов, размещённых в mock/data-дереве.
+- При отделении production-модели от mock-данных потребуется реорганизация общих типов (желательно в отдельный `domain/types` слой).
 
 ### Вывод по пункту
-Текущее состояние сильно связало страницу/компонент с конкретной mock-реализацией данных. Для безопасной передачи и будущего подключения API желательно ввести слой провайдера/репозитория (mock-provider по умолчанию) и постепенно убрать прямые импорты из `data` в UI-слое.
+Текущее состояние сильно связало страницу/компонент с конкретной mock-реализацией данных. Для безопасной передачи и будущего подключения API желательно ввести слой провайдера/репозитория (mock-provider по умолчанию) и постепенно убрать прямые value-импорты из `data` в UI-слое.
 
 ---
 
@@ -191,41 +204,113 @@
 
 ---
 
-## Риски (prioritized)
+## 8) Quality gates
 
-### Высокий приоритет (критично до передачи)
-1. **Нет 404 и router error boundary** — падения/невалидные URL не имеют централизованной деградации UX.
-2. **Модульные side effects и mutable state в `data`** (`clientContracts`, `requests`) — высокий риск неочевидного поведения при интеграции API/кеша.
-3. **Сильная связанность UI со `src/data/*`** — сложнее заменить mock на API без массовых правок.
+Проверка `package.json` показала, что сейчас определены только скрипты:
+- `dev`
+- `build`
+- `preview`
 
-### Средний приоритет
-4. **Дублирование filter/sort/pagination логики** — риск расхождения поведения таблиц между экранами.
-5. **Разрозненная ручная валидация** — повышает стоимость поддержки и риск регрессий.
+Отдельные quality gates **отсутствуют**:
+- `lint`
+- отдельный `typecheck`
+- `test`
+- `test:run`
 
-### Низкий приоритет / можно позже
-6. **Предупреждение npm про `http-proxy` env config** — не блокирует сборку, но лучше очистить конфигурацию окружения.
+Вывод:
+- Базовая сборка проходит, но нет формализованных автоматических «ворот качества» для статического анализа и тестов.
 
 ---
 
-## Что критично сделать до передачи разработчикам
+## 9) Visual/responsive verification
 
-1. Добавить минимальный fallback для роутинга:
-   - 404-маршрут (`*`),
-   - router-level `errorElement`.
-2. Зафиксировать контракт data-access слоя:
+Текущий baseline **не подтверждает выполнение ручной визуальной проверки UI**.
+
+Что нужно проверить отдельно перед передачей:
+- desktop (широкий экран);
+- 1024px;
+- 768px;
+- 390px;
+- поведение sidebar (сворачивание/перекрытие/навигация);
+- таблицы (переполнение, sticky/scroll, читаемость колонок);
+- формы (валидация, состояния ошибок, доступность);
+- модальные окна (позиционирование, скролл, закрытие, фокус).
+
+---
+
+## 10) Reproducible audit commands
+
+Ниже набор команд, которыми можно повторить аудит ключевых зон.
+
+### Импорты из `src/data/*` в pages/components
+```bash
+rg -n "^import( type)? .*from ['\"](\.\./)+data/" src/pages src/components
+```
+
+### Разделение runtime/value и type-only импортов
+```bash
+# runtime/value (включая смешанные импорты)
+rg -n "^import (?!type).*from ['\"](\.\./)+data/" src/pages src/components
+
+# строго type-only
+rg -n "^import type .*from ['\"](\.\./)+data/" src/pages src/components
+```
+
+### Поиск модульных мутаций/side effects в `src/data`
+```bash
+rg -n "(^\s*[^/\n]*\b(push|unshift|splice|Object\.assign)\b|ensureContractsForActiveClients\(\);)" src/data
+```
+
+### Поиск маршрутов, 404 и error boundary
+```bash
+rg -n "createBrowserRouter|path:\s*['\"]|Navigate|errorElement|\*" src/app/routes.tsx
+```
+
+### Проверка scripts в `package.json`
+```bash
+cat package.json
+```
+
+### Быстрая инвентаризация структуры `src`
+```bash
+find src -maxdepth 2 -type d | sort
+```
+
+---
+
+## 11) Что критично сделать до передачи разработчикам
+
+1. Зафиксировать контракт data-access слоя:
    - ввести mock-provider/repository abstraction,
-   - убрать прямые импорты `data/*` из pages/components в пользу этого слоя (постепенно).
-3. Изолировать mutable operations:
+   - убрать прямые value-импорты `data/*` из pages/components в пользу этого слоя (постепенно).
+2. Изолировать mutable operations:
    - исключить неявные модульные side effects,
    - сделать явные операции через provider/service API.
+3. Добавить минимальный fallback для роутинга:
+   - 404-маршрут (`*`),
+   - router-level `errorElement`.
+4. Ввести quality gates:
+   - добавить `lint`,
+   - добавить отдельный `typecheck`,
+   - добавить `test`/`test:run`.
 
 ---
 
-## Что можно оставить на потом
+## 12) Что можно оставить на потом
 
 1. Постепенная унификация table/query логики (фильтры/сортировки/пагинация).
 2. Постепенная унификация ручной валидации (единые схемы/хелперы).
 3. Косметическая cleanup-задача по предупреждению `http-proxy` в npm config.
+
+---
+
+## 13) Результат повторной проверки сборки после обновления baseline
+
+Команда:
+- `npm run build` — **PASSED** (2026-04-24, UTC)
+
+Комментарий:
+- После обновления `docs/TRANSFER_READINESS_BASELINE.md` runtime-код приложения не изменялся; сборка проходит успешно.
 
 ---
 
@@ -258,10 +343,3 @@
   - `src/pages/AgentsPage.tsx`
   - `src/components/crm/SubjectBankAccountsTab.tsx`
   - `src/components/crm/SubjectDocumentsTab.tsx`
-  - `src/components/crm/SubjectContractsTab.tsx`
-  - `src/components/crm/registration/RegistrationBankAccountsSection.tsx`
-
----
-
-## Итог baseline
-Проект находится в рабочем demo-состоянии и собирается без TypeScript-ошибок, но до безопасной передачи под API-интеграцию нужно закрыть архитектурные риски around routing resilience, data-access abstraction и управление mutable mock-state.
