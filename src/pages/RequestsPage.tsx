@@ -793,18 +793,15 @@ export const RequestsPage = () => {
         </div>
       ) : null}
 
-      <FilterBar className="flex-col items-stretch gap-3">
-        <div className="flex w-full flex-wrap gap-3">
+      <FilterBar>
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="По номеру, виду поручения, клиенту или коду"
-            className="w-full md:w-[520px]"
+            className="w-full lg:w-[520px]"
             aria-label="Поиск по номеру, виду поручения, клиенту или коду"
           />
-        </div>
-
-        <div className="flex w-full flex-wrap items-end gap-3">
           <input
             type="text"
             value={clientCodeFilter}
@@ -822,7 +819,11 @@ export const RequestsPage = () => {
             className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
           />
 
-          <SelectFilter value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value as Request['source'] | 'all')}>
+          <SelectFilter
+            value={sourceFilter}
+            onChange={(event) => setSourceFilter(event.target.value as Request['source'] | 'all')}
+            className="sm:min-w-[200px]"
+          >
             <option value="all">Источник</option>
             {sourceOptions.map((source) => (
               <option key={source} value={source}>
@@ -831,7 +832,11 @@ export const RequestsPage = () => {
             ))}
           </SelectFilter>
 
-          <SelectFilter value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as Request['status'] | 'all')}>
+          <SelectFilter
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as Request['status'] | 'all')}
+            className="sm:min-w-[190px]"
+          >
             <option value="all">Статус</option>
             {statusOptions.map((status) => (
               <option key={status} value={status}>
@@ -840,7 +845,7 @@ export const RequestsPage = () => {
             ))}
           </SelectFilter>
 
-          <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
+          <Button variant="secondary" className="w-full sm:ml-auto sm:w-auto" onClick={resetFilters}>
             Очистить фильтры
           </Button>
         </div>
