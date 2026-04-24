@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { useClientsStore } from '../app/ClientsStore';
 import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
-import { NEW_REQUEST_STATUS, createRequest, requests } from '../data/requests';
 import { getContractsByClientId } from '../data/clientContracts';
 import type { ClientBankDetails, CurrencyCode, Request } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
@@ -34,6 +34,7 @@ const defaultManualBankDetails: ClientBankDetails = {
 };
 
 const requestCurrencyOptions: CurrencyCode[] = ['RUB', 'USD', 'EUR', 'CNY'];
+const NEW_REQUEST_STATUS: Request['status'] = 'Ожидает';
 
 const formatAmountByDigits = (rawValue: string): string => {
   const digits = rawValue.replace(/\D/g, '').slice(0, 15);
@@ -58,9 +59,13 @@ const escapeHtml = (value: string): string =>
     .replace(/'/g, '&#039;');
 
 export const RequestsPage = () => {
+  const { requests: requestsDataAccess } = useDataAccess();
   const { clients, getClientById } = useClientsStore();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [requestsList, setRequestsList] = useState<Request[]>(() => [...requests]);
+  const [requestsList, setRequestsList] = useState<Request[]>([]);
+  const [isLoadingRequests, setIsLoadingRequests] = useState(true);
+  const [requestsError, setRequestsError] = useState<string | null>(null);
+  const [isCreatingRequest, setIsCreatingRequest] = useState(false);
   const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const [clientCodeFilter, setClientCodeFilter] = useState(() => searchParams.get('clientCode') ?? '');
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') ?? '');
@@ -217,6 +222,36 @@ export const RequestsPage = () => {
     return () => window.clearTimeout(timer);
   }, [toastMessage]);
 
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadRequests = async () => {
+      setIsLoadingRequests(true);
+      setRequestsError(null);
+
+      try {
+        const loadedRequests = await requestsDataAccess.listRequests();
+        if (!isCancelled) {
+          setRequestsList(loadedRequests);
+        }
+      } catch {
+        if (!isCancelled) {
+          setRequestsError('Не удалось загрузить список поручений.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingRequests(false);
+        }
+      }
+    };
+
+    void loadRequests();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [requestsDataAccess]);
+
   const resetFilters = () => {
     setSearch('');
     setClientCodeFilter('');
@@ -239,7 +274,7 @@ export const RequestsPage = () => {
     setFormError(null);
   };
 
-  const handleCreateRequest = () => {
+  const handleCreateRequest = async () => {
     if (!selectedClient || !selectedContract) {
       setFormError('Выберите клиента и договор для создания поручения.');
       return;
@@ -280,29 +315,38 @@ export const RequestsPage = () => {
       return;
     }
 
-    const createdRequest = createRequest({
-      clientId: selectedClient.id,
-      requestType: requestTypeLabelMap[createType],
-      requestTypeCode: createType,
-      clientName: selectedClient.name,
-      clientCode: selectedClient.code,
-      contractId: selectedContract.id,
-      contractNumber: selectedContract.number,
-      status: 'Ожидает',
-      date,
-      time,
-      source: selectedSource,
-      amount: requestAmount,
-      currency: requestCurrency,
-      withdrawalBankDetails: withdrawalDetails,
-      transferFromMarket: createType === 'transfer' ? transferFromMarket : undefined,
-      transferToMarket: createType === 'transfer' ? transferToMarket : undefined,
-    });
+    setIsCreatingRequest(true);
+    setFormError(null);
 
-    setRequestsList((prev) => [createdRequest, ...prev]);
-    setIsCreateFormOpen(false);
-    resetCreateForm();
-    setToastMessage('Поручение успешно создано');
+    try {
+      const createdRequest = await requestsDataAccess.createRequest({
+        clientId: selectedClient.id,
+        requestType: requestTypeLabelMap[createType],
+        requestTypeCode: createType,
+        clientName: selectedClient.name,
+        clientCode: selectedClient.code,
+        contractId: selectedContract.id,
+        contractNumber: selectedContract.number,
+        status: NEW_REQUEST_STATUS,
+        date,
+        time,
+        source: selectedSource,
+        amount: requestAmount,
+        currency: requestCurrency,
+        withdrawalBankDetails: withdrawalDetails,
+        transferFromMarket: createType === 'transfer' ? transferFromMarket : undefined,
+        transferToMarket: createType === 'transfer' ? transferToMarket : undefined,
+      });
+
+      setRequestsList((prev) => [createdRequest, ...prev]);
+      setIsCreateFormOpen(false);
+      resetCreateForm();
+      setToastMessage('Поручение успешно создано');
+    } catch {
+      setFormError('Не удалось создать поручение. Повторите попытку.');
+    } finally {
+      setIsCreatingRequest(false);
+    }
   };
 
   const getDraftWithdrawalDetails = (): ClientBankDetails | undefined => {
@@ -462,6 +506,9 @@ export const RequestsPage = () => {
 
       {toastMessage ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{toastMessage}</div>
+      ) : null}
+      {requestsError ? (
+        <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{requestsError}</div>
       ) : null}
 
       {isCreateFormOpen ? (
@@ -665,7 +712,9 @@ export const RequestsPage = () => {
             <Button variant="secondary" onClick={handlePrintDraft}>
               Распечатать поручение
             </Button>
-            <Button onClick={handleCreateRequest}>Сохранить поручение</Button>
+            <Button onClick={() => void handleCreateRequest()} disabled={isCreatingRequest}>
+              {isCreatingRequest ? 'Сохранение...' : 'Сохранить поручение'}
+            </Button>
           </div>
         </div>
       ) : null}
@@ -741,7 +790,7 @@ export const RequestsPage = () => {
           { key: 'source', header: 'Источник' },
         ]}
         rows={paginatedRequests}
-        emptyMessage="По выбранным фильтрам поручений нет"
+        emptyMessage={isLoadingRequests ? 'Загрузка поручений...' : 'По выбранным фильтрам поручений нет'}
       />
 
       <div className="flex justify-end">
