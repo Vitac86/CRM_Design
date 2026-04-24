@@ -98,6 +98,14 @@ export const BrokeragePage = () => {
             header: 'Договор',
             className: 'font-medium text-slate-800 whitespace-nowrap',
             sortable: true,
+            render: (contract) => (
+              <Link
+                to={`/subjects/${contract.clientId}/contract-wizard?contractId=${contract.contractId}`}
+                className="text-brand hover:text-brand-dark hover:underline focus-visible:underline"
+              >
+                {contract.contractNumber}
+              </Link>
+            ),
           },
           { key: 'clientCode', header: 'Код клиента', className: 'whitespace-nowrap', sortable: true },
           {

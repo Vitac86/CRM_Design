@@ -197,3 +197,15 @@ export const getLatestRequests = (limit = REQUESTS_DASHBOARD_LIMIT): Request[] =
       return rightDateTime - leftDateTime;
     })
     .slice(0, limit);
+
+export const createRequest = (payload: Omit<Request, 'id' | 'number'>) => {
+  const nextIndex = requests.length + 1;
+  const request: Request = {
+    ...payload,
+    id: `r-${Date.now()}`,
+    number: `REQ-${String(260000 + nextIndex).padStart(6, '0')}`,
+  };
+
+  requests.unshift(request);
+  return request;
+};

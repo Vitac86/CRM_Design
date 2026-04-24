@@ -1,4 +1,5 @@
 import type { ClientContract, ContractProductType, ContractWizardConfig, ContractPersonType } from './types';
+import { clients } from './clients';
 
 const resolvePersonType = (clientType?: string): ContractPersonType => {
   if (clientType === 'ФЛ') {
@@ -139,6 +140,42 @@ export const clientContracts: ClientContract[] = [
     closeDate: null,
     status: 'active',
   },
+  {
+    id: 'ctr-10',
+    clientId: 'c-002',
+    number: 'BR-2026/00440',
+    type: 'broker',
+    openDate: '2026-02-03',
+    closeDate: null,
+    status: 'active',
+  },
+  {
+    id: 'ctr-11',
+    clientId: 'c-003',
+    number: 'BR-2025/01988',
+    type: 'broker',
+    openDate: '2025-11-22',
+    closeDate: null,
+    status: 'active',
+  },
+  {
+    id: 'ctr-12',
+    clientId: 'c-004',
+    number: 'BR-2024/01210',
+    type: 'broker',
+    openDate: '2024-06-09',
+    closeDate: null,
+    status: 'active',
+  },
+  {
+    id: 'ctr-13',
+    clientId: 'c-005',
+    number: 'BR-2023/00771',
+    type: 'broker',
+    openDate: '2023-03-17',
+    closeDate: '2024-12-17',
+    status: 'closed',
+  },
 ];
 
 const contractConfigs = new Map<string, ContractWizardConfig>(
@@ -148,6 +185,47 @@ const contractConfigs = new Map<string, ContractWizardConfig>(
 export const getContractsByClientId = (clientId: string) => clientContracts.filter((contract) => contract.clientId === clientId);
 
 export const getClientContractById = (contractId: string) => clientContracts.find((contract) => contract.id === contractId);
+
+const ensureContractsForActiveClients = () => {
+  const activeClients = clients.filter((client) => client.subjectStatus === 'Активный клиент' && !client.isArchived);
+  const maxContractNumber = clientContracts.reduce((maxValue, contract) => {
+    const numericPart = Number(contract.id.replace('ctr-', ''));
+    return Number.isFinite(numericPart) ? Math.max(maxValue, numericPart) : maxValue;
+  }, 0);
+  let nextCounter = maxContractNumber + 1;
+
+  activeClients.forEach((client) => {
+    const activeContracts = clientContracts.filter((contract) => contract.clientId === client.id && contract.status === 'active');
+    const hasBroker = activeContracts.some((contract) => contract.type === 'broker');
+    const hasDepository = activeContracts.some((contract) => contract.type === 'depository');
+
+    if (!hasBroker) {
+      clientContracts.push({
+        id: `ctr-${nextCounter++}`,
+        clientId: client.id,
+        number: `BR-2026/${String(nextCounter).padStart(5, '0')}`,
+        type: 'broker',
+        openDate: '2026-01-10',
+        closeDate: null,
+        status: 'active',
+      });
+    }
+
+    if (!hasDepository) {
+      clientContracts.push({
+        id: `ctr-${nextCounter++}`,
+        clientId: client.id,
+        number: `DP-2026/${String(nextCounter).padStart(5, '0')}`,
+        type: 'depository',
+        openDate: '2026-01-15',
+        closeDate: null,
+        status: 'active',
+      });
+    }
+  });
+};
+
+ensureContractsForActiveClients();
 
 export const getPrimaryContractByClientId = (clientId: string) => {
   const contracts = getContractsByClientId(clientId);
