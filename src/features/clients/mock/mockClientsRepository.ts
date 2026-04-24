@@ -40,6 +40,7 @@ export const createMockClientsRepository = (): ClientsRepository => {
       clientsStore[clientIndex] = {
         ...clientsStore[clientIndex],
         isArchived: true,
+        archivedAt: new Date().toISOString().slice(0, 10),
       };
 
       return cloneClient(clientsStore[clientIndex]);
