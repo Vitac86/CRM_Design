@@ -1,22 +1,8 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useClientsStore } from '../app/ClientsStore';
-import {
-  createClientContract,
-  createDefaultContractConfig,
-  getClientContractById,
-  getContractConfigById,
-  updateClientContract,
-  updateContractConfig,
-} from '../data/clientContracts';
-import type { Client, ContractProductType, ContractWizardConfig } from '../data/types';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { Client, ClientContract, ContractProductType, ContractWizardConfig } from '../data/types';
 import { Button, Card, EmptyState } from '../components/ui';
-
-const createInitialState = (client: Client): ContractWizardConfig =>
-  createDefaultContractConfig({
-    clientEmail: client.email,
-    clientType: client.type,
-  });
 
 const resolveContractType = (form: ContractWizardConfig): ContractProductType => {
   if (form.joinedUnder428.depositoryContract) {
@@ -62,44 +48,83 @@ export const ContractWizardPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { subjectId } = useParams();
-  const { getClientById, updateClient } = useClientsStore();
-
-  const client = useMemo(() => {
-    if (!subjectId) {
-      return undefined;
-    }
-
-    return getClientById(subjectId);
-  }, [getClientById, subjectId]);
+  const { clients: clientsRepository, contracts: contractsRepository } = useDataAccess();
+  const [client, setClient] = useState<Client | null>(null);
+  const [editingContract, setEditingContract] = useState<ClientContract | null>(null);
 
   const contractId = searchParams.get('contractId')?.trim() || null;
-  const editingContract = useMemo(() => {
-    if (!contractId) {
-      return undefined;
-    }
-
-    return getClientContractById(contractId);
-  }, [contractId]);
   const isEditMode = Boolean(editingContract);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
   const [form, setForm] = useState<ContractWizardConfig | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!client) {
-      setForm(null);
-      return;
-    }
+    let isMounted = true;
 
-    if (editingContract && editingContract.clientId === client.id) {
-      const storedConfig = getContractConfigById(editingContract.id);
-      setForm(storedConfig ?? createInitialState(client));
-      return;
-    }
+    const loadWizardState = async () => {
+      if (!subjectId) {
+        if (isMounted) {
+          setClient(null);
+          setEditingContract(null);
+          setForm(null);
+          setIsLoading(false);
+        }
+        return;
+      }
 
-    setForm(createInitialState(client));
-  }, [client, editingContract]);
+      setIsLoading(true);
+
+      const loadedClient = await clientsRepository.getClientById(subjectId);
+      if (!isMounted || !loadedClient) {
+        if (isMounted) {
+          setClient(null);
+          setEditingContract(null);
+          setForm(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      let loadedContract = null;
+      if (contractId) {
+        loadedContract = await contractsRepository.getContractById(contractId);
+      }
+
+      let nextForm: ContractWizardConfig;
+      if (loadedContract && loadedContract.clientId === loadedClient.id) {
+        const storedConfig = await contractsRepository.getContractConfigById(loadedContract.id);
+        nextForm =
+          storedConfig ??
+          (await contractsRepository.createDefaultContractConfig({
+            clientEmail: loadedClient.email,
+            clientType: loadedClient.type,
+          }));
+      } else {
+        nextForm = await contractsRepository.createDefaultContractConfig({
+          clientEmail: loadedClient.email,
+          clientType: loadedClient.type,
+        });
+      }
+
+      if (isMounted) {
+        setClient(loadedClient);
+        setEditingContract(loadedContract);
+        setForm(nextForm);
+        setIsLoading(false);
+      }
+    };
+
+    void loadWizardState();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientsRepository, contractId, contractsRepository, subjectId]);
+
+  if (isLoading) {
+    return null;
+  }
 
   if (!client || !form || (editingContract && editingContract.clientId !== client.id)) {
     return (
@@ -125,9 +150,11 @@ export const ContractWizardPage = () => {
       return;
     }
 
-    updateContractConfig(editingContract.id, form);
-    updateClient(client.id, mapContractConfigToClientPatch(form));
-    showToast('Настройки договора сохранены');
+    void (async () => {
+      await contractsRepository.updateContractConfig(editingContract.id, form);
+      await clientsRepository.updateClient(client.id, mapContractConfigToClientPatch(form));
+      showToast('Настройки договора сохранены');
+    })();
   };
 
   const exportStatement = () => {
@@ -143,27 +170,29 @@ export const ContractWizardPage = () => {
   };
 
   const submitContract = () => {
-    const contractType = resolveContractType(form);
+    void (async () => {
+      const contractType = resolveContractType(form);
 
-    if (isEditMode && editingContract) {
-      updateClientContract(editingContract.id, { type: contractType });
-      updateContractConfig(editingContract.id, form);
-      updateClient(client.id, mapContractConfigToClientPatch(form));
+      if (isEditMode && editingContract) {
+        await contractsRepository.updateContract(editingContract.id, { type: contractType });
+        await contractsRepository.updateContractConfig(editingContract.id, form);
+        await clientsRepository.updateClient(client.id, mapContractConfigToClientPatch(form));
 
-      navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${editingContract.number} обновлён` } });
-      return;
-    }
+        navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${editingContract.number} обновлён` } });
+        return;
+      }
 
-    const createdContract = createClientContract({
-      clientId: client.id,
-      type: contractType,
-      status: 'active',
-      closeDate: null,
-      config: form,
-    });
+      const createdContract = await contractsRepository.createContract({
+        clientId: client.id,
+        type: contractType,
+        status: 'active',
+        closeDate: null,
+        config: form,
+      });
 
-    updateClient(client.id, mapContractConfigToClientPatch(form));
-    navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${createdContract.number} оформлен` } });
+      await clientsRepository.updateClient(client.id, mapContractConfigToClientPatch(form));
+      navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${createdContract.number} оформлен` } });
+    })();
   };
 
   return (

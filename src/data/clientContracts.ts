@@ -1,5 +1,4 @@
-import type { ClientContract, ContractProductType, ContractWizardConfig, ContractPersonType } from './types';
-import { clients } from './clients';
+import type { ClientContract, ContractWizardConfig, ContractPersonType } from './types';
 
 const resolvePersonType = (clientType?: string): ContractPersonType => {
   if (clientType === 'ФЛ') {
@@ -178,54 +177,7 @@ export const clientContracts: ClientContract[] = [
   },
 ];
 
-const contractConfigs = new Map<string, ContractWizardConfig>(
-  clientContracts.map((contract) => [contract.id, createDefaultContractConfig()]),
-);
-
 export const getContractsByClientId = (clientId: string) => clientContracts.filter((contract) => contract.clientId === clientId);
-
-export const getClientContractById = (contractId: string) => clientContracts.find((contract) => contract.id === contractId);
-
-const ensureContractsForActiveClients = () => {
-  const activeClients = clients.filter((client) => client.subjectStatus === 'Активный клиент' && !client.isArchived);
-  const maxContractNumber = clientContracts.reduce((maxValue, contract) => {
-    const numericPart = Number(contract.id.replace('ctr-', ''));
-    return Number.isFinite(numericPart) ? Math.max(maxValue, numericPart) : maxValue;
-  }, 0);
-  let nextCounter = maxContractNumber + 1;
-
-  activeClients.forEach((client) => {
-    const activeContracts = clientContracts.filter((contract) => contract.clientId === client.id && contract.status === 'active');
-    const hasBroker = activeContracts.some((contract) => contract.type === 'broker');
-    const hasDepository = activeContracts.some((contract) => contract.type === 'depository');
-
-    if (!hasBroker) {
-      clientContracts.push({
-        id: `ctr-${nextCounter++}`,
-        clientId: client.id,
-        number: `BR-2026/${String(nextCounter).padStart(5, '0')}`,
-        type: 'broker',
-        openDate: '2026-01-10',
-        closeDate: null,
-        status: 'active',
-      });
-    }
-
-    if (!hasDepository) {
-      clientContracts.push({
-        id: `ctr-${nextCounter++}`,
-        clientId: client.id,
-        number: `DP-2026/${String(nextCounter).padStart(5, '0')}`,
-        type: 'depository',
-        openDate: '2026-01-15',
-        closeDate: null,
-        status: 'active',
-      });
-    }
-  });
-};
-
-ensureContractsForActiveClients();
 
 export const getPrimaryContractByClientId = (clientId: string) => {
   const contracts = getContractsByClientId(clientId);
@@ -233,74 +185,4 @@ export const getPrimaryContractByClientId = (clientId: string) => {
   const source = activeContracts.length > 0 ? activeContracts : contracts;
 
   return [...source].sort((left, right) => right.openDate.localeCompare(left.openDate))[0];
-};
-
-export const getContractConfigById = (contractId: string) => {
-  const config = contractConfigs.get(contractId);
-  if (!config) {
-    return undefined;
-  }
-
-  return structuredClone(config);
-};
-
-const contractTypePrefixMap: Record<ContractProductType, string> = {
-  broker: 'BR',
-  depository: 'DP',
-  trust: 'DU',
-  iis: 'IIS',
-  other: 'IN',
-};
-
-export const generateContractNumber = (type: ContractProductType = 'broker') => {
-  const year = new Date().getFullYear();
-  const nextIndex = clientContracts.length + 1;
-  const serial = String(nextIndex).padStart(5, '0');
-
-  return `${contractTypePrefixMap[type]}-${year}/${serial}`;
-};
-
-export const createClientContract = (payload: {
-  clientId: string;
-  type?: ContractProductType;
-  number?: string;
-  openDate?: string;
-  closeDate?: string | null;
-  status?: ClientContract['status'];
-  config?: ContractWizardConfig;
-}) => {
-  const type = payload.type ?? 'broker';
-  const contract: ClientContract = {
-    id: `ctr-${Date.now()}`,
-    clientId: payload.clientId,
-    number: payload.number?.trim() || generateContractNumber(type),
-    type,
-    openDate: payload.openDate ?? new Date().toISOString().slice(0, 10),
-    closeDate: payload.closeDate ?? null,
-    status: payload.status ?? 'active',
-  };
-
-  clientContracts.unshift(contract);
-  contractConfigs.set(contract.id, structuredClone(payload.config ?? createDefaultContractConfig()));
-  return contract;
-};
-
-export const updateClientContract = (contractId: string, patch: Partial<Omit<ClientContract, 'id' | 'clientId'>>) => {
-  const contract = getClientContractById(contractId);
-  if (!contract) {
-    return undefined;
-  }
-
-  Object.assign(contract, patch);
-  return contract;
-};
-
-export const updateContractConfig = (contractId: string, config: ContractWizardConfig) => {
-  const contract = getClientContractById(contractId);
-  if (!contract) {
-    return undefined;
-  }
-
-  contractConfigs.set(contractId, structuredClone(config));
-  return getContractConfigById(contractId);
 };
