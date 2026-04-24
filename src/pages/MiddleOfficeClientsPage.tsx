@@ -4,6 +4,7 @@ import { clientAccounts } from '../data/clientAccounts';
 import { clientContracts } from '../data/clientContracts';
 import type { ClientContract, ContractProductType } from '../data/types';
 import { Button, DataTable, SearchInput, SelectFilter, type SortDirection } from '../components/ui';
+import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 type ClientJournalRow = {
   id: string;
@@ -201,11 +202,32 @@ export const MiddleOfficeClientsPage = () => {
     sortKey !== 'clientCode' ||
     sortDirection !== 'asc';
 
+  const handleExport = () => {
+    exportToCsv(
+      sortedClientJournalRows,
+      [
+        { header: 'Код клиента', value: (row) => row.clientCode },
+        { header: 'Вид договора', value: (row) => row.contractKind },
+        { header: 'Клиент', value: (row) => row.clientName },
+        { header: 'ИНН', value: (row) => row.inn },
+        { header: 'Тип клиента', value: (row) => row.clientType },
+        { header: 'Номер договора', value: (row) => row.contractNumber },
+        { header: 'Дата договора', value: (row) => row.contractDate },
+        { header: 'Резидентство', value: (row) => row.residencyStatus },
+        { header: 'Тип счёта', value: (row) => row.accountType },
+        { header: 'Статус счёта', value: (row) => row.accountStatus },
+      ],
+      buildDatedCsvFileName('middle-office-clients'),
+    );
+  };
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал клиентов</h1>
-        <Button variant="secondary">Экспорт</Button>
+        <Button variant="secondary" onClick={handleExport} disabled={sortedClientJournalRows.length === 0}>
+          Экспорт
+        </Button>
       </header>
 
       <section className="space-y-3">
