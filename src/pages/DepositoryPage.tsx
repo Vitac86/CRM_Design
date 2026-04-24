@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText } from '../components/ui';
 import { cn } from '../components/ui/cn';
-import { reports } from '../data/reports';
 import type { Report } from '../data/types';
 
 const deliveryResultToneMap: Record<'Доставлено' | 'Не доставлено', 'neutral' | 'danger'> = {
@@ -23,6 +23,11 @@ const DetailField = ({ label, value }: { label: string; value?: string }) => (
 );
 
 export const DepositoryPage = () => {
+  const { reports: reportsRepository } = useDataAccess();
+  const [reports, setReports] = useState<Report[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [search, setSearch] = useState('');
   const [clientCodeFilter, setClientCodeFilter] = useState('');
   const [dateFromFilter, setDateFromFilter] = useState('');
@@ -34,7 +39,43 @@ export const DepositoryPage = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [deliveryResultOverrides, setDeliveryResultOverrides] = useState<Record<string, 'Доставлено' | 'Не доставлено'>>({});
 
-  const depositoryReports = useMemo(() => reports.filter((report) => report.department === 'Депозитарий'), []);
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadReports = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const loadedReports = await reportsRepository.listReportsByDepartment('Депозитарий');
+
+        if (!isMounted) {
+          return;
+        }
+
+        setReports(loadedReports);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setReports([]);
+        setError('Не удалось загрузить данные депозитария.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadReports();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [reportsRepository]);
+
+  const depositoryReports = useMemo(() => reports, [reports]);
 
   const filteredReports = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -218,9 +259,13 @@ export const DepositoryPage = () => {
         </div>
       </section>
 
+      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+
       <section className="grid gap-4 xl:grid-cols-[1.65fr_1fr]">
         <div className="max-h-[620px] space-y-2 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3">
-          {filteredReports.length === 0 ? (
+          {isLoading ? (
+            <EmptyState title="Загрузка данных..." description="Пожалуйста, подождите." className="h-[460px]" />
+          ) : filteredReports.length === 0 ? (
             <EmptyState title="Отчёты не найдены" description="Измените параметры поиска или фильтров." className="h-[460px]" />
           ) : (
             filteredReports.map((report) => {

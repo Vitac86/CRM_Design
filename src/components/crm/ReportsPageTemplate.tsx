@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../ui';
-import { reports } from '../../data/reports';
 import type { Report } from '../../data/types';
 
 const pageSize = 10;
@@ -25,14 +24,14 @@ const deliveryResultBadgeVariant: Record<'Доставлено' | 'Не дост
 
 type ReportsPageTemplateProps = {
   title: string;
-  department: Report['department'];
+  reports: Report[];
   separateSearchRow?: boolean;
   searchPlaceholder?: string;
 };
 
 export const ReportsPageTemplate = ({
   title,
-  department,
+  reports,
   separateSearchRow = false,
   searchPlaceholder = 'Поиск по коду клиента, имени файла или отчёту',
 }: ReportsPageTemplateProps) => {
@@ -45,13 +44,8 @@ export const ReportsPageTemplate = ({
   const [dateToFilter, setDateToFilter] = useState('');
   const [page, setPage] = useState(1);
 
-  const departmentReports = useMemo(
-    () => reports.filter((report) => report.department === department),
-    [department],
-  );
-
   const filteredReports = useMemo(() => {
-    return departmentReports.filter((report) => {
+    return reports.filter((report) => {
       const normalizedSearch = search.trim().toLowerCase();
       const normalizedClientCodeFilter = clientCodeFilter.trim().toLowerCase();
       const reportDate = report.sentAt.slice(0, 10);
@@ -93,7 +87,7 @@ export const ReportsPageTemplate = ({
 
       return true;
     });
-  }, [clientCodeFilter, dateFromFilter, dateToFilter, deliveryChannelFilter, deliveryResultFilter, departmentReports, reportTypeFilter, search]);
+  }, [clientCodeFilter, dateFromFilter, dateToFilter, deliveryChannelFilter, deliveryResultFilter, reportTypeFilter, reports, search]);
 
   const totalPages = Math.max(1, Math.ceil(filteredReports.length / pageSize));
 
