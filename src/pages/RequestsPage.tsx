@@ -3,8 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { useClientsStore } from '../app/ClientsStore';
 import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
-import { getContractsByClientId } from '../data/clientContracts';
-import type { ClientBankDetails, CurrencyCode, Request } from '../data/types';
+import type { ClientBankDetails, ClientContract, CurrencyCode, Request } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 const pageSize = 10;
@@ -59,7 +58,7 @@ const escapeHtml = (value: string): string =>
     .replace(/'/g, '&#039;');
 
 export const RequestsPage = () => {
-  const { requests: requestsDataAccess } = useDataAccess();
+  const { requests: requestsDataAccess, contracts: contractsDataAccess } = useDataAccess();
   const { clients, getClientById } = useClientsStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [requestsList, setRequestsList] = useState<Request[]>([]);
@@ -91,6 +90,7 @@ export const RequestsPage = () => {
   const [requestCurrency, setRequestCurrency] = useState<CurrencyCode | ''>('');
   const [formError, setFormError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [contractsByClientId, setContractsByClientId] = useState<Record<string, ClientContract[]>>({});
 
   const activeClients = useMemo(
     () => clients.filter((client) => client.subjectStatus === 'Активный клиент' && !client.isArchived),
@@ -100,9 +100,9 @@ export const RequestsPage = () => {
   const activeClientsWithBrokerContract = useMemo(
     () =>
       activeClients.filter((client) =>
-        getContractsByClientId(client.id).some((contract) => contract.type === 'broker' && contract.status === 'active'),
+        (contractsByClientId[client.id] ?? []).some((contract) => contract.type === 'broker' && contract.status === 'active'),
       ),
-    [activeClients],
+    [activeClients, contractsByClientId],
   );
 
   const clientOptions = createType === 'transfer' ? activeClientsWithBrokerContract : activeClients;
@@ -112,10 +112,11 @@ export const RequestsPage = () => {
       return [];
     }
 
-    return getContractsByClientId(selectedClientId).filter(
+    return (contractsByClientId[selectedClientId] ?? []).filter(
       (contract) => contract.type === 'broker' && contract.status === 'active',
     );
-  }, [selectedClientId]);
+  }, [selectedClientId, contractsByClientId]);
+  const hasLoadedSelectedClientContracts = selectedClientId in contractsByClientId;
 
   const selectedClient = selectedClientId ? getClientById(selectedClientId) : undefined;
   const selectedContract = availableContracts.find((contract) => contract.id === selectedContractId);
@@ -251,6 +252,44 @@ export const RequestsPage = () => {
       isCancelled = true;
     };
   }, [requestsDataAccess]);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const activeClientIds = activeClients.map((client) => client.id);
+    const missingClientIds = activeClientIds.filter((clientId) => !(clientId in contractsByClientId));
+
+    if (missingClientIds.length === 0) {
+      return;
+    }
+
+    const loadContracts = async () => {
+      const loadedContractsByClientId = await Promise.all(
+        missingClientIds.map(async (clientId) => [clientId, await contractsDataAccess.listContractsByClientId(clientId)] as const),
+      );
+
+      if (isCancelled) {
+        return;
+      }
+
+      setContractsByClientId((prev) => {
+        const next = { ...prev };
+
+        loadedContractsByClientId.forEach(([clientId, contracts]) => {
+          if (!(clientId in next)) {
+            next[clientId] = contracts;
+          }
+        });
+
+        return next;
+      });
+    };
+
+    void loadContracts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeClients, contractsDataAccess, contractsByClientId]);
 
   const resetFilters = () => {
     setSearch('');
@@ -601,7 +640,7 @@ export const RequestsPage = () => {
             </label>
           </div>
 
-          {selectedClientId && availableContracts.length === 0 ? (
+          {selectedClientId && hasLoadedSelectedClientContracts && availableContracts.length === 0 ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
               Для выбранного клиента нет активного брокерского договора.
             </div>
