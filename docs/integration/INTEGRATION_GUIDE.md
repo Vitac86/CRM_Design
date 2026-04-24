@@ -31,11 +31,13 @@
 - `RequestsPage` использует `useDataAccess().requests` и `useDataAccess().contracts`.
 - `DashboardPage` использует `useDataAccess().dashboard` и `useDataAccess().requests`.
 - `SubjectsPage` (read/list) использует `useDataAccess().clients.listClients()`.
+- `SubjectProfilePage` использует `useDataAccess().clients` для `getClientById/listClients/updateClient/archiveClient`.
 - `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
 - Создание поручений в demo-mode реализовано только в `src/features/requests/mock/mockRequestsRepository.ts`.
 - `src/data/requests.ts` используется только как источник immutable seed для mock-репозитория.
 - `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
-- Действия `ClientsStore` (mutations/actions) ещё не вынесены в data-access и будут переведены отдельным шагом для полного отказа от `ClientsStore`.
+- `ClientsStore` больше не должен быть источником истины для уже мигрированных client-экранов (`SubjectsPage`, `SubjectProfilePage`).
+- Временный технический долг: часть экранов всё ещё использует `ClientsStore` (например, архивы/агенты и другие legacy-flow), их миграция запланирована следующими шагами.
 
 ### Recommended next step
 

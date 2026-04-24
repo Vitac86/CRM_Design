@@ -15,7 +15,7 @@ import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency } from '../utils/labels';
 import { normalizePhoneInput } from '../utils/phone';
-import { useClientsStore } from '../app/ClientsStore';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { getContractConfigById, getPrimaryContractByClientId } from '../data/clientContracts';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
@@ -53,7 +53,11 @@ export const SubjectProfilePage = () => {
   const [newRepresentativeAuthorityBasis, setNewRepresentativeAuthorityBasis] = useState('');
   const [newRepresentativeAuthorityValidUntil, setNewRepresentativeAuthorityValidUntil] = useState('');
   const [newRepresentativeWithoutExpiration, setNewRepresentativeWithoutExpiration] = useState(false);
-  const { clients, getClientById, updateClient, archiveClient } = useClientsStore();
+  const { clients: clientsRepository } = useDataAccess();
+  const [client, setClient] = useState<Client | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const requestedTab = searchParams.get('tab');
@@ -72,13 +76,50 @@ export const SubjectProfilePage = () => {
     navigate(location.pathname + location.search, { replace: true, state: null });
   }, [location.pathname, location.search, location.state, navigate]);
 
-  const client = useMemo(() => {
-    if (!id) {
-      return undefined;
-    }
+  useEffect(() => {
+    let isCancelled = false;
 
-    return getClientById(id);
-  }, [getClientById, id]);
+    const loadClientData = async () => {
+      if (!id) {
+        setClient(null);
+        setClients([]);
+        setIsLoading(false);
+        setError(null);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const [loadedClient, loadedClients] = await Promise.all([
+          clientsRepository.getClientById(id),
+          clientsRepository.listClients(),
+        ]);
+
+        if (!isCancelled) {
+          setClient(loadedClient);
+          setClients(loadedClients);
+        }
+      } catch {
+        if (!isCancelled) {
+          setError('Не удалось загрузить карточку клиента.');
+          setClient(null);
+          setClients([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadClientData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [clientsRepository, id]);
 
 
   const contractDrivenProfile = useMemo(() => {
@@ -181,7 +222,13 @@ export const SubjectProfilePage = () => {
     setShowAllClientCodes(false);
   };
 
-  const handleSaveEdit = () => {
+  const syncClientState = async (nextClient: Client | null) => {
+    setClient(nextClient);
+    const loadedClients = await clientsRepository.listClients();
+    setClients(loadedClients);
+  };
+
+  const handleSaveEdit = async () => {
     if (!client || !draftClient) {
       return;
     }
@@ -224,7 +271,8 @@ export const SubjectProfilePage = () => {
     }
 
     const { bankDetails: _bankDetails, bankAccounts: _bankAccounts, ...profilePatch } = normalizedClient;
-    updateClient(client.id, profilePatch);
+    const updatedClient = await clientsRepository.updateClient(client.id, profilePatch);
+    await syncClientState(updatedClient);
     setIsEditing(false);
     setDraftClient(undefined);
     setValidationError(null);
@@ -232,42 +280,46 @@ export const SubjectProfilePage = () => {
     setToastMessage('Данные клиента сохранены');
   };
 
-  const handleAddBankAccount = (account: BankAccount) => {
+  const handleAddBankAccount = async (account: BankAccount) => {
     if (!client) {
       return;
     }
 
-    updateClient(client.id, {
+    const updatedClient = await clientsRepository.updateClient(client.id, {
       bankAccounts: [...(client.bankAccounts ?? []), account],
     });
+    await syncClientState(updatedClient);
     setToastMessage('Банковский счёт добавлен');
   };
 
-  const handleUpdateBankAccounts = (bankAccounts: BankAccount[]) => {
+  const handleUpdateBankAccounts = async (bankAccounts: BankAccount[]) => {
     if (!client) {
       return;
     }
 
-    updateClient(client.id, { bankAccounts: [...bankAccounts] });
+    const updatedClient = await clientsRepository.updateClient(client.id, { bankAccounts: [...bankAccounts] });
+    await syncClientState(updatedClient);
     setToastMessage('Банковские реквизиты обновлены');
   };
 
-  const handleArchiveClient = () => {
+  const handleArchiveClient = async () => {
     if (!client) {
       return;
     }
 
-    archiveClient(client.id);
+    const archivedClient = await clientsRepository.archiveClient(client.id);
+    await syncClientState(archivedClient);
     setToastMessage('Субъект перемещён в архив');
     window.setTimeout(() => navigate('/archives'), 300);
   };
 
-  const handleSendToCompliance = () => {
+  const handleSendToCompliance = async () => {
     if (!client) {
       return;
     }
 
-    updateClient(client.id, { complianceStatus: 'НА ПРОВЕРКЕ' });
+    const updatedClient = await clientsRepository.updateClient(client.id, { complianceStatus: 'НА ПРОВЕРКЕ' });
+    await syncClientState(updatedClient);
     setToastMessage('Субъект отправлен на комплаенс');
   };
 
@@ -278,6 +330,22 @@ export const SubjectProfilePage = () => {
 
     navigate(`/subjects/${client.id}/contract-wizard`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+        <EmptyState title="Загрузка карточки клиента…" description="Пожалуйста, подождите." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+        <EmptyState title="Не удалось загрузить карточку клиента." description="Попробуйте обновить страницу." />
+      </div>
+    );
+  }
 
   if (!client) {
     return (
@@ -304,7 +372,7 @@ export const SubjectProfilePage = () => {
       : ['Генеральный директор', 'Представитель'];
   const representativesWithSubjects = currentClient.representatives.map((item) => ({
     ...item,
-    subject: getClientById(item.subjectId),
+    subject: clients.find((candidate) => candidate.id === item.subjectId),
   }));
   const selectableSubjects = clients.filter((candidate) => candidate.id !== currentClient.id)
     .filter((candidate) => candidate.name.toLowerCase().includes(representativeQuery.toLowerCase()) || candidate.code.toLowerCase().includes(representativeQuery.toLowerCase()));
@@ -337,7 +405,7 @@ export const SubjectProfilePage = () => {
     setDraftClient((prev) => (prev ? { ...prev, [field]: normalizedValue } : prev));
   };
 
-  const handleAddRepresentative = () => {
+  const handleAddRepresentative = async () => {
     if (!newRepresentativeSubjectId || !newRepresentativeAuthorityBasis.trim()) {
       return;
     }
@@ -356,7 +424,10 @@ export const SubjectProfilePage = () => {
     if (isEditing) {
       setDraftClient((prev) => (prev ? { ...prev, representatives: [...prev.representatives, nextRepresentative] } : prev));
     } else {
-      updateClient(currentClient.id, { representatives: [...currentClient.representatives, nextRepresentative] });
+      const updatedClient = await clientsRepository.updateClient(currentClient.id, {
+        representatives: [...currentClient.representatives, nextRepresentative],
+      });
+      await syncClientState(updatedClient);
     }
     setIsRepresentativeModalOpen(false);
     setRepresentativeQuery('');
