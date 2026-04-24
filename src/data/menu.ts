@@ -41,7 +41,20 @@ export const sidebarMenu: SidebarItem[] = [
     ],
   },
   { id: 'compliance', label: 'Комплаенс', to: '/compliance', icon: 'compliance' },
-  { id: 'middle-office', label: 'Мидл-офис', to: '/middle-office', icon: 'middleOffice' },
+  {
+    id: 'middle-office',
+    label: 'Мидл-офис',
+    icon: 'middleOffice',
+    children: [
+      { id: 'middle-office-clients', label: 'Журнал клиентов', to: '/middle-office/clients', icon: 'documents' },
+      {
+        id: 'middle-office-reports',
+        label: 'Журнал отправленных отчётов',
+        to: '/middle-office/reports',
+        icon: 'documents',
+      },
+    ],
+  },
   { id: 'back-office', label: 'Бэк-офис', to: '/back-office', icon: 'backOffice' },
   { id: 'trading', label: 'Трейдинг', to: '/trading', icon: 'trading' },
   { id: 'depository', label: 'Депозитарий', to: '/depository', icon: 'depository' },
