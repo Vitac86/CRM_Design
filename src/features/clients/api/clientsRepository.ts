@@ -5,4 +5,5 @@ export interface ClientsRepository {
   getClientById(id: string): Promise<Client | null>;
   updateClient(id: string, patch: Partial<Client>): Promise<Client | null>;
   archiveClient(id: string): Promise<Client | null>;
+  restoreClient(id: string): Promise<Client | null>;
 }
