@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
-import { getAccountsByClientId } from '../../data/clientAccounts';
 import type { ClientAccount, ContractProductType, ClientContract } from '../../data/types';
 import { Badge, Button, Card, DataTable } from '../ui';
 
@@ -41,9 +40,9 @@ const defaultAccountForm: AccountForm = {
 
 export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   const navigate = useNavigate();
-  const { contracts: contractsRepository } = useDataAccess();
+  const { contracts: contractsRepository, accounts: accountsRepository } = useDataAccess();
   const [contracts, setContracts] = useState<ClientContract[]>([]);
-  const [accounts, setAccounts] = useState<ClientAccount[]>(() => getAccountsByClientId(clientId));
+  const [accounts, setAccounts] = useState<ClientAccount[]>([]);
 
   const [isAccountFormOpen, setIsAccountFormOpen] = useState(false);
   const [accountForm, setAccountForm] = useState<AccountForm>(defaultAccountForm);
@@ -52,37 +51,41 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   useEffect(() => {
     let isMounted = true;
 
-    const loadContracts = async () => {
-      const nextContracts = await contractsRepository.listContractsByClientId(clientId);
+    const loadData = async () => {
+      const [nextContracts, nextAccounts] = await Promise.all([
+        contractsRepository.listContractsByClientId(clientId),
+        accountsRepository.listAccountsByClientId(clientId),
+      ]);
+
       if (isMounted) {
         setContracts(nextContracts);
+        setAccounts(nextAccounts);
       }
     };
 
-    void loadContracts();
+    void loadData();
 
     return () => {
       isMounted = false;
     };
-  }, [clientId, contractsRepository]);
+  }, [accountsRepository, clientId, contractsRepository]);
 
   const handleOpenContract = (contractId: string) => {
     navigate(`/subjects/${clientId}/contract-wizard?contractId=${contractId}`);
   };
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (!accountForm.number.trim() || !accountForm.openDate) {
       setAccountError('Заполните номер счёта и дату открытия.');
       return;
     }
 
-    const newAccount: ClientAccount = {
-      id: `acc-${Date.now()}`,
+    const newAccount = await accountsRepository.createAccount({
       clientId,
-      number: accountForm.number.trim(),
+      number: accountForm.number,
       type: accountForm.type,
       openDate: accountForm.openDate,
-    };
+    });
 
     setAccounts((prev) => [newAccount, ...prev]);
     setAccountForm(defaultAccountForm);
@@ -205,7 +208,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
               >
                 Отмена
               </Button>
-              <Button size="sm" onClick={handleCreateAccount}>
+              <Button size="sm" onClick={() => void handleCreateAccount()}>
                 Сохранить
               </Button>
             </div>

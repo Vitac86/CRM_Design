@@ -1,6 +1,6 @@
 import type { ClientAccount } from './types';
 
-export const clientAccounts: ClientAccount[] = [
+export const clientAccounts: readonly ClientAccount[] = [
   { id: 'acc-1', clientId: 'c-001', number: '30-001-00003-BR', type: 'broker', openDate: '2025-01-15' },
   { id: 'acc-2', clientId: 'c-001', number: '30-001-00003-DP', type: 'depository', openDate: '2025-03-09' },
   { id: 'acc-3', clientId: 'c-001', number: '30-001-00142-DU', type: 'trust', openDate: '2024-07-22' },
@@ -11,4 +11,3 @@ export const clientAccounts: ClientAccount[] = [
   { id: 'acc-8', clientId: 'c-023', number: '30-023-00023-DU', type: 'trust', openDate: '2026-03-03' },
 ];
 
-export const getAccountsByClientId = (clientId: string) => clientAccounts.filter((account) => account.clientId === clientId);
