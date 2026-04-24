@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, EmptyState, SearchInput, SelectFilter, type SortDirection } from '../components/ui';
+import { Button, DataTable, EmptyState, SearchInput, SelectFilter, TableControlPanel, type SortDirection } from '../components/ui';
 import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
 import { AsyncContent } from '../shared/ui/async';
-
 type ClientJournalSortKey =
   | 'clientCode'
   | 'contractKind'
@@ -17,33 +16,6 @@ type ClientJournalSortKey =
   | 'residencyStatus'
   | 'accountType'
   | 'accountStatus';
-
-const normalizeContractKind = (value: string): ClientJournalRow['contractKind'] | null => {
-  const normalizedValue = value.trim().toUpperCase();
-  if (normalizedValue === 'БО' || normalizedValue === 'ДУ') {
-    return normalizedValue;
-  }
-
-  return null;
-};
-
-const normalizeClientType = (value: string): ClientJournalRow['clientType'] | null => {
-  const normalizedValue = value.trim().toLowerCase();
-  if (normalizedValue === 'ф/л' || normalizedValue === 'ю/л') {
-    return normalizedValue;
-  }
-
-  return null;
-};
-
-const normalizeAccountStatus = (value: string): ClientJournalRow['accountStatus'] | null => {
-  const normalizedValue = value.trim().toLowerCase();
-  if (normalizedValue === 'активный' || normalizedValue === 'закрытый') {
-    return normalizedValue;
-  }
-
-  return null;
-};
 
 export const MiddleOfficeClientsPage = () => {
   const { clients: clientsRepository, contracts: contractsRepository, accounts: accountsRepository } = useDataAccess();
@@ -202,11 +174,8 @@ export const MiddleOfficeClientsPage = () => {
 
   return (
     <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header>
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал клиентов</h1>
-        <Button variant="secondary" onClick={handleExport} disabled={sortedClientJournalRows.length === 0 || isLoading || Boolean(error)}>
-          Экспорт
-        </Button>
       </header>
 
       <AsyncContent
@@ -216,53 +185,54 @@ export const MiddleOfficeClientsPage = () => {
         errorFallback={error ? <EmptyState title="Ошибка загрузки" description={error} /> : undefined}
       >
         <section className="space-y-3">
-          <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
-            <SearchInput
-              value={clientSearch}
-              onChange={(event) => setClientSearch(event.target.value)}
-              placeholder="Поиск по коду, клиенту, ИНН или договору..."
-              className="sm:flex-1"
-            />
-            <SelectFilter
-              value={clientTypeFilter}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                setClientTypeFilter(nextValue === 'all' ? 'all' : (normalizeClientType(nextValue) ?? 'all'));
-              }}
-              className="sm:w-[150px]"
-            >
-              <option value="all">Тип клиента: Все</option>
-              <option value="ф/л">ф/л</option>
-              <option value="ю/л">ю/л</option>
-            </SelectFilter>
-            <SelectFilter
-              value={contractKindFilter}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                setContractKindFilter(nextValue === 'all' ? 'all' : (normalizeContractKind(nextValue) ?? 'all'));
-              }}
-              className="sm:w-[150px]"
-            >
-              <option value="all">Вид договора: Все</option>
-              <option value="БО">БО</option>
-              <option value="ДУ">ДУ</option>
-            </SelectFilter>
-            <SelectFilter
-              value={accountStatusFilter}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                setAccountStatusFilter(nextValue === 'all' ? 'all' : (normalizeAccountStatus(nextValue) ?? 'all'));
-              }}
-              className="sm:w-[170px]"
-            >
-              <option value="all">Статус счёта: Все</option>
-              <option value="активный">активный</option>
-              <option value="закрытый">закрытый</option>
-            </SelectFilter>
-            <Button variant="secondary" size="sm" onClick={resetFilters} className="sm:ml-auto" disabled={!hasActiveConditions}>
-              Сбросить фильтры
-            </Button>
-          </div>
+          <TableControlPanel
+            search={
+              <SearchInput
+                value={clientSearch}
+                onChange={(event) => setClientSearch(event.target.value)}
+                placeholder="Поиск по коду, клиенту, ИНН или договору..."
+              />
+            }
+            filters={
+              <>
+                <SelectFilter value={clientTypeFilter} onChange={(event) => setClientTypeFilter(event.target.value as ClientJournalRow['clientType'] | 'all')}>
+                  <option value="all">Тип клиента</option>
+                  <option value="Физ. лицо">Физ. лицо</option>
+                  <option value="Юр. лицо">Юр. лицо</option>
+                  <option value="ИП">ИП</option>
+                </SelectFilter>
+                <SelectFilter
+                  value={contractKindFilter}
+                  onChange={(event) => setContractKindFilter(event.target.value as ClientJournalRow['contractKind'] | 'all')}
+                >
+                  <option value="all">Вид договора</option>
+                  <option value="БО">БО</option>
+                  <option value="Депозитарный">Депозитарный</option>
+                  <option value="ДУ">ДУ</option>
+                  <option value="ИИС">ИИС</option>
+                  <option value="Дилерский">Дилерский</option>
+                </SelectFilter>
+                <SelectFilter
+                  value={accountStatusFilter}
+                  onChange={(event) => setAccountStatusFilter(event.target.value as ClientJournalRow['accountStatus'] | 'all')}
+                >
+                  <option value="all">Статус счёта</option>
+                  <option value="Открыт">Открыт</option>
+                  <option value="Закрыт">Закрыт</option>
+                </SelectFilter>
+              </>
+            }
+            actions={
+              <>
+                <Button variant="secondary" size="sm" onClick={resetFilters} disabled={!hasActiveConditions}>
+                  Сбросить фильтры
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleExport} disabled={sortedClientJournalRows.length === 0 || isLoading || Boolean(error)}>
+                  Экспорт
+                </Button>
+              </>
+            }
+          />
 
           <DataTable
             rows={sortedClientJournalRows}

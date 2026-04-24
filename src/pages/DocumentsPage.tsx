@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter, TableControlPanel } from '../components/ui';
 import type { Document } from '../data/types';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 
@@ -99,37 +99,42 @@ export const DocumentsPage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Документы</h1>
       </header>
 
-      <FilterBar>
-        <SearchInput
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="По названию"
-          className="w-full max-w-[280px]"
-          aria-label="Поиск по названию"
-        />
+      <TableControlPanel
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="По названию"
+            aria-label="Поиск по названию"
+          />
+        }
+        filters={
+          <>
+            <SelectFilter value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as Document['status'] | 'all')}>
+              <option value="all">Статус</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </SelectFilter>
 
-        <SelectFilter value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as Document['status'] | 'all')}>
-          <option value="all">Статус</option>
-          {statusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </SelectFilter>
-
-        <SelectFilter value={kindFilter} onChange={(event) => setKindFilter(event.target.value as string | 'all')}>
-          <option value="all">Вид документа</option>
-          {kindOptions.map((kind) => (
-            <option key={kind} value={kind}>
-              {kind}
-            </option>
-          ))}
-        </SelectFilter>
-
-        <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
-          Очистить фильтры
-        </Button>
-      </FilterBar>
+            <SelectFilter value={kindFilter} onChange={(event) => setKindFilter(event.target.value as string | 'all')}>
+              <option value="all">Вид документа</option>
+              {kindOptions.map((kind) => (
+                <option key={kind} value={kind}>
+                  {kind}
+                </option>
+              ))}
+            </SelectFilter>
+          </>
+        }
+        actions={
+          <Button variant="secondary" onClick={resetFilters}>
+            Очистить фильтры
+          </Button>
+        }
+      />
 
       <DataTable<Document>
         columns={[

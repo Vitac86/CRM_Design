@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { MiddleOfficeReportDetails } from '../components/crm/MiddleOfficeReportDetails';
 import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList';
-import { Button, DataTable, EmptyState, SearchInput, SelectFilter, Tabs } from '../components/ui';
+import { Button, DataTable, EmptyState, SearchInput, SelectFilter, TableControlPanel, Tabs } from '../components/ui';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
 import type { Client, ClientAccount, ClientContract, Report } from '../data/types';
 import { AsyncContent } from '../shared/ui/async';
@@ -36,6 +36,9 @@ export const MiddleOfficePage = () => {
   const [clientTypeFilter, setClientTypeFilter] = useState<ClientJournalRow['clientType'] | 'all'>('all');
   const [contractKindFilter, setContractKindFilter] = useState<ClientJournalRow['contractKind'] | 'all'>('all');
   const [accountStatusFilter, setAccountStatusFilter] = useState<ClientJournalRow['accountStatus'] | 'all'>('all');
+  const hasClientJournalFilters =
+    clientSearch.trim().length > 0 || clientTypeFilter !== 'all' || contractKindFilter !== 'all' || accountStatusFilter !== 'all';
+  const hasReportFilters = search.trim().length > 0 || statusFilter !== 'all' || channelFilter !== 'all';
 
   useEffect(() => {
     let isMounted = true;
@@ -179,41 +182,53 @@ export const MiddleOfficePage = () => {
       >
         {section === 'clients-journal' ? (
         <section className="space-y-3">
-          <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
-            <SearchInput
-              value={clientSearch}
-              onChange={(event) => setClientSearch(event.target.value)}
-              placeholder="Поиск по коду, клиенту, ИНН или договору..."
-              className="sm:flex-1"
-            />
-            <SelectFilter
-              value={clientTypeFilter}
-              onChange={(event) => setClientTypeFilter(event.target.value as ClientJournalRow['clientType'] | 'all')}
-              className="sm:w-[150px]"
-            >
-              <option value="all">Тип клиента: Все</option>
-              <option value="ф/л">ф/л</option>
-              <option value="ю/л">ю/л</option>
-            </SelectFilter>
-            <SelectFilter
-              value={contractKindFilter}
-              onChange={(event) => setContractKindFilter(event.target.value as ClientJournalRow['contractKind'] | 'all')}
-              className="sm:w-[150px]"
-            >
-              <option value="all">Вид договора: Все</option>
-              <option value="БО">БО</option>
-              <option value="ДУ">ДУ</option>
-            </SelectFilter>
-            <SelectFilter
-              value={accountStatusFilter}
-              onChange={(event) => setAccountStatusFilter(event.target.value as ClientJournalRow['accountStatus'] | 'all')}
-              className="sm:w-[170px]"
-            >
-              <option value="all">Статус счёта: Все</option>
-              <option value="активный">активный</option>
-              <option value="закрытый">закрытый</option>
-            </SelectFilter>
-          </div>
+          <TableControlPanel
+            search={
+              <SearchInput
+                value={clientSearch}
+                onChange={(event) => setClientSearch(event.target.value)}
+                placeholder="Поиск по коду, клиенту, ИНН или договору..."
+              />
+            }
+            filters={
+              <>
+                <SelectFilter value={clientTypeFilter} onChange={(event) => setClientTypeFilter(event.target.value as ClientJournalRow['clientType'] | 'all')}>
+                  <option value="all">Тип клиента</option>
+                  <option value="Физ. лицо">Физ. лицо</option>
+                  <option value="Юр. лицо">Юр. лицо</option>
+                  <option value="ИП">ИП</option>
+                </SelectFilter>
+                <SelectFilter value={contractKindFilter} onChange={(event) => setContractKindFilter(event.target.value as ClientJournalRow['contractKind'] | 'all')}>
+                  <option value="all">Вид договора</option>
+                  <option value="БО">БО</option>
+                  <option value="Депозитарный">Депозитарный</option>
+                  <option value="ДУ">ДУ</option>
+                  <option value="ИИС">ИИС</option>
+                  <option value="Дилерский">Дилерский</option>
+                </SelectFilter>
+                <SelectFilter value={accountStatusFilter} onChange={(event) => setAccountStatusFilter(event.target.value as ClientJournalRow['accountStatus'] | 'all')}>
+                  <option value="all">Статус счёта</option>
+                  <option value="Открыт">Открыт</option>
+                  <option value="Закрыт">Закрыт</option>
+                </SelectFilter>
+              </>
+            }
+            actions={
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={!hasClientJournalFilters}
+                onClick={() => {
+                  setClientSearch('');
+                  setClientTypeFilter('all');
+                  setContractKindFilter('all');
+                  setAccountStatusFilter('all');
+                }}
+              >
+                Очистить фильтры
+              </Button>
+            }
+          />
 
           <DataTable
             rows={filteredClientJournalRows}
@@ -235,35 +250,49 @@ export const MiddleOfficePage = () => {
       ) : (
         <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
           <div className="space-y-3">
-            <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
-              <SearchInput
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Поиск по клиенту или отчёту..."
-                className="sm:flex-1"
-              />
-              <SelectFilter
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as Report['deliveryStatus'] | 'all')}
-                className="sm:w-[170px]"
-              >
-                <option value="all">Статус: Все</option>
-                <option value="Доставлен">Доставлен</option>
-                <option value="Ожидает">Ожидает</option>
-                <option value="Ошибка">Ошибка</option>
-              </SelectFilter>
-              <SelectFilter
-                value={channelFilter}
-                onChange={(event) =>
-                  setChannelFilter(event.target.value as Extract<Report['deliveryChannel'], 'E-mail' | 'Личный кабинет'> | 'all')
-                }
-                className="sm:w-[190px]"
-              >
-                <option value="all">Канал: Все</option>
-                <option value="E-mail">E-mail</option>
-                <option value="Личный кабинет">Личный кабинет</option>
-              </SelectFilter>
-            </div>
+            <TableControlPanel
+              search={
+                <SearchInput
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Поиск по клиенту или отчёту..."
+                />
+              }
+              filters={
+                <>
+                  <SelectFilter value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as Report['deliveryStatus'] | 'all')}>
+                    <option value="all">Статус</option>
+                    <option value="Доставлен">Доставлен</option>
+                    <option value="Ожидает">Ожидает</option>
+                    <option value="Ошибка">Ошибка</option>
+                  </SelectFilter>
+                  <SelectFilter
+                    value={channelFilter}
+                    onChange={(event) =>
+                      setChannelFilter(event.target.value as Extract<Report['deliveryChannel'], 'E-mail' | 'Личный кабинет'> | 'all')
+                    }
+                  >
+                    <option value="all">Канал</option>
+                    <option value="E-mail">E-mail</option>
+                    <option value="Личный кабинет">Личный кабинет</option>
+                  </SelectFilter>
+                </>
+              }
+              actions={
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={!hasReportFilters}
+                  onClick={() => {
+                    setSearch('');
+                    setStatusFilter('all');
+                    setChannelFilter('all');
+                  }}
+                >
+                  Очистить фильтры
+                </Button>
+              }
+            />
 
             <MiddleOfficeReportList reports={filteredReports} selectedReportId={selectedReportId} onSelect={setSelectedReportId} />
           </div>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText } from '../components/ui';
+import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableControlPanel, TableStatusText } from '../components/ui';
 import { cn } from '../components/ui/cn';
 import type { Report } from '../data/types';
 import { AsyncContent } from '../shared/ui/async';
@@ -195,17 +195,17 @@ export const DepositoryPage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Отчёты депозитария</h1>
       </header>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <SearchInput
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Поиск по коду клиента, имени файла или отчёту"
-          aria-label="Поиск по отчётам депозитария"
-        />
-      </section>
-
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2.5">
+      <TableControlPanel
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по коду клиента, имени файла или отчёту"
+            aria-label="Поиск по отчётам депозитария"
+          />
+        }
+        filters={
+          <>
           <input
             value={clientCodeFilter}
             onChange={(event) => setClientCodeFilter(event.target.value)}
@@ -254,11 +254,14 @@ export const DepositoryPage = () => {
             <option value="Доставлено">Доставлено</option>
             <option value="Не доставлено">Не доставлено</option>
           </SelectFilter>
-          <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
+          </>
+        }
+        actions={
+          <Button variant="secondary" onClick={resetFilters}>
             Очистить фильтры
           </Button>
-        </div>
-      </section>
+        }
+      />
 
       <AsyncContent
         isLoading={isLoading}

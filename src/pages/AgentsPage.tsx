@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { AgentProfile } from '../data/agents';
 import type { Client } from '../data/types';
-import { Badge, Button, DataTable, FormField, SearchInput } from '../components/ui';
+import { Badge, Button, DataTable, FormField, SearchInput, TableControlPanel } from '../components/ui';
 
 type AgentTableRow = {
   id: string;
@@ -163,11 +163,14 @@ export const AgentsPage = () => {
         <Button onClick={() => setIsModalOpen(true)}>+ Добавить агента</Button>
       </header>
 
-      <SearchInput
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        placeholder="Поиск по субъекту, договору, комиссии, телефону или email"
-        className="max-w-xl"
+      <TableControlPanel
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по субъекту, договору, комиссии, телефону или email"
+          />
+        }
       />
 
       <DataTable<AgentTableRow>
