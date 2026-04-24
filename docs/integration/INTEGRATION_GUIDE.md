@@ -94,6 +94,41 @@
 
 Следующий безопасный шаг — вынести type-only импорты из `src/data/types` и `src/data/dashboard` в feature/shared типы (без изменения runtime-поведения).
 
+## Async UI foundation status
+
+В проект добавлена базовая инфраструктура для единообразной обработки async-состояний:
+
+- `src/shared/ui/async/AsyncContent.tsx`
+- `src/shared/ui/async/PageSkeleton.tsx`
+- `src/shared/ui/async/InlineError.tsx`
+- `src/shared/ui/async/RetryAction.tsx`
+
+### Уже переведены на `AsyncContent`
+
+- `CompliancePage`
+- `ComplianceCardPage` (loading/error ветки)
+- `MiddleOfficePage`
+- `MiddleOfficeClientsPage`
+- `DepositoryPage`
+
+### Где async-состояния пока локальные
+
+- Есть локальный loading/error UI (следующий кандидат на миграцию):  
+  `DashboardPage`, `SubjectsPage`, `ArchivesPage`, `BackOfficePage`, `MiddleOfficeReportsPage`, `SubjectProfilePage`, `ContractWizardPage`, `RequestsPage`.
+- Имеют частичный async-контроль без общего `AsyncContent`:  
+  `TradingPage`, `TradingCardPage`, `DocumentsPage`, `AdministrationPage`, `BrokeragePage`, `TrustManagementPage`, `AgentsPage`.
+
+### Recommended next async batch
+
+Рекомендуемый следующий batch без риска изменения бизнес-логики:
+
+1. `DashboardPage`
+2. `SubjectsPage`
+3. `ArchivesPage`
+4. `MiddleOfficeReportsPage`
+
+Цель batch: перейти на `AsyncContent`, сохранить текущие тексты статусов/ошибок и текущую структуру фильтров/таблиц без изменения поведения.
+
 ## Что будет сделано в следующих шагах
 
 UI-страницы должны постепенно перестать импортировать `src/data/*` напрямую и использовать репозитории из `useDataAccess`.

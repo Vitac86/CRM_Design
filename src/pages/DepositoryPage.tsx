@@ -3,6 +3,7 @@ import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText } from '../components/ui';
 import { cn } from '../components/ui/cn';
 import type { Report } from '../data/types';
+import { AsyncContent } from '../shared/ui/async';
 
 const deliveryResultToneMap: Record<'Доставлено' | 'Не доставлено', 'neutral' | 'danger'> = {
   'Доставлено': 'neutral',
@@ -259,13 +260,15 @@ export const DepositoryPage = () => {
         </div>
       </section>
 
-      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
-
-      <section className="grid gap-4 xl:grid-cols-[1.65fr_1fr]">
+      <AsyncContent
+        isLoading={isLoading}
+        error={error}
+        loadingFallback={<EmptyState title="Загрузка данных..." description="Пожалуйста, подождите." className="h-[460px]" />}
+        errorFallback={error ? <p className="text-sm text-rose-600">{error}</p> : undefined}
+      >
+        <section className="grid gap-4 xl:grid-cols-[1.65fr_1fr]">
         <div className="max-h-[620px] space-y-2 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3">
-          {isLoading ? (
-            <EmptyState title="Загрузка данных..." description="Пожалуйста, подождите." className="h-[460px]" />
-          ) : filteredReports.length === 0 ? (
+          {filteredReports.length === 0 ? (
             <EmptyState title="Отчёты не найдены" description="Измените параметры поиска или фильтров." className="h-[460px]" />
           ) : (
             filteredReports.map((report) => {
@@ -354,7 +357,8 @@ export const DepositoryPage = () => {
             </div>
           )}
         </div>
-      </section>
+        </section>
+      </AsyncContent>
 
       {toastMessage && (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>

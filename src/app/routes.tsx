@@ -19,11 +19,14 @@ import { AdministrationPage } from '../pages/AdministrationPage';
 import { ContractWizardPage } from '../pages/ContractWizardPage';
 import { MiddleOfficeClientsPage } from '../pages/MiddleOfficeClientsPage';
 import { MiddleOfficeReportsPage } from '../pages/MiddleOfficeReportsPage';
+import { NotFoundPage } from '../pages/NotFoundPage';
+import { AppErrorPage } from '../pages/AppErrorPage';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppShell />,
+    errorElement: <AppErrorPage />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
@@ -46,6 +49,7 @@ export const router = createBrowserRouter([
       { path: 'trading/:id', element: <TradingCardPage /> },
       { path: 'depository', element: <DepositoryPage /> },
       { path: 'administration', element: <AdministrationPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ]);

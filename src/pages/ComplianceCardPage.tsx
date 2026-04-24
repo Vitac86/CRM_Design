@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Badge, Button, Card, EmptyState } from '../components/ui';
 import { ProfileField } from '../components/crm/ProfileField';
+import { AsyncContent } from '../shared/ui/async';
 import type { Client, ClientDocument, ClientRelation, ComplianceCase, ComplianceStatus, IndividualComplianceCard, LegalEntityComplianceCard } from '../data/types';
 import {
   formatClientType,
@@ -167,21 +168,30 @@ export const ComplianceCardPage = () => {
     return () => window.clearTimeout(timer);
   }, [toastMessage]);
 
-  if (isLoading) {
-    return <EmptyState title="Загрузка..." description="Загружаем карточку комплаенса." />;
-  }
-
-  if (error) {
-    return <EmptyState title="Ошибка загрузки" description={error} />;
-  }
-
-  if (!client) {
+  if (!isLoading && !error && !client) {
     return (
       <EmptyState
         title="Карточка не найдена"
         description="Проверьте идентификатор клиента в адресной строке или выберите запись из списка комплаенса."
       />
     );
+  }
+
+  if (isLoading || error) {
+    return (
+      <AsyncContent
+        isLoading={isLoading}
+        error={error}
+        loadingFallback={<EmptyState title="Загрузка..." description="Загружаем карточку комплаенса." />}
+        errorFallback={error ? <EmptyState title="Ошибка загрузки" description={error} /> : undefined}
+      >
+        <div />
+      </AsyncContent>
+    );
+  }
+
+  if (!client) {
+    return null;
   }
 
   const isIndividual = client.type === 'ФЛ' || client.type === 'ИП';
@@ -531,6 +541,6 @@ export const ComplianceCardPage = () => {
           {toastMessage}
         </div>
       )}
-    </div>
+      </div>
   );
 };
