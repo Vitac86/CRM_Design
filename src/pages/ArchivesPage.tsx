@@ -93,7 +93,7 @@ export const ArchivesPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold text-slate-900">Архив</h1>
         <p className="text-sm text-slate-500">Субъекты, выведенные из активного списка</p>

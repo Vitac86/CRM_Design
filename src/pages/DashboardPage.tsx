@@ -86,7 +86,7 @@ export const DashboardPage = () => {
   );
 
   return (
-    <div className="space-y-6 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-6 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header>
         <h1 className="text-2xl font-semibold text-slate-900">Операционный обзор</h1>
       </header>
@@ -113,7 +113,7 @@ export const DashboardPage = () => {
         />
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-3">
             <h2 className="text-sm font-semibold text-slate-900">Последние поручения</h2>
             <Link to="/requests" className="text-sm font-medium text-brand transition hover:text-brand-hover">
               Все поручения

@@ -54,7 +54,7 @@ export const DataTable = <T extends { id?: string | number }>({
   stickyHeader = false,
 }: DataTableProps<T>) => {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+    <div className="relative min-w-0 overflow-x-auto rounded-lg border border-slate-200 bg-white">
       <table className="min-w-full text-left text-sm text-slate-700">
         <thead className="bg-brand-light">
           <tr>

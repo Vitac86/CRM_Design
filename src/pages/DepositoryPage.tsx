@@ -190,7 +190,7 @@ export const DepositoryPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header>
         <h1 className="text-2xl font-semibold text-slate-900">Отчёты депозитария</h1>
       </header>
@@ -210,7 +210,7 @@ export const DepositoryPage = () => {
             value={clientCodeFilter}
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="Код клиента"
-            className="h-10 w-[190px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
             aria-label="Фильтр по коду клиента"
           />
           <input
@@ -254,7 +254,7 @@ export const DepositoryPage = () => {
             <option value="Доставлено">Доставлено</option>
             <option value="Не доставлено">Не доставлено</option>
           </SelectFilter>
-          <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
+          <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
             Очистить фильтры
           </Button>
         </div>

@@ -245,7 +245,7 @@ export const ComplianceCardPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <Card className="space-y-4 p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-200 text-lg font-semibold text-slate-700">

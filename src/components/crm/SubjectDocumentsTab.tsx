@@ -278,8 +278,8 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
       )}
 
       {isCreateOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/35 p-4">
-          <div className="w-full max-w-xl rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/35 p-4" role="dialog" aria-modal="true" aria-label="Добавление документа">
+          <div className="w-full max-w-xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xl">
             <div className="space-y-1">
               <h3 className="text-base font-semibold text-slate-900">Новый документ</h3>
               <p className="text-sm text-slate-500">Заполните поля для добавления документа в список субъекта.</p>
@@ -340,7 +340,7 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
 
             {formError ? <p className="mt-3 text-sm text-rose-600">{formError}</p> : null}
 
-            <div className="mt-5 flex items-center justify-end gap-2">
+            <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
               <Button variant="secondary" onClick={handleCloseCreate}>
                 Отмена
               </Button>

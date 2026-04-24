@@ -9,7 +9,7 @@ type PageSizeSelectorProps = {
 
 export const PageSizeSelector = ({ value, options = [25, 50, 100], onChange, className }: PageSizeSelectorProps) => {
   return (
-    <div className={cn('flex items-center gap-2 text-sm text-slate-600', className)}>
+    <div className={cn('flex flex-wrap items-center gap-2 text-sm text-slate-600', className)}>
       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Строк на странице</span>
       <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
         {options.map((option) => {

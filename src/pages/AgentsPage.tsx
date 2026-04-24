@@ -157,7 +157,7 @@ export const AgentsPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Агенты</h1>
         <Button onClick={() => setIsModalOpen(true)}>+ Добавить агента</Button>
@@ -198,9 +198,9 @@ export const AgentsPage = () => {
       />
 
       {isModalOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4" role="dialog" aria-modal="true" aria-label="Добавить агента">
+          <div className="w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-base font-semibold text-slate-900">Добавить агента</h3>
               <Button variant="secondary" size="sm" onClick={handleCloseModal}>
                 Закрыть
@@ -227,7 +227,7 @@ export const AgentsPage = () => {
                 <FormField label="Комиссионное вознаграждение" value={commission} onChange={(event) => setCommission(event.target.value)} placeholder="Например, 1.5%" />
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex flex-wrap justify-end gap-2">
                 <Button size="sm" onClick={() => void handleSave()}>
                   Сохранить
                 </Button>

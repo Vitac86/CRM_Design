@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import { isMenuGroup, type SidebarItem } from '../../features/navigation/api/navigationRepository';
+import { cn } from '../ui/cn';
 import { SidebarIcon } from './SidebarIcon';
 
 const linkBaseClass =
@@ -15,7 +16,13 @@ const buildInitialOpenGroups = (menu: SidebarItem[]) => menu.reduce<Record<strin
   return acc;
 }, {});
 
-export const Sidebar = () => {
+type SidebarProps = {
+  variant?: 'desktop' | 'mobile';
+  onNavigate?: () => void;
+  className?: string;
+};
+
+export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarProps) => {
   const { navigation } = useDataAccess();
   const location = useLocation();
   const [sidebarMenu, setSidebarMenu] = useState<SidebarItem[]>([]);
@@ -50,14 +57,18 @@ export const Sidebar = () => {
     }, {});
   }, [location.pathname, sidebarMenu]);
 
+  const baseAsideClass = variant === 'desktop'
+    ? 'fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-slate-200 bg-white'
+    : 'h-full w-full border-r border-slate-200 bg-white';
+
   return (
-    <aside className="fixed left-0 top-0 flex h-screen w-[270px] shrink-0 flex-col border-r border-slate-200 bg-white">
+    <aside className={cn('flex min-w-0 flex-col', baseAsideClass, className)}>
       <div className="border-b border-slate-200 px-5 py-4">
         <p className="text-xl font-semibold tracking-tight text-brand-dark">Инвестика</p>
         <p className="text-xs text-slate-500">CRM prototype</p>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
         {sidebarMenu.map((item) => {
           if (isMenuGroup(item)) {
             const isOpen = openGroups[item.id] ?? false;
@@ -72,9 +83,9 @@ export const Sidebar = () => {
                     hasActiveChild ? 'bg-brand-light text-brand-dark' : 'text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
+                  <span className="flex min-w-0 items-center gap-3">
                     <SidebarIcon name={item.icon} className="h-5 w-5 shrink-0" />
-                    <span>{item.label}</span>
+                    <span className="truncate">{item.label}</span>
                   </span>
                   <span className={`text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>⌃</span>
                 </button>
@@ -85,6 +96,7 @@ export const Sidebar = () => {
                       <li key={child.id}>
                         <NavLink
                           to={child.to}
+                          onClick={onNavigate}
                           className={({ isActive }) =>
                             `${linkBaseClass} ${
                               isActive
@@ -94,7 +106,7 @@ export const Sidebar = () => {
                           }
                         >
                           <SidebarIcon name={child.icon} className="h-4 w-4 shrink-0" />
-                          <span>{child.label}</span>
+                          <span className="truncate">{child.label}</span>
                         </NavLink>
                       </li>
                     ))}
@@ -108,6 +120,7 @@ export const Sidebar = () => {
             <NavLink
               key={item.id}
               to={item.to}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 `${linkBaseClass} mb-1 ${
                   isActive ? 'bg-brand-light text-brand-dark' : 'text-slate-700 hover:bg-slate-100'
@@ -115,7 +128,7 @@ export const Sidebar = () => {
               }
             >
               <SidebarIcon name={item.icon} className="h-5 w-5 shrink-0" />
-              <span>{item.label}</span>
+              <span className="truncate">{item.label}</span>
             </NavLink>
           );
         })}

@@ -133,7 +133,7 @@ export const ReportsPageTemplate = ({
               value={clientCodeFilter}
               onChange={(event) => setClientCodeFilter(event.target.value)}
               placeholder="Код клиента"
-              className="h-10 w-[190px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
               aria-label="Фильтр по коду клиента"
             />
 
@@ -185,7 +185,7 @@ export const ReportsPageTemplate = ({
               <option value="Не доставлено">Не доставлено</option>
             </SelectFilter>
 
-            <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
+            <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
               Очистить фильтры
             </Button>
           </FilterBar>
@@ -196,14 +196,14 @@ export const ReportsPageTemplate = ({
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Поиск по коду клиента, имени файла или отчёту"
-            className="h-10 w-[300px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 w-full sm:w-[300px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
             aria-label="Поиск по отчётам"
           />
           <input
             value={clientCodeFilter}
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="Код клиента"
-            className="h-10 w-[190px] rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
             aria-label="Фильтр по коду клиента"
           />
 
@@ -255,7 +255,7 @@ export const ReportsPageTemplate = ({
             <option value="Не доставлено">Не доставлено</option>
           </SelectFilter>
 
-          <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
+          <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
             Очистить фильтры
           </Button>
         </FilterBar>
