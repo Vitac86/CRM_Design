@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRelationsByClientId } from '../../data/clientRelations';
-import { useClientsStore } from '../../app/ClientsStore';
+import { useDataAccess } from '../../app/dataAccess/useDataAccess';
+import type { AgentProfile } from '../../data/agents';
+import type { Client, ClientRelation } from '../../data/types';
 import { Button, DataTable, EmptyState, FormField } from '../ui';
 import { formatClientType } from '../../utils/labels';
 import { buildDatedCsvFileName, exportToCsv } from '../../utils/csv';
@@ -12,15 +13,67 @@ type SubjectRelationsTabProps = {
 
 export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
   const navigate = useNavigate();
-  const { clients, getClientById, getAgentClients, addAgentClient } = useClientsStore();
+  const { clients: clientsRepository, agents: agentsRepository, relations: relationsRepository } = useDataAccess();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [currentClient, setCurrentClient] = useState<Client | null>(null);
+  const [currentAgent, setCurrentAgent] = useState<AgentProfile | null>(null);
+  const [relations, setRelations] = useState<ClientRelation[]>([]);
+  const [agentClients, setAgentClients] = useState<Client[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clientQuery, setClientQuery] = useState('');
   const [selectedClientId, setSelectedClientId] = useState('');
 
-  const relations = getRelationsByClientId(clientId);
-  const currentClient = getClientById(clientId);
-  const isAgent = currentClient?.roles.includes('Агент') ?? false;
-  const agentClients = getAgentClients(clientId);
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadData = async () => {
+      try {
+        const [loadedCurrentClient, loadedClients, loadedRelations, loadedCurrentAgent] = await Promise.all([
+          clientsRepository.getClientById(clientId),
+          clientsRepository.listClients(),
+          relationsRepository.listRelationsByClientId(clientId),
+          agentsRepository.getAgentBySubjectId(clientId),
+        ]);
+
+        if (isCancelled) {
+          return;
+        }
+
+        setCurrentClient(loadedCurrentClient);
+        setClients(loadedClients);
+        setRelations(loadedRelations);
+        setCurrentAgent(loadedCurrentAgent);
+
+        if (loadedCurrentAgent) {
+          const loadedAgentClients = await agentsRepository.listAgentClients(clientId);
+          if (!isCancelled) {
+            setAgentClients(loadedAgentClients);
+          }
+          return;
+        }
+
+        setAgentClients([]);
+      } catch {
+        if (isCancelled) {
+          return;
+        }
+
+        setCurrentClient(null);
+        setCurrentAgent(null);
+        setClients([]);
+        setRelations([]);
+        setAgentClients([]);
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [agentsRepository, clientId, clientsRepository, relationsRepository]);
+
+  const isAgent = (currentClient?.roles.includes('Агент') ?? false) || Boolean(currentAgent);
 
   const availableClients = useMemo(() => {
     const normalizedQuery = clientQuery.trim().toLowerCase();
@@ -42,12 +95,14 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
     setSelectedClientId('');
   };
 
-  const handleSaveAgentClient = () => {
+  const handleSaveAgentClient = async () => {
     if (!selectedClientId) {
       return;
     }
 
-    addAgentClient(clientId, selectedClientId);
+    await agentsRepository.addAgentClient(clientId, selectedClientId);
+    const nextAgentClients = await agentsRepository.listAgentClients(clientId);
+    setAgentClients(nextAgentClients);
     handleCloseModal();
   };
 
@@ -151,7 +206,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
                 </select>
               </label>
               <div className="flex justify-end">
-                <Button size="sm" onClick={handleSaveAgentClient}>
+                <Button size="sm" onClick={() => void handleSaveAgentClient()}>
                   Сохранить
                 </Button>
               </div>

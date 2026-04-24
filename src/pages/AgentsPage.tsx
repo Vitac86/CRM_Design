@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { AgentProfile } from '../data/agents';
+import type { Client } from '../data/types';
 import { Badge, Button, DataTable, FormField, SearchInput } from '../components/ui';
-import { useClientsStore } from '../app/ClientsStore';
 
 type AgentTableRow = {
   id: string;
@@ -17,13 +19,48 @@ type AgentTableRow = {
 
 export const AgentsPage = () => {
   const navigate = useNavigate();
-  const { clients, agents, addAgent } = useClientsStore();
+  const { clients: clientsRepository, agents: agentsRepository } = useDataAccess();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [agents, setAgents] = useState<AgentProfile[]>([]);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subjectQuery, setSubjectQuery] = useState('');
   const [subjectId, setSubjectId] = useState('');
   const [contractNumber, setContractNumber] = useState('');
   const [commission, setCommission] = useState('');
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadData = async () => {
+      try {
+        const [loadedClients, loadedAgents] = await Promise.all([
+          clientsRepository.listClients(),
+          agentsRepository.listAgents(),
+        ]);
+
+        if (isCancelled) {
+          return;
+        }
+
+        setClients(loadedClients);
+        setAgents(loadedAgents);
+      } catch {
+        if (isCancelled) {
+          return;
+        }
+
+        setClients([]);
+        setAgents([]);
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [agentsRepository, clientsRepository]);
 
   const rows = useMemo<AgentTableRow[]>(() => {
     return agents
@@ -81,16 +118,41 @@ export const AgentsPage = () => {
     setCommission('');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!subjectId || !contractNumber.trim() || !commission.trim()) {
       return;
     }
 
-    addAgent({
+    const nextAgent = await agentsRepository.createOrUpdateAgent({
       subjectId,
       contractNumber: contractNumber.trim(),
       commission: commission.trim(),
     });
+
+    setAgents((prev) => {
+      const existingAgentIndex = prev.findIndex((item) => item.subjectId === nextAgent.subjectId);
+      if (existingAgentIndex < 0) {
+        return [...prev, nextAgent];
+      }
+
+      const nextAgents = [...prev];
+      nextAgents[existingAgentIndex] = nextAgent;
+      return nextAgents;
+    });
+
+    setClients((prev) =>
+      prev.map((client) => {
+        if (client.id !== subjectId || client.roles.includes('Агент')) {
+          return client;
+        }
+
+        return {
+          ...client,
+          roles: [...client.roles, 'Агент'],
+        };
+      }),
+    );
+
     handleCloseModal();
   };
 
@@ -166,7 +228,7 @@ export const AgentsPage = () => {
               </div>
 
               <div className="flex justify-end">
-                <Button size="sm" onClick={handleSave}>
+                <Button size="sm" onClick={() => void handleSave()}>
                   Сохранить
                 </Button>
               </div>
