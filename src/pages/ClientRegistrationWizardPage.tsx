@@ -94,6 +94,8 @@ export const ClientRegistrationWizardPage = () => {
   const [registrationMethod, setRegistrationMethod] = useState<RegistrationMethod>(null);
   const [individualForm, setIndividualForm] = useState<IndividualFormData>(initialIndividualForm);
   const [legalEntityForm, setLegalEntityForm] = useState<LegalEntityFormData>(initialLegalEntityForm);
+  const [legalEntityInnInput, setLegalEntityInnInput] = useState('');
+  const [isLegalEntityInnResolved, setIsLegalEntityInnResolved] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [draftMessage, setDraftMessage] = useState('');
   const [result, setResult] = useState<RegistrationResultState | null>(null);
@@ -122,6 +124,50 @@ export const ClientRegistrationWizardPage = () => {
     if (value === 'none') return 'Недееспособен';
     return '';
   };
+
+  // Demo-заглушка до интеграции с реальным API/CRM.
+  const buildLegalEntityDefaultsByInn = (inn: string): LegalEntityFormData => ({
+    ...initialLegalEntityForm,
+    clientName: 'ООО "ТехноИмпульс"',
+    fullName: 'Общество с ограниченной ответственностью "ТехноИмпульс"',
+    englishName: 'TechnoImpulse LLC',
+    englishFullName: 'TechnoImpulse Limited Liability Company',
+    parentCompany: 'no',
+    qualifiedInvestor: 'no',
+    cashPermission: 'yes',
+    securitiesPermission: 'yes',
+    inn,
+    kpp: '770101001',
+    ogrn: '1207700123456',
+    registrationDate: '2020-04-15',
+    registrationAuthority: 'Межрайонная ИФНС России № 46 по г. Москве',
+    authorizedCapital: '1 000 000',
+    registrarName: 'АО "Реестр"',
+    taxName: 'ИФНС России № 1 по г. Москве',
+    taxCode: '7701',
+    fssNumber: '7701001234',
+    pfrNumber: '087-001-123456',
+    residency: 'yes',
+    phones: '+7 495 123-45-67',
+    email: 'info@technoimpulse.demo',
+    address: 'г. Москва, ул. Летниковская, д. 10, стр. 4',
+    beneficiary: 'Иванов Игорь Сергеевич',
+    authorizedPersons: 'Генеральный директор Петров Пётр Петрович',
+    okato: '45286585000',
+    oktmo: '45376000000',
+    okpo: '12345678',
+    okfs: '16',
+    okogu: '4210014',
+    representativeFullName: 'Петров Пётр Петрович',
+    representativePosition: 'Генеральный директор',
+    representativeBirthDate: '1985-08-12',
+    representativeDocumentType: 'passport_rf',
+    representativeDocumentSeries: '4510',
+    representativeDocumentNumber: '123456',
+    representativeDocumentIssuedBy: 'ОВД Тверского района г. Москвы',
+    representativeDocumentIssuedAt: '2015-06-20',
+    representativeDocumentDivisionCode: '770-001',
+  });
 
   const subjectTypeLabel = useMemo(() => {
     if (subjectType === 'individual') {
@@ -161,6 +207,52 @@ export const ClientRegistrationWizardPage = () => {
       ...current,
       [field]: field === 'phones' ? normalizePhoneInput(String(value)) : value,
     }));
+    setValidationError('');
+    setDraftMessage('');
+  };
+
+  const handleSubjectTypeChange = (type: SubjectType) => {
+    setSubjectType(type);
+    if (type === 'individual' && registrationMethod === 'inn') {
+      setRegistrationMethod(null);
+    }
+    setValidationError('');
+    setDraftMessage('');
+  };
+
+  const handleProceedFromStepOne = () => {
+    if (!subjectType || !registrationMethod) {
+      return;
+    }
+
+    setStep(2);
+    setValidationError('');
+    setDraftMessage('');
+
+    if (subjectType === 'legal' && registrationMethod === 'inn') {
+      setIsLegalEntityInnResolved(false);
+      setLegalEntityInnInput(legalEntityForm.inn || '');
+      return;
+    }
+
+    setIsLegalEntityInnResolved(false);
+    setLegalEntityInnInput('');
+  };
+
+  const handleResolveLegalEntityByInn = () => {
+    const normalizedInn = legalEntityInnInput.replace(/\D/g, '');
+    if (!normalizedInn) {
+      setValidationError('Введите ИНН юридического лица.');
+      return;
+    }
+
+    if (!/^\d{10}$/.test(normalizedInn)) {
+      setValidationError('ИНН юридического лица должен содержать 10 цифр.');
+      return;
+    }
+
+    setLegalEntityForm(buildLegalEntityDefaultsByInn(normalizedInn));
+    setIsLegalEntityInnResolved(true);
     setValidationError('');
     setDraftMessage('');
   };
@@ -461,18 +553,12 @@ export const ClientRegistrationWizardPage = () => {
                 <RegistrationOptionCard
                   title="Физическое лицо"
                   selected={subjectType === 'individual'}
-                  onClick={() => {
-                    setSubjectType('individual');
-                    setValidationError('');
-                  }}
+                  onClick={() => handleSubjectTypeChange('individual')}
                 />
                 <RegistrationOptionCard
                   title="Юридическое лицо"
                   selected={subjectType === 'legal'}
-                  onClick={() => {
-                    setSubjectType('legal');
-                    setValidationError('');
-                  }}
+                  onClick={() => handleSubjectTypeChange('legal')}
                 />
               </div>
             </div>
@@ -500,8 +586,9 @@ export const ClientRegistrationWizardPage = () => {
                 />
                 <RegistrationOptionCard
                   title="Загрузить по ИНН"
-                  description="Скоро будет доступно."
+                  description={subjectType === 'individual' ? 'Недоступно для ФЛ.' : 'Автозаполнение demo-данными по ИНН.'}
                   selected={registrationMethod === 'inn'}
+                  disabled={subjectType === 'individual'}
                   onClick={() => {
                     setRegistrationMethod('inn');
                     setValidationError('');
@@ -512,7 +599,7 @@ export const ClientRegistrationWizardPage = () => {
           </div>
 
           <div className="mt-5 flex justify-end">
-            <Button disabled={!subjectType || !registrationMethod} onClick={() => setStep(2)}>
+            <Button disabled={!subjectType || !registrationMethod} onClick={handleProceedFromStepOne}>
               Далее
             </Button>
           </div>
@@ -521,26 +608,67 @@ export const ClientRegistrationWizardPage = () => {
 
       {step === 2 ? (
         <div>
-          <RegistrationStepHeader title="Заполните данные" />
-
-          {subjectType === 'individual' ? (
-            <IndividualRegistrationForm formData={individualForm} onChange={handleIndividualChange} />
+          {subjectType === 'legal' && registrationMethod === 'inn' && !isLegalEntityInnResolved ? (
+            <div>
+              <RegistrationStepHeader title="Введите ИНН юридического лица" />
+              <div className="max-w-md space-y-3">
+                <label className="flex flex-col gap-1.5 text-sm text-slate-700">
+                  <span>ИНН (10 цифр)</span>
+                  <input
+                    value={legalEntityInnInput}
+                    onChange={(event) => {
+                      setLegalEntityInnInput(event.target.value.replace(/\D/g, '').slice(0, 10));
+                      setValidationError('');
+                      setDraftMessage('');
+                    }}
+                    inputMode="numeric"
+                    placeholder="Например, 7707083893"
+                    className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/20"
+                  />
+                </label>
+              </div>
+            </div>
           ) : (
-            <LegalEntityRegistrationForm formData={legalEntityForm} onChange={handleLegalChange} />
+            <>
+              <RegistrationStepHeader title={subjectType === 'legal' && registrationMethod === 'inn' ? 'Проверьте и дополните данные' : 'Заполните данные'} />
+
+              {subjectType === 'individual' ? (
+                <IndividualRegistrationForm formData={individualForm} onChange={handleIndividualChange} />
+              ) : (
+                <LegalEntityRegistrationForm formData={legalEntityForm} onChange={handleLegalChange} />
+              )}
+            </>
           )}
 
           {validationError ? <p className="mt-3 text-sm text-red-600">{validationError}</p> : null}
           {draftMessage ? <p className="mt-3 text-sm text-brand-dark">{draftMessage}</p> : null}
 
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button onClick={handleProceedFromStepTwo}>Сохранить</Button>
-            <Button variant="secondary" onClick={() => setDraftMessage('Черновик сохранён локально')}>
-              Сохранить как черновик
-            </Button>
+            {subjectType === 'legal' && registrationMethod === 'inn' && !isLegalEntityInnResolved ? (
+              <Button onClick={handleResolveLegalEntityByInn}>Далее</Button>
+            ) : (
+              <>
+                <Button onClick={handleProceedFromStepTwo}>Сохранить</Button>
+                <Button variant="secondary" onClick={() => setDraftMessage('Черновик сохранён локально')}>
+                  Сохранить как черновик
+                </Button>
+              </>
+            )}
             <Button variant="ghost" onClick={() => navigate('/subjects')}>
               Отмена
             </Button>
-            <Button variant="secondary" onClick={() => setStep(1)} className="ml-auto">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (subjectType === 'legal' && registrationMethod === 'inn' && isLegalEntityInnResolved) {
+                  setIsLegalEntityInnResolved(false);
+                  setValidationError('');
+                  return;
+                }
+                setStep(1);
+              }}
+              className="ml-auto"
+            >
               Назад
             </Button>
           </div>
