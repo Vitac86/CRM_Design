@@ -48,7 +48,7 @@ export const Sidebar = () => {
 
       return acc;
     }, {});
-  }, [location.pathname]);
+  }, [location.pathname, sidebarMenu]);
 
   return (
     <aside className="fixed left-0 top-0 flex h-screen w-[270px] shrink-0 flex-col border-r border-slate-200 bg-white">
