@@ -57,7 +57,7 @@ export const createDefaultContractConfig = (params?: { clientEmail?: string; cli
   },
 });
 
-export const clientContracts: ClientContract[] = [
+export const clientContracts: readonly ClientContract[] = [
   {
     id: 'ctr-1',
     clientId: 'c-001',
@@ -176,13 +176,3 @@ export const clientContracts: ClientContract[] = [
     status: 'closed',
   },
 ];
-
-export const getContractsByClientId = (clientId: string) => clientContracts.filter((contract) => contract.clientId === clientId);
-
-export const getPrimaryContractByClientId = (clientId: string) => {
-  const contracts = getContractsByClientId(clientId);
-  const activeContracts = contracts.filter((contract) => contract.status === 'active');
-  const source = activeContracts.length > 0 ? activeContracts : contracts;
-
-  return [...source].sort((left, right) => right.openDate.localeCompare(left.openDate))[0];
-};

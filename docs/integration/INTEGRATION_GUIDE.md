@@ -11,6 +11,8 @@
 - Эти данные используются для demo-режима.
 - UI-слой не должен импортировать `src/data/*` напрямую в runtime.
 - `src/data/requests.ts` теперь является **seed-only** файлом (без runtime-мутаций).
+- `src/data/clientAccounts.ts` является **seed-only** файлом для счетов клиента.
+- `src/data/clientContracts.ts` является **seed/pure-helper** файлом (seed + `createDefaultContractConfig`).
 
 ## Новый data-access слой
 
@@ -35,7 +37,7 @@
 - `SubjectProfilePage` больше не читает contract helpers напрямую из `src/data/clientContracts` в runtime.
 - Contract read helpers (`getPrimaryContractByClientId`, `getContractConfigById` и связанные read-операции) доступны через `useDataAccess().contracts`.
 - `ContractWizardPage` использует `useDataAccess().clients` (`getClientById/updateClient`) и `useDataAccess().contracts` (`createDefaultContractConfig/getContractById/getContractConfigById/createContract/updateContract/updateContractConfig`).
-- `SubjectContractsTab` использует `useDataAccess().contracts.listContractsByClientId()` вместо прямого runtime-импорта из `src/data/clientContracts`.
+- `SubjectContractsTab` использует `useDataAccess().contracts.listContractsByClientId()` и `useDataAccess().accounts.listAccountsByClientId()/createAccount()`; runtime-импорты `src/data/clientAccounts` из компонента удалены.
 - `ArchivesPage` использует `useDataAccess().clients` для `listClients/restoreClient`.
 - `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
 - Создание поручений в demo-mode реализовано только в `src/features/requests/mock/mockRequestsRepository.ts`.
@@ -44,8 +46,9 @@
 - `ClientsStore` больше не должен быть источником истины для уже мигрированных client-экранов (`SubjectsPage`, `SubjectProfilePage`, `ArchivesPage`).
 - Client list/profile/archive теперь работают через единый `ClientsRepository` (`useDataAccess().clients`).
 - `ContractsRepository` расширен create/update-методами; runtime-поведение создания/обновления договора и конфигурации договора перенесено в `src/features/contracts/mock/mockContractsRepository.ts`.
-- `src/data/clientContracts.ts` должен рассматриваться как seed/pure-helper источник (seed array + `createDefaultContractConfig` + read-only helper для seed).
-- Временный технический долг: часть экранов всё ещё использует `ClientsStore` (например, `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `ClientRegistrationWizardPage`, `SubjectRelationsTab`), их миграция запланирована следующими шагами.
+- `AccountsRepository` добавлен в `DataAccessProvider` и отвечает за счета клиента в demo-mode через `src/features/accounts/mock/mockAccountsRepository.ts`.
+- `src/data/clientContracts.ts` используется как seed/pure-helper источник без runtime-mutation/read-helper exports.
+- `ClientsProvider` пока остаётся в runtime: `useClientsStore` всё ещё используется в `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `ClientRegistrationWizardPage`, `SubjectRelationsTab`.
 - Contract-related screens, уже мигрированные на data-access: `RequestsPage`, `SubjectProfilePage`, `SubjectContractsTab`, `ContractWizardPage`.
 - Остаточный technical debt по контрактам: `MiddleOfficePage` и `MiddleOfficeClientsPage` всё ещё читают `clientContracts` напрямую для витринных вычислений.
 

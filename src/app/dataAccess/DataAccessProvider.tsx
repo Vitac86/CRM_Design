@@ -3,6 +3,7 @@ import { createMockClientsRepository } from '../../features/clients/mock/mockCli
 import { createMockContractsRepository } from '../../features/contracts/mock/mockContractsRepository';
 import { createMockDashboardRepository } from '../../features/dashboard/mock/mockDashboardRepository';
 import { createMockRequestsRepository } from '../../features/requests/mock/mockRequestsRepository';
+import { createMockAccountsRepository } from '../../features/accounts/mock/mockAccountsRepository';
 import type { DataAccessContextValue } from './types';
 
 export const DataAccessContext = createContext<DataAccessContextValue | undefined>(undefined);
@@ -14,6 +15,7 @@ export const DataAccessProvider = ({ children }: { children: ReactNode }) => {
       requests: createMockRequestsRepository(),
       contracts: createMockContractsRepository(),
       dashboard: createMockDashboardRepository(),
+      accounts: createMockAccountsRepository(),
     }),
     [],
   );
