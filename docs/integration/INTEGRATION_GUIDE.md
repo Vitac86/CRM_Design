@@ -28,7 +28,7 @@
 
 После завершения текущего шага миграции:
 
-- `RequestsPage` использует `useDataAccess().requests` и `useDataAccess().contracts`.
+- `RequestsPage` использует `useDataAccess().clients`, `useDataAccess().requests` и `useDataAccess().contracts`.
 - `DashboardPage` использует `useDataAccess().dashboard` и `useDataAccess().requests`.
 - `SubjectsPage` (read/list) использует `useDataAccess().clients.listClients()`.
 - `SubjectProfilePage` использует `useDataAccess().clients` для `getClientById/listClients/updateClient/archiveClient`.
@@ -39,7 +39,7 @@
 - `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
 - `ClientsStore` больше не должен быть источником истины для уже мигрированных client-экранов (`SubjectsPage`, `SubjectProfilePage`, `ArchivesPage`).
 - Client list/profile/archive теперь работают через единый `ClientsRepository` (`useDataAccess().clients`).
-- Временный технический долг: часть экранов всё ещё использует `ClientsStore` (например, `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `RequestsPage`, `ContractWizardPage`, `ClientRegistrationWizardPage`, `SubjectRelationsTab`), их миграция запланирована следующими шагами.
+- Временный технический долг: часть экранов всё ещё использует `ClientsStore` (например, `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `ContractWizardPage`, `ClientRegistrationWizardPage`, `SubjectRelationsTab`), их миграция запланирована следующими шагами.
 
 ### Recommended next step
 
