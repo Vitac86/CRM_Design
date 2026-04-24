@@ -22,7 +22,7 @@ export const AdministrationPage = () => {
   }, [administration]);
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header>
         <h1 className="text-2xl font-semibold text-slate-900">Администрирование</h1>
       </header>

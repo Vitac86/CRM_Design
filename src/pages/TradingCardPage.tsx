@@ -130,7 +130,7 @@ export const TradingCardPage = () => {
   }
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <Card className="p-4">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10 text-base font-semibold text-brand-dark">
@@ -313,13 +313,9 @@ export const TradingCardPage = () => {
       )}
 
       {selectedTerminal && isQuikMobileTerminal(selectedTerminal.type) && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4" role="dialog" aria-modal="true" aria-labelledby="reset-password-modal-title" aria-describedby="reset-password-modal-description">
           <div
-            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-5 shadow-xl"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="reset-password-modal-title"
-            aria-describedby="reset-password-modal-description"
+            className="w-full max-w-sm max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xl"
           >
             <h3 id="reset-password-modal-title" className="text-base font-semibold text-slate-900">
               Обновить пароль?
@@ -327,7 +323,7 @@ export const TradingCardPage = () => {
             <p id="reset-password-modal-description" className="mt-2 text-sm text-slate-600">
               Вы уверены, что хотите обновить пароль для QUIK Mobile?
             </p>
-            <div className="mt-5 flex justify-end gap-2">
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
               <Button
                 size="sm"
                 variant="secondary"

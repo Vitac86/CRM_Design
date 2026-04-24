@@ -22,7 +22,7 @@ export const Pagination = ({
   ...props
 }: PaginationProps) => {
   return (
-    <div className={cn('flex items-center gap-2 text-sm text-slate-600', className)} {...props}>
+    <div className={cn('flex flex-wrap items-center gap-2 text-sm text-slate-600', className)} {...props}>
       <span className="min-w-[72px] font-medium text-slate-700">
         {page} из {totalPages}
       </span>

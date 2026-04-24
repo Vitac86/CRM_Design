@@ -129,7 +129,7 @@ export const MiddleOfficeReportsPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал отправленных отчётов</h1>
         <Button variant="secondary" onClick={handleExport} disabled={filteredReports.length === 0}>

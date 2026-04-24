@@ -370,7 +370,7 @@ export const SubjectProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+      <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
         <EmptyState title="Загрузка карточки клиента…" description="Пожалуйста, подождите." />
       </div>
     );
@@ -378,7 +378,7 @@ export const SubjectProfilePage = () => {
 
   if (error) {
     return (
-      <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+      <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
         <EmptyState title="Не удалось загрузить карточку клиента." description="Попробуйте обновить страницу." />
       </div>
     );
@@ -386,7 +386,7 @@ export const SubjectProfilePage = () => {
 
   if (!client) {
     return (
-      <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+      <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
         <EmptyState title="Клиент не найден" description="Проверьте ссылку или вернитесь к списку субъектов." />
       </div>
     );
@@ -476,7 +476,7 @@ export const SubjectProfilePage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <ClientProfileHeader
         client={currentClient}
         actions={
@@ -840,7 +840,7 @@ export const SubjectProfilePage = () => {
                 const address = isLocation ? locationAddress : mailingAddress;
                 return (
                   <div key={kind}>
-                    <div className="mb-3 flex items-center justify-between gap-4">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{isLocation ? 'Адрес местонахождения' : 'Почтовый адрес'}</p>
                       {isEditing ? (
                         <label className="inline-flex items-center gap-2 text-xs text-slate-700">
@@ -878,7 +878,7 @@ export const SubjectProfilePage = () => {
 
           <ProfileSection title="Представители">
             <div className="space-y-3">
-              <div className="flex justify-end">
+              <div className="flex flex-wrap justify-end gap-2">
                 <Button
                   variant="secondary"
                   size="sm"
@@ -1310,9 +1310,9 @@ export const SubjectProfilePage = () => {
       )}
 
       {isRepresentativeModalOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4" role="dialog" aria-modal="true" aria-label="Добавить представителя">
+          <div className="w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-base font-semibold text-slate-900">Добавить представителя</h3>
               <Button variant="secondary" size="sm" onClick={() => setIsRepresentativeModalOpen(false)}>
                 Закрыть

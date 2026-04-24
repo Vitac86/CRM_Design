@@ -163,7 +163,7 @@ export const MiddleOfficePage = () => {
   const selectedReport = filteredReports.find((report) => report.id === selectedReportId) ?? null;
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис</h1>
         <Button variant="secondary">Экспорт</Button>

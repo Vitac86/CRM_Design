@@ -94,6 +94,18 @@
 
 Следующий безопасный шаг — вынести type-only импорты из `src/data/types` и `src/data/dashboard` в feature/shared типы (без изменения runtime-поведения).
 
+
+## Layout/Responsive status
+
+- `AppShell` поддерживает dual-mode layout: desktop sidebar (lg+) и mobile/tablet drawer navigation (< lg).
+- Desktop-поведение сохранено: фиксированный sidebar слева, sticky topbar, контент с offset под sidebar.
+- Для mobile/tablet включён drawer с overlay, закрытием по click outside, Escape и навигации по пункту меню.
+- `DataTable` использует controlled horizontal scrolling внутри собственного wrapper (`overflow-x-auto`), чтобы не ломать ширину страницы.
+- Для фильтров/controls добавлены базовые responsive guard-правила (wrap и max-width), без изменения бизнес-логики.
+- Для модалок добавлены viewport-safe ограничения высоты и вертикальный scroll для длинного контента.
+- Ручной визуальный проход остаётся обязательным: см. `docs/VISUAL_QA_CHECKLIST.md`.
+- Финальная визуальная проверка должна выполняться вручную по наборам viewport sizes (390px / 768px / 1024px / 1280px / 1440px).
+
 ## Async UI foundation status
 
 В проект добавлена базовая инфраструктура для единообразной обработки async-состояний:

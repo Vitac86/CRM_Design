@@ -554,10 +554,10 @@ export const RequestsPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <header className="flex items-center justify-between gap-3">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Поручения</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="secondary" onClick={handleExport} disabled={filteredRequests.length === 0}>
             Экспорт
           </Button>
@@ -773,7 +773,7 @@ export const RequestsPage = () => {
             </div>
           ) : null}
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <Button
               variant="secondary"
               onClick={() => {
@@ -811,7 +811,7 @@ export const RequestsPage = () => {
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="По коду клиента"
             aria-label="Фильтр по коду клиента"
-            className="h-10 min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
+            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
           />
 
           <input
@@ -819,7 +819,7 @@ export const RequestsPage = () => {
             value={dateFilter}
             onChange={(event) => setDateFilter(event.target.value)}
             aria-label="Фильтр по дате"
-            className="h-10 min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
+            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
           />
 
           <SelectFilter value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value as Request['source'] | 'all')}>
@@ -840,7 +840,7 @@ export const RequestsPage = () => {
             ))}
           </SelectFilter>
 
-          <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
+          <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
             Очистить фильтры
           </Button>
         </div>

@@ -266,7 +266,7 @@ export const SubjectsPage = () => {
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold text-slate-900">Субъекты</h1>
         <Button className="w-full sm:w-auto" onClick={() => navigate('/subjects/register')}>
