@@ -74,3 +74,30 @@
 - [ ] filter card не становится чрезмерно высокой.
 - [ ] reset/export buttons не перекрывают поля.
 - [ ] mobile layout переносится в одну колонку без горизонтального overflow.
+
+## Table controls and labels consistency
+
+Проверить:
+- [ ] поиск расположен сверху панели.
+- [ ] фильтры расположены ниже поиска.
+- [ ] actions справа или корректно перенесены при переносе строк.
+- [ ] на desktop select filters остаются compact (не растягиваются на всю ширину панели).
+- [ ] на mobile filters stack без horizontal overflow.
+- [ ] тип клиента отображается одинаково во всех таблицах.
+- [ ] вид договора отображается одинаково.
+- [ ] резидентство отображается одинаково.
+- [ ] статусы отображаются одинаково.
+
+Маршруты для проверки:
+- [ ] `/subjects`
+- [ ] `/requests`
+- [ ] `/compliance`
+- [ ] `/middle-office/clients`
+- [ ] `/middle-office/reports`
+- [ ] `/depository`
+- [ ] `/trading`
+- [ ] `/documents`
+- [ ] `/brokerage`
+- [ ] `/trust-management`
+- [ ] `/archives`
+- [ ] `/agents`

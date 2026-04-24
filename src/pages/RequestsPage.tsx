@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
+import { Button, DataTable, Pagination, SearchInput, SelectFilter, TableControlPanel, TableStatusText } from '../components/ui';
 import type { Client, ClientBankDetails, ClientContract, CurrencyCode, Request } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
+import { formatRequestStatus } from '../utils/labels';
 
 const pageSize = 10;
 
@@ -540,7 +541,7 @@ export const RequestsPage = () => {
         { header: 'Код клиента', value: (request) => request.clientCode },
         { header: 'Сумма', value: (request) => request.amount ?? '—' },
         { header: 'Валюта', value: (request) => request.currency ?? '—' },
-        { header: 'Статус', value: (request) => request.status },
+        { header: 'Статус', value: (request) => formatRequestStatus(request.status) },
         { header: 'Дата', value: (request) => request.date },
         { header: 'Время', value: (request) => request.time },
         { header: 'Источник', value: (request) => request.source },
@@ -793,15 +794,17 @@ export const RequestsPage = () => {
         </div>
       ) : null}
 
-      <FilterBar>
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
+      <TableControlPanel
+        search={
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="По номеру, виду поручения, клиенту или коду"
-            className="w-full lg:w-[520px]"
             aria-label="Поиск по номеру, виду поручения, клиенту или коду"
           />
+        }
+        filters={
+          <>
           <input
             type="text"
             value={clientCodeFilter}
@@ -840,16 +843,18 @@ export const RequestsPage = () => {
             <option value="all">Статус</option>
             {statusOptions.map((status) => (
               <option key={status} value={status}>
-                {status === NEW_REQUEST_STATUS ? 'Ожидает (новые)' : status}
+                {formatRequestStatus(status)}
               </option>
             ))}
           </SelectFilter>
-
-          <Button variant="secondary" className="w-full sm:ml-auto sm:w-auto" onClick={resetFilters}>
+          </>
+        }
+        actions={
+          <Button variant="secondary" onClick={resetFilters}>
             Очистить фильтры
           </Button>
-        </div>
-      </FilterBar>
+        }
+      />
 
       <DataTable<Request>
         columns={[
@@ -862,7 +867,7 @@ export const RequestsPage = () => {
           {
             key: 'status',
             header: 'Статус',
-            render: (request) => <TableStatusText tone={requestStatusTone[request.status]}>{request.status}</TableStatusText>,
+            render: (request) => <TableStatusText tone={requestStatusTone[request.status]}>{formatRequestStatus(request.status)}</TableStatusText>,
           },
           { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
           { key: 'time', header: 'Время', className: 'whitespace-nowrap' },

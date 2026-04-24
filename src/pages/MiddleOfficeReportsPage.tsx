@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { MiddleOfficeReportDetails } from '../components/crm/MiddleOfficeReportDetails';
 import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList';
-import { Button, SearchInput, SelectFilter } from '../components/ui';
+import { Button, SearchInput, SelectFilter, TableControlPanel } from '../components/ui';
 import type { Report } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
@@ -130,46 +130,48 @@ export const MiddleOfficeReportsPage = () => {
 
   return (
     <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header>
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал отправленных отчётов</h1>
-        <Button variant="secondary" onClick={handleExport} disabled={filteredReports.length === 0}>
-          Экспорт
-        </Button>
       </header>
 
       {error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
       <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
         <div className="space-y-3">
-          <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
-            <SearchInput
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Поиск по клиенту или отчёту..."
-              className="sm:flex-1"
-            />
-            <SelectFilter
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value as Report['deliveryStatus'] | 'all')}
-              className="sm:w-[170px]"
-            >
-              <option value="all">Статус: Все</option>
-              <option value="Доставлен">Доставлен</option>
-              <option value="Ожидает">Ожидает</option>
-              <option value="Ошибка">Ошибка</option>
-            </SelectFilter>
-            <SelectFilter
-              value={channelFilter}
-              onChange={(event) =>
-                setChannelFilter(event.target.value as Extract<Report['deliveryChannel'], 'E-mail' | 'Личный кабинет'> | 'all')
-              }
-              className="sm:w-[190px]"
-            >
-              <option value="all">Канал: Все</option>
-              <option value="E-mail">E-mail</option>
-              <option value="Личный кабинет">Личный кабинет</option>
-            </SelectFilter>
-          </div>
+          <TableControlPanel
+            search={
+              <SearchInput
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Поиск по клиенту или отчёту..."
+              />
+            }
+            filters={
+              <>
+                <SelectFilter value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as Report['deliveryStatus'] | 'all')}>
+                  <option value="all">Статус</option>
+                  <option value="Доставлен">Доставлен</option>
+                  <option value="Ожидает">Ожидает</option>
+                  <option value="Ошибка">Ошибка</option>
+                </SelectFilter>
+                <SelectFilter
+                  value={channelFilter}
+                  onChange={(event) =>
+                    setChannelFilter(event.target.value as Extract<Report['deliveryChannel'], 'E-mail' | 'Личный кабинет'> | 'all')
+                  }
+                >
+                  <option value="all">Канал</option>
+                  <option value="E-mail">E-mail</option>
+                  <option value="Личный кабинет">Личный кабинет</option>
+                </SelectFilter>
+              </>
+            }
+            actions={
+              <Button variant="secondary" onClick={handleExport} disabled={filteredReports.length === 0}>
+                Экспорт
+              </Button>
+            }
+          />
 
           <MiddleOfficeReportList
             reports={isLoading ? [] : filteredReports}

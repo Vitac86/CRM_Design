@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Badge, Button, DataTable, EmptyState, FilterBar, SelectFilter } from '../components/ui';
+import { Badge, Button, DataTable, EmptyState, SelectFilter, TableControlPanel } from '../components/ui';
 import { AsyncContent } from '../shared/ui/async';
 import type { Client, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
@@ -161,51 +161,56 @@ export const CompliancePage = () => {
 
   return (
     <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header>
         <h1 className="text-2xl font-semibold text-slate-900">Комплаенс</h1>
-        <Button variant="secondary" onClick={handleExport} disabled={filteredRows.length === 0 || isLoading || Boolean(error)}>
-          Экспорт
-        </Button>
       </header>
 
-      <FilterBar>
-        <SelectFilter value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}>
-          <option value="all">Типы</option>
-          {typeOptions.map((type) => (
-            <option key={type} value={type}>
-              {formatClientType(type)}
-            </option>
-          ))}
-        </SelectFilter>
-
-        <SelectFilter
-          value={residencyFilter}
-          onChange={(event) => setResidencyFilter(event.target.value as ResidencyStatus | 'all')}
-        >
-          <option value="all">Признак резидентства</option>
-          {residencyOptions.map((residency) => (
-            <option key={residency} value={residency}>
-              {formatResidency(residency)}
-            </option>
-          ))}
-        </SelectFilter>
-
-        <SelectFilter
-          value={complianceFilter}
-          onChange={(event) => setComplianceFilter(event.target.value as ComplianceStatus | 'all')}
-        >
-          <option value="all">Статус комплаенса</option>
-          {complianceOptions.map((status) => (
-            <option key={status} value={status}>
-              {formatComplianceStatus(status)}
-            </option>
-          ))}
-        </SelectFilter>
-
-        <Button variant="secondary" className="ml-auto" onClick={resetFilters}>
-          Очистить фильтры
-        </Button>
-      </FilterBar>
+      <TableControlPanel
+        filters={
+          <>
+            <SelectFilter value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}>
+              <option value="all">Тип клиента</option>
+              {typeOptions.map((type) => (
+                <option key={type} value={type}>
+                  {formatClientType(type)}
+                </option>
+              ))}
+            </SelectFilter>
+            <SelectFilter
+              value={residencyFilter}
+              onChange={(event) => setResidencyFilter(event.target.value as ResidencyStatus | 'all')}
+            >
+              <option value="all">Резидентство</option>
+              {residencyOptions.map((residency) => (
+                <option key={residency} value={residency}>
+                  {formatResidency(residency)}
+                </option>
+              ))}
+            </SelectFilter>
+            <SelectFilter
+              value={complianceFilter}
+              onChange={(event) => setComplianceFilter(event.target.value as ComplianceStatus | 'all')}
+            >
+              <option value="all">Статус комплаенса</option>
+              {complianceOptions.map((status) => (
+                <option key={status} value={status}>
+                  {formatComplianceStatus(status)}
+                </option>
+              ))}
+            </SelectFilter>
+          </>
+        }
+        actions={
+          <>
+            <Button variant="secondary" onClick={resetFilters}>
+              Очистить фильтры
+            </Button>
+            <Button variant="secondary" onClick={handleExport} disabled={filteredRows.length === 0 || isLoading || Boolean(error)}>
+              Экспорт
+            </Button>
+          </>
+        }
+      />
 
       <AsyncContent
         isLoading={isLoading}

@@ -1,17 +1,18 @@
 import type { Client, ClientAccount, ClientContract, ContractProductType } from '../../../data/types';
+import { formatAccountStatus, formatClientType, formatContractKind, formatResidency } from '../../../utils/labels';
 
 export type ClientJournalRow = {
   id: string;
   clientCode: string;
-  contractKind: 'БО' | 'ДУ';
+  contractKind: string;
   clientName: string;
   inn: string;
-  clientType: 'ф/л' | 'ю/л';
+  clientType: string;
   contractNumber: string;
   contractDate: string;
   residencyStatus: string;
   accountType: 'обычный' | 'ИИС' | 'ИН';
-  accountStatus: 'активный' | 'закрытый';
+  accountStatus: string;
 };
 
 export const formatDate = (value: string): string => {
@@ -22,11 +23,6 @@ export const formatDate = (value: string): string => {
 
   return `${day}.${month}.${year}`;
 };
-
-export const mapContractKind = (contractType: ContractProductType): 'БО' | 'ДУ' =>
-  contractType === 'trust' ? 'ДУ' : 'БО';
-
-export const mapClientType = (type: string): 'ф/л' | 'ю/л' => (type === 'ФЛ' || type === 'ИП' ? 'ф/л' : 'ю/л');
 
 export const mapAccountType = (type: ContractProductType): 'обычный' | 'ИИС' | 'ИН' => {
   if (type === 'iis') {
@@ -40,8 +36,7 @@ export const mapAccountType = (type: ContractProductType): 'обычный' | '�
   return 'обычный';
 };
 
-export const getAccountStatus = (contract: ClientContract): 'активный' | 'закрытый' =>
-  contract.status === 'active' ? 'активный' : 'закрытый';
+export const getAccountStatus = (contract: ClientContract): string => formatAccountStatus(contract.status);
 
 export const buildClientJournalRows = (
   clients: Client[],
@@ -62,13 +57,13 @@ export const buildClientJournalRows = (
       return {
         id: `${client.id}-${contract.id}`,
         clientCode: client.code,
-        contractKind: mapContractKind(contract.type),
+        contractKind: formatContractKind(contract.type),
         clientName: client.name,
         inn: client.inn,
-        clientType: mapClientType(client.type),
+        clientType: formatClientType(client.type),
         contractNumber: contract.number,
         contractDate: formatDate(contract.openDate),
-        residencyStatus: client.residency,
+        residencyStatus: formatResidency(client.residency),
         accountType: matchedAccount ? mapAccountType(matchedAccount.type) : mapAccountType(contract.type),
         accountStatus: getAccountStatus(contract),
       };
