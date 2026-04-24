@@ -52,7 +52,13 @@
 - `AccountsRepository` добавлен в `DataAccessProvider` и отвечает за счета клиента в demo-mode через `src/features/accounts/mock/mockAccountsRepository.ts`.
 - Demo-инициализация active broker/depository договоров для активных клиентов выполняется внутри `src/features/contracts/mock/mockContractsRepository.ts` (а не в seed-файле).
 - `src/data/clientContracts.ts` используется как seed/pure-helper источник без runtime mutations.
-- `ClientsProvider` пока остаётся в runtime: `useClientsStore` всё ещё используется в `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `SubjectRelationsTab`.
+- `AgentsPage` использует `useDataAccess().agents` и `useDataAccess().clients` (без `useClientsStore`).
+- `SubjectRelationsTab` использует `useDataAccess().relations`, `useDataAccess().agents` и `useDataAccess().clients`; runtime-импорты `src/data/clientRelations` удалены.
+- `AgentsRepository` добавлен в `DataAccessProvider` и отвечает за агентов и связи агент-клиент в demo-mode.
+- `RelationsRepository` добавлен в `DataAccessProvider` и отвечает за read-only связи клиента.
+- `src/data/agents.ts` используется как seed-only файл.
+- `src/data/clientRelations.ts` остаётся seed + legacy read-helper (`getRelationsByClientId`) для `ComplianceCardPage`.
+- `ClientsProvider` пока остаётся в runtime: `useClientsStore` всё ещё используется в `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`.
 - Contract-related screens, уже мигрированные на data-access: `RequestsPage`, `SubjectProfilePage`, `SubjectContractsTab`, `ContractWizardPage`.
 - Остаточный technical debt по контрактам: `MiddleOfficePage` и `MiddleOfficeClientsPage` всё ещё читают `clientContracts` напрямую для витринных вычислений.
 

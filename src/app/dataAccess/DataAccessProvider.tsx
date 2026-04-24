@@ -4,21 +4,26 @@ import { createMockContractsRepository } from '../../features/contracts/mock/moc
 import { createMockDashboardRepository } from '../../features/dashboard/mock/mockDashboardRepository';
 import { createMockRequestsRepository } from '../../features/requests/mock/mockRequestsRepository';
 import { createMockAccountsRepository } from '../../features/accounts/mock/mockAccountsRepository';
+import { createMockAgentsRepository } from '../../features/agents/mock/mockAgentsRepository';
+import { createMockRelationsRepository } from '../../features/relations/mock/mockRelationsRepository';
 import type { DataAccessContextValue } from './types';
 
 export const DataAccessContext = createContext<DataAccessContextValue | undefined>(undefined);
 
 export const DataAccessProvider = ({ children }: { children: ReactNode }) => {
-  const value = useMemo<DataAccessContextValue>(
-    () => ({
-      clients: createMockClientsRepository(),
+  const value = useMemo<DataAccessContextValue>(() => {
+    const clientsRepository = createMockClientsRepository();
+
+    return {
+      clients: clientsRepository,
       requests: createMockRequestsRepository(),
       contracts: createMockContractsRepository(),
       dashboard: createMockDashboardRepository(),
       accounts: createMockAccountsRepository(),
-    }),
-    [],
-  );
+      agents: createMockAgentsRepository({ clientsRepository }),
+      relations: createMockRelationsRepository(),
+    };
+  }, []);
 
   return <DataAccessContext.Provider value={value}>{children}</DataAccessContext.Provider>;
 };

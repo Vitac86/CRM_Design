@@ -11,7 +11,7 @@ export interface AgentClientLink {
   createdAt: string;
 }
 
-export const agents: AgentProfile[] = [
+export const agents: readonly AgentProfile[] = [
   {
     subjectId: 'c-003',
     contractNumber: 'AG-2041',
@@ -29,7 +29,7 @@ export const agents: AgentProfile[] = [
   },
 ];
 
-export const agentClientLinks: AgentClientLink[] = [
+export const agentClientLinks: readonly AgentClientLink[] = [
   {
     id: 'agent-client-1',
     agentSubjectId: 'c-003',
