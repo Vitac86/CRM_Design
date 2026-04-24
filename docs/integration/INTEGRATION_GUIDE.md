@@ -25,15 +25,16 @@
 
 ## Migration status
 
-После завершения шага 3:
+После завершения текущего шага миграции:
 
-- `RequestsPage` уже переведена на `useDataAccess().requests` для операций `listRequests` и `createRequest`.
-- В `RequestsPage` временно оставлен runtime-import `getContractsByClientId` из `src/data/clientContracts`, потому что миграция contracts будет выделена в отдельный шаг.
-- `src/data/requests` больше не должен импортироваться напрямую из `RequestsPage`.
+- `RequestsPage` использует `useDataAccess().requests` и `useDataAccess().contracts`.
+- `DashboardPage` использует `useDataAccess().dashboard` и `useDataAccess().requests`.
+- `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
+- `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
 
 ### Recommended next step
 
-Перевести contracts access в `RequestsPage` на `useDataAccess().contracts`.
+Перевести на `useDataAccess` следующие UI-экраны, которые ещё читают `src/data/*` напрямую.
 
 ## Что будет сделано в следующих шагах
 
