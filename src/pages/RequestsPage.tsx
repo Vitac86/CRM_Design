@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { useClientsStore } from '../app/ClientsStore';
 import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
-import type { ClientBankDetails, ClientContract, CurrencyCode, Request } from '../data/types';
+import type { Client, ClientBankDetails, ClientContract, CurrencyCode, Request } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 const pageSize = 10;
@@ -58,10 +57,12 @@ const escapeHtml = (value: string): string =>
     .replace(/'/g, '&#039;');
 
 export const RequestsPage = () => {
-  const { requests: requestsDataAccess, contracts: contractsDataAccess } = useDataAccess();
-  const { clients, getClientById } = useClientsStore();
+  const { clients: clientsDataAccess, requests: requestsDataAccess, contracts: contractsDataAccess } = useDataAccess();
   const [searchParams, setSearchParams] = useSearchParams();
   const [requestsList, setRequestsList] = useState<Request[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoadingClients, setIsLoadingClients] = useState(true);
+  const [clientsError, setClientsError] = useState<string | null>(null);
   const [isLoadingRequests, setIsLoadingRequests] = useState(true);
   const [requestsError, setRequestsError] = useState<string | null>(null);
   const [isCreatingRequest, setIsCreatingRequest] = useState(false);
@@ -118,7 +119,7 @@ export const RequestsPage = () => {
   }, [selectedClientId, contractsByClientId]);
   const hasLoadedSelectedClientContracts = selectedClientId in contractsByClientId;
 
-  const selectedClient = selectedClientId ? getClientById(selectedClientId) : undefined;
+  const selectedClient = selectedClientId ? clients.find((client) => client.id === selectedClientId) : undefined;
   const selectedContract = availableContracts.find((contract) => contract.id === selectedContractId);
   const selectedBankAccount = selectedClient?.bankAccounts?.[0];
 
@@ -222,6 +223,36 @@ export const RequestsPage = () => {
     const timer = window.setTimeout(() => setToastMessage(null), 2200);
     return () => window.clearTimeout(timer);
   }, [toastMessage]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadClients = async () => {
+      setIsLoadingClients(true);
+      setClientsError(null);
+
+      try {
+        const loadedClients = await clientsDataAccess.listClients();
+        if (!isCancelled) {
+          setClients(loadedClients);
+        }
+      } catch {
+        if (!isCancelled) {
+          setClientsError('Не удалось загрузить список клиентов для создания поручения.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingClients(false);
+        }
+      }
+    };
+
+    void loadClients();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [clientsDataAccess]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -552,6 +583,9 @@ export const RequestsPage = () => {
 
       {isCreateFormOpen ? (
         <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          {clientsError ? (
+            <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{clientsError}</div>
+          ) : null}
           {formError ? <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{formError}</div> : null}
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -572,6 +606,7 @@ export const RequestsPage = () => {
               <select
                 value={selectedClientId}
                 onChange={(event) => setSelectedClientId(event.target.value)}
+                disabled={isLoadingClients || Boolean(clientsError)}
                 className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="">Выберите клиента</option>
@@ -732,7 +767,7 @@ export const RequestsPage = () => {
             </div>
           ) : null}
 
-          {clientOptions.length === 0 ? (
+          {clientOptions.length === 0 && !isLoadingClients && !clientsError ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
               Нет клиентов, подходящих под выбранный тип поручения.
             </div>
