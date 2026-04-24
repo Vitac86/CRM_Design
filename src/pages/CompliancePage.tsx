@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Badge, Button, DataTable, EmptyState, FilterBar, SelectFilter } from '../components/ui';
+import { AsyncContent } from '../shared/ui/async';
 import type { Client, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
   formatClientType,
@@ -206,16 +207,14 @@ export const CompliancePage = () => {
         </Button>
       </FilterBar>
 
-      {isLoading ? (
-        <EmptyState title="Загрузка..." description="Загружаем список комплаенса." />
-      ) : error ? (
-        <EmptyState title="Ошибка загрузки" description={error} />
-      ) : filteredRows.length === 0 ? (
-        <EmptyState
-          title="Нет записей"
-          description="По выбранным фильтрам не найдено карточек комплаенса."
-        />
-      ) : (
+      <AsyncContent
+        isLoading={isLoading}
+        error={error}
+        isEmpty={filteredRows.length === 0}
+        loadingFallback={<EmptyState title="Загрузка..." description="Загружаем список комплаенса." />}
+        errorFallback={error ? <EmptyState title="Ошибка загрузки" description={error} /> : undefined}
+        emptyFallback={<EmptyState title="Нет записей" description="По выбранным фильтрам не найдено карточек комплаенса." />}
+      >
         <DataTable<ComplianceRow>
           columns={[
             { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800 whitespace-nowrap' },
@@ -250,7 +249,7 @@ export const CompliancePage = () => {
           onRowClick={(row) => navigate(`/compliance/${row.id}`)}
           emptyMessage="По выбранным фильтрам данных нет"
         />
-      )}
+      </AsyncContent>
     </div>
   );
 };

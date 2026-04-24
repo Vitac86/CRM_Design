@@ -5,6 +5,7 @@ import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList
 import { Button, DataTable, EmptyState, SearchInput, SelectFilter, Tabs } from '../components/ui';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
 import type { Client, ClientAccount, ClientContract, Report } from '../data/types';
+import { AsyncContent } from '../shared/ui/async';
 
 type MiddleOfficeSection = 'clients-journal' | 'reports-journal';
 
@@ -170,11 +171,13 @@ export const MiddleOfficePage = () => {
 
       <Tabs items={[...tabs]} value={section} onChange={(value) => setSection(value as MiddleOfficeSection)} />
 
-      {isLoading ? (
-        <EmptyState title="Загрузка..." description="Загружаем данные мидл-офиса." />
-      ) : error ? (
-        <EmptyState title="Ошибка загрузки" description={error} />
-      ) : section === 'clients-journal' ? (
+      <AsyncContent
+        isLoading={isLoading}
+        error={error}
+        loadingFallback={<EmptyState title="Загрузка..." description="Загружаем данные мидл-офиса." />}
+        errorFallback={error ? <EmptyState title="Ошибка загрузки" description={error} /> : undefined}
+      >
+        {section === 'clients-journal' ? (
         <section className="space-y-3">
           <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
             <SearchInput
@@ -272,6 +275,7 @@ export const MiddleOfficePage = () => {
           />
         </section>
       )}
+      </AsyncContent>
 
       {toastMessage && (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>

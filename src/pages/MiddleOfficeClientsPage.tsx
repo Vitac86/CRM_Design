@@ -4,6 +4,7 @@ import { Button, DataTable, EmptyState, SearchInput, SelectFilter, type SortDire
 import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
+import { AsyncContent } from '../shared/ui/async';
 
 type ClientJournalSortKey =
   | 'clientCode'
@@ -208,11 +209,12 @@ export const MiddleOfficeClientsPage = () => {
         </Button>
       </header>
 
-      {isLoading ? (
-        <EmptyState title="Загрузка..." description="Загружаем журнал клиентов мидл-офиса." />
-      ) : error ? (
-        <EmptyState title="Ошибка загрузки" description={error} />
-      ) : (
+      <AsyncContent
+        isLoading={isLoading}
+        error={error}
+        loadingFallback={<EmptyState title="Загрузка..." description="Загружаем журнал клиентов мидл-офиса." />}
+        errorFallback={error ? <EmptyState title="Ошибка загрузки" description={error} /> : undefined}
+      >
         <section className="space-y-3">
           <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
             <SearchInput
@@ -282,7 +284,7 @@ export const MiddleOfficeClientsPage = () => {
             ]}
           />
         </section>
-      )}
+      </AsyncContent>
     </div>
   );
 };
