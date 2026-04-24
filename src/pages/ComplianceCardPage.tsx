@@ -1,16 +1,9 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
-import { useClientsStore } from '../app/ClientsStore';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Badge, Button, Card, EmptyState } from '../components/ui';
 import { ProfileField } from '../components/crm/ProfileField';
-import {
-  getComplianceCaseByClientId,
-  getIndividualComplianceCardByClientId,
-  getLegalEntityComplianceCardByClientId,
-} from '../data/compliance';
-import { getDocumentsByClientId } from '../data/clientDocuments';
-import { getRelationsByClientId } from '../data/clientRelations';
-import type { ComplianceStatus } from '../data/types';
+import type { Client, ClientDocument, ClientRelation, ComplianceCase, ComplianceStatus, IndividualComplianceCard, LegalEntityComplianceCard } from '../data/types';
 import {
   formatClientType,
   formatComplianceStatus,
@@ -49,20 +42,110 @@ const SectionCard = ({ title, children }: { title: string; children: ReactNode }
 
 export const ComplianceCardPage = () => {
   const { id } = useParams();
-  const { getClientById, updateClient } = useClientsStore();
+  const {
+    clients: clientsRepository,
+    compliance: complianceRepository,
+    documents: documentsRepository,
+    relations: relationsRepository,
+  } = useDataAccess();
 
-  const client = useMemo(() => (id ? getClientById(id) : undefined), [id]);
-  const complianceCase = useMemo(() => (client ? getComplianceCaseByClientId(client.id) : undefined), [client]);
-  const legalCard = useMemo(() => (client ? getLegalEntityComplianceCardByClientId(client.id) : undefined), [client]);
-  const individualCard = useMemo(() => (client ? getIndividualComplianceCardByClientId(client.id) : undefined), [client]);
-  const documents = useMemo(() => (client ? getDocumentsByClientId(client.id) : []), [client]);
-  const relations = useMemo(() => (client ? getRelationsByClientId(client.id) : []), [client]);
+  const [client, setClient] = useState<Client | null>(null);
+  const [complianceCase, setComplianceCase] = useState<ComplianceCase | null>(null);
+  const [legalCard, setLegalCard] = useState<LegalEntityComplianceCard | null>(null);
+  const [individualCard, setIndividualCard] = useState<IndividualComplianceCard | null>(null);
+  const [documents, setDocuments] = useState<ClientDocument[]>([]);
+  const [relations, setRelations] = useState<ClientRelation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [currentStatus, setCurrentStatus] = useState<ComplianceStatus>('НА ПРОВЕРКЕ');
   const [selectedDecision, setSelectedDecision] = useState<DecisionStatus>('ПРОЙДЕН');
   const [commentDraft, setCommentDraft] = useState('');
   const [commentError, setCommentError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCard = async () => {
+      if (!id) {
+        if (isMounted) {
+          setClient(null);
+          setComplianceCase(null);
+          setLegalCard(null);
+          setIndividualCard(null);
+          setDocuments([]);
+          setRelations([]);
+          setIsLoading(false);
+          setError(null);
+        }
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const loadedClient = await clientsRepository.getClientById(id);
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!loadedClient) {
+          setClient(null);
+          setComplianceCase(null);
+          setLegalCard(null);
+          setIndividualCard(null);
+          setDocuments([]);
+          setRelations([]);
+          return;
+        }
+
+        const [loadedComplianceCase, loadedLegalCard, loadedIndividualCard, loadedDocuments, loadedRelations] = await Promise.all([
+          complianceRepository.getComplianceCaseByClientId(loadedClient.id),
+          complianceRepository.getLegalEntityComplianceCardByClientId(loadedClient.id),
+          complianceRepository.getIndividualComplianceCardByClientId(loadedClient.id),
+          documentsRepository.listDocumentsByClientId(loadedClient.id),
+          relationsRepository.listRelationsByClientId(loadedClient.id),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setClient(loadedClient);
+        setComplianceCase(loadedComplianceCase);
+        setLegalCard(loadedLegalCard);
+        setIndividualCard(loadedIndividualCard);
+        setDocuments(loadedDocuments);
+        setRelations(loadedRelations);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setError('Не удалось загрузить карточку комплаенса.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadCard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    id,
+    clientsRepository,
+    complianceRepository,
+    documentsRepository,
+    relationsRepository,
+  ]);
 
   useEffect(() => {
     if (!client) {
@@ -83,6 +166,14 @@ export const ComplianceCardPage = () => {
     const timer = window.setTimeout(() => setToastMessage(null), 2400);
     return () => window.clearTimeout(timer);
   }, [toastMessage]);
+
+  if (isLoading) {
+    return <EmptyState title="Загрузка..." description="Загружаем карточку комплаенса." />;
+  }
+
+  if (error) {
+    return <EmptyState title="Ошибка загрузки" description={error} />;
+  }
 
   if (!client) {
     return (
@@ -113,7 +204,7 @@ export const ComplianceCardPage = () => {
   const shouldRequireComment = selectedDecision === 'НА ДОРАБОТКЕ' || selectedDecision === 'ЗАБЛОКИРОВАН';
   const shouldShowCommentBox = shouldRequireComment || currentStatus === 'НА ДОРАБОТКЕ' || currentStatus === 'ЗАБЛОКИРОВАН';
 
-  const applyFinalDecision = () => {
+  const applyFinalDecision = async () => {
     const trimmedComment = commentDraft.trim();
 
     if (shouldRequireComment && !trimmedComment) {
@@ -125,14 +216,20 @@ export const ComplianceCardPage = () => {
       return;
     }
 
-    updateClient(client.id, {
+    const updatedClient = await clientsRepository.updateClient(client.id, {
       complianceStatus: selectedDecision,
       complianceComment: trimmedComment || undefined,
       complianceOfficer: client.complianceOfficer ?? complianceCase?.analyst,
       complianceDate: new Date().toISOString().slice(0, 10),
     });
 
-    setCurrentStatus(selectedDecision);
+    if (!updatedClient) {
+      setToastMessage('Не удалось сохранить финальное решение.');
+      return;
+    }
+
+    setClient(updatedClient);
+    setCurrentStatus(updatedClient.complianceStatus);
     setCommentError(null);
     setToastMessage(`Финальное решение принято. Новый статус: ${formatComplianceStatus(selectedDecision)}.`);
   };
@@ -417,7 +514,7 @@ export const ComplianceCardPage = () => {
             </div>
           )}
 
-          <Button className="w-full" onClick={applyFinalDecision}>
+          <Button className="w-full" onClick={() => void applyFinalDecision()}>
             Принять финальное решение
           </Button>
 

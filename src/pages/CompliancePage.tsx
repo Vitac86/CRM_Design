@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Badge, Button, DataTable, EmptyState, FilterBar, SelectFilter } from '../components/ui';
-import { useClientsStore } from '../app/ClientsStore';
-import type { ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
+import type { Client, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
   formatClientType,
   formatComplianceStatus,
@@ -27,8 +26,12 @@ type ComplianceRow = {
 
 export const CompliancePage = () => {
   const navigate = useNavigate();
-  const { clients } = useClientsStore();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { clients: clientsRepository } = useDataAccess();
+
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [typeFilter, setTypeFilter] = useState<ClientType | 'all'>(() => {
     const value = searchParams.get('type');
@@ -43,9 +46,44 @@ export const CompliancePage = () => {
     return value === 'ПРОЙДЕН' || value === 'НА ПРОВЕРКЕ' || value === 'НА ДОРАБОТКЕ' || value === 'ЗАБЛОКИРОВАН' ? value : 'all';
   });
 
-  const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], []);
-  const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], []);
-  const complianceOptions = useMemo(() => [...new Set(clients.map((client) => client.complianceStatus))], []);
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadClients = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const loadedClients = await clientsRepository.listClients();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setClients(loadedClients);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setError('Не удалось загрузить список комплаенса.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadClients();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientsRepository]);
+
+  const typeOptions = useMemo(() => [...new Set(clients.map((client) => client.type))], [clients]);
+  const residencyOptions = useMemo(() => [...new Set(clients.map((client) => client.residency))], [clients]);
+  const complianceOptions = useMemo(() => [...new Set(clients.map((client) => client.complianceStatus))], [clients]);
 
   const rows = useMemo<ComplianceRow[]>(
     () =>
@@ -59,7 +97,7 @@ export const CompliancePage = () => {
         complianceStatus: client.complianceStatus,
         fullDocumentSet: client.fullDocumentSet,
       })),
-    [],
+    [clients],
   );
 
   const filteredRows = useMemo(
@@ -124,7 +162,7 @@ export const CompliancePage = () => {
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Комплаенс</h1>
-        <Button variant="secondary" onClick={handleExport} disabled={filteredRows.length === 0}>
+        <Button variant="secondary" onClick={handleExport} disabled={filteredRows.length === 0 || isLoading || Boolean(error)}>
           Экспорт
         </Button>
       </header>
@@ -168,7 +206,11 @@ export const CompliancePage = () => {
         </Button>
       </FilterBar>
 
-      {filteredRows.length === 0 ? (
+      {isLoading ? (
+        <EmptyState title="Загрузка..." description="Загружаем список комплаенса." />
+      ) : error ? (
+        <EmptyState title="Ошибка загрузки" description={error} />
+      ) : filteredRows.length === 0 ? (
         <EmptyState
           title="Нет записей"
           description="По выбранным фильтрам не найдено карточек комплаенса."
