@@ -137,6 +137,8 @@ export type BankAccount = {
   isPrimary?: boolean;
 };
 
+export type CurrencyCode = BankAccount['currency'];
+
 export interface ClientBankDetails {
   bankName: string;
   bik: string;
@@ -310,6 +312,8 @@ export interface Request {
   date: string;
   time: string;
   source: 'Личный кабинет' | 'Почта' | 'Оригинал';
+  amount?: string;
+  currency?: CurrencyCode;
   withdrawalBankDetails?: ClientBankDetails;
   transferFromMarket?: 'Валютный рынок' | 'Фондовый рынок';
   transferToMarket?: 'Валютный рынок' | 'Фондовый рынок';

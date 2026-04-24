@@ -4,7 +4,7 @@ import { useClientsStore } from '../app/ClientsStore';
 import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
 import { NEW_REQUEST_STATUS, createRequest, requests } from '../data/requests';
 import { getContractsByClientId } from '../data/clientContracts';
-import type { ClientBankDetails, Request } from '../data/types';
+import type { ClientBankDetails, CurrencyCode, Request } from '../data/types';
 
 const pageSize = 10;
 
@@ -30,6 +30,22 @@ const defaultManualBankDetails: ClientBankDetails = {
   bik: '',
   checkingAccount: '',
   correspondentAccount: '',
+};
+
+const requestCurrencyOptions: CurrencyCode[] = ['RUB', 'USD', 'EUR', 'CNY'];
+
+const formatAmountByDigits = (rawValue: string): string => {
+  const digits = rawValue.replace(/\D/g, '').slice(0, 15);
+  if (!digits) {
+    return '';
+  }
+
+  const normalized = digits.replace(/^0+(?=\d)/, '');
+  const padded = normalized.padStart(3, '0');
+  const integerPart = padded.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const fractionPart = padded.slice(-2);
+
+  return `${integerPart},${fractionPart}`;
 };
 
 const escapeHtml = (value: string): string =>
@@ -65,6 +81,8 @@ export const RequestsPage = () => {
   const [manualBankDetails, setManualBankDetails] = useState<ClientBankDetails>(defaultManualBankDetails);
   const [withdrawalBankSource, setWithdrawalBankSource] = useState<'client' | 'manual'>('client');
   const [transferFromMarket, setTransferFromMarket] = useState<TransferMarket>('Фондовый рынок');
+  const [requestAmount, setRequestAmount] = useState('');
+  const [requestCurrency, setRequestCurrency] = useState<CurrencyCode | ''>('');
   const [formError, setFormError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -215,12 +233,22 @@ export const RequestsPage = () => {
     setTransferFromMarket('Фондовый рынок');
     setWithdrawalBankSource('client');
     setManualBankDetails(defaultManualBankDetails);
+    setRequestAmount('');
+    setRequestCurrency('');
     setFormError(null);
   };
 
   const handleCreateRequest = () => {
     if (!selectedClient || !selectedContract) {
       setFormError('Выберите клиента и договор для создания поручения.');
+      return;
+    }
+    if (!requestAmount) {
+      setFormError('Укажите сумму поручения в формате NNN NNN,NN.');
+      return;
+    }
+    if (!requestCurrency) {
+      setFormError('Выберите валюту поручения.');
       return;
     }
 
@@ -263,6 +291,8 @@ export const RequestsPage = () => {
       date,
       time,
       source: selectedSource,
+      amount: requestAmount,
+      currency: requestCurrency,
       withdrawalBankDetails: withdrawalDetails,
       transferFromMarket: createType === 'transfer' ? transferFromMarket : undefined,
       transferToMarket: createType === 'transfer' ? transferToMarket : undefined,
@@ -299,6 +329,9 @@ export const RequestsPage = () => {
   const validateDraftForExport = (): string | null => {
     if (!selectedClient || !selectedContract) {
       return 'Для печати заполните обязательные поля: клиент и договор.';
+    }
+    if (!requestAmount || !requestCurrency) {
+      return 'Для печати заполните обязательные поля: сумма и валюта.';
     }
 
     const withdrawalDetails = getDraftWithdrawalDetails();
@@ -370,6 +403,8 @@ export const RequestsPage = () => {
           <tr><td><strong>Договор</strong></td><td>${escapeHtml(selectedContract.number)}</td></tr>
           <tr><td><strong>Статус</strong></td><td>Ожидает</td></tr>
           <tr><td><strong>Источник</strong></td><td>${escapeHtml(selectedSource)}</td></tr>
+          <tr><td><strong>Сумма</strong></td><td>${escapeHtml(requestAmount)}</td></tr>
+          <tr><td><strong>Валюта</strong></td><td>${escapeHtml(requestCurrency)}</td></tr>
           ${detailsRows}
         </table>
       </body>
@@ -461,6 +496,31 @@ export const RequestsPage = () => {
                 <option value="Личный кабинет">Личный кабинет</option>
                 <option value="Почта">Почта</option>
                 <option value="Оригинал">Оригинал</option>
+              </select>
+            </label>
+
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Сумма *</span>
+              <input
+                inputMode="decimal"
+                placeholder="0,00"
+                value={requestAmount}
+                onChange={(event) => setRequestAmount(formatAmountByDigits(event.target.value))}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+              />
+            </label>
+
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Валюта *</span>
+              <select
+                value={requestCurrency}
+                onChange={(event) => setRequestCurrency(event.target.value as CurrencyCode | '')}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+              >
+                <option value="">Выберите валюту</option>
+                {requestCurrencyOptions.map((currency) => (
+                  <option key={currency} value={currency}>{currency}</option>
+                ))}
               </select>
             </label>
           </div>
@@ -640,6 +700,8 @@ export const RequestsPage = () => {
           { key: 'requestType', header: 'Вид поручения', className: 'min-w-[220px]' },
           { key: 'clientName', header: 'Клиент', className: 'min-w-[260px]' },
           { key: 'clientCode', header: 'Код клиента', className: 'whitespace-nowrap' },
+          { key: 'amount', header: 'Сумма', render: (request) => request.amount ?? '—', className: 'whitespace-nowrap' },
+          { key: 'currency', header: 'Валюта', render: (request) => request.currency ?? '—', className: 'whitespace-nowrap' },
           {
             key: 'status',
             header: 'Статус',
