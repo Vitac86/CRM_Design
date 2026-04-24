@@ -1,113 +1,46 @@
-import { useMemo, useState, type ReactNode } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useClientsStore } from '../app/ClientsStore';
-import { createClientContract } from '../data/clientContracts';
-import type { Client, ContractProductType } from '../data/types';
+import {
+  createClientContract,
+  createDefaultContractConfig,
+  getClientContractById,
+  getContractConfigById,
+  updateClientContract,
+  updateContractConfig,
+} from '../data/clientContracts';
+import type { Client, ContractProductType, ContractWizardConfig } from '../data/types';
 import { Button, Card, EmptyState } from '../components/ui';
 
-type PersonTypeOption = 'individual' | 'legal' | 'entrepreneur';
+const createInitialState = (client: Client): ContractWizardConfig =>
+  createDefaultContractConfig({
+    clientEmail: client.email,
+    clientType: client.type,
+  });
 
-type WizardState = {
-  joinedUnder428: {
-    brokerageContract: boolean;
-    depositoryContract: boolean;
-  };
-  personType: PersonTypeOption;
-  depoAccount: {
-    owner: boolean;
-    nomineeHolder: boolean;
-    trustManager: boolean;
-  };
-  depoOperatorEnabled: boolean;
-  tradingDepoAccount: {
-    owner: boolean;
-    nomineeHolder: boolean;
-    trustManager: boolean;
-  };
-  tradingDepoOperatorEnabled: boolean;
-  clearingOrganizations: {
-    nkc: boolean;
-    nrd: boolean;
-  };
-  reporting: {
-    office: boolean;
-    post: boolean;
-    emailEnabled: boolean;
-    email: string;
-    edo: boolean;
-  };
-  brokerageMarkets: {
-    tariff: string;
-    stockMarket: boolean;
-    futuresMarket: boolean;
-    currencyAndMetalsMarket: boolean;
-  };
-  additionalJoinTerms: {
-    electronicSignature: boolean;
-    quikProgram: boolean;
-  };
-  incomeTransfer: {
-    specialBrokerAccount: boolean;
-    bankDetails: boolean;
-  };
-};
-
-const wizardDrafts = new Map<string, WizardState>();
-
-const resolvePersonType = (clientType: Client['type']): PersonTypeOption => {
-  if (clientType === 'ФЛ') {
-    return 'individual';
+const resolveContractType = (form: ContractWizardConfig): ContractProductType => {
+  if (form.joinedUnder428.depositoryContract) {
+    return 'depository';
   }
 
-  if (clientType === 'ИП') {
-    return 'entrepreneur';
+  if (form.joinedUnder428.brokerageContract) {
+    return 'broker';
   }
 
-  return 'legal';
+  return 'other';
 };
 
-const createInitialState = (client: Client): WizardState => ({
-  joinedUnder428: {
-    brokerageContract: true,
-    depositoryContract: true,
-  },
-  personType: resolvePersonType(client.type),
-  depoAccount: {
-    owner: true,
-    nomineeHolder: false,
-    trustManager: false,
-  },
-  depoOperatorEnabled: true,
-  tradingDepoAccount: {
-    owner: true,
-    nomineeHolder: false,
-    trustManager: false,
-  },
-  tradingDepoOperatorEnabled: true,
-  clearingOrganizations: {
-    nkc: true,
-    nrd: false,
-  },
-  reporting: {
-    office: false,
-    post: false,
-    emailEnabled: Boolean(client.email?.trim()),
-    email: client.email?.trim() || '',
-    edo: true,
-  },
-  brokerageMarkets: {
-    tariff: 'Универсальный',
-    stockMarket: true,
-    futuresMarket: false,
-    currencyAndMetalsMarket: true,
-  },
-  additionalJoinTerms: {
-    electronicSignature: false,
-    quikProgram: false,
-  },
-  incomeTransfer: {
-    specialBrokerAccount: true,
-    bankDetails: false,
+const mapContractConfigToClientPatch = (form: ContractWizardConfig) => ({
+  canUseMoney: form.incomeTransfer.specialBrokerAccount,
+  canUseSecurities: form.tradingDepoOperatorEnabled,
+  reportDelivery: {
+    email: {
+      enabled: form.reporting.emailEnabled,
+      address: form.reporting.email,
+    },
+    personalAccount: {
+      enabled: form.reporting.edo,
+    },
   },
 });
 
@@ -127,8 +60,9 @@ const Check = ({ checked, onChange, label }: { checked: boolean; onChange: (valu
 
 export const ContractWizardPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { subjectId } = useParams();
-  const { getClientById } = useClientsStore();
+  const { getClientById, updateClient } = useClientsStore();
 
   const client = useMemo(() => {
     if (!subjectId) {
@@ -138,20 +72,39 @@ export const ContractWizardPage = () => {
     return getClientById(subjectId);
   }, [getClientById, subjectId]);
 
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const [form, setForm] = useState<WizardState | null>(() => {
-    if (!client) {
-      return null;
+  const contractId = searchParams.get('contractId')?.trim() || null;
+  const editingContract = useMemo(() => {
+    if (!contractId) {
+      return undefined;
     }
 
-    return wizardDrafts.get(client.id) ?? createInitialState(client);
-  });
+    return getClientContractById(contractId);
+  }, [contractId]);
+  const isEditMode = Boolean(editingContract);
 
-  if (!client || !form) {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [form, setForm] = useState<ContractWizardConfig | null>(null);
+
+  useEffect(() => {
+    if (!client) {
+      setForm(null);
+      return;
+    }
+
+    if (editingContract && editingContract.clientId === client.id) {
+      const storedConfig = getContractConfigById(editingContract.id);
+      setForm(storedConfig ?? createInitialState(client));
+      return;
+    }
+
+    setForm(createInitialState(client));
+  }, [client, editingContract]);
+
+  if (!client || !form || (editingContract && editingContract.clientId !== client.id)) {
     return (
       <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-        <EmptyState title="Клиент не найден" description="Не удалось открыть мастер оформления договора для выбранного субъекта." />
+        <EmptyState title="Клиент или договор не найден" description="Не удалось открыть мастер оформления договора для выбранного субъекта." />
         <div>
           <Button variant="secondary" onClick={() => navigate(-1)}>
             Назад
@@ -161,10 +114,20 @@ export const ContractWizardPage = () => {
     );
   }
 
-  const saveDraft = () => {
-    wizardDrafts.set(client.id, form);
-    setToastMessage('Настройки сохранены');
+  const showToast = (message: string) => {
+    setToastMessage(message);
     window.setTimeout(() => setToastMessage(null), 2000);
+  };
+
+  const persistDraft = () => {
+    if (!isEditMode || !editingContract) {
+      showToast('Черновик доступен после создания договора');
+      return;
+    }
+
+    updateContractConfig(editingContract.id, form);
+    updateClient(client.id, mapContractConfigToClientPatch(form));
+    showToast('Настройки договора сохранены');
   };
 
   const exportStatement = () => {
@@ -176,20 +139,31 @@ export const ContractWizardPage = () => {
     link.download = `statement-${client.code}.txt`;
     link.click();
     URL.revokeObjectURL(url);
-    setToastMessage('Заявление выгружено');
-    window.setTimeout(() => setToastMessage(null), 2000);
+    showToast('Заявление выгружено');
   };
 
-  const concludeContract = () => {
-    const contractType: ContractProductType = form.joinedUnder428.depositoryContract ? 'depository' : 'broker';
-    createClientContract({
+  const submitContract = () => {
+    const contractType = resolveContractType(form);
+
+    if (isEditMode && editingContract) {
+      updateClientContract(editingContract.id, { type: contractType });
+      updateContractConfig(editingContract.id, form);
+      updateClient(client.id, mapContractConfigToClientPatch(form));
+
+      navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${editingContract.number} обновлён` } });
+      return;
+    }
+
+    const createdContract = createClientContract({
       clientId: client.id,
       type: contractType,
       status: 'active',
       closeDate: null,
+      config: form,
     });
 
-    navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: 'Договор оформлен' } });
+    updateClient(client.id, mapContractConfigToClientPatch(form));
+    navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${createdContract.number} оформлен` } });
   };
 
   return (
@@ -197,11 +171,11 @@ export const ContractWizardPage = () => {
       <Card className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Оформление договора</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">{isEditMode && editingContract ? `Редактирование договора ${editingContract.number}` : 'Новый договор'}</h1>
             <p className="mt-1 text-sm text-slate-600">Настройка параметров заявления о присоединении и договоров клиента</p>
           </div>
-          <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}`)}>
-            Назад к клиенту
+          <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}?tab=contracts`)}>
+            Назад к договорам
           </Button>
         </div>
 
@@ -317,15 +291,15 @@ export const ContractWizardPage = () => {
       </Section>
 
       <Card className="sticky bottom-3 z-20 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur">
-        <Button variant="secondary" onClick={saveDraft}>
+        <Button variant="secondary" onClick={persistDraft}>
           Сохранить настройки заявления
         </Button>
-        <Button onClick={concludeContract}>Заключить договор</Button>
+        <Button onClick={submitContract}>{isEditMode ? 'Сохранить изменения' : 'Заключить договор'}</Button>
         <Button variant="secondary" onClick={exportStatement}>
           Выгрузить заявление
         </Button>
-        <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}`)}>
-          Назад к клиенту
+        <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}?tab=contracts`)}>
+          Назад к договорам
         </Button>
       </Card>
 

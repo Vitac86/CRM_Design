@@ -16,6 +16,7 @@ import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/Su
 import { formatClientType, formatResidency } from '../utils/labels';
 import { normalizePhoneInput } from '../utils/phone';
 import { useClientsStore } from '../app/ClientsStore';
+import { getContractConfigById, getPrimaryContractByClientId } from '../data/clientContracts';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
@@ -78,6 +79,37 @@ export const SubjectProfilePage = () => {
 
     return getClientById(id);
   }, [getClientById, id]);
+
+
+  const contractDrivenProfile = useMemo(() => {
+    if (!client) {
+      return null;
+    }
+
+    const primaryContract = getPrimaryContractByClientId(client.id);
+    if (!primaryContract) {
+      return null;
+    }
+
+    const contractConfig = getContractConfigById(primaryContract.id);
+    if (!contractConfig) {
+      return null;
+    }
+
+    return {
+      canUseMoney: contractConfig.incomeTransfer.specialBrokerAccount,
+      canUseSecurities: contractConfig.tradingDepoOperatorEnabled,
+      reportDelivery: {
+        email: {
+          enabled: contractConfig.reporting.emailEnabled,
+          address: contractConfig.reporting.email,
+        },
+        personalAccount: {
+          enabled: contractConfig.reporting.edo,
+        },
+      },
+    };
+  }, [client]);
 
   useEffect(() => {
     if (!toastMessage) {
@@ -1094,12 +1126,12 @@ export const SubjectProfilePage = () => {
                   <PermissionCard
                     title="Право использования денежных средств"
                     description="Брокер вправе использовать денежные средства клиента"
-                    enabled={client.canUseMoney}
+                    enabled={contractDrivenProfile?.canUseMoney ?? client.canUseMoney}
                   />
                   <PermissionCard
                     title="Право использования ценных бумаг"
                     description="Брокер вправе использовать ЦБ клиента в сделках"
-                    enabled={client.canUseSecurities}
+                    enabled={contractDrivenProfile?.canUseSecurities ?? client.canUseSecurities}
                   />
                 </div>
               </ProfileSection>
@@ -1125,13 +1157,13 @@ export const SubjectProfilePage = () => {
                 <div className="grid gap-3 lg:grid-cols-2">
                   <ReportMethodCard
                     title="Электронная почта"
-                    description={client.reportDelivery.email.address}
-                    enabled={client.reportDelivery.email.enabled}
+                    description={contractDrivenProfile?.reportDelivery.email.address ?? client.reportDelivery.email.address}
+                    enabled={contractDrivenProfile?.reportDelivery.email.enabled ?? client.reportDelivery.email.enabled}
                   />
                   <ReportMethodCard
                     title="Личный кабинет"
                     description="Получение отчётов в личном кабинете"
-                    enabled={client.reportDelivery.personalAccount.enabled}
+                    enabled={contractDrivenProfile?.reportDelivery.personalAccount.enabled ?? client.reportDelivery.personalAccount.enabled}
                   />
                 </div>
               </ProfileSection>
