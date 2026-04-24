@@ -301,12 +301,18 @@ export interface Request {
   clientId: string;
   number: string;
   requestType: string;
+  requestTypeCode?: 'withdrawal' | 'transfer';
+  contractId?: string;
+  contractNumber?: string;
   clientName: string;
   clientCode: string;
   status: 'Ожидает' | 'Принято' | 'Отклонено';
   date: string;
   time: string;
   source: 'Личный кабинет' | 'Почта';
+  withdrawalBankDetails?: ClientBankDetails;
+  transferFromMarket?: 'Валютный рынок' | 'Фондовый рынок';
+  transferToMarket?: 'Валютный рынок' | 'Фондовый рынок';
 }
 
 export type ReportDepartment = 'Мидл-офис' | 'Бэк-офис' | 'Депозитарий';

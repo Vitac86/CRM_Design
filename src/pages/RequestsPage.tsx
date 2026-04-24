@@ -1,10 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useClientsStore } from '../app/ClientsStore';
 import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, TableStatusText } from '../components/ui';
-import { NEW_REQUEST_STATUS, requests } from '../data/requests';
-import type { Request } from '../data/types';
+import { NEW_REQUEST_STATUS, createRequest, requests } from '../data/requests';
+import { getContractsByClientId } from '../data/clientContracts';
+import type { ClientBankDetails, Request } from '../data/types';
 
 const pageSize = 10;
+
+type RequestFormType = 'withdrawal' | 'transfer';
+type TransferMarket = 'Валютный рынок' | 'Фондовый рынок';
+
+const requestTypeLabelMap: Record<RequestFormType, string> = {
+  withdrawal: 'Поручение на вывод ДС',
+  transfer: 'Поручение на перевод ДС',
+};
 
 const requestStatusTone: Record<Request['status'], 'neutral' | 'warning' | 'danger'> = {
   'Ожидает': 'warning',
@@ -12,8 +22,20 @@ const requestStatusTone: Record<Request['status'], 'neutral' | 'warning' | 'dang
   'Отклонено': 'danger',
 };
 
+const getOppositeMarket = (market: TransferMarket): TransferMarket =>
+  market === 'Фондовый рынок' ? 'Валютный рынок' : 'Фондовый рынок';
+
+const defaultManualBankDetails: ClientBankDetails = {
+  bankName: '',
+  bik: '',
+  checkingAccount: '',
+  correspondentAccount: '',
+};
+
 export const RequestsPage = () => {
+  const { clients, getClientById } = useClientsStore();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [requestsList, setRequestsList] = useState<Request[]>(() => [...requests]);
   const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const [clientCodeFilter, setClientCodeFilter] = useState(() => searchParams.get('clientCode') ?? '');
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') ?? '');
@@ -27,19 +49,59 @@ export const RequestsPage = () => {
   });
   const [page, setPage] = useState(1);
 
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [createType, setCreateType] = useState<RequestFormType>('withdrawal');
+  const [selectedClientId, setSelectedClientId] = useState('');
+  const [selectedContractId, setSelectedContractId] = useState('');
+  const [selectedSource, setSelectedSource] = useState<Request['source']>('Личный кабинет');
+  const [manualBankDetails, setManualBankDetails] = useState<ClientBankDetails>(defaultManualBankDetails);
+  const [withdrawalBankSource, setWithdrawalBankSource] = useState<'client' | 'manual'>('client');
+  const [transferFromMarket, setTransferFromMarket] = useState<TransferMarket>('Фондовый рынок');
+  const [formError, setFormError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const activeClients = useMemo(
+    () => clients.filter((client) => client.subjectStatus === 'Активный клиент' && !client.isArchived),
+    [clients],
+  );
+
+  const activeClientsWithBrokerContract = useMemo(
+    () =>
+      activeClients.filter((client) =>
+        getContractsByClientId(client.id).some((contract) => contract.type === 'broker' && contract.status === 'active'),
+      ),
+    [activeClients],
+  );
+
+  const clientOptions = createType === 'transfer' ? activeClientsWithBrokerContract : activeClients;
+
+  const availableContracts = useMemo(() => {
+    if (!selectedClientId) {
+      return [];
+    }
+
+    return getContractsByClientId(selectedClientId).filter(
+      (contract) => contract.type === 'broker' && contract.status === 'active',
+    );
+  }, [selectedClientId]);
+
+  const selectedClient = selectedClientId ? getClientById(selectedClientId) : undefined;
+  const selectedContract = availableContracts.find((contract) => contract.id === selectedContractId);
+  const selectedBankAccount = selectedClient?.bankAccounts?.[0];
+
   const sourceOptions = useMemo(
-    () => [...new Set(requests.map((request) => request.source))],
-    [],
+    () => [...new Set(requestsList.map((request) => request.source))],
+    [requestsList],
   );
 
   const statusOptions = useMemo(
-    () => [...new Set(requests.map((request) => request.status))],
-    [],
+    () => [...new Set(requestsList.map((request) => request.status))],
+    [requestsList],
   );
 
   const filteredRequests = useMemo(
     () =>
-      requests.filter((request) => {
+      requestsList.filter((request) => {
         const normalizedSearch = search.trim().toLowerCase();
 
         if (
@@ -71,7 +133,7 @@ export const RequestsPage = () => {
 
         return true;
       }),
-    [search, clientCodeFilter, dateFilter, sourceFilter, statusFilter],
+    [requestsList, search, clientCodeFilter, dateFilter, sourceFilter, statusFilter],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredRequests.length / pageSize));
@@ -109,6 +171,25 @@ export const RequestsPage = () => {
     setSearchParams(nextParams, { replace: true });
   }, [search, clientCodeFilter, dateFilter, sourceFilter, statusFilter, setSearchParams]);
 
+  useEffect(() => {
+    setSelectedClientId('');
+    setSelectedContractId('');
+    setFormError(null);
+  }, [createType]);
+
+  useEffect(() => {
+    setSelectedContractId('');
+  }, [selectedClientId]);
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setToastMessage(null), 2200);
+    return () => window.clearTimeout(timer);
+  }, [toastMessage]);
+
   const resetFilters = () => {
     setSearch('');
     setClientCodeFilter('');
@@ -118,11 +199,269 @@ export const RequestsPage = () => {
     setPage(1);
   };
 
+  const resetCreateForm = () => {
+    setCreateType('withdrawal');
+    setSelectedClientId('');
+    setSelectedContractId('');
+    setSelectedSource('Личный кабинет');
+    setTransferFromMarket('Фондовый рынок');
+    setWithdrawalBankSource('client');
+    setManualBankDetails(defaultManualBankDetails);
+    setFormError(null);
+  };
+
+  const handleCreateRequest = () => {
+    if (!selectedClient || !selectedContract) {
+      setFormError('Выберите клиента и договор для создания поручения.');
+      return;
+    }
+
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10);
+    const time = now.toTimeString().slice(0, 5);
+
+    const transferToMarket = getOppositeMarket(transferFromMarket);
+
+    const withdrawalDetails: ClientBankDetails | undefined = createType === 'withdrawal'
+      ? withdrawalBankSource === 'client' && selectedBankAccount
+        ? {
+            bankName: selectedBankAccount.bankName,
+            bik: selectedBankAccount.bik,
+            checkingAccount: selectedBankAccount.accountNumber,
+            correspondentAccount: selectedBankAccount.correspondentAccount,
+          }
+        : {
+            bankName: manualBankDetails.bankName.trim(),
+            bik: manualBankDetails.bik.trim(),
+            checkingAccount: manualBankDetails.checkingAccount.trim(),
+            correspondentAccount: manualBankDetails.correspondentAccount.trim(),
+          }
+      : undefined;
+
+    if (createType === 'withdrawal' && withdrawalDetails && Object.values(withdrawalDetails).some((value) => !value.trim())) {
+      setFormError('Заполните банковские реквизиты для поручения на вывод ДС.');
+      return;
+    }
+
+    const createdRequest = createRequest({
+      clientId: selectedClient.id,
+      requestType: requestTypeLabelMap[createType],
+      requestTypeCode: createType,
+      clientName: selectedClient.name,
+      clientCode: selectedClient.code,
+      contractId: selectedContract.id,
+      contractNumber: selectedContract.number,
+      status: 'Ожидает',
+      date,
+      time,
+      source: selectedSource,
+      withdrawalBankDetails: withdrawalDetails,
+      transferFromMarket: createType === 'transfer' ? transferFromMarket : undefined,
+      transferToMarket: createType === 'transfer' ? transferToMarket : undefined,
+    });
+
+    setRequestsList((prev) => [createdRequest, ...prev]);
+    setIsCreateFormOpen(false);
+    resetCreateForm();
+    setToastMessage('Поручение успешно создано');
+  };
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <header>
+      <header className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Поручения</h1>
+        <Button
+          onClick={() => {
+            setIsCreateFormOpen((prev) => !prev);
+            if (isCreateFormOpen) {
+              resetCreateForm();
+            }
+          }}
+        >
+          {isCreateFormOpen ? 'Закрыть форму' : '+ Новое поручение'}
+        </Button>
       </header>
+
+      {toastMessage ? (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{toastMessage}</div>
+      ) : null}
+
+      {isCreateFormOpen ? (
+        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          {formError ? <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{formError}</div> : null}
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Тип поручения</span>
+              <select
+                value={createType}
+                onChange={(event) => setCreateType(event.target.value as RequestFormType)}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+              >
+                <option value="withdrawal">Поручение на вывод ДС</option>
+                <option value="transfer">Поручение на перевод ДС</option>
+              </select>
+            </label>
+
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Клиент</span>
+              <select
+                value={selectedClientId}
+                onChange={(event) => setSelectedClientId(event.target.value)}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+              >
+                <option value="">Выберите клиента</option>
+                {clientOptions.map((client) => (
+                  <option key={client.id} value={client.id}>{client.name} ({client.code})</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Договор</span>
+              <select
+                value={selectedContractId}
+                onChange={(event) => setSelectedContractId(event.target.value)}
+                disabled={!selectedClientId || availableContracts.length === 0}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 disabled:bg-slate-100 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+              >
+                <option value="">Выберите договор</option>
+                {availableContracts.map((contract) => (
+                  <option key={contract.id} value={contract.id}>{contract.number}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Статус</span>
+              <input value="Ожидает" disabled className="h-10 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 text-sm text-slate-600" />
+            </label>
+
+            <label className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Источник</span>
+              <select
+                value={selectedSource}
+                onChange={(event) => setSelectedSource(event.target.value as Request['source'])}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+              >
+                <option value="Личный кабинет">Личный кабинет</option>
+                <option value="Почта">Почта</option>
+              </select>
+            </label>
+          </div>
+
+          {selectedClientId && availableContracts.length === 0 ? (
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              Для выбранного клиента нет активного брокерского договора.
+            </div>
+          ) : null}
+
+          {createType === 'withdrawal' && selectedContract ? (
+            <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-sm font-medium text-slate-800">Банковские реквизиты клиента</p>
+              {selectedBankAccount ? (
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                    <input type="radio" checked={withdrawalBankSource === 'client'} onChange={() => setWithdrawalBankSource('client')} />
+                    Использовать реквизиты клиента
+                  </label>
+                  <div className="grid gap-2 rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-700 md:grid-cols-2">
+                    <p><span className="font-medium">Банк:</span> {selectedBankAccount.bankName}</p>
+                    <p><span className="font-medium">БИК:</span> {selectedBankAccount.bik}</p>
+                    <p><span className="font-medium">Р/с:</span> {selectedBankAccount.accountNumber}</p>
+                    <p><span className="font-medium">К/с:</span> {selectedBankAccount.correspondentAccount}</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                  У клиента нет сохранённых банковских реквизитов. Введите реквизиты вручную.
+                </p>
+              )}
+
+              <label className="flex items-center gap-2 text-sm text-slate-700">
+                <input type="radio" checked={withdrawalBankSource === 'manual'} onChange={() => setWithdrawalBankSource('manual')} />
+                Ввести реквизиты вручную
+              </label>
+
+              {withdrawalBankSource === 'manual' || !selectedBankAccount ? (
+                <div className="grid gap-3 md:grid-cols-2">
+                  <input
+                    placeholder="Банк"
+                    value={manualBankDetails.bankName}
+                    onChange={(event) => setManualBankDetails((prev) => ({ ...prev, bankName: event.target.value }))}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  />
+                  <input
+                    placeholder="БИК"
+                    value={manualBankDetails.bik}
+                    onChange={(event) => setManualBankDetails((prev) => ({ ...prev, bik: event.target.value }))}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  />
+                  <input
+                    placeholder="Расчётный счёт"
+                    value={manualBankDetails.checkingAccount}
+                    onChange={(event) => setManualBankDetails((prev) => ({ ...prev, checkingAccount: event.target.value }))}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  />
+                  <input
+                    placeholder="Корреспондентский счёт"
+                    value={manualBankDetails.correspondentAccount}
+                    onChange={(event) => setManualBankDetails((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {createType === 'transfer' && selectedContract ? (
+            <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-sm font-medium text-slate-800">Площадки перевода</p>
+              <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-end">
+                <label className="space-y-1">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Площадка списания</span>
+                  <select
+                    value={transferFromMarket}
+                    onChange={(event) => setTransferFromMarket(event.target.value as TransferMarket)}
+                    className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  >
+                    <option value="Фондовый рынок">Фондовый рынок</option>
+                    <option value="Валютный рынок">Валютный рынок</option>
+                  </select>
+                </label>
+                <Button variant="secondary" onClick={() => setTransferFromMarket((prev) => getOppositeMarket(prev))}>↔︎</Button>
+                <label className="space-y-1">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Площадка зачисления</span>
+                  <input
+                    value={getOppositeMarket(transferFromMarket)}
+                    disabled
+                    className="h-10 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 text-sm text-slate-700"
+                  />
+                </label>
+              </div>
+            </div>
+          ) : null}
+
+          {clientOptions.length === 0 ? (
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              Нет клиентов, подходящих под выбранный тип поручения.
+            </div>
+          ) : null}
+
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsCreateFormOpen(false);
+                resetCreateForm();
+              }}
+            >
+              Отмена
+            </Button>
+            <Button onClick={handleCreateRequest}>Сохранить поручение</Button>
+          </div>
+        </div>
+      ) : null}
 
       <FilterBar className="flex-col items-stretch gap-3">
         <div className="flex w-full flex-wrap gap-3">

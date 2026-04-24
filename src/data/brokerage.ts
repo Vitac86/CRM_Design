@@ -3,6 +3,7 @@ export type BrokerageContractStatus = 'Активен' | 'Приостановл
 export type BrokerageContract = {
   id: string;
   clientId: string;
+  contractId: string;
   contractNumber: string;
   clientCode: string;
   clientName: string;
@@ -15,6 +16,7 @@ export const brokerageContracts: BrokerageContract[] = [
   {
     id: 'br-001',
     clientId: 'c-001',
+    contractId: 'ctr-1',
     contractNumber: 'БР-2026/0012',
     clientCode: 'CL-10241',
     clientName: 'ООО «Альянс Инвест»',
@@ -25,6 +27,7 @@ export const brokerageContracts: BrokerageContract[] = [
   {
     id: 'br-002',
     clientId: 'c-002',
+    contractId: 'ctr-10',
     contractNumber: 'БР-2026/0044',
     clientCode: 'CL-10873',
     clientName: 'Петрова Анна Сергеевна',
@@ -35,6 +38,7 @@ export const brokerageContracts: BrokerageContract[] = [
   {
     id: 'br-003',
     clientId: 'c-003',
+    contractId: 'ctr-11',
     contractNumber: 'БР-2025/1988',
     clientCode: 'CL-09452',
     clientName: 'ЗАО «Прима Капитал»',
@@ -45,6 +49,7 @@ export const brokerageContracts: BrokerageContract[] = [
   {
     id: 'br-004',
     clientId: 'c-004',
+    contractId: 'ctr-12',
     contractNumber: 'БР-2024/1210',
     clientCode: 'CL-08310',
     clientName: 'ИП Орлов Дмитрий Петрович',
@@ -55,6 +60,7 @@ export const brokerageContracts: BrokerageContract[] = [
   {
     id: 'br-005',
     clientId: 'c-005',
+    contractId: 'ctr-13',
     contractNumber: 'БР-2023/0771',
     clientCode: 'CL-07145',
     clientName: 'ООО «Северный портфель»',
