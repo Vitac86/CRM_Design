@@ -22,6 +22,19 @@
 
 Сейчас `DataAccessProvider` создаёт mock-репозитории и предоставляет их через context. В следующих шагах реализации репозиториев могут быть заменены на реальные API без изменения контракта доступа в UI.
 
+
+## Migration status
+
+После завершения шага 3:
+
+- `RequestsPage` уже переведена на `useDataAccess().requests` для операций `listRequests` и `createRequest`.
+- В `RequestsPage` временно оставлен runtime-import `getContractsByClientId` из `src/data/clientContracts`, потому что миграция contracts будет выделена в отдельный шаг.
+- `src/data/requests` больше не должен импортироваться напрямую из `RequestsPage`.
+
+### Recommended next step
+
+Перевести contracts access в `RequestsPage` на `useDataAccess().contracts`.
+
 ## Что будет сделано в следующих шагах
 
 UI-страницы должны постепенно перестать импортировать `src/data/*` напрямую и использовать репозитории из `useDataAccess`.
