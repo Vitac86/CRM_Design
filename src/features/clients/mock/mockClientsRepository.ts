@@ -44,5 +44,20 @@ export const createMockClientsRepository = (): ClientsRepository => {
 
       return cloneClient(clientsStore[clientIndex]);
     },
+
+    async restoreClient(id: string) {
+      const clientIndex = clientsStore.findIndex((item) => item.id === id);
+      if (clientIndex < 0) {
+        return null;
+      }
+
+      clientsStore[clientIndex] = {
+        ...clientsStore[clientIndex],
+        isArchived: false,
+        archivedAt: undefined,
+      };
+
+      return cloneClient(clientsStore[clientIndex]);
+    },
   };
 };
