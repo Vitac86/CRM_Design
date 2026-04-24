@@ -4,7 +4,7 @@ import type {
   LegalEntityComplianceCard
 } from './types';
 
-export const complianceCases: ComplianceCase[] = [
+export const complianceCases: readonly ComplianceCase[] = [
   {
     id: 'cmp-001',
     clientId: 'c-002',
@@ -62,7 +62,7 @@ export const complianceCases: ComplianceCase[] = [
   }
 ];
 
-export const legalEntityComplianceCards: LegalEntityComplianceCard[] = [
+export const legalEntityComplianceCards: readonly LegalEntityComplianceCard[] = [
   {
     clientId: 'c-001',
     ogrn: '1027700123456',
@@ -105,7 +105,7 @@ export const legalEntityComplianceCards: LegalEntityComplianceCard[] = [
   }
 ];
 
-export const individualComplianceCards: IndividualComplianceCard[] = [
+export const individualComplianceCards: readonly IndividualComplianceCard[] = [
   {
     clientId: 'c-002',
     passportMasked: '45** ****66',

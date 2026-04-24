@@ -1,6 +1,6 @@
 import type { Report } from './types';
 
-export const reports: Report[] = [
+export const reports: readonly Report[] = [
   {
     id: 'rep-001',
     department: 'Мидл-офис',

@@ -1,6 +1,6 @@
 import type { ClientDocument } from './types';
 
-export const clientDocuments: ClientDocument[] = [
+export const clientDocuments: readonly ClientDocument[] = [
   { id: 'doc-1', clientId: 'c-001', title: 'Анкета клиента', documentType: 'Анкета', status: 'Действующий', date: '2026-03-14', fileName: 'anketa-c001.docx' },
   { id: 'doc-2', clientId: 'c-001', title: 'Доверенность на представителя', documentType: 'Доверенность', status: 'На проверке', date: '2026-04-08', fileName: 'power-attorney-c001.pdf' },
   { id: 'doc-3', clientId: 'c-002', title: 'Паспорт ИП', documentType: 'Паспорт', status: 'Действующий', date: '2025-10-19', fileName: 'passport-c002.pdf' },
