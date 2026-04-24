@@ -1,63 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { MiddleOfficeReportDetails } from '../components/crm/MiddleOfficeReportDetails';
 import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList';
-import { useClientsStore } from '../app/ClientsStore';
-import { clientAccounts } from '../data/clientAccounts';
-import { clientContracts } from '../data/clientContracts';
-import { reports } from '../data/reports';
-import type { ClientContract, ContractProductType, Report } from '../data/types';
-import { Button, DataTable, SearchInput, SelectFilter, Tabs } from '../components/ui';
+import { Button, DataTable, EmptyState, SearchInput, SelectFilter, Tabs } from '../components/ui';
+import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
+import type { Client, ClientAccount, ClientContract, Report } from '../data/types';
 
 type MiddleOfficeSection = 'clients-journal' | 'reports-journal';
-
-type ClientJournalRow = {
-  id: string;
-  clientCode: string;
-  contractKind: 'БО' | 'ДУ';
-  clientName: string;
-  inn: string;
-  clientType: 'ф/л' | 'ю/л';
-  contractNumber: string;
-  contractDate: string;
-  residencyStatus: string;
-  accountType: 'обычный' | 'ИИС' | 'ИН';
-  accountStatus: 'активный' | 'закрытый';
-};
 
 const tabs = [
   { value: 'clients-journal', label: 'Журнал клиентов' },
   { value: 'reports-journal', label: 'Журнал отправленных отчётов' },
 ] as const;
 
-const formatDate = (value: string) => {
-  const [year, month, day] = value.split('-');
-  if (!year || !month || !day) {
-    return value;
-  }
-
-  return `${day}.${month}.${year}`;
-};
-
-const mapContractKind = (contractType: ContractProductType): 'БО' | 'ДУ' => (contractType === 'trust' ? 'ДУ' : 'БО');
-
-const mapClientType = (type: string): 'ф/л' | 'ю/л' => (type === 'ФЛ' || type === 'ИП' ? 'ф/л' : 'ю/л');
-
-const mapAccountType = (type: ContractProductType): 'обычный' | 'ИИС' | 'ИН' => {
-  if (type === 'iis') {
-    return 'ИИС';
-  }
-
-  if (type === 'other') {
-    return 'ИН';
-  }
-
-  return 'обычный';
-};
-
-const getAccountStatus = (contract: ClientContract): 'активный' | 'закрытый' => (contract.status === 'active' ? 'активный' : 'закрытый');
-
 export const MiddleOfficePage = () => {
-  const { clients } = useClientsStore();
+  const { clients: clientsRepository, contracts: contractsRepository, accounts: accountsRepository, reports: reportsRepository } =
+    useDataAccess();
+
+  const [clients, setClients] = useState<Client[]>([]);
+  const [contracts, setContracts] = useState<ClientContract[]>([]);
+  const [accounts, setAccounts] = useState<ClientAccount[]>([]);
+  const [middleOfficeReports, setMiddleOfficeReports] = useState<Report[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [section, setSection] = useState<MiddleOfficeSection>('reports-journal');
   const [search, setSearch] = useState('');
@@ -71,37 +36,50 @@ export const MiddleOfficePage = () => {
   const [contractKindFilter, setContractKindFilter] = useState<ClientJournalRow['contractKind'] | 'all'>('all');
   const [accountStatusFilter, setAccountStatusFilter] = useState<ClientJournalRow['accountStatus'] | 'all'>('all');
 
-  const middleOfficeReports = useMemo(() => reports.filter((report) => report.department === 'Мидл-офис'), []);
+  useEffect(() => {
+    let isMounted = true;
 
-  const clientJournalRows = useMemo<ClientJournalRow[]>(() => {
-    const activeClients = clients.filter((client) => !client.isArchived);
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
 
-    return activeClients.flatMap((client) => {
-      const contracts = clientContracts.filter((contract) => contract.clientId === client.id);
+      try {
+        const [loadedClients, loadedContracts, loadedAccounts, loadedReports] = await Promise.all([
+          clientsRepository.listClients(),
+          contractsRepository.listContracts(),
+          accountsRepository.listAccounts(),
+          reportsRepository.listReportsByDepartment('Мидл-офис'),
+        ]);
 
-      return contracts.map((contract) => {
-        const matchedAccount =
-          clientAccounts.find(
-            (account) =>
-              account.clientId === client.id && account.type === contract.type && account.openDate === contract.openDate,
-          ) ?? clientAccounts.find((account) => account.clientId === client.id && account.type === contract.type);
+        if (!isMounted) {
+          return;
+        }
 
-        return {
-          id: `${client.id}-${contract.id}`,
-          clientCode: client.code,
-          contractKind: mapContractKind(contract.type),
-          clientName: client.name,
-          inn: client.inn,
-          clientType: mapClientType(client.type),
-          contractNumber: contract.number,
-          contractDate: formatDate(contract.openDate),
-          residencyStatus: client.residency,
-          accountType: matchedAccount ? mapAccountType(matchedAccount.type) : mapAccountType(contract.type),
-          accountStatus: getAccountStatus(contract),
-        };
-      });
-    });
-  }, [clients]);
+        setClients(loadedClients);
+        setContracts(loadedContracts);
+        setAccounts(loadedAccounts);
+        setMiddleOfficeReports(loadedReports);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setError('Не удалось загрузить данные мидл-офиса.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accountsRepository, clientsRepository, contractsRepository, reportsRepository]);
+
+  const clientJournalRows = useMemo<ClientJournalRow[]>(() => buildClientJournalRows(clients, contracts, accounts), [accounts, clients, contracts]);
 
   const filteredClientJournalRows = useMemo(() => {
     const normalizedSearch = clientSearch.trim().toLowerCase();
@@ -192,7 +170,11 @@ export const MiddleOfficePage = () => {
 
       <Tabs items={[...tabs]} value={section} onChange={(value) => setSection(value as MiddleOfficeSection)} />
 
-      {section === 'clients-journal' ? (
+      {isLoading ? (
+        <EmptyState title="Загрузка..." description="Загружаем данные мидл-офиса." />
+      ) : error ? (
+        <EmptyState title="Ошибка загрузки" description={error} />
+      ) : section === 'clients-journal' ? (
         <section className="space-y-3">
           <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
             <SearchInput

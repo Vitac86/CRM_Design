@@ -1,24 +1,9 @@
-import { useMemo, useState } from 'react';
-import { useClientsStore } from '../app/ClientsStore';
-import { clientAccounts } from '../data/clientAccounts';
-import { clientContracts } from '../data/clientContracts';
-import type { ClientContract, ContractProductType } from '../data/types';
-import { Button, DataTable, SearchInput, SelectFilter, type SortDirection } from '../components/ui';
+import { useEffect, useMemo, useState } from 'react';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import { Button, DataTable, EmptyState, SearchInput, SelectFilter, type SortDirection } from '../components/ui';
+import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
-
-type ClientJournalRow = {
-  id: string;
-  clientCode: string;
-  contractKind: 'БО' | 'ДУ';
-  clientName: string;
-  inn: string;
-  clientType: 'ф/л' | 'ю/л';
-  contractNumber: string;
-  contractDate: string;
-  residencyStatus: string;
-  accountType: 'обычный' | 'ИИС' | 'ИН';
-  accountStatus: 'активный' | 'закрытый';
-};
+import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
 
 type ClientJournalSortKey =
   | 'clientCode'
@@ -59,36 +44,14 @@ const normalizeAccountStatus = (value: string): ClientJournalRow['accountStatus'
   return null;
 };
 
-const formatDate = (value: string): string => {
-  const [year, month, day] = value.split('-');
-  if (!year || !month || !day) {
-    return value;
-  }
-
-  return `${day}.${month}.${year}`;
-};
-
-const mapContractKind = (contractType: ContractProductType): 'БО' | 'ДУ' => (contractType === 'trust' ? 'ДУ' : 'БО');
-
-const mapClientType = (type: string): 'ф/л' | 'ю/л' => (type === 'ФЛ' || type === 'ИП' ? 'ф/л' : 'ю/л');
-
-const mapAccountType = (type: ContractProductType): 'обычный' | 'ИИС' | 'ИН' => {
-  if (type === 'iis') {
-    return 'ИИС';
-  }
-
-  if (type === 'other') {
-    return 'ИН';
-  }
-
-  return 'обычный';
-};
-
-const getAccountStatus = (contract: ClientContract): 'активный' | 'закрытый' =>
-  contract.status === 'active' ? 'активный' : 'закрытый';
-
 export const MiddleOfficeClientsPage = () => {
-  const { clients } = useClientsStore();
+  const { clients: clientsRepository, contracts: contractsRepository, accounts: accountsRepository } = useDataAccess();
+
+  const [clients, setClients] = useState<Client[]>([]);
+  const [contracts, setContracts] = useState<ClientContract[]>([]);
+  const [accounts, setAccounts] = useState<ClientAccount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [clientSearch, setClientSearch] = useState('');
   const [clientTypeFilter, setClientTypeFilter] = useState<ClientJournalRow['clientType'] | 'all'>('all');
@@ -97,35 +60,48 @@ export const MiddleOfficeClientsPage = () => {
   const [sortKey, setSortKey] = useState<ClientJournalSortKey>('clientCode');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const clientJournalRows = useMemo<ClientJournalRow[]>(() => {
-    const activeClients = clients.filter((client) => !client.isArchived);
+  useEffect(() => {
+    let isMounted = true;
 
-    return activeClients.flatMap((client) => {
-      const contracts = clientContracts.filter((contract) => contract.clientId === client.id);
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
 
-      return contracts.map((contract) => {
-        const matchedAccount =
-          clientAccounts.find(
-            (account) =>
-              account.clientId === client.id && account.type === contract.type && account.openDate === contract.openDate,
-          ) ?? clientAccounts.find((account) => account.clientId === client.id && account.type === contract.type);
+      try {
+        const [loadedClients, loadedContracts, loadedAccounts] = await Promise.all([
+          clientsRepository.listClients(),
+          contractsRepository.listContracts(),
+          accountsRepository.listAccounts(),
+        ]);
 
-        return {
-          id: `${client.id}-${contract.id}`,
-          clientCode: client.code,
-          contractKind: mapContractKind(contract.type),
-          clientName: client.name,
-          inn: client.inn,
-          clientType: mapClientType(client.type),
-          contractNumber: contract.number,
-          contractDate: formatDate(contract.openDate),
-          residencyStatus: client.residency,
-          accountType: matchedAccount ? mapAccountType(matchedAccount.type) : mapAccountType(contract.type),
-          accountStatus: getAccountStatus(contract),
-        };
-      });
-    });
-  }, [clients]);
+        if (!isMounted) {
+          return;
+        }
+
+        setClients(loadedClients);
+        setContracts(loadedContracts);
+        setAccounts(loadedAccounts);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setError('Не удалось загрузить журнал клиентов мидл-офиса.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accountsRepository, clientsRepository, contractsRepository]);
+
+  const clientJournalRows = useMemo<ClientJournalRow[]>(() => buildClientJournalRows(clients, contracts, accounts), [accounts, clients, contracts]);
 
   const filteredClientJournalRows = useMemo(() => {
     const normalizedSearch = clientSearch.trim().toLowerCase();
@@ -166,10 +142,12 @@ export const MiddleOfficeClientsPage = () => {
         return (leftTimestamp - rightTimestamp) * direction;
       }
 
-      return String(leftRow[sortKey]).localeCompare(String(rightRow[sortKey]), 'ru', {
-        numeric: true,
-        sensitivity: 'base',
-      }) * direction;
+      return (
+        String(leftRow[sortKey]).localeCompare(String(rightRow[sortKey]), 'ru', {
+          numeric: true,
+          sensitivity: 'base',
+        }) * direction
+      );
     });
 
     return rows;
@@ -225,80 +203,86 @@ export const MiddleOfficeClientsPage = () => {
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал клиентов</h1>
-        <Button variant="secondary" onClick={handleExport} disabled={sortedClientJournalRows.length === 0}>
+        <Button variant="secondary" onClick={handleExport} disabled={sortedClientJournalRows.length === 0 || isLoading || Boolean(error)}>
           Экспорт
         </Button>
       </header>
 
-      <section className="space-y-3">
-        <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
-          <SearchInput
-            value={clientSearch}
-            onChange={(event) => setClientSearch(event.target.value)}
-            placeholder="Поиск по коду, клиенту, ИНН или договору..."
-            className="sm:flex-1"
-          />
-          <SelectFilter
-            value={clientTypeFilter}
-            onChange={(event) => {
-              const nextValue = event.target.value;
-              setClientTypeFilter(nextValue === 'all' ? 'all' : (normalizeClientType(nextValue) ?? 'all'));
-            }}
-            className="sm:w-[150px]"
-          >
-            <option value="all">Тип клиента: Все</option>
-            <option value="ф/л">ф/л</option>
-            <option value="ю/л">ю/л</option>
-          </SelectFilter>
-          <SelectFilter
-            value={contractKindFilter}
-            onChange={(event) => {
-              const nextValue = event.target.value;
-              setContractKindFilter(nextValue === 'all' ? 'all' : (normalizeContractKind(nextValue) ?? 'all'));
-            }}
-            className="sm:w-[150px]"
-          >
-            <option value="all">Вид договора: Все</option>
-            <option value="БО">БО</option>
-            <option value="ДУ">ДУ</option>
-          </SelectFilter>
-          <SelectFilter
-            value={accountStatusFilter}
-            onChange={(event) => {
-              const nextValue = event.target.value;
-              setAccountStatusFilter(nextValue === 'all' ? 'all' : (normalizeAccountStatus(nextValue) ?? 'all'));
-            }}
-            className="sm:w-[170px]"
-          >
-            <option value="all">Статус счёта: Все</option>
-            <option value="активный">активный</option>
-            <option value="закрытый">закрытый</option>
-          </SelectFilter>
-          <Button variant="secondary" size="sm" onClick={resetFilters} className="sm:ml-auto" disabled={!hasActiveConditions}>
-            Сбросить фильтры
-          </Button>
-        </div>
+      {isLoading ? (
+        <EmptyState title="Загрузка..." description="Загружаем журнал клиентов мидл-офиса." />
+      ) : error ? (
+        <EmptyState title="Ошибка загрузки" description={error} />
+      ) : (
+        <section className="space-y-3">
+          <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
+            <SearchInput
+              value={clientSearch}
+              onChange={(event) => setClientSearch(event.target.value)}
+              placeholder="Поиск по коду, клиенту, ИНН или договору..."
+              className="sm:flex-1"
+            />
+            <SelectFilter
+              value={clientTypeFilter}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setClientTypeFilter(nextValue === 'all' ? 'all' : (normalizeClientType(nextValue) ?? 'all'));
+              }}
+              className="sm:w-[150px]"
+            >
+              <option value="all">Тип клиента: Все</option>
+              <option value="ф/л">ф/л</option>
+              <option value="ю/л">ю/л</option>
+            </SelectFilter>
+            <SelectFilter
+              value={contractKindFilter}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setContractKindFilter(nextValue === 'all' ? 'all' : (normalizeContractKind(nextValue) ?? 'all'));
+              }}
+              className="sm:w-[150px]"
+            >
+              <option value="all">Вид договора: Все</option>
+              <option value="БО">БО</option>
+              <option value="ДУ">ДУ</option>
+            </SelectFilter>
+            <SelectFilter
+              value={accountStatusFilter}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setAccountStatusFilter(nextValue === 'all' ? 'all' : (normalizeAccountStatus(nextValue) ?? 'all'));
+              }}
+              className="sm:w-[170px]"
+            >
+              <option value="all">Статус счёта: Все</option>
+              <option value="активный">активный</option>
+              <option value="закрытый">закрытый</option>
+            </SelectFilter>
+            <Button variant="secondary" size="sm" onClick={resetFilters} className="sm:ml-auto" disabled={!hasActiveConditions}>
+              Сбросить фильтры
+            </Button>
+          </div>
 
-        <DataTable
-          rows={sortedClientJournalRows}
-          emptyMessage="По заданным фильтрам записи не найдены"
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-          onSortChange={handleSortChange}
-          columns={[
-            { key: 'clientCode', header: 'Код клиента', className: 'whitespace-nowrap', sortable: true },
-            { key: 'contractKind', header: 'Вид договора', className: 'whitespace-nowrap', sortable: true },
-            { key: 'clientName', header: 'Наименование клиента', className: 'min-w-[240px]', sortable: true },
-            { key: 'inn', header: 'ИНН', className: 'whitespace-nowrap', sortable: true },
-            { key: 'clientType', header: 'Тип клиента', className: 'whitespace-nowrap', sortable: true },
-            { key: 'contractNumber', header: 'Номер договора', className: 'whitespace-nowrap', sortable: true },
-            { key: 'contractDate', header: 'Дата договора', className: 'whitespace-nowrap', sortable: true },
-            { key: 'residencyStatus', header: 'Статус резидентства', className: 'whitespace-nowrap', sortable: true },
-            { key: 'accountType', header: 'Тип счёта', className: 'whitespace-nowrap', sortable: true },
-            { key: 'accountStatus', header: 'Статус счёта', className: 'whitespace-nowrap', sortable: true },
-          ]}
-        />
-      </section>
+          <DataTable
+            rows={sortedClientJournalRows}
+            emptyMessage="По заданным фильтрам записи не найдены"
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSortChange={handleSortChange}
+            columns={[
+              { key: 'clientCode', header: 'Код клиента', className: 'whitespace-nowrap', sortable: true },
+              { key: 'contractKind', header: 'Вид договора', className: 'whitespace-nowrap', sortable: true },
+              { key: 'clientName', header: 'Наименование клиента', className: 'min-w-[240px]', sortable: true },
+              { key: 'inn', header: 'ИНН', className: 'whitespace-nowrap', sortable: true },
+              { key: 'clientType', header: 'Тип клиента', className: 'whitespace-nowrap', sortable: true },
+              { key: 'contractNumber', header: 'Номер договора', className: 'whitespace-nowrap', sortable: true },
+              { key: 'contractDate', header: 'Дата договора', className: 'whitespace-nowrap', sortable: true },
+              { key: 'residencyStatus', header: 'Статус резидентства', className: 'whitespace-nowrap', sortable: true },
+              { key: 'accountType', header: 'Тип счёта', className: 'whitespace-nowrap', sortable: true },
+              { key: 'accountStatus', header: 'Статус счёта', className: 'whitespace-nowrap', sortable: true },
+            ]}
+          />
+        </section>
+      )}
     </div>
   );
 };

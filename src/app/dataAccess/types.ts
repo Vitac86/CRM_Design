@@ -7,6 +7,7 @@ import type { AgentsRepository } from '../../features/agents/api/agentsRepositor
 import type { RelationsRepository } from '../../features/relations/api/relationsRepository';
 import type { ComplianceRepository } from '../../features/compliance/api/complianceRepository';
 import type { DocumentsRepository } from '../../features/documents/api/documentsRepository';
+import type { ReportsRepository } from '../../features/reports/api/reportsRepository';
 
 export type DataAccessContextValue = {
   clients: ClientsRepository;
@@ -18,4 +19,5 @@ export type DataAccessContextValue = {
   relations: RelationsRepository;
   compliance: ComplianceRepository;
   documents: DocumentsRepository;
+  reports: ReportsRepository;
 };

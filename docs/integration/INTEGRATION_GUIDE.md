@@ -13,6 +13,8 @@
 - `src/data/requests.ts` теперь является **seed-only** файлом (без runtime-мутаций).
 - `src/data/clientAccounts.ts` является **seed-only** файлом для счетов клиента.
 - `src/data/clientContracts.ts` является **seed/pure-helper** файлом (seed + `createDefaultContractConfig`).
+- `src/data/compliance.ts` теперь является **readonly seed-only** файлом для комплаенс-данных.
+- `src/data/reports.ts` теперь является **readonly seed-only** файлом для отчётов (используется через ReportsRepository).
 
 ## Новый data-access слой
 
@@ -62,13 +64,16 @@
 - `ComplianceCardPage` использует `useDataAccess().clients/compliance/documents/relations` для загрузки клиента, кейса, карточек, документов и связей.
 - `ComplianceRepository` добавлен в `DataAccessProvider` и отвечает за compliance seed data в demo-mode.
 - `DocumentsRepository` добавлен в `DataAccessProvider` и отвечает за документы клиента в demo-mode.
-- `ClientsProvider` пока остаётся в runtime: `useClientsStore` всё ещё используется в `MiddleOfficePage`, `MiddleOfficeClientsPage`.
-- Contract-related screens, уже мигрированные на data-access: `RequestsPage`, `SubjectProfilePage`, `SubjectContractsTab`, `ContractWizardPage`.
-- Остаточный technical debt по контрактам: `MiddleOfficePage` и `MiddleOfficeClientsPage` всё ещё читают `clientContracts` напрямую для витринных вычислений.
+- `src/data/clientDocuments.ts` остаётся seed-файлом; legacy helper `getDocumentsByClientId` пока сохранён для `SubjectDocumentsTab`.
+- `MiddleOfficePage` использует `useDataAccess().clients/contracts/accounts/reports`; runtime-импорты `src/data/clientAccounts`, `src/data/clientContracts`, `src/data/reports` удалены.
+- `MiddleOfficeClientsPage` использует `useDataAccess().clients/contracts/accounts`; runtime-импорты `src/data/clientAccounts`, `src/data/clientContracts` удалены.
+- `ReportsRepository` добавлен в `DataAccessProvider` и отвечает за reports seed data в demo-mode.
+- `ClientsProvider` удалён из runtime (`src/main.tsx`), так как `useClientsStore` больше не используется.
+- Contract-related screens, уже мигрированные на data-access: `RequestsPage`, `SubjectProfilePage`, `SubjectContractsTab`, `ContractWizardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`.
 
 ### Recommended next step
 
-Перевести на `useDataAccess` следующие UI-экраны, которые ещё читают `src/data/*` напрямую.
+Продолжить миграцию остальных UI-экранов, которые ещё читают `src/data/*` напрямую (например, `DepositoryPage`, `MiddleOfficeReportsPage`, `ReportsPageTemplate`).
 
 ## Что будет сделано в следующих шагах
 
