@@ -39,16 +39,20 @@
 - `ContractWizardPage` использует `useDataAccess().clients` (`getClientById/updateClient`) и `useDataAccess().contracts` (`createDefaultContractConfig/getContractById/getContractConfigById/createContract/updateContract/updateContractConfig`).
 - `SubjectContractsTab` использует `useDataAccess().contracts.listContractsByClientId()` и `useDataAccess().accounts.listAccountsByClientId()/createAccount()`; runtime-импорты `src/data/clientAccounts` из компонента удалены.
 - `ArchivesPage` использует `useDataAccess().clients` для `listClients/restoreClient`.
+- `ClientRegistrationWizardPage` использует `useDataAccess().clients.createClient()` вместо `useClientsStore().addClient()`.
+- Новый клиент после регистрации создаётся в `ClientsRepository` и сразу доступен в `SubjectsPage` (list) и `SubjectProfilePage` (open by id).
 - `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
 - Создание поручений в demo-mode реализовано только в `src/features/requests/mock/mockRequestsRepository.ts`.
 - `src/data/requests.ts` используется только как источник immutable seed для mock-репозитория.
 - `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
 - `ClientsStore` больше не должен быть источником истины для уже мигрированных client-экранов (`SubjectsPage`, `SubjectProfilePage`, `ArchivesPage`).
 - Client list/profile/archive теперь работают через единый `ClientsRepository` (`useDataAccess().clients`).
+- `ClientsRepository` расширен методами `createClient` и `getClientByCode` для сценариев регистрации/поиска.
 - `ContractsRepository` расширен create/update-методами; runtime-поведение создания/обновления договора и конфигурации договора перенесено в `src/features/contracts/mock/mockContractsRepository.ts`.
 - `AccountsRepository` добавлен в `DataAccessProvider` и отвечает за счета клиента в demo-mode через `src/features/accounts/mock/mockAccountsRepository.ts`.
-- `src/data/clientContracts.ts` используется как seed/pure-helper источник без runtime-mutation/read-helper exports.
-- `ClientsProvider` пока остаётся в runtime: `useClientsStore` всё ещё используется в `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `ClientRegistrationWizardPage`, `SubjectRelationsTab`.
+- Demo-инициализация active broker/depository договоров для активных клиентов выполняется внутри `src/features/contracts/mock/mockContractsRepository.ts` (а не в seed-файле).
+- `src/data/clientContracts.ts` используется как seed/pure-helper источник без runtime mutations.
+- `ClientsProvider` пока остаётся в runtime: `useClientsStore` всё ещё используется в `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `SubjectRelationsTab`.
 - Contract-related screens, уже мигрированные на data-access: `RequestsPage`, `SubjectProfilePage`, `SubjectContractsTab`, `ContractWizardPage`.
 - Остаточный technical debt по контрактам: `MiddleOfficePage` и `MiddleOfficeClientsPage` всё ещё читают `clientContracts` напрямую для витринных вычислений.
 

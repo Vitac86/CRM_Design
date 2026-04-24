@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useClientsStore } from '../app/ClientsStore';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { Button } from '../components/ui';
 import { IndividualRegistrationForm, type IndividualFormData } from '../components/crm/registration/IndividualRegistrationForm';
 import { LegalEntityRegistrationForm, type LegalEntityFormData } from '../components/crm/registration/LegalEntityRegistrationForm';
@@ -88,7 +88,7 @@ const initialLegalEntityForm: LegalEntityFormData = {
 
 export const ClientRegistrationWizardPage = () => {
   const navigate = useNavigate();
-  const { addClient } = useClientsStore();
+  const { clients: clientsRepository } = useDataAccess();
   const [step, setStep] = useState(1);
   const [subjectType, setSubjectType] = useState<SubjectType>(null);
   const [registrationMethod, setRegistrationMethod] = useState<RegistrationMethod>(null);
@@ -257,7 +257,7 @@ export const ClientRegistrationWizardPage = () => {
     setDraftMessage('');
   };
 
-  const handleProceedFromStepTwo = () => {
+  const handleProceedFromStepTwo = async () => {
     if (subjectType === 'individual') {
       const hasBase = individualForm.lastName.trim() && individualForm.firstName.trim();
       const hasInnOrPhone = individualForm.inn.trim() || individualForm.phones.trim();
@@ -531,10 +531,10 @@ export const ClientRegistrationWizardPage = () => {
             },
           };
 
-    addClient(client);
+    const createdClient = await clientsRepository.createClient(client);
     setResult({
-      id,
-      code,
+      id: createdClient.id,
+      code: createdClient.code,
       registrationDate,
     });
     setValidationError('');

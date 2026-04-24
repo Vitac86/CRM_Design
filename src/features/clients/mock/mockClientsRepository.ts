@@ -17,6 +17,24 @@ export const createMockClientsRepository = (): ClientsRepository => {
       return client ? cloneClient(client) : null;
     },
 
+    async getClientByCode(code: string) {
+      const client = clientsStore.find((item) => item.code === code);
+      return client ? cloneClient(client) : null;
+    },
+
+    async createClient(client: Client) {
+      const nextClient = cloneClient(client);
+      const existingClientIndex = clientsStore.findIndex((item) => item.id === nextClient.id);
+
+      if (existingClientIndex >= 0) {
+        clientsStore[existingClientIndex] = nextClient;
+        return cloneClient(nextClient);
+      }
+
+      clientsStore.push(nextClient);
+      return cloneClient(nextClient);
+    },
+
     async updateClient(id: string, patch: Partial<Client>) {
       const clientIndex = clientsStore.findIndex((item) => item.id === id);
       if (clientIndex < 0) {
