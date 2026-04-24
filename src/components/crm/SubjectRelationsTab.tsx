@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getRelationsByClientId } from '../../data/clientRelations';
 import { useClientsStore } from '../../app/ClientsStore';
 import { Button, DataTable, EmptyState, FormField } from '../ui';
+import { formatClientType } from '../../utils/labels';
+import { buildDatedCsvFileName, exportToCsv } from '../../utils/csv';
 
 type SubjectRelationsTabProps = {
   clientId: string;
@@ -49,6 +51,19 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
     handleCloseModal();
   };
 
+  const handleExportAgentClients = () => {
+    exportToCsv(
+      agentClients,
+      [
+        { header: 'Субъект', value: (row) => row.name },
+        { header: 'Код субъекта', value: (row) => row.code },
+        { header: 'ИНН', value: (row) => row.inn },
+        { header: 'Тип', value: (row) => formatClientType(row.type) },
+      ],
+      buildDatedCsvFileName('agent-clients'),
+    );
+  };
+
   return (
     <div className="space-y-4">
       {relations.length === 0 ? (
@@ -81,9 +96,14 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
         <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600">Клиенты агента</h3>
-            <Button size="sm" variant="secondary" onClick={() => setIsModalOpen(true)}>
-              + Добавить клиента
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="secondary" onClick={handleExportAgentClients} disabled={agentClients.length === 0}>
+                Экспорт
+              </Button>
+              <Button size="sm" variant="secondary" onClick={() => setIsModalOpen(true)}>
+                + Добавить клиента
+              </Button>
+            </div>
           </div>
 
           <DataTable

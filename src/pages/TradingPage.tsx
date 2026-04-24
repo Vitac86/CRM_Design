@@ -15,6 +15,7 @@ import { getClientById } from '../data/clients';
 import { tradingProfiles } from '../data/trading';
 import type { TradingMethod, TradingProfile, TradingRiskLevel, TradingStatus } from '../data/types';
 import { tradingStatusTone } from '../utils/tableStatus';
+import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 type BooleanFilter = 'all' | 'yes' | 'no';
 
@@ -199,9 +200,28 @@ export const TradingPage = () => {
   };
 
   const hasActiveConditions = search.trim().length > 0 || qualificationFilter !== 'all' || podFtFilter !== 'all';
+  const hasRowsForExport = sortedRows.length > 0;
 
   const qualificationLabel = qualificationFilter === 'all' ? 'Все' : qualificationFilter === 'yes' ? 'Да' : 'Нет';
   const podFtLabel = podFtFilter === 'all' ? 'Все' : podFtFilter === 'yes' ? 'Да' : 'Нет';
+
+  const handleExport = () => {
+    exportToCsv(
+      sortedRows,
+      [
+        { header: 'Клиент', value: (row) => row.clientName },
+        { header: 'Код', value: (row) => row.clientCode },
+        { header: 'Инвестор', value: (row) => row.investorStatus },
+        { header: 'Риск', value: (row) => row.riskLevel },
+        { header: 'Договор', value: (row) => row.brokerContractNumber },
+        { header: 'Распорядитель', value: (row) => row.accountDisposer.name },
+        { header: 'Способ торговли', value: (row) => row.tradingMethods.join(', ') },
+        { header: 'Полномочия до', value: (row) => row.authorityUntil },
+        { header: 'Статус', value: (row) => row.tradingStatus },
+      ],
+      buildDatedCsvFileName('trading'),
+    );
+  };
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
@@ -249,6 +269,9 @@ export const TradingPage = () => {
 
               <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto" disabled={!hasActiveConditions}>
                 Сбросить всё
+              </Button>
+              <Button variant="secondary" size="sm" onClick={handleExport} disabled={!hasRowsForExport}>
+                Экспорт
               </Button>
             </>
           }

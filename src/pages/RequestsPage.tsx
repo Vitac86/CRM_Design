@@ -5,6 +5,7 @@ import { Button, DataTable, FilterBar, SearchInput, SelectFilter, Pagination, Ta
 import { NEW_REQUEST_STATUS, createRequest, requests } from '../data/requests';
 import { getContractsByClientId } from '../data/clientContracts';
 import type { ClientBankDetails, CurrencyCode, Request } from '../data/types';
+import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 const pageSize = 10;
 
@@ -415,20 +416,48 @@ export const RequestsPage = () => {
     printWindow.print();
   };
 
+  const handleExport = () => {
+    const exported = exportToCsv(
+      filteredRequests,
+      [
+        { header: 'Номер поручения', value: (request) => request.number },
+        { header: 'Вид поручения', value: (request) => request.requestType },
+        { header: 'Клиент', value: (request) => request.clientName },
+        { header: 'Код клиента', value: (request) => request.clientCode },
+        { header: 'Сумма', value: (request) => request.amount ?? '—' },
+        { header: 'Валюта', value: (request) => request.currency ?? '—' },
+        { header: 'Статус', value: (request) => request.status },
+        { header: 'Дата', value: (request) => request.date },
+        { header: 'Время', value: (request) => request.time },
+        { header: 'Источник', value: (request) => request.source },
+      ],
+      buildDatedCsvFileName('requests'),
+    );
+
+    if (exported) {
+      setToastMessage('CSV-экспорт выполнен');
+    }
+  };
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Поручения</h1>
-        <Button
-          onClick={() => {
-            setIsCreateFormOpen((prev) => !prev);
-            if (isCreateFormOpen) {
-              resetCreateForm();
-            }
-          }}
-        >
-          {isCreateFormOpen ? 'Закрыть форму' : '+ Новое поручение'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={handleExport} disabled={filteredRequests.length === 0}>
+            Экспорт
+          </Button>
+          <Button
+            onClick={() => {
+              setIsCreateFormOpen((prev) => !prev);
+              if (isCreateFormOpen) {
+                resetCreateForm();
+              }
+            }}
+          >
+            {isCreateFormOpen ? 'Закрыть форму' : '+ Новое поручение'}
+          </Button>
+        </div>
       </header>
 
       {toastMessage ? (

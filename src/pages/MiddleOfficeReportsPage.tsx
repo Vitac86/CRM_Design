@@ -4,6 +4,7 @@ import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList
 import { reports } from '../data/reports';
 import type { Report } from '../data/types';
 import { Button, SearchInput, SelectFilter } from '../components/ui';
+import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 export const MiddleOfficeReportsPage = () => {
   const [search, setSearch] = useState('');
@@ -67,11 +68,34 @@ export const MiddleOfficeReportsPage = () => {
 
   const selectedReport = filteredReports.find((report) => report.id === selectedReportId) ?? null;
 
+  const handleExport = () => {
+    const exported = exportToCsv(
+      filteredReports,
+      [
+        { header: 'Клиент', value: (report) => report.clientName },
+        { header: 'Код клиента', value: (report) => report.clientCode },
+        { header: 'Отчёт', value: (report) => report.reportTitle },
+        { header: 'Файл', value: (report) => report.fileName },
+        { header: 'Период', value: (report) => report.period },
+        { header: 'Канал отправки', value: (report) => report.deliveryChannel },
+        { header: 'Статус', value: (report) => report.deliveryStatus },
+        { header: 'Дата отправки', value: (report) => report.sentAt },
+      ],
+      buildDatedCsvFileName('middle-office-reports'),
+    );
+
+    if (exported) {
+      setToastMessage('CSV-экспорт выполнен');
+    }
+  };
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал отправленных отчётов</h1>
-        <Button variant="secondary">Экспорт</Button>
+        <Button variant="secondary" onClick={handleExport} disabled={filteredReports.length === 0}>
+          Экспорт
+        </Button>
       </header>
 
       <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">

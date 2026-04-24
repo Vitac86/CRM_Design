@@ -12,6 +12,7 @@ import {
   getComplianceBadgeVariant,
   getResidencyBadgeVariant,
 } from '../utils/labels';
+import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 type ComplianceRow = {
   id: string;
@@ -87,6 +88,22 @@ export const CompliancePage = () => {
     setComplianceFilter('all');
   };
 
+  const handleExport = () => {
+    exportToCsv(
+      filteredRows,
+      [
+        { header: 'Код клиента', value: (row) => row.code },
+        { header: 'Наименование клиента', value: (row) => row.name },
+        { header: 'ИНН', value: (row) => row.inn },
+        { header: 'Тип', value: (row) => formatClientType(row.type) },
+        { header: 'Резидент', value: (row) => formatResidency(row.residency) },
+        { header: 'Статус комплаенса', value: (row) => formatComplianceStatus(row.complianceStatus) },
+        { header: 'Полный комплект', value: (row) => (row.fullDocumentSet ? 'Да' : 'Нет') },
+      ],
+      buildDatedCsvFileName('compliance'),
+    );
+  };
+
   useEffect(() => {
     const nextParams = new URLSearchParams();
 
@@ -105,8 +122,11 @@ export const CompliancePage = () => {
 
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <header>
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Комплаенс</h1>
+        <Button variant="secondary" onClick={handleExport} disabled={filteredRows.length === 0}>
+          Экспорт
+        </Button>
       </header>
 
       <FilterBar>

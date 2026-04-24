@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge, DataTable, FilterChipSelect, SearchInput, TableControlPanel, type SortDirection } from '../components/ui';
+import { Badge, Button, DataTable, FilterChipSelect, SearchInput, TableControlPanel, type SortDirection } from '../components/ui';
 import { brokerageContracts, type BrokerageContract, type BrokerageContractStatus } from '../data/brokerage';
+import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 type BrokerageSortKey = 'contractNumber' | 'clientCode' | 'clientName' | 'manager' | 'openedAt' | 'status';
 
@@ -61,6 +62,21 @@ export const BrokeragePage = () => {
     }
   };
 
+  const handleExport = () => {
+    exportToCsv(
+      sortedContracts,
+      [
+        { header: 'Договор', value: (contract) => contract.contractNumber },
+        { header: 'Код клиента', value: (contract) => contract.clientCode },
+        { header: 'Клиент', value: (contract) => contract.clientName },
+        { header: 'Менеджер', value: (contract) => contract.manager },
+        { header: 'Дата открытия', value: (contract) => contract.openedAt },
+        { header: 'Статус', value: (contract) => contract.status },
+      ],
+      buildDatedCsvFileName('brokerage'),
+    );
+  };
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header>
@@ -76,18 +92,29 @@ export const BrokeragePage = () => {
           />
         }
         filters={
-          <FilterChipSelect
-            label="Статус"
-            value={statusFilter}
-            displayValue={statusFilter === 'all' ? 'Все' : statusFilter}
-            onChange={(value) => setStatusFilter(value as BrokerageContractStatus | 'all')}
-            options={[
-              { value: 'all', label: 'Все' },
-              { value: 'Активен', label: 'Активен' },
-              { value: 'Приостановлен', label: 'Приостановлен' },
-              { value: 'Закрыт', label: 'Закрыт' },
-            ]}
-          />
+          <>
+            <FilterChipSelect
+              label="Статус"
+              value={statusFilter}
+              displayValue={statusFilter === 'all' ? 'Все' : statusFilter}
+              onChange={(value) => setStatusFilter(value as BrokerageContractStatus | 'all')}
+              options={[
+                { value: 'all', label: 'Все' },
+                { value: 'Активен', label: 'Активен' },
+                { value: 'Приостановлен', label: 'Приостановлен' },
+                { value: 'Закрыт', label: 'Закрыт' },
+              ]}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className="ml-auto"
+              onClick={handleExport}
+              disabled={sortedContracts.length === 0}
+            >
+              Экспорт
+            </Button>
+          </>
         }
       />
 
