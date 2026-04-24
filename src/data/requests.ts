@@ -1,9 +1,8 @@
 import type { Request } from './types';
 
 export const NEW_REQUEST_STATUS: Request['status'] = 'Ожидает';
-export const REQUESTS_DASHBOARD_LIMIT = 10;
 
-export const requests: Request[] = [
+export const requests: readonly Request[] = [
   {
     id: 'r-001',
     clientId: 'c-001',
@@ -185,27 +184,3 @@ export const requests: Request[] = [
     source: 'Личный кабинет',
   },
 ];
-
-export const getRequestsByClientId = (clientId: string): Request[] =>
-  requests.filter((request) => request.clientId === clientId);
-
-export const getLatestRequests = (limit = REQUESTS_DASHBOARD_LIMIT): Request[] =>
-  [...requests]
-    .sort((left, right) => {
-      const leftDateTime = new Date(`${left.date}T${left.time}:00`).getTime();
-      const rightDateTime = new Date(`${right.date}T${right.time}:00`).getTime();
-      return rightDateTime - leftDateTime;
-    })
-    .slice(0, limit);
-
-export const createRequest = (payload: Omit<Request, 'id' | 'number'>) => {
-  const nextIndex = requests.length + 1;
-  const request: Request = {
-    ...payload,
-    id: `r-${Date.now()}`,
-    number: `REQ-${String(260000 + nextIndex).padStart(6, '0')}`,
-  };
-
-  requests.unshift(request);
-  return request;
-};

@@ -9,7 +9,8 @@
 Каталог `src/data/*` остаётся источником seed/mock-данных для текущего прототипа.
 
 - Эти данные используются для demo-режима.
-- Часть данных по-прежнему импортируется напрямую в UI-слой (это ожидаемо на текущем этапе).
+- UI-слой не должен импортировать `src/data/*` напрямую в runtime.
+- `src/data/requests.ts` теперь является **seed-only** файлом (без runtime-мутаций).
 
 ## Новый data-access слой
 
@@ -30,6 +31,8 @@
 - `RequestsPage` использует `useDataAccess().requests` и `useDataAccess().contracts`.
 - `DashboardPage` использует `useDataAccess().dashboard` и `useDataAccess().requests`.
 - `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
+- Создание поручений в demo-mode реализовано только в `src/features/requests/mock/mockRequestsRepository.ts`.
+- `src/data/requests.ts` используется только как источник immutable seed для mock-репозитория.
 - `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
 
 ### Recommended next step
