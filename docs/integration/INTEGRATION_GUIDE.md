@@ -32,6 +32,8 @@
 - `DashboardPage` использует `useDataAccess().dashboard` и `useDataAccess().requests`.
 - `SubjectsPage` (read/list) использует `useDataAccess().clients.listClients()`.
 - `SubjectProfilePage` использует `useDataAccess().clients` для `getClientById/listClients/updateClient/archiveClient`.
+- `SubjectProfilePage` больше не читает contract helpers напрямую из `src/data/clientContracts` в runtime.
+- Contract read helpers (`getPrimaryContractByClientId`, `getContractConfigById` и связанные read-операции) доступны через `useDataAccess().contracts`.
 - `ArchivesPage` использует `useDataAccess().clients` для `listClients/restoreClient`.
 - `DashboardPage` больше не импортирует `src/data/*` напрямую в runtime.
 - Создание поручений в demo-mode реализовано только в `src/features/requests/mock/mockRequestsRepository.ts`.
@@ -39,7 +41,10 @@
 - `src/data/dashboard` пока остаётся seed/mock-источником внутри `mockDashboardRepository`.
 - `ClientsStore` больше не должен быть источником истины для уже мигрированных client-экранов (`SubjectsPage`, `SubjectProfilePage`, `ArchivesPage`).
 - Client list/profile/archive теперь работают через единый `ClientsRepository` (`useDataAccess().clients`).
+- `ContractsRepository` расширен read-only методами для profile/read-сценариев договоров; `SubjectProfilePage` использует их через data-access.
 - Временный технический долг: часть экранов всё ещё использует `ClientsStore` (например, `AgentsPage`, `CompliancePage`, `ComplianceCardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`, `ContractWizardPage`, `ClientRegistrationWizardPage`, `SubjectRelationsTab`), их миграция запланирована следующими шагами.
+- Временный технический долг по договорам: `ContractWizardPage` и legacy runtime-mutations (`createClientContract`, `updateClientContract`, `updateContractConfig`) всё ещё живут в `src/data/clientContracts.ts` и должны быть перенесены в `ContractsRepository` отдельным шагом.
+- Поэтому `src/data/clientContracts.ts` пока не является полностью seed-only файлом: он seed для mock-репозитория и источник legacy create/update helpers.
 
 ### Recommended next step
 

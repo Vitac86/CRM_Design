@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ClientProfileHeader } from '../components/crm/ClientProfileHeader';
 import { PermissionCard } from '../components/crm/PermissionCard';
@@ -16,7 +16,6 @@ import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/Su
 import { formatClientType, formatResidency } from '../utils/labels';
 import { normalizePhoneInput } from '../utils/phone';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { getContractConfigById, getPrimaryContractByClientId } from '../data/clientContracts';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
@@ -53,9 +52,22 @@ export const SubjectProfilePage = () => {
   const [newRepresentativeAuthorityBasis, setNewRepresentativeAuthorityBasis] = useState('');
   const [newRepresentativeAuthorityValidUntil, setNewRepresentativeAuthorityValidUntil] = useState('');
   const [newRepresentativeWithoutExpiration, setNewRepresentativeWithoutExpiration] = useState(false);
-  const { clients: clientsRepository } = useDataAccess();
+  const { clients: clientsRepository, contracts: contractsRepository } = useDataAccess();
   const [client, setClient] = useState<Client | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+  const [contractDrivenProfile, setContractDrivenProfile] = useState<{
+    canUseMoney: boolean;
+    canUseSecurities: boolean;
+    reportDelivery: {
+      email: {
+        enabled: boolean;
+        address: string;
+      };
+      personalAccount: {
+        enabled: boolean;
+      };
+    };
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,35 +134,60 @@ export const SubjectProfilePage = () => {
   }, [clientsRepository, id]);
 
 
-  const contractDrivenProfile = useMemo(() => {
+  useEffect(() => {
+    let isCancelled = false;
+
     if (!client) {
-      return null;
+      setContractDrivenProfile(null);
+      return;
     }
 
-    const primaryContract = getPrimaryContractByClientId(client.id);
-    if (!primaryContract) {
-      return null;
-    }
+    const loadContractDrivenProfile = async () => {
+      try {
+        const primaryContract = await contractsRepository.getPrimaryContractByClientId(client.id);
+        if (!primaryContract) {
+          if (!isCancelled) {
+            setContractDrivenProfile(null);
+          }
+          return;
+        }
 
-    const contractConfig = getContractConfigById(primaryContract.id);
-    if (!contractConfig) {
-      return null;
-    }
+        const contractConfig = await contractsRepository.getContractConfigById(primaryContract.id);
+        if (!contractConfig) {
+          if (!isCancelled) {
+            setContractDrivenProfile(null);
+          }
+          return;
+        }
 
-    return {
-      canUseMoney: contractConfig.incomeTransfer.specialBrokerAccount,
-      canUseSecurities: contractConfig.tradingDepoOperatorEnabled,
-      reportDelivery: {
-        email: {
-          enabled: contractConfig.reporting.emailEnabled,
-          address: contractConfig.reporting.email,
-        },
-        personalAccount: {
-          enabled: contractConfig.reporting.edo,
-        },
-      },
+        if (!isCancelled) {
+          setContractDrivenProfile({
+            canUseMoney: contractConfig.incomeTransfer.specialBrokerAccount,
+            canUseSecurities: contractConfig.tradingDepoOperatorEnabled,
+            reportDelivery: {
+              email: {
+                enabled: contractConfig.reporting.emailEnabled,
+                address: contractConfig.reporting.email,
+              },
+              personalAccount: {
+                enabled: contractConfig.reporting.edo,
+              },
+            },
+          });
+        }
+      } catch {
+        if (!isCancelled) {
+          setContractDrivenProfile(null);
+        }
+      }
     };
-  }, [client]);
+
+    void loadContractDrivenProfile();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [client, contractsRepository]);
 
   useEffect(() => {
     if (!toastMessage) {
