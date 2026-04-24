@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import { getAccountsByClientId } from '../../data/clientAccounts';
-import { getContractsByClientId } from '../../data/clientContracts';
 import type { ClientAccount, ContractProductType, ClientContract } from '../../data/types';
 import { Badge, Button, Card, DataTable } from '../ui';
 
@@ -41,12 +41,30 @@ const defaultAccountForm: AccountForm = {
 
 export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   const navigate = useNavigate();
-  const contracts = useMemo(() => getContractsByClientId(clientId), [clientId]);
+  const { contracts: contractsRepository } = useDataAccess();
+  const [contracts, setContracts] = useState<ClientContract[]>([]);
   const [accounts, setAccounts] = useState<ClientAccount[]>(() => getAccountsByClientId(clientId));
 
   const [isAccountFormOpen, setIsAccountFormOpen] = useState(false);
   const [accountForm, setAccountForm] = useState<AccountForm>(defaultAccountForm);
   const [accountError, setAccountError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadContracts = async () => {
+      const nextContracts = await contractsRepository.listContractsByClientId(clientId);
+      if (isMounted) {
+        setContracts(nextContracts);
+      }
+    };
+
+    void loadContracts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientId, contractsRepository]);
 
   const handleOpenContract = (contractId: string) => {
     navigate(`/subjects/${clientId}/contract-wizard?contractId=${contractId}`);
