@@ -309,7 +309,7 @@ export interface Request {
   status: 'Ожидает' | 'Принято' | 'Отклонено';
   date: string;
   time: string;
-  source: 'Личный кабинет' | 'Почта';
+  source: 'Личный кабинет' | 'Почта' | 'Оригинал';
   withdrawalBankDetails?: ClientBankDetails;
   transferFromMarket?: 'Валютный рынок' | 'Фондовый рынок';
   transferToMarket?: 'Валютный рынок' | 'Фондовый рынок';

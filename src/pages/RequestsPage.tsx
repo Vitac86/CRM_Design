@@ -32,6 +32,14 @@ const defaultManualBankDetails: ClientBankDetails = {
   correspondentAccount: '',
 };
 
+const escapeHtml = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
 export const RequestsPage = () => {
   const { clients, getClientById } = useClientsStore();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,7 +49,7 @@ export const RequestsPage = () => {
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') ?? '');
   const [sourceFilter, setSourceFilter] = useState<Request['source'] | 'all'>(() => {
     const source = searchParams.get('source');
-    return source === 'Личный кабинет' || source === 'Почта' ? source : 'all';
+    return source === 'Личный кабинет' || source === 'Почта' || source === 'Оригинал' ? source : 'all';
   });
   const [statusFilter, setStatusFilter] = useState<Request['status'] | 'all'>(() => {
     const status = searchParams.get('status');
@@ -266,6 +274,112 @@ export const RequestsPage = () => {
     setToastMessage('Поручение успешно создано');
   };
 
+  const getDraftWithdrawalDetails = (): ClientBankDetails | undefined => {
+    if (createType !== 'withdrawal') {
+      return undefined;
+    }
+
+    if (withdrawalBankSource === 'client' && selectedBankAccount) {
+      return {
+        bankName: selectedBankAccount.bankName,
+        bik: selectedBankAccount.bik,
+        checkingAccount: selectedBankAccount.accountNumber,
+        correspondentAccount: selectedBankAccount.correspondentAccount,
+      };
+    }
+
+    return {
+      bankName: manualBankDetails.bankName.trim(),
+      bik: manualBankDetails.bik.trim(),
+      checkingAccount: manualBankDetails.checkingAccount.trim(),
+      correspondentAccount: manualBankDetails.correspondentAccount.trim(),
+    };
+  };
+
+  const validateDraftForExport = (): string | null => {
+    if (!selectedClient || !selectedContract) {
+      return 'Для печати заполните обязательные поля: клиент и договор.';
+    }
+
+    const withdrawalDetails = getDraftWithdrawalDetails();
+
+    if (createType === 'withdrawal' && withdrawalDetails && Object.values(withdrawalDetails).some((value) => !value.trim())) {
+      return 'Для печати поручения на вывод ДС заполните банковские реквизиты.';
+    }
+
+    return null;
+  };
+
+  const handlePrintDraft = () => {
+    const validationError = validateDraftForExport();
+
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+
+    if (!selectedClient || !selectedContract) {
+      return;
+    }
+
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10);
+    const time = now.toTimeString().slice(0, 5);
+    const transferToMarket = getOppositeMarket(transferFromMarket);
+    const withdrawalDetails = getDraftWithdrawalDetails();
+
+    const detailsRows = createType === 'withdrawal' && withdrawalDetails
+      ? `
+        <tr><td><strong>Банк</strong></td><td>${escapeHtml(withdrawalDetails.bankName)}</td></tr>
+        <tr><td><strong>БИК</strong></td><td>${escapeHtml(withdrawalDetails.bik)}</td></tr>
+        <tr><td><strong>Расчётный счёт</strong></td><td>${escapeHtml(withdrawalDetails.checkingAccount)}</td></tr>
+        <tr><td><strong>Корреспондентский счёт</strong></td><td>${escapeHtml(withdrawalDetails.correspondentAccount)}</td></tr>
+      `
+      : `
+        <tr><td><strong>Площадка списания</strong></td><td>${escapeHtml(transferFromMarket)}</td></tr>
+        <tr><td><strong>Площадка зачисления</strong></td><td>${escapeHtml(transferToMarket)}</td></tr>
+      `;
+
+    const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700');
+    if (!printWindow) {
+      setFormError('Не удалось открыть окно печати. Разрешите всплывающие окна и повторите попытку.');
+      return;
+    }
+
+    printWindow.document.write(`
+      <!doctype html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Поручение — черновик</title>
+        <style>
+          body { font-family: Inter, Arial, sans-serif; color: #0f172a; margin: 24px; }
+          h1 { margin: 0 0 12px; font-size: 20px; }
+          p { margin: 0 0 8px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+          td { border: 1px solid #cbd5e1; padding: 8px; vertical-align: top; }
+          td:first-child { width: 40%; background: #f8fafc; }
+          .meta { margin-bottom: 12px; color: #475569; font-size: 13px; }
+        </style>
+      </head>
+      <body>
+        <h1>${escapeHtml(requestTypeLabelMap[createType])}</h1>
+        <p class="meta">Черновик от ${escapeHtml(date)} ${escapeHtml(time)}</p>
+        <table>
+          <tr><td><strong>Клиент</strong></td><td>${escapeHtml(selectedClient.name)} (${escapeHtml(selectedClient.code)})</td></tr>
+          <tr><td><strong>Договор</strong></td><td>${escapeHtml(selectedContract.number)}</td></tr>
+          <tr><td><strong>Статус</strong></td><td>Ожидает</td></tr>
+          <tr><td><strong>Источник</strong></td><td>${escapeHtml(selectedSource)}</td></tr>
+          ${detailsRows}
+        </table>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header className="flex items-center justify-between gap-3">
@@ -346,6 +460,7 @@ export const RequestsPage = () => {
               >
                 <option value="Личный кабинет">Личный кабинет</option>
                 <option value="Почта">Почта</option>
+                <option value="Оригинал">Оригинал</option>
               </select>
             </label>
           </div>
@@ -457,6 +572,9 @@ export const RequestsPage = () => {
               }}
             >
               Отмена
+            </Button>
+            <Button variant="secondary" onClick={handlePrintDraft}>
+              Распечатать поручение
             </Button>
             <Button onClick={handleCreateRequest}>Сохранить поручение</Button>
           </div>
