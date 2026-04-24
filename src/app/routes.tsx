@@ -9,7 +9,6 @@ import { ClientRegistrationWizardPage } from '../pages/ClientRegistrationWizardP
 import { RequestsPage } from '../pages/RequestsPage';
 import { CompliancePage } from '../pages/CompliancePage';
 import { ComplianceCardPage } from '../pages/ComplianceCardPage';
-import { MiddleOfficePage } from '../pages/MiddleOfficePage';
 import { BackOfficePage } from '../pages/BackOfficePage';
 import { DepositoryPage } from '../pages/DepositoryPage';
 import { BrokeragePage } from '../pages/BrokeragePage';
@@ -18,6 +17,8 @@ import { AgentsPage } from '../pages/AgentsPage';
 import { ArchivesPage } from '../pages/ArchivesPage';
 import { AdministrationPage } from '../pages/AdministrationPage';
 import { ContractWizardPage } from '../pages/ContractWizardPage';
+import { MiddleOfficeClientsPage } from '../pages/MiddleOfficeClientsPage';
+import { MiddleOfficeReportsPage } from '../pages/MiddleOfficeReportsPage';
 
 export const router = createBrowserRouter([
   {
@@ -37,7 +38,9 @@ export const router = createBrowserRouter([
       { path: 'requests', element: <RequestsPage /> },
       { path: 'compliance', element: <CompliancePage /> },
       { path: 'compliance/:id', element: <ComplianceCardPage /> },
-      { path: 'middle-office', element: <MiddleOfficePage /> },
+      { path: 'middle-office', element: <Navigate to="/middle-office/clients" replace /> },
+      { path: 'middle-office/clients', element: <MiddleOfficeClientsPage /> },
+      { path: 'middle-office/reports', element: <MiddleOfficeReportsPage /> },
       { path: 'back-office', element: <BackOfficePage /> },
       { path: 'trading', element: <TradingPage /> },
       { path: 'trading/:id', element: <TradingCardPage /> },
