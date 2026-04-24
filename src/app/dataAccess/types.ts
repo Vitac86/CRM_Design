@@ -8,6 +8,11 @@ import type { RelationsRepository } from '../../features/relations/api/relations
 import type { ComplianceRepository } from '../../features/compliance/api/complianceRepository';
 import type { DocumentsRepository } from '../../features/documents/api/documentsRepository';
 import type { ReportsRepository } from '../../features/reports/api/reportsRepository';
+import type { TradingRepository } from '../../features/trading/api/tradingRepository';
+import type { AdministrationRepository } from '../../features/administration/api/administrationRepository';
+import type { OperationsRepository } from '../../features/operations/api/operationsRepository';
+import type { NavigationRepository } from '../../features/navigation/api/navigationRepository';
+import type { HistoryRepository } from '../../features/history/api/historyRepository';
 
 export type DataAccessContextValue = {
   clients: ClientsRepository;
@@ -20,4 +25,9 @@ export type DataAccessContextValue = {
   compliance: ComplianceRepository;
   documents: DocumentsRepository;
   reports: ReportsRepository;
+  trading: TradingRepository;
+  administration: AdministrationRepository;
+  operations: OperationsRepository;
+  navigation: NavigationRepository;
+  history: HistoryRepository;
 };

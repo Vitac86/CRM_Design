@@ -15,6 +15,7 @@
 - `src/data/clientContracts.ts` является **seed/pure-helper** файлом (seed + `createDefaultContractConfig`).
 - `src/data/compliance.ts` теперь является **readonly seed-only** файлом для комплаенс-данных.
 - `src/data/reports.ts` теперь является **readonly seed-only** файлом для отчётов (используется через ReportsRepository).
+- `src/data/trading.ts`, `src/data/documents.ts`, `src/data/administration.ts`, `src/data/brokerage.ts`, `src/data/trustManagement.ts`, `src/data/clientHistory.ts`, `src/data/menu.ts` переведены в **readonly seed-only** режим для использования через mock-репозитории.
 
 ## Новый data-access слой
 
@@ -72,12 +73,26 @@
 - `DepositoryPage` использует `useDataAccess().reports.listReportsByDepartment('Депозитарий')`.
 - `ReportsPageTemplate` не импортирует runtime-данные из `src/data/*`; шаблон получает отчёты через props (presentation-only).
 - `ReportsRepository` добавлен в `DataAccessProvider` и отвечает за reports seed data в demo-mode.
+- `TradingPage` и `TradingCardPage` используют `useDataAccess().trading` + `useDataAccess().clients`; runtime-импорты `src/data/trading` и `src/data/clients` удалены из UI.
+- Добавлен `TradingRepository` (`src/features/trading/api/tradingRepository.ts`, `src/features/trading/mock/mockTradingRepository.ts`).
+- `DocumentsRepository` расширен методом `listDocuments()`; `DocumentsPage` переведена на `useDataAccess().documents.listDocuments()`.
+- `AdministrationPage` переведена на `useDataAccess().administration.listSections()`.
+- Добавлен `AdministrationRepository` (`src/features/administration/api/administrationRepository.ts`, `src/features/administration/mock/mockAdministrationRepository.ts`).
+- `BrokeragePage` и `TrustManagementPage` переведены на `useDataAccess().operations`.
+- Добавлен `OperationsRepository` (`src/features/operations/api/operationsRepository.ts`, `src/features/operations/mock/mockOperationsRepository.ts`).
+- `Sidebar` переведён на `useDataAccess().navigation.listSidebarItems()`; runtime-импорт `src/data/menu` удалён из layout-слоя.
+- Добавлен `NavigationRepository` (`src/features/navigation/api/navigationRepository.ts`, `src/features/navigation/mock/mockNavigationRepository.ts`).
+- `Topbar` использует `useDataAccess().clients.listClients()` для глобального поиска.
+- `SubjectHistoryTab` переведён на `useDataAccess().history.listHistoryByClientId()`.
+- Добавлен `HistoryRepository` (`src/features/history/api/historyRepository.ts`, `src/features/history/mock/mockHistoryRepository.ts`).
+- Legacy read-helpers удалены из seed-файлов: `getTradingProfileByClientId`, `getDocumentsByClientId`, `getHistoryByClientId`.
+- `DataAccessProvider` расширен новыми репозиториями: `trading`, `administration`, `operations`, `navigation`, `history`.
 - `ClientsProvider` удалён из runtime (`src/main.tsx`), так как `useClientsStore` больше не используется.
 - Contract-related screens, уже мигрированные на data-access: `RequestsPage`, `SubjectProfilePage`, `SubjectContractsTab`, `ContractWizardPage`, `MiddleOfficePage`, `MiddleOfficeClientsPage`.
 
 ### Recommended next step
 
-Продолжить миграцию остальных UI-экранов, которые ещё читают `src/data/*` напрямую в runtime (например, `TradingPage`, `TradingCardPage`, `DocumentsPage`, `Topbar`, `Sidebar`, `AdministrationPage`, `BrokeragePage`, `TrustManagementPage`, `SubjectHistoryTab`).
+Следующий безопасный шаг — вынести type-only импорты из `src/data/types` и `src/data/dashboard` в feature/shared типы (без изменения runtime-поведения).
 
 ## Что будет сделано в следующих шагах
 
@@ -89,16 +104,8 @@ Backend, база данных и реальные сетевые интегра
 
 ## Остаточные runtime imports `src/data/*` (после текущего шага)
 
-В UI-слое (страницы/компоненты) всё ещё есть прямые runtime-импорты `src/data/*` вне текущего documents/reports/depository scope:
+Прямые runtime-импорты `src/data/*` в UI-слое (`src/pages/*`, `src/components/layout/*`, `src/components/crm/*`) для перечисленных выше экранов устранены.
 
-- `src/pages/TradingPage.tsx`
-- `src/pages/TradingCardPage.tsx`
-- `src/pages/DocumentsPage.tsx`
-- `src/pages/AdministrationPage.tsx`
-- `src/pages/BrokeragePage.tsx`
-- `src/pages/TrustManagementPage.tsx`
-- `src/components/layout/Topbar.tsx`
-- `src/components/layout/Sidebar.tsx`
-- `src/components/crm/SubjectHistoryTab.tsx`
-
-Примечание: runtime-импорты внутри `src/features/*/mock/*Repository.ts` остаются допустимыми, так как это mock data-access слой и seed-источник demo-режима.
+Допустимые остатки:
+- type-only импорты из `src/data/types`/`src/data/dashboard`;
+- runtime-импорты в `src/features/*/mock/*Repository.ts` как часть mock data-access слоя.

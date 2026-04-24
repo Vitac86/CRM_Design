@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge, DataTable, FilterChipSelect, SearchInput, TableControlPanel } from '../components/ui';
-import { trustContracts, type TrustContract, type TrustContractStatus } from '../data/trustManagement';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { TrustContract, TrustContractStatus } from '../features/operations/api/operationsRepository';
 
 const badgeByStatus: Record<TrustContractStatus, 'success' | 'info' | 'neutral'> = {
   'Активен': 'success',
@@ -9,12 +10,28 @@ const badgeByStatus: Record<TrustContractStatus, 'success' | 'info' | 'neutral'>
 };
 
 export const TrustManagementPage = () => {
+  const { operations } = useDataAccess();
+  const [contracts, setContracts] = useState<TrustContract[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<TrustContractStatus | 'all'>('all');
 
+  useEffect(() => {
+    let isMounted = true;
+
+    void operations.listTrustContracts().then((items) => {
+      if (isMounted) {
+        setContracts(items);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [operations]);
+
   const filteredContracts = useMemo(
     () =>
-      trustContracts.filter((contract) => {
+      contracts.filter((contract) => {
         const normalizedSearch = search.trim().toLowerCase();
 
         if (normalizedSearch && ![contract.contractNumber, contract.clientName, contract.strategy].join(' ').toLowerCase().includes(normalizedSearch)) {
@@ -27,7 +44,7 @@ export const TrustManagementPage = () => {
 
         return true;
       }),
-    [search, statusFilter],
+    [contracts, search, statusFilter],
   );
 
   return (

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Badge, Button, Card, EmptyState } from '../components/ui';
-import { getClientById } from '../data/clients';
-import { getTradingProfileByClientId } from '../data/trading';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { Client, TradingProfile } from '../data/types';
 
 type TradingTab = 'params' | 'terminals';
 
@@ -69,17 +69,46 @@ const getInitials = (name: string) =>
     .join('');
 
 export const TradingCardPage = () => {
+  const { clients: clientsRepository, trading: tradingRepository } = useDataAccess();
   const { id } = useParams();
 
-  const client = useMemo(() => (id ? getClientById(id) : undefined), [id]);
-  const profile = useMemo(() => (id ? getTradingProfileByClientId(id) : undefined), [id]);
+  const [client, setClient] = useState<Client | null>(null);
+  const [profile, setProfile] = useState<TradingProfile | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setClient(null);
+      setProfile(null);
+      return;
+    }
+
+    let isMounted = true;
+
+    void Promise.all([clientsRepository.getClientById(id), tradingRepository.getTradingItemById(id)]).then(
+      ([loadedClient, loadedProfile]) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setClient(loadedClient ?? null);
+        setProfile(loadedProfile);
+      },
+    );
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientsRepository, id, tradingRepository]);
 
   const [activeTab, setActiveTab] = useState<TradingTab>('params');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [passwordResetTerminalId, setPasswordResetTerminalId] = useState<string | null>(null);
 
   const isQuikMobileTerminal = (terminalType: string) => terminalType.toLowerCase().includes('quik mobile');
-  const selectedTerminal = profile?.terminals.find((terminal) => terminal.id === passwordResetTerminalId);
+  const selectedTerminal = useMemo(
+    () => profile?.terminals.find((terminal) => terminal.id === passwordResetTerminalId),
+    [passwordResetTerminalId, profile],
+  );
 
   useEffect(() => {
     if (!toastMessage) {

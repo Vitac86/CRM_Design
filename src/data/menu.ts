@@ -16,11 +16,7 @@ export type MenuGroupItem = {
 
 export type SidebarItem = MenuLeafItem | MenuGroupItem;
 
-export const isMenuGroup = (item: SidebarItem): item is MenuGroupItem => {
-  return 'children' in item;
-};
-
-export const sidebarMenu: SidebarItem[] = [
+export const sidebarMenu: ReadonlyArray<SidebarItem> = [
   {
     id: 'front-office',
     label: 'Фронт-офис',

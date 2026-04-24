@@ -1,6 +1,6 @@
 import type { TradingClientCard, TradingProfile } from './types';
 
-export const tradingProfiles: TradingProfile[] = [
+export const tradingProfiles: ReadonlyArray<TradingProfile> = [
   {
     id: 'tp-001',
     clientId: 'c-003',
@@ -411,7 +411,7 @@ export const tradingProfiles: TradingProfile[] = [
   }
 ];
 
-export const tradingClientCards: TradingClientCard[] = [
+export const tradingClientCards: ReadonlyArray<TradingClientCard> = [
   {
     clientId: 'c-003',
     brokerAccount: 'BRK-771003',
@@ -434,7 +434,3 @@ export const tradingClientCards: TradingClientCard[] = [
     marginCallThreshold: 90
   }
 ];
-
-export const getTradingProfileByClientId = (
-  clientId: string
-): TradingProfile | undefined => tradingProfiles.find((profile) => profile.clientId === clientId);

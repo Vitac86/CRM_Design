@@ -12,7 +12,7 @@ export type BrokerageContract = {
   status: BrokerageContractStatus;
 };
 
-export const brokerageContracts: BrokerageContract[] = [
+export const brokerageContracts: ReadonlyArray<BrokerageContract> = [
   {
     id: 'br-001',
     clientId: 'c-001',

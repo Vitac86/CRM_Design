@@ -11,9 +11,8 @@ import {
   TableStatusText,
   type SortDirection,
 } from '../components/ui';
-import { getClientById } from '../data/clients';
-import { tradingProfiles } from '../data/trading';
-import type { TradingMethod, TradingProfile, TradingRiskLevel, TradingStatus } from '../data/types';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { Client, TradingMethod, TradingProfile, TradingRiskLevel, TradingStatus } from '../data/types';
 import { tradingStatusTone } from '../utils/tableStatus';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
@@ -64,7 +63,10 @@ const parseRuDate = (value: string) => {
 };
 
 export const TradingPage = () => {
+  const { clients: clientsRepository, trading: tradingRepository } = useDataAccess();
   const navigate = useNavigate();
+  const [tradingProfiles, setTradingProfiles] = useState<TradingProfile[]>([]);
+  const [clientsById, setClientsById] = useState<Record<string, Client>>({});
 
   const [qualificationFilter, setQualificationFilter] = useState<BooleanFilter>('all');
   const [podFtFilter, setPodFtFilter] = useState<BooleanFilter>('all');
@@ -74,10 +76,29 @@ export const TradingPage = () => {
   const [sortKey, setSortKey] = useState<TradingSortKey>('clientName');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
+  useEffect(() => {
+    let isMounted = true;
+
+    void Promise.all([tradingRepository.listTradingItems(), clientsRepository.listClients()]).then(
+      ([tradingItems, clients]) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setTradingProfiles(tradingItems);
+        setClientsById(Object.fromEntries(clients.map((client) => [client.id, client])));
+      },
+    );
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientsRepository, tradingRepository]);
+
   const rows = useMemo<TradingRow[]>(
     () =>
       tradingProfiles.flatMap((profile) => {
-        const client = getClientById(profile.clientId);
+        const client = clientsById[profile.clientId];
 
         if (!client) {
           return [];
@@ -93,7 +114,7 @@ export const TradingPage = () => {
           accountDisposerName: profile.accountDisposer.name,
         };
       }),
-    [],
+    [clientsById, tradingProfiles],
   );
 
   const filteredRows = useMemo(

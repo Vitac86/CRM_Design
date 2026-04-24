@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { clients } from '../../data/clients';
 import type { Client } from '../../data/types';
 import { formatClientType, formatComplianceStatus, getComplianceBadgeVariant } from '../../utils/labels';
 import { SearchIcon } from '../ui/icons';
+import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 
 const complianceBadgeClassMap = {
   success: 'bg-emerald-100 text-emerald-700',
@@ -15,8 +15,10 @@ const complianceBadgeClassMap = {
 const maxResults = 8;
 
 export const Topbar = () => {
+  const { clients: clientsRepository } = useDataAccess();
   const navigate = useNavigate();
   const location = useLocation();
+  const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLLabelElement | null>(null);
@@ -27,6 +29,20 @@ export const Topbar = () => {
     location.pathname.startsWith('/trading/');
 
   const normalizedSearch = search.trim().toLowerCase();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void clientsRepository.listClients().then((items) => {
+      if (isMounted) {
+        setClients(items);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientsRepository]);
 
   const searchResults = useMemo<Client[]>(
     () =>
