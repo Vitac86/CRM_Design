@@ -1,24 +1,63 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { MiddleOfficeReportDetails } from '../components/crm/MiddleOfficeReportDetails';
 import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList';
-import { reports } from '../data/reports';
-import type { Report } from '../data/types';
 import { Button, SearchInput, SelectFilter } from '../components/ui';
+import type { Report } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
 export const MiddleOfficeReportsPage = () => {
+  const { reports: reportsRepository } = useDataAccess();
+
+  const [reports, setReports] = useState<Report[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<Report['deliveryStatus'] | 'all'>('all');
   const [channelFilter, setChannelFilter] = useState<Extract<Report['deliveryChannel'], 'E-mail' | 'Личный кабинет'> | 'all'>('all');
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const middleOfficeReports = useMemo(() => reports.filter((report) => report.department === 'Мидл-офис'), []);
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadReports = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const loadedReports = await reportsRepository.listReportsByDepartment('Мидл-офис');
+
+        if (!isMounted) {
+          return;
+        }
+
+        setReports(loadedReports);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setReports([]);
+        setError('Не удалось загрузить отчёты мидл-офиса.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadReports();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [reportsRepository]);
 
   const filteredReports = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
-    return middleOfficeReports.filter((report) => {
+    return reports.filter((report) => {
       if (normalizedSearch) {
         const searchHit =
           report.clientName.toLowerCase().includes(normalizedSearch) ||
@@ -41,7 +80,7 @@ export const MiddleOfficeReportsPage = () => {
 
       return true;
     });
-  }, [channelFilter, middleOfficeReports, search, statusFilter]);
+  }, [channelFilter, reports, search, statusFilter]);
 
   useEffect(() => {
     if (filteredReports.length === 0) {
@@ -98,6 +137,8 @@ export const MiddleOfficeReportsPage = () => {
         </Button>
       </header>
 
+      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+
       <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
         <div className="space-y-3">
           <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
@@ -130,11 +171,15 @@ export const MiddleOfficeReportsPage = () => {
             </SelectFilter>
           </div>
 
-          <MiddleOfficeReportList reports={filteredReports} selectedReportId={selectedReportId} onSelect={setSelectedReportId} />
+          <MiddleOfficeReportList
+            reports={isLoading ? [] : filteredReports}
+            selectedReportId={selectedReportId}
+            onSelect={setSelectedReportId}
+          />
         </div>
 
         <MiddleOfficeReportDetails
-          report={selectedReport}
+          report={isLoading ? null : selectedReport}
           onResend={() => setToastMessage('Отчёт отправлен повторно')}
           onDownload={() => setToastMessage('Файл подготовлен к скачиванию')}
         />

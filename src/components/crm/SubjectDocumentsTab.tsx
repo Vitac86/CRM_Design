@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getDocumentsByClientId } from '../../data/clientDocuments';
+import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import type { ClientDocument } from '../../data/types';
 import { Badge, Button, DataTable, DownloadIcon, EmptyState, PrintIcon } from '../ui';
 
@@ -35,17 +35,54 @@ const defaultForm: NewDocumentForm = {
 };
 
 export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
-  const [documents, setDocuments] = useState<ClientDocument[]>(() => getDocumentsByClientId(clientId));
+  const { documents: documentsRepository } = useDataAccess();
+
+  const [documents, setDocuments] = useState<ClientDocument[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [formData, setFormData] = useState<NewDocumentForm>(defaultForm);
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    setDocuments(getDocumentsByClientId(clientId));
+    let isMounted = true;
+
+    const loadDocuments = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const loadedDocuments = await documentsRepository.listDocumentsByClientId(clientId);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setDocuments(loadedDocuments);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setDocuments([]);
+        setError('Не удалось загрузить документы клиента.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
     setIsCreateOpen(false);
     setFormData(defaultForm);
     setFormError(null);
-  }, [clientId]);
+
+    void loadDocuments();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientId, documentsRepository]);
 
   const hasDocuments = documents.length > 0;
 
@@ -230,7 +267,15 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
         <Button onClick={handleOpenCreate}>+ Добавить документ</Button>
       </div>
 
-      {hasDocuments ? table : <EmptyState title="Документы отсутствуют" description="Для клиента пока не добавлены документы." />}
+      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+
+      {isLoading ? (
+        <EmptyState title="Загрузка документов..." description="Пожалуйста, подождите." />
+      ) : hasDocuments ? (
+        table
+      ) : (
+        <EmptyState title="Документы отсутствуют" description="Для клиента пока не добавлены документы." />
+      )}
 
       {isCreateOpen ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/35 p-4">

@@ -10,6 +10,3 @@ export const clientDocuments: readonly ClientDocument[] = [
   { id: 'doc-7', clientId: 'c-005', title: 'Выписка ЕГРЮЛ', documentType: 'Выписка', status: 'Не действующий', date: '2024-05-17', fileName: 'egrul-c005.pdf' },
   { id: 'doc-8', clientId: 'c-006', title: 'Дилерский договор', documentType: 'Дилерский', status: 'Действующий', date: '2026-01-23', fileName: 'dealer-c006.pdf' },
 ];
-
-export const getDocumentsByClientId = (clientId: string) =>
-  clientDocuments.filter((document) => document.clientId === clientId);
