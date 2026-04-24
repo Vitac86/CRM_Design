@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccountsByClientId } from '../../data/clientAccounts';
 import { getContractsByClientId } from '../../data/clientContracts';
@@ -41,12 +41,16 @@ const defaultAccountForm: AccountForm = {
 
 export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   const navigate = useNavigate();
-  const contracts = getContractsByClientId(clientId);
+  const contracts = useMemo(() => getContractsByClientId(clientId), [clientId]);
   const [accounts, setAccounts] = useState<ClientAccount[]>(() => getAccountsByClientId(clientId));
 
   const [isAccountFormOpen, setIsAccountFormOpen] = useState(false);
   const [accountForm, setAccountForm] = useState<AccountForm>(defaultAccountForm);
   const [accountError, setAccountError] = useState<string | null>(null);
+
+  const handleOpenContract = (contractId: string) => {
+    navigate(`/subjects/${clientId}/contract-wizard?contractId=${contractId}`);
+  };
 
   const handleCreateAccount = () => {
     if (!accountForm.number.trim() || !accountForm.openDate) {
@@ -80,7 +84,23 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
 
         <DataTable
           columns={[
-            { key: 'number', header: 'Номер договора', className: 'min-w-[180px] font-medium text-slate-800' },
+            {
+              key: 'number',
+              header: 'Номер договора',
+              className: 'min-w-[180px] font-medium text-slate-800',
+              render: (row) => (
+                <button
+                  type="button"
+                  className="cursor-pointer text-left text-brand-dark hover:underline"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleOpenContract(row.id);
+                  }}
+                >
+                  {row.number}
+                </button>
+              ),
+            },
             {
               key: 'type',
               header: 'Вид договора',
@@ -102,6 +122,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
             },
           ]}
           rows={contracts}
+          onRowClick={(row) => handleOpenContract(row.id)}
           emptyMessage="Для субъекта пока нет договоров"
         />
       </section>

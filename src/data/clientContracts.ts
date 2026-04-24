@@ -1,4 +1,61 @@
-import type { ClientContract, ContractProductType } from './types';
+import type { ClientContract, ContractProductType, ContractWizardConfig, ContractPersonType } from './types';
+
+const resolvePersonType = (clientType?: string): ContractPersonType => {
+  if (clientType === 'ФЛ') {
+    return 'individual';
+  }
+
+  if (clientType === 'ИП') {
+    return 'entrepreneur';
+  }
+
+  return 'legal';
+};
+
+export const createDefaultContractConfig = (params?: { clientEmail?: string; clientType?: string }): ContractWizardConfig => ({
+  joinedUnder428: {
+    brokerageContract: true,
+    depositoryContract: true,
+  },
+  personType: resolvePersonType(params?.clientType),
+  depoAccount: {
+    owner: true,
+    nomineeHolder: false,
+    trustManager: false,
+  },
+  depoOperatorEnabled: true,
+  tradingDepoAccount: {
+    owner: true,
+    nomineeHolder: false,
+    trustManager: false,
+  },
+  tradingDepoOperatorEnabled: true,
+  clearingOrganizations: {
+    nkc: true,
+    nrd: false,
+  },
+  reporting: {
+    office: false,
+    post: false,
+    emailEnabled: Boolean(params?.clientEmail?.trim()),
+    email: params?.clientEmail?.trim() || '',
+    edo: true,
+  },
+  brokerageMarkets: {
+    tariff: 'Универсальный',
+    stockMarket: true,
+    futuresMarket: false,
+    currencyAndMetalsMarket: true,
+  },
+  additionalJoinTerms: {
+    electronicSignature: false,
+    quikProgram: false,
+  },
+  incomeTransfer: {
+    specialBrokerAccount: true,
+    bankDetails: false,
+  },
+});
 
 export const clientContracts: ClientContract[] = [
   {
@@ -84,7 +141,30 @@ export const clientContracts: ClientContract[] = [
   },
 ];
 
+const contractConfigs = new Map<string, ContractWizardConfig>(
+  clientContracts.map((contract) => [contract.id, createDefaultContractConfig()]),
+);
+
 export const getContractsByClientId = (clientId: string) => clientContracts.filter((contract) => contract.clientId === clientId);
+
+export const getClientContractById = (contractId: string) => clientContracts.find((contract) => contract.id === contractId);
+
+export const getPrimaryContractByClientId = (clientId: string) => {
+  const contracts = getContractsByClientId(clientId);
+  const activeContracts = contracts.filter((contract) => contract.status === 'active');
+  const source = activeContracts.length > 0 ? activeContracts : contracts;
+
+  return [...source].sort((left, right) => right.openDate.localeCompare(left.openDate))[0];
+};
+
+export const getContractConfigById = (contractId: string) => {
+  const config = contractConfigs.get(contractId);
+  if (!config) {
+    return undefined;
+  }
+
+  return structuredClone(config);
+};
 
 const contractTypePrefixMap: Record<ContractProductType, string> = {
   broker: 'BR',
@@ -109,6 +189,7 @@ export const createClientContract = (payload: {
   openDate?: string;
   closeDate?: string | null;
   status?: ClientContract['status'];
+  config?: ContractWizardConfig;
 }) => {
   const type = payload.type ?? 'broker';
   const contract: ClientContract = {
@@ -122,5 +203,26 @@ export const createClientContract = (payload: {
   };
 
   clientContracts.unshift(contract);
+  contractConfigs.set(contract.id, structuredClone(payload.config ?? createDefaultContractConfig()));
   return contract;
+};
+
+export const updateClientContract = (contractId: string, patch: Partial<Omit<ClientContract, 'id' | 'clientId'>>) => {
+  const contract = getClientContractById(contractId);
+  if (!contract) {
+    return undefined;
+  }
+
+  Object.assign(contract, patch);
+  return contract;
+};
+
+export const updateContractConfig = (contractId: string, config: ContractWizardConfig) => {
+  const contract = getClientContractById(contractId);
+  if (!contract) {
+    return undefined;
+  }
+
+  contractConfigs.set(contractId, structuredClone(config));
+  return getContractConfigById(contractId);
 };

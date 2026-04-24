@@ -230,6 +230,53 @@ export interface ClientContract {
   status: 'active' | 'closed';
 }
 
+export type ContractPersonType = 'individual' | 'legal' | 'entrepreneur';
+
+export interface ContractWizardConfig {
+  joinedUnder428: {
+    brokerageContract: boolean;
+    depositoryContract: boolean;
+  };
+  personType: ContractPersonType;
+  depoAccount: {
+    owner: boolean;
+    nomineeHolder: boolean;
+    trustManager: boolean;
+  };
+  depoOperatorEnabled: boolean;
+  tradingDepoAccount: {
+    owner: boolean;
+    nomineeHolder: boolean;
+    trustManager: boolean;
+  };
+  tradingDepoOperatorEnabled: boolean;
+  clearingOrganizations: {
+    nkc: boolean;
+    nrd: boolean;
+  };
+  reporting: {
+    office: boolean;
+    post: boolean;
+    emailEnabled: boolean;
+    email: string;
+    edo: boolean;
+  };
+  brokerageMarkets: {
+    tariff: string;
+    stockMarket: boolean;
+    futuresMarket: boolean;
+    currencyAndMetalsMarket: boolean;
+  };
+  additionalJoinTerms: {
+    electronicSignature: boolean;
+    quikProgram: boolean;
+  };
+  incomeTransfer: {
+    specialBrokerAccount: boolean;
+    bankDetails: boolean;
+  };
+}
+
 export interface ClientAccount {
   id: string;
   clientId: string;
