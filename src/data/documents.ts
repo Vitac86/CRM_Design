@@ -1,6 +1,6 @@
 import type { Document } from './types';
 
-export const documents: Document[] = [
+export const documents: ReadonlyArray<Document> = [
   { id: 'd-001', clientId: 'c-001', title: 'Договор доверительного управления №120/ДУ', kind: 'Договор ДУ', status: 'Действующий', date: '2026-03-01' },
   { id: 'd-002', clientId: 'c-001', title: 'Договор брокерского обслуживания №22/БО', kind: 'Договор БО', status: 'На подписи', date: '2026-04-10' },
   { id: 'd-003', clientId: 'c-002', title: 'Депозитарный договор №17-Д', kind: 'Депозитарный', status: 'На проверке', date: '2026-02-17' },
@@ -16,6 +16,3 @@ export const documents: Document[] = [
   { id: 'd-013', clientId: 'c-021', title: 'Депозитарный договор (новая редакция)', kind: 'Депозитарный', status: 'На подписи', date: '2026-03-30' },
   { id: 'd-014', clientId: 'c-023', title: 'Доверенность на право подписи договоров', kind: 'Доверенность', status: 'Отклонена', date: '2026-04-19' },
 ];
-
-export const getDocumentsByClientId = (clientId: string): Document[] =>
-  documents.filter((document) => document.clientId === clientId);

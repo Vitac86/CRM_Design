@@ -10,7 +10,7 @@ export type TrustContract = {
   status: TrustContractStatus;
 };
 
-export const trustContracts: TrustContract[] = [
+export const trustContracts: ReadonlyArray<TrustContract> = [
   {
     id: 'tm-001',
     contractNumber: 'ДУ-2026/010',

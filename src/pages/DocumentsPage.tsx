@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../components/ui';
-import { documents } from '../data/documents';
 import type { Document } from '../data/types';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
 
 const pageSize = 10;
 
@@ -22,19 +22,35 @@ const kindBadgeVariant: Record<string, 'purple' | 'orange' | 'info' | 'warning' 
 };
 
 export const DocumentsPage = () => {
+  const { documents: documentsRepository } = useDataAccess();
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<Document['status'] | 'all'>('all');
   const [kindFilter, setKindFilter] = useState<string | 'all'>('all');
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    void documentsRepository.listDocuments().then((items) => {
+      if (isMounted) {
+        setDocuments(items);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [documentsRepository]);
+
   const statusOptions = useMemo(
     () => [...new Set(documents.map((document) => document.status))],
-    [],
+    [documents],
   );
 
   const kindOptions = useMemo(
     () => [...new Set(documents.map((document) => document.kind))],
-    [],
+    [documents],
   );
 
   const filteredDocuments = useMemo(
@@ -54,7 +70,7 @@ export const DocumentsPage = () => {
 
         return true;
       }),
-    [search, statusFilter, kindFilter],
+    [documents, search, statusFilter, kindFilter],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredDocuments.length / pageSize));

@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { isMenuGroup, sidebarMenu } from '../../data/menu';
+import { useDataAccess } from '../../app/dataAccess/useDataAccess';
+import { isMenuGroup, type SidebarItem } from '../../features/navigation/api/navigationRepository';
 import { SidebarIcon } from './SidebarIcon';
 
 const linkBaseClass =
   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
 
-const initialOpenGroups = sidebarMenu.reduce<Record<string, boolean>>((acc, item) => {
+const buildInitialOpenGroups = (menu: SidebarItem[]) => menu.reduce<Record<string, boolean>>((acc, item) => {
   if (isMenuGroup(item)) {
     acc[item.id] = item.id === 'front-office';
   }
@@ -15,8 +16,25 @@ const initialOpenGroups = sidebarMenu.reduce<Record<string, boolean>>((acc, item
 }, {});
 
 export const Sidebar = () => {
+  const { navigation } = useDataAccess();
   const location = useLocation();
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(initialOpenGroups);
+  const [sidebarMenu, setSidebarMenu] = useState<SidebarItem[]>([]);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void navigation.listSidebarItems().then((items) => {
+      if (isMounted) {
+        setSidebarMenu(items);
+        setOpenGroups(buildInitialOpenGroups(items));
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigation]);
 
   const activeGroups = useMemo(() => {
     return sidebarMenu.reduce<Record<string, boolean>>((acc, item) => {

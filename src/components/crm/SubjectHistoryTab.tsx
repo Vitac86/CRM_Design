@@ -1,4 +1,6 @@
-import { getHistoryByClientId } from '../../data/clientHistory';
+import { useEffect, useState } from 'react';
+import { useDataAccess } from '../../app/dataAccess/useDataAccess';
+import type { ClientHistoryEvent } from '../../data/types';
 import { Badge, DataTable, EmptyState } from '../ui';
 
 type SubjectHistoryTabProps = {
@@ -6,7 +8,22 @@ type SubjectHistoryTabProps = {
 };
 
 export const SubjectHistoryTab = ({ clientId }: SubjectHistoryTabProps) => {
-  const history = getHistoryByClientId(clientId);
+  const { history: historyRepository } = useDataAccess();
+  const [history, setHistory] = useState<ClientHistoryEvent[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void historyRepository.listHistoryByClientId(clientId).then((items) => {
+      if (isMounted) {
+        setHistory(items);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [clientId, historyRepository]);
 
   if (history.length === 0) {
     return <EmptyState title="История изменений пуста" description="Изменения по клиенту пока не зафиксированы." />;

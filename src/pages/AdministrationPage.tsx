@@ -1,7 +1,26 @@
+import { useEffect, useState } from 'react';
 import { Card } from '../components/ui';
-import { administrationSections } from '../data/administration';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { AdministrationSection } from '../features/administration/api/administrationRepository';
 
 export const AdministrationPage = () => {
+  const { administration } = useDataAccess();
+  const [sections, setSections] = useState<AdministrationSection[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void administration.listSections().then((items) => {
+      if (isMounted) {
+        setSections(items);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [administration]);
+
   return (
     <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
       <header>
@@ -9,7 +28,7 @@ export const AdministrationPage = () => {
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {administrationSections.map((section) => (
+        {sections.map((section) => (
           <Card key={section.id} className="flex flex-col gap-3 p-4">
             <h2 className="text-lg font-semibold text-slate-900">{section.title}</h2>
             <p className="text-sm text-slate-600">{section.description}</p>

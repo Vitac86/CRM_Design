@@ -9,6 +9,11 @@ import { createMockRelationsRepository } from '../../features/relations/mock/moc
 import { createMockComplianceRepository } from '../../features/compliance/mock/mockComplianceRepository';
 import { createMockDocumentsRepository } from '../../features/documents/mock/mockDocumentsRepository';
 import { createMockReportsRepository } from '../../features/reports/mock/mockReportsRepository';
+import { createMockTradingRepository } from '../../features/trading/mock/mockTradingRepository';
+import { createMockAdministrationRepository } from '../../features/administration/mock/mockAdministrationRepository';
+import { createMockOperationsRepository } from '../../features/operations/mock/mockOperationsRepository';
+import { createMockNavigationRepository } from '../../features/navigation/mock/mockNavigationRepository';
+import { createMockHistoryRepository } from '../../features/history/mock/mockHistoryRepository';
 import type { DataAccessContextValue } from './types';
 
 export const DataAccessContext = createContext<DataAccessContextValue | undefined>(undefined);
@@ -28,6 +33,11 @@ export const DataAccessProvider = ({ children }: { children: ReactNode }) => {
       compliance: createMockComplianceRepository(),
       documents: createMockDocumentsRepository(),
       reports: createMockReportsRepository(),
+      trading: createMockTradingRepository(),
+      administration: createMockAdministrationRepository(),
+      operations: createMockOperationsRepository(),
+      navigation: createMockNavigationRepository(),
+      history: createMockHistoryRepository(),
     };
   }, []);
 

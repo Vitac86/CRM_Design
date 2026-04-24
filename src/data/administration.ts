@@ -5,7 +5,7 @@ export type AdministrationSection = {
   itemsCount: string;
 };
 
-export const administrationSections: AdministrationSection[] = [
+export const administrationSections: ReadonlyArray<AdministrationSection> = [
   {
     id: 'adm-users',
     title: 'Пользователи',

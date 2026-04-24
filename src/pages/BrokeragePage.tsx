@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge, Button, DataTable, FilterChipSelect, SearchInput, TableControlPanel, type SortDirection } from '../components/ui';
-import { brokerageContracts, type BrokerageContract, type BrokerageContractStatus } from '../data/brokerage';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
+import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import type { BrokerageContract, BrokerageContractStatus } from '../features/operations/api/operationsRepository';
 
 type BrokerageSortKey = 'contractNumber' | 'clientCode' | 'clientName' | 'manager' | 'openedAt' | 'status';
 
@@ -13,14 +14,30 @@ const badgeByStatus: Record<BrokerageContractStatus, 'success' | 'warning' | 'ne
 };
 
 export const BrokeragePage = () => {
+  const { operations } = useDataAccess();
+  const [contracts, setContracts] = useState<BrokerageContract[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<BrokerageContractStatus | 'all'>('all');
   const [sortKey, setSortKey] = useState<BrokerageSortKey>('contractNumber');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
+  useEffect(() => {
+    let isMounted = true;
+
+    void operations.listBrokerageContracts().then((items) => {
+      if (isMounted) {
+        setContracts(items);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [operations]);
+
   const filteredContracts = useMemo(
     () =>
-      brokerageContracts.filter((contract) => {
+      contracts.filter((contract) => {
         const normalizedSearch = search.trim().toLowerCase();
 
         if (
@@ -39,7 +56,7 @@ export const BrokeragePage = () => {
 
         return true;
       }),
-    [search, statusFilter],
+    [contracts, search, statusFilter],
   );
 
   const sortedContracts = useMemo(() => {
