@@ -86,36 +86,24 @@ export const DashboardPage = () => {
   );
 
   return (
-    <div className="crm-dashboard-shell crm-prestige-panel relative min-w-0 space-y-6 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <div
-        aria-hidden="true"
-        className="crm-dashboard-eagle pointer-events-none absolute right-[-7rem] top-[-8rem] z-0 hidden select-none xl:block"
-      >
-        <img
-          src="/brand/investica/eagle-glass.png"
-          alt=""
-          className="h-auto w-[24rem] max-w-none"
-          loading="lazy"
-        />
-      </div>
-
-      <header className="relative z-10">
+    <div className="crm-prestige-panel min-w-0 space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+      <header>
         <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Операционный обзор</h1>
       </header>
 
-      <section className="relative z-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (
           <MetricCard key={metric.id} metric={metric} />
         ))}
       </section>
 
-      {error && <p className="relative z-10 text-sm font-medium text-[var(--color-danger)]">{error}</p>}
+      {error && <p className="text-sm font-medium text-[var(--color-danger)]">{error}</p>}
 
       {isLoading && (
-        <p className="relative z-10 text-sm text-[var(--color-text-secondary)]">Загрузка данных...</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">Загрузка данных...</p>
       )}
 
-      <section className="relative z-10 grid gap-5 xl:grid-cols-2">
+      <section className="grid gap-5 xl:grid-cols-2">
         <DashboardTable
           title="Последние изменения по субъектам"
           columns={['Субъект', 'Изменения']}
