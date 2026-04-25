@@ -485,7 +485,7 @@ export const SubjectProfilePage = () => {
               <Button variant="secondary" size="sm" onClick={handleCancelEdit}>
                 Отмена
               </Button>
-              <Button size="sm" className="border-emerald-600 bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveEdit}>
+              <Button size="sm" onClick={handleSaveEdit}>
                 Сохранить
               </Button>
             </div>

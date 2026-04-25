@@ -284,10 +284,10 @@ export const DepositoryPage = () => {
                   type="button"
                   onClick={() => setSelectedReportId(report.id)}
                   className={cn(
-                    'w-full rounded-xl border px-3 py-2.5 text-left transition',
+                    'w-full rounded-xl border px-3 py-2.5 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-button-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)]',
                     isSelected
-                      ? 'border-brand-light bg-brand-light/5 shadow-sm'
-                      : 'border-slate-200 bg-white hover:border-brand-light/50 hover:bg-slate-50',
+                      ? 'border-[var(--color-button-selected-border)] bg-[var(--color-button-selected-bg)] text-[var(--color-button-selected-text)] shadow-sm'
+                      : 'border-slate-200 bg-white hover:border-[var(--color-button-secondary-hover-border)] hover:bg-[var(--color-button-secondary-hover-bg)]',
                   )}
                 >
                   <p className="truncate text-sm font-semibold text-slate-900">{report.fileName}</p>
