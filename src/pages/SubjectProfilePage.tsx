@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, type KeyboardEvent, type ClipboardEvent, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ClientProfileHeader } from '../components/crm/ClientProfileHeader';
 import { PermissionCard } from '../components/crm/PermissionCard';
@@ -14,7 +14,7 @@ import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency, getComplianceBadgeVariant } from '../utils/labels';
-import { isRussianPhoneComplete, normalizePhoneInput } from '../utils/phone';
+import { formatPhoneDisplay, getPhoneDigits, isRussianPhone, normalizePhoneInput, validatePhone } from '../utils/phone';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
@@ -210,6 +210,8 @@ export const SubjectProfilePage = () => {
     setActiveTab('profile');
     setDraftClient({
       ...client,
+      phone: normalizePhoneInput(client.phone),
+      secondaryPhone: normalizePhoneInput(client.secondaryPhone),
       roles: [...client.roles],
       manager: { ...client.manager },
       agent: { ...client.agent },
@@ -274,11 +276,13 @@ export const SubjectProfilePage = () => {
     if (!draftClient.phone.trim() && !draftClient.email.trim()) {
       missingFields.push('Телефон или Email');
     }
-    if (draftClient.phone.trim() && !isRussianPhoneComplete(draftClient.phone)) {
-      missingFields.push('Телефон в формате +7 (999) 123-45-67');
+    const phoneValidation = validatePhone(draftClient.phone);
+    if (draftClient.phone.trim() && !phoneValidation.valid) {
+      missingFields.push(phoneValidation.message ?? 'Телефон');
     }
-    if (draftClient.secondaryPhone.trim() && !isRussianPhoneComplete(draftClient.secondaryPhone)) {
-      missingFields.push('Дополнительный телефон в формате +7 (999) 123-45-67');
+    const secondaryPhoneValidation = validatePhone(draftClient.secondaryPhone);
+    if (draftClient.secondaryPhone.trim() && !secondaryPhoneValidation.valid) {
+      missingFields.push(`Дополнительный телефон: ${secondaryPhoneValidation.message ?? 'некорректный формат'}`);
     }
     if ((draftClient.type === 'ФЛ' || draftClient.type === 'ИП') && !draftClient.lastName.trim()) {
       missingFields.push('Фамилия');
@@ -440,6 +444,61 @@ export const SubjectProfilePage = () => {
   const handleDraftPhoneChange = (field: 'phone' | 'secondaryPhone', value: string) => {
     const normalizedValue = normalizePhoneInput(value);
     setDraftClient((prev) => (prev ? { ...prev, [field]: normalizedValue } : prev));
+  };
+
+  const handleDraftPhonePaste = (field: 'phone' | 'secondaryPhone', event: ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const pastedValue = event.clipboardData.getData('text');
+    handleDraftPhoneChange(field, pastedValue);
+  };
+
+  const handleDraftPhoneKeyDown = (field: 'phone' | 'secondaryPhone', event: KeyboardEvent<HTMLInputElement>) => {
+    if (!draftClient || (event.key !== 'Backspace' && event.key !== 'Delete')) {
+      return;
+    }
+
+    const input = event.currentTarget;
+    const selectionStart = input.selectionStart ?? 0;
+    const selectionEnd = input.selectionEnd ?? 0;
+    if (selectionStart !== selectionEnd) {
+      return;
+    }
+
+    const currentRawValue = draftClient[field];
+    const currentDisplayValue = formatPhoneDisplay(currentRawValue);
+    const rawDigits = getPhoneDigits(currentRawValue);
+    if (!rawDigits) {
+      return;
+    }
+
+    const digitCaretPositions: number[] = [];
+    for (let index = 0; index < currentDisplayValue.length; index += 1) {
+      if (/\d/.test(currentDisplayValue[index])) {
+        digitCaretPositions.push(index);
+      }
+    }
+
+    let targetDigitIndex = -1;
+    if (event.key === 'Backspace') {
+      for (let index = digitCaretPositions.length - 1; index >= 0; index -= 1) {
+        if (digitCaretPositions[index] < selectionStart) {
+          targetDigitIndex = index;
+          break;
+        }
+      }
+    } else {
+      targetDigitIndex = digitCaretPositions.findIndex((position) => position >= selectionStart);
+    }
+
+    if (targetDigitIndex < 0) {
+      return;
+    }
+
+    event.preventDefault();
+    const nextDigits = rawDigits.slice(0, targetDigitIndex) + rawDigits.slice(targetDigitIndex + 1);
+    const hasInternationalPrefix = currentRawValue.startsWith('+') && !isRussianPhone(currentRawValue);
+    const nextRaw = normalizePhoneInput(hasInternationalPrefix ? `+${nextDigits}` : nextDigits);
+    setDraftClient((prev) => (prev ? { ...prev, [field]: nextRaw } : prev));
   };
 
   const handleAddRepresentative = async () => {
@@ -915,22 +974,26 @@ export const SubjectProfilePage = () => {
                   <FormField
                     label="Телефон"
                     type="tel"
-                    value={currentClient.phone}
+                    value={formatPhoneDisplay(currentClient.phone)}
                     mono
                     inputMode="tel"
                     autoComplete="tel-national"
-                    placeholder="+7 (999) 123-45-67"
+                    placeholder="+7 (999) 123-45-67 или +44 2079460958"
                     onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
+                    onPaste={(event) => handleDraftPhonePaste('phone', event)}
+                    onKeyDown={(event) => handleDraftPhoneKeyDown('phone', event)}
                   />
                   <FormField
                     label="Дополнительный телефон"
                     type="tel"
-                    value={currentClient.secondaryPhone}
+                    value={formatPhoneDisplay(currentClient.secondaryPhone)}
                     mono
                     inputMode="tel"
                     autoComplete="tel-national"
-                    placeholder="+7 (999) 123-45-67"
+                    placeholder="+7 (999) 123-45-67 или +44 2079460958"
                     onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
+                    onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
+                    onKeyDown={(event) => handleDraftPhoneKeyDown('secondaryPhone', event)}
                   />
                   <FormField
                     label="Email"
@@ -967,8 +1030,8 @@ export const SubjectProfilePage = () => {
                 </>
               ) : (
                 <>
-                  <ProfileField label="Телефон" value={client.phone} mono />
-                  <ProfileField label="Дополнительный телефон" value={client.secondaryPhone} mono />
+                  <ProfileField label="Телефон" value={formatPhoneDisplay(client.phone)} mono />
+                  <ProfileField label="Дополнительный телефон" value={formatPhoneDisplay(client.secondaryPhone)} mono />
                   <ProfileField label="Email" value={client.email} />
                   {!isIndividualClient ? <ProfileField label="Адрес" value={client.address} /> : null}
                   {!isIndividualClient ? <ProfileField label="Представитель" value={client.representative} /> : null}
@@ -1160,22 +1223,26 @@ export const SubjectProfilePage = () => {
                       <FormField
                         label="Телефон"
                         type="tel"
-                        value={currentClient.phone}
+                        value={formatPhoneDisplay(currentClient.phone)}
                         mono
                         inputMode="tel"
                         autoComplete="tel-national"
-                        placeholder="+7 (999) 123-45-67"
+                        placeholder="+7 (999) 123-45-67 или +44 2079460958"
                         onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
+                        onPaste={(event) => handleDraftPhonePaste('phone', event)}
+                        onKeyDown={(event) => handleDraftPhoneKeyDown('phone', event)}
                       />
                       <FormField
                         label="Дополнительный телефон"
                         type="tel"
-                        value={currentClient.secondaryPhone}
+                        value={formatPhoneDisplay(currentClient.secondaryPhone)}
                         mono
                         inputMode="tel"
                         autoComplete="tel-national"
-                        placeholder="+7 (999) 123-45-67"
+                        placeholder="+7 (999) 123-45-67 или +44 2079460958"
                         onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
+                        onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
+                        onKeyDown={(event) => handleDraftPhoneKeyDown('secondaryPhone', event)}
                       />
                       <FormField
                         label="Email"
@@ -1196,8 +1263,8 @@ export const SubjectProfilePage = () => {
                     </>
                   ) : (
                     <>
-                      <ProfileField label="Телефон" value={client.phone} mono />
-                      <ProfileField label="Дополнительный телефон" value={client.secondaryPhone} mono />
+                      <ProfileField label="Телефон" value={formatPhoneDisplay(client.phone)} mono />
+                      <ProfileField label="Дополнительный телефон" value={formatPhoneDisplay(client.secondaryPhone)} mono />
                       <ProfileField label="Email" value={client.email} />
                       <ProfileField label="Адрес" value={client.address} />
                       <ProfileField label="Представитель" value={client.representative} />
