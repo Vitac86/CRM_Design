@@ -25,4 +25,9 @@ export const statusBadgeVariantMap: Record<string, BadgeVariant> = {
   Отклонено: 'danger',
   'ДОСТАВЛЕНО': 'neutral',
   'НЕ ДОСТАВЛЕНО': 'danger',
+  Да: 'success',
+  Нет: 'neutral',
+  'Юр. лицо': 'neutral',
+  'Физ. лицо': 'neutral',
+  ИП: 'neutral',
 };

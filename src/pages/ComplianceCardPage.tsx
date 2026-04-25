@@ -27,6 +27,15 @@ const decisionOptions: Array<{ value: DecisionStatus; label: string; variant: 'p
   { value: 'ЗАБЛОКИРОВАН', label: 'Заблокировать', variant: 'danger' },
 ];
 
+const decisionSelectedClasses: Record<DecisionStatus, string> = {
+  ПРОЙДЕН:
+    '!border-emerald-600 !bg-emerald-600 !text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18),0_0_0_2px_color-mix(in_srgb,var(--color-success)_22%,transparent)]',
+  'НА ДОРАБОТКЕ':
+    '!border-amber-500 !bg-amber-100 !text-amber-900 shadow-[inset_0_0_0_1px_rgba(245,158,11,0.18),0_0_0_2px_rgba(245,158,11,0.22)]',
+  ЗАБЛОКИРОВАН:
+    '!border-red-600 !bg-red-600 !text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14),0_0_0_2px_rgba(225,29,72,0.2)]',
+};
+
 const documentProblemStatuses = ['На проверке', 'Отклонена', 'Не действующий', 'Черновик'];
 
 const renderFields = (fields: SectionField[]) =>
@@ -491,8 +500,9 @@ export const ComplianceCardPage = () => {
             {decisionOptions.map((option) => (
               <Button
                 key={option.value}
-                variant={selectedDecision === option.value ? option.variant : 'secondary'}
-                className="w-full justify-start"
+                variant={selectedDecision === option.value && option.variant !== 'secondary' ? option.variant : 'secondary'}
+                aria-pressed={selectedDecision === option.value}
+                className={`w-full justify-start ${selectedDecision === option.value ? decisionSelectedClasses[option.value] : ''}`}
                 onClick={() => {
                   setSelectedDecision(option.value);
                   setCommentError(null);
