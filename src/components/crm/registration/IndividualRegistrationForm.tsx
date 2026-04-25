@@ -97,7 +97,15 @@ export const IndividualRegistrationForm = ({ formData, onChange }: IndividualReg
       <Card className="p-4">
         <h3 className="mb-3 text-base font-semibold text-slate-900">Контактные данные</h3>
         <div className="grid gap-3 md:grid-cols-2">
-          <RegistrationTextField label="Номера телефонов" value={formData.phones} onChange={(event) => onChange('phones', event.target.value)} />
+          <RegistrationTextField
+            label="Номера телефонов"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            placeholder="+7 (999) 123-45-67"
+            value={formData.phones}
+            onChange={(event) => onChange('phones', event.target.value)}
+          />
           <RegistrationTextField label="E-mail" value={formData.email} onChange={(event) => onChange('email', event.target.value)} />
         </div>
       </Card>

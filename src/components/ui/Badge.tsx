@@ -9,19 +9,19 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 
 const variantClasses: Record<BadgeVariant, string> = {
   success:
-    'bg-[color:color-mix(in_srgb,var(--color-success)_10%,transparent)] text-[color:color-mix(in_srgb,var(--color-success)_74%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-success)_30%,var(--color-border))]',
+    'bg-[color:color-mix(in_srgb,var(--color-success)_11%,var(--color-surface))] text-[color:color-mix(in_srgb,var(--color-success)_72%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-success)_28%,var(--color-border))]',
   warning:
-    'bg-[color:color-mix(in_srgb,var(--color-warning)_10%,transparent)] text-[color:color-mix(in_srgb,var(--color-warning)_68%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-warning)_30%,var(--color-border))]',
+    'bg-[color:color-mix(in_srgb,var(--color-warning)_11%,var(--color-surface))] text-[color:color-mix(in_srgb,var(--color-warning)_70%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-warning)_28%,var(--color-border))]',
   danger:
-    'bg-[color:color-mix(in_srgb,var(--color-danger)_9%,transparent)] text-[color:color-mix(in_srgb,var(--color-danger)_68%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-danger)_30%,var(--color-border))]',
+    'bg-[color:color-mix(in_srgb,var(--color-danger)_10%,var(--color-surface))] text-[color:color-mix(in_srgb,var(--color-danger)_70%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-danger)_28%,var(--color-border))]',
   neutral:
     'bg-[color:color-mix(in_srgb,var(--color-muted-surface)_55%,transparent)] text-[var(--color-text-secondary)] border-[color:color-mix(in_srgb,var(--color-text-secondary)_18%,var(--color-border))]',
   info:
-    'bg-[color:color-mix(in_srgb,var(--color-primary)_9%,transparent)] text-[color:color-mix(in_srgb,var(--color-primary)_68%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-primary)_24%,var(--color-border))]',
+    'bg-[color:color-mix(in_srgb,var(--color-primary)_10%,var(--color-surface))] text-[color:color-mix(in_srgb,var(--color-primary)_66%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-primary)_26%,var(--color-border))]',
   purple:
-    'bg-[color:color-mix(in_srgb,var(--color-primary)_7%,transparent)] text-[var(--color-text-secondary)] border-[color:color-mix(in_srgb,var(--color-primary)_18%,var(--color-border))]',
+    'bg-[color:color-mix(in_srgb,var(--color-primary)_8%,var(--color-surface))] text-[color:color-mix(in_srgb,var(--color-primary)_62%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-primary)_22%,var(--color-border))]',
   orange:
-    'bg-[color:color-mix(in_srgb,var(--color-warning)_8%,transparent)] text-[var(--color-text-secondary)] border-[color:color-mix(in_srgb,var(--color-warning)_22%,var(--color-border))]',
+    'bg-[color:color-mix(in_srgb,var(--color-warning)_9%,var(--color-surface))] text-[color:color-mix(in_srgb,var(--color-warning)_64%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-warning)_24%,var(--color-border))]',
   brand:
     'bg-[color:color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-[color:color-mix(in_srgb,var(--color-primary)_72%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-primary)_28%,var(--color-border))]',
 };

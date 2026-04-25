@@ -14,7 +14,7 @@ import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency } from '../utils/labels';
-import { normalizePhoneInput } from '../utils/phone';
+import { isRussianPhoneComplete, normalizePhoneInput } from '../utils/phone';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
@@ -279,6 +279,12 @@ export const SubjectProfilePage = () => {
     }
     if (!draftClient.phone.trim() && !draftClient.email.trim()) {
       missingFields.push('Телефон или Email');
+    }
+    if (draftClient.phone.trim() && !isRussianPhoneComplete(draftClient.phone)) {
+      missingFields.push('Телефон в формате +7 (999) 123-45-67');
+    }
+    if (draftClient.secondaryPhone.trim() && !isRussianPhoneComplete(draftClient.secondaryPhone)) {
+      missingFields.push('Дополнительный телефон в формате +7 (999) 123-45-67');
     }
     if ((draftClient.type === 'ФЛ' || draftClient.type === 'ИП') && !draftClient.lastName.trim()) {
       missingFields.push('Фамилия');
@@ -917,6 +923,9 @@ export const SubjectProfilePage = () => {
                     type="tel"
                     value={currentClient.phone}
                     mono
+                    inputMode="tel"
+                    autoComplete="tel-national"
+                    placeholder="+7 (999) 123-45-67"
                     onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                   />
                   <FormField
@@ -924,6 +933,9 @@ export const SubjectProfilePage = () => {
                     type="tel"
                     value={currentClient.secondaryPhone}
                     mono
+                    inputMode="tel"
+                    autoComplete="tel-national"
+                    placeholder="+7 (999) 123-45-67"
                     onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                   />
                   <FormField
@@ -1156,6 +1168,9 @@ export const SubjectProfilePage = () => {
                         type="tel"
                         value={currentClient.phone}
                         mono
+                        inputMode="tel"
+                        autoComplete="tel-national"
+                        placeholder="+7 (999) 123-45-67"
                         onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                       />
                       <FormField
@@ -1163,6 +1178,9 @@ export const SubjectProfilePage = () => {
                         type="tel"
                         value={currentClient.secondaryPhone}
                         mono
+                        inputMode="tel"
+                        autoComplete="tel-national"
+                        placeholder="+7 (999) 123-45-67"
                         onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                       />
                       <FormField

@@ -9,7 +9,7 @@ import { RegistrationResult } from '../components/crm/registration/RegistrationR
 import { RegistrationStepHeader } from '../components/crm/registration/RegistrationStepHeader';
 import { RegistrationWizardLayout } from '../components/crm/registration/RegistrationWizardLayout';
 import type { Client, ClientType, IndividualClientDetails, LegalRepresentative, ResidencyStatus } from '../data/types';
-import { normalizePhoneInput } from '../utils/phone';
+import { isRussianPhoneComplete, normalizePhoneInput } from '../utils/phone';
 
 type SubjectType = 'individual' | 'legal' | null;
 type RegistrationMethod = 'manual' | 'cabinet' | 'inn' | null;
@@ -148,7 +148,7 @@ export const ClientRegistrationWizardPage = () => {
     fssNumber: '7701001234',
     pfrNumber: '087-001-123456',
     residency: 'yes',
-    phones: '+7 495 123-45-67',
+    phones: '+7 (495) 123-45-67',
     email: 'info@technoimpulse.demo',
     address: 'г. Москва, ул. Летниковская, д. 10, стр. 4',
     beneficiary: 'Иванов Игорь Сергеевич',
@@ -266,11 +266,21 @@ export const ClientRegistrationWizardPage = () => {
         setValidationError('Для физического лица заполните фамилию, имя и хотя бы одно из полей: ИНН или телефон.');
         return;
       }
+
+      if (individualForm.phones.trim() && !isRussianPhoneComplete(individualForm.phones)) {
+        setValidationError('Заполните телефон полностью: +7 (999) 123-45-67.');
+        return;
+      }
     }
 
     if (subjectType === 'legal') {
       if (!legalEntityForm.clientName.trim() || !legalEntityForm.inn.trim()) {
         setValidationError('Для юридического лица заполните наименование клиента и ИНН.');
+        return;
+      }
+
+      if (legalEntityForm.phones.trim() && !isRussianPhoneComplete(legalEntityForm.phones)) {
+        setValidationError('Заполните телефон полностью: +7 (999) 123-45-67.');
         return;
       }
     }

@@ -10,8 +10,8 @@ type TableStatusTextProps = HTMLAttributes<HTMLSpanElement> & {
 const toneClasses: Record<TableStatusTone, string> = {
   neutral: 'text-[var(--color-text-primary)]',
   subtle: 'text-[var(--color-text-secondary)]',
-  warning: 'text-amber-700',
-  danger: 'text-rose-700',
+  warning: 'text-[color:color-mix(in_srgb,var(--color-warning)_72%,var(--color-text-primary))]',
+  danger: 'text-[color:color-mix(in_srgb,var(--color-danger)_72%,var(--color-text-primary))]',
 };
 
 export const TableStatusText = ({ tone = 'neutral', className, ...props }: TableStatusTextProps) => {

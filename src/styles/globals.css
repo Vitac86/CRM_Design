@@ -403,6 +403,7 @@
   --color-tab-bg: #ffffff;
   --color-tab-text: #64748b;
   --color-tab-hover: #f1f5f9;
+  --color-tab-hover-text: #1e3a8a;
   --color-tab-active-bg: #dbeafe;
   --color-tab-active-text: #1e3a8a;
   --color-tab-border: #e2e8f0;
@@ -442,6 +443,7 @@
   --color-tab-bg: #ffffff;
   --color-tab-text: #64748b;
   --color-tab-hover: #f1f5f9;
+  --color-tab-hover-text: #1e3a8a;
   --color-tab-active-bg: #dbeafe;
   --color-tab-active-text: #1e3a8a;
   --color-tab-border: #e2e8f0;
@@ -479,6 +481,7 @@
   --color-tab-bg: #0f1021;
   --color-tab-text: #a8b3cf;
   --color-tab-hover: #1c1f4d;
+  --color-tab-hover-text: #ffffff;
   --color-tab-active-bg: #242bf5;
   --color-tab-active-text: #ffffff;
   --color-tab-border: #2a2d4f;
@@ -516,6 +519,7 @@
   --color-tab-bg: #ffffff;
   --color-tab-text: #475569;
   --color-tab-hover: #eef2ff;
+  --color-tab-hover-text: #1f2aa8;
   --color-tab-active-bg: #242bf5;
   --color-tab-active-text: #ffffff;
   --color-tab-border: #dbe2f0;
@@ -687,7 +691,7 @@ body {
   }
 
   .crm-tab:hover {
-    color: var(--color-tab-active-text);
+    color: var(--color-tab-hover-text);
     background-color: var(--color-tab-hover);
   }
 
