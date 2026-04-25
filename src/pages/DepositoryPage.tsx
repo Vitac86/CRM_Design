@@ -200,7 +200,7 @@ export const DepositoryPage = () => {
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по коду клиента, имени файла или отчёту"
+            placeholder="Поиск по клиенту, файлу или отчёту"
             aria-label="Поиск по отчётам депозитария"
           />
         }

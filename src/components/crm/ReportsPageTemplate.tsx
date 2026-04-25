@@ -195,7 +195,7 @@ export const ReportsPageTemplate = ({
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по коду клиента, имени файла или отчёту"
+            placeholder="Поиск по клиенту, файлу или отчёту"
             className="h-10 w-full sm:w-[300px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
             aria-label="Поиск по отчётам"
           />
