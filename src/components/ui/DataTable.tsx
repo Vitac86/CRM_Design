@@ -55,7 +55,7 @@ export const DataTable = <T extends { id?: string | number }>({
 }: DataTableProps<T>) => {
   return (
     <div className="relative min-w-0 overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
-      <table className="min-w-full text-left text-sm text-[var(--color-text-primary)]">
+      <table className="font-sans min-w-full text-left text-sm text-[var(--color-text-primary)]">
         <thead className="bg-[var(--color-muted-surface)]">
           <tr>
             {columns.map((column) => {
@@ -67,7 +67,7 @@ export const DataTable = <T extends { id?: string | number }>({
                 <th
                   key={String(column.key)}
                   className={cn(
-                    'px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]',
+                    'font-display px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]',
                     stickyHeader &&
                       'sticky top-0 z-10 border-b border-[var(--color-border)] bg-[var(--color-muted-surface)] shadow-[0_1px_0_rgba(15,23,42,0.16)]',
                     column.headerClassName,

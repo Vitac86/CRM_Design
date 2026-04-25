@@ -8,7 +8,7 @@ import { cn } from '../ui/cn';
 import { SidebarIcon } from './SidebarIcon';
 
 const linkBaseClass =
-  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
+  'font-display flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
 
 const buildInitialOpenGroups = (menu: SidebarItem[]) => menu.reduce<Record<string, boolean>>((acc, item) => {
   if (isMenuGroup(item)) {

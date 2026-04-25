@@ -10,7 +10,9 @@ export default {
         'brand-dark': '#1E523A',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-heading)'],
+        display: ['var(--font-display)'],
+        sans: ['var(--font-body)'],
       },
     },
   },

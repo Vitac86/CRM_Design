@@ -1,9 +1,8 @@
 import { Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, TableStatusText } from '../ui';
 import type { Report } from '../../data/types';
 
-const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'warning' | 'danger'> = {
+const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'danger'> = {
   'Доставлен': 'neutral',
-  'Ожидает': 'warning',
   'Ошибка': 'danger',
 };
 

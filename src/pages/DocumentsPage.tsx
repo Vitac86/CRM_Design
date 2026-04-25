@@ -13,11 +13,11 @@ const statusBadgeVariant: Record<Document['status'], 'success' | 'warning' | 'da
   'На проверке': 'warning',
 };
 
-const kindBadgeVariant: Record<string, 'purple' | 'orange' | 'info' | 'warning' | 'neutral'> = {
-  'Договор ДУ': 'purple',
-  'Договор БО': 'orange',
-  'Депозитарный': 'info',
-  'Доверенность': 'warning',
+const kindBadgeVariant: Record<string, 'info' | 'warning' | 'neutral'> = {
+  'Договор ДУ': 'neutral',
+  'Договор БО': 'neutral',
+  'Депозитарный': 'neutral',
+  'Доверенность': 'info',
   'Дилерский': 'neutral',
 };
 
@@ -96,7 +96,7 @@ export const DocumentsPage = () => {
   return (
     <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Документы</h1>
+        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Документы</h1>
       </header>
 
       <TableControlPanel
