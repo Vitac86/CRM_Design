@@ -2,10 +2,10 @@ import type { BadgeVariant } from './Badge';
 
 const normalizeStatusKey = (value: string) => value.trim().toLowerCase().replace(/\s+/g, ' ');
 
-const buildMap = (entries: Array<[string, BadgeVariant]>) =>
+const buildMap = (entries: Array<[string, BadgeVariant]>): Record<string, BadgeVariant> =>
   Object.fromEntries(entries.map(([key, variant]) => [normalizeStatusKey(key), variant]));
 
-const statusVariantMap = buildMap([
+const statusVariantMap: Record<string, BadgeVariant> = buildMap([
   ['Резидент', 'neutral'],
   ['Не резидент', 'neutral'],
   ['Резидент РФ', 'neutral'],
