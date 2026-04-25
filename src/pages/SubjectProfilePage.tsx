@@ -1,4 +1,4 @@
-import { useEffect, type ClipboardEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ClientProfileHeader } from '../components/crm/ClientProfileHeader';
 import { PermissionCard } from '../components/crm/PermissionCard';
@@ -449,16 +449,6 @@ export const SubjectProfilePage = () => {
   const handleDraftPhoneChange = (field: 'phone' | 'secondaryPhone', value: string) => {
     const sanitizedValue = sanitizePhoneEditingValue(value);
     setDraftClient((prev) => (prev ? { ...prev, [field]: sanitizedValue } : prev));
-  };
-
-  const handleDraftPhonePaste = (field: 'phone' | 'secondaryPhone', event: ClipboardEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    const pastedValue = event.clipboardData.getData('text');
-    handleDraftPhoneChange(field, pastedValue);
-  };
-
-  const handleDraftPhoneBlur = (field: 'phone' | 'secondaryPhone') => {
-    setDraftClient((prev) => (prev ? { ...prev, [field]: normalizePhoneForStorage(prev[field]) } : prev));
   };
 
   const handleAddRepresentative = async () => {
@@ -937,11 +927,9 @@ export const SubjectProfilePage = () => {
                     value={currentClient.phone}
                     mono
                     inputMode="tel"
-                    autoComplete="tel-national"
+                    autoComplete="tel"
                     placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                     onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
-                    onPaste={(event) => handleDraftPhonePaste('phone', event)}
-                    onBlur={() => handleDraftPhoneBlur('phone')}
                   />
                   <FormField
                     label="Дополнительный телефон"
@@ -949,11 +937,9 @@ export const SubjectProfilePage = () => {
                     value={currentClient.secondaryPhone}
                     mono
                     inputMode="tel"
-                    autoComplete="tel-national"
+                    autoComplete="tel"
                     placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                     onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
-                    onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
-                    onBlur={() => handleDraftPhoneBlur('secondaryPhone')}
                   />
                   <FormField
                     label="Email"
@@ -1186,11 +1172,9 @@ export const SubjectProfilePage = () => {
                         value={currentClient.phone}
                         mono
                         inputMode="tel"
-                        autoComplete="tel-national"
+                        autoComplete="tel"
                         placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                         onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
-                        onPaste={(event) => handleDraftPhonePaste('phone', event)}
-                        onBlur={() => handleDraftPhoneBlur('phone')}
                       />
                       <FormField
                         label="Дополнительный телефон"
@@ -1198,11 +1182,9 @@ export const SubjectProfilePage = () => {
                         value={currentClient.secondaryPhone}
                         mono
                         inputMode="tel"
-                        autoComplete="tel-national"
+                        autoComplete="tel"
                         placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                         onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
-                        onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
-                        onBlur={() => handleDraftPhoneBlur('secondaryPhone')}
                       />
                       <FormField
                         label="Email"
