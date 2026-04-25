@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, DataTable, FilterChipSelect, SearchInput, TableControlPanel } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Badge, DataTable, FilterChipSelect, SearchInput } from '../components/ui';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { TrustContract, TrustContractStatus } from '../features/operations/api/operationsRepository';
 
@@ -48,12 +51,10 @@ export const TrustManagementPage = () => {
   );
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Доверительное управление</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Доверительное управление" />
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -79,7 +80,7 @@ export const TrustManagementPage = () => {
 
       <DataTable<TrustContract>
         columns={[
-          { key: 'contractNumber', header: 'Договор ДУ', className: 'font-medium text-slate-800 whitespace-nowrap' },
+          { key: 'contractNumber', header: 'Договор ДУ', className: 'whitespace-nowrap font-medium' },
           { key: 'clientName', header: 'Клиент' },
           { key: 'strategy', header: 'Стратегия', className: 'whitespace-nowrap' },
           { key: 'portfolioValue', header: 'Стоимость портфеля', className: 'whitespace-nowrap' },
@@ -93,6 +94,6 @@ export const TrustManagementPage = () => {
         rows={filteredContracts}
         emptyMessage="Договоры доверительного управления не найдены"
       />
-    </div>
+    </PageShell>
   );
 };

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge, Button, DataTable, FilterChipSelect, SearchInput, TableControlPanel, type SortDirection } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Badge, Button, DataTable, FilterChipSelect, SearchInput, type SortDirection } from '../components/ui';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BrokerageContract, BrokerageContractStatus } from '../features/operations/api/operationsRepository';
@@ -95,12 +98,10 @@ export const BrokeragePage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Брокерская деятельность</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Брокерская деятельность" />
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -140,7 +141,7 @@ export const BrokeragePage = () => {
           {
             key: 'contractNumber',
             header: 'Договор',
-            className: 'font-medium text-slate-800 whitespace-nowrap',
+            className: 'whitespace-nowrap font-medium',
             sortable: true,
             render: (contract) => (
               <Link
@@ -180,6 +181,6 @@ export const BrokeragePage = () => {
         onSortChange={handleSort}
         emptyMessage="По выбранным фильтрам брокерских записей нет"
       />
-    </div>
+    </PageShell>
   );
 };
