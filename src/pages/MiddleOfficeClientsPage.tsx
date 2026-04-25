@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, EmptyState, SearchInput, SelectFilter, StatusBadge, TableControlPanel, type SortDirection } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Button, DataTable, EmptyState, SearchInput, SelectFilter, StatusBadge, type SortDirection } from '../components/ui';
 import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
@@ -173,10 +176,8 @@ export const MiddleOfficeClientsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <header>
-        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Мидл-офис — Журнал клиентов</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Мидл-офис — Журнал клиентов" />
 
       <AsyncContent
         isLoading={isLoading}
@@ -185,7 +186,7 @@ export const MiddleOfficeClientsPage = () => {
         errorFallback={error ? <EmptyState title="Ошибка загрузки" description={error} /> : undefined}
       >
         <section className="space-y-3">
-          <TableControlPanel
+          <PageToolbar
             search={
               <SearchInput
                 value={clientSearch}
@@ -273,6 +274,6 @@ export const MiddleOfficeClientsPage = () => {
           />
         </section>
       </AsyncContent>
-    </div>
+    </PageShell>
   );
 };

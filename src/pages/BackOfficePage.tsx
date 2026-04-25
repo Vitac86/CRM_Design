@@ -49,9 +49,9 @@ export const BackOfficePage = () => {
   const pageReports = useMemo(() => (isLoading ? [] : reports), [isLoading, reports]);
 
   return (
-    <div className="space-y-3">
-      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+    <>
+      {error ? <p className="mb-3 text-sm text-rose-600">{error}</p> : null}
       <ReportsPageTemplate title="Отчёты Бэк-офиса" reports={pageReports} />
-    </div>
+    </>
   );
 };

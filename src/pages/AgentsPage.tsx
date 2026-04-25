@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
 import type { AgentProfile } from '../data/agents';
 import type { Client } from '../data/types';
-import { Badge, Button, DataTable, FormField, SearchInput, TableControlPanel } from '../components/ui';
+import { Badge, Button, DataTable, FormField, SearchInput } from '../components/ui';
 
 type AgentTableRow = {
   id: string;
@@ -157,13 +160,10 @@ export const AgentsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-slate-900">Агенты</h1>
-        <Button onClick={() => setIsModalOpen(true)}>+ Добавить агента</Button>
-      </header>
+    <PageShell>
+      <PageHeader title="Агенты" actions={<Button onClick={() => setIsModalOpen(true)}>+ Добавить агента</Button>} />
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -239,6 +239,6 @@ export const AgentsPage = () => {
           </div>
         </div>
       ) : null}
-    </div>
+    </PageShell>
   );
 };

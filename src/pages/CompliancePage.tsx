@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Badge, Button, DataTable, EmptyState, SelectFilter, TableControlPanel } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Badge, Button, DataTable, EmptyState, SelectFilter } from '../components/ui';
 import { AsyncContent } from '../shared/ui/async';
 import type { Client, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
@@ -160,12 +163,10 @@ export const CompliancePage = () => {
   }, [typeFilter, residencyFilter, complianceFilter, setSearchParams]);
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <header>
-        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Комплаенс</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Комплаенс" />
 
-      <TableControlPanel
+      <PageToolbar
         filters={
           <>
             <SelectFilter value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as ClientType | 'all')}>
@@ -255,6 +256,6 @@ export const CompliancePage = () => {
           emptyMessage="По выбранным фильтрам данных нет"
         />
       </AsyncContent>
-    </div>
+    </PageShell>
   );
 };

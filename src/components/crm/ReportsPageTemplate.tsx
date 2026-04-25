@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { PageHeader } from '../layout/PageHeader';
+import { PageShell } from '../layout/PageShell';
+import { PageToolbar } from '../layout/PageToolbar';
 import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../ui';
 import type { Report } from '../../data/types';
 
@@ -114,13 +117,11 @@ export const ReportsPageTemplate = ({
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-      </header>
+    <PageShell>
+      <PageHeader title={title} />
 
       {separateSearchRow ? (
-        <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="space-y-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-sm">
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -128,12 +129,12 @@ export const ReportsPageTemplate = ({
             aria-label="Поиск по отчётам депозитария"
           />
 
-          <FilterBar className="rounded-xl border-none bg-slate-50/75 p-0 shadow-none">
+          <FilterBar className="rounded-xl border-none bg-transparent p-0 shadow-none">
             <input
               value={clientCodeFilter}
               onChange={(event) => setClientCodeFilter(event.target.value)}
               placeholder="Код клиента"
-              className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
               aria-label="Фильтр по коду клиента"
             />
 
@@ -141,7 +142,7 @@ export const ReportsPageTemplate = ({
               type="date"
               value={dateFromFilter}
               onChange={(event) => setDateFromFilter(event.target.value)}
-              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
               aria-label="Дата с"
               title="Дата с"
             />
@@ -150,7 +151,7 @@ export const ReportsPageTemplate = ({
               type="date"
               value={dateToFilter}
               onChange={(event) => setDateToFilter(event.target.value)}
-              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+              className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
               aria-label="Дата по"
               title="Дата по"
             />
@@ -191,19 +192,23 @@ export const ReportsPageTemplate = ({
           </FilterBar>
         </section>
       ) : (
-        <FilterBar>
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по клиенту, файлу или отчёту"
-            className="h-10 w-full sm:w-[300px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
-            aria-label="Поиск по отчётам"
-          />
+        <PageToolbar
+          search={
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Поиск по клиенту, файлу или отчёту"
+              className="h-10 w-full sm:w-[300px] max-w-full rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
+              aria-label="Поиск по отчётам"
+            />
+          }
+          filters={
+            <>
           <input
             value={clientCodeFilter}
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="Код клиента"
-            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
             aria-label="Фильтр по коду клиента"
           />
 
@@ -211,7 +216,7 @@ export const ReportsPageTemplate = ({
             type="date"
             value={dateFromFilter}
             onChange={(event) => setDateFromFilter(event.target.value)}
-            className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
             aria-label="Дата с"
             title="Дата с"
           />
@@ -220,7 +225,7 @@ export const ReportsPageTemplate = ({
             type="date"
             value={dateToFilter}
             onChange={(event) => setDateToFilter(event.target.value)}
-            className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
             aria-label="Дата по"
             title="Дата по"
           />
@@ -255,15 +260,19 @@ export const ReportsPageTemplate = ({
             <option value="Не доставлено">Не доставлено</option>
           </SelectFilter>
 
-          <Button variant="secondary" className="sm:ml-auto" onClick={resetFilters}>
-            Очистить фильтры
-          </Button>
-        </FilterBar>
+            </>
+          }
+          actions={(
+            <Button variant="secondary" onClick={resetFilters}>
+              Очистить фильтры
+            </Button>
+          )}
+        />
       )}
 
       <DataTable<Report>
         columns={[
-          { key: 'fileName', header: 'Имя файла', className: 'font-medium text-slate-800 whitespace-nowrap' },
+          { key: 'fileName', header: 'Имя файла', className: 'font-medium text-[var(--color-text-primary)] whitespace-nowrap' },
           { key: 'sentAt', header: 'Дата и время отправки', className: 'whitespace-nowrap' },
           {
             key: 'reportType',
@@ -301,6 +310,6 @@ export const ReportsPageTemplate = ({
           onNext={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
         />
       </div>
-    </div>
+    </PageShell>
   );
 };
