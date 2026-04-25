@@ -12,11 +12,11 @@ export * from './statusBadge';
 export * from './ActiveFilterChip';
 export * from './FilterChipSelect';
 export * from './TableControlPanel';
-export * from './TableStatusText';
 export * from './FormField';
 export * from './BooleanSelect';
 export * from './PageSizeSelector';
 
 export * from './icons';
 
-export * from './StatusBadge';
+export { StatusBadge } from './StatusBadge';
+export { TableStatusText } from './TableStatusText';
