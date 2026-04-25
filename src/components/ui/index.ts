@@ -18,5 +18,5 @@ export * from './PageSizeSelector';
 
 export * from './icons';
 
-export { StatusBadge } from './StatusBadge';
-export { TableStatusText } from './TableStatusText';
+export * from './StatusBadge';
+export * from './TableStatusText';
