@@ -4,8 +4,53 @@
 
 :root {
   font-family: 'Inter', system-ui, sans-serif;
-  color: #1f2937;
-  background-color: #f8fafc;
+  --color-primary: #2563eb;
+  --color-secondary: #dbeafe;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-sidebar: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-accent: #1d4ed8;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+
+:root[data-theme='current'] {
+  --color-primary: #2563eb;
+  --color-secondary: #dbeafe;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-sidebar: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-accent: #1d4ed8;
+}
+
+:root[data-theme='investica-dark'] {
+  --color-primary: #242bf5;
+  --color-secondary: #474efd;
+  --color-background: #050507;
+  --color-surface: #0f1021;
+  --color-sidebar: #0a0b6a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cbd5e1;
+  --color-border: #1e1f38;
+  --color-accent: #474efd;
+}
+
+:root[data-theme='investica-light'] {
+  --color-primary: #242bf5;
+  --color-secondary: #e0e7ff;
+  --color-background: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-sidebar: #0a0b6a;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-border: #dbe2f0;
+  --color-accent: #474efd;
 }
 
 html,
@@ -19,7 +64,8 @@ body,
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 * {
