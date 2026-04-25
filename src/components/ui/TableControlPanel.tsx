@@ -23,7 +23,7 @@ export const TableControlPanel = ({
   const hasSecondRow = Boolean(filters) || Boolean(actions);
 
   return (
-    <section className={cn('space-y-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-sm sm:p-4', className)}>
+    <section className={cn('space-y-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-3 shadow-sm sm:p-4', className)}>
       {search ? (
         <div className={cn('min-w-0 w-full max-w-[520px]', searchClassName)}>
           {search}

@@ -190,7 +190,7 @@ export const DepositoryPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
       <header>
         <h1 className="text-2xl font-semibold text-slate-900">Отчёты депозитария</h1>
       </header>
