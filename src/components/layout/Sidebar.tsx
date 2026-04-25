@@ -73,7 +73,7 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
         <p className={cn('mt-1 text-xs', logoSubtitleClass)}>CRM prototype</p>
       </div>
 
-      <nav className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
+      <nav className="crm-scrollbar min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
         {sidebarMenu.map((item) => {
           if (isMenuGroup(item)) {
             const isOpen = openGroups[item.id] ?? false;
