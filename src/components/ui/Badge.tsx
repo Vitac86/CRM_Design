@@ -8,21 +8,29 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 const variantClasses: Record<BadgeVariant, string> = {
-  success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-  warning: 'bg-amber-50 text-amber-700 border-amber-100',
-  danger: 'bg-rose-50 text-rose-700 border-rose-100',
-  neutral: 'bg-[var(--color-muted-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)]',
-  info: 'bg-sky-50 text-sky-700 border-sky-100',
-  purple: 'bg-violet-50 text-violet-700 border-violet-100',
-  orange: 'bg-orange-50 text-orange-700 border-orange-100',
-  brand: 'bg-[var(--color-primary)]/10 text-[var(--color-accent)] border-[var(--color-primary)]/25',
+  success:
+    'bg-[color:color-mix(in_srgb,var(--color-success)_10%,transparent)] text-[color:color-mix(in_srgb,var(--color-success)_74%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-success)_30%,var(--color-border))]',
+  warning:
+    'bg-[color:color-mix(in_srgb,var(--color-warning)_10%,transparent)] text-[color:color-mix(in_srgb,var(--color-warning)_68%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-warning)_30%,var(--color-border))]',
+  danger:
+    'bg-[color:color-mix(in_srgb,var(--color-danger)_9%,transparent)] text-[color:color-mix(in_srgb,var(--color-danger)_68%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-danger)_30%,var(--color-border))]',
+  neutral:
+    'bg-[color:color-mix(in_srgb,var(--color-muted-surface)_55%,transparent)] text-[var(--color-text-secondary)] border-[color:color-mix(in_srgb,var(--color-text-secondary)_18%,var(--color-border))]',
+  info:
+    'bg-[color:color-mix(in_srgb,var(--color-primary)_9%,transparent)] text-[color:color-mix(in_srgb,var(--color-primary)_68%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-primary)_24%,var(--color-border))]',
+  purple:
+    'bg-[color:color-mix(in_srgb,var(--color-primary)_7%,transparent)] text-[var(--color-text-secondary)] border-[color:color-mix(in_srgb,var(--color-primary)_18%,var(--color-border))]',
+  orange:
+    'bg-[color:color-mix(in_srgb,var(--color-warning)_8%,transparent)] text-[var(--color-text-secondary)] border-[color:color-mix(in_srgb,var(--color-warning)_22%,var(--color-border))]',
+  brand:
+    'bg-[color:color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-[color:color-mix(in_srgb,var(--color-primary)_72%,var(--color-text-primary))] border-[color:color-mix(in_srgb,var(--color-primary)_28%,var(--color-border))]',
 };
 
 export const Badge = ({ variant = 'neutral', className, ...props }: BadgeProps) => {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-5 whitespace-nowrap',
+        'font-display inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-5 whitespace-nowrap',
         variantClasses[variant],
         className,
       )}

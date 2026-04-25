@@ -13,7 +13,7 @@ type TopbarProps = {
 const complianceBadgeClassMap = {
   success: 'bg-emerald-100/90 text-emerald-800',
   warning: 'bg-amber-100/90 text-amber-800',
-  orange: 'bg-orange-100/90 text-orange-800',
+  info: 'bg-sky-100/90 text-sky-800',
   danger: 'bg-rose-100/90 text-rose-800',
 };
 
@@ -106,7 +106,7 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] transition hover:bg-[var(--color-hover)] lg:hidden"
+            className="font-display inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] transition hover:bg-[var(--color-hover)] lg:hidden"
             aria-label="Открыть меню"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -123,7 +123,7 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
               placeholder="Глобальный поиск"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="h-10 w-full min-w-0 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] pl-10 pr-3 text-sm text-[var(--color-text-primary)] outline-none transition hover:border-[var(--color-primary)]/50 focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/20"
+              className="font-display h-10 w-full min-w-0 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] pl-10 pr-3 text-sm text-[var(--color-text-primary)] outline-none transition hover:border-[var(--color-primary)]/50 focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/20"
             />
 
             {isOpen ? (

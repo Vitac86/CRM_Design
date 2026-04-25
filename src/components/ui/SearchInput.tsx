@@ -14,7 +14,7 @@ export const SearchInput = ({ className, inputClassName, placeholder = 'Поис
         type="search"
         placeholder={placeholder}
         className={cn(
-          'h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] pl-9 pr-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/20 disabled:cursor-not-allowed disabled:opacity-60',
+          'font-display h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] pl-9 pr-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/20 disabled:cursor-not-allowed disabled:opacity-60',
           inputClassName,
         )}
         {...props}

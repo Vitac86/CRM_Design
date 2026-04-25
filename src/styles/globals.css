@@ -1,9 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Montserrat', 'Inter', system-ui, sans-serif;
+  --font-display: 'Inter Tight', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   --color-primary: #2563eb;
   --color-secondary: #dbeafe;
   --color-background: #f8fafc;
@@ -122,10 +127,41 @@ body {
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text-primary);
+  font-family: var(--font-body);
 }
 
 * {
   box-sizing: border-box;
+}
+
+@layer base {
+  h1 {
+    font-family: var(--font-heading);
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+  }
+
+  button,
+  input,
+  select,
+  textarea,
+  label {
+    font-family: var(--font-display);
+  }
+
+  td,
+  th,
+  p,
+  li,
+  small {
+    font-family: var(--font-body);
+  }
 }
 
 @layer utilities {

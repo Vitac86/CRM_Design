@@ -9,7 +9,7 @@ import type {
   SubjectStatus,
 } from '../data/types';
 
-type ComplianceBadgeVariant = Extract<BadgeVariant, 'success' | 'warning' | 'orange' | 'danger'>;
+type ComplianceBadgeVariant = Extract<BadgeVariant, 'success' | 'warning' | 'info' | 'danger'>;
 
 const clientTypeLabelMap: Record<ClientType, string> = {
   ООО: 'Юр. лицо',
@@ -27,8 +27,8 @@ const residencyLabelMap: Record<ResidencyStatus, string> = {
 
 const complianceVariantMap: Record<ComplianceStatus, ComplianceBadgeVariant> = {
   ПРОЙДЕН: 'success',
-  'НА ПРОВЕРКЕ': 'warning',
-  'НА ДОРАБОТКЕ': 'orange',
+  'НА ПРОВЕРКЕ': 'info',
+  'НА ДОРАБОТКЕ': 'warning',
   ЗАБЛОКИРОВАН: 'danger',
 };
 
@@ -40,16 +40,16 @@ const complianceLabelMap: Record<ComplianceStatus, string> = {
 };
 
 const clientTypeVariantMap: Record<ClientType, BadgeVariant> = {
-  ООО: 'info',
-  ПАО: 'info',
-  ЗАО: 'info',
-  АО: 'info',
-  ФЛ: 'purple',
-  ИП: 'warning',
+  ООО: 'neutral',
+  ПАО: 'neutral',
+  ЗАО: 'neutral',
+  АО: 'neutral',
+  ФЛ: 'neutral',
+  ИП: 'neutral',
 };
 
 const residencyVariantMap: Record<ResidencyStatus, BadgeVariant> = {
-  'Резидент РФ': 'success',
+  'Резидент РФ': 'neutral',
   Нерезидент: 'neutral',
 };
 

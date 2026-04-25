@@ -2,21 +2,8 @@ import { Badge, EmptyState, TableStatusText } from '../ui';
 import type { Report } from '../../data/types';
 import { cn } from '../ui/cn';
 
-const statusIconMap: Record<Report['deliveryStatus'], string> = {
-  'Доставлен': '✓',
-  'Ожидает': '⏳',
-  'Ошибка': '✕',
-};
-
-const statusIconStyleMap: Record<Report['deliveryStatus'], string> = {
-  'Доставлен': 'text-emerald-600',
-  'Ожидает': 'text-amber-600',
-  'Ошибка': 'text-rose-600',
-};
-
-const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'warning' | 'danger'> = {
+const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'danger'> = {
   'Доставлен': 'neutral',
-  'Ожидает': 'warning',
   'Ошибка': 'danger',
 };
 
@@ -44,29 +31,24 @@ export const MiddleOfficeReportList = ({ reports, selectedReportId, onSelect }: 
             className={cn(
               'w-full rounded-lg border px-2.5 py-2 text-left transition',
               isActive
-                ? 'border-emerald-200 bg-emerald-50/70 shadow-sm'
-                : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/30',
+                ? 'border-[var(--color-primary)]/35 bg-[color:color-mix(in_srgb,var(--color-primary)_8%,transparent)] shadow-sm'
+                : 'border-slate-200 bg-white hover:border-[var(--color-primary)]/30 hover:bg-[color:color-mix(in_srgb,var(--color-primary)_5%,transparent)]',
             )}
           >
             <div className="flex items-start justify-between gap-2">
-              <div className="flex min-w-0 gap-2.5">
-                <span className={cn('mt-0.5 text-sm', statusIconStyleMap[report.deliveryStatus])} aria-hidden="true">
-                  {statusIconMap[report.deliveryStatus]}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-900">{report.clientName}</p>
-                  <p className="mt-0.5 text-xs text-slate-700">{report.reportTitle}</p>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    <Badge className="px-1.5 py-0 leading-4" variant="info">
-                      {report.deliveryChannel}
-                    </Badge>
-                    <Badge className="px-1.5 py-0 leading-4" variant="neutral">
-                      {report.reportType}
-                    </Badge>
-                    <TableStatusText tone={statusToneMap[report.deliveryStatus]} className="text-xs">
-                      {report.deliveryStatus}
-                    </TableStatusText>
-                  </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-900">{report.clientName}</p>
+                <p className="mt-0.5 text-xs text-slate-700">{report.reportTitle}</p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <Badge className="px-1.5 py-0 leading-4" variant="neutral">
+                    {report.deliveryChannel}
+                  </Badge>
+                  <Badge className="px-1.5 py-0 leading-4" variant="neutral">
+                    {report.reportType}
+                  </Badge>
+                  <TableStatusText tone={statusToneMap[report.deliveryStatus]} className="text-xs">
+                    {report.deliveryStatus}
+                  </TableStatusText>
                 </div>
               </div>
               <span className="shrink-0 pt-0.5 text-[11px] leading-4 text-slate-500">{report.sentAt}</span>

@@ -331,7 +331,7 @@ export type ReportType =
   | 'Отчёт ДУ'
   | 'Налоговая справка';
 export type ReportDeliveryChannel = 'Личный кабинет' | 'Почта' | 'E-mail';
-export type ReportDeliveryStatus = 'Доставлен' | 'Ожидает' | 'Ошибка';
+export type ReportDeliveryStatus = 'Доставлен' | 'Ошибка';
 
 export interface Report {
   id: string;
