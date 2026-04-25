@@ -86,7 +86,7 @@ export const DashboardPage = () => {
   );
 
   return (
-    <div className="min-w-0 space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+    <div className="crm-prestige-panel min-w-0 space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
       <header>
         <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Операционный обзор</h1>
       </header>

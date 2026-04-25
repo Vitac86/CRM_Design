@@ -549,87 +549,87 @@
 :root[data-theme='investica-dark'] {
   --color-primary: #242bf5;
   --color-secondary: #474efd;
-  --color-background: #070913;
-  --color-surface: #0d1022;
-  --color-card: #131733;
-  --color-inner-panel: #171c3b;
-  --color-elevated: #1a2040;
+  --color-background: #070a14;
+  --color-surface: #101527;
+  --color-card: #151b31;
+  --color-inner-panel: #1a213a;
+  --color-elevated: #1f2844;
   --color-sidebar: #0a0b6a;
   --color-text-primary: #ffffff;
-  --color-text-secondary: #cbd5e1;
-  --color-border: #2a3260;
+  --color-text-secondary: #c8d1e8;
+  --color-border: #2f395f;
   --color-accent: #474efd;
-  --color-muted: #94a3b8;
-  --color-muted-surface: #111632;
-  --color-shadow: rgba(2, 8, 26, 0.64);
-  --color-hover: #1c1f4d;
-  --color-input: #11142c;
-  --color-input-border: #323763;
+  --color-muted: #9aa8c1;
+  --color-muted-surface: #131a30;
+  --color-shadow: rgba(3, 8, 24, 0.68);
+  --color-hover: #20294a;
+  --color-input: #141a2f;
+  --color-input-border: #39456d;
   --color-input-text: #f8fafc;
-  --color-input-placeholder: #94a3c4;
-  --color-input-icon: #b2bdf3;
+  --color-input-placeholder: #9aa8c6;
+  --color-input-icon: #b4c1e2;
   --color-input-icon-hover: #d8e1ff;
-  --color-input-focus: #7f8aff;
+  --color-input-focus: #6c78ff;
   --input-calendar-icon-filter: invert(1) brightness(1.22) saturate(0.86);
   --input-calendar-icon-filter-hover: invert(1) brightness(1.42) saturate(0.9);
   --color-control-checked: #474efd;
-  --color-control-disabled: #4e577b;
+  --color-control-disabled: #556084;
   --color-focus: #474efd;
   --color-danger: #fb7185;
   --color-success: #34d399;
   --color-warning: #f59e0b;
   --color-sidebar-text: #f8fafc;
-  --color-sidebar-muted: #c7d2fe;
-  --color-sidebar-hover: #1d2198;
-  --color-sidebar-active-bg: #242bf5;
+  --color-sidebar-muted: #c3cffd;
+  --color-sidebar-hover: #1e2393;
+  --color-sidebar-active-bg: color-mix(in srgb, #242bf5 58%, #0a0b6a);
   --color-sidebar-active-text: #ffffff;
-  --color-tab-bg: #0f1021;
-  --color-tab-text: #a8b3cf;
-  --color-tab-hover: #1c1f4d;
+  --color-tab-bg: #121730;
+  --color-tab-text: #aeb9d7;
+  --color-tab-hover: #1f2848;
   --color-tab-hover-text: #ffffff;
-  --color-tab-active-bg: #242bf5;
+  --color-tab-active-bg: color-mix(in srgb, #242bf5 78%, #131a30);
   --color-tab-active-text: #ffffff;
-  --color-tab-border: #2a2d4f;
-  --color-tab-indicator: #9ea5ff;
+  --color-tab-border: #303a63;
+  --color-tab-indicator: #737eff;
   --color-actionbar-bg: var(--color-elevated);
-  --color-actionbar-border: #2f3871;
-  --color-actionbar-shadow: 0 -10px 28px var(--color-shadow);
+  --color-actionbar-border: #35406f;
+  --color-actionbar-shadow: 0 -12px 30px var(--color-shadow);
   --color-actionbar-text: #f8fafc;
-  --color-button-primary-bg: #3a45ff;
+  --color-button-primary-bg: #3842f8;
   --color-button-primary-text: #f8faff;
-  --color-button-primary-hover: #5b66ff;
-  --color-button-primary-active: #2f38db;
-  --color-button-secondary-bg: #1d2448;
+  --color-button-primary-hover: #4e58ff;
+  --color-button-primary-active: #2e37d3;
+  --color-button-secondary-bg: #212b4b;
   --color-button-secondary-text: #e4eaff;
-  --color-button-secondary-border: #3c467b;
-  --color-button-secondary-hover-bg: #293160;
-  --color-button-secondary-hover-border: #5463a2;
+  --color-button-secondary-border: #455383;
+  --color-button-secondary-hover-bg: #2b3560;
+  --color-button-secondary-hover-border: #5a6ca6;
   --color-button-secondary-hover-text: #f8fbff;
-  --color-button-secondary-active-bg: #2f386b;
-  --color-button-secondary-active-border: #6577be;
+  --color-button-secondary-active-bg: #313d6e;
+  --color-button-secondary-active-border: #6678bb;
   --color-button-secondary-active-text: #ffffff;
   --color-button-ghost-bg: transparent;
-  --color-button-ghost-text: #d2daf8;
-  --color-button-ghost-hover-bg: color-mix(in srgb, #293160 68%, transparent);
-  --color-button-ghost-hover-border: color-mix(in srgb, #5364a5 70%, transparent);
+  --color-button-ghost-text: #d1daf5;
+  --color-button-ghost-hover-bg: color-mix(in srgb, #2a3460 68%, transparent);
+  --color-button-ghost-hover-border: color-mix(in srgb, #596dae 68%, transparent);
   --color-button-ghost-hover-text: #ffffff;
-  --color-button-ghost-active-bg: color-mix(in srgb, #2f3a75 80%, transparent);
-  --color-button-ghost-active-border: color-mix(in srgb, #6f80d3 65%, transparent);
+  --color-button-ghost-active-bg: color-mix(in srgb, #334082 80%, transparent);
+  --color-button-ghost-active-border: color-mix(in srgb, #6e82cf 62%, transparent);
   --color-button-danger-bg: #c54462;
   --color-button-danger-text: #fff6f8;
   --color-button-danger-hover: #b13d58;
   --color-button-danger-active: #943249;
-  --color-button-disabled-bg: color-mix(in srgb, #151a36 84%, #262d59);
-  --color-button-disabled-border: color-mix(in srgb, #38457f 68%, transparent);
+  --color-button-disabled-bg: color-mix(in srgb, #171f39 84%, #2b3563);
+  --color-button-disabled-border: color-mix(in srgb, #3e4d84 66%, transparent);
   --color-button-disabled-text: color-mix(in srgb, #c2ccec 62%, transparent);
-  --color-button-selected-bg: color-mix(in srgb, #3a45ff 24%, #1a2040);
-  --color-button-selected-border: color-mix(in srgb, #7f8aff 60%, #42508e);
+  --color-button-selected-bg: color-mix(in srgb, #3842f8 24%, #1f2844);
+  --color-button-selected-border: color-mix(in srgb, #7a86fa 58%, #465892);
   --color-button-selected-text: #f8fbff;
-  --color-button-focus-ring: color-mix(in srgb, #8f9bff 52%, white 14%);
-  --scrollbar-track: #10142e;
-  --scrollbar-thumb: #4d6293;
-  --scrollbar-thumb-hover: #5f77b0;
-  --scrollbar-corner: #10142e;
+  --color-button-focus-ring: color-mix(in srgb, #7f8cff 54%, white 12%);
+  --scrollbar-track: #121833;
+  --scrollbar-thumb: #526696;
+  --scrollbar-thumb-hover: #6580b5;
+  --scrollbar-corner: #121833;
 }
 
 :root[data-theme='investica-light'] {
@@ -988,6 +988,40 @@ body {
 }
 
 @layer components {
+  .crm-card {
+    border-color: color-mix(in srgb, var(--color-border) 88%, white 4%);
+    background:
+      radial-gradient(120% 90% at 5% -12%, color-mix(in srgb, var(--color-secondary) 10%, transparent), transparent 55%),
+      var(--color-card);
+    box-shadow:
+      0 12px 28px color-mix(in srgb, var(--color-shadow) 70%, transparent),
+      inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
+  }
+
+  .crm-prestige-panel {
+    box-shadow:
+      0 14px 30px color-mix(in srgb, var(--color-shadow) 58%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #ffffff 6%, transparent);
+  }
+
+  .crm-data-table {
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--color-shadow) 55%, transparent);
+  }
+
+  .crm-button-primary {
+    box-shadow:
+      0 8px 18px color-mix(in srgb, var(--color-primary) 26%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--color-primary) 44%, transparent);
+  }
+
+  .crm-sidebar {
+    box-shadow: inset -1px 0 0 color-mix(in srgb, white 9%, transparent);
+  }
+
+  .crm-sidebar-link {
+    border: 1px solid transparent;
+  }
+
   .crm-tabs {
     background-color: var(--color-tab-bg);
     border-color: var(--color-tab-border);
@@ -1028,6 +1062,52 @@ body {
     background-color: color-mix(in srgb, var(--color-actionbar-bg) 94%, transparent);
     color: var(--color-actionbar-text);
     box-shadow: var(--color-actionbar-shadow);
+  }
+
+  :root[data-theme='investica-dark'] .crm-card {
+    border-color: color-mix(in srgb, var(--color-border) 85%, #5a6eb2 12%);
+  }
+
+  :root[data-theme='investica-dark'] .crm-prestige-panel {
+    background:
+      radial-gradient(95% 120% at 0% 0%, color-mix(in srgb, #474efd 12%, transparent), transparent 58%),
+      var(--color-surface);
+    border-color: color-mix(in srgb, var(--color-border) 86%, #556ab0 10%);
+  }
+
+  :root[data-theme='investica-dark'] .crm-data-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--color-hover) 82%, transparent);
+  }
+
+  :root[data-theme='investica-dark'] .crm-data-table tbody tr[aria-selected='true'],
+  :root[data-theme='investica-dark'] .crm-data-table tbody tr[data-selected='true'] {
+    background-color: color-mix(in srgb, var(--color-primary) 18%, var(--color-card));
+  }
+
+  :root[data-theme='investica-dark'] .crm-sidebar-link:hover {
+    border-color: color-mix(in srgb, var(--color-secondary) 28%, transparent);
+  }
+
+  :root[data-theme='investica-dark'] .crm-sidebar-link.bg-\[var\(--color-sidebar-active-bg\)\] {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, #ffffff 12%, transparent),
+      0 6px 14px color-mix(in srgb, #242bf5 35%, transparent);
+  }
+
+  :root[data-theme='investica-dark'] .crm-tabs {
+    box-shadow:
+      0 8px 18px color-mix(in srgb, var(--color-shadow) 55%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #ffffff 8%, transparent);
+  }
+
+  :root[data-theme='investica-dark'] .crm-tab-active {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #aab4ff 22%, transparent);
+  }
+
+  :root[data-theme='investica-dark'] .crm-button-primary {
+    box-shadow:
+      0 10px 20px color-mix(in srgb, var(--color-primary) 28%, transparent),
+      0 0 0 1px color-mix(in srgb, #9ea7ff 26%, transparent);
   }
 }
 
