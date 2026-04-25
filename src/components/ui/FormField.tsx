@@ -4,7 +4,7 @@ import { cn } from './cn';
 type FormFieldProps = {
   label: string;
   mono?: boolean;
-} & Pick<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'placeholder' | 'type' | 'name' | 'disabled' | 'inputMode' | 'autoComplete'>;
+} & Pick<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'onBlur' | 'onKeyDown' | 'onPaste' | 'placeholder' | 'type' | 'name' | 'disabled' | 'inputMode' | 'autoComplete'>;
 
 export const FormField = ({ label, mono = false, className, type = 'text', ...props }: FormFieldProps & { className?: string }) => {
   return (

@@ -3,6 +3,7 @@ import { Card } from '../../ui';
 import { RegistrationBankAccountsSection } from './RegistrationBankAccountsSection';
 import { RegistrationCheckboxGroup } from './RegistrationCheckboxGroup';
 import { RegistrationTextField } from './RegistrationTextField';
+import { formatPhoneDisplay } from '../../../utils/phone';
 
 type LegalEntityFormData = {
   clientName: string;
@@ -165,8 +166,8 @@ export const LegalEntityRegistrationForm = ({ formData, onChange }: LegalEntityR
             type="tel"
             inputMode="tel"
             autoComplete="tel-national"
-            placeholder="+7 (999) 123-45-67"
-            value={formData.phones}
+            placeholder="+7 (999) 123-45-67 или +44 2079460958"
+            value={formatPhoneDisplay(formData.phones)}
             onChange={(event) => onChange('phones', event.target.value)}
           />
           <RegistrationTextField label="E-mail" value={formData.email} onChange={(event) => onChange('email', event.target.value)} />

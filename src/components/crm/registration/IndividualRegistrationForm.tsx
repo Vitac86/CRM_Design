@@ -3,6 +3,7 @@ import type { BankAccount } from '../../../data/types';
 import { RegistrationCheckboxGroup } from './RegistrationCheckboxGroup';
 import { RegistrationTextField } from './RegistrationTextField';
 import { RegistrationBankAccountsSection } from './RegistrationBankAccountsSection';
+import { formatPhoneDisplay } from '../../../utils/phone';
 
 type IndividualFormData = {
   lastName: string;
@@ -102,8 +103,8 @@ export const IndividualRegistrationForm = ({ formData, onChange }: IndividualReg
             type="tel"
             inputMode="tel"
             autoComplete="tel-national"
-            placeholder="+7 (999) 123-45-67"
-            value={formData.phones}
+            placeholder="+7 (999) 123-45-67 или +44 2079460958"
+            value={formatPhoneDisplay(formData.phones)}
             onChange={(event) => onChange('phones', event.target.value)}
           />
           <RegistrationTextField label="E-mail" value={formData.email} onChange={(event) => onChange('email', event.target.value)} />

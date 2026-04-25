@@ -9,7 +9,7 @@ import { RegistrationResult } from '../components/crm/registration/RegistrationR
 import { RegistrationStepHeader } from '../components/crm/registration/RegistrationStepHeader';
 import { RegistrationWizardLayout } from '../components/crm/registration/RegistrationWizardLayout';
 import type { Client, ClientType, IndividualClientDetails, LegalRepresentative, ResidencyStatus } from '../data/types';
-import { isRussianPhoneComplete, normalizePhoneInput } from '../utils/phone';
+import { normalizePhoneInput, validatePhone } from '../utils/phone';
 
 type SubjectType = 'individual' | 'legal' | null;
 type RegistrationMethod = 'manual' | 'cabinet' | 'inn' | null;
@@ -267,8 +267,9 @@ export const ClientRegistrationWizardPage = () => {
         return;
       }
 
-      if (individualForm.phones.trim() && !isRussianPhoneComplete(individualForm.phones)) {
-        setValidationError('Заполните телефон полностью: +7 (999) 123-45-67.');
+      const phoneValidation = validatePhone(individualForm.phones);
+      if (individualForm.phones.trim() && !phoneValidation.valid) {
+        setValidationError(phoneValidation.message ?? 'Укажите корректный номер телефона.');
         return;
       }
     }
@@ -279,8 +280,9 @@ export const ClientRegistrationWizardPage = () => {
         return;
       }
 
-      if (legalEntityForm.phones.trim() && !isRussianPhoneComplete(legalEntityForm.phones)) {
-        setValidationError('Заполните телефон полностью: +7 (999) 123-45-67.');
+      const phoneValidation = validatePhone(legalEntityForm.phones);
+      if (legalEntityForm.phones.trim() && !phoneValidation.valid) {
+        setValidationError(phoneValidation.message ?? 'Укажите корректный номер телефона.');
         return;
       }
     }
