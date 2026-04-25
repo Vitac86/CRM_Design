@@ -1,17 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter, TableControlPanel } from '../components/ui';
+import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter, StatusBadge, TableControlPanel } from '../components/ui';
 import type { Document } from '../data/types';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 
 const pageSize = 10;
 
-const statusBadgeVariant: Record<Document['status'], 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
-  'Действующий': 'success',
-  'Не действующий': 'neutral',
-  'Отклонена': 'danger',
-  'На подписи': 'info',
-  'На проверке': 'warning',
-};
 
 const kindBadgeVariant: Record<string, 'info' | 'warning' | 'neutral'> = {
   'Договор ДУ': 'neutral',
@@ -147,7 +140,7 @@ export const DocumentsPage = () => {
           {
             key: 'status',
             header: 'Статус',
-            render: (document) => <Badge variant={statusBadgeVariant[document.status]}>{document.status}</Badge>,
+            render: (document) => <StatusBadge value={document.status} compact />,
           },
           { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
         ]}

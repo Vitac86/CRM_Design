@@ -9,12 +9,11 @@ import {
   PageSizeSelector,
   Pagination,
   SearchInput,
+  StatusBadge,
   TableControlPanel,
-  TableStatusText,
   type SortDirection,
 } from '../components/ui';
 import { formatClientType, formatComplianceStatus, formatResidency, formatSubjectStatus } from '../utils/labels';
-import { subjectStatusTone } from '../utils/tableStatus';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
 const subjectStatusValues: SubjectStatus[] = ['Регистрация', 'Активный клиент', 'На комплаенсе', 'Данные заполнены'];
@@ -370,7 +369,7 @@ export const SubjectsPage = () => {
             header: 'Тип',
             sortable: true,
             render: (client) => (
-              <TableStatusText tone={subjectStatusTone.clientType[client.type]}>{formatClientType(client.type)}</TableStatusText>
+              <StatusBadge value={formatClientType(client.type)} compact />
             ),
           },
           {
@@ -378,9 +377,7 @@ export const SubjectsPage = () => {
             header: 'Резидент',
             sortable: true,
             render: (client) => (
-              <TableStatusText tone={subjectStatusTone.residency[client.residency]}>
-                {formatResidency(client.residency)}
-              </TableStatusText>
+              <StatusBadge value={formatResidency(client.residency)} compact />
             ),
           },
           {
@@ -388,9 +385,7 @@ export const SubjectsPage = () => {
             header: 'Статус субъекта',
             sortable: true,
             render: (client) => (
-              <TableStatusText tone={subjectStatusTone.subject[client.subjectStatus]}>
-                {formatSubjectStatus(client.subjectStatus)}
-              </TableStatusText>
+              <StatusBadge value={formatSubjectStatus(client.subjectStatus)} compact />
             ),
           },
           {
@@ -398,9 +393,7 @@ export const SubjectsPage = () => {
             header: 'Статус комплаенса',
             sortable: true,
             render: (client) => (
-              <TableStatusText tone={subjectStatusTone.compliance[client.complianceStatus]}>
-                {formatComplianceStatus(client.complianceStatus)}
-              </TableStatusText>
+              <StatusBadge value={formatComplianceStatus(client.complianceStatus)} compact />
             ),
           },
           {
@@ -408,9 +401,7 @@ export const SubjectsPage = () => {
             header: 'Полный комплект',
             sortable: true,
             render: (client) => (
-              <TableStatusText tone={subjectStatusTone.fullDocumentSet[String(client.fullDocumentSet) as 'true' | 'false']}>
-                {client.fullDocumentSet ? 'Да' : 'Нет'}
-              </TableStatusText>
+              <StatusBadge value={client.fullDocumentSet ? 'Да' : 'Нет'} compact />
             ),
           },
         ]}
