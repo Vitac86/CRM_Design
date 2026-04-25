@@ -11,7 +11,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'border border-[var(--color-button-primary-bg)] bg-[var(--color-button-primary-bg)] text-[var(--color-button-primary-text)] hover:border-[var(--color-button-primary-hover)] hover:bg-[var(--color-button-primary-hover)] active:border-[var(--color-button-primary-active)] active:bg-[var(--color-button-primary-active)]',
+    'crm-button-primary border border-[var(--color-button-primary-bg)] bg-[var(--color-button-primary-bg)] text-[var(--color-button-primary-text)] hover:border-[var(--color-button-primary-hover)] hover:bg-[var(--color-button-primary-hover)] active:border-[var(--color-button-primary-active)] active:bg-[var(--color-button-primary-active)]',
   secondary:
     'border border-[var(--color-button-secondary-border)] bg-[var(--color-button-secondary-bg)] text-[var(--color-button-secondary-text)] hover:border-[var(--color-button-secondary-hover-border)] hover:bg-[var(--color-button-secondary-hover-bg)] hover:text-[var(--color-button-secondary-hover-text)] active:border-[var(--color-button-secondary-active-border)] active:bg-[var(--color-button-secondary-active-bg)] active:text-[var(--color-button-secondary-active-text)]',
   ghost:

@@ -8,7 +8,7 @@ import { cn } from '../ui/cn';
 import { SidebarIcon } from './SidebarIcon';
 
 const linkBaseClass =
-  'font-display flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
+  'crm-sidebar-link font-display flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
 
 const buildInitialOpenGroups = (menu: SidebarItem[]) => menu.reduce<Record<string, boolean>>((acc, item) => {
   if (isMenuGroup(item)) {
@@ -61,8 +61,8 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
   }, [location.pathname, sidebarMenu]);
 
   const baseAsideClass = variant === 'desktop'
-    ? 'fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)]'
-    : 'h-full w-full border-r border-[var(--color-border)] bg-[var(--color-sidebar)]';
+    ? 'crm-sidebar fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)]'
+    : 'crm-sidebar h-full w-full border-r border-[var(--color-border)] bg-[var(--color-sidebar)]';
   const logoTone = themeId === 'current' ? 'blue' : 'white';
   const logoSubtitleClass = themeId === 'current' ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-sidebar-muted)]';
 
