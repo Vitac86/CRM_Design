@@ -18,3 +18,5 @@ export * from './BooleanSelect';
 export * from './PageSizeSelector';
 
 export * from './icons';
+
+export * from './StatusBadge';

@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import type { Client } from '../../data/types';
-import { Badge, Card } from '../ui';
+import { Badge, Card, StatusBadge } from '../ui';
 import {
   formatClientType,
   formatResidency,
@@ -31,8 +31,8 @@ const getInitials = (client: Client) => {
 
 export const ClientProfileHeader = ({ client, actions }: ClientProfileHeaderProps) => {
   return (
-    <Card className="flex flex-col gap-4 p-4 sm:p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <Card className="flex flex-col gap-3 p-3.5 sm:p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-lg font-semibold text-emerald-700">
             {getInitials(client)}
@@ -48,12 +48,8 @@ export const ClientProfileHeader = ({ client, actions }: ClientProfileHeaderProp
               <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
               <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
               {client.representatives.length > 0 ? <Badge variant="neutral">Представитель</Badge> : null}
-              <Badge variant={client.qualification ? 'brand' : 'neutral'}>
-                {client.qualification ? 'Квалифицированный' : 'Неквалифицированный'}
-              </Badge>
-              <Badge variant={getRiskCategoryBadgeVariant(client.riskCategory)}>
-                {formatRiskCategoryForHeader(client.riskCategory)}
-              </Badge>
+              <StatusBadge value={client.qualification ? 'Квалифицированный' : 'Неквалифицированный'} />
+              <StatusBadge value={formatRiskCategoryForHeader(client.riskCategory)} fallbackVariant={getRiskCategoryBadgeVariant(client.riskCategory)} />
             </div>
           </div>
         </div>

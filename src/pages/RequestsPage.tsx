@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, Pagination, SearchInput, SelectFilter, TableControlPanel, TableStatusText } from '../components/ui';
+import { Button, DataTable, Pagination, SearchInput, SelectFilter, StatusBadge, TableControlPanel } from '../components/ui';
 import type { Client, ClientBankDetails, ClientContract, CurrencyCode, Request } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { formatRequestStatus } from '../utils/labels';
@@ -14,12 +14,6 @@ type TransferMarket = 'Валютный рынок' | 'Фондовый рыно
 const requestTypeLabelMap: Record<RequestFormType, string> = {
   withdrawal: 'Поручение на вывод ДС',
   transfer: 'Поручение на перевод ДС',
-};
-
-const requestStatusTone: Record<Request['status'], 'neutral' | 'warning' | 'danger'> = {
-  'Ожидает': 'warning',
-  'Принято': 'neutral',
-  'Отклонено': 'danger',
 };
 
 const getOppositeMarket = (market: TransferMarket): TransferMarket =>
@@ -867,7 +861,7 @@ export const RequestsPage = () => {
           {
             key: 'status',
             header: 'Статус',
-            render: (request) => <TableStatusText tone={requestStatusTone[request.status]}>{formatRequestStatus(request.status)}</TableStatusText>,
+            render: (request) => <StatusBadge value={formatRequestStatus(request.status)} compact />,
           },
           { key: 'date', header: 'Дата', className: 'whitespace-nowrap' },
           { key: 'time', header: 'Время', className: 'whitespace-nowrap' },

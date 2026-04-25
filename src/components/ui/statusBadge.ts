@@ -1,33 +1,64 @@
 import type { BadgeVariant } from './Badge';
 
-export const statusBadgeVariantMap: Record<string, BadgeVariant> = {
-  'РЕЗИДЕНТ': 'neutral',
-  'НЕ РЕЗИДЕНТ': 'neutral',
-  'РЕЗИДЕНТ РФ': 'neutral',
-  'НЕРЕЗИДЕНТ': 'neutral',
-  'Резидент РФ': 'neutral',
-  Нерезидент: 'neutral',
-  'ПРОЙДЕН': 'success',
-  'НА ПРОВЕРКЕ': 'info',
-  'НА ДОРАБОТКЕ': 'warning',
-  'ЗАБЛОКИРОВАН': 'danger',
-  Пройден: 'success',
-  'На проверке': 'info',
-  'На доработке': 'warning',
-  Заблокирован: 'danger',
-  'ДЕЙСТВУЮЩИЙ': 'success',
-  'НЕ ДЕЙСТВУЮЩИЙ': 'neutral',
-  'ОЖИДАЕТ': 'warning',
-  'ПРИНЯТО': 'info',
-  'ОТКЛОНЕНО': 'danger',
-  Ожидает: 'warning',
-  Принято: 'info',
-  Отклонено: 'danger',
-  'ДОСТАВЛЕНО': 'neutral',
-  'НЕ ДОСТАВЛЕНО': 'danger',
-  Да: 'success',
-  Нет: 'neutral',
-  'Юр. лицо': 'neutral',
-  'Физ. лицо': 'neutral',
-  ИП: 'neutral',
+const normalizeStatusKey = (value: string) => value.trim().toLowerCase().replace(/\s+/g, ' ');
+
+const buildMap = (entries: Array<[string, BadgeVariant]>) =>
+  Object.fromEntries(entries.map(([key, variant]) => [normalizeStatusKey(key), variant]));
+
+const statusVariantMap = buildMap([
+  ['Резидент', 'neutral'],
+  ['Не резидент', 'neutral'],
+  ['Резидент РФ', 'neutral'],
+  ['Нерезидент', 'neutral'],
+  ['Юр. лицо', 'neutral'],
+  ['Физ. лицо', 'neutral'],
+  ['ИП', 'neutral'],
+
+  ['Активный клиент', 'success'],
+  ['На комплаенсе', 'info'],
+  ['Данные заполнены', 'neutral'],
+  ['Пройден', 'success'],
+  ['На проверке', 'info'],
+  ['На доработке', 'warning'],
+  ['Заблокирован', 'danger'],
+
+  ['Действующий', 'success'],
+  ['Не действующий', 'neutral'],
+  ['Ожидает', 'warning'],
+  ['Принято', 'info'],
+  ['Отклонено', 'danger'],
+  ['Доставлен', 'neutral'],
+  ['Доставлено', 'neutral'],
+  ['Не доставлено', 'danger'],
+  ['Ошибка', 'danger'],
+
+  ['Да', 'success'],
+  ['Нет', 'neutral'],
+
+  ['Квалифицированный', 'brand'],
+  ['Неквалифицированный', 'neutral'],
+  ['Квалифицированный инвестор', 'brand'],
+  ['Неквалифицированный инвестор', 'neutral'],
+
+  ['КОУР', 'danger'],
+  ['КПУР', 'orange'],
+  ['КСУР', 'warning'],
+  ['КНУР', 'success'],
+  ['Риск: Низкий', 'success'],
+  ['Риск: Средний', 'warning'],
+  ['Риск: Повышенный', 'orange'],
+  ['Риск: Высокий', 'danger'],
+
+  ['Открыт', 'success'],
+  ['Закрыт', 'neutral'],
+]);
+
+export const statusBadgeVariantMap: Record<string, BadgeVariant> = statusVariantMap;
+
+export const getStatusBadgeVariant = (value: string, fallback: BadgeVariant = 'neutral'): BadgeVariant => {
+  if (!value) {
+    return fallback;
+  }
+
+  return statusVariantMap[normalizeStatusKey(value)] ?? fallback;
 };

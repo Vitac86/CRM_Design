@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, EmptyState, SearchInput, SelectFilter, TableControlPanel, type SortDirection } from '../components/ui';
+import { Button, DataTable, EmptyState, SearchInput, SelectFilter, StatusBadge, TableControlPanel, type SortDirection } from '../components/ui';
 import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
@@ -173,9 +173,9 @@ export const MiddleOfficeClientsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Мидл-офис — Журнал клиентов</h1>
+        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Мидл-офис — Журнал клиентов</h1>
       </header>
 
       <AsyncContent
@@ -245,12 +245,30 @@ export const MiddleOfficeClientsPage = () => {
               { key: 'contractKind', header: 'Вид договора', className: 'whitespace-nowrap', sortable: true },
               { key: 'clientName', header: 'Наименование клиента', className: 'min-w-[240px]', sortable: true },
               { key: 'inn', header: 'ИНН', className: 'whitespace-nowrap', sortable: true },
-              { key: 'clientType', header: 'Тип клиента', className: 'whitespace-nowrap', sortable: true },
+              {
+                key: 'clientType',
+                header: 'Тип клиента',
+                className: 'whitespace-nowrap',
+                sortable: true,
+                render: (row) => <StatusBadge value={row.clientType} compact />,
+              },
               { key: 'contractNumber', header: 'Номер договора', className: 'whitespace-nowrap', sortable: true },
               { key: 'contractDate', header: 'Дата договора', className: 'whitespace-nowrap', sortable: true },
-              { key: 'residencyStatus', header: 'Статус резидентства', className: 'whitespace-nowrap', sortable: true },
+              {
+                key: 'residencyStatus',
+                header: 'Статус резидентства',
+                className: 'whitespace-nowrap',
+                sortable: true,
+                render: (row) => <StatusBadge value={row.residencyStatus} compact />,
+              },
               { key: 'accountType', header: 'Тип счёта', className: 'whitespace-nowrap', sortable: true },
-              { key: 'accountStatus', header: 'Статус счёта', className: 'whitespace-nowrap', sortable: true },
+              {
+                key: 'accountStatus',
+                header: 'Статус счёта',
+                className: 'whitespace-nowrap',
+                sortable: true,
+                render: (row) => <StatusBadge value={row.accountStatus} compact />,
+              },
             ]}
           />
         </section>

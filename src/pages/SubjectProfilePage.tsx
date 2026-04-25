@@ -13,7 +13,7 @@ import { SubjectContractsTab } from '../components/crm/SubjectContractsTab';
 import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
-import { formatClientType, formatResidency } from '../utils/labels';
+import { formatClientType, formatResidency, getComplianceBadgeVariant } from '../utils/labels';
 import { isRussianPhoneComplete, normalizePhoneInput } from '../utils/phone';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
@@ -21,12 +21,6 @@ import type { BankAccount, Client, ClientRepresentativeRole, ClientType, Residen
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
 const residencyOptions: ResidencyStatus[] = ['Резидент РФ', 'Нерезидент'];
 
-const complianceBadgeVariantMap: Record<Client['complianceStatus'], 'success' | 'warning' | 'danger' | 'orange'> = {
-  ПРОЙДЕН: 'success',
-  'НА ПРОВЕРКЕ': 'warning',
-  'НА ДОРАБОТКЕ': 'orange',
-  ЗАБЛОКИРОВАН: 'danger',
-};
 
 const shouldShowSendToComplianceButton = (status: string) => {
   const normalized = status.trim().toUpperCase();
@@ -538,7 +532,7 @@ export const SubjectProfilePage = () => {
       <SubjectProfileTabs activeTab={activeTab} onChange={handleTabChange} />
 
       {activeTab === 'profile' ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {validationError ? (
             <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{validationError}</div>
           ) : null}
@@ -1217,15 +1211,15 @@ export const SubjectProfilePage = () => {
           {!isEditing ? (
             <>
               <ProfileSection title="Комплаенс">
-                <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
+                <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-3.5">
                   <div className="space-y-1">
                     <h4 className="text-sm font-semibold text-slate-900">Комплаенс</h4>
                     <p className="text-sm text-slate-500">Текущая информация по статусу</p>
                   </div>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                     <div className="space-y-1">
                       <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Статус комплаенса</p>
-                      <Badge variant={complianceBadgeVariantMap[client.complianceStatus]}>{client.complianceStatus}</Badge>
+                      <Badge variant={getComplianceBadgeVariant(client.complianceStatus)}>{client.complianceStatus}</Badge>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Комментарий</p>
@@ -1303,7 +1297,7 @@ export const SubjectProfilePage = () => {
                 <textarea
                   value={currentClient.managerComment ?? ''}
                   onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, managerComment: event.target.value } : prev))}
-                  className="min-h-24 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  className="min-h-20 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   placeholder="—"
                 />
               </label>
