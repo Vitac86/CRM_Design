@@ -8,8 +8,8 @@ type TableStatusTextProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 const toneClasses: Record<TableStatusTone, string> = {
-  neutral: 'text-slate-700',
-  subtle: 'text-slate-500',
+  neutral: 'text-[var(--color-text-primary)]',
+  subtle: 'text-[var(--color-text-secondary)]',
   warning: 'text-amber-700',
   danger: 'text-rose-700',
 };

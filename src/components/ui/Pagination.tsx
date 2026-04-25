@@ -22,8 +22,8 @@ export const Pagination = ({
   ...props
 }: PaginationProps) => {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2 text-sm text-slate-600', className)} {...props}>
-      <span className="min-w-[72px] font-medium text-slate-700">
+    <div className={cn('flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-secondary)]', className)} {...props}>
+      <span className="min-w-[72px] font-medium text-[var(--color-text-primary)]">
         {page} из {totalPages}
       </span>
       <Button size="sm" onClick={onPrev} disabled={!canPrev} aria-label="Предыдущая страница">

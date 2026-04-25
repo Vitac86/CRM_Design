@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import { isMenuGroup, type SidebarItem } from '../../features/navigation/api/navigationRepository';
+import { useTheme } from '../../theme/useTheme';
+import { BrandLogo } from '../brand/BrandLogo';
 import { cn } from '../ui/cn';
 import { SidebarIcon } from './SidebarIcon';
 
@@ -24,6 +26,7 @@ type SidebarProps = {
 
 export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarProps) => {
   const { navigation } = useDataAccess();
+  const { themeId } = useTheme();
   const location = useLocation();
   const [sidebarMenu, setSidebarMenu] = useState<SidebarItem[]>([]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -58,14 +61,16 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
   }, [location.pathname, sidebarMenu]);
 
   const baseAsideClass = variant === 'desktop'
-    ? 'fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-slate-200 bg-white'
-    : 'h-full w-full border-r border-slate-200 bg-white';
+    ? 'fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)]'
+    : 'h-full w-full border-r border-[var(--color-border)] bg-[var(--color-sidebar)]';
+  const logoTone = themeId === 'current' ? 'blue' : 'white';
+  const logoSubtitleClass = themeId === 'current' ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-sidebar-muted)]';
 
   return (
     <aside className={cn('flex min-w-0 flex-col', baseAsideClass, className)}>
-      <div className="border-b border-slate-200 px-5 py-4">
-        <p className="text-xl font-semibold tracking-tight text-brand-dark">Инвестика</p>
-        <p className="text-xs text-slate-500">CRM prototype</p>
+      <div className="border-b border-[var(--color-border)] px-5 py-4">
+        <BrandLogo tone={logoTone} className="h-8" />
+        <p className={cn('mt-1 text-xs', logoSubtitleClass)}>CRM prototype</p>
       </div>
 
       <nav className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
@@ -79,9 +84,11 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
                 <button
                   type="button"
                   onClick={() => setOpenGroups((value) => ({ ...value, [item.id]: !isOpen }))}
-                  className={`${linkBaseClass} w-full justify-between ${
-                    hasActiveChild ? 'bg-brand-light text-brand-dark' : 'text-slate-700 hover:bg-slate-100'
-                  }`}
+                  className={cn(
+                    linkBaseClass,
+                    'w-full justify-between text-[var(--color-sidebar-text)] hover:bg-[var(--color-sidebar-hover)]',
+                    hasActiveChild && 'bg-[var(--color-sidebar-active-bg)] text-[var(--color-sidebar-active-text)]',
+                  )}
                 >
                   <span className="flex min-w-0 items-center gap-3">
                     <SidebarIcon name={item.icon} className="h-5 w-5 shrink-0" />
@@ -98,11 +105,11 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
                           to={child.to}
                           onClick={onNavigate}
                           className={({ isActive }) =>
-                            `${linkBaseClass} ${
-                              isActive
-                                ? 'bg-brand-light text-brand-dark'
-                                : 'text-slate-700 hover:bg-slate-100'
-                            }`
+                            cn(
+                              linkBaseClass,
+                              'text-[var(--color-sidebar-text)] hover:bg-[var(--color-sidebar-hover)]',
+                              isActive && 'bg-[var(--color-sidebar-active-bg)] text-[var(--color-sidebar-active-text)]',
+                            )
                           }
                         >
                           <SidebarIcon name={child.icon} className="h-4 w-4 shrink-0" />
@@ -122,9 +129,11 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
               to={item.to}
               onClick={onNavigate}
               className={({ isActive }) =>
-                `${linkBaseClass} mb-1 ${
-                  isActive ? 'bg-brand-light text-brand-dark' : 'text-slate-700 hover:bg-slate-100'
-                }`
+                cn(
+                  linkBaseClass,
+                  'mb-1 text-[var(--color-sidebar-text)] hover:bg-[var(--color-sidebar-hover)]',
+                  isActive && 'bg-[var(--color-sidebar-active-bg)] text-[var(--color-sidebar-active-text)]',
+                )
               }
             >
               <SidebarIcon name={item.icon} className="h-5 w-5 shrink-0" />

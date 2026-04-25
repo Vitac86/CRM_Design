@@ -8,11 +8,25 @@
   --color-secondary: #dbeafe;
   --color-background: #f8fafc;
   --color-surface: #ffffff;
+  --color-card: #ffffff;
   --color-sidebar: #ffffff;
   --color-text-primary: #0f172a;
   --color-text-secondary: #64748b;
   --color-border: #e2e8f0;
   --color-accent: #1d4ed8;
+  --color-muted: #64748b;
+  --color-muted-surface: #f8fafc;
+  --color-hover: #f1f5f9;
+  --color-input: #ffffff;
+  --color-focus: #3b82f6;
+  --color-danger: #e11d48;
+  --color-success: #047857;
+  --color-warning: #b45309;
+  --color-sidebar-text: #0f172a;
+  --color-sidebar-muted: #64748b;
+  --color-sidebar-hover: #f1f5f9;
+  --color-sidebar-active-bg: #dbeafe;
+  --color-sidebar-active-text: #1e3a8a;
   color: var(--color-text-primary);
   background-color: var(--color-background);
 }
@@ -22,35 +36,77 @@
   --color-secondary: #dbeafe;
   --color-background: #f8fafc;
   --color-surface: #ffffff;
+  --color-card: #ffffff;
   --color-sidebar: #ffffff;
   --color-text-primary: #0f172a;
   --color-text-secondary: #64748b;
   --color-border: #e2e8f0;
   --color-accent: #1d4ed8;
+  --color-muted: #64748b;
+  --color-muted-surface: #f8fafc;
+  --color-hover: #f1f5f9;
+  --color-input: #ffffff;
+  --color-focus: #3b82f6;
+  --color-danger: #e11d48;
+  --color-success: #047857;
+  --color-warning: #b45309;
+  --color-sidebar-text: #0f172a;
+  --color-sidebar-muted: #64748b;
+  --color-sidebar-hover: #f1f5f9;
+  --color-sidebar-active-bg: #dbeafe;
+  --color-sidebar-active-text: #1e3a8a;
 }
 
 :root[data-theme='investica-dark'] {
   --color-primary: #242bf5;
   --color-secondary: #474efd;
   --color-background: #050507;
-  --color-surface: #0f1021;
+  --color-surface: #0a0b1d;
+  --color-card: #0f1021;
   --color-sidebar: #0a0b6a;
   --color-text-primary: #ffffff;
   --color-text-secondary: #cbd5e1;
   --color-border: #1e1f38;
   --color-accent: #474efd;
+  --color-muted: #94a3b8;
+  --color-muted-surface: #141635;
+  --color-hover: #1c1f4d;
+  --color-input: #11142c;
+  --color-focus: #474efd;
+  --color-danger: #fb7185;
+  --color-success: #34d399;
+  --color-warning: #f59e0b;
+  --color-sidebar-text: #f8fafc;
+  --color-sidebar-muted: #c7d2fe;
+  --color-sidebar-hover: #1d2198;
+  --color-sidebar-active-bg: #242bf5;
+  --color-sidebar-active-text: #ffffff;
 }
 
 :root[data-theme='investica-light'] {
   --color-primary: #242bf5;
-  --color-secondary: #e0e7ff;
+  --color-secondary: #d8ddff;
   --color-background: #f5f7fb;
   --color-surface: #ffffff;
+  --color-card: #ffffff;
   --color-sidebar: #0a0b6a;
   --color-text-primary: #0f172a;
   --color-text-secondary: #475569;
   --color-border: #dbe2f0;
   --color-accent: #474efd;
+  --color-muted: #64748b;
+  --color-muted-surface: #eef2ff;
+  --color-hover: #eef2ff;
+  --color-input: #ffffff;
+  --color-focus: #242bf5;
+  --color-danger: #e11d48;
+  --color-success: #047857;
+  --color-warning: #b45309;
+  --color-sidebar-text: #f8fafc;
+  --color-sidebar-muted: #c7d2fe;
+  --color-sidebar-hover: #1d2198;
+  --color-sidebar-active-bg: #242bf5;
+  --color-sidebar-active-text: #ffffff;
 }
 
 html,

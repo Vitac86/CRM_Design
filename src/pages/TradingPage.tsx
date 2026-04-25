@@ -245,9 +245,9 @@ export const TradingPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Трейдинг</h1>
+        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Трейдинг</h1>
       </header>
 
       <div>
@@ -302,7 +302,7 @@ export const TradingPage = () => {
       <DataTable<TradingRow>
         columns={[
           { key: 'clientName', header: 'Клиент', className: 'min-w-[240px] max-w-[300px] truncate', sortable: true },
-          { key: 'clientCode', header: 'Код', className: 'font-medium text-slate-800 whitespace-nowrap', sortable: true },
+          { key: 'clientCode', header: 'Код', className: 'font-medium text-[var(--color-text-primary)] whitespace-nowrap', sortable: true },
           {
             key: 'investorStatus',
             header: 'Инвестор',

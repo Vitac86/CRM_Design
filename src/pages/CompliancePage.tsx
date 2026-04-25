@@ -160,9 +160,9 @@ export const CompliancePage = () => {
   }, [typeFilter, residencyFilter, complianceFilter, setSearchParams]);
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Комплаенс</h1>
+        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Комплаенс</h1>
       </header>
 
       <TableControlPanel
@@ -222,7 +222,7 @@ export const CompliancePage = () => {
       >
         <DataTable<ComplianceRow>
           columns={[
-            { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800 whitespace-nowrap' },
+            { key: 'code', header: 'Код клиента', className: 'font-medium text-[var(--color-text-primary)] whitespace-nowrap' },
             { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]' },
             { key: 'inn', header: 'ИНН' },
             {

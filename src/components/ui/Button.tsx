@@ -10,10 +10,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-brand text-white border border-brand hover:bg-brand-dark focus-visible:ring-brand/30',
+  primary: 'border border-[var(--color-primary)] bg-[var(--color-primary)] text-white hover:bg-[var(--color-accent)] focus-visible:ring-[var(--color-focus)]/40',
   secondary:
-    'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-slate-200/80',
-  ghost: 'bg-transparent text-slate-700 border border-transparent hover:bg-slate-100 focus-visible:ring-slate-300/50',
+    'border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/35 hover:bg-[var(--color-hover)] hover:text-[var(--color-text-primary)] focus-visible:ring-[var(--color-focus)]/20',
+  ghost: 'border border-transparent bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-hover)] focus-visible:ring-[var(--color-focus)]/25',
   danger: 'bg-red-600 text-white border border-red-600 hover:bg-red-700 focus-visible:ring-red-300/50',
 };
 
@@ -27,7 +27,7 @@ export const Button = ({ variant = 'primary', size = 'md', className, type = 'bu
     <button
       type={type}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-50',
         variantClasses[variant],
         sizeClasses[size],
         className,
