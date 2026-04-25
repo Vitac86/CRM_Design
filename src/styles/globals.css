@@ -1065,6 +1065,26 @@ body {
     box-shadow: var(--color-actionbar-shadow);
   }
 
+  .crm-dashboard-eagle {
+    opacity: 0;
+    filter: blur(0);
+    transition: opacity 0.28s ease;
+  }
+
+  :root[data-theme='investica-dark'] .crm-dashboard-eagle {
+    opacity: 0.18;
+    filter: drop-shadow(0 0 28px color-mix(in srgb, #4d5fff 22%, transparent));
+  }
+
+  :root[data-theme='investica-light'] .crm-dashboard-eagle {
+    opacity: 0.06;
+    filter: blur(0.4px);
+  }
+
+  :root[data-theme='current'] .crm-dashboard-eagle {
+    opacity: 0;
+  }
+
   :root[data-theme='investica-dark'] .crm-card {
     border-color: color-mix(in srgb, var(--color-border) 85%, #5a6eb2 12%);
   }
@@ -1109,6 +1129,12 @@ body {
     box-shadow:
       0 10px 20px color-mix(in srgb, var(--color-primary) 28%, transparent),
       0 0 0 1px color-mix(in srgb, #9ea7ff 26%, transparent);
+  }
+}
+
+@media (max-width: 1279px) {
+  .crm-dashboard-eagle {
+    display: none;
   }
 }
 
