@@ -1,0 +1,60 @@
+import type { ThemeDefinition, ThemeId } from './themeTypes';
+
+export const themes: Record<ThemeId, ThemeDefinition> = {
+  current: {
+    id: 'current',
+    name: 'Current',
+    description: 'Текущий дизайн CRM по умолчанию без визуальных изменений пользовательского сценария.',
+    primary: '#2563eb',
+    secondary: '#dbeafe',
+    background: '#f8fafc',
+    surface: '#ffffff',
+    sidebar: '#ffffff',
+    textPrimary: '#0f172a',
+    textSecondary: '#64748b',
+    border: '#e2e8f0',
+    accent: '#1d4ed8',
+    logoVariant: 'full-ru',
+    logoTone: 'blue',
+  },
+  'investica-dark': {
+    id: 'investica-dark',
+    name: 'Investica Dark',
+    description: 'Брендовая тёмная тема Инвестика для сценариев с низкой яркостью окружения.',
+    primary: '#242BF5',
+    secondary: '#474EFD',
+    background: '#050507',
+    surface: '#0f1021',
+    sidebar: '#0A0B6A',
+    textPrimary: '#ffffff',
+    textSecondary: '#cbd5e1',
+    border: '#1e1f38',
+    accent: '#474EFD',
+    logoVariant: 'full-ru',
+    logoTone: 'white',
+  },
+  'investica-light': {
+    id: 'investica-light',
+    name: 'Investica Light',
+    description: 'Брендовая светлая тема Инвестика с тёмно-синим сайдбаром и читаемым контентом.',
+    primary: '#242BF5',
+    secondary: '#e0e7ff',
+    background: '#f5f7fb',
+    surface: '#ffffff',
+    sidebar: '#0A0B6A',
+    textPrimary: '#0f172a',
+    textSecondary: '#475569',
+    border: '#dbe2f0',
+    accent: '#474EFD',
+    logoVariant: 'full-ru',
+    logoTone: 'blue',
+  },
+};
+
+export const DEFAULT_THEME_ID: ThemeId = 'current';
+
+export const THEME_STORAGE_KEY = 'crm-theme';
+
+export const getThemeById = (themeId: ThemeId) => themes[themeId];
+
+export const isThemeId = (value: string): value is ThemeId => value in themes;
