@@ -2,52 +2,55 @@ const E164_MAX_DIGITS = 15;
 const RUSSIAN_PHONE_DIGITS = 11;
 const RUSSIAN_NATIONAL_DIGITS = 10;
 
-export const getPhoneDigits = (value: string): string => value.replace(/\D/g, '').slice(0, E164_MAX_DIGITS);
+export const getPhoneDigits = (value: string): string => value.replace(/\D/g, '');
 
-const hasLeadingPlus = (value: string): boolean => /^\s*\+/.test(value);
+const hasLeadingPlus = (value: string): boolean => /^\+/.test(value.trim());
 
 const normalizeRussianPhone = (digits: string): string | null => {
   if (digits.length === RUSSIAN_NATIONAL_DIGITS) {
     return `+7${digits}`;
   }
 
-  if (digits.startsWith('8') && digits.length >= RUSSIAN_PHONE_DIGITS) {
-    return `+7${digits.slice(1, RUSSIAN_PHONE_DIGITS)}`;
-  }
-
-  if (digits.startsWith('7') && digits.length >= RUSSIAN_PHONE_DIGITS) {
-    return `+7${digits.slice(1, RUSSIAN_PHONE_DIGITS)}`;
+  if (digits.length === RUSSIAN_PHONE_DIGITS && (digits.startsWith('8') || digits.startsWith('7'))) {
+    return `+7${digits.slice(1)}`;
   }
 
   return null;
 };
 
-const normalizeInternationalPhone = (value: string): string => {
-  if (hasLeadingPlus(value)) {
-    const digits = getPhoneDigits(value);
-    return digits ? `+${digits}` : '+';
+export const sanitizePhoneEditingValue = (value: string): string => {
+  const cleaned = value.trimStart().replace(/[^\d+\s()-]/g, '');
+  let sanitized = '';
+  let hasPlus = false;
+
+  for (const char of cleaned) {
+    if (char === '+') {
+      if (!hasPlus && sanitized.length === 0) {
+        sanitized += '+';
+        hasPlus = true;
+      }
+      continue;
+    }
+
+    sanitized += char;
   }
 
-  return getPhoneDigits(value);
+  return sanitized;
 };
 
-export const normalizePhoneInput = (value: string): string => {
-  if (hasLeadingPlus(value)) {
-    const digits = getPhoneDigits(value);
-    if (!digits) {
-      return '+';
-    }
-
-    if (digits.startsWith('7')) {
-      return `+${digits.slice(0, RUSSIAN_PHONE_DIGITS)}`;
-    }
-
-    return `+${digits.slice(0, E164_MAX_DIGITS)}`;
+export const normalizePhoneForStorage = (value: string): string => {
+  const sanitized = sanitizePhoneEditingValue(value).trim();
+  if (!sanitized || sanitized === '+') {
+    return '';
   }
 
-  const digits = getPhoneDigits(value);
+  const digits = getPhoneDigits(sanitized);
   if (!digits) {
     return '';
+  }
+
+  if (hasLeadingPlus(sanitized)) {
+    return `+${digits.slice(0, E164_MAX_DIGITS)}`;
   }
 
   const normalizedRussianPhone = normalizeRussianPhone(digits);
@@ -55,10 +58,16 @@ export const normalizePhoneInput = (value: string): string => {
     return normalizedRussianPhone;
   }
 
-  return normalizeInternationalPhone(value);
+  return `+${digits.slice(0, E164_MAX_DIGITS)}`;
 };
 
-export const isRussianPhone = (value: string): boolean => normalizePhoneInput(value).startsWith('+7') && getPhoneDigits(value).length >= 1;
+// Backward-compatible alias used in other forms/pages.
+export const normalizePhoneInput = (value: string): string => normalizePhoneForStorage(value);
+
+export const isRussianPhone = (value: string): boolean => {
+  const normalized = normalizePhoneForStorage(value);
+  return normalized.startsWith('+7');
+};
 
 const detectInternationalPrefixLength = (digits: string): number => {
   if (digits.length <= 1) {
@@ -78,66 +87,46 @@ const detectInternationalPrefixLength = (digits: string): number => {
 };
 
 export const formatPhoneDisplay = (value: string): string => {
-  const normalized = normalizePhoneInput(value);
+  const normalized = normalizePhoneForStorage(value);
   if (!normalized) {
     return '';
   }
 
-  if (normalized === '+') {
-    return '+';
+  if (!normalized.startsWith('+')) {
+    return normalized;
   }
 
-  if (!isRussianPhone(normalized)) {
-    if (!normalized.startsWith('+')) {
-      return normalized;
-    }
-
-    const digits = normalized.slice(1);
-    const prefixLength = detectInternationalPrefixLength(digits);
-    const countryCode = digits.slice(0, prefixLength);
-    const subscriber = digits.slice(prefixLength);
-    return subscriber ? `+${countryCode} ${subscriber}` : `+${countryCode}`;
+  if (normalized.startsWith('+7') && normalized.length === RUSSIAN_PHONE_DIGITS + 1) {
+    const domestic = normalized.slice(2);
+    const part1 = domestic.slice(0, 3);
+    const part2 = domestic.slice(3, 6);
+    const part3 = domestic.slice(6, 8);
+    const part4 = domestic.slice(8, 10);
+    return `+7 (${part1}) ${part2}-${part3}-${part4}`;
   }
 
-  const domestic = normalized.slice(2, 12);
-  const part1 = domestic.slice(0, 3);
-  const part2 = domestic.slice(3, 6);
-  const part3 = domestic.slice(6, 8);
-  const part4 = domestic.slice(8, 10);
-
-  let formatted = '+7';
-  if (part1) {
-    formatted += ` (${part1}`;
-  }
-  if (domestic.length >= 3) {
-    formatted += ')';
-  }
-  if (part2) {
-    formatted += ` ${part2}`;
-  }
-  if (part3) {
-    formatted += `-${part3}`;
-  }
-  if (part4) {
-    formatted += `-${part4}`;
-  }
-  return formatted;
+  const digits = normalized.slice(1);
+  const prefixLength = detectInternationalPrefixLength(digits);
+  const countryCode = digits.slice(0, prefixLength);
+  const subscriber = digits.slice(prefixLength);
+  return subscriber ? `+${countryCode} ${subscriber}` : `+${countryCode}`;
 };
 
 export const validatePhone = (value: string): { valid: boolean; message?: string } => {
-  const normalized = normalizePhoneInput(value);
+  const normalized = normalizePhoneForStorage(value);
   if (!normalized) {
     return { valid: true };
   }
 
-  const digitsCount = normalized.slice(1).length;
+  const digitsCount = getPhoneDigits(value).length;
   if (digitsCount < 8) {
     return { valid: false, message: 'Укажите не менее 8 цифр в номере телефона.' };
   }
   if (digitsCount > E164_MAX_DIGITS) {
     return { valid: false, message: 'Телефон должен содержать не более 15 цифр.' };
   }
-  if (isRussianPhone(normalized) && digitsCount !== RUSSIAN_PHONE_DIGITS) {
+
+  if (isRussianPhone(value) && normalized.slice(1).length !== RUSSIAN_PHONE_DIGITS) {
     return { valid: false, message: 'Российский номер должен содержать 11 цифр в формате +7XXXXXXXXXX.' };
   }
 
@@ -145,6 +134,6 @@ export const validatePhone = (value: string): { valid: boolean; message?: string
 };
 
 export const isRussianPhoneComplete = (value: string): boolean => {
-  const normalized = normalizePhoneInput(value);
-  return isRussianPhone(normalized) && normalized.slice(1).length === RUSSIAN_PHONE_DIGITS;
+  const normalized = normalizePhoneForStorage(value);
+  return normalized.startsWith('+7') && normalized.slice(1).length === RUSSIAN_PHONE_DIGITS;
 };
