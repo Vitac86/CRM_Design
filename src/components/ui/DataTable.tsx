@@ -54,7 +54,7 @@ export const DataTable = <T extends { id?: string | number }>({
   stickyHeader = false,
 }: DataTableProps<T>) => {
   return (
-    <div className="relative min-w-0 overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
+    <div className="crm-scrollbar relative min-w-0 overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
       <table className="font-sans min-w-full text-left text-sm text-[var(--color-text-primary)]">
         <thead className="bg-[var(--color-muted-surface)]">
           <tr>

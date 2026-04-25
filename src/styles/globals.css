@@ -32,6 +32,10 @@
   --color-sidebar-hover: #f1f5f9;
   --color-sidebar-active-bg: #dbeafe;
   --color-sidebar-active-text: #1e3a8a;
+  --scrollbar-track: #edf2f7;
+  --scrollbar-thumb: #9aa9bf;
+  --scrollbar-thumb-hover: #7f90a8;
+  --scrollbar-corner: #edf2f7;
   color: var(--color-text-primary);
   background-color: var(--color-background);
 }
@@ -60,6 +64,10 @@
   --color-sidebar-hover: #f1f5f9;
   --color-sidebar-active-bg: #dbeafe;
   --color-sidebar-active-text: #1e3a8a;
+  --scrollbar-track: #edf2f7;
+  --scrollbar-thumb: #9aa9bf;
+  --scrollbar-thumb-hover: #7f90a8;
+  --scrollbar-corner: #edf2f7;
 }
 
 :root[data-theme='investica-dark'] {
@@ -86,6 +94,10 @@
   --color-sidebar-hover: #1d2198;
   --color-sidebar-active-bg: #242bf5;
   --color-sidebar-active-text: #ffffff;
+  --scrollbar-track: #10142e;
+  --scrollbar-thumb: #4d6293;
+  --scrollbar-thumb-hover: #5f77b0;
+  --scrollbar-corner: #10142e;
 }
 
 :root[data-theme='investica-light'] {
@@ -112,6 +124,10 @@
   --color-sidebar-hover: #1d2198;
   --color-sidebar-active-bg: #242bf5;
   --color-sidebar-active-text: #ffffff;
+  --scrollbar-track: #e9eef8;
+  --scrollbar-thumb: #8a98d8;
+  --scrollbar-thumb-hover: #6f81d4;
+  --scrollbar-corner: #e9eef8;
 }
 
 html,
@@ -120,6 +136,101 @@ body,
   width: 100%;
   max-width: 100%;
   overflow-x: clip;
+}
+
+
+:where(
+    html,
+    body,
+    #root,
+    main,
+    aside,
+    nav,
+    .crm-scrollbar,
+    [class*='overflow-auto'],
+    [class*='overflow-x-auto'],
+    [class*='overflow-y-auto']
+  ) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+:where(
+    html,
+    body,
+    #root,
+    main,
+    aside,
+    nav,
+    .crm-scrollbar,
+    [class*='overflow-auto'],
+    [class*='overflow-x-auto'],
+    [class*='overflow-y-auto']
+  )::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+:where(
+    html,
+    body,
+    #root,
+    main,
+    aside,
+    nav,
+    .crm-scrollbar,
+    [class*='overflow-auto'],
+    [class*='overflow-x-auto'],
+    [class*='overflow-y-auto']
+  )::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+:where(
+    html,
+    body,
+    #root,
+    main,
+    aside,
+    nav,
+    .crm-scrollbar,
+    [class*='overflow-auto'],
+    [class*='overflow-x-auto'],
+    [class*='overflow-y-auto']
+  )::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+:where(
+    html,
+    body,
+    #root,
+    main,
+    aside,
+    nav,
+    .crm-scrollbar,
+    [class*='overflow-auto'],
+    [class*='overflow-x-auto'],
+    [class*='overflow-y-auto']
+  )::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+:where(
+    html,
+    body,
+    #root,
+    main,
+    aside,
+    nav,
+    .crm-scrollbar,
+    [class*='overflow-auto'],
+    [class*='overflow-x-auto'],
+    [class*='overflow-y-auto']
+  )::-webkit-scrollbar-corner {
+  background: var(--scrollbar-corner);
 }
 
 body {

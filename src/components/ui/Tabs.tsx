@@ -33,7 +33,7 @@ const TabButton = ({ active = false, className, ...props }: TabButtonProps) => (
 
 export const Tabs = ({ items, value, onChange, className }: TabsProps) => {
   return (
-    <div className={cn('overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm', className)}>
+    <div className={cn('crm-scrollbar overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm', className)}>
       <div className="inline-flex min-w-max items-center border-b border-slate-100">
         {items.map((item) => (
           <TabButton

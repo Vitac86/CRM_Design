@@ -129,7 +129,7 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
             {isOpen ? (
               <div className="absolute top-12 z-40 max-h-[min(420px,calc(100vh-5rem))] w-full max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
                 {searchResults.length ? (
-                  <ul className="max-h-[min(420px,calc(100vh-5rem))] overflow-y-auto py-1">
+                  <ul className="crm-scrollbar max-h-[min(420px,calc(100vh-5rem))] overflow-y-auto py-1">
                     {searchResults.map((client) => (
                       <li key={client.id}>
                         <button
