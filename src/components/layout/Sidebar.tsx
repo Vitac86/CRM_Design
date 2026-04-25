@@ -68,9 +68,11 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
 
   return (
     <aside className={cn('flex min-w-0 flex-col', baseAsideClass, className)}>
-      <div className="border-b border-[var(--color-border)] px-5 py-4">
-        <BrandLogo tone={logoTone} className="h-8" />
-        <p className={cn('mt-1 text-xs', logoSubtitleClass)}>CRM prototype</p>
+      <div className="flex h-[var(--layout-topbar-height)] items-center border-b border-[var(--color-border)] px-5">
+        <div>
+          <BrandLogo tone={logoTone} className="h-8" />
+          <p className={cn('mt-1 text-xs leading-none', logoSubtitleClass)}>CRM prototype</p>
+        </div>
       </div>
 
       <nav className="crm-scrollbar min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
