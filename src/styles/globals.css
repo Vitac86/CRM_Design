@@ -373,6 +373,7 @@
 @tailwind utilities;
 
 :root {
+  --layout-topbar-height: 4rem;
   --font-heading: 'Montserrat', 'Inter Tight', 'Inter', system-ui, sans-serif;
   --font-display: 'Inter Tight', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;

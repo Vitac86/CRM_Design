@@ -100,7 +100,7 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_92%,transparent)] px-4 backdrop-blur lg:px-6">
+    <header className="sticky top-0 z-30 flex h-[var(--layout-topbar-height)] min-w-0 items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_92%,transparent)] px-4 backdrop-blur lg:px-6">
       <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-3">
         {showMenuButton ? (
           <button
