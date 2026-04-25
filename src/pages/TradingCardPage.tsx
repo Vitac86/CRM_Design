@@ -7,11 +7,7 @@ import type { Client, TradingProfile } from '../data/types';
 type TradingTab = 'params' | 'terminals';
 
 const tabClassName = (active: boolean) =>
-  `relative px-5 py-3 text-sm font-medium transition-colors ${
-    active
-      ? 'bg-brand-light/20 font-semibold text-brand-dark after:absolute after:right-4 after:bottom-0 after:left-4 after:h-0.5 after:rounded-full after:bg-brand'
-      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-  }`;
+  `crm-tab relative px-5 py-3 text-sm font-medium transition-colors ${active ? 'crm-tab-active font-semibold' : ''}`;
 
 const statusBadgeVariant = (status: 'Активен' | 'Истёк' | 'Подключён' | 'Отключён') => {
   if (status === 'Активен' || status === 'Подключён') {
@@ -145,9 +141,9 @@ export const TradingCardPage = () => {
         </div>
       </Card>
 
-      <Card className="overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm">
+      <Card className="crm-tabs overflow-hidden rounded-xl border p-0 shadow-sm">
         <div className="overflow-x-auto">
-          <div className="flex min-w-max border-b border-slate-100 px-1">
+          <div className="flex min-w-max border-b px-1">
             <button className={tabClassName(activeTab === 'params')} onClick={() => setActiveTab('params')}>
               Торговые параметры
             </button>
