@@ -1,4 +1,4 @@
-import { useEffect, type KeyboardEvent, type ClipboardEvent, useState } from 'react';
+import { useEffect, type ClipboardEvent, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ClientProfileHeader } from '../components/crm/ClientProfileHeader';
 import { PermissionCard } from '../components/crm/PermissionCard';
@@ -14,7 +14,12 @@ import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
 import { formatClientType, formatResidency, getComplianceBadgeVariant } from '../utils/labels';
-import { formatPhoneDisplay, getPhoneDigits, isRussianPhone, normalizePhoneInput, validatePhone } from '../utils/phone';
+import {
+  formatPhoneDisplay,
+  normalizePhoneForStorage,
+  sanitizePhoneEditingValue,
+  validatePhone,
+} from '../utils/phone';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
 
@@ -210,8 +215,8 @@ export const SubjectProfilePage = () => {
     setActiveTab('profile');
     setDraftClient({
       ...client,
-      phone: normalizePhoneInput(client.phone),
-      secondaryPhone: normalizePhoneInput(client.secondaryPhone),
+      phone: sanitizePhoneEditingValue(client.phone),
+      secondaryPhone: sanitizePhoneEditingValue(client.secondaryPhone),
       roles: [...client.roles],
       manager: { ...client.manager },
       agent: { ...client.agent },
@@ -298,8 +303,8 @@ export const SubjectProfilePage = () => {
 
     const normalizedClient = {
       ...draftClient,
-      phone: normalizePhoneInput(draftClient.phone),
-      secondaryPhone: normalizePhoneInput(draftClient.secondaryPhone),
+      phone: normalizePhoneForStorage(draftClient.phone),
+      secondaryPhone: normalizePhoneForStorage(draftClient.secondaryPhone),
     };
     if (normalizedClient.type === 'ФЛ' || normalizedClient.type === 'ИП') {
       const fullName = [normalizedClient.lastName, normalizedClient.firstName, normalizedClient.middleName]
@@ -442,8 +447,8 @@ export const SubjectProfilePage = () => {
   };
 
   const handleDraftPhoneChange = (field: 'phone' | 'secondaryPhone', value: string) => {
-    const normalizedValue = normalizePhoneInput(value);
-    setDraftClient((prev) => (prev ? { ...prev, [field]: normalizedValue } : prev));
+    const sanitizedValue = sanitizePhoneEditingValue(value);
+    setDraftClient((prev) => (prev ? { ...prev, [field]: sanitizedValue } : prev));
   };
 
   const handleDraftPhonePaste = (field: 'phone' | 'secondaryPhone', event: ClipboardEvent<HTMLInputElement>) => {
@@ -452,53 +457,8 @@ export const SubjectProfilePage = () => {
     handleDraftPhoneChange(field, pastedValue);
   };
 
-  const handleDraftPhoneKeyDown = (field: 'phone' | 'secondaryPhone', event: KeyboardEvent<HTMLInputElement>) => {
-    if (!draftClient || (event.key !== 'Backspace' && event.key !== 'Delete')) {
-      return;
-    }
-
-    const input = event.currentTarget;
-    const selectionStart = input.selectionStart ?? 0;
-    const selectionEnd = input.selectionEnd ?? 0;
-    if (selectionStart !== selectionEnd) {
-      return;
-    }
-
-    const currentRawValue = draftClient[field];
-    const currentDisplayValue = formatPhoneDisplay(currentRawValue);
-    const rawDigits = getPhoneDigits(currentRawValue);
-    if (!rawDigits) {
-      return;
-    }
-
-    const digitCaretPositions: number[] = [];
-    for (let index = 0; index < currentDisplayValue.length; index += 1) {
-      if (/\d/.test(currentDisplayValue[index])) {
-        digitCaretPositions.push(index);
-      }
-    }
-
-    let targetDigitIndex = -1;
-    if (event.key === 'Backspace') {
-      for (let index = digitCaretPositions.length - 1; index >= 0; index -= 1) {
-        if (digitCaretPositions[index] < selectionStart) {
-          targetDigitIndex = index;
-          break;
-        }
-      }
-    } else {
-      targetDigitIndex = digitCaretPositions.findIndex((position) => position >= selectionStart);
-    }
-
-    if (targetDigitIndex < 0) {
-      return;
-    }
-
-    event.preventDefault();
-    const nextDigits = rawDigits.slice(0, targetDigitIndex) + rawDigits.slice(targetDigitIndex + 1);
-    const hasInternationalPrefix = currentRawValue.startsWith('+') && !isRussianPhone(currentRawValue);
-    const nextRaw = normalizePhoneInput(hasInternationalPrefix ? `+${nextDigits}` : nextDigits);
-    setDraftClient((prev) => (prev ? { ...prev, [field]: nextRaw } : prev));
+  const handleDraftPhoneBlur = (field: 'phone' | 'secondaryPhone') => {
+    setDraftClient((prev) => (prev ? { ...prev, [field]: normalizePhoneForStorage(prev[field]) } : prev));
   };
 
   const handleAddRepresentative = async () => {
@@ -974,26 +934,26 @@ export const SubjectProfilePage = () => {
                   <FormField
                     label="Телефон"
                     type="tel"
-                    value={formatPhoneDisplay(currentClient.phone)}
+                    value={currentClient.phone}
                     mono
                     inputMode="tel"
                     autoComplete="tel-national"
                     placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                     onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                     onPaste={(event) => handleDraftPhonePaste('phone', event)}
-                    onKeyDown={(event) => handleDraftPhoneKeyDown('phone', event)}
+                    onBlur={() => handleDraftPhoneBlur('phone')}
                   />
                   <FormField
                     label="Дополнительный телефон"
                     type="tel"
-                    value={formatPhoneDisplay(currentClient.secondaryPhone)}
+                    value={currentClient.secondaryPhone}
                     mono
                     inputMode="tel"
                     autoComplete="tel-national"
                     placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                     onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                     onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
-                    onKeyDown={(event) => handleDraftPhoneKeyDown('secondaryPhone', event)}
+                    onBlur={() => handleDraftPhoneBlur('secondaryPhone')}
                   />
                   <FormField
                     label="Email"
@@ -1223,26 +1183,26 @@ export const SubjectProfilePage = () => {
                       <FormField
                         label="Телефон"
                         type="tel"
-                        value={formatPhoneDisplay(currentClient.phone)}
+                        value={currentClient.phone}
                         mono
                         inputMode="tel"
                         autoComplete="tel-national"
                         placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                         onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                         onPaste={(event) => handleDraftPhonePaste('phone', event)}
-                        onKeyDown={(event) => handleDraftPhoneKeyDown('phone', event)}
+                        onBlur={() => handleDraftPhoneBlur('phone')}
                       />
                       <FormField
                         label="Дополнительный телефон"
                         type="tel"
-                        value={formatPhoneDisplay(currentClient.secondaryPhone)}
+                        value={currentClient.secondaryPhone}
                         mono
                         inputMode="tel"
                         autoComplete="tel-national"
                         placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                         onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                         onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
-                        onKeyDown={(event) => handleDraftPhoneKeyDown('secondaryPhone', event)}
+                        onBlur={() => handleDraftPhoneBlur('secondaryPhone')}
                       />
                       <FormField
                         label="Email"
