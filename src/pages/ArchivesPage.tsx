@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, EmptyState, FilterChipSelect, SearchInput, TableControlPanel, TableStatusText } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Button, DataTable, EmptyState, FilterChipSelect, SearchInput, TableStatusText } from '../components/ui';
 import type { Client, ClientType } from '../data/types';
 import { formatClientType, formatComplianceStatus, formatResidency } from '../utils/labels';
 import { subjectStatusTone } from '../utils/tableStatus';
@@ -93,13 +96,11 @@ export const ArchivesPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold text-slate-900">Архив</h1>
-        <p className="text-sm text-slate-500">Субъекты, выведенные из активного списка</p>
-      </header>
+    <PageShell>
+      <PageHeader title="Архив" />
+      <p className="-mt-2 text-sm text-[var(--color-text-secondary)]">Субъекты, выведенные из активного списка</p>
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -123,7 +124,7 @@ export const ArchivesPage = () => {
         }
       />
 
-      {isLoading ? <p className="text-sm text-slate-500">Загрузка архива…</p> : null}
+      {isLoading ? <p className="text-sm text-[var(--color-text-secondary)]">Загрузка архива…</p> : null}
       {!isLoading && error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
       {!isLoading && !error && archivedClients.length === 0 ? (
@@ -141,7 +142,7 @@ export const ArchivesPage = () => {
       {!isLoading && !error && archivedClients.length > 0 ? (
         <DataTable<Client>
           columns={[
-            { key: 'code', header: 'Код клиента', className: 'font-medium text-slate-800 whitespace-nowrap' },
+            { key: 'code', header: 'Код клиента', className: 'font-medium text-[var(--color-text-primary)] whitespace-nowrap' },
             { key: 'name', header: 'Наименование клиента', className: 'min-w-[260px]' },
             { key: 'inn', header: 'ИНН' },
             {
@@ -196,6 +197,6 @@ export const ArchivesPage = () => {
       {toastMessage ? (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
       ) : null}
-    </div>
+    </PageShell>
   );
 };

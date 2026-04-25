@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableControlPanel, TableStatusText } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageSection } from '../components/layout/PageSection';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { SplitContentShell } from '../components/layout/SplitContentShell';
+import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText } from '../components/ui';
 import { cn } from '../components/ui/cn';
 import type { Report } from '../data/types';
 import { AsyncContent } from '../shared/ui/async';
@@ -17,9 +22,9 @@ const deliveryChannelBadgeVariant: Partial<Record<Report['deliveryChannel'], 'pu
 };
 
 const DetailField = ({ label, value }: { label: string; value?: string }) => (
-  <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-    <p className="text-xs text-slate-500">{label}</p>
-    <p className="mt-1 text-sm font-medium text-slate-800">{value && value.trim().length > 0 ? value : '—'}</p>
+  <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2">
+    <p className="text-xs text-[var(--color-text-secondary)]">{label}</p>
+    <p className="mt-1 text-sm font-medium text-[var(--color-text-primary)]">{value && value.trim().length > 0 ? value : '—'}</p>
   </div>
 );
 
@@ -190,12 +195,10 @@ export const DepositoryPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Отчёты депозитария</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Отчёты депозитария" />
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -210,14 +213,14 @@ export const DepositoryPage = () => {
             value={clientCodeFilter}
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="Код клиента"
-            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
             aria-label="Фильтр по коду клиента"
           />
           <input
             type="date"
             value={dateFromFilter}
             onChange={(event) => setDateFromFilter(event.target.value)}
-            className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
             aria-label="Дата с"
             title="Дата с"
           />
@@ -225,7 +228,7 @@ export const DepositoryPage = () => {
             type="date"
             value={dateToFilter}
             onChange={(event) => setDateToFilter(event.target.value)}
-            className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-light focus:ring-2 focus:ring-brand-light/30"
+            className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
             aria-label="Дата по"
             title="Дата по"
           />
@@ -269,8 +272,8 @@ export const DepositoryPage = () => {
         loadingFallback={<EmptyState title="Загрузка данных..." description="Пожалуйста, подождите." className="h-[460px]" />}
         errorFallback={error ? <p className="text-sm text-rose-600">{error}</p> : undefined}
       >
-        <section className="grid gap-4 xl:grid-cols-[1.65fr_1fr]">
-        <div className="max-h-[620px] space-y-2 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3">
+        <SplitContentShell className="xl:grid-cols-[1.65fr_1fr]">
+        <PageSection className="max-h-[620px] space-y-2 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3">
           {filteredReports.length === 0 ? (
             <EmptyState title="Отчёты не найдены" description="Измените параметры поиска или фильтров." className="h-[460px]" />
           ) : (
@@ -287,12 +290,12 @@ export const DepositoryPage = () => {
                     'w-full rounded-xl border px-3 py-2.5 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-button-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)]',
                     isSelected
                       ? 'border-[var(--color-button-selected-border)] bg-[var(--color-button-selected-bg)] text-[var(--color-button-selected-text)] shadow-sm'
-                      : 'border-slate-200 bg-white hover:border-[var(--color-button-secondary-hover-border)] hover:bg-[var(--color-button-secondary-hover-bg)]',
+                      : 'border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-button-secondary-hover-border)] hover:bg-[var(--color-button-secondary-hover-bg)]',
                   )}
                 >
-                  <p className="truncate text-sm font-semibold text-slate-900">{report.fileName}</p>
-                  <p className="mt-0.5 text-xs text-slate-600">{report.reportType}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600">
+                  <p className="truncate text-sm font-semibold text-[var(--color-text-primary)]">{report.fileName}</p>
+                  <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">{report.reportType}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--color-text-secondary)]">
                     <span>{report.clientCode}</span>
                     <span>{report.sentAt}</span>
                   </div>
@@ -308,14 +311,14 @@ export const DepositoryPage = () => {
               );
             })
           )}
-        </div>
+        </PageSection>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 xl:sticky xl:top-4">
+        <PageSection className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 xl:sticky xl:top-4">
           {!selectedReport ? (
             <EmptyState title="Отчёты не найдены" description="Для текущих параметров поиска и фильтров нет доступных отчётов." className="h-[460px]" />
           ) : (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">{selectedReport.reportTitle || selectedReport.fileName}</h2>
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">{selectedReport.reportTitle || selectedReport.fileName}</h2>
 
               <div className="grid gap-2 sm:grid-cols-2">
                 <DetailField label="Клиент" value={selectedReport.clientName} />
@@ -323,8 +326,8 @@ export const DepositoryPage = () => {
                 <DetailField label="Вид отчёта" value={selectedReport.reportType} />
                 <DetailField label="Период" value={selectedReport.period} />
                 <DetailField label="Способ отправки" value={selectedReport.deliveryChannel} />
-                <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                  <p className="text-xs text-slate-500">Статус / результат доставки</p>
+                <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2">
+                  <p className="text-xs text-[var(--color-text-secondary)]">Статус / результат доставки</p>
                   <TableStatusText tone={deliveryResultToneMap[selectedReportResult ?? 'Не доставлено']} className="mt-1 block">
                     {selectedReportResult ?? '—'}
                   </TableStatusText>
@@ -335,14 +338,14 @@ export const DepositoryPage = () => {
                 <DetailField label="Сформировал" value={selectedReport.createdBy} />
               </div>
 
-              <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3">
+              <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-3">
                 <div className="flex items-center gap-3">
-                  <span className="rounded-md bg-slate-100 p-2 text-slate-500" aria-hidden="true">
+                  <span className="rounded-md bg-[var(--color-surface)] p-2 text-[var(--color-text-secondary)]" aria-hidden="true">
                     <FileIcon className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-medium text-slate-800">{selectedReport.fileName}</p>
-                    <p className="text-xs text-slate-500">{selectedReport.fileSize || '—'}</p>
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">{selectedReport.fileName}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">{selectedReport.fileSize || '—'}</p>
                   </div>
                 </div>
               </div>
@@ -359,13 +362,13 @@ export const DepositoryPage = () => {
               </div>
             </div>
           )}
-        </div>
-        </section>
+        </PageSection>
+        </SplitContentShell>
       </AsyncContent>
 
       {toastMessage && (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
       )}
-    </div>
+    </PageShell>
   );
 };

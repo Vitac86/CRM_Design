@@ -13,9 +13,9 @@ type MiddleOfficeReportDetailsProps = {
 };
 
 const DetailField = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-    <p className="text-xs text-slate-500">{label}</p>
-    <p className="mt-1 text-sm font-medium text-slate-800">{value}</p>
+  <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2">
+    <p className="text-xs text-[var(--color-text-secondary)]">{label}</p>
+    <p className="mt-1 text-sm font-medium text-[var(--color-text-primary)]">{value}</p>
   </div>
 );
 
@@ -25,9 +25,9 @@ export const MiddleOfficeReportDetails = ({ report, onResend, onDownload }: Midd
   }
 
   return (
-    <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 lg:sticky lg:top-4">
+    <div className="space-y-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-4 lg:sticky lg:top-4">
       <div>
-        <h2 className="text-base font-semibold text-slate-900">{report.reportTitle}</h2>
+        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">{report.reportTitle}</h2>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
@@ -36,8 +36,8 @@ export const MiddleOfficeReportDetails = ({ report, onResend, onDownload }: Midd
         <DetailField label="Тип отчёта" value={report.reportType} />
         <DetailField label="Период" value={report.period} />
         <DetailField label="Способ отправки" value={report.deliveryChannel} />
-        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-          <p className="text-xs text-slate-500">Статус</p>
+        <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2">
+          <p className="text-xs text-[var(--color-text-secondary)]">Статус</p>
           <TableStatusText tone={statusToneMap[report.deliveryStatus]} className="mt-1 block">
             {report.deliveryStatus}
           </TableStatusText>
@@ -48,14 +48,14 @@ export const MiddleOfficeReportDetails = ({ report, onResend, onDownload }: Midd
         <DetailField label="Сформировал" value={report.createdBy} />
       </div>
 
-      <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3">
+      <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-3">
         <div className="flex items-center gap-3">
-          <span className="rounded-md bg-slate-100 p-2 text-slate-500" aria-hidden="true">
+          <span className="rounded-md bg-[var(--color-surface)] p-2 text-[var(--color-text-secondary)]" aria-hidden="true">
             <FileIcon className="h-5 w-5" />
           </span>
           <div>
-            <p className="text-sm font-medium text-slate-800">{report.fileName}</p>
-            <p className="text-xs text-slate-500">{report.fileSize}</p>
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">{report.fileName}</p>
+            <p className="text-xs text-[var(--color-text-secondary)]">{report.fileSize}</p>
           </div>
         </div>
       </div>

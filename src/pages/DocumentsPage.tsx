@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter, StatusBadge, TableControlPanel } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Badge, Button, DataTable, Pagination, SearchInput, SelectFilter, StatusBadge } from '../components/ui';
 import type { Document } from '../data/types';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 
@@ -87,12 +90,10 @@ export const DocumentsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
-      <header>
-        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Документы</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Документы" />
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -156,6 +157,6 @@ export const DocumentsPage = () => {
           onNext={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
         />
       </div>
-    </div>
+    </PageShell>
   );
 };

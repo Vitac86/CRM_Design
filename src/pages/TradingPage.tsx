@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
 import {
   Button,
   DataTable,
@@ -7,7 +10,6 @@ import {
   PageSizeSelector,
   Pagination,
   SearchInput,
-  TableControlPanel,
   TableStatusText,
   type SortDirection,
 } from '../components/ui';
@@ -245,13 +247,11 @@ export const TradingPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
-      <header>
-        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Трейдинг</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Трейдинг" />
 
       <div>
-        <TableControlPanel
+        <PageToolbar
           search={
             <SearchInput
               value={search}
@@ -384,6 +384,6 @@ export const TradingPage = () => {
           onNext={() => setPage((prev) => Math.min(totalPages, prev + 1))}
         />
       </div>
-    </div>
+    </PageShell>
   );
 };

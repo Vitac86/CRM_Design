@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { MiddleOfficeReportDetails } from '../components/crm/MiddleOfficeReportDetails';
 import { MiddleOfficeReportList } from '../components/crm/MiddleOfficeReportList';
-import { Button, SearchInput, SelectFilter, TableControlPanel } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { SplitContentShell } from '../components/layout/SplitContentShell';
+import { Button, SearchInput, SelectFilter } from '../components/ui';
 import type { Report } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
@@ -129,16 +133,14 @@ export const MiddleOfficeReportsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
-      <header>
-        <h1 className="font-heading text-2xl font-semibold text-slate-900">Мидл-офис — Журнал отправленных отчётов</h1>
-      </header>
+    <PageShell>
+      <PageHeader title="Мидл-офис — Журнал отправленных отчётов" />
 
       {error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
-      <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
+      <SplitContentShell>
         <div className="space-y-3">
-          <TableControlPanel
+          <PageToolbar
             search={
               <SearchInput
                 value={search}
@@ -184,11 +186,11 @@ export const MiddleOfficeReportsPage = () => {
           onResend={() => setToastMessage('Отчёт отправлен повторно')}
           onDownload={() => setToastMessage('Файл подготовлен к скачиванию')}
         />
-      </section>
+      </SplitContentShell>
 
       {toastMessage && (
         <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
       )}
-    </div>
+    </PageShell>
   );
 };

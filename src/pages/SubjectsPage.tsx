@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, SubjectStatus } from '../data/types';
 import {
   Button,
@@ -10,7 +13,6 @@ import {
   Pagination,
   SearchInput,
   StatusBadge,
-  TableControlPanel,
   type SortDirection,
 } from '../components/ui';
 import { formatClientType, formatComplianceStatus, formatResidency, formatSubjectStatus } from '../utils/labels';
@@ -265,16 +267,18 @@ export const SubjectsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Субъекты</h1>
-        <Button className="w-full sm:w-auto" onClick={() => navigate('/subjects/register')}>
-          + Добавить
-        </Button>
-      </header>
+    <PageShell>
+      <PageHeader
+        title="Субъекты"
+        actions={(
+          <Button className="w-full sm:w-auto" onClick={() => navigate('/subjects/register')}>
+            + Добавить
+          </Button>
+        )}
+      />
 
       <div>
-        <TableControlPanel
+        <PageToolbar
           search={
             <SearchInput
               value={search}
@@ -432,6 +436,6 @@ export const SubjectsPage = () => {
           onNext={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
         />
       </div>
-    </div>
+    </PageShell>
   );
 };
