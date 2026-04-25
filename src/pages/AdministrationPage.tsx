@@ -31,17 +31,17 @@ export const AdministrationPage = () => {
   }, [administration]);
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Администрирование</h1>
+        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Администрирование</h1>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {sections.map((section) => (
           <Card key={section.id} className="flex flex-col gap-3 p-4">
-            <h2 className="text-lg font-semibold text-slate-900">{section.title}</h2>
-            <p className="text-sm text-slate-600">{section.description}</p>
-            <p className="mt-auto text-sm font-medium text-brand-dark">{section.itemsCount}</p>
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">{section.title}</h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">{section.description}</p>
+            <p className="mt-auto text-sm font-medium text-[var(--color-accent)]">{section.itemsCount}</p>
           </Card>
         ))}
       </section>
@@ -49,8 +49,8 @@ export const AdministrationPage = () => {
       <Card className="p-4 sm:p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Внешний вид CRM</h2>
-            <p className="text-sm text-slate-600">Выберите визуальный стиль интерфейса, переключение применяется сразу.</p>
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Внешний вид CRM</h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">Выберите визуальный стиль интерфейса, переключение применяется сразу.</p>
           </div>
         </div>
 
@@ -62,8 +62,8 @@ export const AdministrationPage = () => {
               <Card key={theme.id} className="flex h-full flex-col gap-3 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-base font-semibold text-slate-900">{THEME_TITLES[theme.id]}</h3>
-                    <p className="mt-1 text-xs text-slate-600">{theme.description}</p>
+                    <h3 className="text-base font-semibold text-[var(--color-text-primary)]">{THEME_TITLES[theme.id]}</h3>
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]">{theme.description}</p>
                   </div>
                   {isActive ? <Badge variant="brand">Активно</Badge> : null}
                 </div>

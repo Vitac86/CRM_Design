@@ -30,7 +30,7 @@ type DataTableProps<T extends { id?: string | number }> = {
 const SortIcon = ({ active, direction }: { active: boolean; direction: SortDirection | null | undefined }) => {
   if (!active || !direction) {
     return (
-      <BaseSortIcon className="h-3.5 w-3.5 text-slate-400" />
+      <BaseSortIcon className="h-3.5 w-3.5 text-[var(--color-text-secondary)]/70" />
     );
   }
 
@@ -54,9 +54,9 @@ export const DataTable = <T extends { id?: string | number }>({
   stickyHeader = false,
 }: DataTableProps<T>) => {
   return (
-    <div className="relative min-w-0 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table className="min-w-full text-left text-sm text-slate-700">
-        <thead className="bg-brand-light">
+    <div className="relative min-w-0 overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <table className="min-w-full text-left text-sm text-[var(--color-text-primary)]">
+        <thead className="bg-[var(--color-muted-surface)]">
           <tr>
             {columns.map((column) => {
               const currentSortKey = column.sortKey ?? String(column.key);
@@ -67,9 +67,9 @@ export const DataTable = <T extends { id?: string | number }>({
                 <th
                   key={String(column.key)}
                   className={cn(
-                    'px-4 py-3 text-xs font-semibold uppercase tracking-wide text-brand-dark',
+                    'px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]',
                     stickyHeader &&
-                      'sticky top-0 z-10 border-b border-slate-200 bg-brand-light shadow-[0_1px_0_rgba(15,23,42,0.08)]',
+                      'sticky top-0 z-10 border-b border-[var(--color-border)] bg-[var(--color-muted-surface)] shadow-[0_1px_0_rgba(15,23,42,0.16)]',
                     column.headerClassName,
                   )}
                 >
@@ -78,8 +78,8 @@ export const DataTable = <T extends { id?: string | number }>({
                       type="button"
                       onClick={() => onSortChange?.(currentSortKey)}
                       className={cn(
-                        'inline-flex items-center gap-1.5 rounded-sm transition-colors cursor-pointer hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20',
-                        isActiveSort ? 'text-brand-dark' : 'text-brand-dark/80',
+                        'inline-flex cursor-pointer items-center gap-1.5 rounded-sm transition-colors hover:text-[var(--color-text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)]/25',
+                        isActiveSort ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-primary)]/75',
                       )}
                     >
                       <span>{column.header}</span>
@@ -97,7 +97,7 @@ export const DataTable = <T extends { id?: string | number }>({
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-slate-500">
+              <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-[var(--color-text-secondary)]">
                 {emptyMessage}
               </td>
             </tr>
@@ -106,7 +106,7 @@ export const DataTable = <T extends { id?: string | number }>({
               <tr
                 key={getRowKey ? getRowKey(row, rowIndex) : row.id ?? rowIndex}
                 className={cn(
-                  'border-b border-slate-200 last:border-b-0 hover:bg-slate-50/70',
+                  'border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-hover)]/70',
                   onRowClick && 'cursor-pointer',
                   rowClassName?.(row, rowIndex),
                 )}

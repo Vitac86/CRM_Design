@@ -29,12 +29,12 @@ export const AppShell = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-slate-50 text-slate-900">
+    <div className="min-h-screen overflow-x-clip bg-[var(--color-background)] text-[var(--color-text-primary)]">
       <Sidebar variant="desktop" className="hidden lg:flex" />
 
       {isMobileMenuOpen ? (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/45 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-hidden="true"
         />

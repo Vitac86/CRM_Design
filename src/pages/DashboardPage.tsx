@@ -86,9 +86,9 @@ export const DashboardPage = () => {
   );
 
   return (
-    <div className="min-w-0 space-y-6 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-6 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Операционный обзор</h1>
+        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Операционный обзор</h1>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -102,7 +102,7 @@ export const DashboardPage = () => {
       )}
 
       {isLoading && (
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">Загрузка данных...</p>
       )}
 
       <section className="grid gap-5 xl:grid-cols-2">
@@ -112,17 +112,17 @@ export const DashboardPage = () => {
           rows={subjectRows}
         />
 
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-3">
-            <h2 className="text-sm font-semibold text-slate-900">Последние поручения</h2>
-            <Link to="/requests" className="text-sm font-medium text-brand transition hover:text-brand-hover">
+        <section className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-3">
+            <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Последние поручения</h2>
+            <Link to="/requests" className="text-sm font-medium text-[var(--color-primary)] transition hover:text-[var(--color-accent)]">
               Все поручения
             </Link>
           </header>
 
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
-              <thead className="bg-brand-light/70 text-left text-xs uppercase tracking-wide text-slate-600">
+              <thead className="bg-[var(--color-muted-surface)] text-left text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">
                 <tr>
                   <th className="px-4 py-2.5 font-semibold">Номер поручения</th>
                   <th className="px-4 py-2.5 font-semibold">Статус</th>
@@ -131,8 +131,8 @@ export const DashboardPage = () => {
               </thead>
               <tbody>
                 {requestRows.map(([requestNumber, status, date], rowIndex) => (
-                  <tr key={`request-${rowIndex}`} className="border-t border-slate-100 align-top text-slate-700">
-                    <td className="px-4 py-3 font-medium text-slate-800">{requestNumber}</td>
+                  <tr key={`request-${rowIndex}`} className="border-t border-[var(--color-border)] align-top text-[var(--color-text-primary)]">
+                    <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">{requestNumber}</td>
                     <td className="px-4 py-3">
                       <TableStatusText tone={requestStatusTone[status]}>
                         {status}

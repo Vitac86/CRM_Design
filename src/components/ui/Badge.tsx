@@ -11,11 +11,11 @@ const variantClasses: Record<BadgeVariant, string> = {
   success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
   warning: 'bg-amber-50 text-amber-700 border-amber-100',
   danger: 'bg-rose-50 text-rose-700 border-rose-100',
-  neutral: 'bg-slate-50 text-slate-600 border-slate-200',
+  neutral: 'bg-[var(--color-muted-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)]',
   info: 'bg-sky-50 text-sky-700 border-sky-100',
   purple: 'bg-violet-50 text-violet-700 border-violet-100',
   orange: 'bg-orange-50 text-orange-700 border-orange-100',
-  brand: 'bg-brand/5 text-brand-dark border-brand/15',
+  brand: 'bg-[var(--color-primary)]/10 text-[var(--color-accent)] border-[var(--color-primary)]/25',
 };
 
 export const Badge = ({ variant = 'neutral', className, ...props }: BadgeProps) => {

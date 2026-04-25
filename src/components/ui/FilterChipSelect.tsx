@@ -75,10 +75,12 @@ export const FilterChipSelect = ({
         aria-expanded={open}
         aria-controls={listboxId}
         className={cn(
-          'inline-flex h-9 min-w-[180px] items-center rounded-full border bg-slate-50 px-3 text-sm font-medium text-slate-700 shadow-sm transition',
-          'hover:border-slate-300 hover:bg-white',
-          isActive ? 'border-brand/25 bg-brand/5 text-brand-dark ring-1 ring-brand/10' : 'border-slate-200',
-          open && 'border-brand/40 ring-2 ring-brand/10',
+          'inline-flex h-9 min-w-[180px] items-center rounded-full border bg-[var(--color-muted-surface)] px-3 text-sm font-medium text-[var(--color-text-primary)] shadow-sm transition',
+          'hover:border-[var(--color-primary)]/35 hover:bg-[var(--color-surface)]',
+          isActive
+            ? 'border-[var(--color-primary)]/30 bg-[var(--color-primary)]/10 text-[var(--color-accent)] ring-1 ring-[var(--color-primary)]/20'
+            : 'border-[var(--color-border)]',
+          open && 'border-[var(--color-focus)]/50 ring-2 ring-[var(--color-focus)]/20',
         )}
       >
         <span className="truncate">{label}: {displayValue}</span>
@@ -96,7 +98,7 @@ export const FilterChipSelect = ({
         <div
           id={listboxId}
           role="listbox"
-          className="absolute left-0 top-full z-50 mt-2 max-h-64 min-w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+          className="absolute left-0 top-full z-50 mt-2 max-h-64 min-w-full overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-lg"
           style={{ width: 'max-content' }}
         >
           {options.map((option) => {
@@ -110,9 +112,9 @@ export const FilterChipSelect = ({
                 aria-selected={selected}
                 onClick={() => handleOptionSelect(option.value)}
                 className={cn(
-                  'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition',
-                  'hover:bg-slate-50 hover:text-slate-900',
-                  selected && 'bg-brand/5 font-medium text-brand-dark',
+                  'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition',
+                  'text-[var(--color-text-primary)] hover:bg-[var(--color-hover)]',
+                  selected && 'bg-[var(--color-primary)]/10 font-medium text-[var(--color-accent)]',
                 )}
               >
                 <span>{option.label}</span>

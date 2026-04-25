@@ -11,10 +11,10 @@ type TopbarProps = {
 };
 
 const complianceBadgeClassMap = {
-  success: 'bg-emerald-100 text-emerald-700',
-  warning: 'bg-amber-100 text-amber-700',
-  orange: 'bg-orange-100 text-orange-700',
-  danger: 'bg-rose-100 text-rose-700',
+  success: 'bg-emerald-100/90 text-emerald-800',
+  warning: 'bg-amber-100/90 text-amber-800',
+  orange: 'bg-orange-100/90 text-orange-800',
+  danger: 'bg-rose-100/90 text-rose-800',
 };
 
 const maxResults = 8;
@@ -100,13 +100,13 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-4 backdrop-blur lg:px-6">
+    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_92%,transparent)] px-4 backdrop-blur lg:px-6">
       <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-3">
         {showMenuButton ? (
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-700 transition hover:bg-slate-100 lg:hidden"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] transition hover:bg-[var(--color-hover)] lg:hidden"
             aria-label="Открыть меню"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -117,17 +117,17 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
 
         {!hideGlobalSearch ? (
           <label ref={searchRef} className="relative hidden min-w-0 w-full max-w-xl sm:block">
-            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400"><SearchIcon className="h-4 w-4" /></span>
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[var(--color-text-secondary)]"><SearchIcon className="h-4 w-4" /></span>
             <input
               type="search"
               placeholder="Глобальный поиск"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="h-10 w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-700 outline-none transition focus:border-brand focus:bg-white"
+              className="h-10 w-full min-w-0 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] pl-10 pr-3 text-sm text-[var(--color-text-primary)] outline-none transition hover:border-[var(--color-primary)]/50 focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/20"
             />
 
             {isOpen ? (
-              <div className="absolute top-12 z-40 max-h-[min(420px,calc(100vh-5rem))] w-full max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl">
+              <div className="absolute top-12 z-40 max-h-[min(420px,calc(100vh-5rem))] w-full max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
                 {searchResults.length ? (
                   <ul className="max-h-[min(420px,calc(100vh-5rem))] overflow-y-auto py-1">
                     {searchResults.map((client) => (
@@ -135,12 +135,12 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
                         <button
                           type="button"
                           onClick={() => handleSelect(client.id)}
-                          className="flex w-full items-start justify-between gap-3 px-3 py-2 text-left transition hover:bg-slate-50"
+                          className="flex w-full items-start justify-between gap-3 px-3 py-2 text-left transition hover:bg-[var(--color-hover)]"
                         >
                           <div className="min-w-0">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{client.code}</p>
-                            <p className="truncate text-sm font-medium text-slate-900">{client.name}</p>
-                            <p className="truncate text-xs text-slate-500">{formatClientType(client.type)}</p>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">{client.code}</p>
+                            <p className="truncate text-sm font-medium text-[var(--color-text-primary)]">{client.name}</p>
+                            <p className="truncate text-xs text-[var(--color-text-secondary)]">{formatClientType(client.type)}</p>
                           </div>
                           <span
                             className={`inline-flex shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${
@@ -154,7 +154,7 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
                     ))}
                   </ul>
                 ) : (
-                  <p className="px-3 py-3 text-sm text-slate-500">Ничего не найдено</p>
+                  <p className="px-3 py-3 text-sm text-[var(--color-text-secondary)]">Ничего не найдено</p>
                 )}
               </div>
             ) : null}
@@ -166,10 +166,10 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
 
       <div className="ml-2 flex shrink-0 min-w-0 items-center gap-2 sm:gap-3">
         <div className="min-w-0 text-right">
-          <p className="truncate text-sm font-semibold text-slate-900">Иванов И.И.</p>
-          <p className="truncate text-xs text-slate-500">менеджер</p>
+          <p className="truncate text-sm font-semibold text-[var(--color-text-primary)]">Иванов И.И.</p>
+          <p className="truncate text-xs text-[var(--color-text-secondary)]">менеджер</p>
         </div>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white">ИИ</div>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-semibold text-white">ИИ</div>
       </div>
     </header>
   );

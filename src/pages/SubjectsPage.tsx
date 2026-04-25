@@ -266,9 +266,9 @@ export const SubjectsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">Субъекты</h1>
+        <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Субъекты</h1>
         <Button className="w-full sm:w-auto" onClick={() => navigate('/subjects/register')}>
           + Добавить
         </Button>
@@ -423,7 +423,7 @@ export const SubjectsPage = () => {
         onSortChange={handleSort}
       />
 
-      {isLoading && <p className="text-sm text-slate-500">Загрузка списка субъектов…</p>}
+      {isLoading && <p className="text-sm text-[var(--color-text-secondary)]">Загрузка списка субъектов…</p>}
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
