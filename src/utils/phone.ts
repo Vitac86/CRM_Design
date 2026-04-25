@@ -1,52 +1,64 @@
 const E164_MAX_DIGITS = 15;
 const RUSSIAN_PHONE_DIGITS = 11;
+const RUSSIAN_NATIONAL_DIGITS = 10;
 
 export const getPhoneDigits = (value: string): string => value.replace(/\D/g, '').slice(0, E164_MAX_DIGITS);
 
 const hasLeadingPlus = (value: string): boolean => /^\s*\+/.test(value);
 
-const normalizeRussianPhone = (digits: string): string => {
-  if (!digits) {
-    return '';
-  }
-
-  if (digits.length === 10) {
+const normalizeRussianPhone = (digits: string): string | null => {
+  if (digits.length === RUSSIAN_NATIONAL_DIGITS) {
     return `+7${digits}`;
   }
 
-  if (digits.startsWith('8')) {
+  if (digits.startsWith('8') && digits.length >= RUSSIAN_PHONE_DIGITS) {
     return `+7${digits.slice(1, RUSSIAN_PHONE_DIGITS)}`;
   }
 
-  if (digits.startsWith('7')) {
-    return `+${digits.slice(0, RUSSIAN_PHONE_DIGITS)}`;
+  if (digits.startsWith('7') && digits.length >= RUSSIAN_PHONE_DIGITS) {
+    return `+7${digits.slice(1, RUSSIAN_PHONE_DIGITS)}`;
   }
 
-  if (digits.startsWith('9')) {
-    return `+7${digits.slice(0, 10)}`;
+  return null;
+};
+
+const normalizeInternationalPhone = (value: string): string => {
+  if (hasLeadingPlus(value)) {
+    const digits = getPhoneDigits(value);
+    return digits ? `+${digits}` : '+';
   }
 
-  return `+7${digits.slice(0, 10)}`;
+  return getPhoneDigits(value);
 };
 
 export const normalizePhoneInput = (value: string): string => {
-  const digits = getPhoneDigits(value);
+  if (hasLeadingPlus(value)) {
+    const digits = getPhoneDigits(value);
+    if (!digits) {
+      return '+';
+    }
 
+    if (digits.startsWith('7')) {
+      return `+${digits.slice(0, RUSSIAN_PHONE_DIGITS)}`;
+    }
+
+    return `+${digits.slice(0, E164_MAX_DIGITS)}`;
+  }
+
+  const digits = getPhoneDigits(value);
   if (!digits) {
     return '';
   }
 
-  if (hasLeadingPlus(value)) {
-    if (digits.startsWith('7')) {
-      return `+${digits.slice(0, RUSSIAN_PHONE_DIGITS)}`;
-    }
-    return `+${digits.slice(0, E164_MAX_DIGITS)}`;
+  const normalizedRussianPhone = normalizeRussianPhone(digits);
+  if (normalizedRussianPhone) {
+    return normalizedRussianPhone;
   }
 
-  return normalizeRussianPhone(digits);
+  return normalizeInternationalPhone(value);
 };
 
-export const isRussianPhone = (value: string): boolean => normalizePhoneInput(value).startsWith('+7');
+export const isRussianPhone = (value: string): boolean => normalizePhoneInput(value).startsWith('+7') && getPhoneDigits(value).length >= 1;
 
 const detectInternationalPrefixLength = (digits: string): number => {
   if (digits.length <= 1) {
@@ -71,7 +83,15 @@ export const formatPhoneDisplay = (value: string): string => {
     return '';
   }
 
+  if (normalized === '+') {
+    return '+';
+  }
+
   if (!isRussianPhone(normalized)) {
+    if (!normalized.startsWith('+')) {
+      return normalized;
+    }
+
     const digits = normalized.slice(1);
     const prefixLength = detectInternationalPrefixLength(digits);
     const countryCode = digits.slice(0, prefixLength);
