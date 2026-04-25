@@ -31,15 +31,15 @@ const mapContractConfigToClientPatch = (form: ContractWizardConfig) => ({
 });
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
-  <Card className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+  <Card className="space-y-4 rounded-2xl p-5 shadow-sm">
+    <h2 className="text-base font-semibold text-[var(--color-text-primary)]">{title}</h2>
     {children}
   </Card>
 );
 
 const Check = ({ checked, onChange, label }: { checked: boolean; onChange: (value: boolean) => void; label: string }) => (
-  <label className="flex items-center gap-3 text-sm text-slate-700">
-    <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand/40" />
+  <label className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
+    <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="h-4 w-4 rounded border-[var(--color-input-border)] text-brand focus:ring-brand/40" />
     <span>{label}</span>
   </label>
 );
@@ -197,29 +197,29 @@ export const ContractWizardPage = () => {
 
   return (
     <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <Card className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <Card className="space-y-4 rounded-2xl p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{isEditMode && editingContract ? `Редактирование договора ${editingContract.number}` : 'Новый договор'}</h1>
-            <p className="mt-1 text-sm text-slate-600">Настройка параметров заявления о присоединении и договоров клиента</p>
+            <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">{isEditMode && editingContract ? `Редактирование договора ${editingContract.number}` : 'Новый договор'}</h1>
+            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Настройка параметров заявления о присоединении и договоров клиента</p>
           </div>
           <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}?tab=contracts`)}>
             Назад к договорам
           </Button>
         </div>
 
-        <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-sm sm:grid-cols-3">
+        <div className="grid gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-4 text-sm sm:grid-cols-3">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Клиент</p>
-            <p className="font-medium text-slate-900">{client.name}</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Клиент</p>
+            <p className="font-medium text-[var(--color-text-primary)]">{client.name}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">ИНН</p>
-            <p className="font-mono font-medium text-slate-900">{client.inn?.trim() || '—'}</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">ИНН</p>
+            <p className="font-mono font-medium text-[var(--color-text-primary)]">{client.inn?.trim() || '—'}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Email</p>
-            <p className="font-medium text-slate-900">{client.email?.trim() || '—'}</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Email</p>
+            <p className="font-medium text-[var(--color-text-primary)]">{client.email?.trim() || '—'}</p>
           </div>
         </div>
       </Card>
@@ -238,8 +238,8 @@ export const ContractWizardPage = () => {
             { value: 'legal' as const, label: 'Юридическое лицо' },
             { value: 'entrepreneur' as const, label: 'Индивидуальный предприниматель' },
           ].map((option) => (
-            <label key={option.value} className="flex items-center gap-3 text-sm text-slate-700">
-              <input type="radio" name="personType" checked={form.personType === option.value} onChange={() => setForm((prev) => prev ? ({ ...prev, personType: option.value }) : prev)} className="h-4 w-4 border-slate-300 text-brand focus:ring-brand/40" />
+            <label key={option.value} className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
+              <input type="radio" name="personType" checked={form.personType === option.value} onChange={() => setForm((prev) => prev ? ({ ...prev, personType: option.value }) : prev)} className="h-4 w-4 border-[var(--color-input-border)] text-brand focus:ring-brand/40" />
               <span>{option.label}</span>
             </label>
           ))}
@@ -281,9 +281,9 @@ export const ContractWizardPage = () => {
         <div className="space-y-3">
           <Check label="В офисе ООО «Инвестика»" checked={form.reporting.office} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, office: value } }) : prev)} />
           <Check label="По почте заказным письмом" checked={form.reporting.post} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, post: value } }) : prev)} />
-          <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div className="space-y-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-3">
             <Check label="По электронной почте" checked={form.reporting.emailEnabled} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, emailEnabled: value } }) : prev)} />
-            <input value={form.reporting.email} onChange={(event) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, email: event.target.value } }) : prev)} placeholder="Введите email" className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none" />
+            <input value={form.reporting.email} onChange={(event) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, email: event.target.value } }) : prev)} placeholder="Введите email" className="h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] placeholder:text-[var(--color-input-placeholder)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none" />
           </div>
           <Check label="По системе ЭДО" checked={form.reporting.edo} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, edo: value } }) : prev)} />
         </div>
@@ -292,8 +292,8 @@ export const ContractWizardPage = () => {
       <Section title="ООО «Инвестика» брокерское обслуживание на следующих рынках">
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1 sm:col-span-2">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Тариф для всех счетов</span>
-            <select value={form.brokerageMarkets.tariff} onChange={(event) => setForm((prev) => prev ? ({ ...prev, brokerageMarkets: { ...prev.brokerageMarkets, tariff: event.target.value } }) : prev)} className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Тариф для всех счетов</span>
+            <select value={form.brokerageMarkets.tariff} onChange={(event) => setForm((prev) => prev ? ({ ...prev, brokerageMarkets: { ...prev.brokerageMarkets, tariff: event.target.value } }) : prev)} className="h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none">
               <option value="Универсальный">Универсальный</option>
               <option value="Инвестор">Инвестор</option>
               <option value="Премиум">Премиум</option>
@@ -319,7 +319,7 @@ export const ContractWizardPage = () => {
         </div>
       </Section>
 
-      <Card className="crm-action-bar sticky bottom-3 z-20 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 border-t p-4 backdrop-blur">
+      <Card className="crm-action-bar sticky bottom-3 z-20 flex flex-wrap items-center gap-2 rounded-2xl border p-4 backdrop-blur">
         <Button variant="secondary" onClick={persistDraft}>
           Сохранить настройки заявления
         </Button>

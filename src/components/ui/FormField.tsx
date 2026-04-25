@@ -9,7 +9,7 @@ type FormFieldProps = {
 export const FormField = ({ label, mono = false, className, type = 'text', ...props }: FormFieldProps & { className?: string }) => {
   return (
     <label className="space-y-1">
-      <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">{label}</span>
+      <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">{label}</span>
       <input
         type={type}
         className={cn(
