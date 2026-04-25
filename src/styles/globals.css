@@ -127,3 +127,106 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@layer utilities {
+  .bg-white,
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-gray-50,
+  .bg-gray-100 {
+    background-color: var(--color-card) !important;
+  }
+
+  .bg-slate-100\/80,
+  .bg-slate-50\/80,
+  .bg-gray-100\/80 {
+    background-color: color-mix(in srgb, var(--color-hover) 80%, transparent) !important;
+  }
+
+  .bg-slate-50\/30 {
+    background-color: color-mix(in srgb, var(--color-hover) 30%, transparent) !important;
+  }
+
+  .text-slate-900,
+  .text-slate-800,
+  .text-gray-900,
+  .text-gray-800 {
+    color: var(--color-text-primary) !important;
+  }
+
+  .text-slate-700,
+  .text-slate-600,
+  .text-slate-500,
+  .text-slate-400,
+  .text-gray-700,
+  .text-gray-600,
+  .text-gray-500,
+  .text-gray-400 {
+    color: var(--color-text-secondary) !important;
+  }
+
+  .border-slate-50,
+  .border-slate-100,
+  .border-slate-200,
+  .border-slate-300,
+  .border-gray-100,
+  .border-gray-200,
+  .border-gray-300,
+  .border-white {
+    border-color: var(--color-border) !important;
+  }
+
+  .hover\:bg-slate-50:hover,
+  .hover\:bg-slate-100:hover,
+  .hover\:bg-gray-50:hover,
+  .hover\:bg-gray-100:hover {
+    background-color: var(--color-hover) !important;
+  }
+
+  .hover\:text-slate-900:hover,
+  .hover\:text-slate-800:hover,
+  .hover\:text-gray-900:hover,
+  .hover\:text-gray-800:hover {
+    color: var(--color-text-primary) !important;
+  }
+
+  .focus\:border-brand:focus,
+  .focus\:border-brand-dark:focus {
+    border-color: var(--color-focus) !important;
+  }
+
+  .focus\:ring-brand\/10:focus,
+  .focus\:ring-brand\/20:focus,
+  .focus-visible\:ring-brand\/20:focus-visible,
+  .focus\:ring-brand\/40:focus,
+  .focus-visible\:ring-brand\/40:focus-visible {
+    --tw-ring-color: color-mix(in srgb, var(--color-focus) 22%, transparent) !important;
+  }
+
+  .bg-brand-light,
+  .bg-brand-light\/20 {
+    background-color: color-mix(in srgb, var(--color-secondary) 55%, transparent) !important;
+  }
+
+  .bg-brand,
+  .after\:bg-brand::after {
+    background-color: var(--color-primary) !important;
+  }
+
+  .text-brand,
+  .text-brand-dark,
+  .hover\:text-brand:hover,
+  .hover\:text-brand-dark:hover {
+    color: var(--color-primary) !important;
+  }
+
+  .disabled\:bg-slate-100:disabled,
+  .disabled\:bg-gray-100:disabled {
+    background-color: color-mix(in srgb, var(--color-input) 65%, var(--color-border)) !important;
+  }
+
+  .disabled\:text-slate-500:disabled,
+  .disabled\:text-gray-500:disabled {
+    color: color-mix(in srgb, var(--color-text-secondary) 85%, transparent) !important;
+  }
+}
