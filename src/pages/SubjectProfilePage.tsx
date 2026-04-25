@@ -978,7 +978,7 @@ export const SubjectProfilePage = () => {
                     mono
                     inputMode="tel"
                     autoComplete="tel-national"
-                    placeholder="+7 (999) 123-45-67 или +44 2079460958"
+                    placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                     onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                     onPaste={(event) => handleDraftPhonePaste('phone', event)}
                     onKeyDown={(event) => handleDraftPhoneKeyDown('phone', event)}
@@ -990,7 +990,7 @@ export const SubjectProfilePage = () => {
                     mono
                     inputMode="tel"
                     autoComplete="tel-national"
-                    placeholder="+7 (999) 123-45-67 или +44 2079460958"
+                    placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                     onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                     onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
                     onKeyDown={(event) => handleDraftPhoneKeyDown('secondaryPhone', event)}
@@ -1227,7 +1227,7 @@ export const SubjectProfilePage = () => {
                         mono
                         inputMode="tel"
                         autoComplete="tel-national"
-                        placeholder="+7 (999) 123-45-67 или +44 2079460958"
+                        placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                         onChange={(event) => handleDraftPhoneChange('phone', event.target.value)}
                         onPaste={(event) => handleDraftPhonePaste('phone', event)}
                         onKeyDown={(event) => handleDraftPhoneKeyDown('phone', event)}
@@ -1239,7 +1239,7 @@ export const SubjectProfilePage = () => {
                         mono
                         inputMode="tel"
                         autoComplete="tel-national"
-                        placeholder="+7 (999) 123-45-67 или +44 2079460958"
+                        placeholder="+7 (900) 123-45-67 или +44 20 7946 0958"
                         onChange={(event) => handleDraftPhoneChange('secondaryPhone', event.target.value)}
                         onPaste={(event) => handleDraftPhonePaste('secondaryPhone', event)}
                         onKeyDown={(event) => handleDraftPhoneKeyDown('secondaryPhone', event)}
