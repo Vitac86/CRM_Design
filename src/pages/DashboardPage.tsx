@@ -97,9 +97,7 @@ export const DashboardPage = () => {
         ))}
       </section>
 
-      {error && (
-        <p className="text-sm font-medium text-rose-600">{error}</p>
-      )}
+      {error && <p className="text-sm font-medium text-[var(--color-danger)]">{error}</p>}
 
       {isLoading && (
         <p className="text-sm text-[var(--color-text-secondary)]">Загрузка данных...</p>

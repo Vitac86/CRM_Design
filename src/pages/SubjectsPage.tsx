@@ -424,7 +424,7 @@ export const SubjectsPage = () => {
       />
 
       {isLoading && <p className="text-sm text-[var(--color-text-secondary)]">Загрузка списка субъектов…</p>}
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <PageSizeSelector

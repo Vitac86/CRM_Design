@@ -6,7 +6,7 @@ interface MetricCardProps {
 }
 
 export const MetricCard = ({ metric }: MetricCardProps) => {
-  const trendClass = metric.trendType === 'up' ? 'text-brand' : 'text-rose-600';
+  const trendClass = metric.trendType === 'up' ? 'text-[var(--color-accent)]' : 'text-[var(--color-danger)]';
   const IconComponent = metric.icon;
 
   const card = (
