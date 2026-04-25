@@ -3,6 +3,7 @@ import { Badge, Button, Card } from '../components/ui';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { AdministrationSection } from '../features/administration/api/administrationRepository';
 import { useTheme } from '../theme/useTheme';
+import { BrandLogo } from '../components/brand/BrandLogo';
 import type { ThemeId } from '../theme/themeTypes';
 
 const THEME_TITLES: Record<ThemeId, string> = {
@@ -59,7 +60,14 @@ export const AdministrationPage = () => {
             const isActive = theme.id === themeId;
 
             return (
-              <Card key={theme.id} className="flex h-full flex-col gap-3 p-4">
+              <Card
+                key={theme.id}
+                className={`flex h-full flex-col gap-3 p-4 transition-all ${
+                  isActive
+                    ? 'border-[var(--color-primary)] shadow-[0_0_0_1px_var(--color-primary)]'
+                    : 'hover:border-[var(--color-primary)]/40'
+                }`}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-base font-semibold text-[var(--color-text-primary)]">{THEME_TITLES[theme.id]}</h3>
@@ -69,18 +77,31 @@ export const AdministrationPage = () => {
                 </div>
 
                 <div
-                  className="overflow-hidden rounded-lg border"
+                  className="relative overflow-hidden rounded-lg border"
                   style={{ borderColor: theme.border, backgroundColor: theme.surface }}
                   aria-hidden
                 >
                   <div className="h-2" style={{ backgroundColor: theme.primary }} />
-                  <div className="flex h-16">
-                    <div className="w-7" style={{ backgroundColor: theme.sidebar }} />
+                  <div className="flex h-20">
+                    <div className="flex w-14 items-start justify-center px-2 pt-2" style={{ backgroundColor: theme.sidebar }}>
+                      <BrandLogo variant="mark" tone={theme.logoTone} className="h-4" />
+                    </div>
                     <div className="flex-1 p-2" style={{ backgroundColor: theme.background }}>
-                      <div className="mb-1 h-2 w-3/4 rounded" style={{ backgroundColor: theme.textSecondary, opacity: 0.4 }} />
-                      <div className="h-2 w-1/2 rounded" style={{ backgroundColor: theme.accent, opacity: 0.7 }} />
+                      <div className="mb-1.5 h-2 w-4/5 rounded" style={{ backgroundColor: theme.textSecondary, opacity: 0.4 }} />
+                      <div className="mb-2 h-2 w-1/2 rounded" style={{ backgroundColor: theme.accent, opacity: 0.7 }} />
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div className="h-6 rounded" style={{ backgroundColor: theme.surface, border: `1px solid ${theme.border}` }} />
+                        <div className="h-6 rounded" style={{ backgroundColor: theme.surface, border: `1px solid ${theme.border}` }} />
+                      </div>
                     </div>
                   </div>
+                  {theme.id !== 'current' ? (
+                    <img
+                      src="/brand/investica/eagle-glass.png"
+                      alt=""
+                      className="pointer-events-none absolute -right-3 -bottom-5 h-16 w-16 opacity-20"
+                    />
+                  ) : null}
                 </div>
 
                 <Button
