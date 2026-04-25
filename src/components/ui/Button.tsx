@@ -10,11 +10,14 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'border border-[var(--color-primary)] bg-[var(--color-primary)] text-white hover:bg-[var(--color-accent)] focus-visible:ring-[var(--color-focus)]/40',
+  primary:
+    'border border-[var(--color-button-primary-bg)] bg-[var(--color-button-primary-bg)] text-[var(--color-button-primary-text)] hover:border-[var(--color-button-primary-hover)] hover:bg-[var(--color-button-primary-hover)] active:border-[var(--color-button-primary-active)] active:bg-[var(--color-button-primary-active)]',
   secondary:
-    'border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/35 hover:bg-[var(--color-hover)] hover:text-[var(--color-text-primary)] focus-visible:ring-[var(--color-focus)]/20',
-  ghost: 'border border-transparent bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-hover)] focus-visible:ring-[var(--color-focus)]/25',
-  danger: 'bg-red-600 text-white border border-red-600 hover:bg-red-700 focus-visible:ring-red-300/50',
+    'border border-[var(--color-button-secondary-border)] bg-[var(--color-button-secondary-bg)] text-[var(--color-button-secondary-text)] hover:border-[var(--color-button-secondary-hover-border)] hover:bg-[var(--color-button-secondary-hover-bg)] hover:text-[var(--color-button-secondary-hover-text)] active:border-[var(--color-button-secondary-active-border)] active:bg-[var(--color-button-secondary-active-bg)] active:text-[var(--color-button-secondary-active-text)]',
+  ghost:
+    'border border-transparent bg-[var(--color-button-ghost-bg)] text-[var(--color-button-ghost-text)] hover:border-[var(--color-button-ghost-hover-border)] hover:bg-[var(--color-button-ghost-hover-bg)] hover:text-[var(--color-button-ghost-hover-text)] active:border-[var(--color-button-ghost-active-border)] active:bg-[var(--color-button-ghost-active-bg)]',
+  danger:
+    'border border-[var(--color-button-danger-bg)] bg-[var(--color-button-danger-bg)] text-[var(--color-button-danger-text)] hover:border-[var(--color-button-danger-hover)] hover:bg-[var(--color-button-danger-hover)] active:border-[var(--color-button-danger-active)] active:bg-[var(--color-button-danger-active)]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -27,7 +30,7 @@ export const Button = ({ variant = 'primary', size = 'md', className, type = 'bu
     <button
       type={type}
       className={cn(
-        'font-display inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-50',
+        "font-display inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-[background-color,border-color,color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-button-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-[var(--color-button-disabled-border)] disabled:bg-[var(--color-button-disabled-bg)] disabled:text-[var(--color-button-disabled-text)] [&[aria-pressed='true']]:border-[var(--color-button-selected-border)] [&[aria-pressed='true']]:bg-[var(--color-button-selected-bg)] [&[aria-pressed='true']]:text-[var(--color-button-selected-text)] [&[aria-pressed='true']]:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-button-selected-text)_12%,transparent),0_0_0_2px_color-mix(in_srgb,var(--color-button-focus-ring)_20%,transparent)]",
         variantClasses[variant],
         sizeClasses[size],
         className,
