@@ -391,6 +391,13 @@
   --color-muted-surface: #f8fafc;
   --color-hover: #f1f5f9;
   --color-input: #ffffff;
+  --color-input-border: #e2e8f0;
+  --color-input-text: #0f172a;
+  --color-input-placeholder: #94a3b8;
+  --color-input-icon: #64748b;
+  --color-input-focus: #3b82f6;
+  --color-control-checked: #2563eb;
+  --color-control-disabled: #cbd5e1;
   --color-focus: #3b82f6;
   --color-danger: #e11d48;
   --color-success: #047857;
@@ -435,6 +442,13 @@
   --color-muted-surface: #f8fafc;
   --color-hover: #f1f5f9;
   --color-input: #ffffff;
+  --color-input-border: #e2e8f0;
+  --color-input-text: #0f172a;
+  --color-input-placeholder: #94a3b8;
+  --color-input-icon: #64748b;
+  --color-input-focus: #3b82f6;
+  --color-control-checked: #2563eb;
+  --color-control-disabled: #cbd5e1;
   --color-focus: #3b82f6;
   --color-danger: #e11d48;
   --color-success: #047857;
@@ -477,6 +491,13 @@
   --color-muted-surface: #141635;
   --color-hover: #1c1f4d;
   --color-input: #11142c;
+  --color-input-border: #323763;
+  --color-input-text: #f8fafc;
+  --color-input-placeholder: #94a3c4;
+  --color-input-icon: #b2bdf3;
+  --color-input-focus: #7f8aff;
+  --color-control-checked: #474efd;
+  --color-control-disabled: #4e577b;
   --color-focus: #474efd;
   --color-danger: #fb7185;
   --color-success: #34d399;
@@ -519,6 +540,13 @@
   --color-muted-surface: #eef2ff;
   --color-hover: #eef2ff;
   --color-input: #ffffff;
+  --color-input-border: #dbe2f0;
+  --color-input-text: #0f172a;
+  --color-input-placeholder: #94a3b8;
+  --color-input-icon: #64748b;
+  --color-input-focus: #242bf5;
+  --color-control-checked: #242bf5;
+  --color-control-disabled: #cbd5e1;
   --color-focus: #242bf5;
   --color-danger: #e11d48;
   --color-success: #047857;
@@ -689,6 +717,114 @@ body {
   small {
     font-family: var(--font-body);
   }
+
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea) {
+    color: var(--color-input-text);
+    border-color: var(--color-input-border);
+    background-color: var(--color-input);
+  }
+
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea)::placeholder {
+    color: var(--color-input-placeholder);
+  }
+
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea):focus-visible {
+    border-color: var(--color-input-focus);
+    outline: 2px solid color-mix(in srgb, var(--color-input-focus) 25%, transparent);
+    outline-offset: 1px;
+  }
+
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea):disabled {
+    color: color-mix(in srgb, var(--color-input-text) 62%, transparent);
+    background-color: color-mix(in srgb, var(--color-input) 72%, var(--color-control-disabled));
+    border-color: color-mix(in srgb, var(--color-input-border) 60%, var(--color-control-disabled));
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  :where(input[type='checkbox'], input[type='radio']) {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input);
+    display: inline-grid;
+    place-content: center;
+    vertical-align: middle;
+    transition: background-color 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+    cursor: pointer;
+  }
+
+  :where(input[type='checkbox']) {
+    border-radius: 0.25rem;
+  }
+
+  :where(input[type='radio']) {
+    border-radius: 9999px;
+  }
+
+  :where(input[type='checkbox'])::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    transform: scale(0);
+    transition: transform 0.12s ease-in-out;
+    clip-path: polygon(14% 44%, 0 62%, 44% 100%, 100% 20%, 82% 2%, 40% 72%);
+    background-color: #ffffff;
+  }
+
+  :where(input[type='radio'])::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    transform: scale(0);
+    transition: transform 0.12s ease-in-out;
+    background-color: #ffffff;
+  }
+
+  :where(input[type='checkbox'], input[type='radio']):checked {
+    background-color: var(--color-control-checked);
+    border-color: var(--color-control-checked);
+  }
+
+  :where(input[type='checkbox'], input[type='radio']):checked::before {
+    transform: scale(1);
+  }
+
+  :where(input[type='checkbox'], input[type='radio']):focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-input-focus) 45%, transparent);
+    outline-offset: 2px;
+  }
+
+  :where(input[type='checkbox'], input[type='radio']):disabled {
+    background-color: color-mix(in srgb, var(--color-input) 68%, var(--color-control-disabled));
+    border-color: var(--color-control-disabled);
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  :where(input[type='search'])::-webkit-search-cancel-button {
+    filter: grayscale(1);
+    opacity: 0.7;
+  }
+
+  :root[data-theme='investica-dark'] :where(input[type='date']) {
+    color-scheme: dark;
+  }
+
+  :root[data-theme='investica-dark'] :where(input[type='date'])::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(1) brightness(1.3) saturate(0.8);
+    opacity: 0.95;
+  }
+
+  :root[data-theme='investica-dark'] :where(input[type='search'])::-webkit-search-cancel-button {
+    filter: invert(1) brightness(1.25);
+    opacity: 0.9;
+  }
 }
 
 @layer components {
@@ -776,6 +912,13 @@ body {
     color: var(--color-text-secondary) !important;
   }
 
+  .placeholder\:text-slate-400::placeholder,
+  .placeholder\:text-gray-400::placeholder,
+  .placeholder\:text-slate-500::placeholder,
+  .placeholder\:text-gray-500::placeholder {
+    color: var(--color-input-placeholder) !important;
+  }
+
   .border-slate-50,
   .border-slate-100,
   .border-slate-200,
@@ -803,7 +946,7 @@ body {
 
   .focus\:border-brand:focus,
   .focus\:border-brand-dark:focus {
-    border-color: var(--color-focus) !important;
+    border-color: var(--color-input-focus) !important;
   }
 
   .focus\:ring-brand\/10:focus,
@@ -811,7 +954,7 @@ body {
   .focus-visible\:ring-brand\/20:focus-visible,
   .focus\:ring-brand\/40:focus,
   .focus-visible\:ring-brand\/40:focus-visible {
-    --tw-ring-color: color-mix(in srgb, var(--color-focus) 22%, transparent) !important;
+    --tw-ring-color: color-mix(in srgb, var(--color-input-focus) 22%, transparent) !important;
   }
 
   .bg-brand-light,
@@ -829,6 +972,11 @@ body {
   .hover\:text-brand:hover,
   .hover\:text-brand-dark:hover {
     color: var(--color-primary) !important;
+  }
+
+  input[type='checkbox'].text-brand,
+  input[type='radio'].text-brand {
+    color: var(--color-control-checked) !important;
   }
 
   .disabled\:bg-slate-100:disabled,
