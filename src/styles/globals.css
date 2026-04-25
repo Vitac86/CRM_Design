@@ -408,6 +408,10 @@
   --color-tab-active-text: #1e3a8a;
   --color-tab-border: #e2e8f0;
   --color-tab-indicator: #2563eb;
+  --color-actionbar-bg: #ffffff;
+  --color-actionbar-border: #e2e8f0;
+  --color-actionbar-shadow: 0 -6px 20px rgba(15, 23, 42, 0.08);
+  --color-actionbar-text: #0f172a;
   --scrollbar-track: #edf2f7;
   --scrollbar-thumb: #9aa9bf;
   --scrollbar-thumb-hover: #7f90a8;
@@ -448,6 +452,10 @@
   --color-tab-active-text: #1e3a8a;
   --color-tab-border: #e2e8f0;
   --color-tab-indicator: #2563eb;
+  --color-actionbar-bg: #ffffff;
+  --color-actionbar-border: #e2e8f0;
+  --color-actionbar-shadow: 0 -6px 20px rgba(15, 23, 42, 0.08);
+  --color-actionbar-text: #0f172a;
   --scrollbar-track: #edf2f7;
   --scrollbar-thumb: #9aa9bf;
   --scrollbar-thumb-hover: #7f90a8;
@@ -486,6 +494,10 @@
   --color-tab-active-text: #ffffff;
   --color-tab-border: #2a2d4f;
   --color-tab-indicator: #9ea5ff;
+  --color-actionbar-bg: #12142f;
+  --color-actionbar-border: #2a2d4f;
+  --color-actionbar-shadow: 0 -8px 24px rgba(1, 4, 20, 0.62);
+  --color-actionbar-text: #f8fafc;
   --scrollbar-track: #10142e;
   --scrollbar-thumb: #4d6293;
   --scrollbar-thumb-hover: #5f77b0;
@@ -524,6 +536,10 @@
   --color-tab-active-text: #ffffff;
   --color-tab-border: #dbe2f0;
   --color-tab-indicator: #242bf5;
+  --color-actionbar-bg: #ffffff;
+  --color-actionbar-border: #dbe2f0;
+  --color-actionbar-shadow: 0 -6px 16px rgba(30, 41, 59, 0.08);
+  --color-actionbar-text: #0f172a;
   --scrollbar-track: #e9eef8;
   --scrollbar-thumb: #8a98d8;
   --scrollbar-thumb-hover: #6f81d4;
@@ -710,6 +726,13 @@ body {
     border-radius: 999px;
     background-color: var(--color-tab-indicator);
   }
+
+  .crm-action-bar {
+    border-color: var(--color-actionbar-border);
+    background-color: color-mix(in srgb, var(--color-actionbar-bg) 94%, transparent);
+    color: var(--color-actionbar-text);
+    box-shadow: var(--color-actionbar-shadow);
+  }
 }
 
 @layer utilities {
@@ -725,6 +748,10 @@ body {
   .bg-slate-50\/80,
   .bg-gray-100\/80 {
     background-color: color-mix(in srgb, var(--color-hover) 80%, transparent) !important;
+  }
+
+  .bg-white\/95 {
+    background-color: color-mix(in srgb, var(--color-actionbar-bg) 95%, transparent) !important;
   }
 
   .bg-slate-50\/30 {

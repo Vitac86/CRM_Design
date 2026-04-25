@@ -319,7 +319,7 @@ export const ContractWizardPage = () => {
         </div>
       </Section>
 
-      <Card className="sticky bottom-3 z-20 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur">
+      <Card className="crm-action-bar sticky bottom-3 z-20 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 border-t p-4 backdrop-blur">
         <Button variant="secondary" onClick={persistDraft}>
           Сохранить настройки заявления
         </Button>
