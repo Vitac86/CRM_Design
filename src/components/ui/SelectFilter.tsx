@@ -7,7 +7,7 @@ export const SelectFilter = ({ className, children, ...props }: SelectFilterProp
   return (
     <select
       className={cn(
-        'font-display h-10 w-full min-w-0 max-w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] px-3 pr-9 text-sm font-medium text-[var(--color-text-primary)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)]/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[180px]',
+        'font-display h-10 w-full min-w-0 max-w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 pr-9 text-sm font-medium text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto sm:min-w-[180px]',
         className,
       )}
       {...props}
