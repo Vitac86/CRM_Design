@@ -549,7 +549,7 @@ export const RequestsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-heading text-2xl font-semibold text-slate-900">Поручения</h1>
         <div className="flex flex-wrap items-center gap-2">

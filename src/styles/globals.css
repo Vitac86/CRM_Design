@@ -380,15 +380,18 @@
   --color-primary: #2563eb;
   --color-secondary: #dbeafe;
   --color-background: #f8fafc;
-  --color-surface: #ffffff;
+  --color-surface: #f1f5f9;
   --color-card: #ffffff;
+  --color-inner-panel: #f8fafc;
+  --color-elevated: #ffffff;
   --color-sidebar: #ffffff;
   --color-text-primary: #0f172a;
   --color-text-secondary: #64748b;
   --color-border: #e2e8f0;
   --color-accent: #1d4ed8;
   --color-muted: #64748b;
-  --color-muted-surface: #f8fafc;
+  --color-muted-surface: #eef2f7;
+  --color-shadow: rgba(15, 23, 42, 0.1);
   --color-hover: #f1f5f9;
   --color-input: #ffffff;
   --color-input-border: #e2e8f0;
@@ -415,9 +418,9 @@
   --color-tab-active-text: #1e3a8a;
   --color-tab-border: #e2e8f0;
   --color-tab-indicator: #2563eb;
-  --color-actionbar-bg: #ffffff;
+  --color-actionbar-bg: var(--color-elevated);
   --color-actionbar-border: #e2e8f0;
-  --color-actionbar-shadow: 0 -6px 20px rgba(15, 23, 42, 0.08);
+  --color-actionbar-shadow: 0 -6px 20px var(--color-shadow);
   --color-actionbar-text: #0f172a;
   --scrollbar-track: #edf2f7;
   --scrollbar-thumb: #9aa9bf;
@@ -431,15 +434,18 @@
   --color-primary: #2563eb;
   --color-secondary: #dbeafe;
   --color-background: #f8fafc;
-  --color-surface: #ffffff;
+  --color-surface: #f1f5f9;
   --color-card: #ffffff;
+  --color-inner-panel: #f8fafc;
+  --color-elevated: #ffffff;
   --color-sidebar: #ffffff;
   --color-text-primary: #0f172a;
   --color-text-secondary: #64748b;
   --color-border: #e2e8f0;
   --color-accent: #1d4ed8;
   --color-muted: #64748b;
-  --color-muted-surface: #f8fafc;
+  --color-muted-surface: #eef2f7;
+  --color-shadow: rgba(15, 23, 42, 0.1);
   --color-hover: #f1f5f9;
   --color-input: #ffffff;
   --color-input-border: #e2e8f0;
@@ -466,9 +472,9 @@
   --color-tab-active-text: #1e3a8a;
   --color-tab-border: #e2e8f0;
   --color-tab-indicator: #2563eb;
-  --color-actionbar-bg: #ffffff;
+  --color-actionbar-bg: var(--color-elevated);
   --color-actionbar-border: #e2e8f0;
-  --color-actionbar-shadow: 0 -6px 20px rgba(15, 23, 42, 0.08);
+  --color-actionbar-shadow: 0 -6px 20px var(--color-shadow);
   --color-actionbar-text: #0f172a;
   --scrollbar-track: #edf2f7;
   --scrollbar-thumb: #9aa9bf;
@@ -479,16 +485,19 @@
 :root[data-theme='investica-dark'] {
   --color-primary: #242bf5;
   --color-secondary: #474efd;
-  --color-background: #050507;
-  --color-surface: #0a0b1d;
-  --color-card: #0f1021;
+  --color-background: #070913;
+  --color-surface: #0d1022;
+  --color-card: #131733;
+  --color-inner-panel: #171c3b;
+  --color-elevated: #1a2040;
   --color-sidebar: #0a0b6a;
   --color-text-primary: #ffffff;
   --color-text-secondary: #cbd5e1;
-  --color-border: #1e1f38;
+  --color-border: #2a3260;
   --color-accent: #474efd;
   --color-muted: #94a3b8;
-  --color-muted-surface: #141635;
+  --color-muted-surface: #111632;
+  --color-shadow: rgba(2, 8, 26, 0.64);
   --color-hover: #1c1f4d;
   --color-input: #11142c;
   --color-input-border: #323763;
@@ -515,9 +524,9 @@
   --color-tab-active-text: #ffffff;
   --color-tab-border: #2a2d4f;
   --color-tab-indicator: #9ea5ff;
-  --color-actionbar-bg: #12142f;
-  --color-actionbar-border: #2a2d4f;
-  --color-actionbar-shadow: 0 -8px 24px rgba(1, 4, 20, 0.62);
+  --color-actionbar-bg: var(--color-elevated);
+  --color-actionbar-border: #2f3871;
+  --color-actionbar-shadow: 0 -10px 28px var(--color-shadow);
   --color-actionbar-text: #f8fafc;
   --scrollbar-track: #10142e;
   --scrollbar-thumb: #4d6293;
@@ -528,16 +537,19 @@
 :root[data-theme='investica-light'] {
   --color-primary: #242bf5;
   --color-secondary: #d8ddff;
-  --color-background: #f5f7fb;
-  --color-surface: #ffffff;
+  --color-background: #f4f6fb;
+  --color-surface: #edf1f8;
   --color-card: #ffffff;
+  --color-inner-panel: #f6f8fe;
+  --color-elevated: #ffffff;
   --color-sidebar: #0a0b6a;
   --color-text-primary: #0f172a;
   --color-text-secondary: #475569;
   --color-border: #dbe2f0;
   --color-accent: #474efd;
   --color-muted: #64748b;
-  --color-muted-surface: #eef2ff;
+  --color-muted-surface: #e9eefb;
+  --color-shadow: rgba(15, 23, 42, 0.08);
   --color-hover: #eef2ff;
   --color-input: #ffffff;
   --color-input-border: #dbe2f0;
@@ -564,9 +576,9 @@
   --color-tab-active-text: #ffffff;
   --color-tab-border: #dbe2f0;
   --color-tab-indicator: #242bf5;
-  --color-actionbar-bg: #ffffff;
+  --color-actionbar-bg: var(--color-elevated);
   --color-actionbar-border: #dbe2f0;
-  --color-actionbar-shadow: 0 -6px 16px rgba(30, 41, 59, 0.08);
+  --color-actionbar-shadow: 0 -6px 16px var(--color-shadow);
   --color-actionbar-text: #0f172a;
   --scrollbar-track: #e9eef8;
   --scrollbar-thumb: #8a98d8;
@@ -873,17 +885,27 @@ body {
 
 @layer utilities {
   .bg-white,
-  .bg-slate-50,
-  .bg-slate-100,
-  .bg-gray-50,
-  .bg-gray-100 {
+  .bg-gray-50 {
     background-color: var(--color-card) !important;
   }
 
+  .bg-slate-50,
+  .bg-slate-50\/70 {
+    background-color: var(--color-inner-panel) !important;
+  }
+
+  .bg-slate-100,
+  .bg-gray-100 {
+    background-color: var(--color-muted-surface) !important;
+  }
+
   .bg-slate-100\/80,
-  .bg-slate-50\/80,
   .bg-gray-100\/80 {
-    background-color: color-mix(in srgb, var(--color-hover) 80%, transparent) !important;
+    background-color: color-mix(in srgb, var(--color-muted-surface) 80%, transparent) !important;
+  }
+
+  .bg-slate-50\/80 {
+    background-color: color-mix(in srgb, var(--color-inner-panel) 82%, transparent) !important;
   }
 
   .bg-white\/95 {
