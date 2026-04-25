@@ -100,6 +100,9 @@ export const AdministrationPage = () => {
                       src="/brand/investica/eagle-glass.png"
                       alt=""
                       className="pointer-events-none absolute -right-3 -bottom-5 h-16 w-16 opacity-20"
+                      onError={(event) => {
+                        event.currentTarget.style.display = 'none';
+                      }}
                     />
                   ) : null}
                 </div>
