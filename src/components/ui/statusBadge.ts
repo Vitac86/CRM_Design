@@ -53,6 +53,10 @@ const statusCatalog: StatusDescriptor[] = [
 
   { label: 'Действующий', tone: 'success', group: 'account' },
   { label: 'Не действующий', tone: 'neutral', group: 'account' },
+  { label: 'Архивный', tone: 'neutral', group: 'generic' },
+  { label: 'Черновик', tone: 'neutral', group: 'generic' },
+  { label: 'На подписи', tone: 'warning', group: 'generic' },
+  { label: 'Отклонена', tone: 'danger', group: 'generic' },
   { label: 'Ожидает', tone: 'warning', group: 'request' },
   { label: 'Принято', tone: 'info', group: 'request' },
   { label: 'Отклонено', tone: 'danger', group: 'request' },
@@ -72,7 +76,7 @@ const statusCatalog: StatusDescriptor[] = [
   { label: 'КНУР', tone: 'success', group: 'risk', aliases: ['Риск: Низкий', 'Низкий', 'Начальный'] },
 
   { label: 'Открыт', tone: 'success', group: 'account' },
-  { label: 'Закрыт', tone: 'neutral', group: 'account' },
+  { label: 'Закрыт', tone: 'neutral', group: 'account', aliases: ['Закрытый'] },
   { label: 'Приостановлен', tone: 'warning', group: 'account' },
   { label: 'На подписании', tone: 'info', group: 'account' },
 ];

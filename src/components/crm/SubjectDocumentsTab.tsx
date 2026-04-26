@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import type { ClientDocument } from '../../data/types';
-import { Badge, Button, DataTable, DownloadIcon, EmptyState, PrintIcon } from '../ui';
+import { Button, DataTable, DownloadIcon, EmptyState, PrintIcon, StatusBadge } from '../ui';
 
 type SubjectDocumentsTabProps = {
   clientId: string;
@@ -16,16 +16,6 @@ type NewDocumentForm = {
 
 const documentTypeOptions = ['Договор ДУ', 'Депозитарный', 'Анкета', 'Паспорт', 'Доверенность', 'Иной документ'];
 const documentStatusOptions: Array<NewDocumentForm['status']> = ['Действующий', 'На подписи', 'Архивный', 'Черновик'];
-
-const documentStatusVariant: Record<ClientDocument['status'], 'success' | 'danger' | 'warning' | 'neutral'> = {
-  Действующий: 'success',
-  'Не действующий': 'neutral',
-  'На проверке': 'warning',
-  'На подписи': 'warning',
-  Отклонена: 'danger',
-  Архивный: 'neutral',
-  Черновик: 'neutral',
-};
 
 const defaultForm: NewDocumentForm = {
   title: '',
@@ -217,7 +207,7 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
             key: 'status',
             header: 'Статус',
             className: 'min-w-[160px]',
-            render: (row) => <Badge variant={documentStatusVariant[row.status]}>{row.status}</Badge>,
+            render: (row) => <StatusBadge value={row.status} />,
           },
           { key: 'date', header: 'Дата', className: 'min-w-[140px]' },
           {

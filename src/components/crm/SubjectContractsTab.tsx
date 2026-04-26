@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import { routes } from '../../routes/paths';
 import type { ClientAccount, ContractProductType, ClientContract } from '../../data/types';
-import { Badge, Button, Card, DataTable } from '../ui';
+import { Button, Card, DataTable, StatusBadge } from '../ui';
 
 type SubjectContractsTabProps = {
   clientId: string;
@@ -26,11 +26,6 @@ const productTypeLabelMap: Record<ContractProductType, string> = {
 const statusLabelMap: Record<ClientContract['status'], string> = {
   active: 'Действующий',
   closed: 'Закрытый',
-};
-
-const statusVariantMap: Record<ClientContract['status'], 'success' | 'danger'> = {
-  active: 'success',
-  closed: 'danger',
 };
 
 const defaultAccountForm: AccountForm = {
@@ -140,7 +135,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
               key: 'status',
               header: 'Статус',
               className: 'min-w-[170px]',
-              render: (row) => <Badge variant={statusVariantMap[row.status]}>{statusLabelMap[row.status]}</Badge>,
+              render: (row) => <StatusBadge value={statusLabelMap[row.status]} />,
             },
           ]}
           rows={contracts}
