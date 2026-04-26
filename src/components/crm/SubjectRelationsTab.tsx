@@ -130,7 +130,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
             {
               key: 'relatedName',
               header: 'Связанное лицо / организация',
-              className: 'min-w-[260px] font-medium text-slate-800',
+              className: 'min-w-[260px] font-medium text-[var(--color-text-primary)]',
               render: (row) =>
                 row.relatedClientId ? (
                   <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => row.relatedClientId && navigate(routes.subject(row.relatedClientId))}>
@@ -149,9 +149,9 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
       )}
 
       {isAgent ? (
-        <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
+        <div className="space-y-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600">Клиенты агента</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Клиенты агента</h3>
             <div className="flex items-center gap-2">
               <Button size="sm" variant="secondary" onClick={handleExportAgentClients} disabled={agentClients.length === 0}>
                 Экспорт
@@ -167,7 +167,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
               {
                 key: 'name',
                 header: 'Субъект',
-                className: 'font-medium text-slate-800',
+                className: 'font-medium text-[var(--color-text-primary)]',
                 render: (row) => (
                   <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(routes.subject(row.id))}>
                     {row.name}
@@ -185,10 +185,10 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
       ) : null}
 
       {isModalOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[color:color-mix(in_oklab,var(--color-text-primary)_40%,transparent)] p-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-slate-900">Добавить клиента агенту</h3>
+              <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Добавить клиента агенту</h3>
               <Button variant="secondary" size="sm" onClick={handleCloseModal}>
                 Закрыть
               </Button>
