@@ -379,7 +379,7 @@ export const SubjectProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+      <div className="crm-dossier-shell min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
         <EmptyState title="Загрузка карточки клиента…" description="Пожалуйста, подождите." />
       </div>
     );
@@ -387,7 +387,7 @@ export const SubjectProfilePage = () => {
 
   if (error) {
     return (
-      <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+      <div className="crm-dossier-shell min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
         <EmptyState title="Не удалось загрузить карточку клиента." description="Попробуйте обновить страницу." />
       </div>
     );
@@ -395,7 +395,7 @@ export const SubjectProfilePage = () => {
 
   if (!client) {
     return (
-      <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+      <div className="crm-dossier-shell min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
         <EmptyState title="Клиент не найден" description="Проверьте ссылку или вернитесь к списку субъектов." />
       </div>
     );
@@ -485,7 +485,7 @@ export const SubjectProfilePage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+    <div className="crm-dossier-shell min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
       <ClientProfileHeader
         client={currentClient}
         actions={

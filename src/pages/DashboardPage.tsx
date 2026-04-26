@@ -92,7 +92,7 @@ export const DashboardPage = () => {
   }, [latestRequests]);
 
   return (
-    <div className="crm-prestige-panel min-w-0 space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
+    <div className="crm-prestige-panel crm-dashboard-executive min-w-0 space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
       <header>
         <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Операционный обзор</h1>
       </header>
@@ -103,7 +103,7 @@ export const DashboardPage = () => {
         ))}
       </section>
 
-      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] p-[var(--density-panel-padding)] shadow-sm">
+      <section className="crm-executive-summary rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] p-[var(--density-panel-padding)] shadow-sm">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] pb-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Операционный статус смены</h2>
           <span className="rounded border border-[var(--color-border)] bg-[var(--color-table-header)] px-2 py-1 text-xs font-medium text-[var(--color-text-secondary)]">

@@ -773,6 +773,104 @@
   --scrollbar-corner: #e9eef8;
 }
 
+:root[data-theme='investica-private'] {
+  --color-primary: #1d3f8f;
+  --color-secondary: #e9edf8;
+  --color-background: #f3f0ea;
+  --color-surface: #f8f5ef;
+  --color-card: #fffdf8;
+  --color-inner-panel: #f5f1e9;
+  --color-elevated: #ffffff;
+  --color-sidebar: #e8e1d4;
+  --color-text-primary: #1b2433;
+  --color-text-secondary: #5b6577;
+  --color-border: #d7d0c2;
+  --color-accent: #2c4fa6;
+  --color-muted: #6f7888;
+  --color-muted-surface: #efebe3;
+  --color-shadow: rgba(29, 37, 54, 0.12);
+  --color-hover: #f1ece2;
+  --color-input: #fffdf8;
+  --color-input-border: #d5cdc0;
+  --color-input-text: #1f2a3a;
+  --color-input-placeholder: #8b93a4;
+  --color-input-icon: #6f7789;
+  --color-input-icon-hover: #4f5b72;
+  --color-input-focus: #2f57b0;
+  --color-control-checked: #2f57b0;
+  --color-control-disabled: #d2cabd;
+  --color-focus: #2f57b0;
+  --color-danger: #9f4a55;
+  --color-success: #2f6a5a;
+  --color-warning: #9a7442;
+  --color-sidebar-text: #1f2d46;
+  --color-sidebar-muted: #5d6880;
+  --color-sidebar-hover: #ddd5c8;
+  --color-sidebar-active-bg: #d0d8ea;
+  --color-sidebar-active-text: #1f3f87;
+  --color-tab-bg: #fdfbf6;
+  --color-tab-text: #5c6678;
+  --color-tab-hover: #f1ece3;
+  --color-tab-hover-text: #273755;
+  --color-tab-active-bg: #e5eaf7;
+  --color-tab-active-text: #1f3f87;
+  --color-tab-border: #d5cdbe;
+  --color-tab-indicator: #2c4fa6;
+  --color-actionbar-bg: #fdfbf6;
+  --color-actionbar-border: #d5cdbd;
+  --color-actionbar-shadow: 0 -8px 20px color-mix(in srgb, var(--color-shadow) 72%, transparent);
+  --color-actionbar-text: #1f2a3a;
+  --color-button-primary-bg: #1f438f;
+  --color-button-primary-text: #f8f9fd;
+  --color-button-primary-hover: #2652ac;
+  --color-button-primary-active: #193a7b;
+  --color-button-secondary-bg: #fffdf8;
+  --color-button-secondary-text: #1f2e48;
+  --color-button-secondary-border: #cbc3b5;
+  --color-button-secondary-hover-bg: #f2ede4;
+  --color-button-secondary-hover-border: #bdb5a5;
+  --color-button-secondary-hover-text: #152338;
+  --color-button-secondary-active-bg: #e9e2d6;
+  --color-button-secondary-active-border: #afa796;
+  --color-button-secondary-active-text: #111d2e;
+  --color-button-ghost-bg: transparent;
+  --color-button-ghost-text: #5a6478;
+  --color-button-ghost-hover-bg: color-mix(in srgb, #efe8dc 78%, transparent);
+  --color-button-ghost-hover-border: color-mix(in srgb, #cbc2b2 72%, transparent);
+  --color-button-ghost-hover-text: #1f2e48;
+  --color-button-ghost-active-bg: color-mix(in srgb, #e7dfd1 85%, transparent);
+  --color-button-ghost-active-border: color-mix(in srgb, #b9b09f 72%, transparent);
+  --color-button-danger-bg: #9f4a55;
+  --color-button-danger-text: #fef8f8;
+  --color-button-danger-hover: #8f404b;
+  --color-button-danger-active: #74333d;
+  --color-button-disabled-bg: color-mix(in srgb, #fffdf8 62%, #d8d1c4);
+  --color-button-disabled-border: color-mix(in srgb, #d3cbbe 82%, transparent);
+  --color-button-disabled-text: color-mix(in srgb, #667186 70%, transparent);
+  --color-button-selected-bg: color-mix(in srgb, #2c4fa6 12%, #fffdf8);
+  --color-button-selected-border: color-mix(in srgb, #2c4fa6 34%, #cec7bb);
+  --color-button-selected-text: #1a2b43;
+  --color-button-focus-ring: color-mix(in srgb, #2f57b0 38%, white 12%);
+  --color-table-header: #ebe6dc;
+  --color-table-row-hover: color-mix(in srgb, #f0eadf 92%, transparent);
+  --color-kpi-surface: #fcf9f3;
+  --density-table-cell-x: 1.05rem;
+  --density-table-header-y: 0.78rem;
+  --density-table-row-y: 0.82rem;
+  --density-panel-padding: 1rem;
+  --density-filter-gap: 0.8rem;
+  --density-button-sm-height: 2.05rem;
+  --density-button-sm-px: 0.8rem;
+  --density-button-md-height: 2.55rem;
+  --density-button-md-px: 1.05rem;
+  --density-tab-px: 1.3rem;
+  --density-tab-py: 0.82rem;
+  --scrollbar-track: #ece6dc;
+  --scrollbar-thumb: #a8a094;
+  --scrollbar-thumb-hover: #8f887c;
+  --scrollbar-corner: #ece6dc;
+}
+
 :root[data-theme='investica-command'] {
   --color-primary: #2f5dff;
   --color-secondary: #1d2f52;
@@ -1320,6 +1418,80 @@ body {
     box-shadow:
       0 8px 16px color-mix(in srgb, var(--color-primary) 24%, transparent),
       0 0 0 1px color-mix(in srgb, #93abdf 18%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-card {
+    border-color: color-mix(in srgb, var(--color-border) 94%, #ffffff 5%);
+    background: var(--color-card);
+    box-shadow:
+      0 10px 24px color-mix(in srgb, var(--color-shadow) 44%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #ffffff 82%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-prestige-panel {
+    background:
+      radial-gradient(100% 120% at 0% -18%, color-mix(in srgb, #e6ebf7 58%, transparent), transparent 62%),
+      var(--color-surface);
+    border-color: color-mix(in srgb, var(--color-border) 95%, #ffffff 4%);
+    box-shadow:
+      0 16px 36px color-mix(in srgb, var(--color-shadow) 40%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #ffffff 85%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-dashboard-executive {
+    gap: 1.65rem;
+  }
+
+  :root[data-theme='investica-private'] .crm-kpi-card {
+    border-radius: 0.9rem;
+  }
+
+  :root[data-theme='investica-private'] .crm-kpi-icon {
+    background-color: color-mix(in srgb, var(--color-muted-surface) 78%, #ffffff);
+  }
+
+  :root[data-theme='investica-private'] .crm-executive-summary {
+    border-radius: 0.9rem;
+  }
+
+  :root[data-theme='investica-private'] .crm-data-table {
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--color-shadow) 36%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-data-table tbody tr {
+    border-bottom-color: color-mix(in srgb, var(--color-border) 88%, #ffffff);
+  }
+
+  :root[data-theme='investica-private'] .crm-data-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--color-table-row-hover) 85%, #ffffff 8%);
+  }
+
+  :root[data-theme='investica-private'] .crm-sidebar-link:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-sidebar-link.bg-\[var\(--color-sidebar-active-bg\)\] {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, #ffffff 35%, transparent),
+      0 6px 14px color-mix(in srgb, #d3dced 42%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-button-primary {
+    box-shadow:
+      0 8px 16px color-mix(in srgb, var(--color-primary) 20%, transparent),
+      0 0 0 1px color-mix(in srgb, #f5f7fd 24%, transparent);
+  }
+
+  :root[data-theme='investica-private'] .crm-dossier-shell {
+    gap: 1.15rem;
+  }
+
+  :root[data-theme='investica-private'] .crm-dossier-header {
+    border-radius: 0.95rem;
+  }
+
+  :root[data-theme='investica-private'] .crm-dossier-section {
+    border-radius: 0.9rem;
   }
 }
 

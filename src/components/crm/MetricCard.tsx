@@ -17,9 +17,9 @@ export const MetricCard = ({ metric }: MetricCardProps) => {
         : 'Поток клиентов';
 
   const card = (
-    <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] p-[var(--density-panel-padding)] shadow-sm">
+    <article className="crm-kpi-card rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] p-[var(--density-panel-padding)] shadow-sm">
       <div className="mb-2 flex items-start justify-between gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] text-[var(--color-primary)]" aria-hidden="true">
+        <div className="crm-kpi-icon flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] text-[var(--color-primary)]" aria-hidden="true">
           <IconComponent className="h-5 w-5" />
         </div>
         <div className="space-y-1 text-right">
