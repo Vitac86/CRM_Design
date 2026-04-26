@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:health": "node scripts/project-health-check.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
