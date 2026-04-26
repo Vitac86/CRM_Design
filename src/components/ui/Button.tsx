@@ -21,8 +21,8 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-xs',
-  md: 'h-10 px-4 text-sm',
+  sm: 'h-[var(--density-button-sm-height)] px-[var(--density-button-sm-px)] text-xs',
+  md: 'h-[var(--density-button-md-height)] px-[var(--density-button-md-px)] text-sm',
 };
 
 export const Button = ({ variant = 'primary', size = 'md', className, type = 'button', ...props }: ButtonProps) => {

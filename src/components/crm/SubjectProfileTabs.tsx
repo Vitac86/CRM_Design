@@ -34,7 +34,7 @@ export const SubjectProfileTabs = ({ activeTab, onChange }: SubjectProfileTabsPr
               type="button"
               onClick={() => onChange(tab.value)}
               className={cn(
-                'crm-tab relative px-5 py-3 text-left text-base font-medium transition-colors',
+                'crm-tab relative px-[var(--density-tab-px)] py-[var(--density-tab-py)] text-left text-base font-medium transition-colors',
                 active && 'crm-tab-active font-semibold',
               )}
             >

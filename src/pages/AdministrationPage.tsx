@@ -10,6 +10,7 @@ const THEME_TITLES: Record<ThemeId, string> = {
   current: 'Текущий дизайн',
   'investica-dark': 'Investica Dark Prestige',
   'investica-light': 'Investica Light Executive',
+  'investica-command': 'Investica Command Center',
 };
 
 export const AdministrationPage = () => {
@@ -55,7 +56,7 @@ export const AdministrationPage = () => {
           </div>
         </div>
 
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {themes.map((theme) => {
             const isActive = theme.id === themeId;
 
@@ -95,7 +96,14 @@ export const AdministrationPage = () => {
                       </div>
                     </div>
                   </div>
-                  {theme.id !== 'current' ? (
+                  {theme.id === 'investica-command' ? (
+                    <div className="pointer-events-none absolute inset-x-2 bottom-2 flex items-center justify-between gap-2 rounded border px-2 py-1" style={{ borderColor: theme.border, backgroundColor: theme.background }}>
+                      <span className="h-1.5 w-8 rounded-full" style={{ backgroundColor: theme.accent, opacity: 0.8 }} />
+                      <span className="h-1.5 w-6 rounded-full" style={{ backgroundColor: theme.textSecondary, opacity: 0.7 }} />
+                      <span className="h-1.5 w-4 rounded-full" style={{ backgroundColor: theme.primary, opacity: 0.85 }} />
+                    </div>
+                  ) : null}
+                  {theme.id !== 'current' && theme.id !== 'investica-command' ? (
                     <img
                       src="/brand/investica/eagle-glass.png"
                       alt=""
