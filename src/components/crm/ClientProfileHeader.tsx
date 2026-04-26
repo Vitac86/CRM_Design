@@ -31,7 +31,7 @@ const getInitials = (client: Client) => {
 
 export const ClientProfileHeader = ({ client, actions }: ClientProfileHeaderProps) => {
   return (
-    <Card className="flex flex-col gap-3 p-[var(--density-panel-padding)]">
+    <Card className="crm-dossier-header flex flex-col gap-3 p-[var(--density-panel-padding)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-muted-surface)] text-lg font-semibold text-[var(--color-primary)]">

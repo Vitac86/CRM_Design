@@ -11,6 +11,7 @@ const THEME_TITLES: Record<ThemeId, string> = {
   'investica-dark': 'Investica Dark Prestige',
   'investica-light': 'Investica Light Executive',
   'investica-command': 'Investica Command Center',
+  'investica-private': 'Investica Private Office',
 };
 
 export const AdministrationPage = () => {
@@ -38,7 +39,7 @@ export const AdministrationPage = () => {
         <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Администрирование</h1>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {sections.map((section) => (
           <Card key={section.id} className="flex flex-col gap-3 p-4">
             <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">{section.title}</h2>
@@ -56,7 +57,7 @@ export const AdministrationPage = () => {
           </div>
         </div>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           {themes.map((theme) => {
             const isActive = theme.id === themeId;
 
@@ -103,15 +104,18 @@ export const AdministrationPage = () => {
                       <span className="h-1.5 w-4 rounded-full" style={{ backgroundColor: theme.primary, opacity: 0.85 }} />
                     </div>
                   ) : null}
-                  {theme.id !== 'current' && theme.id !== 'investica-command' ? (
-                    <img
-                      src="/brand/investica/eagle-glass.png"
-                      alt=""
-                      className="pointer-events-none absolute -right-3 -bottom-5 h-16 w-16 opacity-20"
-                      onError={(event) => {
-                        event.currentTarget.style.display = 'none';
-                      }}
-                    />
+                  {theme.id === 'investica-private' ? (
+                    <div
+                      className="pointer-events-none absolute inset-x-2 bottom-2 rounded border px-2 py-1"
+                      style={{ borderColor: theme.border, backgroundColor: theme.surface }}
+                    >
+                      <div className="mb-1.5 h-1.5 w-9 rounded-full" style={{ backgroundColor: theme.textSecondary, opacity: 0.55 }} />
+                      <div className="flex items-center gap-1.5">
+                        <span className="h-5 w-5 rounded-full" style={{ backgroundColor: theme.secondary, border: `1px solid ${theme.border}` }} />
+                        <span className="h-1.5 w-12 rounded-full" style={{ backgroundColor: theme.accent, opacity: 0.8 }} />
+                        <span className="h-1.5 w-6 rounded-full" style={{ backgroundColor: theme.textSecondary, opacity: 0.45 }} />
+                      </div>
+                    </div>
                   ) : null}
                 </div>
 

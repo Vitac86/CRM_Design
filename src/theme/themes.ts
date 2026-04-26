@@ -65,6 +65,22 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
     logoVariant: 'full-ru',
     logoTone: 'white',
   },
+  'investica-private': {
+    id: 'investica-private',
+    name: 'Investica Private Office',
+    description: 'Премиальный private office режим для executive-досье клиентов и спокойной аналитической работы.',
+    primary: '#1d3f8f',
+    secondary: '#e9edf8',
+    background: '#f3f0ea',
+    surface: '#f8f5ef',
+    sidebar: '#e8e1d4',
+    textPrimary: '#1b2433',
+    textSecondary: '#5b6577',
+    border: '#d7d0c2',
+    accent: '#2c4fa6',
+    logoVariant: 'full-ru',
+    logoTone: 'blue',
+  },
 };
 
 export const DEFAULT_THEME_ID: ThemeId = 'current';

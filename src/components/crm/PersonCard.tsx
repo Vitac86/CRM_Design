@@ -18,17 +18,17 @@ const getInitials = (name: string) =>
 
 export const PersonCard = ({ title, name, subtitle, phone, email }: PersonCardProps) => {
   return (
-    <Card className="space-y-3 p-4">
-      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">{title}</p>
+    <Card className="crm-dossier-section space-y-3 p-4">
+      <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">{title}</p>
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-muted-surface)] text-sm font-semibold text-[var(--color-accent)]">
           {getInitials(name)}
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-slate-900">{name}</p>
-          <p className="text-sm text-slate-500">{subtitle}</p>
-          <p className="text-xs text-slate-600 font-mono">{phone}</p>
-          <p className="text-xs text-slate-600">{email}</p>
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">{name}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{subtitle}</p>
+          <p className="text-xs font-mono text-[var(--color-text-secondary)]">{phone}</p>
+          <p className="text-xs text-[var(--color-text-secondary)]">{email}</p>
         </div>
       </div>
     </Card>
