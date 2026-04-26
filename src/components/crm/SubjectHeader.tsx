@@ -1,6 +1,6 @@
 import type { Client } from '../../data/types';
-import { Badge, Card } from '../ui';
-import { formatClientType, formatResidency, getClientTypeBadgeVariant, getResidencyBadgeVariant } from '../../utils/labels';
+import { Badge, Card, StatusBadge } from '../ui';
+import { formatClientType, formatResidency } from '../../utils/labels';
 
 type SubjectHeaderProps = {
   client: Client;
@@ -18,12 +18,10 @@ export const SubjectHeader = ({ client }: SubjectHeaderProps) => {
           <h1 className="text-2xl font-semibold text-slate-900 md:text-3xl">{client.name}</h1>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
-            <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
+            <StatusBadge value={formatClientType(client.type)} />
+            <StatusBadge value={formatResidency(client.residency)} />
             {isRepresentative ? <Badge variant="purple">ПРЕДСТАВИТЕЛЬ</Badge> : null}
-            <Badge variant={client.qualification ? 'success' : 'warning'}>
-              {client.qualification ? 'КВАЛИФИЦИРОВАН' : 'НЕ КВАЛИФИЦИРОВАН'}
-            </Badge>
+            <StatusBadge value={client.qualification ? 'Квалифицированный' : 'Неквалифицированный'} />
           </div>
 
           <p className="text-sm text-slate-600">

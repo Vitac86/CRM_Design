@@ -1,14 +1,7 @@
 import { type ReactNode } from 'react';
 import type { Client } from '../../data/types';
 import { Badge, Card, StatusBadge } from '../ui';
-import {
-  formatClientType,
-  formatResidency,
-  formatRiskCategoryForHeader,
-  getClientTypeBadgeVariant,
-  getResidencyBadgeVariant,
-  getRiskCategoryBadgeVariant,
-} from '../../utils/labels';
+import { formatClientType, formatResidency, formatRiskCategoryForHeader } from '../../utils/labels';
 
 type ClientProfileHeaderProps = {
   client: Client;
@@ -45,11 +38,11 @@ export const ClientProfileHeader = ({ client, actions }: ClientProfileHeaderProp
               <span className="font-mono font-semibold text-[var(--color-text-primary)]">{client.code}</span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
-              <Badge variant={getResidencyBadgeVariant(client.residency)}>{formatResidency(client.residency)}</Badge>
+              <StatusBadge value={formatClientType(client.type)} />
+              <StatusBadge value={formatResidency(client.residency)} />
               {client.representatives.length > 0 ? <Badge variant="neutral">Представитель</Badge> : null}
               <StatusBadge value={client.qualification ? 'Квалифицированный' : 'Неквалифицированный'} />
-              <StatusBadge value={formatRiskCategoryForHeader(client.riskCategory)} fallbackVariant={getRiskCategoryBadgeVariant(client.riskCategory)} />
+              <StatusBadge value={formatRiskCategoryForHeader(client.riskCategory)} />
             </div>
           </div>
         </div>

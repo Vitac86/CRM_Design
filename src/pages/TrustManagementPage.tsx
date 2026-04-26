@@ -2,15 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
-import { Badge, DataTable, FilterChipSelect, SearchInput } from '../components/ui';
+import { DataTable, FilterChipSelect, SearchInput, StatusBadge } from '../components/ui';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { TrustContract, TrustContractStatus } from '../features/operations/api/operationsRepository';
 
-const badgeByStatus: Record<TrustContractStatus, 'success' | 'info' | 'neutral'> = {
-  'Активен': 'success',
-  'На подписании': 'info',
-  'Закрыт': 'neutral',
-};
 
 export const TrustManagementPage = () => {
   const { operations } = useDataAccess();
@@ -88,7 +83,7 @@ export const TrustManagementPage = () => {
           {
             key: 'status',
             header: 'Статус',
-            render: (contract) => <Badge variant={badgeByStatus[contract.status]}>{contract.status}</Badge>,
+            render: (contract) => <StatusBadge value={contract.status} />,
           },
         ]}
         rows={filteredContracts}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Badge, Button, Card, EmptyState } from '../components/ui';
+import { Button, Card, EmptyState, StatusBadge } from '../components/ui';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { Client, TradingProfile } from '../data/types';
 
@@ -8,26 +8,6 @@ type TradingTab = 'params' | 'terminals';
 
 const tabClassName = (active: boolean) =>
   `crm-tab relative px-5 py-3 text-sm font-medium transition-colors ${active ? 'crm-tab-active font-semibold' : ''}`;
-
-const statusBadgeVariant = (status: 'Активен' | 'Истёк' | 'Подключён' | 'Отключён') => {
-  if (status === 'Активен' || status === 'Подключён') {
-    return 'success';
-  }
-
-  return 'neutral';
-};
-
-const amlBadgeVariant = (amlStatus: string) => {
-  if (amlStatus === 'АКТИВЕН') {
-    return 'success';
-  }
-
-  if (amlStatus === 'НА ПРОВЕРКЕ' || amlStatus === 'ЗАМОРОЖЕН') {
-    return 'warning';
-  }
-
-  return 'info';
-};
 
 const terminalIcon = (type: 'QUIK Desktop' | 'QUIK Mobile (Android)' | 'WebQUIK') => {
   if (type === 'QUIK Desktop') {
@@ -182,7 +162,7 @@ export const TradingCardPage = () => {
                   <div>
                     <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Статус</p>
                     <div className="mt-1">
-                      <Badge variant={amlBadgeVariant(profile.amlStatus)}>{profile.amlStatus}</Badge>
+                      <StatusBadge value={profile.amlStatus} fallbackVariant="info" />
                     </div>
                   </div>
                   <div>
@@ -228,9 +208,7 @@ export const TradingCardPage = () => {
                   <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
                     <p>Полномочия с: {profile.accountDisposer.authorityFrom}</p>
                     <p>Полномочия до: {profile.accountDisposer.authorityUntil}</p>
-                    <Badge variant={statusBadgeVariant(profile.accountDisposer.status)}>
-                      {profile.accountDisposer.status === 'Активен' ? 'Действует' : 'Истёк'}
-                    </Badge>
+                    <StatusBadge value={profile.accountDisposer.status === 'Активен' ? 'Действующий' : 'Не действующий'} />
                   </div>
                 </div>
               </Card>
@@ -249,7 +227,7 @@ export const TradingCardPage = () => {
                     <div key={method.id} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
                       <div className="mb-2 flex items-start justify-between gap-2">
                         <p className="text-sm font-semibold text-[var(--color-text-primary)]">{method.title}</p>
-                        <Badge variant={statusBadgeVariant(method.status)}>{method.status}</Badge>
+                        <StatusBadge value={method.status} size="sm" />
                       </div>
                       <p className="text-sm text-[var(--color-text-secondary)]">{method.description}</p>
                     </div>
@@ -284,7 +262,7 @@ export const TradingCardPage = () => {
                       </div>
                     </div>
                     <div className="flex flex-col items-start gap-2 md:items-end">
-                      <Badge variant={statusBadgeVariant(terminal.status)}>{terminal.status}</Badge>
+                      <StatusBadge value={terminal.status} size="sm" />
                       {isQuikMobileTerminal(terminal.type) && (
                         <Button
                           size="sm"

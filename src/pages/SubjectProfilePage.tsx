@@ -6,14 +6,14 @@ import { PersonCard } from '../components/crm/PersonCard';
 import { ProfileField } from '../components/crm/ProfileField';
 import { ProfileSection } from '../components/crm/ProfileSection';
 import { ReportMethodCard } from '../components/crm/ReportMethodCard';
-import { EmptyState, Button, FormField, Badge } from '../components/ui';
+import { EmptyState, Button, FormField, StatusBadge } from '../components/ui';
 import { SubjectDocumentsTab } from '../components/crm/SubjectDocumentsTab';
 import { SubjectRelationsTab } from '../components/crm/SubjectRelationsTab';
 import { SubjectContractsTab } from '../components/crm/SubjectContractsTab';
 import { SubjectHistoryTab } from '../components/crm/SubjectHistoryTab';
 import { SubjectBankAccountsTab } from '../components/crm/SubjectBankAccountsTab';
 import { SubjectProfileTabs, type SubjectProfileTab } from '../components/crm/SubjectProfileTabs';
-import { formatClientType, formatResidency, getComplianceBadgeVariant } from '../utils/labels';
+import { formatClientType, formatResidency } from '../utils/labels';
 import {
   formatPhoneDisplay,
   normalizePhoneForStorage,
@@ -1228,7 +1228,7 @@ export const SubjectProfilePage = () => {
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                     <div className="space-y-1">
                       <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Статус комплаенса</p>
-                      <Badge variant={getComplianceBadgeVariant(client.complianceStatus)}>{client.complianceStatus}</Badge>
+                      <StatusBadge value={client.complianceStatus} />
                     </div>
                     <div className="space-y-1">
                       <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Комментарий</p>
