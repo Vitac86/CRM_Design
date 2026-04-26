@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '../routes/paths';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
@@ -140,7 +141,7 @@ export const BrokeragePage = () => {
             sortable: true,
             render: (contract) => (
               <Link
-                to={`/subjects/${contract.clientId}/contract-wizard?contractId=${contract.contractId}`}
+                to={`${routes.subjectContractWizard(contract.clientId)}?contractId=${contract.contractId}`}
                 className="crm-link hover:underline focus-visible:underline"
               >
                 {contract.contractNumber}
@@ -154,7 +155,7 @@ export const BrokeragePage = () => {
             sortable: true,
             render: (contract) => (
               <Link
-                to={`/subjects/${contract.clientId}`}
+                to={routes.subject(contract.clientId)}
                 className="crm-link hover:underline focus-visible:underline"
               >
                 {contract.clientName}

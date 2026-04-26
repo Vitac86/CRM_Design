@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { routes } from '../../routes/paths';
 import type { Client } from '../../data/types';
 import { formatClientType, formatComplianceStatus } from '../../utils/labels';
 import { SearchIcon } from '../ui/icons';
@@ -22,10 +23,10 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLLabelElement | null>(null);
   const hideGlobalSearch =
-    location.pathname === '/subjects' ||
-    location.pathname.startsWith('/subjects/') ||
-    location.pathname === '/trading' ||
-    location.pathname.startsWith('/trading/');
+    location.pathname === routes.subjects ||
+    location.pathname.startsWith(`${routes.subjects}/`) ||
+    location.pathname === routes.trading ||
+    location.pathname.startsWith(`${routes.trading}/`);
 
   const normalizedSearch = search.trim().toLowerCase();
 
@@ -90,7 +91,7 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
 
   const handleSelect = (clientId: string) => {
     setIsOpen(false);
-    navigate(`/subjects/${clientId}`);
+    navigate(routes.subject(clientId));
   };
 
   return (

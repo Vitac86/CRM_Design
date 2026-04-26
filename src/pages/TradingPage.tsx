@@ -17,6 +17,7 @@ import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { Client, TradingMethod, TradingProfile, TradingRiskLevel, TradingStatus } from '../data/types';
 import { tradingStatusTone } from '../utils/tableStatus';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
+import { routes } from '../routes/paths';
 
 type BooleanFilter = 'all' | 'yes' | 'no';
 
@@ -362,7 +363,7 @@ export const TradingPage = () => {
         ]}
         rows={paginatedRows}
         emptyMessage="По выбранным фильтрам данных нет"
-        onRowClick={(row) => navigate(`/trading/${row.clientId}`)}
+        onRowClick={(row) => navigate(routes.tradingCard(row.clientId))}
         sortKey={sortKey}
         sortDirection={sortDirection}
         onSortChange={handleSort}

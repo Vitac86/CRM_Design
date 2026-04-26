@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import { routes } from '../routes/paths';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
@@ -180,7 +181,7 @@ export const AgentsPage = () => {
             header: 'Субъект',
             className: 'font-medium text-slate-800',
             render: (row) => (
-              <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(`/subjects/${row.subjectId}`)}>
+              <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(routes.subject(row.subjectId))}>
                 {row.fullName}
               </button>
             ),

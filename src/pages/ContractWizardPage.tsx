@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import { routes } from '../routes/paths';
 import type { Client, ClientContract, ContractProductType, ContractWizardConfig } from '../data/types';
 import { Button, Card, EmptyState } from '../components/ui';
 
@@ -178,7 +179,7 @@ export const ContractWizardPage = () => {
         await contractsRepository.updateContractConfig(editingContract.id, form);
         await clientsRepository.updateClient(client.id, mapContractConfigToClientPatch(form));
 
-        navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${editingContract.number} обновлён` } });
+        navigate(`${routes.subject(client.id)}?tab=contracts`, { state: { toastMessage: `Договор ${editingContract.number} обновлён` } });
         return;
       }
 
@@ -191,7 +192,7 @@ export const ContractWizardPage = () => {
       });
 
       await clientsRepository.updateClient(client.id, mapContractConfigToClientPatch(form));
-      navigate(`/subjects/${client.id}?tab=contracts`, { state: { toastMessage: `Договор ${createdContract.number} оформлен` } });
+      navigate(`${routes.subject(client.id)}?tab=contracts`, { state: { toastMessage: `Договор ${createdContract.number} оформлен` } });
     })();
   };
 
@@ -203,7 +204,7 @@ export const ContractWizardPage = () => {
             <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">{isEditMode && editingContract ? `Редактирование договора ${editingContract.number}` : 'Новый договор'}</h1>
             <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Настройка параметров заявления о присоединении и договоров клиента</p>
           </div>
-          <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}?tab=contracts`)}>
+          <Button variant="secondary" onClick={() => navigate(`${routes.subject(client.id)}?tab=contracts`)}>
             Назад к договорам
           </Button>
         </div>
@@ -327,7 +328,7 @@ export const ContractWizardPage = () => {
         <Button variant="secondary" onClick={exportStatement}>
           Выгрузить заявление
         </Button>
-        <Button variant="secondary" onClick={() => navigate(`/subjects/${client.id}?tab=contracts`)}>
+        <Button variant="secondary" onClick={() => navigate(`${routes.subject(client.id)}?tab=contracts`)}>
           Назад к договорам
         </Button>
       </Card>

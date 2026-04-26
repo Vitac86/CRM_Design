@@ -13,6 +13,7 @@ import {
   formatResidency,
 } from '../utils/labels';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
+import { routes } from '../routes/paths';
 
 type ComplianceRow = {
   id: string;
@@ -245,7 +246,7 @@ export const CompliancePage = () => {
             },
           ]}
           rows={filteredRows}
-          onRowClick={(row) => navigate(`/compliance/${row.id}`)}
+          onRowClick={(row) => navigate(routes.complianceCard(row.id))}
           emptyMessage="По выбранным фильтрам данных нет"
         />
       </AsyncContent>

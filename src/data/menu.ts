@@ -1,4 +1,5 @@
 import type { SidebarIconName } from '../components/layout/SidebarIcon';
+import { routes } from '../routes/paths';
 
 export type MenuLeafItem = {
   id: string;
@@ -22,37 +23,38 @@ export const sidebarMenu: ReadonlyArray<SidebarItem> = [
     label: 'Фронт-офис',
     icon: 'frontOffice',
     children: [
-      { id: 'dashboard', label: 'Дашборд', to: '/dashboard', icon: 'dashboard' },
-      { id: 'subjects', label: 'Субъекты', to: '/subjects', icon: 'subjects' },
-      { id: 'brokerage', label: 'Брок. деятельность', to: '/brokerage', icon: 'brokerage' },
+      { id: 'dashboard', label: 'Дашборд', to: routes.dashboard, icon: 'dashboard' },
+      { id: 'subjects', label: 'Субъекты', to: routes.subjects, icon: 'subjects' },
+      { id: 'brokerage', label: 'Брок. деятельность', to: routes.brokerage, icon: 'brokerage' },
       {
         id: 'trust-management',
         label: 'Дов. управление',
-        to: '/trust-management',
+        to: routes.trustManagement,
         icon: 'trustManagement',
       },
-      { id: 'agents', label: 'Агенты', to: '/agents', icon: 'agents' },
-      { id: 'archives-emergency', label: 'Архив', to: '/archives', icon: 'archives' },
-      { id: 'requests', label: 'Поручения', to: '/requests', icon: 'requests' },
+      { id: 'agents', label: 'Агенты', to: routes.agents, icon: 'agents' },
+      { id: 'archives-emergency', label: 'Архив', to: routes.archives, icon: 'archives' },
+      { id: 'requests', label: 'Поручения', to: routes.requests, icon: 'requests' },
     ],
   },
-  { id: 'compliance', label: 'Комплаенс', to: '/compliance', icon: 'compliance' },
+  { id: 'compliance', label: 'Комплаенс', to: routes.compliance, icon: 'compliance' },
   {
     id: 'middle-office',
     label: 'Мидл-офис',
     icon: 'middleOffice',
     children: [
-      { id: 'middle-office-clients', label: 'Журнал клиентов', to: '/middle-office/clients', icon: 'documents' },
+      { id: 'middle-office-clients', label: 'Журнал клиентов', to: routes.middleOfficeClients, icon: 'documents' },
       {
         id: 'middle-office-reports',
         label: 'Журнал отправленных отчётов',
-        to: '/middle-office/reports',
+        to: routes.middleOfficeReports,
         icon: 'documents',
       },
+      { id: 'documents', label: 'Документы', to: routes.documents, icon: 'documents' },
     ],
   },
-  { id: 'back-office', label: 'Бэк-офис', to: '/back-office', icon: 'backOffice' },
-  { id: 'trading', label: 'Трейдинг', to: '/trading', icon: 'trading' },
-  { id: 'depository', label: 'Депозитарий', to: '/depository', icon: 'depository' },
-  { id: 'administration', label: 'Администрирование', to: '/administration', icon: 'administration' },
+  { id: 'back-office', label: 'Бэк-офис', to: routes.backOffice, icon: 'backOffice' },
+  { id: 'trading', label: 'Трейдинг', to: routes.trading, icon: 'trading' },
+  { id: 'depository', label: 'Депозитарий', to: routes.depository, icon: 'depository' },
+  { id: 'administration', label: 'Администрирование', to: routes.administration, icon: 'administration' },
 ];

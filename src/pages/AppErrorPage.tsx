@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useRouteError } from 'react-router-dom';
 import { Button, Card, EmptyState } from '../components/ui';
+import { routes } from '../routes/paths';
 
 export const AppErrorPage = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export const AppErrorPage = () => {
           title="Что-то пошло не так"
           description="Попробуйте обновить страницу или вернуться на дашборд."
           action={
-            <Button variant="primary" onClick={() => navigate('/dashboard')}>
+            <Button variant="primary" onClick={() => navigate(routes.dashboard)}>
               На дашборд
             </Button>
           }

@@ -22,6 +22,7 @@ import {
 } from '../utils/phone';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BankAccount, Client, ClientRepresentativeRole, ClientType, ResidencyStatus } from '../data/types';
+import { routes } from '../routes/paths';
 
 const clientTypeOptions: ClientType[] = ['ООО', 'ИП', 'ПАО', 'ЗАО', 'АО', 'ФЛ'];
 const residencyOptions: ResidencyStatus[] = ['Резидент РФ', 'Нерезидент'];
@@ -356,7 +357,7 @@ export const SubjectProfilePage = () => {
     const archivedClient = await clientsRepository.archiveClient(client.id);
     await syncClientState(archivedClient);
     setToastMessage('Субъект перемещён в архив');
-    window.setTimeout(() => navigate('/archives'), 300);
+    window.setTimeout(() => navigate(routes.archives), 300);
   };
 
   const handleSendToCompliance = async () => {
@@ -374,7 +375,7 @@ export const SubjectProfilePage = () => {
       return;
     }
 
-    navigate(`/subjects/${client.id}/contract-wizard`);
+    navigate(routes.subjectContractWizard(client.id));
   };
 
   if (isLoading) {
@@ -905,7 +906,7 @@ export const SubjectProfilePage = () => {
                 representativesWithSubjects.map((representative) => (
                   <div key={representative.id} className="grid gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm md:grid-cols-4">
                     <p className="text-[var(--color-text-secondary)]">{representative.role}</p>
-                    <button type="button" className="crm-link text-left font-medium hover:underline focus-visible:underline" onClick={() => representative.subject && navigate(`/subjects/${representative.subject.id}`)}>
+                    <button type="button" className="crm-link text-left font-medium hover:underline focus-visible:underline" onClick={() => representative.subject && navigate(routes.subject(representative.subject.id))}>
                       {representative.subject?.name ?? '—'}
                     </button>
                     <p>{representative.authorityBasis || '—'}</p>
