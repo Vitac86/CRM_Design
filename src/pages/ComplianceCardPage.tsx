@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Badge, Button, Card, EmptyState, StatusBadge } from '../components/ui';
+import { Button, Card, EmptyState, StatusBadge } from '../components/ui';
 import { ProfileField } from '../components/crm/ProfileField';
 import { AsyncContent } from '../shared/ui/async';
 import type { Client, ClientDocument, ClientRelation, ComplianceCase, ComplianceStatus, IndividualComplianceCard, LegalEntityComplianceCard } from '../data/types';
@@ -9,8 +9,6 @@ import {
   formatClientType,
   formatComplianceStatus,
   formatResidency,
-  getClientTypeBadgeVariant,
-  getComplianceBadgeVariant,
 } from '../utils/labels';
 
 type DecisionStatus = Extract<ComplianceStatus, 'ПРОЙДЕН' | 'НА ДОРАБОТКЕ' | 'ЗАБЛОКИРОВАН'>;
@@ -260,11 +258,11 @@ export const ComplianceCardPage = () => {
             <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">{client.name}</h1>
             <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-secondary)]">
               <span className="font-mono text-[13px]">{client.code}</span>
-              <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
-              <Badge variant={getComplianceBadgeVariant(currentStatus)}>{formatComplianceStatus(currentStatus)}</Badge>
+              <StatusBadge value={formatClientType(client.type)} />
+              <StatusBadge value={formatComplianceStatus(currentStatus)} />
               <StatusBadge value={formatResidency(client.residency)} />
               <StatusBadge value={client.qualification ? 'Квалифицированный инвестор' : 'Неквалифицированный инвестор'} />
-              <StatusBadge value={`Риск: ${client.riskCategory}`} fallbackVariant={client.riskCategory === 'Высокий' || client.riskCategory === 'Повышенный' ? 'warning' : 'neutral'} />
+              <StatusBadge value={`Риск: ${client.riskCategory}`} />
             </div>
           </div>
         </div>

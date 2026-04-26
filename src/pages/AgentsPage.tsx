@@ -6,7 +6,7 @@ import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
 import type { AgentProfile } from '../data/agents';
 import type { Client } from '../data/types';
-import { Badge, Button, DataTable, FormField, SearchInput } from '../components/ui';
+import { Button, DataTable, FormField, SearchInput, StatusBadge } from '../components/ui';
 
 type AgentTableRow = {
   id: string;
@@ -193,7 +193,7 @@ export const AgentsPage = () => {
           {
             key: 'status',
             header: 'Статус',
-            render: () => <Badge variant="success">Активен</Badge>,
+            render: () => <StatusBadge value="Активен" />,
           },
         ]}
         rows={filteredAgents}

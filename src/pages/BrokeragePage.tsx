@@ -3,18 +3,13 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
-import { Badge, Button, DataTable, FilterChipSelect, SearchInput, type SortDirection } from '../components/ui';
+import { Button, DataTable, FilterChipSelect, SearchInput, StatusBadge, type SortDirection } from '../components/ui';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import type { BrokerageContract, BrokerageContractStatus } from '../features/operations/api/operationsRepository';
 
 type BrokerageSortKey = 'contractNumber' | 'clientCode' | 'clientName' | 'manager' | 'openedAt' | 'status';
 
-const badgeByStatus: Record<BrokerageContractStatus, 'success' | 'warning' | 'neutral'> = {
-  'Активен': 'success',
-  'Приостановлен': 'warning',
-  'Закрыт': 'neutral',
-};
 
 export const BrokeragePage = () => {
   const { operations } = useDataAccess();
@@ -172,7 +167,7 @@ export const BrokeragePage = () => {
             key: 'status',
             header: 'Статус',
             sortable: true,
-            render: (contract) => <Badge variant={badgeByStatus[contract.status]}>{contract.status}</Badge>,
+            render: (contract) => <StatusBadge value={contract.status} />,
           },
         ]}
         rows={sortedContracts}

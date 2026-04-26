@@ -4,16 +4,13 @@ import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
-import { Badge, Button, DataTable, EmptyState, SelectFilter } from '../components/ui';
+import { Button, DataTable, EmptyState, SelectFilter, StatusBadge } from '../components/ui';
 import { AsyncContent } from '../shared/ui/async';
 import type { Client, ClientType, ComplianceStatus, ResidencyStatus } from '../data/types';
 import {
   formatClientType,
   formatComplianceStatus,
   formatResidency,
-  getClientTypeBadgeVariant,
-  getComplianceBadgeVariant,
-  getResidencyBadgeVariant,
 } from '../utils/labels';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 
@@ -229,26 +226,22 @@ export const CompliancePage = () => {
             {
               key: 'type',
               header: 'Тип',
-              render: (row) => <Badge variant={getClientTypeBadgeVariant(row.type)}>{formatClientType(row.type)}</Badge>,
+              render: (row) => <StatusBadge value={formatClientType(row.type)} />,
             },
             {
               key: 'residency',
               header: 'Резидент',
-              render: (row) => <Badge variant={getResidencyBadgeVariant(row.residency)}>{formatResidency(row.residency)}</Badge>,
+              render: (row) => <StatusBadge value={formatResidency(row.residency)} />,
             },
             {
               key: 'complianceStatus',
               header: 'Статус комплаенса',
-              render: (row) => (
-                <Badge variant={getComplianceBadgeVariant(row.complianceStatus)}>
-                  {formatComplianceStatus(row.complianceStatus)}
-                </Badge>
-              ),
+              render: (row) => <StatusBadge value={formatComplianceStatus(row.complianceStatus)} />,
             },
             {
               key: 'fullDocumentSet',
               header: 'Полный комплект',
-              render: (row) => <Badge variant={row.fullDocumentSet ? 'success' : 'warning'}>{row.fullDocumentSet ? 'Да' : 'Нет'}</Badge>,
+              render: (row) => <StatusBadge value={row.fullDocumentSet ? 'Да' : 'Нет'} />,
             },
           ]}
           rows={filteredRows}
