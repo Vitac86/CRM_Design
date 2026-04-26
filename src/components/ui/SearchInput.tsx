@@ -14,7 +14,7 @@ export const SearchInput = ({ className, inputClassName, placeholder = 'Поис
         type="search"
         placeholder={placeholder}
         className={cn(
-          'font-display h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] pl-9 pr-3 text-sm text-[var(--color-input-text)] placeholder:text-[var(--color-input-placeholder)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20 disabled:cursor-not-allowed disabled:opacity-70',
+          'app-form-input h-10 w-full rounded-lg pl-9 pr-3',
           inputClassName,
         )}
         {...props}

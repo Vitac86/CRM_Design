@@ -589,7 +589,7 @@ export const RequestsPage = () => {
               <select
                 value={createType}
                 onChange={(event) => setCreateType(event.target.value as RequestFormType)}
-                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
               >
                 <option value="withdrawal">Поручение на вывод ДС</option>
                 <option value="transfer">Поручение на перевод ДС</option>
@@ -602,7 +602,7 @@ export const RequestsPage = () => {
                 value={selectedClientId}
                 onChange={(event) => setSelectedClientId(event.target.value)}
                 disabled={isLoadingClients || Boolean(clientsError)}
-                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
               >
                 <option value="">Выберите клиента</option>
                 {clientOptions.map((client) => (
@@ -617,7 +617,7 @@ export const RequestsPage = () => {
                 value={selectedContractId}
                 onChange={(event) => setSelectedContractId(event.target.value)}
                 disabled={!selectedClientId || availableContracts.length === 0}
-                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] disabled:bg-[var(--color-muted-surface)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
               >
                 <option value="">Выберите договор</option>
                 {availableContracts.map((contract) => (
@@ -628,7 +628,7 @@ export const RequestsPage = () => {
 
             <label className="space-y-1">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Статус</span>
-              <input value="Ожидает" disabled className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 text-sm text-[var(--color-text-secondary)]" />
+              <input value="Ожидает" disabled className="app-form-input h-10 w-full rounded-lg px-3 text-sm" />
             </label>
 
             <label className="space-y-1">
@@ -636,7 +636,7 @@ export const RequestsPage = () => {
               <select
                 value={selectedSource}
                 onChange={(event) => setSelectedSource(event.target.value as Request['source'])}
-                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
               >
                 <option value="Личный кабинет">Личный кабинет</option>
                 <option value="Почта">Почта</option>
@@ -651,7 +651,7 @@ export const RequestsPage = () => {
                 placeholder="0,00"
                 value={requestAmount}
                 onChange={(event) => setRequestAmount(formatAmountByDigits(event.target.value))}
-                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
               />
             </label>
 
@@ -660,7 +660,7 @@ export const RequestsPage = () => {
               <select
                 value={requestCurrency}
                 onChange={(event) => setRequestCurrency(event.target.value as CurrencyCode | '')}
-                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
               >
                 <option value="">Выберите валюту</option>
                 {requestCurrencyOptions.map((currency) => (
@@ -709,25 +709,25 @@ export const RequestsPage = () => {
                     placeholder="Банк"
                     value={manualBankDetails.bankName}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, bankName: event.target.value }))}
-                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="app-form-input h-10 rounded-lg px-3 text-sm"
                   />
                   <input
                     placeholder="БИК"
                     value={manualBankDetails.bik}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, bik: event.target.value }))}
-                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="app-form-input h-10 rounded-lg px-3 text-sm"
                   />
                   <input
                     placeholder="Расчётный счёт"
                     value={manualBankDetails.checkingAccount}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, checkingAccount: event.target.value }))}
-                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="app-form-input h-10 rounded-lg px-3 text-sm"
                   />
                   <input
                     placeholder="Корреспондентский счёт"
                     value={manualBankDetails.correspondentAccount}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
-                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="app-form-input h-10 rounded-lg px-3 text-sm"
                   />
                 </div>
               ) : null}
@@ -743,7 +743,7 @@ export const RequestsPage = () => {
                   <select
                     value={transferFromMarket}
                     onChange={(event) => setTransferFromMarket(event.target.value as TransferMarket)}
-                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
                   >
                     <option value="Фондовый рынок">Фондовый рынок</option>
                     <option value="Валютный рынок">Валютный рынок</option>
@@ -755,7 +755,7 @@ export const RequestsPage = () => {
                   <input
                     value={getOppositeMarket(transferFromMarket)}
                     disabled
-                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 text-sm text-[var(--color-text-secondary)]"
+                    className="app-form-input h-10 w-full rounded-lg px-3 text-sm"
                   />
                 </label>
               </div>
@@ -805,7 +805,7 @@ export const RequestsPage = () => {
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="По коду клиента"
             aria-label="Фильтр по коду клиента"
-            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-input-placeholder)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-brand focus:ring-2 focus:ring-brand/10"
+            className="app-form-input h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg px-3 text-sm"
           />
 
           <input
@@ -813,7 +813,7 @@ export const RequestsPage = () => {
             value={dateFilter}
             onChange={(event) => setDateFilter(event.target.value)}
             aria-label="Фильтр по дате"
-            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-medium text-[var(--color-text-secondary)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-brand focus:ring-2 focus:ring-brand/10"
+            className="app-form-input h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg px-3 text-sm font-medium"
           />
 
           <SelectFilter
