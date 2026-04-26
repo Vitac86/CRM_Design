@@ -1,20 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { Client } from '../../data/types';
-import { formatClientType, formatComplianceStatus, getComplianceBadgeVariant } from '../../utils/labels';
+import { formatClientType, formatComplianceStatus } from '../../utils/labels';
 import { SearchIcon } from '../ui/icons';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
+import { StatusBadge } from '../ui';
 
 type TopbarProps = {
   onMenuClick?: () => void;
   showMenuButton?: boolean;
-};
-
-const complianceBadgeClassMap = {
-  success: 'bg-emerald-100/90 text-emerald-800',
-  warning: 'bg-amber-100/90 text-amber-800',
-  info: 'bg-sky-100/90 text-sky-800',
-  danger: 'bg-rose-100/90 text-rose-800',
 };
 
 const maxResults = 8;
@@ -142,13 +136,11 @@ export const Topbar = ({ onMenuClick, showMenuButton = false }: TopbarProps) => 
                             <p className="truncate text-sm font-medium text-[var(--color-text-primary)]">{client.name}</p>
                             <p className="truncate text-xs text-[var(--color-text-secondary)]">{formatClientType(client.type)}</p>
                           </div>
-                          <span
-                            className={`inline-flex shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${
-                              complianceBadgeClassMap[getComplianceBadgeVariant(client.complianceStatus)]
-                            }`}
-                          >
-                            {formatComplianceStatus(client.complianceStatus)}
-                          </span>
+                          <StatusBadge
+                            value={formatComplianceStatus(client.complianceStatus)}
+                            compact
+                            className="w-auto max-w-[9.5rem] shrink-0"
+                          />
                         </button>
                       </li>
                     ))}

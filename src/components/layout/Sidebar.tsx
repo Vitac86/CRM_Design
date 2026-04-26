@@ -64,15 +64,11 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
     ? 'crm-sidebar fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)]'
     : 'crm-sidebar h-full w-full border-r border-[var(--color-border)] bg-[var(--color-sidebar)]';
   const logoTone = themeId === 'current' ? 'blue' : 'white';
-  const logoSubtitleClass = themeId === 'current' ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-sidebar-muted)]';
 
   return (
     <aside className={cn('flex min-w-0 flex-col', baseAsideClass, className)}>
       <div className="flex h-[var(--layout-topbar-height)] items-center border-b border-[var(--color-border)] px-5">
-        <div>
-          <BrandLogo tone={logoTone} className="h-8" />
-          <p className={cn('mt-1 text-xs leading-none', logoSubtitleClass)}>CRM prototype</p>
-        </div>
+        <BrandLogo tone={logoTone} className="h-10 max-w-full" />
       </div>
 
       <nav className="crm-scrollbar min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
