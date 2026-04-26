@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
-import { Button, DataTable, Pagination, SearchInput, SelectFilter, StatusBadge, TableControlPanel } from '../components/ui';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageShell } from '../components/layout/PageShell';
+import { PageToolbar } from '../components/layout/PageToolbar';
+import { Button, DataTable, Pagination, SearchInput, SelectFilter, StatusBadge } from '../components/ui';
 import type { Client, ClientBankDetails, ClientContract, CurrencyCode, Request } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { formatRequestStatus } from '../utils/labels';
@@ -549,10 +552,9 @@ export const RequestsPage = () => {
   };
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Поручения</h1>
-        <div className="flex flex-wrap items-center gap-2">
+    <PageShell>
+      <PageHeader title="Поручения" actions={(
+        <>
           <Button variant="secondary" onClick={handleExport} disabled={filteredRequests.length === 0}>
             Экспорт
           </Button>
@@ -566,8 +568,8 @@ export const RequestsPage = () => {
           >
             {isCreateFormOpen ? 'Закрыть форму' : '+ Новое поручение'}
           </Button>
-        </div>
-      </header>
+        </>
+      )} />
 
       {toastMessage ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{toastMessage}</div>
@@ -788,7 +790,7 @@ export const RequestsPage = () => {
         </div>
       ) : null}
 
-      <TableControlPanel
+      <PageToolbar
         search={
           <SearchInput
             value={search}
@@ -879,6 +881,6 @@ export const RequestsPage = () => {
           onNext={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
         />
       </div>
-    </div>
+    </PageShell>
   );
 };

@@ -251,54 +251,52 @@ export const TradingPage = () => {
     <PageShell>
       <PageHeader title="Трейдинг" />
 
-      <div>
-        <PageToolbar
-          search={
-            <SearchInput
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Поиск по клиенту, коду, договору или распорядителю"
-              className="w-full"
+      <PageToolbar
+        search={
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по клиенту, коду, договору или распорядителю"
+            className="w-full"
+          />
+        }
+        filters={
+          <>
+            <FilterChipSelect
+              label="Квалификация"
+              value={qualificationFilter}
+              displayValue={qualificationLabel}
+              onChange={(value) => setQualificationFilter(value as BooleanFilter)}
+              active={qualificationFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                { value: 'yes', label: 'Да' },
+                { value: 'no', label: 'Нет' },
+              ]}
             />
-          }
-          filters={
-            <>
-              <FilterChipSelect
-                label="Квалификация"
-                value={qualificationFilter}
-                displayValue={qualificationLabel}
-                onChange={(value) => setQualificationFilter(value as BooleanFilter)}
-                active={qualificationFilter !== 'all'}
-                options={[
-                  { value: 'all', label: 'Все' },
-                  { value: 'yes', label: 'Да' },
-                  { value: 'no', label: 'Нет' },
-                ]}
-              />
 
-              <FilterChipSelect
-                label="ПОД / ФТ"
-                value={podFtFilter}
-                displayValue={podFtLabel}
-                onChange={(value) => setPodFtFilter(value as BooleanFilter)}
-                active={podFtFilter !== 'all'}
-                options={[
-                  { value: 'all', label: 'Все' },
-                  { value: 'yes', label: 'Да' },
-                  { value: 'no', label: 'Нет' },
-                ]}
-              />
+            <FilterChipSelect
+              label="ПОД / ФТ"
+              value={podFtFilter}
+              displayValue={podFtLabel}
+              onChange={(value) => setPodFtFilter(value as BooleanFilter)}
+              active={podFtFilter !== 'all'}
+              options={[
+                { value: 'all', label: 'Все' },
+                { value: 'yes', label: 'Да' },
+                { value: 'no', label: 'Нет' },
+              ]}
+            />
 
-              <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto" disabled={!hasActiveConditions}>
-                Сбросить всё
-              </Button>
-              <Button variant="secondary" size="sm" onClick={handleExport} disabled={!hasRowsForExport}>
-                Экспорт
-              </Button>
-            </>
-          }
-        />
-      </div>
+            <Button variant="secondary" size="sm" onClick={resetFilters} className="ml-auto" disabled={!hasActiveConditions}>
+              Сбросить всё
+            </Button>
+            <Button variant="secondary" size="sm" onClick={handleExport} disabled={!hasRowsForExport}>
+              Экспорт
+            </Button>
+          </>
+        }
+      />
 
       <DataTable<TradingRow>
         columns={[
