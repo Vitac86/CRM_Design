@@ -5,15 +5,10 @@ import { PageSection } from '../components/layout/PageSection';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
 import { SplitContentShell } from '../components/layout/SplitContentShell';
-import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText } from '../components/ui';
+import { Badge, Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, SearchInput, SelectFilter, TableStatusText, getStatusDescriptor } from '../components/ui';
 import { cn } from '../components/ui/cn';
 import type { Report } from '../data/types';
 import { AsyncContent } from '../shared/ui/async';
-
-const deliveryResultToneMap: Record<'Доставлено' | 'Не доставлено', 'neutral' | 'danger'> = {
-  'Доставлено': 'neutral',
-  'Не доставлено': 'danger',
-};
 
 const deliveryChannelBadgeVariant: Partial<Record<Report['deliveryChannel'], 'purple' | 'info' | 'neutral'>> = {
   'Личный кабинет': 'purple',
@@ -303,7 +298,7 @@ export const DepositoryPage = () => {
                     <Badge className="px-1.5 py-0 leading-4" variant={deliveryChannelBadgeVariant[report.deliveryChannel] ?? 'neutral'}>
                       {report.deliveryChannel}
                     </Badge>
-                    <TableStatusText tone={deliveryResultToneMap[deliveryResult]} className="text-xs">
+                    <TableStatusText tone={getStatusDescriptor(deliveryResult)?.tone === 'danger' ? 'danger' : 'neutral'} className="text-xs">
                       {deliveryResult}
                     </TableStatusText>
                   </div>
@@ -328,7 +323,7 @@ export const DepositoryPage = () => {
                 <DetailField label="Способ отправки" value={selectedReport.deliveryChannel} />
                 <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2">
                   <p className="text-xs text-[var(--color-text-secondary)]">Статус / результат доставки</p>
-                  <TableStatusText tone={deliveryResultToneMap[selectedReportResult ?? 'Не доставлено']} className="mt-1 block">
+                  <TableStatusText tone={getStatusDescriptor(selectedReportResult ?? 'Не доставлено')?.tone === 'danger' ? 'danger' : 'neutral'} className="mt-1 block">
                     {selectedReportResult ?? '—'}
                   </TableStatusText>
                 </div>

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { PageShell } from '../layout/PageShell';
 import { PageToolbar } from '../layout/PageToolbar';
-import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter } from '../ui';
+import { Badge, Button, DataTable, FilterBar, Pagination, SearchInput, SelectFilter, StatusBadge } from '../ui';
 import type { Report } from '../../data/types';
 
 const pageSize = 10;
@@ -18,11 +18,6 @@ const reportTypeBadgeVariant: Partial<Record<Report['reportType'], 'info' | 'suc
 const deliveryChannelBadgeVariant: Partial<Record<Report['deliveryChannel'], 'purple' | 'info'>> = {
   'Личный кабинет': 'purple',
   'Почта': 'info',
-};
-
-const deliveryResultBadgeVariant: Record<'Доставлено' | 'Не доставлено', 'success' | 'warning'> = {
-  'Доставлено': 'success',
-  'Не доставлено': 'warning',
 };
 
 type ReportsPageTemplateProps = {
@@ -294,7 +289,7 @@ export const ReportsPageTemplate = ({
             render: (report) => {
               const result = report.deliveryResult ?? 'Не доставлено';
 
-              return <Badge variant={deliveryResultBadgeVariant[result]}>{result}</Badge>;
+              return <StatusBadge value={result} />;
             },
           },
         ]}

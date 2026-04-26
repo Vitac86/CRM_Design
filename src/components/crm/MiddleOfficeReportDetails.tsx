@@ -1,10 +1,5 @@
-import { Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, TableStatusText } from '../ui';
+import { Button, DownloadIcon, EmptyState, FileIcon, RefreshIcon, TableStatusText, getStatusDescriptor } from '../ui';
 import type { Report } from '../../data/types';
-
-const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'danger'> = {
-  'Доставлен': 'neutral',
-  'Ошибка': 'danger',
-};
 
 type MiddleOfficeReportDetailsProps = {
   report: Report | null;
@@ -38,7 +33,7 @@ export const MiddleOfficeReportDetails = ({ report, onResend, onDownload }: Midd
         <DetailField label="Способ отправки" value={report.deliveryChannel} />
         <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2">
           <p className="text-xs text-[var(--color-text-secondary)]">Статус</p>
-          <TableStatusText tone={statusToneMap[report.deliveryStatus]} className="mt-1 block">
+          <TableStatusText tone={getStatusDescriptor(report.deliveryStatus)?.tone === 'danger' ? 'danger' : 'neutral'} className="mt-1 block">
             {report.deliveryStatus}
           </TableStatusText>
         </div>
