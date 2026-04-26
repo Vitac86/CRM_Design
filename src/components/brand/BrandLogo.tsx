@@ -27,7 +27,7 @@ const logoMap: Record<BrandLogoVariant, Partial<Record<BrandLogoTone, string>>> 
 
 const sizeClassMap: Record<BrandLogoSize, string> = {
   default: 'h-7 w-auto',
-  sidebar: 'h-[76px] w-auto max-w-[230px]',
+  sidebar: 'h-[76px] w-auto max-w-[220px]',
   preview: 'h-8 w-auto',
 };
 
