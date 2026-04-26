@@ -90,10 +90,10 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   };
 
   return (
-    <Card className="space-y-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <Card className="space-y-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-sm">
       <section className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">Договоры</h2>
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Договоры</h2>
           <Button variant="secondary" size="sm" onClick={() => navigate(routes.subjectContractWizard(clientId))}>
             + Добавить договор
           </Button>
@@ -104,7 +104,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
             {
               key: 'number',
               header: 'Номер договора',
-              className: 'min-w-[180px] font-medium text-slate-800',
+              className: 'min-w-[180px] font-medium text-[var(--color-text-primary)]',
               render: (row) => (
                 <button
                   type="button"
@@ -144,35 +144,35 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
         />
       </section>
 
-      <div className="border-t border-slate-100" />
+      <div className="border-t border-[var(--color-border)]" />
 
       <section className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">Счета</h2>
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Счета</h2>
           <Button variant="secondary" size="sm" onClick={() => setIsAccountFormOpen(true)}>
             + Добавить счёт
           </Button>
         </div>
 
         {isAccountFormOpen ? (
-          <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+          <div className="space-y-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-4">
             {accountError ? <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{accountError}</div> : null}
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               <label className="space-y-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Номер счёта</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Номер счёта</span>
                 <input
                   value={accountForm.number}
                   onChange={(event) => setAccountForm((prev) => ({ ...prev, number: event.target.value }))}
-                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Вид счёта</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Вид счёта</span>
                 <select
                   value={accountForm.type}
                   onChange={(event) => setAccountForm((prev) => ({ ...prev, type: event.target.value as ContractProductType }))}
-                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                 >
                   {Object.entries(productTypeLabelMap).map(([key, label]) => (
                     <option key={key} value={key}>
@@ -182,12 +182,12 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
                 </select>
               </label>
               <label className="space-y-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Дата открытия</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Дата открытия</span>
                 <input
                   type="date"
                   value={accountForm.openDate}
                   onChange={(event) => setAccountForm((prev) => ({ ...prev, openDate: event.target.value }))}
-                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                 />
               </label>
             </div>
@@ -213,7 +213,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
 
         <DataTable
           columns={[
-            { key: 'number', header: 'Номер счёта', className: 'min-w-[220px] font-medium text-slate-800' },
+            { key: 'number', header: 'Номер счёта', className: 'min-w-[220px] font-medium text-[var(--color-text-primary)]' },
             {
               key: 'type',
               header: 'Вид счёта',

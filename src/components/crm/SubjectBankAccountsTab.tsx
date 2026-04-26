@@ -112,10 +112,10 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-sm">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Банковские реквизиты</h2>
-          <p className="text-sm text-slate-600">Расчётные и специальные счета клиента</p>
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Банковские реквизиты</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">Расчётные и специальные счета клиента</p>
         </div>
         <Button variant="secondary" size="sm" onClick={() => setShowAddForm(true)}>
           + Добавить счёт
@@ -123,34 +123,34 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
       </div>
 
       {showAddForm ? (
-        <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h3 className="text-base font-semibold text-slate-900">Новый счёт</h3>
+        <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-sm">
+          <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Новый счёт</h3>
 
           {validationError ? <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{validationError}</div> : null}
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Наименование банка *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Наименование банка *</span>
               <input
                 value={formData.bankName}
                 onChange={(event) => setFormData((prev) => ({ ...prev, bankName: event.target.value }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">БИК *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">БИК *</span>
               <input
                 value={formData.bik}
                 onChange={(event) => setFormData((prev) => ({ ...prev, bik: event.target.value }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 font-mono text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Валюта *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Валюта *</span>
               <select
                 value={formData.currency}
                 onChange={(event) => setFormData((prev) => ({ ...prev, currency: event.target.value as AccountForm['currency'] }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="RUB">RUB</option>
                 <option value="USD">USD</option>
@@ -159,36 +159,36 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
               </select>
             </label>
             <label className="space-y-1 md:col-span-2 xl:col-span-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Расчётный счёт *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Расчётный счёт *</span>
               <input
                 value={formData.accountNumber}
                 onChange={(event) => setFormData((prev) => ({ ...prev, accountNumber: event.target.value }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 font-mono text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
             <label className="space-y-1 md:col-span-2 xl:col-span-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Корреспондентский счёт *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Корреспондентский счёт *</span>
               <input
                 value={formData.correspondentAccount}
                 onChange={(event) => setFormData((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 font-mono text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Дата открытия</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Дата открытия</span>
               <input
                 type="date"
                 value={formData.openedAt}
                 onChange={(event) => setFormData((prev) => ({ ...prev, openedAt: event.target.value }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
             <label className="space-y-1 md:col-span-2 xl:col-span-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Назначение</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Назначение</span>
               <input
                 value={formData.purpose}
                 onChange={(event) => setFormData((prev) => ({ ...prev, purpose: event.target.value }))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
           </div>
@@ -205,9 +205,9 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
       ) : null}
 
       {accounts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center shadow-sm">
-          <h3 className="text-base font-semibold text-slate-900">Банковские счета не добавлены</h3>
-          <p className="mt-1 text-sm text-slate-600">Добавьте первый счёт клиента для отображения реквизитов.</p>
+        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center shadow-sm">
+          <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Банковские счета не добавлены</h3>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Добавьте первый счёт клиента для отображения реквизитов.</p>
           <div className="mt-4">
             <Button variant="secondary" size="sm" onClick={() => setShowAddForm(true)}>
               + Добавить счёт
@@ -220,11 +220,11 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
             const isEditing = editingAccountId === account.id;
 
             return (
-              <article key={account.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <article key={account.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <h3 className="text-base font-semibold text-slate-900">{account.bankName}</h3>
-                    <p className="text-sm text-slate-600">{account.purpose}</p>
+                    <h3 className="text-base font-semibold text-[var(--color-text-primary)]">{account.bankName}</h3>
+                    <p className="text-sm text-[var(--color-text-secondary)]">{account.purpose}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {account.isPrimary ? <Badge variant="brand">Основной</Badge> : null}
@@ -232,34 +232,34 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
                 </div>
 
                 {isEditing ? (
-                  <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
+                  <div className="mt-4 space-y-4 border-t border-[var(--color-border)] pt-4">
                     {editingValidationError ? (
                       <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{editingValidationError}</div>
                     ) : null}
 
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                       <label className="space-y-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Наименование банка *</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Наименование банка *</span>
                         <input
                           value={editingFormData.bankName}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, bankName: event.target.value }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
                       </label>
                       <label className="space-y-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">БИК *</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">БИК *</span>
                         <input
                           value={editingFormData.bik}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, bik: event.target.value }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 font-mono text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
                       </label>
                       <label className="space-y-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Валюта *</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Валюта *</span>
                         <select
                           value={editingFormData.currency}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, currency: event.target.value as AccountForm['currency'] }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         >
                           <option value="RUB">RUB</option>
                           <option value="USD">USD</option>
@@ -268,36 +268,36 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
                         </select>
                       </label>
                       <label className="space-y-1 md:col-span-2 xl:col-span-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Расчётный счёт *</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Расчётный счёт *</span>
                         <input
                           value={editingFormData.accountNumber}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, accountNumber: event.target.value }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 font-mono text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
                       </label>
                       <label className="space-y-1 md:col-span-2 xl:col-span-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Корреспондентский счёт *</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Корреспондентский счёт *</span>
                         <input
                           value={editingFormData.correspondentAccount}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 font-mono text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
                       </label>
                       <label className="space-y-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Дата открытия</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Дата открытия</span>
                         <input
                           type="date"
                           value={editingFormData.openedAt}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, openedAt: event.target.value }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
                       </label>
                       <label className="space-y-1 md:col-span-2 xl:col-span-3">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Назначение</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">Назначение</span>
                         <input
                           value={editingFormData.purpose}
                           onChange={(event) => setEditingFormData((prev) => ({ ...prev, purpose: event.target.value }))}
-                          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                          className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                         />
                       </label>
                     </div>
@@ -315,28 +315,28 @@ export const SubjectBankAccountsTab = ({ client, onAddAccount, onUpdateAccounts 
                   <>
                     <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
                       <div>
-                        <dt className="text-slate-500">БИК</dt>
-                        <dd className="font-mono text-slate-900">{account.bik}</dd>
+                        <dt className="text-[var(--color-text-muted)]">БИК</dt>
+                        <dd className="font-mono text-[var(--color-text-primary)]">{account.bik}</dd>
                       </div>
                       <div>
-                        <dt className="text-slate-500">Валюта</dt>
-                        <dd className="text-slate-900">{account.currency}</dd>
+                        <dt className="text-[var(--color-text-muted)]">Валюта</dt>
+                        <dd className="text-[var(--color-text-primary)]">{account.currency}</dd>
                       </div>
                       <div>
-                        <dt className="text-slate-500">Расчётный счёт</dt>
-                        <dd className="font-mono text-slate-900">{account.accountNumber}</dd>
+                        <dt className="text-[var(--color-text-muted)]">Расчётный счёт</dt>
+                        <dd className="font-mono text-[var(--color-text-primary)]">{account.accountNumber}</dd>
                       </div>
                       <div>
-                        <dt className="text-slate-500">Дата открытия</dt>
-                        <dd className="text-slate-900">{account.openedAt}</dd>
+                        <dt className="text-[var(--color-text-muted)]">Дата открытия</dt>
+                        <dd className="text-[var(--color-text-primary)]">{account.openedAt}</dd>
                       </div>
                       <div className="md:col-span-2">
-                        <dt className="text-slate-500">Корреспондентский счёт</dt>
-                        <dd className="font-mono text-slate-900">{account.correspondentAccount}</dd>
+                        <dt className="text-[var(--color-text-muted)]">Корреспондентский счёт</dt>
+                        <dd className="font-mono text-[var(--color-text-primary)]">{account.correspondentAccount}</dd>
                       </div>
                     </dl>
 
-                    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3">
+                    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
                       <Button variant="secondary" size="sm" onClick={() => handleStartEdit(account)}>
                         Редактировать
                       </Button>

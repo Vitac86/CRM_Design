@@ -15,7 +15,7 @@ export const AppErrorPage = () => {
   }, [error]);
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-100/80 p-5">
+    <div className="space-y-4 rounded-2xl bg-[var(--color-muted-surface)] p-5">
       <Card className="p-6">
         <EmptyState
           title="Что-то пошло не так"
