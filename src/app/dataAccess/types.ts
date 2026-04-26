@@ -15,6 +15,7 @@ import type { NavigationRepository } from '../../features/navigation/api/navigat
 import type { HistoryRepository } from '../../features/history/api/historyRepository';
 
 export type DataAccessContextValue = {
+  // Domain repositories only. UI must not read seed arrays directly.
   clients: ClientsRepository;
   requests: RequestsRepository;
   contracts: ContractsRepository;

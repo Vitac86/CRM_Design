@@ -1,6 +1,6 @@
 import { clientContracts as seedContracts, createDefaultContractConfig as createSeedDefaultContractConfig } from '../../../data/clientContracts';
-import { clients as seedClients } from '../../../data/clients';
 import type { ClientContract, ContractProductType, ContractWizardConfig } from '../../../data/types';
+import type { ClientsRepository } from '../../clients/api/clientsRepository';
 import type { ContractsRepository } from '../api/contractsRepository';
 
 const cloneContract = (contract: ClientContract): ClientContract => structuredClone(contract);
@@ -14,7 +14,11 @@ const contractTypePrefixMap: Record<ContractProductType, string> = {
   other: 'IN',
 };
 
-export const createMockContractsRepository = (): ContractsRepository => {
+type CreateMockContractsRepositoryOptions = {
+  clientsRepository: ClientsRepository;
+};
+
+export const createMockContractsRepository = ({ clientsRepository }: CreateMockContractsRepositoryOptions): ContractsRepository => {
   const contractsStore = seedContracts.map(cloneContract);
   const contractConfigsStore = new Map<string, ContractWizardConfig>(
     contractsStore.map((contract) => {
@@ -47,7 +51,13 @@ export const createMockContractsRepository = (): ContractsRepository => {
     nextContractSerial2026 += 1;
     return `${prefix}-2026/${serial}`;
   };
-  const appendAutoContractIfMissing = (clientId: string, type: 'broker' | 'depository', openDate: string) => {
+  const appendAutoContractIfMissing = (
+    clientId: string,
+    type: 'broker' | 'depository',
+    openDate: string,
+    clientEmail?: string,
+    clientType?: string,
+  ) => {
     const hasActiveContract = contractsStore.some(
       (contract) => contract.clientId === clientId && contract.type === type && contract.status === 'active',
     );
@@ -55,7 +65,6 @@ export const createMockContractsRepository = (): ContractsRepository => {
       return;
     }
 
-    const client = seedClients.find((item) => item.id === clientId);
     const contractId = `ctr-${nextContractId}`;
     const contract: ClientContract = {
       id: contractId,
@@ -71,37 +80,41 @@ export const createMockContractsRepository = (): ContractsRepository => {
     contractConfigsStore.set(
       contractId,
       createSeedDefaultContractConfig({
-        clientEmail: client?.email,
-        clientType: client?.type,
+        clientEmail,
+        clientType,
       }),
     );
   };
-  const hydrateDemoContractsForActiveClients = () => {
-    const activeClients = seedClients.filter((client) => client.subjectStatus === 'Активный клиент' && !client.isArchived);
+  const hydrateDemoContractsForActiveClients = async () => {
+    const clients = await clientsRepository.listClients();
+    const activeClients = clients.filter((client) => client.subjectStatus === 'Активный клиент' && !client.isArchived);
 
     activeClients.forEach((client) => {
-      appendAutoContractIfMissing(client.id, 'broker', '2026-01-10');
-      appendAutoContractIfMissing(client.id, 'depository', '2026-01-15');
+      appendAutoContractIfMissing(client.id, 'broker', '2026-01-10', client.email, client.type);
+      appendAutoContractIfMissing(client.id, 'depository', '2026-01-15', client.email, client.type);
     });
   };
-
-  hydrateDemoContractsForActiveClients();
+  const hydrationPromise = hydrateDemoContractsForActiveClients();
 
   return {
     async listContracts() {
+      await hydrationPromise;
       return contractsStore.map(cloneContract);
     },
 
     async getContractById(id: string) {
+      await hydrationPromise;
       const contract = contractsStore.find((item) => item.id === id);
       return contract ? cloneContract(contract) : null;
     },
 
     async listContractsByClientId(clientId: string) {
+      await hydrationPromise;
       return contractsStore.filter((contract) => contract.clientId === clientId).map(cloneContract);
     },
 
     async getPrimaryContractByClientId(clientId: string) {
+      await hydrationPromise;
       const contracts = contractsStore.filter((contract) => contract.clientId === clientId);
       const activeContracts = contracts.filter((contract) => contract.status === 'active');
       const source = activeContracts.length > 0 ? activeContracts : contracts;
@@ -110,6 +123,7 @@ export const createMockContractsRepository = (): ContractsRepository => {
     },
 
     async getContractConfigById(contractId: string) {
+      await hydrationPromise;
       const config = contractConfigsStore.get(contractId);
       return config ? cloneContractConfig(config) : null;
     },
@@ -119,6 +133,7 @@ export const createMockContractsRepository = (): ContractsRepository => {
     },
 
     async createContract(payload) {
+      await hydrationPromise;
       const type = payload.type ?? 'broker';
       const contract: ClientContract = {
         id: `ctr-${nextContractId}`,
@@ -137,6 +152,7 @@ export const createMockContractsRepository = (): ContractsRepository => {
     },
 
     async updateContract(contractId, patch) {
+      await hydrationPromise;
       const contractIndex = contractsStore.findIndex((contract) => contract.id === contractId);
       if (contractIndex < 0) {
         return null;
@@ -151,6 +167,7 @@ export const createMockContractsRepository = (): ContractsRepository => {
     },
 
     async updateContractConfig(contractId, config) {
+      await hydrationPromise;
       const contract = contractsStore.find((item) => item.id === contractId);
       if (!contract) {
         return null;

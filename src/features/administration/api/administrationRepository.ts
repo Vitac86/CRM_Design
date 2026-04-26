@@ -1,9 +1,5 @@
-export type AdministrationSection = {
-  id: string;
-  title: string;
-  description: string;
-  itemsCount: string;
-};
+import type { AdministrationSection } from '../../../data/administration';
+export type { AdministrationSection };
 
 export interface AdministrationRepository {
   listSections(): Promise<AdministrationSection[]>;
