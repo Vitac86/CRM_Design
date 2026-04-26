@@ -132,7 +132,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
               className: 'min-w-[260px] font-medium text-slate-800',
               render: (row) =>
                 row.relatedClientId ? (
-                  <button type="button" className="text-left text-brand hover:underline" onClick={() => navigate(`/subjects/${row.relatedClientId}`)}>
+                  <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(`/subjects/${row.relatedClientId}`)}>
                     {row.relatedName}
                   </button>
                 ) : (
@@ -168,7 +168,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
                 header: 'Субъект',
                 className: 'font-medium text-slate-800',
                 render: (row) => (
-                  <button type="button" className="text-left text-brand hover:underline" onClick={() => navigate(`/subjects/${row.id}`)}>
+                  <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(`/subjects/${row.id}`)}>
                     {row.name}
                   </button>
                 ),

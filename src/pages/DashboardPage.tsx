@@ -142,7 +142,7 @@ export const DashboardPage = () => {
         <section className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] shadow-sm">
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] px-[var(--density-panel-padding)] py-[var(--density-table-header-y)]">
             <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Последние поручения</h2>
-            <Link to="/requests" className="text-sm font-medium text-[var(--color-primary)] transition hover:text-[var(--color-accent)]">
+            <Link to="/requests" className="crm-link text-sm font-medium">
               Все поручения
             </Link>
           </header>

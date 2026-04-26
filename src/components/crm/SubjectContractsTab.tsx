@@ -112,7 +112,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
               render: (row) => (
                 <button
                   type="button"
-                  className="cursor-pointer text-left text-brand-dark hover:underline"
+                  className="crm-link cursor-pointer text-left hover:underline focus-visible:underline"
                   onClick={(event) => {
                     event.stopPropagation();
                     handleOpenContract(row.id);

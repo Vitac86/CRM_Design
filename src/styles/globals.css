@@ -401,6 +401,8 @@
   --color-input-icon: #64748b;
   --color-input-icon-hover: #475569;
   --color-input-focus: #3b82f6;
+  --color-link: #1d4ed8;
+  --color-link-hover: #1e40af;
   --color-control-checked: #2563eb;
   --color-control-disabled: #cbd5e1;
   --color-focus: #3b82f6;
@@ -501,6 +503,8 @@
   --color-input-icon: #64748b;
   --color-input-icon-hover: #475569;
   --color-input-focus: #3b82f6;
+  --color-link: #1d4ed8;
+  --color-link-hover: #1e40af;
   --color-control-checked: #2563eb;
   --color-control-disabled: #cbd5e1;
   --color-focus: #3b82f6;
@@ -599,8 +603,10 @@
   --color-input-icon: #b4c1e2;
   --color-input-icon-hover: #d8e1ff;
   --color-input-focus: #6c78ff;
-  --input-calendar-icon-filter: invert(1) brightness(1.22) saturate(0.86);
-  --input-calendar-icon-filter-hover: invert(1) brightness(1.42) saturate(0.9);
+  --input-calendar-icon-filter: invert(1) brightness(1.34) saturate(0.78);
+  --input-calendar-icon-filter-hover: invert(1) brightness(1.52) saturate(0.84);
+  --color-link: #92a6dd;
+  --color-link-hover: #b1c2f2;
   --color-control-checked: #474efd;
   --color-control-disabled: #556084;
   --color-focus: #474efd;
@@ -699,6 +705,8 @@
   --color-input-icon: #64748b;
   --color-input-icon-hover: #475569;
   --color-input-focus: #242bf5;
+  --color-link: #1f46c8;
+  --color-link-hover: #1a389f;
   --color-control-checked: #242bf5;
   --color-control-disabled: #cbd5e1;
   --color-focus: #242bf5;
@@ -797,6 +805,8 @@
   --color-input-icon: #6f7789;
   --color-input-icon-hover: #4f5b72;
   --color-input-focus: #2f57b0;
+  --color-link: #2f57b0;
+  --color-link-hover: #24458b;
   --color-control-checked: #2f57b0;
   --color-control-disabled: #d2cabd;
   --color-focus: #2f57b0;
@@ -895,8 +905,10 @@
   --color-input-icon: #9fb1cf;
   --color-input-icon-hover: #c5d3ea;
   --color-input-focus: #4d78ff;
-  --input-calendar-icon-filter: invert(1) brightness(1.14) saturate(0.8);
-  --input-calendar-icon-filter-hover: invert(1) brightness(1.32) saturate(0.88);
+  --input-calendar-icon-filter: invert(1) brightness(1.26) saturate(0.74);
+  --input-calendar-icon-filter-hover: invert(1) brightness(1.44) saturate(0.82);
+  --color-link: #8eaadf;
+  --color-link-hover: #acc3f0;
   --color-control-checked: #4d78ff;
   --color-control-disabled: #5e6f8c;
   --color-focus: #4d78ff;
@@ -1232,6 +1244,12 @@ body {
     color-scheme: dark;
   }
 
+  :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time'])::-webkit-calendar-picker-indicator,
+  :root[data-theme='investica-command'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time'])::-webkit-calendar-picker-indicator {
+    opacity: 0.78;
+    filter: var(--input-calendar-icon-filter);
+  }
+
   :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):hover::-webkit-calendar-picker-indicator,
   :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):focus-visible::-webkit-calendar-picker-indicator,
   :root[data-theme='investica-command'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):hover::-webkit-calendar-picker-indicator,
@@ -1247,6 +1265,24 @@ body {
 }
 
 @layer components {
+  .crm-link {
+    color: var(--color-link);
+    text-decoration-color: color-mix(in srgb, var(--color-link) 55%, transparent);
+    text-underline-offset: 0.16em;
+    transition: color 0.16s ease, text-decoration-color 0.16s ease;
+  }
+
+  .crm-link:hover {
+    color: var(--color-link-hover);
+    text-decoration-color: color-mix(in srgb, var(--color-link-hover) 65%, transparent);
+  }
+
+  .crm-link:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-focus) 42%, transparent);
+    outline-offset: 2px;
+    border-radius: 0.3rem;
+  }
+
   .crm-card {
     border-color: color-mix(in srgb, var(--color-border) 88%, white 4%);
     background:
@@ -1606,6 +1642,22 @@ body {
   .hover\:text-brand:hover,
   .hover\:text-brand-dark:hover {
     color: var(--color-primary) !important;
+  }
+
+  .text-blue-500,
+  .text-blue-600,
+  .text-blue-700,
+  .text-indigo-500,
+  .text-indigo-600,
+  .text-indigo-700 {
+    color: var(--color-link) !important;
+  }
+
+  .hover\:text-blue-600:hover,
+  .hover\:text-blue-700:hover,
+  .hover\:text-indigo-600:hover,
+  .hover\:text-indigo-700:hover {
+    color: var(--color-link-hover) !important;
   }
 
   input[type='checkbox'].text-brand,
