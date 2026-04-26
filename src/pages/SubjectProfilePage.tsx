@@ -549,17 +549,17 @@ export const SubjectProfilePage = () => {
           {hasExtraClientCodes ? (
             <ProfileSection title="Идентификаторы клиента">
               <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm">
-                  <span className="text-slate-500">Основной код</span>
-                  <span className="font-mono font-semibold text-slate-900">{currentClient.code}</span>
+                <div className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-1.5 text-sm">
+                  <span className="text-[var(--color-text-secondary)]">Основной код</span>
+                  <span className="font-mono font-semibold text-[var(--color-text-primary)]">{currentClient.code}</span>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Дополнительные коды</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Дополнительные коды</p>
                   <div className="flex flex-wrap gap-2">
                     {visibleAdditionalCodes.map((code) => (
                       <span
                         key={code}
-                        className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-mono text-slate-700"
+                        className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-2.5 py-1 text-xs font-mono text-[var(--color-text-secondary)]"
                       >
                         {code}
                       </span>
@@ -570,7 +570,7 @@ export const SubjectProfilePage = () => {
                   <button
                     type="button"
                     onClick={() => setShowAllClientCodes((current) => !current)}
-                    className="text-xs font-medium text-slate-600 transition hover:text-slate-900"
+                    className="text-xs font-medium text-[var(--color-text-secondary)] transition hover:text-[var(--color-text-primary)]"
                   >
                     {showAllClientCodes ? 'Скрыть' : 'Показать все коды'}
                   </button>
@@ -666,13 +666,13 @@ export const SubjectProfilePage = () => {
                     </>
                   )}
                   <label className="space-y-1">
-                    <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Тип клиента</span>
+                    <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Тип клиента</span>
                     <select
                       value={currentClient.type}
                       onChange={(event) =>
                         setDraftClient((prev) => (prev ? { ...prev, type: event.target.value as ClientType } : prev))
                       }
-                      className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                      className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                     >
                       {clientTypeOptions.map((option) => (
                         <option key={option} value={option}>
@@ -682,13 +682,13 @@ export const SubjectProfilePage = () => {
                     </select>
                   </label>
                   <label className="space-y-1">
-                    <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Признак резидентства</span>
+                    <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Признак резидентства</span>
                     <select
                       value={currentClient.residency}
                       onChange={(event) =>
                         setDraftClient((prev) => (prev ? { ...prev, residency: event.target.value as ResidencyStatus } : prev))
                       }
-                      className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                      className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                     >
                       {residencyOptions.map((option) => (
                         <option key={option} value={option}>
@@ -764,13 +764,13 @@ export const SubjectProfilePage = () => {
                     </>
                   )}
                   <label className="space-y-1">
-                    <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Признак инвестора</span>
+                    <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Признак инвестора</span>
                     <select
                       value={currentClient.qualification ? 'qualified' : 'not-qualified'}
                       onChange={(event) =>
                         setDraftClient((prev) => (prev ? { ...prev, qualification: event.target.value === 'qualified' } : prev))
                       }
-                      className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                      className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                     >
                       <option value="qualified">Квалифицированный</option>
                       <option value="not-qualified">Неквалифицированный</option>
@@ -813,7 +813,7 @@ export const SubjectProfilePage = () => {
           <ProfileSection title="Адреса">
             <div className="space-y-5">
               <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Адрес регистрации</p>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Адрес регистрации</p>
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {isEditing ? (
                     <>
@@ -850,9 +850,9 @@ export const SubjectProfilePage = () => {
                 return (
                   <div key={kind}>
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{isLocation ? 'Адрес местонахождения' : 'Почтовый адрес'}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">{isLocation ? 'Адрес местонахождения' : 'Почтовый адрес'}</p>
                       {isEditing ? (
-                        <label className="inline-flex items-center gap-2 text-xs text-slate-700">
+                        <label className="inline-flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
                           <input type="checkbox" checked={synced} onChange={(event) => handleAddressSyncToggle(isLocation ? 'locationMatchesRegistration' : 'mailingMatchesRegistration', event.target.checked)} />
                           Совпадает с адресом регистрации
                         </label>
@@ -900,11 +900,11 @@ export const SubjectProfilePage = () => {
                 </Button>
               </div>
               {representativesWithSubjects.length === 0 ? (
-                <p className="text-sm text-slate-500">Представители не добавлены.</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">Представители не добавлены.</p>
               ) : (
                 representativesWithSubjects.map((representative) => (
-                  <div key={representative.id} className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm md:grid-cols-4">
-                    <p className="text-slate-500">{representative.role}</p>
+                  <div key={representative.id} className="grid gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm md:grid-cols-4">
+                    <p className="text-[var(--color-text-secondary)]">{representative.role}</p>
                     <button type="button" className="crm-link text-left font-medium hover:underline focus-visible:underline" onClick={() => representative.subject && navigate(`/subjects/${representative.subject.id}`)}>
                       {representative.subject?.name ?? '—'}
                     </button>
@@ -1039,7 +1039,7 @@ export const SubjectProfilePage = () => {
                       }
                     />
                     <label className="space-y-1">
-                      <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Налоговый резидент</span>
+                      <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Налоговый резидент</span>
                       <select
                         value={currentClient.individualDetails?.taxResident == null ? '' : currentClient.individualDetails.taxResident ? 'yes' : 'no'}
                         onChange={(event) =>
@@ -1060,7 +1060,7 @@ export const SubjectProfilePage = () => {
                               : prev,
                           )
                         }
-                        className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                       >
                         <option value="">—</option>
                         <option value="yes">Да</option>
@@ -1068,7 +1068,7 @@ export const SubjectProfilePage = () => {
                       </select>
                     </label>
                     <label className="space-y-1">
-                      <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Дееспособность</span>
+                      <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Дееспособность</span>
                       <select
                         value={currentClient.individualDetails?.legalCapacity ?? ''}
                         onChange={(event) =>
@@ -1089,7 +1089,7 @@ export const SubjectProfilePage = () => {
                               : prev,
                           )
                         }
-                        className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                        className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                       >
                         <option value="">—</option>
                         <option value="Полная">Полная</option>
@@ -1220,27 +1220,27 @@ export const SubjectProfilePage = () => {
           {!isEditing ? (
             <>
               <ProfileSection title="Комплаенс">
-                <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-3.5">
+                <div className="space-y-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
                   <div className="space-y-1">
-                    <h4 className="text-sm font-semibold text-slate-900">Комплаенс</h4>
-                    <p className="text-sm text-slate-500">Текущая информация по статусу</p>
+                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">Комплаенс</h4>
+                    <p className="text-sm text-[var(--color-text-secondary)]">Текущая информация по статусу</p>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                     <div className="space-y-1">
-                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Статус комплаенса</p>
+                      <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Статус комплаенса</p>
                       <Badge variant={getComplianceBadgeVariant(client.complianceStatus)}>{client.complianceStatus}</Badge>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Комментарий</p>
-                      <p className="text-sm text-slate-700">{client.complianceComment?.trim() || '—'}</p>
+                      <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Комментарий</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{client.complianceComment?.trim() || '—'}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Дата прохождения</p>
-                      <p className="text-sm text-slate-700">{client.complianceDate || '—'}</p>
+                      <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Дата прохождения</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{client.complianceDate || '—'}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Комплаенс офицер</p>
-                      <p className="text-sm text-slate-700">{client.complianceOfficer?.trim() || '—'}</p>
+                      <p className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Комплаенс офицер</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{client.complianceOfficer?.trim() || '—'}</p>
                     </div>
                   </div>
                   {shouldShowSendToComplianceButton(client.complianceStatus) ? (
@@ -1302,16 +1302,16 @@ export const SubjectProfilePage = () => {
           <ProfileSection title="Комментарий менеджера">
             {isEditing ? (
               <label className="space-y-1">
-                <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Комментарий менеджера</span>
+                <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Комментарий менеджера</span>
                 <textarea
                   value={currentClient.managerComment ?? ''}
                   onChange={(event) => setDraftClient((prev) => (prev ? { ...prev, managerComment: event.target.value } : prev))}
-                  className="min-h-20 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                  className="min-h-20 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   placeholder="—"
                 />
               </label>
             ) : (
-              <p className="text-sm leading-6 whitespace-pre-wrap text-slate-700">{client.managerComment?.trim() || '—'}</p>
+              <p className="text-sm leading-6 whitespace-pre-wrap text-[var(--color-text-secondary)]">{client.managerComment?.trim() || '—'}</p>
             )}
           </ProfileSection>
 
@@ -1331,10 +1331,10 @@ export const SubjectProfilePage = () => {
       )}
 
       {isRepresentativeModalOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4" role="dialog" aria-modal="true" aria-label="Добавить представителя">
-          <div className="w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[color:color-mix(in_srgb,var(--color-text-primary)_28%,transparent)] p-4" role="dialog" aria-modal="true" aria-label="Добавить представителя">
+          <div className="w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-xl">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-base font-semibold text-slate-900">Добавить представителя</h3>
+              <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Добавить представителя</h3>
               <Button variant="secondary" size="sm" onClick={() => setIsRepresentativeModalOpen(false)}>
                 Закрыть
               </Button>
@@ -1342,8 +1342,8 @@ export const SubjectProfilePage = () => {
             <div className="space-y-4">
               <FormField label="Поиск субъекта" value={representativeQuery} onChange={(event) => setRepresentativeQuery(event.target.value)} placeholder="Введите ФИО или код" />
               <label className="space-y-1">
-                <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Субъект</span>
-                <select value={newRepresentativeSubjectId} onChange={(event) => setNewRepresentativeSubjectId(event.target.value)} className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm">
+                <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Субъект</span>
+                <select value={newRepresentativeSubjectId} onChange={(event) => setNewRepresentativeSubjectId(event.target.value)} className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm">
                   <option value="">Выберите субъекта</option>
                   {selectableSubjects.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -1354,8 +1354,8 @@ export const SubjectProfilePage = () => {
               </label>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-1">
-                  <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Роль</span>
-                  <select value={newRepresentativeRole} onChange={(event) => setNewRepresentativeRole(event.target.value as ClientRepresentativeRole)} className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm">
+                  <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Роль</span>
+                  <select value={newRepresentativeRole} onChange={(event) => setNewRepresentativeRole(event.target.value as ClientRepresentativeRole)} className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm">
                     {availableRepresentativeRoles.map((role) => (
                       <option key={role} value={role}>
                         {role}
@@ -1365,7 +1365,7 @@ export const SubjectProfilePage = () => {
                 </label>
                 <FormField label="Основание полномочий" value={newRepresentativeAuthorityBasis} onChange={(event) => setNewRepresentativeAuthorityBasis(event.target.value)} />
                 <FormField label="Срок действия полномочий" type="date" value={newRepresentativeAuthorityValidUntil} disabled={newRepresentativeWithoutExpiration} onChange={(event) => setNewRepresentativeAuthorityValidUntil(event.target.value)} />
-                <label className="inline-flex items-center gap-2 pt-6 text-sm text-slate-700">
+                <label className="inline-flex items-center gap-2 pt-6 text-sm text-[var(--color-text-secondary)]">
                   <input type="checkbox" checked={newRepresentativeWithoutExpiration} onChange={(event) => setNewRepresentativeWithoutExpiration(event.target.checked)} />
                   Без срока действия
                 </label>
@@ -1381,7 +1381,7 @@ export const SubjectProfilePage = () => {
       ) : null}
 
       {toastMessage && (
-        <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
+        <div className="fixed right-6 bottom-6 z-50 rounded-md bg-[var(--color-text-primary)] px-4 py-3 text-sm text-[var(--color-surface)] shadow-lg">{toastMessage}</div>
       )}
     </div>
   );

@@ -32,7 +32,7 @@ const amlBadgeVariant = (amlStatus: string) => {
 const terminalIcon = (type: 'QUIK Desktop' | 'QUIK Mobile (Android)' | 'WebQUIK') => {
   if (type === 'QUIK Desktop') {
     return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg viewBox="0 0 24 24" className="h-5 w-5 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="3" y="4" width="18" height="12" rx="2" />
         <path d="M8 20h8M12 16v4" />
       </svg>
@@ -41,7 +41,7 @@ const terminalIcon = (type: 'QUIK Desktop' | 'QUIK Mobile (Android)' | 'WebQUIK'
 
   if (type === 'QUIK Mobile (Android)') {
     return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg viewBox="0 0 24 24" className="h-5 w-5 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="7" y="2.5" width="10" height="19" rx="2.2" />
         <path d="M10.5 5.5h3M11.8 18.5h.4" />
       </svg>
@@ -49,7 +49,7 @@ const terminalIcon = (type: 'QUIK Desktop' | 'QUIK Mobile (Android)' | 'WebQUIK'
   }
 
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" strokeWidth="1.8">
       <circle cx="12" cy="12" r="9" />
       <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
     </svg>
@@ -126,15 +126,15 @@ export const TradingCardPage = () => {
   }
 
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl bg-slate-100/80 p-4 sm:p-5">
+    <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)] p-4 sm:p-5">
       <Card className="p-4">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10 text-base font-semibold text-brand-dark">
             {getInitials(client.name)}
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-slate-900">{client.name}</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">{client.name}</h1>
+            <p className="text-sm text-[var(--color-text-secondary)]">
               {client.code} · {profile.brokerContractNumber}
             </p>
           </div>
@@ -157,75 +157,75 @@ export const TradingCardPage = () => {
           {activeTab === 'params' ? (
             <>
               <Card className="p-4">
-                <h2 className="mb-3 text-sm font-semibold text-slate-900">Квалификация и риск</h2>
+                <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Квалификация и риск</h2>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Признак инвестора</p>
-                    <p className="mt-1 text-sm text-slate-900">
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Признак инвестора</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">
                       {profile.investorStatus === 'Квал' ? 'Квалифицированный' : 'Неквалифицированный'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Уровень риска</p>
-                    <p className="mt-1 text-sm text-slate-900">{profile.riskLevel}</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Уровень риска</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">{profile.riskLevel}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Дата присвоения уровня</p>
-                    <p className="mt-1 text-sm text-slate-900">{profile.riskAssignedAt}</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Дата присвоения уровня</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">{profile.riskAssignedAt}</p>
                   </div>
                 </div>
               </Card>
 
               <Card className="p-4">
-                <h2 className="mb-3 text-sm font-semibold text-slate-900">ПОД / ФТ</h2>
+                <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">ПОД / ФТ</h2>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Статус</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Статус</p>
                     <div className="mt-1">
                       <Badge variant={amlBadgeVariant(profile.amlStatus)}>{profile.amlStatus}</Badge>
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Причина блокировки / заморозки</p>
-                    <p className="mt-1 text-sm text-slate-900">{profile.amlFreezeReason || '—'}</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Причина блокировки / заморозки</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">{profile.amlFreezeReason || '—'}</p>
                   </div>
                 </div>
               </Card>
 
               <Card className="p-4">
-                <h2 className="mb-3 text-sm font-semibold text-slate-900">Контактные данные</h2>
+                <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Контактные данные</h2>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Номера телефонов</p>
-                    <p className="mt-1 text-sm text-slate-900">{client.phone || '—'}</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Номера телефонов</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">{client.phone || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">E-mail</p>
-                    <p className="mt-1 text-sm text-slate-900">{client.email || '—'}</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">E-mail</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">{client.email || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Адрес</p>
-                    <p className="mt-1 text-sm text-slate-900">{client.address || '—'}</p>
+                    <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Адрес</p>
+                    <p className="mt-1 text-sm text-[var(--color-text-primary)]">{client.address || '—'}</p>
                   </div>
                 </div>
               </Card>
 
               <Card className="p-4">
-                <h2 className="mb-3 text-sm font-semibold text-slate-900">Распорядитель счёта</h2>
+                <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Распорядитель счёта</h2>
                 <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-muted-surface)] text-xs font-semibold text-[var(--color-text-secondary)]">
                       {getInitials(profile.accountDisposer.name)}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{profile.accountDisposer.name}</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm font-semibold text-[var(--color-text-primary)]">{profile.accountDisposer.name}</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">
                         {profile.accountDisposer.role} · {profile.accountDisposer.powerOfAttorney}
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-1 text-sm text-slate-600">
+                  <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
                     <p>Полномочия с: {profile.accountDisposer.authorityFrom}</p>
                     <p>Полномочия до: {profile.accountDisposer.authorityUntil}</p>
                     <Badge variant={statusBadgeVariant(profile.accountDisposer.status)}>
@@ -236,22 +236,22 @@ export const TradingCardPage = () => {
               </Card>
 
               <Card className="p-4">
-                <h2 className="mb-2 text-sm font-semibold text-slate-900">Кодовое слово</h2>
-                <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm tracking-wider text-slate-700">
+                <h2 className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">Кодовое слово</h2>
+                <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2 text-sm tracking-wider text-[var(--color-text-secondary)]">
                   {profile.codeWord}
                 </div>
               </Card>
 
               <Card className="p-4">
-                <h2 className="mb-3 text-sm font-semibold text-slate-900">Способы подачи поручений</h2>
+                <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">Способы подачи поручений</h2>
                 <div className="grid gap-3 md:grid-cols-2">
                   {profile.orderMethods.map((method) => (
-                    <div key={method.id} className="rounded-lg border border-slate-200 bg-white p-3">
+                    <div key={method.id} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
                       <div className="mb-2 flex items-start justify-between gap-2">
-                        <p className="text-sm font-semibold text-slate-900">{method.title}</p>
+                        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{method.title}</p>
                         <Badge variant={statusBadgeVariant(method.status)}>{method.status}</Badge>
                       </div>
-                      <p className="text-sm text-slate-600">{method.description}</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{method.description}</p>
                     </div>
                   ))}
                 </div>
@@ -260,7 +260,7 @@ export const TradingCardPage = () => {
           ) : (
             <Card className="p-4">
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold text-slate-900">Терминалы и подключения</h2>
+                <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Терминалы и подключения</h2>
                 <Button size="sm" onClick={() => setToastMessage('Выдача терминала добавлена как заглушка')}>
                   + Выдать терминал
                 </Button>
@@ -270,13 +270,13 @@ export const TradingCardPage = () => {
                 {profile.terminals.map((terminal) => (
                   <div
                     key={terminal.id}
-                    className="grid gap-3 rounded-lg border border-slate-200 bg-white p-3 md:grid-cols-[1fr_auto] md:items-center"
+                    className="grid gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3 md:grid-cols-[1fr_auto] md:items-center"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 rounded-md bg-slate-100 p-2">{terminalIcon(terminal.type)}</div>
+                      <div className="mt-0.5 rounded-md bg-[var(--color-muted-surface)] p-2">{terminalIcon(terminal.type)}</div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">{terminal.type}</p>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{terminal.type}</p>
+                        <p className="text-sm text-[var(--color-text-secondary)]">
                           Логин: {terminal.login} · {terminal.uid} · Выдан: {terminal.issuedAt}
                           {terminal.ip ? ` · IP: ${terminal.ip}` : ''}
                           {terminal.certificateUntil ? ` · Сертификат: до ${terminal.certificateUntil}` : ''}
@@ -305,18 +305,18 @@ export const TradingCardPage = () => {
       </Card>
 
       {toastMessage && (
-        <div className="fixed right-6 bottom-6 z-50 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">{toastMessage}</div>
+        <div className="fixed right-6 bottom-6 z-50 rounded-md bg-[var(--color-text-primary)] px-4 py-3 text-sm text-[var(--color-surface)] shadow-lg">{toastMessage}</div>
       )}
 
       {selectedTerminal && isQuikMobileTerminal(selectedTerminal.type) && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4" role="dialog" aria-modal="true" aria-labelledby="reset-password-modal-title" aria-describedby="reset-password-modal-description">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[color:color-mix(in_srgb,var(--color-text-primary)_28%,transparent)] p-4" role="dialog" aria-modal="true" aria-labelledby="reset-password-modal-title" aria-describedby="reset-password-modal-description">
           <div
-            className="w-full max-w-sm max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xl"
+            className="w-full max-w-sm max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:p-5 shadow-xl"
           >
-            <h3 id="reset-password-modal-title" className="text-base font-semibold text-slate-900">
+            <h3 id="reset-password-modal-title" className="text-base font-semibold text-[var(--color-text-primary)]">
               Обновить пароль?
             </h3>
-            <p id="reset-password-modal-description" className="mt-2 text-sm text-slate-600">
+            <p id="reset-password-modal-description" className="mt-2 text-sm text-[var(--color-text-secondary)]">
               Вы уверены, что хотите обновить пароль для QUIK Mobile?
             </p>
             <div className="mt-5 flex flex-wrap justify-end gap-2">
