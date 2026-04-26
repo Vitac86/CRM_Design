@@ -20,12 +20,14 @@ export const DataAccessContext = createContext<DataAccessContextValue | undefine
 
 export const DataAccessProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo<DataAccessContextValue>(() => {
+    // Keep a single composition root for data access so mock repositories can be
+    // replaced by API-backed implementations without touching page components.
     const clientsRepository = createMockClientsRepository();
 
     return {
       clients: clientsRepository,
       requests: createMockRequestsRepository(),
-      contracts: createMockContractsRepository(),
+      contracts: createMockContractsRepository({ clientsRepository }),
       dashboard: createMockDashboardRepository(),
       accounts: createMockAccountsRepository(),
       agents: createMockAgentsRepository({ clientsRepository }),

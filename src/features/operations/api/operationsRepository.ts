@@ -1,28 +1,7 @@
-export type BrokerageContractStatus = 'Активен' | 'Приостановлен' | 'Закрыт';
+import type { BrokerageContract, BrokerageContractStatus } from '../../../data/brokerage';
+import type { TrustContract, TrustContractStatus } from '../../../data/trustManagement';
 
-export type BrokerageContract = {
-  id: string;
-  clientId: string;
-  contractId: string;
-  contractNumber: string;
-  clientCode: string;
-  clientName: string;
-  manager: string;
-  openedAt: string;
-  status: BrokerageContractStatus;
-};
-
-export type TrustContractStatus = 'Активен' | 'На подписании' | 'Закрыт';
-
-export type TrustContract = {
-  id: string;
-  contractNumber: string;
-  clientName: string;
-  strategy: string;
-  portfolioValue: string;
-  startDate: string;
-  status: TrustContractStatus;
-};
+export type { BrokerageContract, BrokerageContractStatus, TrustContract, TrustContractStatus };
 
 export interface OperationsRepository {
   listBrokerageContracts(): Promise<BrokerageContract[]>;
