@@ -180,7 +180,7 @@ export const AgentsPage = () => {
             header: 'Субъект',
             className: 'font-medium text-slate-800',
             render: (row) => (
-              <button type="button" className="text-left text-brand hover:underline" onClick={() => navigate(`/subjects/${row.subjectId}`)}>
+              <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(`/subjects/${row.subjectId}`)}>
                 {row.fullName}
               </button>
             ),

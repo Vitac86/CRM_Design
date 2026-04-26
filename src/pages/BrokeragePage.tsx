@@ -146,7 +146,7 @@ export const BrokeragePage = () => {
             render: (contract) => (
               <Link
                 to={`/subjects/${contract.clientId}/contract-wizard?contractId=${contract.contractId}`}
-                className="text-brand hover:text-brand-dark hover:underline focus-visible:underline"
+                className="crm-link hover:underline focus-visible:underline"
               >
                 {contract.contractNumber}
               </Link>
@@ -160,7 +160,7 @@ export const BrokeragePage = () => {
             render: (contract) => (
               <Link
                 to={`/subjects/${contract.clientId}`}
-                className="text-brand hover:text-brand-dark hover:underline focus-visible:underline"
+                className="crm-link hover:underline focus-visible:underline"
               >
                 {contract.clientName}
               </Link>

@@ -905,7 +905,7 @@ export const SubjectProfilePage = () => {
                 representativesWithSubjects.map((representative) => (
                   <div key={representative.id} className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm md:grid-cols-4">
                     <p className="text-slate-500">{representative.role}</p>
-                    <button type="button" className="text-left font-medium text-brand hover:underline" onClick={() => representative.subject && navigate(`/subjects/${representative.subject.id}`)}>
+                    <button type="button" className="crm-link text-left font-medium hover:underline focus-visible:underline" onClick={() => representative.subject && navigate(`/subjects/${representative.subject.id}`)}>
                       {representative.subject?.name ?? '—'}
                     </button>
                     <p>{representative.authorityBasis || '—'}</p>
