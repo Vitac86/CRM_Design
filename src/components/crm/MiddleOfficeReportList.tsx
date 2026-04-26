@@ -1,11 +1,6 @@
-import { Badge, EmptyState, TableStatusText } from '../ui';
+import { Badge, EmptyState, TableStatusText, getStatusDescriptor } from '../ui';
 import type { Report } from '../../data/types';
 import { cn } from '../ui/cn';
-
-const statusToneMap: Record<Report['deliveryStatus'], 'neutral' | 'danger'> = {
-  'Доставлен': 'neutral',
-  'Ошибка': 'danger',
-};
 
 type MiddleOfficeReportListProps = {
   reports: Report[];
@@ -46,7 +41,7 @@ export const MiddleOfficeReportList = ({ reports, selectedReportId, onSelect }: 
                   <Badge className="px-1.5 py-0 leading-4" variant="neutral">
                     {report.reportType}
                   </Badge>
-                  <TableStatusText tone={statusToneMap[report.deliveryStatus]} className="text-xs">
+                  <TableStatusText tone={getStatusDescriptor(report.deliveryStatus)?.tone === 'danger' ? 'danger' : 'neutral'} className="text-xs">
                     {report.deliveryStatus}
                   </TableStatusText>
                 </div>
