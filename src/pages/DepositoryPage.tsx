@@ -273,7 +273,7 @@ export const DepositoryPage = () => {
         errorFallback={error ? <p className="text-sm text-rose-600">{error}</p> : undefined}
       >
         <SplitContentShell className="xl:grid-cols-[1.65fr_1fr]">
-        <PageSection className="max-h-[620px] space-y-2 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3">
+          <PageSection className="max-h-[620px] space-y-2 overflow-y-auto p-3">
           {filteredReports.length === 0 ? (
             <EmptyState title="Отчёты не найдены" description="Измените параметры поиска или фильтров." className="h-[460px]" />
           ) : (
@@ -311,9 +311,9 @@ export const DepositoryPage = () => {
               );
             })
           )}
-        </PageSection>
+          </PageSection>
 
-        <PageSection className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 xl:sticky xl:top-4">
+          <PageSection className="p-4 xl:sticky xl:top-4">
           {!selectedReport ? (
             <EmptyState title="Отчёты не найдены" description="Для текущих параметров поиска и фильтров нет доступных отчётов." className="h-[460px]" />
           ) : (
@@ -362,7 +362,7 @@ export const DepositoryPage = () => {
               </div>
             </div>
           )}
-        </PageSection>
+          </PageSection>
         </SplitContentShell>
       </AsyncContent>
 
