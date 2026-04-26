@@ -551,7 +551,7 @@ export const RequestsPage = () => {
   return (
     <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-semibold text-slate-900">Поручения</h1>
+        <h1 className="font-heading text-2xl font-semibold text-[var(--color-text-primary)]">Поручения</h1>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="secondary" onClick={handleExport} disabled={filteredRequests.length === 0}>
             Экспорт
@@ -577,7 +577,7 @@ export const RequestsPage = () => {
       ) : null}
 
       {isCreateFormOpen ? (
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="space-y-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm">
           {clientsError ? (
             <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{clientsError}</div>
           ) : null}
@@ -585,11 +585,11 @@ export const RequestsPage = () => {
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Тип поручения</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Тип поручения</span>
               <select
                 value={createType}
                 onChange={(event) => setCreateType(event.target.value as RequestFormType)}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="withdrawal">Поручение на вывод ДС</option>
                 <option value="transfer">Поручение на перевод ДС</option>
@@ -597,12 +597,12 @@ export const RequestsPage = () => {
             </label>
 
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Клиент</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Клиент</span>
               <select
                 value={selectedClientId}
                 onChange={(event) => setSelectedClientId(event.target.value)}
                 disabled={isLoadingClients || Boolean(clientsError)}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="">Выберите клиента</option>
                 {clientOptions.map((client) => (
@@ -612,12 +612,12 @@ export const RequestsPage = () => {
             </label>
 
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Договор</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Договор</span>
               <select
                 value={selectedContractId}
                 onChange={(event) => setSelectedContractId(event.target.value)}
                 disabled={!selectedClientId || availableContracts.length === 0}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 disabled:bg-slate-100 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] disabled:bg-[var(--color-muted-surface)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="">Выберите договор</option>
                 {availableContracts.map((contract) => (
@@ -627,16 +627,16 @@ export const RequestsPage = () => {
             </label>
 
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Статус</span>
-              <input value="Ожидает" disabled className="h-10 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 text-sm text-slate-600" />
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Статус</span>
+              <input value="Ожидает" disabled className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 text-sm text-[var(--color-text-secondary)]" />
             </label>
 
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Источник</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Источник</span>
               <select
                 value={selectedSource}
                 onChange={(event) => setSelectedSource(event.target.value as Request['source'])}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="Личный кабинет">Личный кабинет</option>
                 <option value="Почта">Почта</option>
@@ -645,22 +645,22 @@ export const RequestsPage = () => {
             </label>
 
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Сумма *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Сумма *</span>
               <input
                 inputMode="decimal"
                 placeholder="0,00"
                 value={requestAmount}
                 onChange={(event) => setRequestAmount(formatAmountByDigits(event.target.value))}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               />
             </label>
 
             <label className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Валюта *</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Валюта *</span>
               <select
                 value={requestCurrency}
                 onChange={(event) => setRequestCurrency(event.target.value as CurrencyCode | '')}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
               >
                 <option value="">Выберите валюту</option>
                 {requestCurrencyOptions.map((currency) => (
@@ -677,15 +677,15 @@ export const RequestsPage = () => {
           ) : null}
 
           {createType === 'withdrawal' && selectedContract ? (
-            <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-sm font-medium text-slate-800">Банковские реквизиты клиента</p>
+            <div className="space-y-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-3">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">Банковские реквизиты клиента</p>
               {selectedBankAccount ? (
                 <div className="space-y-3">
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                     <input type="radio" checked={withdrawalBankSource === 'client'} onChange={() => setWithdrawalBankSource('client')} />
                     Использовать реквизиты клиента
                   </label>
-                  <div className="grid gap-2 rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-700 md:grid-cols-2">
+                  <div className="grid gap-2 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm text-[var(--color-text-secondary)] md:grid-cols-2">
                     <p><span className="font-medium">Банк:</span> {selectedBankAccount.bankName}</p>
                     <p><span className="font-medium">БИК:</span> {selectedBankAccount.bik}</p>
                     <p><span className="font-medium">Р/с:</span> {selectedBankAccount.accountNumber}</p>
@@ -698,7 +698,7 @@ export const RequestsPage = () => {
                 </p>
               )}
 
-              <label className="flex items-center gap-2 text-sm text-slate-700">
+              <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                 <input type="radio" checked={withdrawalBankSource === 'manual'} onChange={() => setWithdrawalBankSource('manual')} />
                 Ввести реквизиты вручную
               </label>
@@ -709,25 +709,25 @@ export const RequestsPage = () => {
                     placeholder="Банк"
                     value={manualBankDetails.bankName}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, bankName: event.target.value }))}
-                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   />
                   <input
                     placeholder="БИК"
                     value={manualBankDetails.bik}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, bik: event.target.value }))}
-                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   />
                   <input
                     placeholder="Расчётный счёт"
                     value={manualBankDetails.checkingAccount}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, checkingAccount: event.target.value }))}
-                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   />
                   <input
                     placeholder="Корреспондентский счёт"
                     value={manualBankDetails.correspondentAccount}
                     onChange={(event) => setManualBankDetails((prev) => ({ ...prev, correspondentAccount: event.target.value }))}
-                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   />
                 </div>
               ) : null}
@@ -735,15 +735,15 @@ export const RequestsPage = () => {
           ) : null}
 
           {createType === 'transfer' && selectedContract ? (
-            <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-sm font-medium text-slate-800">Площадки перевода</p>
+            <div className="space-y-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-3">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">Площадки перевода</p>
               <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-end">
                 <label className="space-y-1">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Площадка списания</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Площадка списания</span>
                   <select
                     value={transferFromMarket}
                     onChange={(event) => setTransferFromMarket(event.target.value as TransferMarket)}
-                    className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none"
                   >
                     <option value="Фондовый рынок">Фондовый рынок</option>
                     <option value="Валютный рынок">Валютный рынок</option>
@@ -751,11 +751,11 @@ export const RequestsPage = () => {
                 </label>
                 <Button variant="secondary" onClick={() => setTransferFromMarket((prev) => getOppositeMarket(prev))}>↔︎</Button>
                 <label className="space-y-1">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Площадка зачисления</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Площадка зачисления</span>
                   <input
                     value={getOppositeMarket(transferFromMarket)}
                     disabled
-                    className="h-10 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 text-sm text-slate-700"
+                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 text-sm text-[var(--color-text-secondary)]"
                   />
                 </label>
               </div>
@@ -805,7 +805,7 @@ export const RequestsPage = () => {
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="По коду клиента"
             aria-label="Фильтр по коду клиента"
-            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
+            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-input-placeholder)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-brand focus:ring-2 focus:ring-brand/10"
           />
 
           <input
@@ -813,7 +813,7 @@ export const RequestsPage = () => {
             value={dateFilter}
             onChange={(event) => setDateFilter(event.target.value)}
             aria-label="Фильтр по дате"
-            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm outline-none transition hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
+            className="h-10 w-full min-w-0 sm:w-auto sm:min-w-[200px] rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-medium text-[var(--color-text-secondary)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-brand focus:ring-2 focus:ring-brand/10"
           />
 
           <SelectFilter
@@ -852,7 +852,7 @@ export const RequestsPage = () => {
 
       <DataTable<Request>
         columns={[
-          { key: 'number', header: 'Номер поручения', className: 'font-medium text-slate-800 whitespace-nowrap' },
+          { key: 'number', header: 'Номер поручения', className: 'font-medium text-[var(--color-text-primary)] whitespace-nowrap' },
           { key: 'requestType', header: 'Вид поручения', className: 'min-w-[220px]' },
           { key: 'clientName', header: 'Клиент', className: 'min-w-[260px]' },
           { key: 'clientCode', header: 'Код клиента', className: 'whitespace-nowrap' },

@@ -36,7 +36,7 @@ const renderFields = (fields: SectionField[]) =>
 
 const SectionCard = ({ title, children }: { title: string; children: ReactNode }) => (
   <Card className="space-y-3 p-3.5 sm:p-4">
-    <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+    <h2 className="text-base font-semibold text-[var(--color-text-primary)]">{title}</h2>
     {children}
   </Card>
 );
@@ -248,7 +248,7 @@ export const ComplianceCardPage = () => {
     <div className="min-w-0 space-y-4 rounded-2xl bg-[var(--color-muted-surface)]/80 p-4 sm:p-5">
       <Card className="space-y-3 p-3.5 sm:p-4">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-200 text-lg font-semibold text-slate-700">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-muted-surface)] text-lg font-semibold text-[var(--color-text-secondary)]">
             {client.name
               .split(' ')
               .slice(0, 2)
@@ -257,8 +257,8 @@ export const ComplianceCardPage = () => {
           </div>
 
           <div className="min-w-[220px] flex-1 space-y-2">
-            <h1 className="text-xl font-semibold text-slate-900">{client.name}</h1>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">{client.name}</h1>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-secondary)]">
               <span className="font-mono text-[13px]">{client.code}</span>
               <Badge variant={getClientTypeBadgeVariant(client.type)}>{formatClientType(client.type)}</Badge>
               <Badge variant={getComplianceBadgeVariant(currentStatus)}>{formatComplianceStatus(currentStatus)}</Badge>
@@ -269,7 +269,7 @@ export const ComplianceCardPage = () => {
           </div>
         </div>
 
-        <div className="grid gap-3 border-t border-slate-200 pt-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 border-t border-[var(--color-border)] pt-4 sm:grid-cols-2 xl:grid-cols-3">
           <ProfileField label="Представитель" value={client.representative || representativeRelation?.relatedName || '—'} />
           <ProfileField label="Статус комплаенса" value={formatComplianceStatus(currentStatus)} />
           <ProfileField label="Последнее обновление" value={client.complianceDate ?? complianceCase?.lastCheckAt ?? client.updatedAt} />
@@ -481,7 +481,7 @@ export const ComplianceCardPage = () => {
         </div>
 
         <Card className="h-fit space-y-3 p-3.5 sm:sticky sm:top-4">
-          <p className="text-sm font-semibold text-slate-900">Панель принятия решения</p>
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">Панель принятия решения</p>
 
           <div className="space-y-2">
             {decisionOptions.map((option) => (
@@ -501,8 +501,8 @@ export const ComplianceCardPage = () => {
           </div>
 
           {shouldShowCommentBox && (
-            <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50/70 p-2.5">
-              <label htmlFor="decision-comment" className="text-sm font-medium text-slate-800">
+            <div className="space-y-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-2.5">
+              <label htmlFor="decision-comment" className="text-sm font-medium text-[var(--color-text-primary)]">
                 Комментарий комплаенса
               </label>
               <textarea
@@ -514,7 +514,7 @@ export const ComplianceCardPage = () => {
                     setCommentError(null);
                   }
                 }}
-                className="min-h-20 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
+                className="min-h-20 w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-secondary)] outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
                 placeholder={selectedDecision === 'ЗАБЛОКИРОВАН' ? 'Укажите причину блокировки' : 'Укажите комментарий'}
               />
               {commentError && <p className="text-xs text-red-600">{commentError}</p>}
@@ -525,7 +525,7 @@ export const ComplianceCardPage = () => {
             Принять финальное решение
           </Button>
 
-          <div className="space-y-1 border-t border-slate-200 pt-3 text-xs text-slate-500">
+          <div className="space-y-1 border-t border-[var(--color-border)] pt-3 text-xs text-[var(--color-text-secondary)]">
             <p>Текущее решение: {formatComplianceStatus(currentStatus)}</p>
             <p>Офицер: {client.complianceOfficer ?? complianceCase?.analyst ?? '—'}</p>
             <p>Обновлено: {client.complianceDate ?? complianceCase?.lastCheckAt ?? '—'}</p>
@@ -534,7 +534,7 @@ export const ComplianceCardPage = () => {
       </div>
 
       {toastMessage && (
-        <div className="fixed bottom-4 right-6 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white shadow-lg">
+        <div className="fixed bottom-4 right-6 rounded-lg bg-[var(--color-text-primary)] px-4 py-2 text-sm text-[var(--color-surface)] shadow-lg">
           {toastMessage}
         </div>
       )}
