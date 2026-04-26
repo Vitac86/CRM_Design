@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, EmptyState } from '../components/ui';
+import { routes } from '../routes/paths';
 
 export const NotFoundPage = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export const NotFoundPage = () => {
         description="Проверьте адрес или вернитесь на главную страницу."
         action={
           <div className="flex flex-wrap justify-center gap-2">
-            <Button variant="primary" onClick={() => navigate('/dashboard')}>
+            <Button variant="primary" onClick={() => navigate(routes.dashboard)}>
               На дашборд
             </Button>
             <Button variant="secondary" onClick={() => window.history.back()}>

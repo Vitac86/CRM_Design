@@ -20,7 +20,9 @@ import { ContractWizardPage } from '../pages/ContractWizardPage';
 import { MiddleOfficeClientsPage } from '../pages/MiddleOfficeClientsPage';
 import { MiddleOfficeReportsPage } from '../pages/MiddleOfficeReportsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { DocumentsPage } from '../pages/DocumentsPage';
 import { AppErrorPage } from '../pages/AppErrorPage';
+import { routeParams, routes } from '../routes/paths';
 
 export const router = createBrowserRouter([
   {
@@ -28,27 +30,28 @@ export const router = createBrowserRouter([
     element: <AppShell />,
     errorElement: <AppErrorPage />,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'subjects', element: <SubjectsPage /> },
-      { path: 'subjects/register', element: <ClientRegistrationWizardPage /> },
-      { path: 'subjects/:id', element: <SubjectProfilePage /> },
-      { path: 'subjects/:subjectId/contract-wizard', element: <ContractWizardPage /> },
-      { path: 'brokerage', element: <BrokeragePage /> },
-      { path: 'trust-management', element: <TrustManagementPage /> },
-      { path: 'agents', element: <AgentsPage /> },
-      { path: 'archives', element: <ArchivesPage /> },
-      { path: 'requests', element: <RequestsPage /> },
-      { path: 'compliance', element: <CompliancePage /> },
-      { path: 'compliance/:id', element: <ComplianceCardPage /> },
-      { path: 'middle-office', element: <Navigate to="/middle-office/clients" replace /> },
-      { path: 'middle-office/clients', element: <MiddleOfficeClientsPage /> },
-      { path: 'middle-office/reports', element: <MiddleOfficeReportsPage /> },
-      { path: 'back-office', element: <BackOfficePage /> },
-      { path: 'trading', element: <TradingPage /> },
-      { path: 'trading/:id', element: <TradingCardPage /> },
-      { path: 'depository', element: <DepositoryPage /> },
-      { path: 'administration', element: <AdministrationPage /> },
+      { index: true, element: <Navigate to={routes.dashboard} replace /> },
+      { path: routes.dashboard.slice(1), element: <DashboardPage /> },
+      { path: routes.subjects.slice(1), element: <SubjectsPage /> },
+      { path: routes.subjectRegister.slice(1), element: <ClientRegistrationWizardPage /> },
+      { path: `subjects/${routeParams.subjectId}`, element: <SubjectProfilePage /> },
+      { path: `subjects/${routeParams.subjectId}/contract-wizard`, element: <ContractWizardPage /> },
+      { path: routes.brokerage.slice(1), element: <BrokeragePage /> },
+      { path: routes.trustManagement.slice(1), element: <TrustManagementPage /> },
+      { path: routes.agents.slice(1), element: <AgentsPage /> },
+      { path: routes.archives.slice(1), element: <ArchivesPage /> },
+      { path: routes.requests.slice(1), element: <RequestsPage /> },
+      { path: routes.compliance.slice(1), element: <CompliancePage /> },
+      { path: `compliance/${routeParams.complianceId}`, element: <ComplianceCardPage /> },
+      { path: routes.middleOffice.slice(1), element: <Navigate to={routes.middleOfficeClients} replace /> },
+      { path: routes.middleOfficeClients.slice(1), element: <MiddleOfficeClientsPage /> },
+      { path: routes.middleOfficeReports.slice(1), element: <MiddleOfficeReportsPage /> },
+      { path: routes.backOffice.slice(1), element: <BackOfficePage /> },
+      { path: routes.documents.slice(1), element: <DocumentsPage /> },
+      { path: routes.trading.slice(1), element: <TradingPage /> },
+      { path: `trading/${routeParams.tradingId}`, element: <TradingCardPage /> },
+      { path: routes.depository.slice(1), element: <DepositoryPage /> },
+      { path: routes.administration.slice(1), element: <AdministrationPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

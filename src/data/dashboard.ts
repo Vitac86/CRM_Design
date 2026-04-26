@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { ClockIcon, FileIcon, ShieldIcon, UsersIcon } from '../components/ui/icons';
+import { routes } from '../routes/paths';
 
 export interface DashboardMetric {
   id: string;
@@ -25,7 +26,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     label: 'новых субъектов',
     trendLabel: '+6.2%',
     trendType: 'up',
-    to: '/subjects?subjectStatus=Регистрация',
+    to: `${routes.subjects}?subjectStatus=Регистрация`,
   },
   {
     id: 'metric-02',
@@ -34,7 +35,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     label: 'очередь комплаенса',
     trendLabel: '+4.1%',
     trendType: 'up',
-    to: '/compliance?complianceStatus=НА%20ПРОВЕРКЕ',
+    to: `${routes.compliance}?complianceStatus=НА%20ПРОВЕРКЕ`,
   },
   {
     id: 'metric-03',
@@ -43,7 +44,7 @@ export const dashboardMetrics: DashboardMetric[] = [
     label: 'новые поручения',
     trendLabel: '+8.7%',
     trendType: 'up',
-    to: '/requests?status=Ожидает',
+    to: `${routes.requests}?status=Ожидает`,
   },
   {
     id: 'metric-04',

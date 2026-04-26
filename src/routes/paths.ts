@@ -1,0 +1,30 @@
+export const routes = {
+  root: '/',
+  dashboard: '/dashboard',
+  subjects: '/subjects',
+  subjectRegister: '/subjects/register',
+  subject: (id: string) => `/subjects/${id}`,
+  subjectContractWizard: (id: string) => `/subjects/${id}/contract-wizard`,
+  compliance: '/compliance',
+  complianceCard: (id: string) => `/compliance/${id}`,
+  requests: '/requests',
+  documents: '/documents',
+  trading: '/trading',
+  tradingCard: (id: string) => `/trading/${id}`,
+  brokerage: '/brokerage',
+  trustManagement: '/trust-management',
+  depository: '/depository',
+  backOffice: '/back-office',
+  middleOffice: '/middle-office',
+  middleOfficeClients: '/middle-office/clients',
+  middleOfficeReports: '/middle-office/reports',
+  agents: '/agents',
+  archives: '/archives',
+  administration: '/administration',
+} as const;
+
+export const routeParams = {
+  subjectId: ':id',
+  complianceId: ':id',
+  tradingId: ':id',
+} as const;

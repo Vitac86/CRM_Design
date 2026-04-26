@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
+import { routes } from '../../routes/paths';
 import type { AgentProfile } from '../../data/agents';
 import type { Client, ClientRelation } from '../../data/types';
 import { Button, DataTable, EmptyState, FormField } from '../ui';
@@ -132,7 +133,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
               className: 'min-w-[260px] font-medium text-slate-800',
               render: (row) =>
                 row.relatedClientId ? (
-                  <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(`/subjects/${row.relatedClientId}`)}>
+                  <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => row.relatedClientId && navigate(routes.subject(row.relatedClientId))}>
                     {row.relatedName}
                   </button>
                 ) : (
@@ -168,7 +169,7 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
                 header: 'Субъект',
                 className: 'font-medium text-slate-800',
                 render: (row) => (
-                  <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(`/subjects/${row.id}`)}>
+                  <button type="button" className="crm-link text-left hover:underline focus-visible:underline" onClick={() => navigate(routes.subject(row.id))}>
                     {row.name}
                   </button>
                 ),

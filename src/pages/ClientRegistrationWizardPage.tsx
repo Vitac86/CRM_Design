@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
+import { routes } from '../routes/paths';
 import { Button } from '../components/ui';
 import { IndividualRegistrationForm, type IndividualFormData } from '../components/crm/registration/IndividualRegistrationForm';
 import { LegalEntityRegistrationForm, type LegalEntityFormData } from '../components/crm/registration/LegalEntityRegistrationForm';
@@ -666,7 +667,7 @@ export const ClientRegistrationWizardPage = () => {
                 </Button>
               </>
             )}
-            <Button variant="ghost" onClick={() => navigate('/subjects')}>
+            <Button variant="ghost" onClick={() => navigate(routes.subjects)}>
               Отмена
             </Button>
             <Button
@@ -693,8 +694,8 @@ export const ClientRegistrationWizardPage = () => {
           code={result.code}
           displayName={displayName}
           registrationDate={result.registrationDate}
-          onFinish={() => navigate('/subjects')}
-          onOpenCard={() => navigate(`/subjects/${result.id}`)}
+          onFinish={() => navigate(routes.subjects)}
+          onOpenCard={() => navigate(routes.subject(result.id))}
         />
       ) : null}
 

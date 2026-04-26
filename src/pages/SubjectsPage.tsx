@@ -16,6 +16,7 @@ import {
   type SortDirection,
 } from '../components/ui';
 import { formatClientType, formatComplianceStatus, formatResidency, formatSubjectStatus } from '../utils/labels';
+import { routes } from '../routes/paths';
 
 const allRoles: ClientRole[] = ['Клиент', 'Бенефициар', 'Представитель'];
 const subjectStatusValues: SubjectStatus[] = ['Регистрация', 'Активный клиент', 'На комплаенсе', 'Данные заполнены'];
@@ -271,7 +272,7 @@ export const SubjectsPage = () => {
       <PageHeader
         title="Субъекты"
         actions={(
-          <Button className="w-full sm:w-auto" onClick={() => navigate('/subjects/register')}>
+          <Button className="w-full sm:w-auto" onClick={() => navigate(routes.subjectRegister)}>
             + Добавить
           </Button>
         )}
@@ -412,7 +413,7 @@ export const SubjectsPage = () => {
         rows={paginatedClients}
         emptyMessage="По выбранным фильтрам данных нет"
         rowClassName={() => 'cursor-pointer'}
-        onRowClick={(client) => navigate(`/subjects/${client.id}`)}
+        onRowClick={(client) => navigate(routes.subject(client.id))}
         sortKey={sortKey}
         sortDirection={sortDirection}
         onSortChange={handleSort}

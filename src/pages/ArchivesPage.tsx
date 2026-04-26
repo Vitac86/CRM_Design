@@ -7,6 +7,7 @@ import { PageToolbar } from '../components/layout/PageToolbar';
 import { Button, DataTable, EmptyState, FilterChipSelect, SearchInput, TableStatusText } from '../components/ui';
 import type { Client, ClientType } from '../data/types';
 import { formatClientType, formatComplianceStatus, formatResidency } from '../utils/labels';
+import { routes } from '../routes/paths';
 import { subjectStatusTone } from '../utils/tableStatus';
 
 export const ArchivesPage = () => {
@@ -132,7 +133,7 @@ export const ArchivesPage = () => {
           title="Архив пуст"
           description="В архиве пока нет субъектов"
           action={
-            <Button variant="secondary" size="sm" onClick={() => navigate('/subjects')}>
+            <Button variant="secondary" size="sm" onClick={() => navigate(routes.subjects)}>
               Вернуться к субъектам
             </Button>
           }

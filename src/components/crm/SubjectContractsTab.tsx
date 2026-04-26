@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
+import { routes } from '../../routes/paths';
 import type { ClientAccount, ContractProductType, ClientContract } from '../../data/types';
 import { Badge, Button, Card, DataTable } from '../ui';
 
@@ -71,7 +72,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
   }, [accountsRepository, clientId, contractsRepository]);
 
   const handleOpenContract = (contractId: string) => {
-    navigate(`/subjects/${clientId}/contract-wizard?contractId=${contractId}`);
+    navigate(`${routes.subjectContractWizard(clientId)}?contractId=${contractId}`);
   };
 
   const handleCreateAccount = async () => {
@@ -98,7 +99,7 @@ export const SubjectContractsTab = ({ clientId }: SubjectContractsTabProps) => {
       <section className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">Договоры</h2>
-          <Button variant="secondary" size="sm" onClick={() => navigate(`/subjects/${clientId}/contract-wizard`)}>
+          <Button variant="secondary" size="sm" onClick={() => navigate(routes.subjectContractWizard(clientId))}>
             + Добавить договор
           </Button>
         </div>
