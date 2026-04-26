@@ -12,7 +12,7 @@ export const RegistrationTextField = ({ label, id, className, ...props }: Regist
       <input
         id={id}
         className={cn(
-          'h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/20',
+          'app-form-input h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/20',
           className,
         )}
         {...props}

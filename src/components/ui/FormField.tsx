@@ -13,7 +13,7 @@ export const FormField = ({ label, mono = false, className, type = 'text', ...pr
       <input
         type={type}
         className={cn(
-          'h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] placeholder:text-[var(--color-input-placeholder)] focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70',
+          'app-form-input h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] placeholder:text-[var(--color-input-placeholder)] focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70',
           mono && 'font-mono text-[13px]',
           className,
         )}
