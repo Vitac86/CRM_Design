@@ -23,7 +23,7 @@ export const TableControlPanel = ({
   const hasSecondRow = Boolean(filters) || Boolean(actions);
 
   return (
-    <section className={cn('space-y-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-3 shadow-sm sm:p-4', className)}>
+    <section className={cn('space-y-[var(--density-filter-gap)] rounded-2xl border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-[var(--density-panel-padding)] shadow-sm sm:p-[var(--density-panel-padding)]', className)}>
       {search ? (
         <div className={cn('min-w-0 w-full max-w-[520px]', searchClassName)}>
           {search}
@@ -31,7 +31,7 @@ export const TableControlPanel = ({
       ) : null}
 
       {hasSecondRow ? (
-        <div className={cn('flex min-w-0 flex-wrap items-center gap-2 sm:gap-3', filtersClassName)}>
+        <div className={cn('flex min-w-0 flex-wrap items-center gap-[var(--density-filter-gap)]', filtersClassName)}>
           {filters}
           {actions ? <div className={cn('ml-auto flex flex-wrap items-center gap-2', actionsClassName)}>{actions}</div> : null}
         </div>

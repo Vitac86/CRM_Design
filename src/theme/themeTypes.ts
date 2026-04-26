@@ -1,4 +1,4 @@
-export type ThemeId = 'current' | 'investica-dark' | 'investica-light';
+export type ThemeId = 'current' | 'investica-dark' | 'investica-light' | 'investica-command';
 
 export type ThemeLogoVariant = 'mark' | 'full-ru' | 'full-en';
 

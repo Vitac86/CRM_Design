@@ -49,6 +49,22 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
     logoVariant: 'full-ru',
     logoTone: 'blue',
   },
+  'investica-command': {
+    id: 'investica-command',
+    name: 'Investica Command Center',
+    description: 'Операционный режим командного центра для плотной ежедневной работы с потоком задач.',
+    primary: '#2f5dff',
+    secondary: '#1d2f52',
+    background: '#08101d',
+    surface: '#121b2b',
+    sidebar: '#0b1424',
+    textPrimary: '#ecf3ff',
+    textSecondary: '#9badc8',
+    border: '#2a3a53',
+    accent: '#4d78ff',
+    logoVariant: 'full-ru',
+    logoTone: 'white',
+  },
 };
 
 export const DEFAULT_THEME_ID: ThemeId = 'current';

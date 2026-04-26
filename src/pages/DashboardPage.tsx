@@ -84,6 +84,12 @@ export const DashboardPage = () => {
       ]),
     [latestRequests],
   );
+  const operationalSnapshot = useMemo(() => {
+    const awaiting = latestRequests.filter((request) => request.status === 'Ожидает').length;
+    const accepted = latestRequests.filter((request) => request.status === 'Принято').length;
+    const rejected = latestRequests.filter((request) => request.status === 'Отклонено').length;
+    return { awaiting, accepted, rejected };
+  }, [latestRequests]);
 
   return (
     <div className="crm-prestige-panel min-w-0 space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
@@ -95,6 +101,29 @@ export const DashboardPage = () => {
         {metrics.map((metric) => (
           <MetricCard key={metric.id} metric={metric} />
         ))}
+      </section>
+
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] p-[var(--density-panel-padding)] shadow-sm">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] pb-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Операционный статус смены</h2>
+          <span className="rounded border border-[var(--color-border)] bg-[var(--color-table-header)] px-2 py-1 text-xs font-medium text-[var(--color-text-secondary)]">
+            Live board
+          </span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2.5">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Очередь поручений</p>
+            <p className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">{operationalSnapshot.awaiting}</p>
+          </div>
+          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2.5">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Закрыто сегодня</p>
+            <p className="mt-1 text-lg font-semibold text-[var(--color-success)]">{operationalSnapshot.accepted}</p>
+          </div>
+          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] px-3 py-2.5">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">Требуют эскалации</p>
+            <p className="mt-1 text-lg font-semibold text-[var(--color-warning)]">{operationalSnapshot.rejected}</p>
+          </div>
+        </div>
       </section>
 
       {error && <p className="text-sm font-medium text-[var(--color-danger)]">{error}</p>}
@@ -110,8 +139,8 @@ export const DashboardPage = () => {
           rows={subjectRows}
         />
 
-        <section className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-3">
+        <section className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-kpi-surface)] shadow-sm">
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] px-[var(--density-panel-padding)] py-[var(--density-table-header-y)]">
             <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Последние поручения</h2>
             <Link to="/requests" className="text-sm font-medium text-[var(--color-primary)] transition hover:text-[var(--color-accent)]">
               Все поручения
@@ -120,23 +149,23 @@ export const DashboardPage = () => {
 
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
-              <thead className="bg-[var(--color-muted-surface)] text-left text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">
+              <thead className="bg-[var(--color-table-header)] text-left text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">
                 <tr>
-                  <th className="px-4 py-2.5 font-semibold">Номер поручения</th>
-                  <th className="px-4 py-2.5 font-semibold">Статус</th>
-                  <th className="px-4 py-2.5 font-semibold">Дата</th>
+                  <th className="px-[var(--density-table-cell-x)] py-[var(--density-table-header-y)] font-semibold">Номер поручения</th>
+                  <th className="px-[var(--density-table-cell-x)] py-[var(--density-table-header-y)] font-semibold">Статус</th>
+                  <th className="px-[var(--density-table-cell-x)] py-[var(--density-table-header-y)] font-semibold">Дата</th>
                 </tr>
               </thead>
               <tbody>
                 {requestRows.map(([requestNumber, status, date], rowIndex) => (
-                  <tr key={`request-${rowIndex}`} className="border-t border-[var(--color-border)] align-top text-[var(--color-text-primary)]">
-                    <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">{requestNumber}</td>
-                    <td className="px-4 py-3">
+                  <tr key={`request-${rowIndex}`} className="border-t border-[var(--color-border)] align-top text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-table-row-hover)]">
+                    <td className="px-[var(--density-table-cell-x)] py-[var(--density-table-row-y)] font-medium text-[var(--color-text-primary)]">{requestNumber}</td>
+                    <td className="px-[var(--density-table-cell-x)] py-[var(--density-table-row-y)]">
                       <TableStatusText tone={requestStatusTone[status]}>
                         {status}
                       </TableStatusText>
                     </td>
-                    <td className="px-4 py-3">{date}</td>
+                    <td className="px-[var(--density-table-cell-x)] py-[var(--density-table-row-y)]">{date}</td>
                   </tr>
                 ))}
               </tbody>

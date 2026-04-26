@@ -56,7 +56,7 @@ export const DataTable = <T extends { id?: string | number }>({
   return (
     <div className="crm-data-table crm-scrollbar relative min-w-0 overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-card)]">
       <table className="font-sans min-w-full text-left text-sm text-[var(--color-text-primary)]">
-        <thead className="bg-[var(--color-muted-surface)]">
+        <thead className="bg-[var(--color-table-header)]">
           <tr>
             {columns.map((column) => {
               const currentSortKey = column.sortKey ?? String(column.key);
@@ -67,9 +67,9 @@ export const DataTable = <T extends { id?: string | number }>({
                 <th
                   key={String(column.key)}
                   className={cn(
-                    'font-display px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]',
+                    'font-display px-[var(--density-table-cell-x)] py-[var(--density-table-header-y)] text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]',
                     stickyHeader &&
-                      'sticky top-0 z-10 border-b border-[var(--color-border)] bg-[var(--color-muted-surface)] shadow-[0_1px_0_rgba(15,23,42,0.16)]',
+                      'sticky top-0 z-10 border-b border-[var(--color-border)] bg-[var(--color-table-header)] shadow-[0_1px_0_rgba(15,23,42,0.16)]',
                     column.headerClassName,
                   )}
                 >
@@ -106,7 +106,7 @@ export const DataTable = <T extends { id?: string | number }>({
               <tr
                 key={getRowKey ? getRowKey(row, rowIndex) : row.id ?? rowIndex}
                 className={cn(
-                  'border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-hover)]/70',
+                  'border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-table-row-hover)]',
                   onRowClick && 'cursor-pointer',
                   rowClassName?.(row, rowIndex),
                 )}
@@ -115,7 +115,7 @@ export const DataTable = <T extends { id?: string | number }>({
                 {columns.map((column) => {
                   const cellValue = row[column.key as keyof T] as ReactNode;
                   return (
-                    <td key={String(column.key)} className={cn('px-4 py-3 align-middle', column.className)}>
+                    <td key={String(column.key)} className={cn('px-[var(--density-table-cell-x)] py-[var(--density-table-row-y)] align-middle', column.className)}>
                       {column.render ? column.render(row, rowIndex) : cellValue}
                     </td>
                   );

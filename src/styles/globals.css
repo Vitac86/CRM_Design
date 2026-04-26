@@ -455,6 +455,20 @@
   --color-button-selected-border: color-mix(in srgb, var(--color-primary) 56%, var(--color-border));
   --color-button-selected-text: var(--color-text-primary);
   --color-button-focus-ring: color-mix(in srgb, var(--color-focus) 46%, white 8%);
+  --color-table-header: var(--color-muted-surface);
+  --color-table-row-hover: color-mix(in srgb, var(--color-hover) 70%, transparent);
+  --color-kpi-surface: var(--color-surface);
+  --density-table-cell-x: 1rem;
+  --density-table-header-y: 0.7rem;
+  --density-table-row-y: 0.75rem;
+  --density-panel-padding: 0.875rem;
+  --density-filter-gap: 0.75rem;
+  --density-button-sm-height: 2rem;
+  --density-button-sm-px: 0.75rem;
+  --density-button-md-height: 2.5rem;
+  --density-button-md-px: 1rem;
+  --density-tab-px: 1.25rem;
+  --density-tab-py: 0.75rem;
   --scrollbar-track: #edf2f7;
   --scrollbar-thumb: #9aa9bf;
   --scrollbar-thumb-hover: #7f90a8;
@@ -541,6 +555,20 @@
   --color-button-selected-border: color-mix(in srgb, var(--color-primary) 56%, var(--color-border));
   --color-button-selected-text: var(--color-text-primary);
   --color-button-focus-ring: color-mix(in srgb, var(--color-focus) 46%, white 8%);
+  --color-table-header: var(--color-muted-surface);
+  --color-table-row-hover: color-mix(in srgb, var(--color-hover) 70%, transparent);
+  --color-kpi-surface: var(--color-surface);
+  --density-table-cell-x: 1rem;
+  --density-table-header-y: 0.7rem;
+  --density-table-row-y: 0.75rem;
+  --density-panel-padding: 0.875rem;
+  --density-filter-gap: 0.75rem;
+  --density-button-sm-height: 2rem;
+  --density-button-sm-px: 0.75rem;
+  --density-button-md-height: 2.5rem;
+  --density-button-md-px: 1rem;
+  --density-tab-px: 1.25rem;
+  --density-tab-py: 0.75rem;
   --scrollbar-track: #edf2f7;
   --scrollbar-thumb: #9aa9bf;
   --scrollbar-thumb-hover: #7f90a8;
@@ -627,6 +655,20 @@
   --color-button-selected-border: color-mix(in srgb, #7a86fa 58%, #465892);
   --color-button-selected-text: #f8fbff;
   --color-button-focus-ring: color-mix(in srgb, #7f8cff 54%, white 12%);
+  --color-table-header: #1a223c;
+  --color-table-row-hover: color-mix(in srgb, #2a3563 65%, transparent);
+  --color-kpi-surface: #18213b;
+  --density-table-cell-x: 1rem;
+  --density-table-header-y: 0.68rem;
+  --density-table-row-y: 0.72rem;
+  --density-panel-padding: 0.875rem;
+  --density-filter-gap: 0.75rem;
+  --density-button-sm-height: 2rem;
+  --density-button-sm-px: 0.75rem;
+  --density-button-md-height: 2.5rem;
+  --density-button-md-px: 1rem;
+  --density-tab-px: 1.25rem;
+  --density-tab-py: 0.75rem;
   --scrollbar-track: #121833;
   --scrollbar-thumb: #526696;
   --scrollbar-thumb-hover: #6580b5;
@@ -711,10 +753,124 @@
   --color-button-selected-border: color-mix(in srgb, #242bf5 48%, #dbe2f0);
   --color-button-selected-text: #111a50;
   --color-button-focus-ring: color-mix(in srgb, #242bf5 40%, white 12%);
+  --color-table-header: #e8edfb;
+  --color-table-row-hover: color-mix(in srgb, #eef2ff 82%, transparent);
+  --color-kpi-surface: #ffffff;
+  --density-table-cell-x: 1rem;
+  --density-table-header-y: 0.7rem;
+  --density-table-row-y: 0.75rem;
+  --density-panel-padding: 0.875rem;
+  --density-filter-gap: 0.75rem;
+  --density-button-sm-height: 2rem;
+  --density-button-sm-px: 0.75rem;
+  --density-button-md-height: 2.5rem;
+  --density-button-md-px: 1rem;
+  --density-tab-px: 1.25rem;
+  --density-tab-py: 0.75rem;
   --scrollbar-track: #e9eef8;
   --scrollbar-thumb: #8a98d8;
   --scrollbar-thumb-hover: #6f81d4;
   --scrollbar-corner: #e9eef8;
+}
+
+:root[data-theme='investica-command'] {
+  --color-primary: #2f5dff;
+  --color-secondary: #1d2f52;
+  --color-background: #08101d;
+  --color-surface: #121b2b;
+  --color-card: #152133;
+  --color-inner-panel: #182538;
+  --color-elevated: #19273a;
+  --color-sidebar: #0b1424;
+  --color-text-primary: #ecf3ff;
+  --color-text-secondary: #9badc8;
+  --color-border: #2a3a53;
+  --color-accent: #4d78ff;
+  --color-muted: #97aac8;
+  --color-muted-surface: #1a273a;
+  --color-shadow: rgba(2, 9, 21, 0.7);
+  --color-hover: #22324a;
+  --color-input: #131f31;
+  --color-input-border: #344864;
+  --color-input-text: #edf2ff;
+  --color-input-placeholder: #8ea4c8;
+  --color-input-icon: #9fb1cf;
+  --color-input-icon-hover: #c5d3ea;
+  --color-input-focus: #4d78ff;
+  --input-calendar-icon-filter: invert(1) brightness(1.14) saturate(0.8);
+  --input-calendar-icon-filter-hover: invert(1) brightness(1.32) saturate(0.88);
+  --color-control-checked: #4d78ff;
+  --color-control-disabled: #5e6f8c;
+  --color-focus: #4d78ff;
+  --color-danger: #f2849a;
+  --color-success: #4cc1a0;
+  --color-warning: #e6ab53;
+  --color-sidebar-text: #e8f0ff;
+  --color-sidebar-muted: #92a7cb;
+  --color-sidebar-hover: #1a2b46;
+  --color-sidebar-active-bg: color-mix(in srgb, #2f5dff 35%, #0b1424);
+  --color-sidebar-active-text: #ffffff;
+  --color-tab-bg: #131e30;
+  --color-tab-text: #a2b4d0;
+  --color-tab-hover: #202f46;
+  --color-tab-hover-text: #edf3ff;
+  --color-tab-active-bg: #223653;
+  --color-tab-active-text: #f5f9ff;
+  --color-tab-border: #2f425c;
+  --color-tab-indicator: #4d78ff;
+  --color-actionbar-bg: #182638;
+  --color-actionbar-border: #324762;
+  --color-actionbar-shadow: 0 -10px 24px rgba(2, 9, 21, 0.72);
+  --color-actionbar-text: #edf3ff;
+  --color-button-primary-bg: #3d68ff;
+  --color-button-primary-text: #f4f7ff;
+  --color-button-primary-hover: #4d78ff;
+  --color-button-primary-active: #3056d2;
+  --color-button-secondary-bg: #1b2a3f;
+  --color-button-secondary-text: #dbe5f7;
+  --color-button-secondary-border: #3a4d68;
+  --color-button-secondary-hover-bg: #24364f;
+  --color-button-secondary-hover-border: #4b6180;
+  --color-button-secondary-hover-text: #f0f4ff;
+  --color-button-secondary-active-bg: #2a3d59;
+  --color-button-secondary-active-border: #587399;
+  --color-button-secondary-active-text: #ffffff;
+  --color-button-ghost-bg: transparent;
+  --color-button-ghost-text: #b7c7e0;
+  --color-button-ghost-hover-bg: color-mix(in srgb, #2a3f5b 68%, transparent);
+  --color-button-ghost-hover-border: color-mix(in srgb, #4f6687 70%, transparent);
+  --color-button-ghost-hover-text: #f1f5ff;
+  --color-button-ghost-active-bg: color-mix(in srgb, #314a6a 78%, transparent);
+  --color-button-ghost-active-border: color-mix(in srgb, #627ea4 65%, transparent);
+  --color-button-danger-bg: #b94f67;
+  --color-button-danger-text: #fff7fa;
+  --color-button-danger-hover: #a2455b;
+  --color-button-danger-active: #87394c;
+  --color-button-disabled-bg: color-mix(in srgb, #121b2c 82%, #2f415b);
+  --color-button-disabled-border: color-mix(in srgb, #3a4f6e 66%, transparent);
+  --color-button-disabled-text: color-mix(in srgb, #b8c6dd 60%, transparent);
+  --color-button-selected-bg: color-mix(in srgb, #3d68ff 22%, #182638);
+  --color-button-selected-border: color-mix(in srgb, #7c99ff 46%, #3d4f6a);
+  --color-button-selected-text: #f3f7ff;
+  --color-button-focus-ring: color-mix(in srgb, #4d78ff 48%, white 8%);
+  --color-table-header: #1c2b40;
+  --color-table-row-hover: color-mix(in srgb, #2a3d58 68%, transparent);
+  --color-kpi-surface: #131f31;
+  --density-table-cell-x: 0.9rem;
+  --density-table-header-y: 0.58rem;
+  --density-table-row-y: 0.6rem;
+  --density-panel-padding: 0.75rem;
+  --density-filter-gap: 0.625rem;
+  --density-button-sm-height: 1.9rem;
+  --density-button-sm-px: 0.7rem;
+  --density-button-md-height: 2.25rem;
+  --density-button-md-px: 0.9rem;
+  --density-tab-px: 1rem;
+  --density-tab-py: 0.62rem;
+  --scrollbar-track: #0e192a;
+  --scrollbar-thumb: #425774;
+  --scrollbar-thumb-hover: #566f92;
+  --scrollbar-corner: #0e192a;
 }
 
 html,
@@ -973,16 +1129,20 @@ body {
     color: var(--color-input-placeholder);
   }
 
-  :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']) {
+  :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']),
+  :root[data-theme='investica-command'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']) {
     color-scheme: dark;
   }
 
   :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):hover::-webkit-calendar-picker-indicator,
-  :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):focus-visible::-webkit-calendar-picker-indicator {
+  :root[data-theme='investica-dark'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):focus-visible::-webkit-calendar-picker-indicator,
+  :root[data-theme='investica-command'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):hover::-webkit-calendar-picker-indicator,
+  :root[data-theme='investica-command'] :where(input[type='date'], input[type='datetime-local'], input[type='month'], input[type='week'], input[type='time']):focus-visible::-webkit-calendar-picker-indicator {
     color: var(--color-input-icon-hover);
   }
 
-  :root[data-theme='investica-dark'] :where(input[type='search'])::-webkit-search-cancel-button {
+  :root[data-theme='investica-dark'] :where(input[type='search'])::-webkit-search-cancel-button,
+  :root[data-theme='investica-command'] :where(input[type='search'])::-webkit-search-cancel-button {
     filter: invert(1) brightness(1.25);
     opacity: 0.9;
   }
@@ -1109,6 +1269,57 @@ body {
     box-shadow:
       0 10px 20px color-mix(in srgb, var(--color-primary) 28%, transparent),
       0 0 0 1px color-mix(in srgb, #9ea7ff 26%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-card {
+    border-color: color-mix(in srgb, var(--color-border) 92%, #516789 8%);
+    background: var(--color-card);
+    box-shadow:
+      0 8px 20px color-mix(in srgb, var(--color-shadow) 62%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #f4f8ff 5%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-prestige-panel {
+    background: var(--color-surface);
+    border-color: color-mix(in srgb, var(--color-border) 90%, #5d7397 10%);
+    box-shadow:
+      0 10px 22px color-mix(in srgb, var(--color-shadow) 60%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #f4f8ff 4%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-data-table {
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--color-shadow) 58%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-data-table tbody tr[aria-selected='true'],
+  :root[data-theme='investica-command'] .crm-data-table tbody tr[data-selected='true'] {
+    background-color: color-mix(in srgb, var(--color-primary) 15%, var(--color-card));
+  }
+
+  :root[data-theme='investica-command'] .crm-sidebar-link:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 24%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-sidebar-link.bg-\[var\(--color-sidebar-active-bg\)\] {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, #e6edff 12%, transparent),
+      0 4px 12px color-mix(in srgb, #1a3255 48%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-tabs {
+    box-shadow:
+      0 6px 14px color-mix(in srgb, var(--color-shadow) 54%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #f3f7ff 4%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-tab-active {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #9eb5df 20%, transparent);
+  }
+
+  :root[data-theme='investica-command'] .crm-button-primary {
+    box-shadow:
+      0 8px 16px color-mix(in srgb, var(--color-primary) 24%, transparent),
+      0 0 0 1px color-mix(in srgb, #93abdf 18%, transparent);
   }
 }
 
