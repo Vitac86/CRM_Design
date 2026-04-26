@@ -213,14 +213,14 @@ export const DepositoryPage = () => {
             value={clientCodeFilter}
             onChange={(event) => setClientCodeFilter(event.target.value)}
             placeholder="Код клиента"
-            className="h-10 w-full sm:w-[190px] max-w-full rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
+            className="app-form-input h-10 w-full sm:w-[190px] max-w-full rounded-md px-3 text-sm"
             aria-label="Фильтр по коду клиента"
           />
           <input
             type="date"
             value={dateFromFilter}
             onChange={(event) => setDateFromFilter(event.target.value)}
-            className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
+            className="app-form-input h-10 rounded-md px-3 text-sm"
             aria-label="Дата с"
             title="Дата с"
           />
@@ -228,7 +228,7 @@ export const DepositoryPage = () => {
             type="date"
             value={dateToFilter}
             onChange={(event) => setDateToFilter(event.target.value)}
-            className="h-10 rounded-md border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] shadow-sm outline-none transition hover:border-[var(--color-primary)]/40 focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-input-focus)]/20"
+            className="app-form-input h-10 rounded-md px-3 text-sm"
             aria-label="Дата по"
             title="Дата по"
           />

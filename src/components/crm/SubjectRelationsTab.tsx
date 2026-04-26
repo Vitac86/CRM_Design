@@ -196,8 +196,8 @@ export const SubjectRelationsTab = ({ clientId }: SubjectRelationsTabProps) => {
             <div className="space-y-4">
               <FormField label="Поиск субъекта" value={clientQuery} onChange={(event) => setClientQuery(event.target.value)} placeholder="Введите ФИО, название, код или ИНН" />
               <label className="space-y-1">
-                <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Клиент</span>
-                <select value={selectedClientId} onChange={(event) => setSelectedClientId(event.target.value)} className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm">
+                <span className="text-[11px] font-semibold tracking-wide text-[var(--color-text-secondary)] uppercase">Клиент</span>
+                <select value={selectedClientId} onChange={(event) => setSelectedClientId(event.target.value)} className="app-form-input app-form-select h-10 w-full rounded-lg px-3 pr-9 text-sm">
                   <option value="">Выберите клиента</option>
                   {availableClients.map((item) => (
                     <option key={item.id} value={item.id}>

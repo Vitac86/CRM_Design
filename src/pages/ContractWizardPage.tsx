@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { routes } from '../routes/paths';
 import type { Client, ClientContract, ContractProductType, ContractWizardConfig } from '../data/types';
-import { Button, Card, EmptyState } from '../components/ui';
+import { Button, Card, EmptyState, FormField, SelectFilter } from '../components/ui';
 
 const resolveContractType = (form: ContractWizardConfig): ContractProductType => {
   if (form.joinedUnder428.depositoryContract) {
@@ -40,7 +40,7 @@ const Section = ({ title, children }: { title: string; children: ReactNode }) =>
 
 const Check = ({ checked, onChange, label }: { checked: boolean; onChange: (value: boolean) => void; label: string }) => (
   <label className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
-    <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="h-4 w-4 rounded border-[var(--color-input-border)] text-brand focus:ring-brand/40" />
+    <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
     <span>{label}</span>
   </label>
 );
@@ -240,7 +240,7 @@ export const ContractWizardPage = () => {
             { value: 'entrepreneur' as const, label: 'Индивидуальный предприниматель' },
           ].map((option) => (
             <label key={option.value} className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
-              <input type="radio" name="personType" checked={form.personType === option.value} onChange={() => setForm((prev) => prev ? ({ ...prev, personType: option.value }) : prev)} className="h-4 w-4 border-[var(--color-input-border)] text-brand focus:ring-brand/40" />
+              <input type="radio" name="personType" checked={form.personType === option.value} onChange={() => setForm((prev) => prev ? ({ ...prev, personType: option.value }) : prev)} />
               <span>{option.label}</span>
             </label>
           ))}
@@ -284,7 +284,7 @@ export const ContractWizardPage = () => {
           <Check label="По почте заказным письмом" checked={form.reporting.post} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, post: value } }) : prev)} />
           <div className="space-y-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted-surface)] p-3">
             <Check label="По электронной почте" checked={form.reporting.emailEnabled} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, emailEnabled: value } }) : prev)} />
-            <input value={form.reporting.email} onChange={(event) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, email: event.target.value } }) : prev)} placeholder="Введите email" className="h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] placeholder:text-[var(--color-input-placeholder)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none" />
+            <FormField label="Email для отчётов" type="email" value={form.reporting.email} onChange={(event) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, email: event.target.value } }) : prev)} placeholder="Введите email" />
           </div>
           <Check label="По системе ЭДО" checked={form.reporting.edo} onChange={(value) => setForm((prev) => prev ? ({ ...prev, reporting: { ...prev.reporting, edo: value } }) : prev)} />
         </div>
@@ -294,11 +294,11 @@ export const ContractWizardPage = () => {
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1 sm:col-span-2">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Тариф для всех счетов</span>
-            <select value={form.brokerageMarkets.tariff} onChange={(event) => setForm((prev) => prev ? ({ ...prev, brokerageMarkets: { ...prev.brokerageMarkets, tariff: event.target.value } }) : prev)} className="h-10 w-full rounded-lg border border-[var(--color-input-border)] bg-[var(--color-input)] px-3 text-sm text-[var(--color-input-text)] focus:border-brand focus:ring-2 focus:ring-brand/10 focus:outline-none">
+            <SelectFilter value={form.brokerageMarkets.tariff} onChange={(event) => setForm((prev) => prev ? ({ ...prev, brokerageMarkets: { ...prev.brokerageMarkets, tariff: event.target.value } }) : prev)} className="w-full sm:w-full sm:min-w-0">
               <option value="Универсальный">Универсальный</option>
               <option value="Инвестор">Инвестор</option>
               <option value="Премиум">Премиум</option>
-            </select>
+            </SelectFilter>
           </label>
           <Check label="Фондовый рынок" checked={form.brokerageMarkets.stockMarket} onChange={(value) => setForm((prev) => prev ? ({ ...prev, brokerageMarkets: { ...prev.brokerageMarkets, stockMarket: value } }) : prev)} />
           <Check label="Срочный рынок" checked={form.brokerageMarkets.futuresMarket} onChange={(value) => setForm((prev) => prev ? ({ ...prev, brokerageMarkets: { ...prev.brokerageMarkets, futuresMarket: value } }) : prev)} />
