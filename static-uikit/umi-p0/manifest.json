@@ -1,0 +1,80 @@
+{
+  "name": "CRM UMI P0 Extraction Pack",
+  "version": "0.1.0",
+  "type": "umi-template-extraction-pack",
+  "runtime": false,
+  "buildStep": false,
+  "sourcePagesRoot": "static-uikit/pages",
+  "sourcePartialsRoot": "static-uikit/partials",
+  "packRoot": "static-uikit/umi-p0",
+  "layout": {
+    "base": "layout/base.html"
+  },
+  "partials": [
+    "partials/sidebar.html",
+    "partials/topbar.html",
+    "partials/page-header.html",
+    "partials/filter-panel.html",
+    "partials/table.html",
+    "partials/badge.html",
+    "partials/action-row.html",
+    "partials/empty-state.html"
+  ],
+  "pages": [
+    {
+      "name": "dashboard",
+      "template": "pages/dashboard.html",
+      "reference": "../pages/dashboard.html",
+      "priority": "P0"
+    },
+    {
+      "name": "subjects",
+      "template": "pages/subjects.html",
+      "reference": "../pages/subjects.html",
+      "priority": "P0"
+    },
+    {
+      "name": "subject-card",
+      "template": "pages/subject-card.html",
+      "reference": "../pages/subject-card.html",
+      "priority": "P0"
+    },
+    {
+      "name": "requests",
+      "template": "pages/requests.html",
+      "reference": "../pages/requests.html",
+      "priority": "P0"
+    },
+    {
+      "name": "compliance",
+      "template": "pages/compliance.html",
+      "reference": "../pages/compliance.html",
+      "priority": "P0"
+    },
+    {
+      "name": "compliance-card",
+      "template": "pages/compliance-card.html",
+      "reference": "../pages/compliance-card.html",
+      "priority": "P0"
+    },
+    {
+      "name": "trading",
+      "template": "pages/trading.html",
+      "reference": "../pages/trading.html",
+      "priority": "P0"
+    },
+    {
+      "name": "error",
+      "template": "pages/error.html",
+      "reference": "../pages/error.html",
+      "priority": "P0"
+    }
+  ],
+  "constraints": {
+    "noReact": true,
+    "noViteForStatic": true,
+    "localAssetsOnly": true,
+    "noExternalApi": true,
+    "noSpaRouter": true
+  }
+}

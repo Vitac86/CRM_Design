@@ -1,0 +1,113 @@
+{
+  "routes": [
+    {
+      "page": "dashboard",
+      "staticTemplate": "pages/dashboard.html",
+      "suggestedUmiRoute": "/dashboard",
+      "referenceStandalone": "../pages/dashboard.html"
+    },
+    {
+      "page": "subjects",
+      "staticTemplate": "pages/subjects.html",
+      "suggestedUmiRoute": "/subjects",
+      "referenceStandalone": "../pages/subjects.html"
+    },
+    {
+      "page": "subject-card",
+      "staticTemplate": "pages/subject-card.html",
+      "suggestedUmiRoute": "/subjects/{id}",
+      "referenceStandalone": "../pages/subject-card.html"
+    },
+    {
+      "page": "requests",
+      "staticTemplate": "pages/requests.html",
+      "suggestedUmiRoute": "/requests",
+      "referenceStandalone": "../pages/requests.html"
+    },
+    {
+      "page": "compliance",
+      "staticTemplate": "pages/compliance.html",
+      "suggestedUmiRoute": "/compliance",
+      "referenceStandalone": "../pages/compliance.html"
+    },
+    {
+      "page": "compliance-card",
+      "staticTemplate": "pages/compliance-card.html",
+      "suggestedUmiRoute": "/compliance/{id}",
+      "referenceStandalone": "../pages/compliance-card.html"
+    },
+    {
+      "page": "trading",
+      "staticTemplate": "pages/trading.html",
+      "suggestedUmiRoute": "/trading",
+      "referenceStandalone": "../pages/trading.html"
+    },
+    {
+      "page": "error",
+      "staticTemplate": "pages/error.html",
+      "suggestedUmiRoute": "/error/{code}",
+      "referenceStandalone": "../pages/error.html"
+    }
+  ],
+  "entities": [
+    "dashboard-kpi",
+    "subject",
+    "subject-profile",
+    "request",
+    "compliance",
+    "compliance-risk",
+    "trading-profile",
+    "error"
+  ],
+  "actions": [
+    "open-requests",
+    "go-dashboard",
+    "export-subjects",
+    "open-subject-register",
+    "filter-subjects",
+    "move-to-archive",
+    "edit-subject",
+    "open-contract-wizard",
+    "export-requests",
+    "create-request",
+    "save-request",
+    "print-request",
+    "export-request",
+    "filter-requests",
+    "export-compliance",
+    "filter-compliance",
+    "compliance-decision",
+    "filter-trading",
+    "switch-tab",
+    "reset-filters"
+  ],
+  "forms": [
+    "subjects-filters",
+    "request-create",
+    "requests-filters",
+    "compliance-filters",
+    "compliance-decision",
+    "trading-filters"
+  ],
+  "filters": [
+    "subjects",
+    "requests",
+    "compliance",
+    "trading"
+  ],
+  "statuses": [
+    "active-client",
+    "pending-review",
+    "approved",
+    "rework",
+    "blocked",
+    "draft",
+    "request-waiting",
+    "request-accepted",
+    "request-rejected",
+    "risk-medium",
+    "qualified",
+    "aml-ok",
+    "active"
+  ]
+}

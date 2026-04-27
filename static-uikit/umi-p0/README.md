@@ -8,6 +8,9 @@
 - `pages/` — content-area шаблоны для P0-страниц без полного HTML shell.
 
 ## Важные ограничения
+- `manifest.json` — machine-readable состав P0 pack (layout/partials/pages/constraints).
+- `integration-inventory.json` — inventory маршрутов, сущностей, actions, forms, filters и statuses для UMI-интеграции.
+- `HANDOFF_CHECKLIST.md` — короткий pre-handoff checklist перед передачей шаблонов в UMI-разработку.
 - Standalone demo pages остаются в `static-uikit/pages/` и не заменяются.
 - Source fragments в `static-uikit/partials/` остаются эталонными фрагментами.
 - `umi-p0` не подключается автоматически и не требует build step.
