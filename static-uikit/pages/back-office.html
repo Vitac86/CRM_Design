@@ -56,7 +56,21 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        <div class="crm-page-header"><h1>Бэк-офис</h1></div><div class="crm-split-view"><div class="crm-card uk-card uk-card-body crm-section"><h3>Платёжный календарь</h3><p>5 операций ожидают подтверждения.</p></div><div class="crm-card uk-card uk-card-body crm-section"><h3>Сверка остатков</h3><p>Отклонений не обнаружено.</p></div></div>
+        <div class="crm-page-header"><h1>Отчёты Бэк-офиса</h1></div>
+        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
+          <div class="uk-width-1-1 uk-width-1-4@m"><input class="uk-input crm-input" placeholder="Поиск по файлу/клиенту"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Код клиента"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input type="date" class="uk-input crm-input" value="2026-04-24"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Вид отчёта</option><option>Операционный</option><option>Финансовый</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Канал отправки</option><option>ЭДО</option><option>SFTP</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Результат доставки</option><option>Доставлен</option><option>Ошибка</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost">Очистить фильтры</button></div>
+        </div>
+        <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Имя файла</th><th>Дата и время отправки</th><th>Вид отчёта</th><th>Канал отправки</th><th>Результат доставки</th></tr></thead><tbody>
+        <tr><td>bo_oper_24042026_003.xml</td><td>24.04.2026 11:08</td><td>Операционный</td><td><span class="crm-badge info">ЭДО</span></td><td><span class="crm-badge success">Доставлен</span></td></tr>
+        <tr><td>bo_fin_24042026_005.xml</td><td>24.04.2026 09:48</td><td>Финансовый</td><td><span class="crm-badge muted">Email</span></td><td><span class="crm-badge warning">Ожидает</span></td></tr>
+        <tr><td>bo_ops_23042026_014.xml</td><td>23.04.2026 18:14</td><td>Операционный</td><td><span class="crm-badge info">SFTP</span></td><td><span class="crm-badge danger">Ошибка</span></td></tr>
+        </tbody></table></div>
       </section>
     </main>
   </div>

@@ -56,7 +56,37 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        <div class="crm-page-header"><h1>Депозитарий</h1></div><div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider"><thead><tr><th>Счёт депо</th><th>Клиент</th><th>Тип</th><th>Статус</th></tr></thead><tbody><tr><td>DEP-90011</td><td>АО «Восток Майнинг Системс»</td><td>Основной</td><td><span class="crm-badge success">Открыт</span></td></tr></tbody></table></div>
+        <div class="crm-page-header"><h1>Депозитарий</h1></div>
+        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
+          <div class="uk-width-1-1 uk-width-1-4@m"><input class="uk-input crm-input" placeholder="Поиск по клиенту/файлу/отчёту"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Код клиента"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input type="date" class="uk-input crm-input" value="2026-04-24"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Вид отчёта</option><option>Отчёт депозитария за день</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Канал отправки</option><option>ЭДО</option><option>SFTP</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Результат доставки</option><option>Доставлен</option><option>Ошибка</option></select></div>
+        </div>
+        <div class="crm-split-view">
+          <div class="crm-card uk-card uk-card-body">
+            <h3>Список отчётов</h3>
+            <div class="crm-report-list">
+              <article class="crm-report-item is-selected"><div><strong>dep_day_24042026_001.xml</strong><small>Отчёт депозитария за день · CL-4401 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">ЭДО</span><span class="crm-badge success">Доставлен</span></div></article>
+              <article class="crm-report-item"><div><strong>dep_day_24042026_002.xml</strong><small>Свод движения ЦБ · CL-4408 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge muted">Email</span><span class="crm-badge warning">Ожидает</span></div></article>
+              <article class="crm-report-item"><div><strong>dep_register_23042026_007.xml</strong><small>Реестр поручений · CL-4412 · 23.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">SFTP</span><span class="crm-badge danger">Ошибка</span></div></article>
+            </div>
+          </div>
+          <aside class="crm-card uk-card uk-card-body">
+            <h3>Отчёт депозитария за день</h3>
+            <div class="crm-form-grid uk-grid-small" uk-grid>
+              <div class="uk-width-1-2"><label class="uk-form-label">Клиент</label><div>АО «Восток Майнинг Системс»</div></div>
+              <div class="uk-width-1-2"><label class="uk-form-label">Код клиента</label><div>CL-4401</div></div>
+              <div class="uk-width-1-2"><label class="uk-form-label">Дата отчёта</label><div>24.04.2026</div></div>
+              <div class="uk-width-1-2"><label class="uk-form-label">Канал отправки</label><div>ЭДО</div></div>
+              <div class="uk-width-1-2"><label class="uk-form-label">Статус доставки</label><div><span class="crm-badge success">Доставлен</span></div></div>
+              <div class="uk-width-1-2"><label class="uk-form-label">Файл</label><div>dep_day_24042026_001.xml</div></div>
+            </div>
+            <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Скачать</button><button class="uk-button crm-button-primary crm-button">Отправить повторно</button></div>
+          </aside>
+        </div>
       </section>
     </main>
   </div>

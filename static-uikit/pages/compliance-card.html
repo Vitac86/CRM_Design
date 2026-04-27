@@ -56,27 +56,51 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        
-<div class="crm-page-header"><h1>Карточка комплаенса</h1></div>
-<div class="crm-grid-2">
-<div class="crm-card uk-card uk-card-body crm-section">
-  <h3>АО «Глобал Ресурс Траст» <span class="crm-badge warning">НА ПРОВЕРКЕ</span></h3>
-  <p>Код клиента CL-4408 · ИНН 7705964812</p>
-  <div class="crm-form-grid uk-grid-small" uk-grid>
-    <div class="uk-width-1-2"><label class="uk-form-label">Риск-профиль</label><div>Средний</div></div>
-    <div class="uk-width-1-2"><label class="uk-form-label">Источник средств</label><div>Подтверждён частично</div></div>
-    <div class="uk-width-1-1"><label class="uk-form-label">Комментарии по проверке</label><div>Требуется обновление анкеты и подтверждение структуры владения.</div></div>
-  </div>
-  <div class="crm-card crm-table crm-table-wrapper uk-margin-top"><table class="uk-table uk-table-divider"><thead><tr><th>Проверка</th><th>Статус</th><th>Дата</th></tr></thead><tbody>
-    <tr><td>KYC анкета</td><td><span class="crm-badge warning">На проверке</span></td><td>24.04.2026</td></tr>
-    <tr><td>Бенефициары</td><td><span class="crm-badge success">Пройдено</span></td><td>23.04.2026</td></tr>
-  </tbody></table></div>
-</div>
-<aside class="crm-card uk-card uk-card-body crm-section"><h3>Принятие решения</h3><label class="uk-form-label">Комментарий</label><textarea class="uk-textarea crm-input" rows="8" placeholder="Опишите решение"></textarea>
-  <div class="crm-footer-actions" style="justify-content:stretch;display:grid;grid-template-columns:1fr;gap:8px;"><button class="uk-button uk-button-default crm-button">На доработку</button><button class="uk-button crm-button-primary crm-button">Одобрить</button><button class="uk-button uk-button-danger crm-button">Заблокировать</button></div>
-</aside>
-</div>
-
+        <div class="crm-detail-header crm-card uk-card uk-card-body uk-margin-bottom">
+          <div>
+            <h1>АО «Глобал Ресурс Траст»</h1>
+            <p>Код CL-4408 · ИНН 7705964812 · ЮЛ · Нерезидент</p>
+          </div>
+          <div class="crm-inline-badges">
+            <span class="crm-badge warning">Риск: Средний</span>
+            <span class="crm-badge info">На проверке</span>
+            <span class="crm-badge muted">Обновлено: 24.04.2026 10:18</span>
+          </div>
+        </div>
+        <div class="crm-grid-2">
+          <div>
+            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
+              <h3>Карточка клиента</h3>
+              <div class="crm-form-grid uk-grid-small" uk-grid>
+                <div class="uk-width-1-2"><label class="uk-form-label">Тип клиента</label><div>Юридическое лицо</div></div>
+                <div class="uk-width-1-2"><label class="uk-form-label">Резидентство</label><div>Нерезидент</div></div>
+                <div class="uk-width-1-2"><label class="uk-form-label">Ответственный менеджер</label><div>Иванов И.И.</div></div>
+                <div class="uk-width-1-2"><label class="uk-form-label">Источник средств</label><div>Подтверждён частично</div></div>
+              </div>
+            </article>
+            <article class="crm-card crm-table crm-table-wrapper">
+              <table class="uk-table uk-table-divider">
+                <thead><tr><th>Проверка</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr></thead>
+                <tbody>
+                  <tr><td>KYC анкета</td><td><span class="crm-badge warning">На проверке</span></td><td>Нужны обновлённые документы</td><td>24.04.2026</td></tr>
+                  <tr><td>Бенефициары</td><td><span class="crm-badge success">Пройден</span></td><td>Данные подтверждены</td><td>23.04.2026</td></tr>
+                  <tr><td>AML мониторинг</td><td><span class="crm-badge info">На доработке</span></td><td>Требуется доп. пояснение</td><td>23.04.2026</td></tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
+          <aside class="crm-card uk-card uk-card-body crm-decision-panel">
+            <h3>Панель решения</h3>
+            <div class="crm-action-row">
+              <button class="uk-button uk-button-default crm-button">Одобрить</button>
+              <button class="uk-button uk-button-default crm-button">На доработку</button>
+              <button class="uk-button uk-button-default crm-button">Заблокировать</button>
+            </div>
+            <label class="uk-form-label">Комментарий комплаенса</label>
+            <textarea class="uk-textarea crm-input" rows="8" placeholder="Укажите обоснование решения"></textarea>
+            <button class="uk-button crm-button-primary crm-button uk-width-1-1">Принять финальное решение</button>
+          </aside>
+        </div>
       </section>
     </main>
   </div>

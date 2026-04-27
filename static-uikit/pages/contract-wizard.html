@@ -56,11 +56,31 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        
-<div class="crm-page-header"><h1>Мастер оформления договора</h1><p>Шаг 2 из 3 · Выбор продукта</p></div>
-<div class="crm-split-view"><div class="crm-card uk-card uk-card-body crm-section"><h3>Параметры договора</h3><div class="crm-form-grid uk-grid-small" uk-grid><div class="uk-width-1-2"><label class="uk-form-label">Клиент</label><input class="uk-input crm-input" value="АО «Восток Майнинг Системс"/></div><div class="uk-width-1-2"><label class="uk-form-label">Код клиента</label><input class="uk-input crm-input" value="CL-4401"/></div><div class="uk-width-1-2"><label class="uk-form-label">Продукт</label><select class="uk-select crm-select"><option>Брокерское обслуживание</option></select></div><div class="uk-width-1-2"><label class="uk-form-label">Тариф</label><select class="uk-select crm-select"><option>Executive Prime</option></select></div><div class="uk-width-1-1"><label class="uk-form-label">Параметры</label><label><input class="uk-checkbox" checked/> Открыть новый счёт</label> <label class="uk-margin-left"><input class="uk-checkbox"/> Использовать существующий</label></div></div></div>
-<div class="crm-card uk-card uk-card-body crm-section"><h3>Контроль заполнения</h3><ul class="uk-list uk-list-divider"><li>Идентификация клиента — <span class="crm-badge success">Выполнено</span></li><li>Проверка документов — <span class="crm-badge info">В работе</span></li><li>Подтверждение анкеты FATCA — <span class="crm-badge warning">Требуется</span></li></ul><div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Назад</button><button class="uk-button crm-button-primary crm-button">Сформировать договор</button></div></div></div>
-
+        <div class="crm-register-header">
+          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Мастер договора</span></div>
+          <div class="crm-page-header"><h1>Мастер оформления договора</h1><p class="crm-step-note">Шаг 2 из 3 · Параметры договора</p></div>
+        </div>
+        <div class="crm-card uk-card uk-card-body crm-register-card">
+          <div class="crm-option-grid">
+            <label class="crm-option-card"><input type="radio" checked name="product"/><span>Брокерский договор</span><small>Открытие счёта и торговых доступов.</small></label>
+            <label class="crm-option-card is-selected"><input type="radio" name="product"/><span>Договор ДУ</span><small>Передача активов в доверительное управление.</small></label>
+            <label class="crm-option-card"><input type="radio" name="product"/><span>Депозитарный договор</span><small>Учёт и хранение ценных бумаг клиента.</small></label>
+          </div>
+          <div class="crm-form-grid uk-grid-small" uk-grid>
+            <div class="uk-width-1-2"><label class="uk-form-label">Клиент</label><input class="uk-input crm-input" value="АО «Восток Майнинг Системс»"/></div>
+            <div class="uk-width-1-2"><label class="uk-form-label">Код клиента</label><input class="uk-input crm-input" value="CL-4401"/></div>
+            <div class="uk-width-1-2"><label class="uk-form-label">Тариф/стратегия</label><select class="uk-select crm-select"><option>Сбалансированная</option></select></div>
+            <div class="uk-width-1-2"><label class="uk-form-label">Дата начала</label><input type="date" class="uk-input crm-input" value="2026-04-27"/></div>
+            <div class="uk-width-1-1"><label class="uk-form-label">Особые условия</label><textarea rows="4" class="uk-textarea crm-input" placeholder="Комментарий по условиям и ограничениям"></textarea></div>
+          </div>
+        </div>
+        <div class="crm-sticky-actions">
+          <button class="uk-button uk-button-default crm-button">Назад</button>
+          <div class="crm-page-actions">
+            <button class="uk-button uk-button-default crm-button">Сохранить черновик</button>
+            <button class="uk-button crm-button-primary crm-button">Далее / Сформировать договор</button>
+          </div>
+        </div>
       </section>
     </main>
   </div>

@@ -56,7 +56,28 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        <div class="crm-page-header"><h1>Комплаенс</h1></div><div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid><div class="uk-width-1-3@m"><input class="uk-input crm-input" placeholder="Поиск"/></div><div class="uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус</option></select></div></div><div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Клиент</th><th>Код</th><th>Статус</th><th>Срок</th></tr></thead><tbody><tr onclick="location.href='compliance-card.html'"><td>АО «Глобал Ресурс Траст»</td><td>CL-4408</td><td><span class="crm-badge warning">На проверке</span></td><td>27.04.2026</td></tr></tbody></table></div>
+        <div class="crm-page-header crm-page-header-row">
+          <h1>Комплаенс</h1>
+          <div class="crm-page-actions"><button class="uk-button uk-button-default crm-button">Выгрузка реестра</button></div>
+        </div>
+        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
+          <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" placeholder="Поиск клиента или кода"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Риск</option><option>Низкий</option><option>Средний</option><option>Высокий</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус</option><option>Пройден</option><option>На проверке</option><option>На доработке</option><option>Заблокирован</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>KYC</option><option>Полный</option><option>Частичный</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Резидентство</option><option>Резидент</option><option>Нерезидент</option></select></div>
+        </div>
+        <div class="crm-card crm-table crm-table-wrapper">
+          <table class="uk-table uk-table-divider uk-table-hover">
+            <thead><tr><th>Клиент</th><th>Уровень риска</th><th>KYC</th><th>AML</th><th>Статус</th><th>Последнее обновление</th></tr></thead>
+            <tbody>
+              <tr onclick="location.href='compliance-card.html'"><td>АО «Глобал Ресурс Траст»</td><td><span class="crm-badge warning">Средний</span></td><td><span class="crm-badge info">Частичный</span></td><td><span class="crm-badge warning">Мониторинг</span></td><td><span class="crm-badge warning">На проверке</span></td><td>24.04.2026 10:18</td></tr>
+              <tr onclick="location.href='compliance-card.html'"><td>АО «Восток Майнинг Системс»</td><td><span class="crm-badge success">Низкий</span></td><td><span class="crm-badge success">Полный</span></td><td><span class="crm-badge success">ОК</span></td><td><span class="crm-badge success">Пройден</span></td><td>24.04.2026 09:43</td></tr>
+              <tr onclick="location.href='compliance-card.html'"><td>Громова Алина Сергеевна</td><td><span class="crm-badge info">Средний</span></td><td><span class="crm-badge warning">Обновить</span></td><td><span class="crm-badge info">Проверка источника</span></td><td><span class="crm-badge info">На доработке</span></td><td>23.04.2026 16:51</td></tr>
+              <tr onclick="location.href='compliance-card.html'"><td>ООО «Северный Портфель»</td><td><span class="crm-badge danger">Высокий</span></td><td><span class="crm-badge danger">Неполный</span></td><td><span class="crm-badge danger">Риск-фактор</span></td><td><span class="crm-badge danger">Заблокирован</span></td><td>22.04.2026 14:12</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   </div>
