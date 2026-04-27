@@ -8,57 +8,85 @@
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
 <body>
-<div class="crm-app"><div class="crm-layout"><aside class="crm-sidebar">
-  <div class="crm-sidebar-brand"><img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/></div>
+<div class="crm-app">
+  <div class="crm-layout">
+    <aside class="crm-sidebar">
+  <div class="crm-sidebar-brand">
+    <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+  </div>
   <nav>
-    <a class="crm-nav-link" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
-    <a class="crm-nav-link" href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
-    <a class="crm-nav-link" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
-    <a class="crm-nav-link" href="trust-management.html"><span><span uk-icon="briefcase"></span>Дов. управление</span></a>
-    <a class="crm-nav-link" href="agents.html"><span><span uk-icon="users"></span>Агенты</span></a>
-    <a class="crm-nav-link" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
-    <a class="crm-nav-link active" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
-    <a class="crm-nav-link" href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
-    <a class="crm-nav-link" href="middle-office-clients.html"><span><span uk-icon="database"></span>Мидл-офис</span><span uk-icon="chevron-down"></span></a>
-    <div class="crm-nav-submenu"><a class="crm-nav-link" href="middle-office-clients.html">Журнал клиентов</a><a class="crm-nav-link" href="middle-office-reports.html">Журнал отправленных отчётов</a></div>
-    <a class="crm-nav-link" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a><a class="crm-nav-link" href="trading.html"><span><span uk-icon="credit-card"></span>Трейдинг</span></a>
-    <a class="crm-nav-link" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a><a class="crm-nav-link" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
+    <div class="crm-nav-section">
+      <div class="crm-nav-heading">Фронт-офис</div>
+      <a class="crm-nav-link crm-nav-item " href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
+      <a class="crm-nav-link crm-nav-item " href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
+      <a class="crm-nav-link crm-nav-item " href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+      <a class="crm-nav-link crm-nav-item " href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
+      <a class="crm-nav-link crm-nav-item " href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
+      <a class="crm-nav-link crm-nav-item " href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
+      <a class="crm-nav-link crm-nav-item active" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+      <a class="crm-nav-link crm-nav-item " href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+    </div>
+
+    <div class="crm-nav-section">
+      <div class="crm-nav-heading">Мидл-офис</div>
+      <a class="crm-nav-link crm-nav-item " href="middle-office-clients.html"><span><span uk-icon="database"></span>Мидл-офис</span><span uk-icon="chevron-down"></span></a>
+      <div class="crm-nav-submenu">
+        <a class="crm-nav-link crm-nav-item " href="middle-office-clients.html">Журнал клиентов</a>
+        <a class="crm-nav-link crm-nav-item " href="middle-office-reports.html">Журнал отправленных отчётов</a>
+      </div>
+    </div>
+
+    <div class="crm-nav-section">
+      <a class="crm-nav-link crm-nav-item " href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
+      <a class="crm-nav-link crm-nav-item " href="trading.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
+      <a class="crm-nav-link crm-nav-item " href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+      <a class="crm-nav-link crm-nav-item " href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
+    </div>
   </nav>
 </aside>
-<main class="crm-main">
-  <header class="crm-topbar"><button class="uk-button uk-button-default" data-sidebar-toggle><span uk-icon="menu"></span></button><div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск по CRM"/></div><div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div></header>
-  <section class="crm-page">
-    <div class="crm-page-header"><h1>Поручения</h1></div>
+    <main class="crm-main">
+      <header class="crm-topbar">
+        <button class="uk-button uk-button-default" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
+        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+      </header>
+      <section class="crm-page">
+        
+<div class="crm-page-header crm-page-header-row"><h1>Поручения</h1><button class="uk-button crm-button-primary crm-button">+ Создать поручение</button></div>
+<div class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
+  <h3>Новое поручение</h3>
+  <div class="crm-form-grid uk-grid-small" uk-grid>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Тип поручения</label><select class="uk-select crm-select"><option>Поручение на вывод ДС</option></select></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Клиент</label><select class="uk-select crm-select"><option>АО «Восток Майнинг Системс»</option></select></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Договор</label><select class="uk-select crm-select"><option>BR-8821</option></select></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Источник</label><select class="uk-select crm-select"><option>Личный кабинет</option></select></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Сумма</label><input class="uk-input crm-input" value="2450000"/></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Валюта</label><select class="uk-select crm-select"><option>RUB</option></select></div>
+    <div class="uk-width-1-2@m"><label class="uk-form-label">Банк получателя</label><input class="uk-input crm-input" value="ПАО Сбербанк"/></div>
+    <div class="uk-width-1-4@m"><label class="uk-form-label">БИК</label><input class="uk-input crm-input" value="044525225"/></div>
+    <div class="uk-width-1-4@m"><label class="uk-form-label">Расчётный счёт</label><input class="uk-input crm-input" value="40702810900000012345"/></div>
+  </div>
+  <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Отмена</button><button class="uk-button crm-button-primary crm-button">Создать</button></div>
+</div>
+<div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
+  <div class="uk-width-1-4@m"><input class="uk-input crm-input" placeholder="Поиск поручения"/></div>
+  <div class="uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Код клиента"/></div>
+  <div class="uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Дата"/></div>
+  <div class="uk-width-1-6@m"><select class="uk-select crm-select"><option>Источник</option></select></div>
+  <div class="uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус</option></select></div>
+  <div class="uk-width-1-6@m"><button class="uk-button uk-button-default crm-button">Очистить фильтры</button></div>
+</div>
+<div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Номер</th><th>Тип поручения</th><th>Клиент</th><th>Код</th><th>Источник</th><th>Сумма</th><th>Валюта</th><th>Статус</th><th>Дата</th></tr></thead><tbody>
+<tr><td>P-24108</td><td>Вывод ДС</td><td>АО «Восток Майнинг Системс»</td><td>CL-4401</td><td>Личный кабинет</td><td>2 450 000</td><td>RUB</td><td><span class="crm-badge warning">Ожидает</span></td><td>24.04.2026</td></tr>
+<tr><td>P-24103</td><td>Перевод ДС</td><td>Громова Алина Сергеевна</td><td>CL-4412</td><td>Почта</td><td>340 000</td><td>RUB</td><td><span class="crm-badge info">Принято</span></td><td>23.04.2026</td></tr>
+</tbody></table></div>
 
-    <div class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
-      <div class="crm-form-grid uk-grid-small" uk-grid>
-        <div class="uk-width-1-3@m"><label class="uk-form-label">Тип поручения</label><select class="uk-select crm-select"><option>Покупка ценных бумаг</option></select></div>
-        <div class="uk-width-1-3@m"><label class="uk-form-label">Клиент</label><input class="uk-input crm-input" value="АО «Восток Майнинг Системс"/></div>
-        <div class="uk-width-1-3@m"><label class="uk-form-label">Договор</label><input class="uk-input crm-input" value="BR-8821"/></div>
-        <div class="uk-width-1-4@m"><label class="uk-form-label">Статус</label><select class="uk-select crm-select"><option>Черновик</option></select></div>
-        <div class="uk-width-1-4@m"><label class="uk-form-label">Источник</label><select class="uk-select crm-select"><option>Кабинет клиента</option></select></div>
-        <div class="uk-width-1-4@m"><label class="uk-form-label">Сумма</label><input class="uk-input crm-input" value="2 450 000"/></div>
-        <div class="uk-width-1-4@m"><label class="uk-form-label">Валюта</label><select class="uk-select crm-select"><option>RUB</option></select></div>
-      </div>
-      <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Отмена</button><button class="uk-button uk-button-default crm-button">Распечатать поручение</button><button class="uk-button crm-button-primary crm-button">Сохранить поручение</button></div>
-    </div>
-
-    <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
-      <div class="uk-width-1-4@m"><input class="uk-input crm-input" placeholder="Поиск поручения"/></div>
-      <div class="uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Код клиента"/></div>
-      <div class="uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Дата"/></div>
-      <div class="uk-width-1-6@m"><select class="uk-select crm-select"><option>Источник</option></select></div>
-      <div class="uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус</option></select></div>
-      <div class="uk-width-1-6@m"><button class="uk-button uk-button-default crm-button">Очистить фильтры</button></div>
-    </div>
-
-    <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Номер поручения</th><th>Вид поручения</th><th>Клиент</th><th>Код клиента</th><th>Договор</th><th>Источник</th><th>Сумма</th><th>Валюта</th><th>Статус</th><th>Дата</th></tr></thead><tbody>
-      <tr><td>P-24108</td><td>Покупка ценных бумаг</td><td>АО «Восток Майнинг Системс»</td><td>CL-4401</td><td>BR-8821</td><td>Кабинет клиента</td><td>2 450 000</td><td>RUB</td><td><span class="crm-badge warning">В работе</span></td><td>24.04.2026</td></tr>
-      <tr><td>P-24103</td><td>Вывод денежных средств</td><td>Громова Алина Сергеевна</td><td>CL-4412</td><td>BR-8849</td><td>Офис менеджера</td><td>340 000</td><td>RUB</td><td><span class="crm-badge info">На проверке</span></td><td>23.04.2026</td></tr>
-      <tr><td>P-24099</td><td>Покупка облигаций</td><td>АО «Глобал Ресурс Траст»</td><td>CL-4408</td><td>DU-1144</td><td>Почта с ЭЦП</td><td>1 120 000</td><td>USD</td><td><span class="crm-badge success">Исполнено</span></td><td>22.04.2026</td></tr>
-    </tbody></table></div>
-  </section>
-</main></div></div>
-<script src="../assets/js/uikit.min.js"></script><script src="../assets/js/uikit-icons.min.js"></script><script src="../assets/js/crm-static.js"></script>
+      </section>
+    </main>
+  </div>
+</div>
+<script src="../assets/js/uikit.min.js"></script>
+<script src="../assets/js/uikit-icons.min.js"></script>
+<script src="../assets/js/crm-static.js"></script>
 </body>
 </html>

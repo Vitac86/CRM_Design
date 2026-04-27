@@ -15,60 +15,73 @@
     <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
   </div>
   <nav>
-    <a class="crm-nav-link active" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
-    <a class="crm-nav-link" href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
-    <a class="crm-nav-link" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
-    <a class="crm-nav-link" href="trust-management.html"><span><span uk-icon="briefcase"></span>Дов. управление</span></a>
-    <a class="crm-nav-link" href="agents.html"><span><span uk-icon="users"></span>Агенты</span></a>
-    <a class="crm-nav-link" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
-    <a class="crm-nav-link" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
-    <a class="crm-nav-link" href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
-    <a class="crm-nav-link" href="middle-office-clients.html"><span><span uk-icon="database"></span>Мидл-офис</span><span uk-icon="chevron-down"></span></a>
-    <div class="crm-nav-submenu">
-      <a class="crm-nav-link" href="middle-office-clients.html">Журнал клиентов</a>
-      <a class="crm-nav-link" href="middle-office-reports.html">Журнал отправленных отчётов</a>
+    <div class="crm-nav-section">
+      <div class="crm-nav-heading">Фронт-офис</div>
+      <a class="crm-nav-link crm-nav-item active" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
+      <a class="crm-nav-link crm-nav-item " href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
+      <a class="crm-nav-link crm-nav-item " href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+      <a class="crm-nav-link crm-nav-item " href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
+      <a class="crm-nav-link crm-nav-item " href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
+      <a class="crm-nav-link crm-nav-item " href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
+      <a class="crm-nav-link crm-nav-item " href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+      <a class="crm-nav-link crm-nav-item " href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
     </div>
-    <a class="crm-nav-link" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
-    <a class="crm-nav-link" href="trading.html"><span><span uk-icon="credit-card"></span>Трейдинг</span></a>
-    <a class="crm-nav-link" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
-    <a class="crm-nav-link" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
+
+    <div class="crm-nav-section">
+      <div class="crm-nav-heading">Мидл-офис</div>
+      <a class="crm-nav-link crm-nav-item " href="middle-office-clients.html"><span><span uk-icon="database"></span>Мидл-офис</span><span uk-icon="chevron-down"></span></a>
+      <div class="crm-nav-submenu">
+        <a class="crm-nav-link crm-nav-item " href="middle-office-clients.html">Журнал клиентов</a>
+        <a class="crm-nav-link crm-nav-item " href="middle-office-reports.html">Журнал отправленных отчётов</a>
+      </div>
+    </div>
+
+    <div class="crm-nav-section">
+      <a class="crm-nav-link crm-nav-item " href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
+      <a class="crm-nav-link crm-nav-item " href="trading.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
+      <a class="crm-nav-link crm-nav-item " href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+      <a class="crm-nav-link crm-nav-item " href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
+    </div>
   </nav>
 </aside>
-<main class="crm-main">
-  <header class="crm-topbar">
-    <button class="uk-button uk-button-default" data-sidebar-toggle><span uk-icon="menu"></span></button>
-    <div class="crm-search">
-      <span class="crm-search-icon" uk-icon="search"></span>
-      <input class="uk-input crm-input" placeholder="Глобальный поиск по CRM"/>
-    </div>
-    <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
-  </header>
+    <main class="crm-main">
+      <header class="crm-topbar">
+        <button class="uk-button uk-button-default" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
+        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+      </header>
       <section class="crm-page">
-        <h1>Операционный обзор</h1>
-        <div class="crm-kpi-grid">
-          <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">17</div><div>новых субъектов</div></article>
-          <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">43</div><div>очередь комплаенса</div></article>
-          <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">24</div><div>новые поручения</div></article>
-          <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">12</div><div>задач просрочено</div></article>
-        </div>
-        <div class="crm-grid-2">
-          <div class="crm-card uk-card uk-card-body crm-section">
-            <h3>Последние изменения по субъектам</h3>
-            <ul class="uk-list uk-list-divider">
-              <li><strong>АО «Восток Майнинг Системс»</strong> — обновлён комплект документов <span class="crm-badge info">На комплаенсе</span></li>
-              <li><strong>АО «Глобал Ресурс Траст»</strong> — изменён ответственный менеджер <span class="crm-badge success">Активен</span></li>
-              <li><strong>Громова Алина Сергеевна</strong> — смена статуса резидентства <span class="crm-badge warning">На проверке</span></li>
-            </ul>
-          </div>
-          <div class="crm-card uk-card uk-card-body crm-section">
-            <div class="crm-section-head"><h3>Последние поручения</h3><a href="requests.html">Все поручения</a></div>
-            <ul class="uk-list uk-list-divider">
-              <li>#P-24108 — Покупка облигаций <span class="crm-badge warning">В работе</span></li>
-              <li>#P-24103 — Вывод денежных средств <span class="crm-badge info">На проверке</span></li>
-              <li>#P-24099 — Изменение лимита <span class="crm-badge success">Исполнено</span></li>
-            </ul>
-          </div>
-        </div>
+        
+<div class="crm-page-header"><h1>Операционный обзор</h1></div>
+<div class="crm-kpi-grid">
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">17</div><div>Новые субъекты</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">43</div><div>Очередь комплаенса</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">24</div><div>Поручения за день</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">12</div><div>Просроченные задачи</div></article>
+</div>
+<div class="crm-split-view">
+  <div class="crm-card crm-table-wrapper crm-table">
+    <table class="uk-table uk-table-divider uk-table-hover">
+      <thead><tr><th>Субъект</th><th>Изменение</th><th>Время</th></tr></thead>
+      <tbody>
+        <tr><td>АО «Восток Майнинг Системс»</td><td>Обновлён комплект документов</td><td>10:48</td></tr>
+        <tr><td>АО «Глобал Ресурс Траст»</td><td>Изменён менеджер сопровождения</td><td>10:12</td></tr>
+        <tr><td>Громова Алина Сергеевна</td><td>Обновлён статус резидентства</td><td>09:54</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="crm-card crm-table-wrapper crm-table">
+    <table class="uk-table uk-table-divider uk-table-hover">
+      <thead><tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr></thead>
+      <tbody>
+        <tr><td>P-24108</td><td><span class="crm-badge warning">Ожидает</span></td><td>24.04.2026</td></tr>
+        <tr><td>P-24103</td><td><span class="crm-badge info">Принято</span></td><td>23.04.2026</td></tr>
+        <tr><td>P-24099</td><td><span class="crm-badge danger">Отклонено</span></td><td>22.04.2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
       </section>
     </main>
   </div>
