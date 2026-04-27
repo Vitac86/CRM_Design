@@ -88,3 +88,4 @@ node static-uikit/tools/validate-static-uikit.mjs
 - Это не build step и не runtime для standalone-демо.
 - Standalone pages остаются в `static-uikit/pages/`.
 - Перед использованием в реальном UMI.CMS-проекте замените placeholders на синтаксис проекта.
+- Дополнительно pack содержит manifest, integration inventory и handoff checklist.
