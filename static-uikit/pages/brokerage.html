@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
-<body>
+<body data-page="brokerage">
 <div class="crm-app">
   <div class="crm-layout">
     <aside class="crm-sidebar">
@@ -55,15 +55,16 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page">
-        <div class="crm-page-header crm-page-header-row"><h1>Брокерская деятельность</h1><div class="crm-page-actions"><button class="uk-button uk-button-default crm-button">Экспорт</button></div></div>
-        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
-          <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" placeholder="Поиск: договор/код/клиент/менеджер"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус</option><option>Активен</option><option>На паузе</option></select></div>
-        </div>
+      <section class="crm-page" data-page="brokerage">
+        <div class="crm-page-header crm-page-header-row"><h1 data-entity="page-title">Брокерская деятельность</h1><div class="crm-page-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-brokerage">Экспорт</button></div></div>
+        <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="brokerage">
+          <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" name="brokerage-search" placeholder="Поиск: договор/код/клиент/менеджер"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="brokerage-status"><option>Статус</option><option>Активен</option><option>На паузе</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" type="reset" data-action="reset-filters">Очистить фильтры</button></div>
+        </form>
         <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Договор</th><th>Код клиента</th><th>Клиент</th><th>Менеджер</th><th>Дата открытия</th><th>Статус</th></tr></thead><tbody>
-        <tr><td>BR-8821</td><td>CL-4401</td><td>АО «Восток Майнинг Системс»</td><td>Иванов И.И.</td><td>11.01.2026</td><td><span class="crm-badge success">Активен</span></td></tr>
-        <tr><td>BR-8890</td><td>CL-4408</td><td>АО «Глобал Ресурс Траст»</td><td>Петрова Н.А.</td><td>18.02.2026</td><td><span class="crm-badge warning">На паузе</span></td></tr>
+        <tr data-entity="brokerage-contract" data-id="BR-8821"><td>BR-8821</td><td>CL-4401</td><td>АО «Восток Майнинг Системс»</td><td>Иванов И.И.</td><td>11.01.2026</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
+        <tr data-entity="brokerage-contract" data-id="BR-8890"><td>BR-8890</td><td>CL-4408</td><td>АО «Глобал Ресурс Траст»</td><td>Петрова Н.А.</td><td>18.02.2026</td><td><span class="crm-badge warning" data-status="paused">На паузе</span></td></tr>
         </tbody></table></div>
       </section>
     </main>
