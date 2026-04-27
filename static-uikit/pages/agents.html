@@ -56,7 +56,20 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        <div class="crm-page-header crm-page-header-row"><h1>Агенты</h1><div class="crm-header-actions"><a class="crm-link-action" href="#">Экспорт</a><button class="uk-button crm-button-primary crm-button">+ Добавить агента</button></div></div><div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider"><thead><tr><th>Агент</th><th>Регион</th><th>Клиентов</th><th>Статус</th></tr></thead><tbody><tr><td>Смирнов П.П.</td><td>Москва</td><td>41</td><td><span class="crm-badge success">Активен</span></td></tr></tbody></table></div>
+        <div class="crm-page-header crm-page-header-row"><h1>Агенты</h1><div class="crm-header-actions"><button class="uk-button crm-button-primary crm-button">+ Добавить агента</button></div></div>
+        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
+          <div class="uk-width-1-1"><input class="uk-input crm-input" placeholder="Поиск по субъекту, договору, комиссии, телефону или email"/></div>
+        </div>
+        <div class="crm-card crm-table crm-table-wrapper">
+          <table class="uk-table uk-table-divider uk-table-hover">
+            <thead><tr><th>Субъект</th><th>Компания</th><th>Номер договора</th><th>Комиссия</th><th>Телефон</th><th>Email</th><th>Статус</th></tr></thead>
+            <tbody>
+              <tr><td><a href="#" class="crm-link-action">ПАО «НеоЭнергоСбыт»</a></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>+7 (900) 100-11-03</td><td>corp@neoenergy.test</td><td><span class="crm-badge success">Активен</span></td></tr>
+              <tr><td><a href="#" class="crm-link-action">АО «Орбита ФинСервис»</a></td><td>АО «Орбита ФинСервис»</td><td>AG-1988</td><td>2.00%</td><td>+7 (900) 100-11-05</td><td>support@orbita-fin.test</td><td><span class="crm-badge success">Активен</span></td></tr>
+              <tr><td><a href="#" class="crm-link-action">ЗАО «Северо-Западный Трейд»</a></td><td>ЗАО «Северо-Западный Трейд»</td><td>AG-1760</td><td>0.90%</td><td>+7 (900) 100-11-14</td><td>contact@nw-trade.test</td><td><span class="crm-badge success">Активен</span></td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   </div>
