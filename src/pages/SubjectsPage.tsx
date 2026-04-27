@@ -6,6 +6,7 @@ import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
 import type { Client, ClientRole, ClientType, ComplianceStatus, ResidencyStatus, SubjectStatus } from '../data/types';
 import {
+  Badge,
   Button,
   DataTable,
   FilterChipSelect,
@@ -407,6 +408,17 @@ export const SubjectsPage = () => {
             sortable: true,
             render: (client) => (
               <StatusBadge value={client.fullDocumentSet ? 'Да' : 'Нет'} compact />
+            ),
+          },
+          {
+            key: 'permissions',
+            header: 'ДС / ЦБ',
+            className: 'min-w-[170px]',
+            render: (client) => (
+              <div className="flex flex-wrap gap-1.5">
+                <Badge variant={client.canUseMoney ? 'success' : 'neutral'}>ДС: {client.canUseMoney ? 'Да' : 'Нет'}</Badge>
+                <Badge variant={client.canUseSecurities ? 'success' : 'neutral'}>ЦБ: {client.canUseSecurities ? 'Да' : 'Нет'}</Badge>
+              </div>
             ),
           },
         ]}
