@@ -1,0 +1,55 @@
+<!-- Reference: static-uikit/pages/subject-card.html -->
+<!-- UMI TODO: render inside layout/base main content slot -->
+
+<section class="crm-page" data-page="subject-card">
+  <!-- UMI TODO: resolve subject by route id -->
+  <div class="crm-card uk-card uk-card-body crm-page-header" data-entity="subject-header">
+    <div class="crm-section-head">
+      <h1 data-entity="page-title">{{ subject.name }}</h1>
+      <div class="crm-header-actions">
+        <span class="crm-badge success" data-status="active-client">{{ subject.client_status }}</span>
+        <span class="crm-badge info" data-status="approved">{{ subject.compliance_status }}</span>
+      </div>
+    </div>
+    <p>Код {{ subject.code }} · ИНН {{ subject.inn }} · Менеджер {{ subject.manager }}</p>
+  </div>
+
+  <div class="crm-action-row" data-entity="action-row">
+    <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
+    <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
+    <button class="uk-button crm-button-primary crm-button" type="button" data-action="open-contract-wizard">Оформить договор</button>
+  </div>
+
+  <ul class="crm-tabs" uk-tab data-action="switch-tab">
+    <li class="uk-active"><a href="#">Профиль</a></li>
+    <li><a href="#">Договоры/счета</a></li>
+    <li><a href="#">Документы</a></li>
+    <li><a href="#">История</a></li>
+  </ul>
+  <!-- UMI TODO: render tabs based on permissions and available data -->
+
+  <div class="crm-split-view">
+    <div class="crm-card uk-card uk-card-body crm-section" data-entity="subject-profile">
+      <h3>Профиль</h3>
+      <!-- UMI TODO: render profile section -->
+      {{ subject_profile }}
+    </div>
+    <div class="crm-card uk-card uk-card-body crm-section" data-entity="subject-contracts">
+      <h3>Договоры и счета</h3>
+      <!-- UMI TODO: render contracts/accounts section -->
+      {{ subject_contracts }}
+    </div>
+  </div>
+
+  <div class="crm-card uk-card uk-card-body crm-section" data-entity="subject-documents">
+    <h3>Документы</h3>
+    <!-- UMI TODO: render documents section -->
+    {{ subject_documents }}
+  </div>
+
+  <div class="crm-card uk-card uk-card-body crm-section" data-entity="subject-history">
+    <h3>История</h3>
+    <!-- UMI TODO: render history section -->
+    {{ subject_history }}
+  </div>
+</section>

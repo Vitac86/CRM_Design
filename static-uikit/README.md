@@ -82,3 +82,9 @@ node static-uikit/tools/validate-static-uikit.mjs
 ```
 
 Скрипт проверяет отсутствие внешних зависимостей (CDN/analytics/API), валидность локальных `href`/`data-href`, корректность `form`/полей, наличие `body[data-page]` и `section.crm-page[data-page]`.
+
+## UMI P0 extraction pack
+- Папка `static-uikit/umi-p0/` содержит layout/partials/pages заготовки для P0-переноса в UMI.CMS.
+- Это не build step и не runtime для standalone-демо.
+- Standalone pages остаются в `static-uikit/pages/`.
+- Перед использованием в реальном UMI.CMS-проекте замените placeholders на синтаксис проекта.

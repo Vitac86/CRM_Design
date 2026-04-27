@@ -4,7 +4,14 @@ import path from 'node:path';
 
 const rootDir = path.resolve('static-uikit');
 const pagesDir = path.join(rootDir, 'pages');
-const scanDirs = [path.join(rootDir, 'pages'), path.join(rootDir, 'partials'), path.join(rootDir, 'assets', 'js')];
+const umiP0Dir = path.join(rootDir, 'umi-p0');
+const umiPagesDir = path.join(umiP0Dir, 'pages');
+const scanDirs = [
+  pagesDir,
+  path.join(rootDir, 'partials'),
+  path.join(rootDir, 'assets', 'js'),
+  umiP0Dir,
+];
 const textExt = new Set(['.html', '.js', '.mjs', '.css', '.md']);
 
 const forbiddenExternalPattern = /(https?:\/\/|cdn|fonts\.googleapis|fonts\.gstatic|unpkg|jsdelivr|cloudflare|analytics|gtag|tagmanager|sentry|amplitude|mixpanel)/i;
@@ -13,6 +20,7 @@ const forbiddenApiPattern = /(fetch\(|XMLHttpRequest|axios|WebSocket|EventSource
 const errors = [];
 
 function walk(dir) {
+  if (!fs.existsSync(dir)) return [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
@@ -32,8 +40,9 @@ function addError(file, message, sample = '') {
   errors.push(`${rel(file)}: ${message}${suffix}`);
 }
 
-const pageFiles = fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html'));
-const pageSet = new Set(pageFiles);
+const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
+const umiPageFiles = fs.existsSync(umiPagesDir) ? fs.readdirSync(umiPagesDir).filter((f) => f.endsWith('.html')) : [];
+const knownHtmlTargets = new Set([...pageFiles, ...umiPageFiles]);
 
 const allFiles = scanDirs.flatMap((dir) => walk(dir)).filter((file) => textExt.has(path.extname(file)));
 
@@ -54,9 +63,9 @@ for (const file of allFiles) {
     const dataHrefMatches = content.matchAll(/\bdata-href="([^"]+)"/g);
     for (const m of dataHrefMatches) {
       const target = m[1];
-      if (/^[a-z]+:/i.test(target) || target.startsWith('#') || target.startsWith('/')) continue;
-      if (target.endsWith('.html') && !pageSet.has(path.basename(target))) {
-        addError(file, `data-href target does not exist in static-uikit/pages`, target);
+      if (/^[a-z]+:/i.test(target) || target.startsWith('#') || target.startsWith('/') || target.includes('{{')) continue;
+      if (target.endsWith('.html') && !knownHtmlTargets.has(path.basename(target))) {
+        addError(file, 'data-href target does not exist in static-uikit/pages or static-uikit/umi-p0/pages', target);
       }
     }
 
@@ -64,9 +73,9 @@ for (const file of allFiles) {
     for (const m of hrefMatches) {
       const target = m[1];
       if (!target.endsWith('.html')) continue;
-      if (/^[a-z]+:/i.test(target) || target.startsWith('/') || target.startsWith('#')) continue;
-      if (!pageSet.has(path.basename(target))) {
-        addError(file, `href target does not exist in static-uikit/pages`, target);
+      if (/^[a-z]+:/i.test(target) || target.startsWith('/') || target.startsWith('#') || target.includes('{{')) continue;
+      if (!knownHtmlTargets.has(path.basename(target))) {
+        addError(file, 'href target does not exist in static-uikit/pages or static-uikit/umi-p0/pages', target);
       }
     }
 
@@ -101,6 +110,14 @@ for (const page of pageFiles) {
   }
   if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) {
     addError(file, 'missing section.crm-page[data-page]');
+  }
+}
+
+for (const page of umiPageFiles) {
+  const file = path.join(umiPagesDir, page);
+  const content = fs.readFileSync(file, 'utf8');
+  if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) {
+    addError(file, 'missing section.crm-page[data-page] in umi-p0 page template');
   }
 }
 
