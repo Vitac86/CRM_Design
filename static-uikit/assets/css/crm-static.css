@@ -841,3 +841,105 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+.crm-header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.crm-header-actions .uk-button {
+  min-height: 36px;
+}
+
+.crm-filter-panel {
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.crm-button-ghost {
+  background: #f6f9ff;
+  border-color: #d4deee;
+  color: #3f5376;
+}
+
+.crm-button-ghost:hover {
+  background: #eef4ff;
+  border-color: #c5d3ea;
+}
+
+.crm-kpi-grid {
+  align-items: stretch;
+}
+
+.crm-kpi-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 138px;
+}
+
+.crm-kpi-meta span:last-child {
+  color: #556887;
+  font-weight: 500;
+}
+
+.crm-kpi-value {
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
+.crm-kpi-note {
+  color: #7b8ba3;
+  font-size: 12px;
+  margin-top: auto;
+}
+
+.crm-badge {
+  border-radius: 999px;
+  min-height: 20px;
+  padding: 2px 10px;
+  font-weight: 600;
+}
+
+.crm-option-card {
+  min-height: 108px;
+}
+
+.crm-option-card.is-selected {
+  border-color: #6f90de;
+  background: #edf3ff;
+  box-shadow: inset 0 0 0 1px rgba(82, 116, 205, 0.2);
+}
+
+.crm-binary-control {
+  gap: 10px;
+}
+
+.crm-binary-control label {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #cdd8ec;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #3e4f6c;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+}
+
+.crm-binary-control label input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.crm-binary-control label.is-active,
+.crm-binary-control label:has(input:checked) {
+  border-color: #88a5e7;
+  background: #edf3ff;
+  color: #2f4e96;
+}
+
+.crm-binary-control label span {
+  line-height: 1;
+}

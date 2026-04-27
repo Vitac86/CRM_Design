@@ -25,7 +25,7 @@
 
     function setExpanded(expanded) {
       group.classList.toggle('expanded', expanded);
-      group.classList.toggle('active', expanded || hasActiveChild);
+      group.classList.toggle('active', expanded && !hasActiveChild);
       if (groupToggle) groupToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       if (submenu) submenu.hidden = !expanded;
     }
