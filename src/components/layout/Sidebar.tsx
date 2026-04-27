@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import { isMenuGroup, type SidebarItem } from '../../features/navigation/api/navigationRepository';
-import { useTheme } from '../../theme/useTheme';
 import { BrandLogo } from '../brand/BrandLogo';
 import { cn } from '../ui/cn';
 import { SidebarIcon } from './SidebarIcon';
@@ -26,7 +25,6 @@ type SidebarProps = {
 
 export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarProps) => {
   const { navigation } = useDataAccess();
-  const { themeId } = useTheme();
   const location = useLocation();
   const [sidebarMenu, setSidebarMenu] = useState<SidebarItem[]>([]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -63,13 +61,12 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
   const baseAsideClass = variant === 'desktop'
     ? 'crm-sidebar fixed left-0 top-0 h-screen w-[270px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)]'
     : 'crm-sidebar h-full w-full border-r border-[var(--color-border)] bg-[var(--color-sidebar)]';
-  const logoTone = themeId === 'current' ? 'blue' : 'white';
 
   return (
     <aside className={cn('flex min-w-0 flex-col', baseAsideClass, className)}>
-      <div className="flex h-[var(--layout-topbar-height)] items-center justify-center border-b border-[var(--color-border)] px-4">
+      <div className="flex h-[var(--layout-topbar-height)] items-center justify-center border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4">
         <div className="flex max-h-full w-full items-center justify-center overflow-visible">
-          <BrandLogo tone={logoTone} size="sidebar" className="max-h-[76px] max-w-[230px]" />
+          <BrandLogo tone="blue" size="sidebar" className="max-h-[76px] max-w-[230px]" />
         </div>
       </div>
 
