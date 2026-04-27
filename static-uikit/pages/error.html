@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
-<body>
+<body data-page="error">
 <div class="crm-app">
   <div class="crm-layout">
     <aside class="crm-sidebar">
@@ -55,12 +55,12 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page">
+      <section class="crm-page" data-page="error">
         <div class="crm-error-state">
           <div class="crm-card uk-card uk-card-body crm-section crm-error-card">
-            <h1>Ошибка обработки операции</h1>
+            <h1 data-entity="page-title">Ошибка обработки операции</h1>
             <p>Мы не смогли выполнить запрос из-за временной недоступности сервиса. Проверьте данные и попробуйте снова.</p>
-            <a href="dashboard.html" class="uk-button crm-button-primary crm-button">На дашборд</a>
+            <a href="dashboard.html" class="uk-button crm-button-primary crm-button" data-action="go-dashboard">На дашборд</a>
           </div>
         </div>
       </section>

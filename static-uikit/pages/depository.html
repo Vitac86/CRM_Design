@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
-<body>
+<body data-page="depository">
 <div class="crm-app">
   <div class="crm-layout">
     <aside class="crm-sidebar">
@@ -55,23 +55,23 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page">
+      <section class="crm-page" data-page="depository">
         <div class="crm-page-header"><h1>Депозитарий</h1></div>
-        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
-          <div class="uk-width-1-1 uk-width-1-4@m"><input class="uk-input crm-input" placeholder="Поиск по клиенту/файлу/отчёту"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Код клиента"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><input type="date" class="uk-input crm-input" value="2026-04-24"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Вид отчёта</option><option>Отчёт депозитария за день</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Канал отправки</option><option>ЭДО</option><option>SFTP</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Результат доставки</option><option>Доставлен</option><option>Ошибка</option></select></div>
+        <form action="#" method="post" data-form="depository-filters" data-action="filter-depository" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="depository">
+          <div class="uk-width-1-1 uk-width-1-4@m"><input class="uk-input crm-input" name="search" placeholder="Поиск по клиенту/файлу/отчёту"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" name="client-code" placeholder="Код клиента"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input type="date" class="uk-input crm-input" name="date" value="2026-04-24"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="report-type"><option>Вид отчёта</option><option>Отчёт депозитария за день</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="delivery-channel"><option>Канал отправки</option><option>ЭДО</option><option>SFTP</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="delivery-result"><option>Результат доставки</option><option>Доставлен</option><option>Ошибка</option></select></div>
         </div>
         <div class="crm-split-view">
           <div class="crm-card uk-card uk-card-body">
             <h3>Список отчётов</h3>
             <div class="crm-report-list">
-              <article class="crm-report-item is-selected"><div><strong>dep_day_24042026_001.xml</strong><small>Отчёт депозитария за день · CL-4401 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">ЭДО</span><span class="crm-badge success">Доставлен</span></div></article>
-              <article class="crm-report-item"><div><strong>dep_day_24042026_002.xml</strong><small>Свод движения ЦБ · CL-4408 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge muted">Email</span><span class="crm-badge warning">Ожидает</span></div></article>
-              <article class="crm-report-item"><div><strong>dep_register_23042026_007.xml</strong><small>Реестр поручений · CL-4412 · 23.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">SFTP</span><span class="crm-badge danger">Ошибка</span></div></article>
+              <article class="crm-report-item is-selected" data-entity="report" data-id="dep-report-001" data-href="depository.html"><div><strong>dep_day_24042026_001.xml</strong><small>Отчёт депозитария за день · CL-4401 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">ЭДО</span><span class="crm-badge success">Доставлен</span></div></article>
+              <article class="crm-report-item" data-entity="report" data-id="dep-report-002" data-href="depository.html"><div><strong>dep_day_24042026_002.xml</strong><small>Свод движения ЦБ · CL-4408 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge muted">Email</span><span class="crm-badge warning">Ожидает</span></div></article>
+              <article class="crm-report-item" data-entity="report" data-id="dep-report-003" data-href="depository.html"><div><strong>dep_register_23042026_007.xml</strong><small>Реестр поручений · CL-4412 · 23.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">SFTP</span><span class="crm-badge danger">Ошибка</span></div></article>
             </div>
           </div>
           <aside class="crm-card uk-card uk-card-body">
@@ -84,7 +84,7 @@
               <div class="uk-width-1-2"><label class="uk-form-label">Статус доставки</label><div><span class="crm-badge success">Доставлен</span></div></div>
               <div class="uk-width-1-2"><label class="uk-form-label">Файл</label><div>dep_day_24042026_001.xml</div></div>
             </div>
-            <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Скачать</button><button class="uk-button crm-button-primary crm-button">Отправить повторно</button></div>
+            <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="download-report">Скачать</button><button class="uk-button crm-button-primary crm-button" type="button" data-action="resend-report">Отправить повторно</button></div>
           </aside>
         </div>
       </section>
