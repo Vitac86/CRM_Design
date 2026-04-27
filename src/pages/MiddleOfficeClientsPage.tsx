@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
@@ -8,6 +9,7 @@ import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
 import { AsyncContent } from '../shared/ui/async';
+import { routes } from '../routes/paths';
 type ClientJournalSortKey =
   | 'clientCode'
   | 'contractKind'
@@ -21,6 +23,7 @@ type ClientJournalSortKey =
   | 'accountStatus';
 
 export const MiddleOfficeClientsPage = () => {
+  const navigate = useNavigate();
   const { clients: clientsRepository, contracts: contractsRepository, accounts: accountsRepository } = useDataAccess();
 
   const [clients, setClients] = useState<Client[]>([]);
@@ -238,6 +241,14 @@ export const MiddleOfficeClientsPage = () => {
           <DataTable
             rows={sortedClientJournalRows}
             emptyMessage="По заданным фильтрам записи не найдены"
+            rowClassName={(row) => (row.clientId ? 'cursor-pointer' : undefined)}
+            onRowClick={(row) => {
+              if (!row.clientId) {
+                return;
+              }
+
+              navigate(routes.subject(row.clientId));
+            }}
             sortKey={sortKey}
             sortDirection={sortDirection}
             onSortChange={handleSortChange}

@@ -3,6 +3,7 @@ import { formatAccountStatus, formatClientType, formatContractKind, formatReside
 
 export type ClientJournalRow = {
   id: string;
+  clientId?: string;
   clientCode: string;
   contractKind: string;
   clientName: string;
@@ -56,6 +57,7 @@ export const buildClientJournalRows = (
 
       return {
         id: `${client.id}-${contract.id}`,
+        clientId: client.id,
         clientCode: client.code,
         contractKind: formatContractKind(contract.type),
         clientName: client.name,
