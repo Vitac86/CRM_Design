@@ -65,3 +65,11 @@
 - Без React внутри `static-uikit`.
 - Без Vite-сборки для `static-uikit`.
 - Без внешних API, аналитики, Google Fonts, CDN.
+
+## Partials for UMI
+- Папка `static-uikit/partials/` содержит готовые HTML-фрагменты (sidebar, topbar, headers, filters, tables, actions, формы и т.д.).
+- `static-uikit/pages/*.html` остаются standalone demo pages и продолжают открываться отдельно.
+- Partials не подключаются автоматически и не используются как include-механизм.
+- Это не build step и не template-engine для текущей static-версии.
+- UMI-разработчики могут переносить фрагменты из `partials/` в шаблоны UMI.CMS (`layout`, `partials`, `pages`).
+- `data-*` атрибуты (`data-page`, `data-entity`, `data-id`, `data-href`, `data-action`, `data-filter`, `data-form`, `data-status`) добавлены как hooks для интеграции, навигации, форм, действий и будущей серверной логики.

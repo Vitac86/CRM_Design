@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
-<body>
+<body data-page="middle-office-reports">
 <div class="crm-app">
   <div class="crm-layout">
     <aside class="crm-sidebar">
@@ -55,21 +55,21 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page">
-        <div class="crm-page-header"><h1>Мидл-офис — Журнал отправленных отчётов</h1></div>
+      <section class="crm-page" data-page="middle-office-reports">
+        <div class="crm-page-header"><h1 data-entity="page-title">Мидл-офис — Журнал отправленных отчётов</h1></div>
         <div class="crm-split-view">
           <div class="crm-card uk-card uk-card-body">
             <div class="crm-section-head"><h3>Список отправок</h3><span class="crm-badge muted">24 записи</span></div>
             <div class="crm-report-list">
-              <article class="crm-report-item is-selected">
+              <article class="crm-report-item is-selected" data-entity="report" data-id="mo-report-001" data-href="middle-office-reports.html">
                 <div><strong>mo_report_24042026_001.xml</strong><small>Отчёт по операциям · 24.04.2026 10:21</small></div>
                 <div class="crm-inline-badges"><span class="crm-badge info">ЭДО</span><span class="crm-badge success">Доставлен</span></div>
               </article>
-              <article class="crm-report-item">
+              <article class="crm-report-item" data-entity="report" data-id="mo-report-002" data-href="middle-office-reports.html">
                 <div><strong>mo_positions_24042026_002.xml</strong><small>Позиции по клиентам · 24.04.2026 09:15</small></div>
                 <div class="crm-inline-badges"><span class="crm-badge muted">Email</span><span class="crm-badge warning">Ожидает</span></div>
               </article>
-              <article class="crm-report-item">
+              <article class="crm-report-item" data-entity="report" data-id="mo-report-003" data-href="middle-office-reports.html">
                 <div><strong>mo_kyc_status_23042026_006.xml</strong><small>KYC-статусы · 23.04.2026 18:40</small></div>
                 <div class="crm-inline-badges"><span class="crm-badge info">SFTP</span><span class="crm-badge danger">Ошибка</span></div>
               </article>
@@ -89,8 +89,8 @@
               <div class="uk-width-1-1"><label class="uk-form-label">Сформировал</label><div>Петрова Н.А.</div></div>
             </div>
             <div class="crm-footer-actions">
-              <button class="uk-button uk-button-default crm-button">Скачать</button>
-              <button class="uk-button crm-button-primary crm-button">Отправить повторно</button>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="download-report">Скачать</button>
+              <button class="uk-button crm-button-primary crm-button" type="button" data-action="resend-report">Отправить повторно</button>
             </div>
           </aside>
         </div>

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
-<body>
+<body data-page="subjects">
 <div class="crm-app">
   <div class="crm-layout">
     <aside class="crm-sidebar">
@@ -55,23 +55,23 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page">
+      <section class="crm-page" data-page="subjects">
         
-<div class="crm-page-header crm-page-header-row"><h1>Субъекты</h1><div class="crm-header-actions"><button class="uk-button uk-button-default crm-button">Экспорт</button><a href="subject-register.html" class="uk-button crm-button-primary crm-button">+ Добавить</a></div></div>
-<div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
-  <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" placeholder="Поиск по клиенту, коду, ИНН или email"/></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Тип</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Резидентство</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус субъекта</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Комплаенс</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Роль</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Квалификация</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost">Сбросить всё</button></div>
-</div>
-<div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Наименование клиента</th><th>ИНН</th><th>Тип</th><th>Резидент</th><th>Статус субъекта</th><th>Статус комплаенса</th><th>Полный комплект</th></tr></thead><tbody>
-<tr onclick="location.href='subject-card.html'"><td>АО «Восток Майнинг Системс»</td><td>7704132901</td><td>АО</td><td>Да</td><td><span class="crm-badge success">Активный клиент</span></td><td><span class="crm-badge success">Пройден</span></td><td><span class="crm-badge success">Да</span></td></tr>
-<tr onclick="location.href='subject-card.html'"><td>АО «Глобал Ресурс Траст»</td><td>7705964812</td><td>АО</td><td>Нет</td><td><span class="crm-badge info">На комплаенсе</span></td><td><span class="crm-badge warning">На проверке</span></td><td><span class="crm-badge warning">Частично</span></td></tr>
-<tr onclick="location.href='subject-card.html'"><td>Громова Алина Сергеевна</td><td>502113742889</td><td>ФЛ</td><td>Да</td><td><span class="crm-badge warning">Регистрация</span></td><td><span class="crm-badge warning">На доработке</span></td><td><span class="crm-badge danger">Нет</span></td></tr>
+<div class="crm-page-header crm-page-header-row"><h1>Субъекты</h1><div class="crm-header-actions"><button class="uk-button uk-button-default crm-button" data-action="export-subjects">Экспорт</button><a href="subject-register.html" class="uk-button crm-button-primary crm-button">+ Добавить</a></div></div>
+<form action="#" method="post" data-form="subjects-filters" data-action="filter-subjects" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="subjects">
+  <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="subject-type"><option>Тип</option></select></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="resident-type"><option>Резидентство</option></select></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="subject-status"><option>Статус субъекта</option></select></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="compliance-status"><option>Комплаенс</option></select></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="subject-role"><option>Роль</option></select></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="qualification"><option>Квалификация</option></select></div>
+  <div class="uk-width-1-2 uk-width-1-6@m"><button type="reset" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters">Сбросить всё</button></div>
+</form>
+<div class="crm-card crm-table crm-table-wrapper" data-entity="subject-table"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Наименование клиента</th><th>ИНН</th><th>Тип</th><th>Резидент</th><th>Статус субъекта</th><th>Статус комплаенса</th><th>Полный комплект</th></tr></thead><tbody>
+<tr data-entity="subject" data-id="c-011" data-href="subject-card.html"><td>АО «Восток Майнинг Системс»</td><td>7704132901</td><td>АО</td><td>Да</td><td><span class="crm-badge success">Активный клиент</span></td><td><span class="crm-badge success">Пройден</span></td><td><span class="crm-badge success">Да</span></td></tr>
+<tr data-entity="subject" data-id="c-012" data-href="subject-card.html"><td>АО «Глобал Ресурс Траст»</td><td>7705964812</td><td>АО</td><td>Нет</td><td><span class="crm-badge info">На комплаенсе</span></td><td><span class="crm-badge warning">На проверке</span></td><td><span class="crm-badge warning">Частично</span></td></tr>
+<tr data-entity="subject" data-id="c-013" data-href="subject-card.html"><td>Громова Алина Сергеевна</td><td>502113742889</td><td>ФЛ</td><td>Да</td><td><span class="crm-badge warning">Регистрация</span></td><td><span class="crm-badge warning">На доработке</span></td><td><span class="crm-badge danger">Нет</span></td></tr>
 </tbody></table></div>
 
       </section>
