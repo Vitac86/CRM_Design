@@ -8,7 +8,6 @@ export const routes = {
   compliance: '/compliance',
   complianceCard: (id: string) => `/compliance/${id}`,
   requests: '/requests',
-  documents: '/documents',
   trading: '/trading',
   tradingCard: (id: string) => `/trading/${id}`,
   brokerage: '/brokerage',

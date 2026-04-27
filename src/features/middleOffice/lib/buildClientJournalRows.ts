@@ -14,6 +14,8 @@ export type ClientJournalRow = {
   residencyStatus: string;
   accountType: 'обычный' | 'ИИС' | 'ИН';
   accountStatus: string;
+  canUseMoney: boolean;
+  canUseSecurities: boolean;
 };
 
 export const formatDate = (value: string): string => {
@@ -68,6 +70,8 @@ export const buildClientJournalRows = (
         residencyStatus: formatResidency(client.residency),
         accountType: matchedAccount ? mapAccountType(matchedAccount.type) : mapAccountType(contract.type),
         accountStatus: getAccountStatus(contract),
+        canUseMoney: client.canUseMoney,
+        canUseSecurities: client.canUseSecurities,
       };
     });
   });

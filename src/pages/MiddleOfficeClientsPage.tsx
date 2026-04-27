@@ -4,7 +4,7 @@ import { useDataAccess } from '../app/dataAccess/useDataAccess';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageShell } from '../components/layout/PageShell';
 import { PageToolbar } from '../components/layout/PageToolbar';
-import { Button, DataTable, EmptyState, SearchInput, SelectFilter, StatusBadge, type SortDirection } from '../components/ui';
+import { Badge, Button, DataTable, EmptyState, SearchInput, SelectFilter, StatusBadge, type SortDirection } from '../components/ui';
 import type { Client, ClientAccount, ClientContract } from '../data/types';
 import { buildDatedCsvFileName, exportToCsv } from '../utils/csv';
 import { buildClientJournalRows, type ClientJournalRow } from '../features/middleOffice/lib/buildClientJournalRows';
@@ -280,6 +280,18 @@ export const MiddleOfficeClientsPage = () => {
                 className: 'whitespace-nowrap',
                 sortable: true,
                 render: (row) => <StatusBadge value={row.accountStatus} compact />,
+              },
+
+              {
+                key: 'permissions',
+                header: 'Права ДС / ЦБ',
+                className: 'min-w-[170px]',
+                render: (row) => (
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant={row.canUseMoney ? 'success' : 'neutral'}>ДС: {row.canUseMoney ? 'Да' : 'Нет'}</Badge>
+                    <Badge variant={row.canUseSecurities ? 'success' : 'neutral'}>ЦБ: {row.canUseSecurities ? 'Да' : 'Нет'}</Badge>
+                  </div>
+                ),
               },
             ]}
           />

@@ -20,7 +20,6 @@ import { ContractWizardPage } from '../pages/ContractWizardPage';
 import { MiddleOfficeClientsPage } from '../pages/MiddleOfficeClientsPage';
 import { MiddleOfficeReportsPage } from '../pages/MiddleOfficeReportsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
-import { DocumentsPage } from '../pages/DocumentsPage';
 import { AppErrorPage } from '../pages/AppErrorPage';
 import { routeParams, routes } from '../routes/paths';
 
@@ -47,7 +46,6 @@ export const router = createBrowserRouter([
       { path: routes.middleOfficeClients.slice(1), element: <MiddleOfficeClientsPage /> },
       { path: routes.middleOfficeReports.slice(1), element: <MiddleOfficeReportsPage /> },
       { path: routes.backOffice.slice(1), element: <BackOfficePage /> },
-      { path: routes.documents.slice(1), element: <DocumentsPage /> },
       { path: routes.trading.slice(1), element: <TradingPage /> },
       { path: `trading/${routeParams.tradingId}`, element: <TradingCardPage /> },
       { path: routes.depository.slice(1), element: <DepositoryPage /> },
