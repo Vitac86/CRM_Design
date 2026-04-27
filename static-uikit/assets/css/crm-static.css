@@ -943,3 +943,94 @@ a:focus-visible {
 .crm-binary-control label span {
   line-height: 1;
 }
+
+.crm-page-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.crm-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.crm-detail-header h1 {
+  margin-bottom: 4px;
+  font-size: 28px;
+}
+
+.crm-decision-panel {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.crm-action-row {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-report-list {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-report-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #d7e0ef;
+  border-radius: 10px;
+  padding: 10px 11px;
+  background: #fff;
+}
+
+.crm-report-item strong {
+  display: block;
+  color: #20304b;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.crm-report-item small {
+  color: #70829f;
+  font-size: 12px;
+}
+
+.crm-report-item.is-selected {
+  border-color: #8eacef;
+  background: #edf3ff;
+}
+
+.crm-option-card strong {
+  margin-top: auto;
+  font-size: 14px;
+  color: #2f4773;
+}
+
+.crm-error-state {
+  max-width: 560px;
+  margin: 56px auto;
+}
+
+@media (max-width: 960px) {
+  .crm-detail-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crm-report-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.crm-error-card {
+  text-align: center;
+}

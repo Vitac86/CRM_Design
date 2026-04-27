@@ -56,7 +56,18 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        <div class="crm-page-header"><h1>Трейдинг</h1></div><div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Клиент</th><th>Договор</th><th>Рынок</th><th>Статус</th></tr></thead><tbody><tr onclick="location.href='trading-card.html'"><td>ООО «Альфа Капитал»</td><td>TR-1201</td><td>MOEX</td><td><span class="crm-badge success">Активен</span></td></tr></tbody></table></div>
+        <div class="crm-page-header"><h1>Трейдинг</h1></div>
+        <div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid>
+          <div class="uk-width-1-1 uk-width-1-4@m"><input class="uk-input crm-input" placeholder="Поиск клиента/договора"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" placeholder="Код клиента"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Статус</option><option>Активен</option><option>На проверке</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Риск</option><option>Низкий</option><option>Средний</option><option>Высокий</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select"><option>Квалификация</option><option>Квалифицированный</option><option>Неквалифицированный</option></select></div>
+        </div>
+        <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Клиент</th><th>Код клиента</th><th>Договор</th><th>Статус</th><th>Риск</th><th>Терминалы</th><th>Дата открытия</th><th>Ответственный</th></tr></thead><tbody>
+        <tr onclick="location.href='trading-card.html'"><td>АО «Восток Майнинг Системс»</td><td>CL-4401</td><td>BR-8821</td><td><span class="crm-badge success">Активен</span></td><td><span class="crm-badge success">Низкий</span></td><td>QUIK Desktop, WebQUIK</td><td>11.01.2026</td><td>Иванов И.И.</td></tr>
+        <tr onclick="location.href='trading-card.html'"><td>АО «Глобал Ресурс Траст»</td><td>CL-4408</td><td>BR-8890</td><td><span class="crm-badge warning">На проверке</span></td><td><span class="crm-badge warning">Средний</span></td><td>QUIK Desktop</td><td>18.02.2026</td><td>Петрова Н.А.</td></tr>
+        </tbody></table></div>
       </section>
     </main>
   </div>

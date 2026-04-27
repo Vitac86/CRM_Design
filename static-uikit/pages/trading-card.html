@@ -56,12 +56,36 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page">
-        
-<div class="crm-page-header"><h1>Карточка трейдинга</h1><p>Клиент: ООО «Альфа Капитал» · Договор TR-1201</p></div>
-<ul class="crm-tabs" uk-tab><li class="uk-active"><a href="#">Торговые параметры</a></li><li><a href="#">Терминалы</a></li><li><a href="#">История операций</a></li></ul>
-<div class="crm-split-view"><div class="crm-card uk-card uk-card-body crm-section"><h3>Параметры обслуживания</h3><div class="crm-form-grid uk-grid-small" uk-grid><div class="uk-width-1-2"><label class="uk-form-label">Лимит</label><div>75 000 000 ₽</div></div><div class="uk-width-1-2"><label class="uk-form-label">Риск профиль</label><div>Умеренный</div></div><div class="uk-width-1-2"><label class="uk-form-label">Инструменты</label><div>Акции, облигации, РЕПО</div></div><div class="uk-width-1-2"><label class="uk-form-label">Маржинальная торговля</label><span class="crm-badge info">Разрешена</span></div></div></div>
-<div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider"><thead><tr><th>Терминал</th><th>Логин</th><th>Статус</th><th>Дата активации</th></tr></thead><tbody><tr><td>QUIK</td><td>QK-7781</td><td><span class="crm-badge success">Активен</span></td><td>12.03.2026</td></tr><tr><td>WEB</td><td>WEB-3321</td><td><span class="crm-badge info">Активен</span></td><td>14.03.2026</td></tr></tbody></table></div></div>
-
+        <div class="crm-detail-header crm-card uk-card uk-card-body uk-margin-bottom">
+          <div>
+            <h1>АО «Восток Майнинг Системс»</h1>
+            <p>Код CL-4401 · Договор BR-8821</p>
+          </div>
+          <button class="uk-button crm-button-primary crm-button">+ Выдать терминал</button>
+        </div>
+        <ul class="uk-tab crm-tabs" uk-tab>
+          <li class="uk-active"><a href="#trading-params">Торговые параметры</a></li>
+          <li><a href="#trading-terminals">Терминалы и подключения</a></li>
+        </ul>
+        <div class="crm-grid-2" id="trading-params">
+          <div>
+            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom"><h3>Квалификация и риск</h3><div class="crm-inline-badges"><span class="crm-badge success">Квалифицированный инвестор</span><span class="crm-badge warning">Риск: Средний</span></div></article>
+            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom"><h3>ПОД/ФТ</h3><p>Мониторинг активен, триггеры не выявлены. Последняя проверка: 23.04.2026 17:30.</p></article>
+            <article class="crm-card uk-card uk-card-body crm-section"><h3>Контактные данные</h3><div class="crm-form-grid uk-grid-small" uk-grid><div class="uk-width-1-2"><label class="uk-form-label">Email</label><div>compliance@vms.ru</div></div><div class="uk-width-1-2"><label class="uk-form-label">Телефон</label><div>+7 (495) 000-00-01</div></div></div></article>
+          </div>
+          <aside>
+            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom"><h3>Распорядитель счёта</h3><div>Смирнов Павел Олегович</div><p class="uk-text-meta">Доверенность №34/22 от 14.01.2026</p></article>
+            <article class="crm-card uk-card uk-card-body crm-section" id="trading-terminals">
+              <h3>Терминалы и подключения</h3>
+              <div class="crm-report-list">
+                <div class="crm-report-item"><div><strong>QUIK Desktop</strong><small>Рабочее место трейдера</small></div><div class="crm-inline-badges"><span class="crm-badge success">Подключен</span></div></div>
+                <div class="crm-report-item"><div><strong>QUIK Mobile</strong><small>Мобильное подключение</small></div><div class="crm-inline-badges"><span class="crm-badge warning">Ожидает активации</span></div></div>
+                <div class="crm-report-item"><div><strong>WebQUIK</strong><small>Браузерный терминал</small></div><div class="crm-inline-badges"><span class="crm-badge success">Подключен</span></div></div>
+              </div>
+              <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Отключить</button><button class="uk-button uk-button-default crm-button">Сбросить доступ</button></div>
+            </article>
+          </aside>
+        </div>
       </section>
     </main>
   </div>
