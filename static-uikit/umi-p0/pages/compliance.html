@@ -1,0 +1,33 @@
+<!-- Reference: static-uikit/pages/compliance.html -->
+<!-- UMI TODO: render inside layout/base main content slot -->
+
+<section class="crm-page" data-page="compliance">
+  <div class="crm-page-header crm-page-header-row">
+    <h1>Комплаенс</h1>
+    <div class="crm-page-actions"><button class="uk-button uk-button-default crm-button" data-action="export-compliance">Выгрузка реестра</button></div>
+  </div>
+
+  <form action="#" method="get" data-form="compliance-filters" data-action="filter-compliance" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="compliance">
+    <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" name="compliance-search" placeholder="Поиск клиента или кода"/></div>
+    <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="risk-level"><option value="">Риск</option></select></div>
+    <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="compliance-status"><option value="">Статус</option></select></div>
+  </form>
+
+  <div class="crm-card crm-table crm-table-wrapper" data-entity="compliance-table">
+    <table class="uk-table uk-table-divider uk-table-hover">
+      <thead><tr><th>Клиент</th><th>Уровень риска</th><th>KYC</th><th>AML</th><th>Статус</th><th>Обновление</th></tr></thead>
+      <tbody>
+        <!-- UMI TODO: render compliance queue rows from backend -->
+        <tr data-entity="compliance" data-id="{{ compliance.id }}" data-href="compliance-card.html">
+          <td>{{ compliance.client_name }}</td>
+          <td><span class="crm-badge warning" data-status="risk-medium">{{ compliance.risk_label }}</span></td>
+          <td><span class="crm-badge info" data-status="partial">{{ compliance.kyc_label }}</span></td>
+          <td><span class="crm-badge warning" data-status="monitoring">{{ compliance.aml_label }}</span></td>
+          <td><span class="crm-badge warning" data-status="pending-review">{{ compliance.status_label }}</span></td>
+          <td>{{ compliance.updated_at }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- UMI TODO: replace data-href with real compliance card route if needed -->
+</section>

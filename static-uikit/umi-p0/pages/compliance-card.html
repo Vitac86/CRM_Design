@@ -1,0 +1,44 @@
+<!-- Reference: static-uikit/pages/compliance-card.html -->
+<!-- UMI TODO: render inside layout/base main content slot -->
+
+<section class="crm-page" data-page="compliance-card">
+  <div class="crm-detail-header crm-card uk-card uk-card-body uk-margin-bottom" data-entity="compliance-header">
+    <div>
+      <h1>{{ compliance.client_name }}</h1>
+      <p>Код {{ compliance.client_code }} · ИНН {{ compliance.inn }} · {{ compliance.client_type }}</p>
+    </div>
+    <div class="crm-inline-badges">
+      <span class="crm-badge warning" data-status="risk-medium">Риск: {{ compliance.risk_label }}</span>
+      <span class="crm-badge info" data-status="pending-review">{{ compliance.status_label }}</span>
+    </div>
+  </div>
+
+  <div class="crm-grid-2">
+    <div>
+      <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom" data-entity="compliance-risk">
+        <h3>Риск-профиль</h3>
+        <!-- UMI TODO: render risk checks list -->
+        {{ compliance_risk_checks }}
+      </article>
+      <article class="crm-card uk-card uk-card-body crm-section" data-entity="compliance-documents">
+        <h3>Документы</h3>
+        <!-- UMI TODO: render documents validation result -->
+        {{ compliance_documents }}
+      </article>
+    </div>
+
+    <form action="#" method="post" data-form="compliance-decision" data-action="compliance-decision" class="crm-card uk-card uk-card-body crm-decision-panel">
+      <h3>Панель решения</h3>
+      <div class="crm-action-row" data-entity="action-row">
+        <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="approved">Одобрить</button>
+        <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="rework">На доработку</button>
+        <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
+      </div>
+      <label class="uk-form-label">Комментарий комплаенса</label>
+      <textarea class="uk-textarea crm-input" name="compliance-comment" rows="8" placeholder="Укажите обоснование решения"></textarea>
+      <!-- UMI TODO: comment is required for rework/block decisions -->
+      <!-- UMI TODO: create audit event on final decision -->
+      <button type="submit" class="uk-button crm-button-primary crm-button uk-width-1-1" data-action="compliance-submit">Принять финальное решение</button>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,43 @@
+<!-- Reference: static-uikit/pages/dashboard.html -->
+<!-- UMI TODO: render inside layout/base main content slot -->
+
+<section class="crm-page" data-page="dashboard">
+  <div class="crm-page-header">
+    <h1 data-entity="page-title">Операционный обзор</h1>
+  </div>
+
+  <!-- UMI TODO: replace KPI demo values with dashboard metrics -->
+  <div class="crm-kpi-grid" data-entity="dashboard-kpi">
+    <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="users"></span><span>Новые субъекты</span></div><div class="crm-kpi-value">{{ kpi.new_subjects }}</div><div class="crm-kpi-note">за период</div></article>
+    <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="shield"></span><span>Очередь комплаенса</span></div><div class="crm-kpi-value">{{ kpi.compliance_queue }}</div><div class="crm-kpi-note">на проверке</div></article>
+    <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="file-edit"></span><span>Поручения за день</span></div><div class="crm-kpi-value">{{ kpi.requests_today }}</div><div class="crm-kpi-note">всего создано</div></article>
+    <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="warning"></span><span>Просроченные задачи</span></div><div class="crm-kpi-value">{{ kpi.overdue_tasks }}</div><div class="crm-kpi-note">требуют обработки</div></article>
+  </div>
+
+  <div class="crm-split-view">
+    <div class="crm-card crm-table-wrapper crm-table crm-dashboard-card" data-entity="subject-changes">
+      <div class="crm-section-head"><h3>Последние изменения по субъектам</h3></div>
+      <table class="uk-table uk-table-divider uk-table-hover">
+        <thead><tr><th>Субъект</th><th>Изменение</th><th>Время</th></tr></thead>
+        <tbody>
+          <!-- UMI TODO: render recent subject changes from backend data -->
+          {{ recent_subject_changes }}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="crm-card crm-table-wrapper crm-table crm-dashboard-card" data-entity="recent-requests">
+      <div class="crm-section-head">
+        <h3>Последние поручения</h3>
+        <a class="crm-link-action" href="requests.html" data-href="requests.html" data-action="open-requests">Все поручения</a>
+      </div>
+      <table class="uk-table uk-table-divider uk-table-hover">
+        <thead><tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr></thead>
+        <tbody>
+          <!-- UMI TODO: render recent requests from backend data -->
+          {{ recent_requests }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
