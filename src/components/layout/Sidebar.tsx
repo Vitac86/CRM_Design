@@ -64,7 +64,7 @@ export const Sidebar = ({ variant = 'desktop', onNavigate, className }: SidebarP
 
   return (
     <aside className={cn('flex min-w-0 flex-col', baseAsideClass, className)}>
-      <div className="flex h-[var(--layout-topbar-height)] items-center justify-center border-b border-transparent bg-[var(--color-sidebar)] px-4">
+      <div className="flex h-[var(--layout-topbar-height)] items-center justify-center border-b border-[var(--color-border)] bg-[var(--color-sidebar)] px-4">
         <div className="flex max-h-full w-full items-center justify-center overflow-visible">
           <BrandLogo tone="white" size="sidebar" className="max-h-[76px] max-w-[230px]" />
         </div>
