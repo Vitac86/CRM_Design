@@ -1,6 +1,25 @@
 (function () {
   const app = document.querySelector('.crm-app');
   const toggle = document.querySelector('[data-sidebar-toggle]');
+
+  function syncOptionGridState(scope) {
+    scope.querySelectorAll('.crm-option-grid').forEach(function (group) {
+      group.querySelectorAll('.crm-option-card').forEach(function (card) {
+        const radio = card.querySelector('input[type="radio"]');
+        card.classList.toggle('is-selected', !!(radio && radio.checked));
+      });
+    });
+  }
+
+  function syncBinaryPills(scope) {
+    scope.querySelectorAll('.crm-binary-control').forEach(function (binaryGroup) {
+      binaryGroup.querySelectorAll('label').forEach(function (pill) {
+        const radio = pill.querySelector('input[type="radio"]');
+        pill.classList.toggle('is-active', !!(radio && radio.checked));
+      });
+    });
+  }
+
   if (toggle && app) {
     toggle.addEventListener('click', function () {
       app.classList.toggle('sidebar-open');
@@ -39,14 +58,22 @@
     }
   });
 
+  syncOptionGridState(document);
+  syncBinaryPills(document);
+
   document.addEventListener('click', function (event) {
     const target = event.target;
-    const hrefHost = target.closest('[data-href]');
-    if (hrefHost) {
-      const interactive = target.closest('a, button, input, select, textarea, label');
-      if (!interactive || interactive === hrefHost) {
-        window.location.href = hrefHost.dataset.href;
+
+    const resetButton = target.closest('[data-action="reset-filters"]');
+    if (resetButton) {
+      const form = resetButton.closest('form');
+      if (form) {
+        form.reset();
+        syncOptionGridState(form);
+        syncBinaryPills(form);
       }
+      event.preventDefault();
+      return;
     }
 
     const optionCard = target.closest('.crm-option-card');
@@ -83,26 +110,22 @@
       }
     }
 
-    const resetButton = target.closest('[data-action="reset-filters"]');
-    if (resetButton) {
-      const panel = resetButton.closest('[data-filter]') || resetButton.closest('form') || resetButton.closest('.crm-filter-panel');
-      if (panel) {
-        panel.querySelectorAll('input, select, textarea').forEach(function (field) {
-          if (field.type === 'hidden' || field.type === 'submit' || field.type === 'button') {
-            return;
-          }
-          if (field.tagName === 'SELECT') {
-            field.selectedIndex = 0;
-            return;
-          }
-          if (field.type === 'checkbox' || field.type === 'radio') {
-            field.checked = false;
-            return;
-          }
-          field.value = '';
-        });
+    const hrefHost = target.closest('[data-href]');
+    if (hrefHost) {
+      const directAnchor = target.closest('a[href]');
+      if (directAnchor && !directAnchor.matches('[href="#"]')) {
+        return;
       }
-      event.preventDefault();
+
+      const interactive = target.closest('button, input, select, textarea, label, [role="button"]');
+      if (interactive) {
+        return;
+      }
+
+      const href = hrefHost.dataset.href;
+      if (href) {
+        window.location.href = href;
+      }
     }
   });
 

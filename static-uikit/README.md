@@ -73,3 +73,12 @@
 - Это не build step и не template-engine для текущей static-версии.
 - UMI-разработчики могут переносить фрагменты из `partials/` в шаблоны UMI.CMS (`layout`, `partials`, `pages`).
 - `data-*` атрибуты (`data-page`, `data-entity`, `data-id`, `data-href`, `data-action`, `data-filter`, `data-form`, `data-status`) добавлены как hooks для интеграции, навигации, форм, действий и будущей серверной логики.
+
+## Static validation
+Запустите локальную проверку standalone-версии:
+
+```bash
+node static-uikit/tools/validate-static-uikit.mjs
+```
+
+Скрипт проверяет отсутствие внешних зависимостей (CDN/analytics/API), валидность локальных `href`/`data-href`, корректность `form`/полей, наличие `body[data-page]` и `section.crm-page[data-page]`.

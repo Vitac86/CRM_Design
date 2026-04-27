@@ -69,9 +69,9 @@
           <div class="crm-card uk-card uk-card-body">
             <h3>Список отчётов</h3>
             <div class="crm-report-list">
-              <article class="crm-report-item is-selected" data-entity="report" data-id="dep-report-001" data-href="depository.html"><div><strong>dep_day_24042026_001.xml</strong><small>Отчёт депозитария за день · CL-4401 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">ЭДО</span><span class="crm-badge success">Доставлен</span></div></article>
-              <article class="crm-report-item" data-entity="report" data-id="dep-report-002" data-href="depository.html"><div><strong>dep_day_24042026_002.xml</strong><small>Свод движения ЦБ · CL-4408 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge muted">Email</span><span class="crm-badge warning">Ожидает</span></div></article>
-              <article class="crm-report-item" data-entity="report" data-id="dep-report-003" data-href="depository.html"><div><strong>dep_register_23042026_007.xml</strong><small>Реестр поручений · CL-4412 · 23.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info">SFTP</span><span class="crm-badge danger">Ошибка</span></div></article>
+              <article class="crm-report-item is-selected" data-entity="report" data-id="dep-report-001" data-href="depository.html"><div><strong>dep_day_24042026_001.xml</strong><small>Отчёт депозитария за день · CL-4401 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info" data-status="delivery-edo">ЭДО</span><span class="crm-badge success" data-status="delivered">Доставлен</span></div></article>
+              <article class="crm-report-item" data-entity="report" data-id="dep-report-002" data-href="depository.html"><div><strong>dep_day_24042026_002.xml</strong><small>Свод движения ЦБ · CL-4408 · 24.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge muted" data-status="delivery-email">Email</span><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></div></article>
+              <article class="crm-report-item" data-entity="report" data-id="dep-report-003" data-href="depository.html"><div><strong>dep_register_23042026_007.xml</strong><small>Реестр поручений · CL-4412 · 23.04.2026</small></div><div class="crm-inline-badges"><span class="crm-badge info" data-status="delivery-sftp">SFTP</span><span class="crm-badge danger" data-status="delivery-error">Ошибка</span></div></article>
             </div>
           </div>
           <aside class="crm-card uk-card uk-card-body">
@@ -81,7 +81,7 @@
               <div class="uk-width-1-2"><label class="uk-form-label">Код клиента</label><div>CL-4401</div></div>
               <div class="uk-width-1-2"><label class="uk-form-label">Дата отчёта</label><div>24.04.2026</div></div>
               <div class="uk-width-1-2"><label class="uk-form-label">Канал отправки</label><div>ЭДО</div></div>
-              <div class="uk-width-1-2"><label class="uk-form-label">Статус доставки</label><div><span class="crm-badge success">Доставлен</span></div></div>
+              <div class="uk-width-1-2"><label class="uk-form-label">Статус доставки</label><div><span class="crm-badge success" data-status="delivered">Доставлен</span></div></div>
               <div class="uk-width-1-2"><label class="uk-form-label">Файл</label><div>dep_day_24042026_001.xml</div></div>
             </div>
             <div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="download-report">Скачать</button><button class="uk-button crm-button-primary crm-button" type="button" data-action="resend-report">Отправить повторно</button></div>
