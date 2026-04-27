@@ -50,7 +50,6 @@ export const sidebarMenu: ReadonlyArray<SidebarItem> = [
         to: routes.middleOfficeReports,
         icon: 'documents',
       },
-      { id: 'documents', label: 'Документы', to: routes.documents, icon: 'documents' },
     ],
   },
   { id: 'back-office', label: 'Бэк-офис', to: routes.backOffice, icon: 'backOffice' },
