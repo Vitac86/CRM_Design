@@ -1,12 +1,63 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Мидл-офис — Журнал отправленных отчётов</title><link rel="stylesheet" href="../assets/css/uikit.min.css"/><link rel="stylesheet" href="../assets/css/crm-static.css"/></head>
-<body><div class="crm-app"><div class="crm-layout"><aside class="crm-sidebar">
-  <div class="crm-sidebar-brand"><img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/></div>
-  <nav><a class="crm-nav-link" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a><a class="crm-nav-link" href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a><a class="crm-nav-link" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a><a class="crm-nav-link" href="trust-management.html"><span><span uk-icon="briefcase"></span>Дов. управление</span></a><a class="crm-nav-link" href="agents.html"><span><span uk-icon="users"></span>Агенты</span></a><a class="crm-nav-link" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a><a class="crm-nav-link" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a><a class="crm-nav-link" href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a><a class="crm-nav-link active" href="middle-office-clients.html"><span><span uk-icon="database"></span>Мидл-офис</span><span uk-icon="chevron-down"></span></a><div class="crm-nav-submenu"><a class="crm-nav-link" href="middle-office-clients.html">Журнал клиентов</a><a class="crm-nav-link active" href="middle-office-reports.html">Журнал отправленных отчётов</a></div><a class="crm-nav-link" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a><a class="crm-nav-link" href="trading.html"><span><span uk-icon="credit-card"></span>Трейдинг</span></a><a class="crm-nav-link" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a><a class="crm-nav-link" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a></nav>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Мидл-офис — отчёты</title>
+  <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
+  <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+</head>
+<body>
+<div class="crm-app">
+  <div class="crm-layout">
+    <aside class="crm-sidebar">
+  <div class="crm-sidebar-brand">
+    <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+  </div>
+  <nav>
+    <div class="crm-nav-section">
+      <div class="crm-nav-heading">Фронт-офис</div>
+      <a class="crm-nav-link crm-nav-item " href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
+      <a class="crm-nav-link crm-nav-item " href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
+      <a class="crm-nav-link crm-nav-item " href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+      <a class="crm-nav-link crm-nav-item " href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
+      <a class="crm-nav-link crm-nav-item " href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
+      <a class="crm-nav-link crm-nav-item " href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
+      <a class="crm-nav-link crm-nav-item " href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+      <a class="crm-nav-link crm-nav-item " href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+    </div>
+
+    <div class="crm-nav-section">
+      <div class="crm-nav-heading">Мидл-офис</div>
+      <a class="crm-nav-link crm-nav-item active" href="middle-office-clients.html"><span><span uk-icon="database"></span>Мидл-офис</span><span uk-icon="chevron-down"></span></a>
+      <div class="crm-nav-submenu">
+        <a class="crm-nav-link crm-nav-item " href="middle-office-clients.html">Журнал клиентов</a>
+        <a class="crm-nav-link crm-nav-item active" href="middle-office-reports.html">Журнал отправленных отчётов</a>
+      </div>
+    </div>
+
+    <div class="crm-nav-section">
+      <a class="crm-nav-link crm-nav-item " href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
+      <a class="crm-nav-link crm-nav-item " href="trading.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
+      <a class="crm-nav-link crm-nav-item " href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+      <a class="crm-nav-link crm-nav-item " href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
+    </div>
+  </nav>
 </aside>
-<main class="crm-main"><header class="crm-topbar"><button class="uk-button uk-button-default" data-sidebar-toggle><span uk-icon="menu"></span></button><div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск по CRM"/></div><div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div></header>
-<section class="crm-page"><h1>Мидл-офис — Журнал отправленных отчётов</h1><div class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid><div class="uk-width-1-2@m"><input class="uk-input crm-input" placeholder="Поиск по номеру отчёта, клиенту или договору"/></div><div class="uk-width-1-5@m"><select class="uk-select crm-select"><option>Период</option></select></div><div class="uk-width-1-5@m"><select class="uk-select crm-select"><option>Канал</option></select></div><div class="uk-width-1-5@m"><button class="uk-button uk-button-default crm-button">Сбросить</button></div></div>
-<div class="crm-split-view"><div class="crm-card uk-card uk-card-body crm-section"><h3>Список отчётов</h3><ul class="uk-list uk-list-divider"><li><strong>APR-0326-001</strong><br/><small>АО «Восток Майнинг Системс» · BR-8821 · 26.04.2026</small></li><li><strong>APR-0326-002</strong><br/><small>Громова А.С. · BR-8849 · 26.04.2026</small></li><li><strong>APR-0326-003</strong><br/><small>АО «Глобал Ресурс Траст» · DU-1144 · 25.04.2026</small></li></ul></div>
-<div class="crm-card uk-card uk-card-body crm-section"><h3>Детали отчёта APR-0326-001</h3><div class="uk-grid-small" uk-grid><div class="uk-width-1-2"><label class="uk-form-label">Статус</label><div><span class="crm-badge success">Доставлен</span></div></div><div class="uk-width-1-2"><label class="uk-form-label">Канал</label><div>ЛК + Email</div></div><div class="uk-width-1-2"><label class="uk-form-label">Время отправки</label><div>26.04.2026 11:42</div></div><div class="uk-width-1-2"><label class="uk-form-label">Подписант</label><div>Орлова Н.Н.</div></div></div><div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Отправить повторно</button><button class="uk-button crm-button-primary crm-button">Скачать</button></div></div></div></section></main></div></div>
-<script src="../assets/js/uikit.min.js"></script><script src="../assets/js/uikit-icons.min.js"></script><script src="../assets/js/crm-static.js"></script></body></html>
+    <main class="crm-main">
+      <header class="crm-topbar">
+        <button class="uk-button uk-button-default" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" placeholder="Глобальный поиск"/></div>
+        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+      </header>
+      <section class="crm-page">
+        <div class="crm-page-header"><h1>Журнал отправленных отчётов</h1></div><div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider"><thead><tr><th>Отчёт</th><th>Клиент</th><th>Канал</th><th>Статус</th><th>Дата</th></tr></thead><tbody><tr><td>Ежедневный портфельный</td><td>АО «Восток Майнинг Системс»</td><td>Email</td><td><span class="crm-badge success">Отправлен</span></td><td>26.04.2026</td></tr></tbody></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+<script src="../assets/js/uikit.min.js"></script>
+<script src="../assets/js/uikit-icons.min.js"></script>
+<script src="../assets/js/crm-static.js"></script>
+</body>
+</html>
