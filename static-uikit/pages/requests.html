@@ -15,30 +15,38 @@
     <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
   </div>
   <nav class="crm-nav">
-    <div class="crm-nav-section">
-      <div class="crm-nav-heading">Фронт-офис</div>
-      <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
-      <a class="crm-nav-link crm-nav-item" href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
-      <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
-      <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
-      <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
-      <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
-      <a class="crm-nav-link crm-nav-item active" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
-      <a class="crm-nav-link crm-nav-item" href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+    <div class="crm-nav-group" data-group="front-office">
+      <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+        <span><span uk-icon="briefcase"></span>Фронт-офис</span>
+        <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+      </button>
+      <div class="crm-nav-submenu">
+        <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
+        <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><span uk-icon="users"></span>Субъекты</span></a>
+        <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+        <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
+        <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
+        <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
+        <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+      </div>
     </div>
-    <div class="crm-nav-section">
-      <div class="crm-nav-heading">Мидл-офис</div>
+
+    <div class="crm-nav-group" data-group="middle-office">
+      <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+        <span><span uk-icon="album"></span>Мидл-офис</span>
+        <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+      </button>
       <div class="crm-nav-submenu">
         <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html">Журнал клиентов</a>
         <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html">Журнал отправленных отчётов</a>
       </div>
     </div>
-    <div class="crm-nav-section">
-      <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
-      <a class="crm-nav-link crm-nav-item" href="trading.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
-      <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
-      <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
-    </div>
+
+    <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
+    <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
+    <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+    <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
   </nav>
 </aside>
     <main class="crm-main">
