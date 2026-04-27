@@ -36,9 +36,10 @@
 
 body {
   margin: 0;
-  font-family: Inter, "Inter Tight", "Segoe UI", Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.4;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.45;
   color: var(--crm-text);
   background: var(--crm-bg);
 }
@@ -52,6 +53,7 @@ body {
 }
 
 .crm-sidebar {
+  font-family: "Inter", sans-serif;
   background: linear-gradient(180deg, #0b1a49 0%, #09143a 100%);
   color: #fff;
   padding: 0;
@@ -79,12 +81,12 @@ body {
 .crm-nav-section { margin-bottom: 4px; }
 
 .crm-nav-heading {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(203, 219, 255, 0.72);
-  font-weight: 700;
+  font-weight: 600;
   padding: 12px 10px 6px;
 }
 
@@ -97,7 +99,7 @@ body {
   border-radius: 8px;
   padding: 9px 10px;
   min-height: 38px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.01em;
   transition: background-color .14s ease, color .14s ease;
@@ -121,7 +123,7 @@ body {
   padding-left: 9px;
 }
 .crm-nav-submenu .crm-nav-link {
-  font-size: 12px;
+  font-size: 14px;
   min-height: 32px;
   padding: 7px 9px;
   color: rgba(224, 234, 255, 0.88);
@@ -209,9 +211,10 @@ body {
 
 .crm-page h1 {
   margin: 0 0 14px;
-  font-size: 28px;
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-size: 30px;
   line-height: 1.18;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.01em;
   color: #16233a;
 }
@@ -266,7 +269,11 @@ body {
   border-radius: 12px;
 }
 
-.crm-section h3 { margin-bottom: 9px; font-size: 15px; }
+.crm-section h3 {
+  margin-bottom: 9px;
+  font-size: 17px;
+  font-weight: 600;
+}
 
 .crm-section-head {
   display: flex;
@@ -307,7 +314,7 @@ body {
 
 .uk-form-label {
   color: var(--crm-text-secondary);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .03em;
@@ -368,14 +375,14 @@ body {
 .crm-table .uk-table {
   margin: 0;
   min-width: 100%;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .crm-table .uk-table th {
   background: #eff4fb;
   color: #607189;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -388,6 +395,7 @@ body {
   padding: 11px 12px;
   color: var(--crm-text-secondary);
   line-height: 1.35;
+  font-weight: 400;
 }
 
 .crm-table .uk-table td:first-child {
@@ -405,11 +413,11 @@ body {
 
 .crm-badge {
   border-radius: 999px;
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.15;
   padding: 4px 9px;
   border: 1px solid transparent;
-  font-weight: 700;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
