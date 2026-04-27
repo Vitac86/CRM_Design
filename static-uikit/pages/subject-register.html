@@ -15,30 +15,38 @@
     <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
   </div>
   <nav class="crm-nav">
-    <div class="crm-nav-section">
-      <div class="crm-nav-heading">Фронт-офис</div>
-      <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
-      <a class="crm-nav-link crm-nav-item active" href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
-      <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
-      <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
-      <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
-      <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
-      <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
-      <a class="crm-nav-link crm-nav-item" href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+    <div class="crm-nav-group" data-group="front-office">
+      <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+        <span><span uk-icon="briefcase"></span>Фронт-офис</span>
+        <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+      </button>
+      <div class="crm-nav-submenu">
+        <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
+        <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><span uk-icon="users"></span>Субъекты</span></a>
+        <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+        <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
+        <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
+        <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
+        <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+      </div>
     </div>
-    <div class="crm-nav-section">
-      <div class="crm-nav-heading">Мидл-офис</div>
+
+    <div class="crm-nav-group" data-group="middle-office">
+      <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+        <span><span uk-icon="album"></span>Мидл-офис</span>
+        <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+      </button>
       <div class="crm-nav-submenu">
         <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html">Журнал клиентов</a>
         <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html">Журнал отправленных отчётов</a>
       </div>
     </div>
-    <div class="crm-nav-section">
-      <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
-      <a class="crm-nav-link crm-nav-item" href="trading.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
-      <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
-      <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
-    </div>
+
+    <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
+    <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
+    <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+    <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
   </nav>
 </aside>
     <main class="crm-main">
@@ -49,17 +57,29 @@
       </header>
       <section class="crm-page">
         
-<div class="crm-page-header"><h1>Регистрация субъекта</h1><p>Шаг 1 из 3 · Идентификация клиента</p></div>
-<div class="crm-card uk-card uk-card-body crm-section">
-<div class="crm-form-grid uk-grid-small" uk-grid>
-<div class="uk-width-1-3@m"><label class="uk-form-label">Тип субъекта</label><select class="uk-select crm-select"><option>Юридическое лицо</option></select></div>
-<div class="uk-width-1-3@m"><label class="uk-form-label">ИНН</label><input class="uk-input crm-input"/></div>
-<div class="uk-width-1-3@m"><label class="uk-form-label">ОГРН</label><input class="uk-input crm-input"/></div>
-<div class="uk-width-1-2@m"><label class="uk-form-label">Полное наименование</label><input class="uk-input crm-input"/></div>
-<div class="uk-width-1-2@m"><label class="uk-form-label">Телефон</label><input class="uk-input crm-input"/></div>
-<div class="uk-width-1-1"><label class="uk-form-label">Статус резидентства</label><label><input class="uk-radio" type="radio" checked/> Резидент</label> <label class="uk-margin-left"><input class="uk-radio" type="radio"/> Нерезидент</label></div>
+<div class="crm-page-header crm-register-header">
+  <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Регистрация</span></div>
+  <h1>Мастер регистрации клиентов</h1>
+  <p class="crm-step-note">Шаг 1 из 3 · Идентификация клиента</p>
 </div>
-<div class="crm-footer-actions"><button class="uk-button uk-button-default crm-button">Сохранить черновик</button><button class="uk-button crm-button-primary crm-button">Продолжить</button></div>
+<div class="crm-card uk-card uk-card-body crm-section crm-register-card">
+  <div class="crm-section-head"><h3>Основные параметры регистрации</h3><span class="crm-step-note">Выберите тип субъекта и заполните обязательные поля</span></div>
+  <div class="crm-option-grid">
+    <label class="crm-option-card is-selected"><input type="radio" name="subject-kind" checked/><span>Юридическое лицо</span><small>Регистрация компании с полным комплектом реквизитов</small></label>
+    <label class="crm-option-card"><input type="radio" name="subject-kind"/><span>Физическое лицо</span><small>Упрощённый профиль клиента для розничного обслуживания</small></label>
+    <label class="crm-option-card"><input type="radio" name="subject-kind"/><span>ИП</span><small>Сочетание атрибутов ФЛ и ЮЛ для предпринимателей</small></label>
+  </div>
+  <div class="crm-form-grid uk-grid-small" uk-grid>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">ИНН</label><input class="uk-input crm-input" placeholder="7704132901"/></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">ОГРН</label><input class="uk-input crm-input" placeholder="1027700132195"/></div>
+    <div class="uk-width-1-3@m"><label class="uk-form-label">Дата регистрации</label><input class="uk-input crm-input" type="date" value="2026-04-27"/></div>
+    <div class="uk-width-1-2@m"><label class="uk-form-label">Полное наименование</label><input class="uk-input crm-input" placeholder="АО «Восток Майнинг Системс»"/></div>
+    <div class="uk-width-1-2@m"><label class="uk-form-label">Телефон</label><input class="uk-input crm-input" placeholder="+7 (495) 000-00-00"/></div>
+    <div class="uk-width-1-2@m"><label class="uk-form-label">Электронная почта</label><input class="uk-input crm-input" placeholder="mail@company.ru"/></div>
+    <div class="uk-width-1-2@m"><label class="uk-form-label">Менеджер</label><select class="uk-select crm-select"><option>Иванов И.И.</option></select></div>
+    <div class="uk-width-1-1"><label class="uk-form-label">Резидентство</label><div class="crm-binary-control"><label><input class="uk-radio" type="radio" name="resident" checked/> Резидент</label><label><input class="uk-radio" type="radio" name="resident"/> Нерезидент</label></div></div>
+  </div>
+  <div class="crm-footer-actions crm-register-actions"><button class="uk-button uk-button-default crm-button">Сохранить черновик</button><button class="uk-button crm-button-primary crm-button">Далее</button></div>
 </div>
 
       </section>

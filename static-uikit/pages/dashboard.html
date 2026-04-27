@@ -15,30 +15,38 @@
     <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
   </div>
   <nav class="crm-nav">
-    <div class="crm-nav-section">
-      <div class="crm-nav-heading">Фронт-офис</div>
-      <a class="crm-nav-link crm-nav-item active" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
-      <a class="crm-nav-link crm-nav-item" href="subjects.html"><span><span uk-icon="users"></span>Субъекты</span></a>
-      <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
-      <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
-      <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
-      <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
-      <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
-      <a class="crm-nav-link crm-nav-item" href="compliance.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+    <div class="crm-nav-group" data-group="front-office">
+      <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+        <span><span uk-icon="briefcase"></span>Фронт-офис</span>
+        <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+      </button>
+      <div class="crm-nav-submenu">
+        <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
+        <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><span uk-icon="users"></span>Субъекты</span></a>
+        <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+        <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
+        <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
+        <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="archive"></span>Архив</span></a>
+        <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><span uk-icon="shield"></span>Комплаенс</span></a>
+      </div>
     </div>
-    <div class="crm-nav-section">
-      <div class="crm-nav-heading">Мидл-офис</div>
+
+    <div class="crm-nav-group" data-group="middle-office">
+      <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+        <span><span uk-icon="album"></span>Мидл-офис</span>
+        <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+      </button>
       <div class="crm-nav-submenu">
         <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html">Журнал клиентов</a>
         <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html">Журнал отправленных отчётов</a>
       </div>
     </div>
-    <div class="crm-nav-section">
-      <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
-      <a class="crm-nav-link crm-nav-item" href="trading.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
-      <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
-      <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
-    </div>
+
+    <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
+    <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
+    <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+    <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
   </nav>
 </aside>
     <main class="crm-main">
@@ -49,15 +57,16 @@
       </header>
       <section class="crm-page">
         
-<div class="crm-page-header crm-page-header-row"><h1>Операционный обзор</h1><a class="crm-link-action" href="requests.html">Все поручения</a></div>
+<div class="crm-page-header"><h1>Операционный обзор</h1></div>
 <div class="crm-kpi-grid">
-  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">17</div><div>Новые субъекты</div></article>
-  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">43</div><div>Очередь комплаенса</div></article>
-  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">24</div><div>Поручения за день</div></article>
-  <article class="crm-card crm-kpi-card"><div class="crm-kpi-value">12</div><div>Просроченные задачи</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="users"></span><span>Новые субъекты</span></div><div class="crm-kpi-value">17</div><div>за последние 24 часа</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="shield"></span><span>Очередь комплаенса</span></div><div class="crm-kpi-value">43</div><div>документов на проверке</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="file-edit"></span><span>Поручения за день</span></div><div class="crm-kpi-value">24</div><div>всего создано сегодня</div></article>
+  <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="warning"></span><span>Просроченные задачи</span></div><div class="crm-kpi-value">12</div><div>требуют обработки</div></article>
 </div>
 <div class="crm-split-view">
-  <div class="crm-card crm-table-wrapper crm-table">
+  <div class="crm-card crm-table-wrapper crm-table crm-dashboard-card">
+    <div class="crm-section-head"><h3>Последние изменения по субъектам</h3></div>
     <table class="uk-table uk-table-divider uk-table-hover">
       <thead><tr><th>Субъект</th><th>Изменение</th><th>Время</th></tr></thead>
       <tbody>
@@ -67,7 +76,8 @@
       </tbody>
     </table>
   </div>
-  <div class="crm-card crm-table-wrapper crm-table">
+  <div class="crm-card crm-table-wrapper crm-table crm-dashboard-card">
+    <div class="crm-section-head"><h3>Последние поручения</h3><a class="crm-link-action" href="requests.html">Все поручения</a></div>
     <table class="uk-table uk-table-divider uk-table-hover">
       <thead><tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr></thead>
       <tbody>
