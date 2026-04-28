@@ -117,4 +117,18 @@
   }
 }
 
+/* Page layout */
+.crm-page {
+  max-width: none;
+  padding: 20px 22px 30px;
+}
 
+.crm-page > * {
+  width: min(1520px, 100%);
+}
+
+@media (max-width: 960px) {
+  .crm-page > * {
+    width: 100%;
+  }
+}

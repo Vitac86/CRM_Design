@@ -83,3 +83,17 @@
   transform: rotate(180deg);
 }
 
+/* Sidebar layout */
+.crm-sidebar-brand {
+  min-height: 64px;
+  padding: 16px 18px;
+}
+
+.crm-sidebar nav {
+  padding: 14px 12px 18px;
+}
+
+.crm-nav-link {
+  min-height: 38px;
+  border-radius: 11px;
+}
