@@ -56,24 +56,111 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="subjects">
-        
-<div class="crm-page-header crm-page-header-row"><h1>Субъекты</h1><div class="crm-header-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-subjects">Экспорт</button><a href="subject-register.html" class="uk-button crm-button-primary crm-button" data-action="open-subject-register">+ Добавить</a></div></div>
-<form action="#" method="post" data-form="subjects-filters" data-action="filter-subjects" class="crm-toolbar crm-filter-panel crm-subjects-filters uk-grid-small" uk-grid data-filter="subjects">
-  <div class="uk-width-1-1 uk-width-1-3@l"><label class="uk-form-label" for="subject-search">Поиск</label><input id="subject-search" class="uk-input crm-input" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/></div>
-  <div class="uk-width-1-2 uk-width-1-6@l"><label class="uk-form-label" for="subject-type">Тип</label><select id="subject-type" class="uk-select crm-select" name="subject-type"><option>Все</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@l"><label class="uk-form-label" for="resident-type">Резидентство</label><select id="resident-type" class="uk-select crm-select" name="resident-type"><option>Все</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@l"><label class="uk-form-label" for="subject-status">Статус субъекта</label><select id="subject-status" class="uk-select crm-select" name="subject-status"><option>Все</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@l"><label class="uk-form-label" for="compliance-status">Комплаенс</label><select id="compliance-status" class="uk-select crm-select" name="compliance-status"><option>Все</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@l"><label class="uk-form-label" for="subject-role">Роль</label><select id="subject-role" class="uk-select crm-select" name="subject-role"><option>Все</option></select></div>
-  <div class="uk-width-1-2 uk-width-1-6@l"><label class="uk-form-label" for="qualification">Квалификация</label><select id="qualification" class="uk-select crm-select" name="qualification"><option>Все</option></select></div>
-  <div class="uk-width-1-1 uk-width-auto@l crm-filter-actions"><button type="reset" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters">Сбросить фильтры</button></div>
-</form>
-<div class="crm-card crm-table crm-table-wrapper crm-subjects-table" data-entity="subject-table"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Наименование клиента</th><th>ИНН</th><th>Тип</th><th>Резидент</th><th>Статус субъекта</th><th>Статус комплаенса</th><th>Полный комплект</th></tr></thead><tbody>
-<tr data-entity="subject" data-id="c-011" data-href="subject-card.html"><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · ИНН 7704132901</div></td><td>7704132901</td><td>АО</td><td>Да</td><td><span class="crm-badge success" data-status="active-client">Активный клиент</span></td><td><span class="crm-badge success" data-status="approved">Пройден</span></td><td><span class="crm-badge success" data-status="yes">Да</span></td></tr>
-<tr data-entity="subject" data-id="c-012" data-href="subject-card.html"><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · ИНН 7705964812</div></td><td>7705964812</td><td>АО</td><td>Нет</td><td><span class="crm-badge info" data-status="on-compliance">На комплаенсе</span></td><td><span class="crm-badge warning" data-status="pending-review">На проверке</span></td><td><span class="crm-badge warning" data-status="partial">Частично</span></td></tr>
-<tr data-entity="subject" data-id="c-013" data-href="subject-card.html"><td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412 · ИНН 502113742889</div></td><td>502113742889</td><td>ФЛ</td><td>Да</td><td><span class="crm-badge warning" data-status="registration">Регистрация</span></td><td><span class="crm-badge warning" data-status="rework">На доработке</span></td><td><span class="crm-badge danger" data-status="no">Нет</span></td></tr>
-</tbody></table><div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет записей</div><div class="crm-empty-state-text">Измените фильтры или создайте нового субъекта.</div></div></div>
+        <section class="crm-registry-shell">
+          <div class="crm-page-header crm-page-header-row crm-registry-header">
+            <h1>Субъекты</h1>
+            <div class="crm-header-actions">
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="export-subjects">Экспорт</button>
+              <a href="subject-register.html" class="uk-button crm-button-primary crm-button" data-action="open-subject-register">+ Добавить</a>
+            </div>
+          </div>
 
+          <form action="#" method="post" data-form="subjects-filters" data-action="filter-subjects" class="crm-toolbar crm-registry-filters" data-filter="subjects">
+            <div class="crm-registry-search">
+              <label class="uk-form-label" for="subject-search">Поиск</label>
+              <input id="subject-search" class="uk-input crm-input" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/>
+            </div>
+
+            <div class="crm-filter-pill">
+              <label class="uk-form-label" for="subject-type">Тип</label>
+              <select id="subject-type" class="uk-select crm-select" name="subject-type"><option>Все</option></select>
+            </div>
+
+            <div class="crm-filter-pill">
+              <label class="uk-form-label" for="resident-type">Резидентство</label>
+              <select id="resident-type" class="uk-select crm-select" name="resident-type"><option>Все</option></select>
+            </div>
+
+            <div class="crm-filter-pill">
+              <label class="uk-form-label" for="subject-status">Статус субъекта</label>
+              <select id="subject-status" class="uk-select crm-select" name="subject-status"><option>Все</option></select>
+            </div>
+
+            <div class="crm-filter-pill">
+              <label class="uk-form-label" for="compliance-status">Комплаенс</label>
+              <select id="compliance-status" class="uk-select crm-select" name="compliance-status"><option>Все</option></select>
+            </div>
+
+            <div class="crm-filter-pill">
+              <label class="uk-form-label" for="subject-role">Роль</label>
+              <select id="subject-role" class="uk-select crm-select" name="subject-role"><option>Все</option></select>
+            </div>
+
+            <div class="crm-filter-pill">
+              <label class="uk-form-label" for="qualification">Квалификация</label>
+              <select id="qualification" class="uk-select crm-select" name="qualification"><option>Все</option></select>
+            </div>
+
+            <div class="crm-filter-actions">
+              <button type="reset" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters">Сбросить фильтры</button>
+            </div>
+          </form>
+
+          <div class="crm-card crm-table crm-table-wrapper crm-subjects-registry crm-subjects-table" data-entity="subject-table">
+            <table class="uk-table uk-table-divider uk-table-hover">
+              <thead>
+              <tr>
+                <th>Наименование клиента</th>
+                <th>ИНН</th>
+                <th>Тип</th>
+                <th>Резидент</th>
+                <th>Статус субъекта</th>
+                <th>Статус комплаенса</th>
+                <th>Полный комплект</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr data-entity="subject" data-id="c-011" data-href="subject-card.html" data-status="active-client">
+                <td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · Персональный менеджер: Кузнецова Е.А.</div></td>
+                <td>7704132901</td>
+                <td><span class="crm-badge muted" data-entity="badge-type">АО</span></td>
+                <td><span class="crm-badge success" data-entity="badge-residency">Резидент РФ</span></td>
+                <td><span class="crm-badge success" data-status="active-client">Активный клиент</span></td>
+                <td><span class="crm-badge success" data-status="approved">Пройден</span></td>
+                <td><span class="crm-badge success" data-status="yes">Да</span></td>
+              </tr>
+              <tr data-entity="subject" data-id="c-012" data-href="subject-card.html" data-status="on-compliance">
+                <td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · Персональный менеджер: Сафронов М.Г.</div></td>
+                <td>7705964812</td>
+                <td><span class="crm-badge muted" data-entity="badge-type">АО</span></td>
+                <td><span class="crm-badge warning" data-entity="badge-residency">Нерезидент</span></td>
+                <td><span class="crm-badge info" data-status="on-compliance">На комплаенсе</span></td>
+                <td><span class="crm-badge warning" data-status="pending-review">На проверке</span></td>
+                <td><span class="crm-badge warning" data-status="partial">Частично</span></td>
+              </tr>
+              <tr data-entity="subject" data-id="c-013" data-href="subject-card.html" data-status="registration">
+                <td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412 · Персональный менеджер: Назарова Т.П.</div></td>
+                <td>502113742889</td>
+                <td><span class="crm-badge muted" data-entity="badge-type">ФЛ</span></td>
+                <td><span class="crm-badge success" data-entity="badge-residency">Резидент РФ</span></td>
+                <td><span class="crm-badge warning" data-status="registration">Регистрация</span></td>
+                <td><span class="crm-badge warning" data-status="rework">На доработке</span></td>
+                <td><span class="crm-badge danger" data-status="no">Нет</span></td>
+              </tr>
+              <tr data-entity="subject" data-id="c-014" data-href="subject-card.html" data-status="data-filled">
+                <td><div class="crm-row-main">ООО «Север Логистик Капитал»</div><div class="crm-row-sub">CL-4397 · Персональный менеджер: Власова К.О.</div></td>
+                <td>7812054881</td>
+                <td><span class="crm-badge muted" data-entity="badge-type">ООО</span></td>
+                <td><span class="crm-badge success" data-entity="badge-residency">Резидент РФ</span></td>
+                <td><span class="crm-badge info" data-status="data-filled">Данные заполнены</span></td>
+                <td><span class="crm-badge success" data-status="approved">Пройден</span></td>
+                <td><span class="crm-badge success" data-status="yes">Да</span></td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет записей</div><div class="crm-empty-state-text">Измените фильтры или создайте нового субъекта.</div></div>
+          </div>
+        </section>
       </section>
     </main>
   </div>
