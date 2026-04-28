@@ -104,18 +104,7 @@
               <section class="crm-subject-section-layout crm-subject-form-layout">
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="main-data">
                   <div class="crm-form-section-head"><h3>Основные данные</h3></div>
-                  <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3">
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Наименование клиента</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">Акционерное общество «Восток Майнинг Системс»</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Английское наименование</div><div class="crm-profile-value">JSC Vostok Mining Systems</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Тип клиента</div><div class="crm-profile-value">Юридическое лицо (АО)</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Признак резидентства</div><div class="crm-profile-value">Резидент Российской Федерации</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">7704132901</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">КПП</div><div class="crm-profile-value">770301001</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">1217700011256</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Квалификация инвестора</div><div class="crm-profile-value">Неквалифицированный инвестор</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
-                  </div>
+                  <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3" data-role="main-data-grid"></div>
                 </article>
 
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card subject-section" data-entity="addresses" data-role="addresses-section">
@@ -124,24 +113,8 @@
                     <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
                   </div>
                   <div class="crm-address-stack subject-address-stack" data-role="addresses-list">
-                    <div class="crm-address-row subject-data-field crm-data-field">
-                      <div class="crm-profile-label">Адрес регистрации</div>
-                      <div class="crm-profile-value">123112, Российская Федерация, г. Москва, Пресненская набережная, д. 8, стр. 1</div>
-                    </div>
-                    <div id="subject-addresses-extra" data-role="addresses-extra" hidden>
-                      <div class="crm-address-row subject-data-field crm-data-field">
-                        <div class="crm-profile-label">Юридический адрес / адрес местонахождения</div>
-                        <div class="crm-profile-value">123112, г. Москва, Пресненская наб., д. 8, стр. 1, этаж 31, офис 3102</div>
-                      </div>
-                      <div class="crm-address-row subject-data-field crm-data-field">
-                        <div class="crm-profile-label">Фактический адрес</div>
-                        <div class="crm-profile-value">123290, г. Москва, 1-й Магистральный тупик, д. 5А, бизнес-центр «Магистраль Плаза», офис 406</div>
-                      </div>
-                      <div class="crm-address-row subject-data-field crm-data-field">
-                        <div class="crm-profile-label">Почтовый адрес</div>
-                        <div class="crm-profile-value">123112, г. Москва, а/я 241, АО «Восток Майнинг Системс»</div>
-                      </div>
-                    </div>
+                    <div data-role="address-registration"></div>
+                    <div id="subject-addresses-extra" data-role="addresses-extra" hidden></div>
                   </div>
                 </article>
 
@@ -158,11 +131,7 @@
                           <th>ФИО / название</th><th>Роль / должность</th><th>Документ / основание полномочий</th><th>Срок действия</th><th>Статус</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr><td><strong>Крылов Денис Олегович</strong></td><td>Генеральный директор</td><td>Устав АО, протокол №3 от 15.01.2021</td><td>Бессрочно</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr>
-                        <tr><td><strong>Соколова Мария Владимировна</strong></td><td>Представитель по доверенности</td><td>Доверенность №44/25 от 02.02.2025</td><td>до 01.02.2027</td><td><span class="crm-badge warning" data-status="attention">Требует продления</span></td></tr>
-                        <tr><td><strong>Никифоров Артём Игоревич</strong></td><td>Главный бухгалтер</td><td>Приказ о назначении №12-к от 11.03.2022</td><td>Бессрочно</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr>
-                        </tbody>
+                        <tbody data-role="representatives-table-body"></tbody>
                       </table>
                     </div>
                   </div>
@@ -339,6 +308,71 @@
     </main>
   </div>
 </div>
+<script>
+  window.subjectCardData = {
+    subjectHeader: {
+      shortName: "АО «Восток Майнинг Системс»",
+      clientCode: "INV-1011",
+      clientType: "Юр. лицо",
+      residency: "Резидент РФ",
+      representative: "Представитель",
+      investorStatus: "Квалифицированный"
+    },
+    subjectProfile: {
+      shortName: "АО «Восток Майнинг Системс»",
+      fullName: "АО «Восток Майнинг Системс» (полное наименование)",
+      englishName: "АО Восток Майнинг Системс",
+      clientType: "Юр. лицо",
+      residency: "Резидент РФ",
+      inn: "2721123456",
+      kpp: "771011001",
+      ogrn: "10277V-10111234",
+      investorStatus: "Квалифицированный"
+    },
+    addresses: {
+      registration: {
+        title: "Адрес регистрации",
+        country: "Россия",
+        region: "Хабаровск",
+        city: "Хабаровск",
+        street: "ул. Муравьёва-Амурского, д. 25",
+        house: "—",
+        index: "101000"
+      },
+      location: {
+        title: "Адрес местонахождения",
+        country: "Россия",
+        region: "Хабаровск",
+        city: "Хабаровск",
+        street: "ул. Муравьёва-Амурского, д. 25",
+        house: "—",
+        index: "101000"
+      },
+      postal: {
+        title: "Почтовый адрес",
+        country: "Россия",
+        region: "Хабаровск",
+        city: "Хабаровск",
+        street: "ул. Муравьёва-Амурского, д. 25",
+        house: "—",
+        index: "101000"
+      }
+    },
+    representatives: [
+      { fullName: "Крылов Денис Олегович", role: "Генеральный директор", authority: "Устав АО, протокол №3 от 15.01.2021", validTo: "Бессрочно", statusLabel: "Действует", statusClass: "success", statusCode: "active" },
+      { fullName: "Соколова Мария Владимировна", role: "Представитель по доверенности", authority: "Доверенность №44/25 от 02.02.2025", validTo: "до 01.02.2027", statusLabel: "Требует продления", statusClass: "warning", statusCode: "attention" },
+      { fullName: "Никифоров Артём Игоревич", role: "Главный бухгалтер", authority: "Приказ о назначении №12-к от 11.03.2022", validTo: "Бессрочно", statusLabel: "Действует", statusClass: "success", statusCode: "active" }
+    ],
+    registrationData: {},
+    contacts: {},
+    compliance: {},
+    rights: {},
+    manager: {},
+    agent: {},
+    reportDelivery: {},
+    managerComment: {}
+  };
+</script>
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>

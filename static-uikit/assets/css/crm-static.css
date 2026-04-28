@@ -4399,11 +4399,11 @@ a:focus-visible,
 .crm-page[data-page="subject-card"] .subject-data-field,
 .crm-page[data-page="subject-card"] .crm-profile-row {
   min-height: 0;
-  padding: 8px 12px;
-  border: 1px solid var(--sc-border);
-  border-radius: 9px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
   background: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: none;
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-row-full { grid-column: 1 / -1; }
@@ -4426,13 +4426,36 @@ a:focus-visible,
 
 .crm-page[data-page="subject-card"] .crm-profile-note { font-size: 12px; margin-top: 3px; }
 
-.crm-page[data-page="subject-card"] .crm-address-stack { display: grid; gap: 6px; }
+.crm-page[data-page="subject-card"] .crm-address-stack { display: grid; gap: 10px; }
 .crm-page[data-page="subject-card"] .crm-address-row {
-  padding: 8px 12px;
+  padding: 10px 12px;
   border: 1px solid var(--sc-border);
   border-radius: 9px;
   background: #fff;
 }
+.crm-page[data-page="subject-card"] .crm-address-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #1f3354;
+  font-weight: 600;
+}
+.crm-page[data-page="subject-card"] .crm-address-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+.crm-page[data-page="subject-card"] .crm-address-field {
+  display: grid;
+  gap: 3px;
+}
+.crm-page[data-page="subject-card"] .crm-address-field strong {
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--sc-text);
+  font-weight: 500;
+}
+.crm-page[data-page="subject-card"] .crm-address-field-street { grid-column: span 2; }
 
 .crm-page[data-page="subject-card"] .subject-address-stack [data-role="addresses-extra"] {
   display: grid;
@@ -4554,6 +4577,10 @@ a:focus-visible,
   .crm-page[data-page="subject-card"] .crm-modal-form-grid {
     grid-template-columns: 1fr;
   }
+  .crm-page[data-page="subject-card"] .crm-address-fields {
+    grid-template-columns: 1fr;
+  }
+  .crm-page[data-page="subject-card"] .crm-address-field-street { grid-column: auto; }
 }
 
 body[data-page="subject-card"].crm-modal-open { overflow: hidden; }

@@ -109,6 +109,101 @@
     if (!toggle || !expiryInput) return;
     expiryInput.disabled = !!toggle.checked;
   }
+
+  function createProfileRow(label, value) {
+    const row = document.createElement('div');
+    row.className = 'crm-profile-row crm-data-field';
+    row.innerHTML = '<div class="crm-profile-label"></div><div class="crm-profile-value"></div>';
+    row.querySelector('.crm-profile-label').textContent = label;
+    row.querySelector('.crm-profile-value').textContent = value;
+    return row;
+  }
+
+  function createAddressCard(address) {
+    const card = document.createElement('article');
+    card.className = 'crm-address-row crm-address-card';
+    card.innerHTML = '' +
+      '<h4 class="crm-address-title"></h4>' +
+      '<div class="crm-address-fields">' +
+      '<div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong></strong></div>' +
+      '<div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong></strong></div>' +
+      '<div class="crm-address-field"><span class="crm-profile-label">Город</span><strong></strong></div>' +
+      '<div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong></strong></div>' +
+      '<div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong></strong></div>' +
+      '<div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong></strong></div>' +
+      '</div>';
+    const strongs = card.querySelectorAll('strong');
+    card.querySelector('.crm-address-title').textContent = address.title;
+    strongs[0].textContent = address.country;
+    strongs[1].textContent = address.region;
+    strongs[2].textContent = address.city;
+    strongs[3].textContent = address.street;
+    strongs[4].textContent = address.house;
+    strongs[5].textContent = address.index;
+    return card;
+  }
+
+  function renderSubjectCardProfile() {
+    const page = document.querySelector('.crm-page[data-page="subject-card"]');
+    const data = window.subjectCardData;
+    if (!page || !data) return;
+
+    const mainGrid = page.querySelector('[data-role="main-data-grid"]');
+    if (mainGrid && data.subjectProfile) {
+      const fields = [
+        ['Наименование клиента', data.subjectProfile.shortName],
+        ['Полное наименование', data.subjectProfile.fullName],
+        ['Английское наименование', data.subjectProfile.englishName],
+        ['Тип клиента', data.subjectProfile.clientType],
+        ['Признак резидентства', data.subjectProfile.residency],
+        ['ИНН', data.subjectProfile.inn],
+        ['КПП', data.subjectProfile.kpp],
+        ['ОГРН', data.subjectProfile.ogrn],
+        ['Квалификация инвестора', data.subjectProfile.investorStatus]
+      ];
+      mainGrid.innerHTML = '';
+      fields.forEach(function (field) {
+        mainGrid.appendChild(createProfileRow(field[0], field[1]));
+      });
+    }
+
+    if (data.addresses) {
+      const registrationHost = page.querySelector('[data-role="address-registration"]');
+      const extraHost = page.querySelector('[data-role="addresses-extra"]');
+      if (registrationHost) {
+        registrationHost.innerHTML = '';
+        registrationHost.appendChild(createAddressCard(data.addresses.registration));
+      }
+      if (extraHost) {
+        extraHost.innerHTML = '';
+        extraHost.appendChild(createAddressCard(data.addresses.location));
+        extraHost.appendChild(createAddressCard(data.addresses.postal));
+      }
+    }
+
+    const representativesBody = page.querySelector('[data-role="representatives-table-body"]');
+    if (representativesBody && Array.isArray(data.representatives)) {
+      representativesBody.innerHTML = '';
+      data.representatives.forEach(function (item) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '' +
+          '<td><strong></strong></td>' +
+          '<td></td>' +
+          '<td></td>' +
+          '<td></td>' +
+          '<td><span class="crm-badge"></span></td>';
+        tr.children[0].querySelector('strong').textContent = item.fullName;
+        tr.children[1].textContent = item.role;
+        tr.children[2].textContent = item.authority;
+        tr.children[3].textContent = item.validTo;
+        const badge = tr.children[4].querySelector('.crm-badge');
+        badge.textContent = item.statusLabel;
+        badge.classList.add(item.statusClass);
+        badge.dataset.status = item.statusCode;
+        representativesBody.appendChild(tr);
+      });
+    }
+  }
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       closeSidebar();
@@ -266,6 +361,7 @@
   });
 
   syncRepresentativeExpiry();
+  renderSubjectCardProfile();
 
   if (window.UIkit) {
     document.querySelectorAll('ul[uk-tab], .crm-tabs[uk-tab]').forEach(function (tab) {
