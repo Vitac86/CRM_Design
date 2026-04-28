@@ -48,8 +48,10 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - Replace placeholders like `{{ ... }}` with project-specific UMI.CMS template syntax.
 - Keep assets local.
 - `assets/js/crm-static.js` должен оставаться global-only (layout/navigation/forms/tabs behavior).
+- Reusable form controls (`.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row`) также принадлежат `crm-static.js` и только синхронизируют `.is-selected`/`.is-active` с native input checked state.
 - `assets/js/pages/subject-card.js` — page-only behavior для `subject-card` и подключается только там, где реально нужен.
 - Любой новый page-specific скрипт размещается только в `assets/js/pages/<page>.js`, защищается page guard и не используется для data rendering.
 - UMI template должен подключать page-specific script только для своего matching page template (без глобального include на весь pack).
 - Subject-card данные (профиль/адреса/представители) остаются server-rendered/static-template-first: JS их не генерирует.
 - Карта ownership по standalone страницам и page scripts: `static-uikit/PAGE_SCRIPT_AUDIT.md`.
+- Для UMI P0/P1 шаблонов сервер должен рендерить `checked` и соответствующие `.is-selected`/`.is-active` консистентно; `crm-static.js` после этого поддерживает только синхронизацию при взаимодействии пользователя.
