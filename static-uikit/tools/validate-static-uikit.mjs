@@ -118,6 +118,10 @@ const hookKeys = {
   'data-status': 'statuses'
 };
 const nonSubmitActionPrefixes = ['export', 'download', 'resend', 'view', 'open', 'restore', 'print'];
+const standalonePageScriptRegistry = {
+  'subject-card.html': ['../assets/js/pages/subject-card.js']
+};
+const sharedPageUtilities = new Set([]);
 
 const errors = [];
 
@@ -275,6 +279,86 @@ function validateRegistryFilterPanelStructure(file, content) {
     if (/<div[^>]*class="[^"]*\bcrm-card\b[^"]*\bcrm-table\b[^"]*"/i.test(panel)) {
       addError(file, '.crm-card.crm-table must not be inside .crm-filter-panel form');
     }
+  }
+}
+
+function validateStandalonePageScriptRegistry(pageFiles) {
+  const scriptDir = path.join(rootDir, 'assets', 'js', 'pages');
+  const pageScripts = fs.existsSync(scriptDir) ? fs.readdirSync(scriptDir).filter((file) => file.endsWith('.js')) : [];
+  const owners = new Map();
+
+  for (const [page, scripts] of Object.entries(standalonePageScriptRegistry)) {
+    const pageFile = path.join(pagesDir, page);
+    if (!pageFiles.includes(page)) addError(pageFile, 'registered page script owner page does not exist');
+    if (!Array.isArray(scripts) || !scripts.length) {
+      addError(pageFile, 'registered page scripts must be a non-empty array');
+      continue;
+    }
+
+    const pageContent = fs.existsSync(pageFile) ? fs.readFileSync(pageFile, 'utf8') : '';
+    const crmStaticIndex = findScriptIndex(pageContent, '../assets/js/crm-static.js');
+
+    scripts.forEach((scriptPath) => {
+      const resolved = path.resolve(pagesDir, scriptPath);
+      if (!fs.existsSync(resolved)) addError(pageFile, 'registered page script file does not exist', scriptPath);
+
+      owners.set(scriptPath, (owners.get(scriptPath) || 0) + 1);
+
+      const scriptIndex = findScriptIndex(pageContent, scriptPath);
+      if (scriptIndex < 0) addError(pageFile, 'registered page script is missing from owning standalone page', scriptPath);
+      if (crmStaticIndex >= 0 && scriptIndex >= 0 && scriptIndex < crmStaticIndex) {
+        addError(pageFile, 'page script must be loaded after ../assets/js/crm-static.js', scriptPath);
+      }
+    });
+  }
+
+  for (const page of pageFiles) {
+    const pageFile = path.join(pagesDir, page);
+    const content = fs.readFileSync(pageFile, 'utf8');
+    const ownerScripts = new Set(standalonePageScriptRegistry[page] || []);
+    const pageScriptRefs = [...content.matchAll(/<script[^>]*\bsrc="(\.\.\/assets\/js\/pages\/[^"]+)"[^>]*>/gi)].map((m) => m[1]);
+    for (const ref of pageScriptRefs) {
+      if (!ownerScripts.has(ref)) addError(pageFile, 'standalone page includes page script it does not own', ref);
+    }
+  }
+
+  for (const scriptName of pageScripts) {
+    const refPath = `../assets/js/pages/${scriptName}`;
+    if (sharedPageUtilities.has(refPath)) continue;
+    const ownerCount = owners.get(refPath) || 0;
+    if (ownerCount !== 1) addError(path.join(scriptDir, scriptName), 'every page script must be owned by exactly one standalone page registry entry');
+  }
+}
+
+function validatePageScriptsAndGlobalPurity() {
+  const crmStaticFile = path.join(rootDir, 'assets', 'js', 'crm-static.js');
+  const scriptDir = path.join(rootDir, 'assets', 'js', 'pages');
+  const pageScripts = fs.existsSync(scriptDir) ? fs.readdirSync(scriptDir).filter((file) => file.endsWith('.js')).map((file) => path.join(scriptDir, file)) : [];
+
+  if (fs.existsSync(crmStaticFile)) {
+    const content = fs.readFileSync(crmStaticFile, 'utf8');
+    for (const scriptFile of pageScripts) {
+      const token = `assets/js/pages/${path.basename(scriptFile)}`;
+      if (content.includes(token) || content.includes(`../${token}`)) addError(crmStaticFile, 'crm-static.js must not reference page-only script paths', token);
+    }
+    if (/body\.getAttribute\(['"]data-page['"]\)\s*===\s*['"][a-z0-9-]+['"]/.test(content) || /\[data-page=['"][a-z0-9-]+['"]\]/.test(content)) {
+      addError(crmStaticFile, 'crm-static.js must not contain concrete page guards by data-page');
+    }
+  }
+
+  const forbiddenDataPattern = /window\.[a-z0-9_]*data/i;
+  const forbiddenRendererPattern = /(render[A-Z][a-zA-Z0-9]*|create[A-Z][a-zA-Z0-9]*(?:Row|Card))\s*\(/;
+  const forbiddenMutations = [/innerHTML\s*=/, /createElement\(/, /insertAdjacentHTML\s*\(/];
+
+  for (const scriptFile of pageScripts) {
+    const content = fs.readFileSync(scriptFile, 'utf8');
+    const guardPattern = /(body\.getAttribute\(['"]data-page['"]\)\s*===\s*['"][a-z0-9-]+['"]|\.crm-page\[data-page=['"][a-z0-9-]+['"]\])/;
+    if (!guardPattern.test(content)) addError(scriptFile, 'page script must include a concrete page guard');
+    if (forbiddenDataPattern.test(content)) addError(scriptFile, 'page script must not contain window.*Data demo models');
+    if (forbiddenRendererPattern.test(content)) addError(scriptFile, 'page script must be behavior-only and must not include render/create row/card style renderers');
+    forbiddenMutations.forEach((pattern) => {
+      if (pattern.test(content)) addError(scriptFile, 'page script must not generate page data/content via DOM insertion APIs', pattern.toString());
+    });
   }
 }
 
@@ -641,6 +725,11 @@ function validateBalancedTagHelperSelfTest() {
   if (extractBalancedTagByAttribute(fixture, 'div', 'data-role', 'missing-role') !== null) {
     addError(file, 'balanced-tag helper self-test failed for missing attribute lookup');
   }
+
+  const brokenFixture = '<section><div data-role="broken"><span>Oops</section>';
+  if (extractBalancedTagByAttribute(brokenFixture, 'div', 'data-role', 'broken') !== null) {
+    addError(file, 'balanced-tag helper self-test failed for unbalanced target element');
+  }
 }
 
 function validateSubjectCardStaticRendering() {
@@ -821,6 +910,8 @@ function validateStaticUikitLauncher() {
 
 validatePartials();
 validateStaticUikitLauncher();
+validateStandalonePageScriptRegistry(pageFiles);
+validatePageScriptsAndGlobalPurity();
 validateNoRawHexInPageCss();
 validateSubjectCardNoNestedCards();
 validateSubjectCardStaticRendering();
@@ -849,11 +940,6 @@ for (const page of pageFiles) {
   if (bodyPageMatch && sectionPageMatch && bodyPageMatch[1].trim() !== sectionPageMatch[1].trim()) {
     addError(file, 'body[data-page] must match section.crm-page[data-page]', `${bodyPageMatch[1]} !== ${sectionPageMatch[1]}`);
   }
-
-  const requiresSubjectCardScript = page === 'subject-card.html';
-  const hasSubjectCardScript = /\bsrc="\.\.\/assets\/js\/pages\/subject-card\.js"/i.test(content);
-  if (requiresSubjectCardScript && !hasSubjectCardScript) addError(file, 'subject-card page must include ../assets/js/pages/subject-card.js');
-  if (!requiresSubjectCardScript && hasSubjectCardScript) addError(file, 'non-subject-card standalone page must not include subject-card page script');
 
   for (const requiredAssetRef of requiredStandaloneAssetRefs) {
     const escaped = requiredAssetRef.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

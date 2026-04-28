@@ -49,5 +49,7 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - Keep assets local.
 - `assets/js/crm-static.js` должен оставаться global-only (layout/navigation/forms/tabs behavior).
 - `assets/js/pages/subject-card.js` — page-only behavior для `subject-card` и подключается только там, где реально нужен.
+- Любой новый page-specific скрипт размещается только в `assets/js/pages/<page>.js`, защищается page guard и не используется для data rendering.
+- UMI template должен подключать page-specific script только для своего matching page template (без глобального include на весь pack).
 - Subject-card данные (профиль/адреса/представители) остаются server-rendered/static-template-first: JS их не генерирует.
-
+- Карта ownership по standalone страницам и page scripts: `static-uikit/PAGE_SCRIPT_AUDIT.md`.
