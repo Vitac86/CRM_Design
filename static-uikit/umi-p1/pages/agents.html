@@ -9,6 +9,6 @@
     <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" type="reset" data-action="reset-filters">Очистить фильтры</button></div>
   </form>
   <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Агент</th><th>Клиент</th><th>Доверенность</th><th>Статус</th><th></th></tr></thead><tbody>
-    <tr data-entity="agent" data-id="{{ agent.id }}"><td>{{ agent.name }}</td><td>{{ agent.subject }}</td><td>{{ agent.powerOfAttorney }}</td><td><span class="crm-badge success" data-status="active">Активен</span></td><td><a href="subject-card.html" data-href="subject-card.html" data-action="open-subject-card">Карточка субъекта</a></td></tr>
-  </tbody></table></div>
+    <tr data-entity="agent" data-id="{{ agent.id }}"><td><div class="crm-row-main">{{ agent.name }}</div><div class="crm-row-sub">{{ agent.id }}</div></td><td>{{ agent.subject }}</td><td>{{ agent.powerOfAttorney }}</td><td><span class="crm-badge success" data-status="active">Активен</span></td><td><a href="subject-card.html" data-href="subject-card.html" data-action="open-subject-card">Карточка субъекта</a></td></tr>
+  </tbody></table><div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет агентов</div><div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div></div></div>
 </section>

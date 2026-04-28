@@ -4,7 +4,7 @@
 <section class="crm-page" data-page="compliance">
   <div class="crm-page-header crm-page-header-row">
     <h1>Комплаенс</h1>
-    <div class="crm-page-actions"><button class="uk-button uk-button-default crm-button" data-action="export-compliance">Выгрузка реестра</button></div>
+    <div class="crm-page-actions"><button type="button" class="uk-button uk-button-default crm-button" data-action="export-compliance">Выгрузка реестра</button></div>
   </div>
 
   <form action="#" method="get" data-form="compliance-filters" data-action="filter-compliance" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="compliance">
@@ -19,7 +19,7 @@
       <tbody>
         <!-- UMI TODO: render compliance queue rows from backend -->
         <tr data-entity="compliance" data-id="{{ compliance.id }}" data-href="compliance-card.html">
-          <td>{{ compliance.client_name }}</td>
+          <td><div class="crm-row-main">{{ compliance.client_name }}</div><div class="crm-row-sub">{{ compliance.client_code }} · {{ compliance.client_type }}</div></td>
           <td><span class="crm-badge warning" data-status="risk-medium">{{ compliance.risk_label }}</span></td>
           <td><span class="crm-badge info" data-status="partial">{{ compliance.kyc_label }}</span></td>
           <td><span class="crm-badge warning" data-status="monitoring">{{ compliance.aml_label }}</span></td>
@@ -28,6 +28,7 @@
         </tr>
       </tbody>
     </table>
+    <div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет записей комплаенса</div><div class="crm-empty-state-text">Скорректируйте фильтры и повторите поиск.</div></div>
   </div>
   <!-- UMI TODO: replace data-href with real compliance card route if needed -->
 </section>

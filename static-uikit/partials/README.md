@@ -6,3 +6,4 @@
 - Эти partials не подключаются автоматически.
 - Фрагменты подготовлены для безопасного переноса в UMI-шаблоны (`layout`, `partials`, `pages`).
 - Включены UMI-ready `data-*` hooks (`data-page`, `data-entity`, `data-id`, `data-href`, `data-action`, `data-filter`, `data-form`, `data-status`).
+- Partials синхронизированы с финальными standalone UI patterns (таблицы, формы, badges, empty-state, actions).

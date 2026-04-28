@@ -5,6 +5,7 @@ import path from 'node:path';
 const rootDir = path.resolve('static-uikit');
 const pagesDir = path.join(rootDir, 'pages');
 const launcherFile = path.join(rootDir, 'index.html');
+const partialsDir = path.join(rootDir, 'partials');
 
 const packs = [
   {
@@ -364,6 +365,60 @@ for (const file of allFiles) {
 }
 
 
+
+function validatePartials() {
+  const partialFiles = fs.existsSync(partialsDir) ? fs.readdirSync(partialsDir).filter((f) => f.endsWith('.html')).map((f) => path.join(partialsDir, f)) : [];
+
+  for (const file of partialFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+
+    const lines = content.split(/\r?\n/);
+    lines.forEach((line, idx) => {
+      if (forbiddenExternalPattern.test(line)) addError(file, `forbidden external/CDN/analytics pattern on line ${idx + 1}`, line.trim());
+      if (forbiddenApiPattern.test(line)) addError(file, `forbidden API pattern on line ${idx + 1}`, line.trim());
+    });
+
+    for (const m of content.matchAll(/\b(?:href|data-href)="([^"]+)"/g)) {
+      const target = m[1].trim();
+      if (!target.endsWith('.html')) continue;
+      if (/placeholder|todo/i.test(target)) continue;
+      if (target.startsWith('#') || target.startsWith('/') || target.includes('{{') || /^[a-z]+:/i.test(target)) continue;
+      if (!pageFilesSet.has(path.basename(target))) {
+        addError(file, 'partials html link target must point to existing standalone page', target);
+      }
+    }
+
+    for (const match of content.matchAll(/<button\b([^>]*)>/gi)) {
+      const attrs = match[1];
+      if (!/\btype="[^"]+"/i.test(attrs)) addError(file, '<button> is missing required type attribute', match[0]);
+    }
+
+    for (const match of content.matchAll(/<([a-z0-9-]+)\b([^>]*)>/gi)) {
+      const attrs = match[2];
+      const classValue = (attrs.match(/\bclass="([^"]+)"/i) || [])[1] || '';
+      const classTokens = classValue.split(/\s+/).filter(Boolean);
+      const entityMatch = attrs.match(/\bdata-entity="([^"]*)"/i);
+      const actionMatch = attrs.match(/\bdata-action="([^"]*)"/i);
+      const statusMatch = attrs.match(/\bdata-status="([^"]*)"/i);
+
+      if (entityMatch && !entityMatch[1].trim()) addError(file, 'data-entity must not be empty', match[0]);
+      if (actionMatch && !actionMatch[1].trim()) addError(file, 'data-action must not be empty', match[0]);
+      if (statusMatch && !statusMatch[1].trim()) addError(file, 'data-status must not be empty', match[0]);
+
+      if (classTokens.includes('crm-badge')) {
+        const hasStatus = /\bdata-status="[^"]+"/i.test(attrs);
+        const hasDecorativeEntity = /\bdata-entity="[^"]+"/i.test(attrs);
+        if (!hasStatus && !hasDecorativeEntity) addError(file, 'crm-badge must include data-status or explicit decorative data-entity', match[0]);
+      }
+
+      if (classTokens.includes('crm-empty-state')) {
+        if (!/\bdata-entity="empty-state"/i.test(attrs)) addError(file, 'crm-empty-state block must include data-entity="empty-state"', match[0]);
+        if (/\bdemo-hidden\b/i.test(attrs) && !/\bhidden\b/i.test(attrs)) addError(file, 'demo-hidden empty-state must use native hidden attribute', match[0]);
+      }
+    }
+  }
+}
+
 function validateStaticUikitLauncher() {
   if (!fs.existsSync(launcherFile)) {
     addError(launcherFile, 'static-uikit/index.html is missing');
@@ -407,6 +462,7 @@ function validateStaticUikitLauncher() {
   });
 }
 
+validatePartials();
 validateStaticUikitLauncher();
 
 for (const page of pageFiles) {

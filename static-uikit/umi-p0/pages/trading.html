@@ -18,7 +18,7 @@
       <tbody>
         <!-- UMI TODO: render trading profiles in server-side loop -->
         <tr data-entity="trading-profile" data-id="{{ profile.id }}" data-href="trading-card.html">
-          <td>{{ profile.client_name }}</td>
+          <td><div class="crm-row-main">{{ profile.client_name }}</div><div class="crm-row-sub">{{ profile.client_code }} · {{ profile.contract_number }}</div></td>
           <td>{{ profile.client_code }}</td>
           <td>{{ profile.contract_number }}</td>
           <td><span class="crm-badge info" data-status="qualified">{{ profile.qualification_label }}</span></td>
@@ -28,6 +28,7 @@
         </tr>
       </tbody>
     </table>
+    <div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет торговых профилей</div><div class="crm-empty-state-text">Измените фильтры для отображения результатов.</div></div>
   </div>
 
   <!-- UMI TODO: if trading detail route is not ready, disable row navigation explicitly -->
