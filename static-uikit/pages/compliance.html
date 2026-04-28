@@ -69,13 +69,15 @@
           </div>
         </div>
 
-        <form action="#" method="post" data-form="compliance-filters" data-action="filter-compliance" class="crm-registry-filters crm-operations-filters" data-filter="compliance">
-          <div class="crm-filter-control crm-filter-control-search crm-registry-search"><label class="uk-form-label" for="compliance-search">Поиск</label><input class="uk-input crm-input" id="compliance-search" type="search" data-filter="search" name="compliance-search" placeholder="Клиент, код или ИНН"/></div>
+        <form action="#" method="post" data-form="compliance-filters" data-action="filter-compliance" class="crm-registry-filters crm-filter-panel crm-operations-filters" data-filter="compliance">
+          <div class="crm-filter-search-row"><input class="uk-input crm-input crm-filter-search-input" id="compliance-search" type="search" data-filter="search" name="compliance-search" placeholder="Клиент, код или ИНН"/></div>
+
+            <div class="crm-filter-fields-row">
           <div class="crm-filter-control"><label class="uk-form-label" for="risk-level">Риск</label><select class="uk-select crm-select" id="risk-level" name="risk-level"><option>Риск</option><option>Низкий</option><option>Средний</option><option>Высокий</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="compliance-status">Статус</label><select class="uk-select crm-select" id="compliance-status" name="compliance-status"><option>Статус</option><option>Пройден</option><option>На проверке</option><option>На доработке</option><option>Заблокирован</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="kyc-status">KYC</label><select class="uk-select crm-select" id="kyc-status" name="kyc-status"><option>KYC</option><option>Полный</option><option>Частичный</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="residency">Резидентство</label><select class="uk-select crm-select" id="residency" name="residency"><option>Резидентство</option><option>Резидент</option><option>Нерезидент</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить фильтры</button></div>
         </form>
 
         <div class="crm-card crm-table crm-table-wrapper crm-compliance-queue" data-entity="compliance-table">

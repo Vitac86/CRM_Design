@@ -59,11 +59,13 @@
       </header>
       <section class="crm-page crm-registry-page" data-page="middle-office-clients">
         <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1>Мидл-офис — Журнал клиентов</h1><p>Единый журнал клиентов для операционного сопровождения, контроля договоров и прав.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-mo-clients">Экспорт</button></div></div>
-        <form action="#" method="post" data-form="mo-clients-filters" data-action="filter-mo-clients" class="crm-registry-filters" data-filter="middle-office-clients">
-          <div class="crm-filter-control crm-filter-control-search crm-registry-search"><label class="uk-form-label" for="client-search">Поиск</label><input id="client-search" class="uk-input crm-input" type="search" data-filter="search" name="client-search" placeholder="Клиент, код, ИНН"/></div>
+        <form action="#" method="post" data-form="mo-clients-filters" data-action="filter-mo-clients" class="crm-registry-filters crm-filter-panel" data-filter="middle-office-clients">
+          <div class="crm-filter-search-row"><input id="client-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="client-search" placeholder="Клиент, код, ИНН"/></div>
+
+            <div class="crm-filter-fields-row">
           <div class="crm-filter-control"><label class="uk-form-label" for="client-type">Тип клиента</label><select id="client-type" class="uk-select crm-select" name="client-type"><option>Все</option><option>ФЛ</option><option>ЮЛ</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="contract-type">Вид договора</label><select id="contract-type" class="uk-select crm-select" name="contract-type"><option>Все</option><option>Брокерский</option><option>ДУ</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить фильтры</button></div>
         </form>
         <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="mo-client-table"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Клиент</th><th>Договор</th><th>ИНН</th><th>Резидентство</th><th>Права ДС / ЦБ</th></tr></thead><tbody>
           <tr data-entity="subject" data-id="c-011" data-href="subject-card.html"><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · ЮЛ</div></td><td><div class="crm-row-main">BR-8821</div><div class="crm-row-sub">Брокерский · 11.01.2026</div></td><td>7704132901</td><td><span class="crm-badge success" data-status="resident">Резидент</span></td><td><span class="crm-inline-badges"><span class="crm-badge muted" data-status="cash-account-yes">ДС: Да</span><span class="crm-badge muted" data-status="securities-account-no">ЦБ: Нет</span></span></td></tr>

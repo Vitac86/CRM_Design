@@ -70,11 +70,13 @@
             <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-contract">Договор</label><select class="uk-select crm-select" id="request-contract" name="contract"><option>BR-8821</option></select></div>
           </div>
         </form>
-        <form action="#" method="post" data-form="requests-filters" data-action="filter-requests" class="crm-registry-filters" data-filter="requests">
-          <div class="crm-filter-control crm-filter-control-search crm-registry-search"><label class="uk-form-label" for="request-search">Поиск</label><input class="uk-input crm-input" id="request-search" type="search" data-filter="search" name="request-search" placeholder="Номер, клиент, код"/></div>
-          <div class="crm-filter-control"><label class="uk-form-label" for="filter-source">Источник</label><select class="uk-select crm-select" id="filter-source" name="filter-source"><option>Все</option><option>Личный кабинет</option><option>Операционист</option></select></div>
-          <div class="crm-filter-control"><label class="uk-form-label" for="filter-status">Статус</label><select class="uk-select crm-select" id="filter-status" name="filter-status"><option>Все</option><option>Ожидает</option><option>Принято</option><option>Отклонено</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить</button></div>
+        <form action="#" method="post" data-form="requests-filters" data-action="filter-requests" class="crm-registry-filters crm-filter-panel" data-filter="requests">
+          <div class="crm-filter-search-row"><input class="uk-input crm-input crm-filter-search-input" id="request-search" type="search" data-filter="search" name="request-search" placeholder="Номер, клиент, код"/></div>
+          <div class="crm-filter-fields-row">
+            <div class="crm-filter-control"><label class="uk-form-label" for="filter-source">Источник</label><select class="uk-select crm-select" id="filter-source" name="filter-source"><option>Все</option><option>Личный кабинет</option><option>Операционист</option></select></div>
+            <div class="crm-filter-control"><label class="uk-form-label" for="filter-status">Статус</label><select class="uk-select crm-select" id="filter-status" name="filter-status"><option>Все</option><option>Ожидает</option><option>Принято</option><option>Отклонено</option></select></div>
+            <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить фильтры</button></div>
+          </div>
         </form>
         <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="request-table">
           <table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Поручение</th><th>Клиент</th><th>Сумма</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead><tbody>
