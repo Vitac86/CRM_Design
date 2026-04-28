@@ -1,3 +1,6 @@
+/* ========================================================================== */
+/* fonts                                                                        */
+/* ========================================================================== */
 @font-face {
   font-family: "Inter";
   src: url("../fonts/inter/Inter-Cyrillic-Regular.woff2") format("woff2"),
@@ -69,6 +72,9 @@
   font-style: normal;
   font-display: swap;
 }
+/* ========================================================================== */
+/* variables / tokens                                                          */
+/* ========================================================================== */
 :root {
   --crm-bg: #f4f7fc;
   --crm-surface: #ffffff;
@@ -103,6 +109,9 @@
   --crm-sidebar-w: 276px;
 }
 
+/* ========================================================================== */
+/* reset / base                                                                */
+/* ========================================================================== */
 * { box-sizing: border-box; }
 
 body {
@@ -117,6 +126,9 @@ body {
   scrollbar-color: #bcc9e4 transparent;
 }
 
+/* ========================================================================== */
+/* layout: app / sidebar / topbar / page                                      */
+/* ========================================================================== */
 .crm-app { min-height: 100vh; }
 
 .crm-layout {
@@ -329,6 +341,9 @@ body {
 
 .crm-page h2, .crm-page h3, .crm-page h4 { color: #1c2b45; margin-top: 0; }
 
+/* ========================================================================== */
+/* common components: cards / filters / buttons / badges / tables / tabs      */
+/* ========================================================================== */
 .crm-card,
 .uk-card.crm-card {
   background: var(--crm-surface);
@@ -4316,33 +4331,7 @@ a:focus-visible,
 
 .crm-page[data-page="subject-card"] .crm-subject-detail-shell { gap: 10px; }
 
-.crm-page[data-page="subject-card"] .crm-subject-hero {
-  padding: 14px 16px;
-  border-radius: 10px;
-  gap: 14px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(19, 34, 63, 0.08);
-}
-
-.crm-page[data-page="subject-card"] .crm-subject-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  font-size: 15px;
-}
-
-.crm-page[data-page="subject-card"] .crm-subject-identity h1 { font-size: 28px; margin-bottom: 2px; }
-.crm-page[data-page="subject-card"] .crm-subject-code { font-size: 16px; margin-bottom: 7px; }
 .crm-page[data-page="subject-card"] .crm-inline-badges { gap: 6px; }
-.crm-page[data-page="subject-card"] .crm-badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; }
-
-.crm-page[data-page="subject-card"] .crm-subject-actions .uk-button {
-  min-height: 34px;
-  height: 34px;
-  border-radius: 8px;
-  font-size: 14px;
-  padding: 0 12px;
-}
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs-wrap {
   border-radius: 10px;
@@ -4924,7 +4913,7 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
 }
 
 body[data-page="subject-card"] .crm-chip,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge {
+.crm-page[data-page="subject-card"] .crm-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4941,42 +4930,42 @@ body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge {
 }
 
 body[data-page="subject-card"] .crm-chip--blue,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.info {
+.crm-page[data-page="subject-card"] .crm-badge.info {
   background: #edf3ff;
   border-color: #c9d8ff;
   color: #3157b7;
 }
 
 body[data-page="subject-card"] .crm-chip--green,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.success {
+.crm-page[data-page="subject-card"] .crm-badge.success {
   background: #eefaf3;
   border-color: #cbead7;
   color: #2f7d4e;
 }
 
 body[data-page="subject-card"] .crm-chip--amber,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.warning {
+.crm-page[data-page="subject-card"] .crm-badge.warning {
   background: #fff7e8;
   border-color: #f2d7a3;
   color: #95621a;
 }
 
 body[data-page="subject-card"] .crm-chip--red,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.danger {
+.crm-page[data-page="subject-card"] .crm-badge.danger {
   background: #fff0f0;
   border-color: #f0c7c7;
   color: #a34545;
 }
 
 body[data-page="subject-card"] .crm-chip--gray,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.muted {
+.crm-page[data-page="subject-card"] .crm-badge.muted {
   background: #f3f6fa;
   border-color: #d8e0ec;
   color: #58677d;
 }
 
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-table .crm-badge,
-body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-representatives-table .crm-badge {
+.crm-page[data-page="subject-card"] .crm-table .crm-badge,
+.crm-page[data-page="subject-card"] .crm-representatives-table .crm-badge {
   min-height: 22px;
   padding: 2px 8px;
   border-radius: 7px;
