@@ -98,50 +98,51 @@
 
           <ul class="uk-switcher crm-subject-switcher">
             <li class="crm-subject-tab-panel" data-tab-panel="profile">
-              <section class="crm-subject-section-layout">
+              <section class="crm-subject-section-layout crm-subject-form-layout">
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="main-data">
                   <div class="crm-form-section-head"><h3>Основные данные</h3></div>
-                  <div class="crm-subject-info-grid crm-profile-summary-grid crm-profile-grid-3">
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Наименование клиента</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">Акционерное общество «Восток Майнинг Системс»</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Английское наименование</div><div class="crm-profile-value">JSC Vostok Mining Systems</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Тип клиента</div><div class="crm-profile-value">Юридическое лицо (АО)</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Признак резидентства</div><div class="crm-profile-value">Резидент Российской Федерации</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">7704132901</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">КПП</div><div class="crm-profile-value">770301001</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">1217700011256</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Квалификация инвестора</div><div class="crm-profile-value">Неквалифицированный инвестор</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
+                  <div class="crm-profile-rows crm-profile-rows-main crm-profile-rows-3">
+                    <div class="crm-profile-row"><div class="crm-profile-label">Наименование клиента</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">Акционерное общество «Восток Майнинг Системс»</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">Английское наименование</div><div class="crm-profile-value">JSC Vostok Mining Systems</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">Тип клиента</div><div class="crm-profile-value">Юридическое лицо (АО)</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">Признак резидентства</div><div class="crm-profile-value">Резидент Российской Федерации</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">7704132901</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">КПП</div><div class="crm-profile-value">770301001</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">1217700011256</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">Квалификация инвестора</div><div class="crm-profile-value">Неквалифицированный инвестор</div></div>
+                    <div class="crm-profile-row"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
                   </div>
                 </article>
 
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="addresses">
-                  <div class="crm-form-section-head"><h3>Адреса</h3></div>
-                  <div class="crm-subject-info-grid crm-profile-grid crm-profile-grid-2">
-                    <div class="crm-subject-info-cell crm-profile-field crm-profile-field-full">
+                  <div class="crm-form-section-head crm-section-head-inline">
+                    <h3>Адреса</h3>
+                    <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false">Показать остальные адреса</button>
+                  </div>
+                  <div class="crm-address-stack" data-role="addresses-list">
+                    <div class="crm-address-row">
                       <div class="crm-profile-label">Адрес регистрации</div>
-                      <div class="crm-address-grid">
-                        <div><span>Страна:</span><strong>Российская Федерация</strong></div>
-                        <div><span>Регион:</span><strong>г. Москва</strong></div>
-                        <div><span>Город:</span><strong>Москва</strong></div>
-                        <div><span>Улица:</span><strong>Пресненская набережная</strong></div>
-                        <div><span>Дом / строение:</span><strong>д. 8, стр. 1</strong></div>
-                        <div><span>Индекс:</span><strong>123112</strong></div>
-                      </div>
+                      <div class="crm-profile-value">123112, Российская Федерация, г. Москва, Пресненская набережная, д. 8, стр. 1</div>
                     </div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Юридический адрес</div><div class="crm-profile-value">123112, г. Москва, Пресненская наб., д. 8, стр. 1, этаж 31, офис 3102</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Фактический адрес</div><div class="crm-profile-value">123317, г. Москва, ул. Тестовская, д. 10, БЦ «Северная Башня», офис 1915</div></div>
-                    <div class="crm-subject-info-cell crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Почтовый адрес</div><div class="crm-profile-value">123112, г. Москва, а/я 241, АО «Восток Майнинг Системс»</div></div>
+                    <div class="crm-address-row" data-role="addresses-extra" hidden>
+                      <div class="crm-profile-label">Юридический адрес / адрес местонахождения</div>
+                      <div class="crm-profile-value">123112, г. Москва, Пресненская наб., д. 8, стр. 1, этаж 31, офис 3102</div>
+                    </div>
+                    <div class="crm-address-row" data-role="addresses-extra" hidden>
+                      <div class="crm-profile-label">Почтовый адрес</div>
+                      <div class="crm-profile-value">123112, г. Москва, а/я 241, АО «Восток Майнинг Системс»</div>
+                    </div>
                   </div>
                 </article>
 
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="representatives">
                   <div class="crm-form-section-head crm-section-head-inline">
                     <h3>Представители</h3>
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="add-representative">+ Добавить представителя</button>
+                    <button class="uk-button uk-button-default crm-button" type="button" data-action="open-representative-modal">+ Добавить представителя</button>
                   </div>
                   <div class="crm-table-wrapper">
-                    <div class="crm-table crm-table-compact">
+                    <div class="crm-table crm-table-compact crm-representatives-table">
                       <table class="uk-table uk-table-divider uk-table-small">
                         <thead>
                         <tr>
@@ -161,24 +162,24 @@
                 <div class="crm-double-grid">
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="registration-data">
                     <div class="crm-form-section-head"><h3>Регистрационные данные</h3></div>
-                    <div class="crm-subject-info-grid crm-profile-grid">
-                      <div class="crm-profile-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Регистрирующий орган</div><div class="crm-profile-value">Межрайонная ИФНС России №46 по г. Москве</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Уставный капитал</div><div class="crm-profile-value">300 000 000 ₽</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Страна регистрации</div><div class="crm-profile-value">Российская Федерация</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Регистрационный номер</div><div class="crm-profile-value">1217700011256</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Налоговый статус</div><div class="crm-profile-value">Плательщик налога на прибыль (ОСНО)</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-2">
+                      <div class="crm-profile-row"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Регистрирующий орган</div><div class="crm-profile-value">Межрайонная ИФНС России №46 по г. Москве</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Уставный капитал</div><div class="crm-profile-value">300 000 000 ₽</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Страна регистрации</div><div class="crm-profile-value">Российская Федерация</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Регистрационный номер</div><div class="crm-profile-value">1217700011256</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Налоговый статус</div><div class="crm-profile-value">Плательщик налога на прибыль (ОСНО)</div></div>
                     </div>
                   </article>
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="contacts">
                     <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
-                    <div class="crm-subject-info-grid crm-profile-grid">
-                      <div class="crm-profile-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Дополнительный телефон</div><div class="crm-profile-value">+7 (495) 900-22-18 (приёмная)</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Сайт</div><div class="crm-profile-value">www.vostokms.ru</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Контактное лицо</div><div class="crm-profile-value">Соколова Мария Владимировна</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Ответственный представитель</div><div class="crm-profile-value">Крылов Денис Олегович</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-2">
+                      <div class="crm-profile-row"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Дополнительный телефон</div><div class="crm-profile-value">+7 (495) 900-22-18 (приёмная)</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Сайт</div><div class="crm-profile-value">www.vostokms.ru</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Контактное лицо</div><div class="crm-profile-value">Соколова Мария Владимировна</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Ответственный представитель</div><div class="crm-profile-value">Крылов Денис Олегович</div></div>
                     </div>
                   </article>
                 </div>
@@ -186,20 +187,20 @@
                 <div class="crm-double-grid">
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="compliance">
                     <div class="crm-form-section-head"><h3>Комплаенс</h3></div>
-                    <div class="crm-subject-info-grid crm-profile-grid">
-                      <div class="crm-profile-field"><div class="crm-profile-label">Статус комплаенса</div><div class="crm-profile-value"><span class="crm-badge success" data-status="passed">Пройден</span></div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Дата прохождения</div><div class="crm-profile-value">25.04.2026</div></div>
-                      <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Комментарий</div><div class="crm-profile-value">Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено.</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Комплаенс офицер</div><div class="crm-profile-value">Петрова Елена Сергеевна</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Последняя проверка</div><div class="crm-profile-value">25.04.2026 11:40</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Риск-профиль</div><div class="crm-profile-value">Средний (MR-2)</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-2">
+                      <div class="crm-profile-row"><div class="crm-profile-label">Статус комплаенса</div><div class="crm-profile-value"><span class="crm-badge success" data-status="passed">Пройден</span></div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Дата прохождения</div><div class="crm-profile-value">25.04.2026</div></div>
+                      <div class="crm-profile-row crm-profile-row-full"><div class="crm-profile-label">Комментарий</div><div class="crm-profile-value">Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено.</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Комплаенс офицер</div><div class="crm-profile-value">Петрова Елена Сергеевна</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Последняя проверка</div><div class="crm-profile-value">25.04.2026 11:40</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Риск-профиль</div><div class="crm-profile-value">Средний (MR-2)</div></div>
                     </div>
                   </article>
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="usage-rights">
                     <div class="crm-form-section-head"><h3>Права использования</h3></div>
-                    <div class="crm-usage-grid">
-                      <div class="crm-profile-field"><div class="crm-profile-label">Право использования денежных средств</div><div class="crm-profile-value"><span class="crm-badge success" data-status="allowed">Да</span></div><div class="crm-profile-note">Разрешено в рамках действующих брокерских договоров и лимитов риска.</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Право использования ценных бумаг</div><div class="crm-profile-value"><span class="crm-badge info" data-status="restricted">Ограничено</span></div><div class="crm-profile-note">Только по операциям РЕПО и под залог в пределах утверждённого обеспечения.</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-1">
+                      <div class="crm-profile-row"><div class="crm-profile-label">Право использования денежных средств</div><div class="crm-profile-value"><span class="crm-badge success" data-status="allowed">Да</span></div><div class="crm-profile-note">Разрешено в рамках действующих брокерских договоров и лимитов риска.</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Право использования ценных бумаг</div><div class="crm-profile-value"><span class="crm-badge info" data-status="restricted">Ограничено</span></div><div class="crm-profile-note">Только по операциям РЕПО и под залог в пределах утверждённого обеспечения.</div></div>
                     </div>
                   </article>
                 </div>
@@ -207,20 +208,20 @@
                 <div class="crm-double-grid">
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="manager">
                     <div class="crm-form-section-head"><h3>Менеджер</h3></div>
-                    <div class="crm-subject-info-grid crm-profile-grid">
-                      <div class="crm-profile-field"><div class="crm-profile-label">ФИО</div><div class="crm-profile-value">Иванов Илья Игоревич</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Должность</div><div class="crm-profile-value">Старший менеджер фронт-офиса</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 780-15-03 доб. 214</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">i.ivanov@investika.ru</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-2">
+                      <div class="crm-profile-row"><div class="crm-profile-label">ФИО</div><div class="crm-profile-value">Иванов Илья Игоревич</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Должность</div><div class="crm-profile-value">Старший менеджер фронт-офиса</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 780-15-03 доб. 214</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Email</div><div class="crm-profile-value">i.ivanov@investika.ru</div></div>
                     </div>
                   </article>
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="agent">
                     <div class="crm-form-section-head"><h3>Агент</h3></div>
-                    <div class="crm-subject-info-grid crm-profile-grid">
-                      <div class="crm-profile-field"><div class="crm-profile-label">ФИО / организация</div><div class="crm-profile-value">ООО «Регион Брокер Партнер»</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Код агента</div><div class="crm-profile-value">AG-1097</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (343) 351-88-21</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">partner@rbp-agent.ru</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-2">
+                      <div class="crm-profile-row"><div class="crm-profile-label">ФИО / организация</div><div class="crm-profile-value">ООО «Регион Брокер Партнер»</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Код агента</div><div class="crm-profile-value">AG-1097</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (343) 351-88-21</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Email</div><div class="crm-profile-value">partner@rbp-agent.ru</div></div>
                     </div>
                   </article>
                 </div>
@@ -228,10 +229,10 @@
                 <div class="crm-double-grid">
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="report-delivery">
                     <div class="crm-form-section-head"><h3>Способ получения отчётов</h3></div>
-                    <div class="crm-report-methods">
-                      <div class="crm-profile-field"><div class="crm-profile-label">Электронная почта</div><div class="crm-profile-value"><span class="crm-badge success" data-status="enabled">Включён</span></div><div class="crm-profile-note">Отчёты направляются на reporting@vms.ru ежедневно до 11:00 МСК.</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Личный кабинет</div><div class="crm-profile-value"><span class="crm-badge success" data-status="enabled">Включён</span></div><div class="crm-profile-note">Права доступа у пользователей: Крылов Д.О., Соколова М.В.</div></div>
-                      <div class="crm-profile-field"><div class="crm-profile-label">Бумажный отчёт</div><div class="crm-profile-value"><span class="crm-badge muted" data-status="disabled">Выключен</span></div><div class="crm-profile-note">Печатные отчёты не требуются, доставка курьером отключена.</div></div>
+                    <div class="crm-profile-rows crm-profile-rows-1">
+                      <div class="crm-profile-row"><div class="crm-profile-label">Электронная почта</div><div class="crm-profile-value"><span class="crm-badge success" data-status="enabled">Включён</span></div><div class="crm-profile-note">Отчёты направляются на reporting@vms.ru ежедневно до 11:00 МСК.</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Личный кабинет</div><div class="crm-profile-value"><span class="crm-badge success" data-status="enabled">Включён</span></div><div class="crm-profile-note">Права доступа у пользователей: Крылов Д.О., Соколова М.В.</div></div>
+                      <div class="crm-profile-row"><div class="crm-profile-label">Бумажный отчёт</div><div class="crm-profile-value"><span class="crm-badge muted" data-status="disabled">Выключен</span></div><div class="crm-profile-note">Печатные отчёты не требуются, доставка курьером отключена.</div></div>
                     </div>
                   </article>
                   <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card" data-entity="manager-comment">
@@ -305,7 +306,27 @@
             </li>
           </ul>
         </div>
-      </section>
+      
+        <div class="crm-modal" data-role="representative-modal" hidden>
+          <div class="crm-modal-backdrop" data-action="close-representative-modal"></div>
+          <div class="crm-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="representative-modal-title">
+            <button class="crm-modal-close" type="button" aria-label="Закрыть" data-action="close-representative-modal">×</button>
+            <h3 id="representative-modal-title">Добавить представителя</h3>
+            <div class="crm-modal-form-grid">
+              <label class="crm-modal-field"><span>Поиск субъекта</span><input class="uk-input crm-input" type="search" placeholder="Введите ФИО или организацию"/></label>
+              <label class="crm-modal-field"><span>Субъект</span><input class="uk-input crm-input" type="text" placeholder="Выберите субъекта"/></label>
+              <label class="crm-modal-field"><span>Роль</span><select class="uk-select crm-input"><option>Представитель по доверенности</option><option>Генеральный директор</option><option>Главный бухгалтер</option></select></label>
+              <label class="crm-modal-field"><span>Основание полномочий</span><input class="uk-input crm-input" type="text" placeholder="Доверенность / приказ / устав"/></label>
+              <label class="crm-modal-field crm-modal-field-wide"><span>Срок действия полномочий</span><input class="uk-input crm-input" type="date" data-role="representative-expiry"/></label>
+              <label class="crm-modal-checkbox crm-modal-field-wide"><input type="checkbox" data-action="toggle-representative-expiry"/> Без срока действия</label>
+            </div>
+            <div class="crm-modal-actions">
+              <button class="uk-button crm-button-primary crm-button" type="button" data-action="save-representative">Сохранить</button>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="close-representative-modal">Закрыть</button>
+            </div>
+          </div>
+        </div>
+</section>
     </main>
   </div>
 </div>

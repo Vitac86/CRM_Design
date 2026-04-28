@@ -94,9 +94,25 @@
   });
 
 
+
+
+  function setRepresentativeModalState(isOpen) {
+    const modal = document.querySelector('[data-role="representative-modal"]');
+    if (!modal) return;
+    modal.hidden = !isOpen;
+    document.body.classList.toggle('crm-modal-open', isOpen);
+  }
+
+  function syncRepresentativeExpiry() {
+    const toggle = document.querySelector('[data-action="toggle-representative-expiry"]');
+    const expiryInput = document.querySelector('[data-role="representative-expiry"]');
+    if (!toggle || !expiryInput) return;
+    expiryInput.disabled = !!toggle.checked;
+  }
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       closeSidebar();
+      setRepresentativeModalState(false);
     }
   });
 
@@ -184,6 +200,40 @@
       }
     }
 
+    const toggleAddressesButton = target.closest('[data-action="toggle-addresses"]');
+    if (toggleAddressesButton) {
+      const section = toggleAddressesButton.closest('[data-entity="addresses"]');
+      if (section) {
+        const extraRows = section.querySelectorAll('[data-role="addresses-extra"]');
+        const expanded = toggleAddressesButton.getAttribute('aria-expanded') === 'true';
+        const nextExpanded = !expanded;
+        extraRows.forEach(function (row) {
+          row.hidden = !nextExpanded;
+        });
+        toggleAddressesButton.setAttribute('aria-expanded', nextExpanded ? 'true' : 'false');
+        toggleAddressesButton.textContent = nextExpanded ? 'Скрыть остальные адреса' : 'Показать остальные адреса';
+      }
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="open-representative-modal"]')) {
+      setRepresentativeModalState(true);
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="close-representative-modal"]')) {
+      setRepresentativeModalState(false);
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="save-representative"]')) {
+      setRepresentativeModalState(false);
+      event.preventDefault();
+      return;
+    }
     const hrefHost = target.closest('[data-href]');
     if (hrefHost) {
       const directAnchor = target.closest('a[href]');
@@ -209,6 +259,14 @@
       event.preventDefault();
     }
   });
+
+  document.addEventListener('change', function (event) {
+    if (event.target.matches('[data-action="toggle-representative-expiry"]')) {
+      syncRepresentativeExpiry();
+    }
+  });
+
+  syncRepresentativeExpiry();
 
   if (window.UIkit) {
     document.querySelectorAll('ul[uk-tab], .crm-tabs[uk-tab]').forEach(function (tab) {
