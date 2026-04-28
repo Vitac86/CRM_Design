@@ -313,12 +313,27 @@ function validateRegistryFilterPanelStructure(file, content) {
 function validateRegistryTableAndEmptyState(file, content) {
   const isStandaloneRegistry = file.includes('/static-uikit/pages/') && registryPages.has(path.basename(file));
   if (!isStandaloneRegistry) return;
-  if (!/<div[^>]*class="[^"]*\bcrm-registry-table\b[^"]*"[^>]*>[\s\S]*?<div[^>]*class="[^"]*\bcrm-table-wrapper\b[^"]*"[^>]*>[\s\S]*?<div[^>]*class="[^"]*\bcrm-table\b[^"]*"[^>]*>[\s\S]*?<table\b[^>]*class="[^"]*\buk-table\b/i.test(content)) {
-    addError(file, 'registry table must follow nesting: .crm-registry-table > .crm-table-wrapper > .crm-table > table.uk-table');
+  const registryTableBlocks = content.match(/<div[^>]*class="[^"]*\bcrm-registry-table\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi) || [];
+  if (!registryTableBlocks.length) {
+    addError(file, 'registry page must include at least one .crm-registry-table block');
   }
-  for (const tm of content.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)) {
-    const inner = tm[1];
-    if (!/<thead\b/i.test(inner) || !/<tbody\b/i.test(inner)) addError(file, 'table.uk-table must include both thead and tbody');
+  for (const block of registryTableBlocks) {
+    if (!/<div[^>]*class="[^"]*\bcrm-table-wrapper\b[^"]*"[^>]*>/i.test(block)) {
+      addError(file, '.crm-registry-table must contain .crm-table-wrapper');
+      continue;
+    }
+    if (!/<div[^>]*class="[^"]*\bcrm-table-wrapper\b[^"]*"[^>]*>[\s\S]*?<div[^>]*class="[^"]*\bcrm-table\b[^"]*"[^>]*>/i.test(block)) {
+      addError(file, '.crm-table-wrapper must contain .crm-table');
+      continue;
+    }
+    if (!/<div[^>]*class="[^"]*\bcrm-table\b[^"]*"[^>]*>[\s\S]*?<table\b[^>]*class="[^"]*\buk-table\b/i.test(block)) {
+      addError(file, '.crm-table must contain table.uk-table');
+      continue;
+    }
+    for (const tm of block.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)) {
+      const inner = tm[1];
+      if (!/<thead\b/i.test(inner) || !/<tbody\b/i.test(inner)) addError(file, 'table.uk-table must include both thead and tbody');
+    }
   }
   for (const tableMatch of content.matchAll(/<(table|thead|tbody|tr)\b[^>]*>[\s\S]*?<\/\1>/gi)) {
     if (/\bcrm-empty-state\b/i.test(tableMatch[0])) {
@@ -328,6 +343,20 @@ function validateRegistryTableAndEmptyState(file, content) {
   }
   if (isStandaloneRegistry && !registryEmptyStateAllowlist.has(path.basename(file))) {
     if (!/<[^>]*class="[^"]*\bcrm-empty-state\b[^"]*"[^>]*\bdata-entity="empty-state"/i.test(content)) addError(file, 'registry page must include at least one .crm-empty-state[data-entity=\"empty-state\"]');
+  }
+}
+
+function validateEmptyStateContract(file, attrs, sample) {
+  if (!/\bdata-entity="empty-state"/i.test(attrs)) {
+    addError(file, 'crm-empty-state block must include data-entity="empty-state"', sample);
+  }
+  const isDemoVisible = /\bdata-demo-visible="true"/i.test(attrs);
+  const hasHidden = /\bhidden\b/i.test(attrs);
+  if (!isDemoVisible && !hasHidden) {
+    addError(file, 'crm-empty-state block must use native hidden attribute unless data-demo-visible="true"', sample);
+  }
+  if (/\bdemo-hidden\b/i.test(attrs) && !hasHidden) {
+    addError(file, 'demo-hidden empty-state must use native hidden attribute', sample);
   }
 }
 
@@ -1035,8 +1064,7 @@ function validatePartials() {
       }
 
       if (classTokens.includes('crm-empty-state')) {
-        if (!/\bdata-entity="empty-state"/i.test(attrs)) addError(file, 'crm-empty-state block must include data-entity="empty-state"', match[0]);
-        if (/\bdemo-hidden\b/i.test(attrs) && !/\bhidden\b/i.test(attrs)) addError(file, 'demo-hidden empty-state must use native hidden attribute', match[0]);
+        validateEmptyStateContract(file, attrs, match[0]);
       }
     }
   }
@@ -1153,15 +1181,7 @@ for (const page of pageFiles) {
     if (hasDataStatus && !hasDataStatus[1].trim()) addError(file, 'data-status must not be empty', match[0]);
 
     if (classTokens.includes('crm-empty-state')) {
-      if (!/\bdata-entity="empty-state"/i.test(attrs)) {
-        addError(file, 'crm-empty-state block must include data-entity="empty-state"', match[0]);
-      }
-      if (!/\bhidden\b/i.test(attrs)) {
-        addError(file, 'demo empty-state must use native hidden attribute', match[0]);
-      }
-      if (/\bdemo-hidden\b/i.test(attrs) && !/\bhidden\b/i.test(attrs)) {
-        addError(file, 'demo-hidden empty-state must use native hidden attribute', match[0]);
-      }
+      validateEmptyStateContract(file, attrs, match[0]);
     }
 
     if (classTokens.includes('crm-badge') && !/\bdata-status="/i.test(attrs) && !/\bdata-entity="/i.test(attrs)) {
