@@ -10,17 +10,17 @@
 <body data-page="requests">
 <div class="crm-app">
   <div class="crm-layout">
-    <aside class="crm-sidebar">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
   <div class="crm-sidebar-brand">
     <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
   </div>
-  <nav class="crm-nav">
+  <nav class="crm-nav" aria-label="Основная навигация">
     <div class="crm-nav-group" data-group="front-office">
       <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
         <span><span uk-icon="briefcase"></span>Фронт-офис</span>
         <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
       </button>
-      <div class="crm-nav-submenu">
+      <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
         <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
         <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><span uk-icon="users"></span>Субъекты</span></a>
         <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
@@ -37,9 +37,9 @@
         <span><span uk-icon="album"></span>Мидл-офис</span>
         <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
       </button>
-      <div class="crm-nav-submenu">
-        <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html">Журнал клиентов</a>
-        <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html">Журнал отправленных отчётов</a>
+      <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
+        <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><span uk-icon="file-text"></span>Журнал клиентов</span></a>
+        <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><span uk-icon="file-text"></span>Журнал отправленных отчётов</span></a>
       </div>
     </div>
 
@@ -49,6 +49,7 @@
     <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
   </nav>
 </aside>
+
     <main class="crm-main">
       <header class="crm-topbar">
         <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
