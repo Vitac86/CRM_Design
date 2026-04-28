@@ -555,6 +555,40 @@ function validateSubjectCardNoNestedCards() {
     if (!isSelfClosing) stack.push({ tagName, isCard });
   }
 }
+
+function validateSubjectCardStaticRendering() {
+  const standalone = path.join(rootDir, 'pages', 'subject-card.html');
+  const umiP0 = path.join(rootDir, 'umi-p0', 'pages', 'subject-card.html');
+  const scriptFile = path.join(rootDir, 'assets', 'js', 'crm-static.js');
+
+  const forbiddenPatterns = [/window\.subjectCardData/, /renderSubjectCardProfile\s*\(/, /createProfileRow\s*\(/, /createAddressCard\s*\(/];
+  for (const file of [standalone, umiP0, scriptFile]) {
+    if (!fs.existsSync(file)) continue;
+    const content = fs.readFileSync(file, 'utf8');
+    for (const pattern of forbiddenPatterns) {
+      if (pattern.test(content)) addError(file, 'forbidden subject-card demo runtime renderer/data pattern detected', pattern.toString());
+    }
+  }
+
+  if (!fs.existsSync(standalone)) return;
+  const content = fs.readFileSync(standalone, 'utf8');
+
+  const mainGridMatch = content.match(/<div[^>]*data-role="main-data-grid"[^>]*>([\s\S]*?)<\/div>/i);
+  if (!mainGridMatch || !/crm-profile-row/.test(mainGridMatch[1])) {
+    addError(standalone, 'subject-card main-data-grid must contain at least one .crm-profile-row');
+  }
+
+  const registrationMatch = content.match(/<div[^>]*data-role="address-registration"[^>]*>([\s\S]*?)<\/div>/i);
+  if (registrationMatch && !/crm-address-(row|card)|crm-address-fields/.test(registrationMatch[1])) {
+    addError(standalone, 'subject-card address-registration must contain rendered address markup when present');
+  }
+
+  const repsMatch = content.match(/<tbody[^>]*data-role="representatives-table-body"[^>]*>([\s\S]*?)<\/tbody>/i);
+  if (!repsMatch || !(repsMatch[1].match(/<tr\b/gi) || []).length) {
+    addError(standalone, 'subject-card representatives tbody must contain at least one row');
+  }
+}
+
 function validatePartials() {
   const partialFiles = fs.existsSync(partialsDir) ? fs.readdirSync(partialsDir).filter((f) => f.endsWith('.html')).map((f) => path.join(partialsDir, f)) : [];
 
@@ -655,6 +689,7 @@ validatePartials();
 validateStaticUikitLauncher();
 validateNoRawHexInPageCss();
 validateSubjectCardNoNestedCards();
+validateSubjectCardStaticRendering();
 
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);

@@ -74,6 +74,9 @@
 2. Содержимое `pages/*.html` используйте как content-area шаблонов.
 3. Demo-данные замените на UMI variables/macros.
 4. Подключайте `assets` локально (без внешних CDN/API).
+5. `pages/subject-card.html` теперь server-rendered/static-template-first: профиль, адреса и представители заданы в HTML и не заполняются через demo JSON в runtime.
+6. `assets/js/crm-static.js` используется только для UI-поведения (tabs/sidebar/modals/toggles), без data-rendering предметных карточек.
+
 
 ## Ограничения
 - Без React внутри `static-uikit`.

@@ -104,7 +104,17 @@
               <section class="crm-subject-section-layout crm-subject-form-layout">
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="main-data">
                   <div class="crm-form-section-head"><h3>Основные данные</h3></div>
-                  <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3" data-role="main-data-grid"></div>
+                  <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3" data-role="main-data-grid">
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Наименование клиента</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">АО «Восток Майнинг Системс» (полное наименование)</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Английское наименование</div><div class="crm-profile-value">АО Восток Майнинг Системс</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Тип клиента</div><div class="crm-profile-value">Юр. лицо</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Признак резидентства</div><div class="crm-profile-value">Резидент РФ</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">2721123456</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">КПП</div><div class="crm-profile-value">771011001</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">10277V-10111234</div></div>
+                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Квалификация инвестора</div><div class="crm-profile-value">Квалифицированный</div></div>
+                  </div>
                 </article>
 
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card subject-section" data-entity="addresses" data-role="addresses-section">
@@ -113,8 +123,43 @@
                     <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
                   </div>
                   <div class="crm-address-stack subject-address-stack" data-role="addresses-list">
-                    <div data-role="address-registration"></div>
-                    <div id="subject-addresses-extra" data-role="addresses-extra" hidden></div>
+                    <div data-role="address-registration">
+                      <article class="crm-address-row crm-address-card">
+                        <h4 class="crm-address-title">Адрес регистрации</h4>
+                        <div class="crm-address-fields">
+                          <div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong>Россия</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong>Хабаровск</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Город</span><strong>Хабаровск</strong></div>
+                          <div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong>ул. Муравьёва-Амурского, д. 25</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong>—</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong>101000</strong></div>
+                        </div>
+                      </article>
+                    </div>
+                    <div id="subject-addresses-extra" data-role="addresses-extra" hidden>
+                      <article class="crm-address-row crm-address-card">
+                        <h4 class="crm-address-title">Адрес местонахождения</h4>
+                        <div class="crm-address-fields">
+                          <div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong>Россия</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong>Хабаровск</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Город</span><strong>Хабаровск</strong></div>
+                          <div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong>ул. Муравьёва-Амурского, д. 25</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong>—</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong>101000</strong></div>
+                        </div>
+                      </article>
+                      <article class="crm-address-row crm-address-card">
+                        <h4 class="crm-address-title">Почтовый адрес</h4>
+                        <div class="crm-address-fields">
+                          <div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong>Россия</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong>Хабаровск</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Город</span><strong>Хабаровск</strong></div>
+                          <div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong>ул. Муравьёва-Амурского, д. 25</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong>—</strong></div>
+                          <div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong>101000</strong></div>
+                        </div>
+                      </article>
+                    </div>
                   </div>
                 </article>
 
@@ -131,7 +176,11 @@
                           <th>ФИО / название</th><th>Роль / должность</th><th>Документ / основание полномочий</th><th>Срок действия</th><th>Статус</th>
                         </tr>
                         </thead>
-                        <tbody data-role="representatives-table-body"></tbody>
+                        <tbody data-role="representatives-table-body">
+                        <tr><td><strong>Крылов Денис Олегович</strong></td><td>Генеральный директор</td><td>Устав АО, протокол №3 от 15.01.2021</td><td>Бессрочно</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr>
+                        <tr><td><strong>Соколова Мария Владимировна</strong></td><td>Представитель по доверенности</td><td>Доверенность №44/25 от 02.02.2025</td><td>до 01.02.2027</td><td><span class="crm-badge warning" data-status="attention">Требует продления</span></td></tr>
+                        <tr><td><strong>Никифоров Артём Игоревич</strong></td><td>Главный бухгалтер</td><td>Приказ о назначении №12-к от 11.03.2022</td><td>Бессрочно</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -313,71 +362,7 @@
     </main>
   </div>
 </div>
-<script>
-  window.subjectCardData = {
-    subjectHeader: {
-      shortName: "АО «Восток Майнинг Системс»",
-      clientCode: "INV-1011",
-      clientType: "Юр. лицо",
-      residency: "Резидент РФ",
-      representative: "Представитель",
-      investorStatus: "Квалифицированный"
-    },
-    subjectProfile: {
-      shortName: "АО «Восток Майнинг Системс»",
-      fullName: "АО «Восток Майнинг Системс» (полное наименование)",
-      englishName: "АО Восток Майнинг Системс",
-      clientType: "Юр. лицо",
-      residency: "Резидент РФ",
-      inn: "2721123456",
-      kpp: "771011001",
-      ogrn: "10277V-10111234",
-      investorStatus: "Квалифицированный"
-    },
-    addresses: {
-      registration: {
-        title: "Адрес регистрации",
-        country: "Россия",
-        region: "Хабаровск",
-        city: "Хабаровск",
-        street: "ул. Муравьёва-Амурского, д. 25",
-        house: "—",
-        index: "101000"
-      },
-      location: {
-        title: "Адрес местонахождения",
-        country: "Россия",
-        region: "Хабаровск",
-        city: "Хабаровск",
-        street: "ул. Муравьёва-Амурского, д. 25",
-        house: "—",
-        index: "101000"
-      },
-      postal: {
-        title: "Почтовый адрес",
-        country: "Россия",
-        region: "Хабаровск",
-        city: "Хабаровск",
-        street: "ул. Муравьёва-Амурского, д. 25",
-        house: "—",
-        index: "101000"
-      }
-    },
-    representatives: [
-      { fullName: "Крылов Денис Олегович", role: "Генеральный директор", authority: "Устав АО, протокол №3 от 15.01.2021", validTo: "Бессрочно", statusLabel: "Действует", statusClass: "success", statusCode: "active" },
-      { fullName: "Соколова Мария Владимировна", role: "Представитель по доверенности", authority: "Доверенность №44/25 от 02.02.2025", validTo: "до 01.02.2027", statusLabel: "Требует продления", statusClass: "warning", statusCode: "attention" },
-      { fullName: "Никифоров Артём Игоревич", role: "Главный бухгалтер", authority: "Приказ о назначении №12-к от 11.03.2022", validTo: "Бессрочно", statusLabel: "Действует", statusClass: "success", statusCode: "active" }
-    ],
-    registrationData: {},
-    contacts: {},
-    compliance: {},
-    rights: {},
-    manager: {},
-    agent: {},
-    reportDelivery: {},
-    managerComment: {}
-  };
-</script>
+
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
