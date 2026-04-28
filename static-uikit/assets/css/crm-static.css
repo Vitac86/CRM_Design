@@ -181,7 +181,24 @@ body {
 }
 .crm-nav-item { width: 100%; }
 .crm-sidebar .crm-nav-link > span { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
-.crm-nav-link [uk-icon] { width: 14px; height: 14px; color: rgba(232, 240, 255, 0.78); }
+.crm-sidebar .crm-nav-link [uk-icon] {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 14px;
+  color: rgba(232, 240, 255, 0.78);
+}
+
+.crm-sidebar .crm-nav-group-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
 
 .crm-nav-link:hover { background: var(--crm-sidebar-hover); color: #fff; text-decoration: none; }
 
