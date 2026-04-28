@@ -3585,3 +3585,204 @@ a:focus-visible,
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Subjects page parity tuning (single-screen PR) ===== */
+.crm-page[data-page="subjects"] {
+  overflow-x: hidden;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-shell {
+  width: min(1540px, 100%);
+}
+
+.crm-page[data-page="subjects"] .crm-registry-header {
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-title-block h1 {
+  margin: 0;
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-title-block p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #5f6f89;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-actions {
+  margin-left: auto;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-actions .uk-button,
+.crm-page[data-page="subjects"] .crm-registry-actions a.uk-button {
+  min-height: 34px;
+  height: 34px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.7fr) repeat(4, minmax(132px, 1fr));
+  gap: 8px 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #d9e2f0;
+  background: #f8faff;
+  overflow: visible;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-search {
+  grid-column: 1 / span 2;
+}
+
+.crm-page[data-page="subjects"] .crm-filter-control {
+  min-width: 0;
+}
+
+.crm-page[data-page="subjects"] .crm-filter-control .uk-form-label {
+  margin-bottom: 3px;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #6d7d96;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters .uk-input,
+.crm-page[data-page="subjects"] .crm-registry-filters .uk-select,
+.crm-page[data-page="subjects"] .crm-registry-filters .uk-button {
+  min-height: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters .crm-filter-actions {
+  justify-self: end;
+  align-self: end;
+}
+
+.crm-page[data-page="subjects"] .crm-filter-reset {
+  color: #4d607e;
+  background: #f2f6fd;
+  border-color: #cdd8eb;
+}
+
+.crm-page[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table {
+  min-width: 1200px;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table th {
+  background: #edf2fb;
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table td:first-child {
+  min-width: 320px;
+  border-left: 2px solid transparent;
+}
+
+.crm-page[data-page="subjects"] .crm-row-main {
+  font-size: 13px;
+  line-height: 1.3;
+  color: #1b2b46;
+}
+
+.crm-page[data-page="subjects"] .crm-row-sub {
+  margin-top: 1px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #7283a0;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table tbody tr[data-href] {
+  cursor: pointer;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table tbody tr[data-href]:hover td:first-child {
+  border-left-color: #84a1df;
+  background: #f9fbff;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge {
+  padding: 2px 7px;
+  font-size: 11px;
+  line-height: 1.2;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.crm-page[data-page="subjects"] .crm-inline-badges {
+  gap: 4px;
+}
+
+@media (max-width: 1439px) {
+  .crm-page[data-page="subjects"] .crm-registry-filters {
+    grid-template-columns: minmax(220px, 1.5fr) repeat(3, minmax(120px, 1fr));
+  }
+
+  .crm-page[data-page="subjects"] .crm-registry-search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1100px) {
+  .crm-page[data-page="subjects"] .crm-registry-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .crm-page[data-page="subjects"] .crm-registry-filters .crm-filter-actions {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 959px) {
+  .crm-page[data-page="subjects"] .crm-registry-header {
+    align-items: stretch;
+  }
+
+  .crm-page[data-page="subjects"] .crm-registry-actions {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .crm-page[data-page="subjects"] .crm-registry-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .crm-page[data-page="subjects"] .crm-registry-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="subjects"] .crm-registry-search,
+  .crm-page[data-page="subjects"] .crm-registry-filters .crm-filter-actions {
+    grid-column: auto;
+  }
+}
