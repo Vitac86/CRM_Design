@@ -180,7 +180,7 @@ body {
   transition: background-color .14s ease, color .14s ease;
 }
 .crm-nav-item { width: 100%; }
-.crm-nav-link > span:first-child { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.crm-sidebar .crm-nav-link > span { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
 .crm-nav-link [uk-icon] { width: 14px; height: 14px; color: rgba(232, 240, 255, 0.78); }
 
 .crm-nav-link:hover { background: var(--crm-sidebar-hover); color: #fff; text-decoration: none; }
@@ -200,7 +200,7 @@ body {
 .crm-nav-submenu[hidden] {
   display: none !important;
 }
-.crm-nav-submenu .crm-nav-link {
+.crm-sidebar .crm-nav-submenu .crm-nav-link {
   font-size: 13px;
   min-height: 30px;
   padding: 6px 9px;
@@ -2236,7 +2236,7 @@ a:focus-visible,
   padding-left: 10px;
 }
 
-.crm-nav-submenu .crm-nav-link {
+.crm-sidebar .crm-nav-submenu .crm-nav-link {
   min-height: 32px;
   padding: 6px 10px;
   font-size: 13px;
