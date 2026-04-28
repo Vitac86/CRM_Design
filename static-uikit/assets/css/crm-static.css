@@ -2013,3 +2013,160 @@ a:focus-visible,
     grid-template-columns: 1fr;
   }
 }
+
+.crm-operations-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.crm-create-panel,
+.crm-compliance-queue,
+.crm-journal-table {
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.crm-create-panel .crm-form-section-head {
+  margin-bottom: 10px;
+}
+
+.crm-create-panel .crm-form-hint {
+  margin: 0;
+  color: var(--crm-muted);
+  font-size: 12px;
+}
+
+.crm-operations-filters {
+  margin-bottom: 2px;
+}
+
+.crm-filter-reset-cell {
+  display: flex;
+  align-items: flex-end;
+}
+
+.crm-filter-reset-cell .uk-button {
+  width: 100%;
+}
+
+.crm-journal-table .crm-row-main,
+.crm-compliance-queue .crm-row-main {
+  font-weight: 600;
+  color: #21304b;
+}
+
+.crm-row-sub {
+  margin-top: 2px;
+  color: #6f7f99;
+  font-size: 12px;
+}
+
+.crm-row-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.crm-journal-table tbody tr[data-href],
+.crm-compliance-queue tbody tr[data-href] {
+  cursor: pointer;
+}
+
+.crm-compliance-queue tbody tr[data-status="risk-high"] {
+  background: #fff7f7;
+}
+
+.crm-compliance-queue tbody tr[data-status="risk-high"]:hover {
+  background: #ffefef;
+}
+
+.crm-decision-hero {
+  border-left: 4px solid #d3def8;
+}
+
+.crm-risk-summary {
+  justify-content: flex-end;
+}
+
+.crm-compliance-card-layout {
+  align-items: start;
+}
+
+.crm-risk-grid .uk-form-label {
+  margin-bottom: 2px;
+}
+
+.crm-doc-checklist {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-doc-checklist-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #f9fbff;
+  padding: 10px 12px;
+}
+
+.crm-doc-checklist-item strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #1d2d49;
+}
+
+.crm-doc-checklist-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #5e6f8c;
+}
+
+.crm-decision-panel {
+  position: sticky;
+  top: calc(var(--crm-topbar-h) + 12px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.crm-decision-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.crm-decision-action {
+  justify-content: center;
+}
+
+.crm-decision-action.is-rework {
+  border-color: #f0d5a8;
+  background: #fff8eb;
+  color: #8b5e22;
+}
+
+.crm-decision-action.is-rework:hover {
+  background: #fff2da;
+}
+
+.crm-decision-action.is-block {
+  border-color: #f2c3c3;
+  background: #fef0f0;
+  color: #a14141;
+}
+
+.crm-decision-action.is-block:hover {
+  background: #fde6e6;
+}
+
+.crm-decision-footer {
+  margin-top: auto;
+}
+
+@media (max-width: 920px) {
+  .crm-decision-panel {
+    position: static;
+  }
+}

@@ -56,55 +56,100 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="compliance-card">
-        <div class="crm-breadcrumbs"><a href="compliance.html">Комплаенс</a><span uk-icon="chevron-right"></span><span>Карточка проверки</span></div>
-        <div class="crm-detail-header crm-card uk-card uk-card-body uk-margin-bottom">
+        <div class="crm-breadcrumbs"><a href="compliance.html">Комплаенс</a><span uk-icon="chevron-right"></span><span>Проверка CL-4408</span></div>
+
+        <article class="crm-detail-header crm-card uk-card uk-card-body crm-decision-hero uk-margin-bottom">
           <div>
             <h1>АО «Глобал Ресурс Траст»</h1>
-            <p>Код CL-4408 · ИНН 7705964812 · ЮЛ · Нерезидент</p>
+            <p>Код CL-4408 · ИНН 7705964812 · ЮЛ · Нерезидент · Последняя проверка 24.04.2026 10:18</p>
           </div>
-          <div class="crm-inline-badges">
+          <div class="crm-inline-badges crm-risk-summary">
             <span class="crm-badge warning" data-status="risk-medium">Риск: Средний</span>
-            <span class="crm-badge info" data-status="pending-review">На проверке</span>
-            <span class="crm-badge muted" data-entity="status-note">Обновлено: 24.04.2026 10:18</span>
+            <span class="crm-badge warning" data-status="pending-review">Статус: На проверке</span>
+            <span class="crm-badge info" data-status="docs-partial">Документы: Частичный комплект</span>
+            <span class="crm-badge muted" data-status="officer">Аналитик: Иванов И.И.</span>
           </div>
-        </div>
-        <div class="crm-grid-2">
+        </article>
+
+        <div class="crm-grid-2 crm-compliance-card-layout">
           <div>
             <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
-              <div class="crm-form-section-head"><h3>Карточка клиента</h3><span class="crm-step-note">Профиль клиента и ключевые признаки риска.</span></div>
-              <div class="crm-form-grid uk-grid-small" uk-grid>
+              <div class="crm-form-section-head"><h3>Сводка по клиенту</h3><span class="crm-step-note">Быстрый профиль для принятия решения.</span></div>
+              <div class="crm-risk-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-2"><label class="uk-form-label">Тип клиента</label><div>Юридическое лицо</div></div>
                 <div class="uk-width-1-2"><label class="uk-form-label">Резидентство</label><div>Нерезидент</div></div>
                 <div class="uk-width-1-2"><label class="uk-form-label">Ответственный менеджер</label><div>Иванов И.И.</div></div>
                 <div class="uk-width-1-2"><label class="uk-form-label">Источник средств</label><div>Подтверждён частично</div></div>
+                <div class="uk-width-1-2"><label class="uk-form-label">Бенефициар</label><div>Смирнов П.В.</div></div>
+                <div class="uk-width-1-2"><label class="uk-form-label">Группа риска</label><div><span class="crm-badge warning" data-status="risk-medium">Средний риск</span></div></div>
               </div>
             </article>
-            <article class="crm-card crm-table crm-table-wrapper">
+
+            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
+              <div class="crm-form-section-head"><h3>KYC / AML / Риск-факторы</h3><span class="crm-step-note">Критичные проверки перед финальным решением.</span></div>
+              <div class="crm-doc-checklist">
+                <div class="crm-doc-checklist-item">
+                  <div>
+                    <strong>KYC анкета</strong>
+                    <p>Требуется обновление паспортных данных представителя.</p>
+                  </div>
+                  <span class="crm-badge warning" data-status="pending-review">На проверке</span>
+                </div>
+                <div class="crm-doc-checklist-item">
+                  <div>
+                    <strong>Проверка бенефициаров</strong>
+                    <p>Структура владения подтверждена, расхождений не найдено.</p>
+                  </div>
+                  <span class="crm-badge success" data-status="approved">Пройден</span>
+                </div>
+                <div class="crm-doc-checklist-item">
+                  <div>
+                    <strong>AML мониторинг</strong>
+                    <p>Есть транзакции, требующие дополнительного пояснения.</p>
+                  </div>
+                  <span class="crm-badge info" data-status="rework">На доработке</span>
+                </div>
+                <div class="crm-doc-checklist-item">
+                  <div>
+                    <strong>Санкционные списки</strong>
+                    <p>Совпадений по контрагентам не обнаружено.</p>
+                  </div>
+                  <span class="crm-badge success" data-status="approved">Пройден</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="crm-card crm-table crm-table-wrapper crm-section">
               <table class="uk-table uk-table-divider">
-                <thead><tr><th>Проверка</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr></thead>
+                <thead><tr><th>Документ</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr></thead>
                 <tbody>
-                  <tr><td>KYC анкета</td><td><span class="crm-badge warning" data-status="pending-review">На проверке</span></td><td>Нужны обновлённые документы</td><td>24.04.2026</td></tr>
-                  <tr><td>Бенефициары</td><td><span class="crm-badge success" data-status="approved">Пройден</span></td><td>Данные подтверждены</td><td>23.04.2026</td></tr>
-                  <tr><td>AML мониторинг</td><td><span class="crm-badge info" data-status="rework">На доработке</span></td><td>Требуется доп. пояснение</td><td>23.04.2026</td></tr>
+                  <tr><td><div class="crm-row-main">Устав компании</div><div class="crm-row-sub">DOC-3117</div></td><td><span class="crm-badge success" data-status="approved">Проверен</span></td><td>Актуальная редакция</td><td>24.04.2026</td></tr>
+                  <tr><td><div class="crm-row-main">Анкета KYC</div><div class="crm-row-sub">DOC-3118</div></td><td><span class="crm-badge warning" data-status="pending-review">На проверке</span></td><td>Нет обновлённого телефона</td><td>24.04.2026</td></tr>
+                  <tr><td><div class="crm-row-main">Сведения о бенефициарах</div><div class="crm-row-sub">DOC-3120</div></td><td><span class="crm-badge info" data-status="rework">На доработке</span></td><td>Нужна расшифровка доли участия</td><td>23.04.2026</td></tr>
                 </tbody>
               </table>
             </article>
           </div>
+
           <form action="#" method="post" data-form="compliance-decision" data-action="compliance-decision" class="crm-card uk-card uk-card-body crm-decision-panel">
             <div class="crm-form-section-head"><h3>Панель решения</h3><span class="crm-badge warning" data-status="pending-review">Требует решения</span></div>
-            <div class="crm-action-row">
-              <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="approved">Одобрить</button>
-              <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="rework">На доработку</button>
-              <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
+            <p class="crm-form-hint">Выберите решение по кейсу. Для «На доработку» и «Заблокировать» комментарий обязателен.</p>
+
+            <div class="crm-decision-actions">
+              <button type="button" class="uk-button crm-button-primary crm-button crm-decision-action is-approve" data-action="compliance-decision" data-status="approved">Одобрить</button>
+              <button type="button" class="uk-button uk-button-default crm-button crm-decision-action is-rework" data-action="compliance-decision" data-status="rework">На доработку</button>
+              <button type="button" class="uk-button uk-button-default crm-button crm-decision-action is-block" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
             </div>
+
             <div class="crm-form-section">
-              <label class="uk-form-label" for="compliance-comment">Комментарий комплаенса <span class="crm-required">*</span></label>
+              <label class="uk-form-label" for="compliance-comment">Комментарий комплаенса</label>
               <textarea class="uk-textarea crm-input" id="compliance-comment" name="compliance-comment" rows="8" placeholder="Укажите обоснование решения"></textarea>
-              <span class="crm-field-note">Для статусов «На доработку» и «Заблокировать» комментарий обязателен.</span>
+              <span class="crm-field-note">Комментарий обязателен для статусов «На доработку» и «Заблокировать».</span>
             </div>
-            <div class="crm-footer-actions">
+
+            <div class="crm-footer-actions crm-decision-footer">
               <button type="button" class="uk-button uk-button-default crm-button" data-action="save-draft">Сохранить черновик</button>
-              <button type="submit" class="uk-button crm-button-primary crm-button" data-action="compliance-decision">Принять финальное решение</button>
+              <button type="submit" class="uk-button crm-button-primary crm-button" data-action="compliance-decision" data-status="approved">Принять финальное решение</button>
             </div>
           </form>
         </div>
