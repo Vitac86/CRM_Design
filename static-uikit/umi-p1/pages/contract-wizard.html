@@ -1,5 +1,8 @@
 <!-- Reference: static-uikit/pages/contract-wizard.html -->
-<!-- UMI TODO: render inside layout/base main content slot -->
+<!-- UMI NOTE: extraction skeleton only. Render this template inside layout/base main content slot. -->
+<!-- UMI NOTE: server-rendered/static-template-first: all form values, dictionaries and selected states are rendered by UMI backend/template macros. -->
+<!-- UMI NOTE: global-only JS contract: do not add page-specific runtime renderers; crm-static.js handles reusable controls behavior only. -->
+<!-- UMI NOTE: selectable controls (.crm-option-card, .crm-binary-control, .crm-radio-tile, .crm-check-row) must be rendered with consistent checked + .is-active/.is-selected state server-side. -->
 
 <section class="crm-page" data-page="contract-wizard">
   <div class="crm-register-header">

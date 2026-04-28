@@ -145,3 +145,12 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - Для page-level CSS используйте только токены (`var(--crm-...)`, `var(--crm-umi-...)`; `var(--crm-c24-...)` оставлены как deprecated compatibility aliases) вместо raw hex/shadow значений.
 - Минимальный UMI compatibility слой включает: primary/hover, border, surface/surface-muted, text/secondary/muted, radius, shadows, status colors.
 - Для страницы subject-card цвета/тени нормализуются через token layer без изменения standalone-структуры страницы.
+
+
+## UMI extraction pack contract (P0/P1)
+- `umi-p0/` и `umi-p1/` — extraction packs, не runtime app и не build step (`runtime=false`, `buildStep=false`).
+- Standalone `pages/*.html` — визуальный/source-of-truth reference для структуры и UX.
+- UMI templates обязаны рендерить данные server-side (static-template-first), без JS demo data/render helpers.
+- `assets/js/crm-static.js` — только global reusable behavior.
+- Page scripts (`assets/js/pages/*.js`) подключаются только matching template (сейчас только `subject-card`).
+- Для `.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row` сервер должен рендерить `checked` + `.is-selected`/`.is-active` консистентно.

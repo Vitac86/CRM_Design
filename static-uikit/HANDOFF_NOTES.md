@@ -55,3 +55,11 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - Subject-card данные (профиль/адреса/представители) остаются server-rendered/static-template-first: JS их не генерирует.
 - Карта ownership по standalone страницам и page scripts: `static-uikit/PAGE_SCRIPT_AUDIT.md`.
 - Для UMI P0/P1 шаблонов сервер должен рендерить `checked` и соответствующие `.is-selected`/`.is-active` консистентно; `crm-static.js` после этого поддерживает только синхронизацию при взаимодействии пользователя.
+
+
+## UMI extraction pack contract
+- `umi-p0/` and `umi-p1/` are extraction packs only (not runtime).
+- Server renders page data and selected/active control states (static-template-first).
+- `assets/js/crm-static.js` stays global-only; it does not render data.
+- Page script includes are template-specific; `assets/js/pages/subject-card.js` is only for subject-card when representative/address interactions are present.
+- Selectable controls (`.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row`) must be emitted with consistent `checked` + `.is-selected`/`.is-active`.
