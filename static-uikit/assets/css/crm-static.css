@@ -4020,7 +4020,8 @@ a:focus-visible,
 
 /* ===== Global registry filter panel redesign ===== */
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   margin-bottom: 18px;
   padding: 16px 18px;
@@ -4030,7 +4031,9 @@ a:focus-visible,
 }
 
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-search-row {
+  display: block;
   width: min(560px, 100%);
+  order: 1;
 }
 
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
@@ -4043,6 +4046,7 @@ a:focus-visible,
 }
 
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-fields-row {
+  order: 2;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;

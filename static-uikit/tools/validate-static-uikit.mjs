@@ -256,6 +256,28 @@ function validatePackHooks(pack, inventory) {
   }
 }
 
+function validateRegistryFilterPanelStructure(file, content) {
+  const filterFormRegex = /<form\b([^>]*)class="([^"]*\bcrm-registry-filters\b[^"]*\bcrm-filter-panel\b[^"]*)"([^>]*)>([\s\S]*?)<\/form>/gi;
+  for (const match of content.matchAll(filterFormRegex)) {
+    const formOpenTag = `<form ${match[1]}class="${match[2]}"${match[3]}>`;
+    const inner = match[4];
+
+    const searchRows = inner.match(/<div[^>]*class="[^"]*\bcrm-filter-search-row\b[^"]*"/gi) || [];
+    if (searchRows.length !== 1) addError(file, 'registry filter panel must include exactly one .crm-filter-search-row', formOpenTag);
+
+    if (!/<div[^>]*class="[^"]*\bcrm-filter-fields-row\b[^"]*"/i.test(inner)) {
+      addError(file, 'registry filter panel is missing .crm-filter-fields-row', formOpenTag);
+    }
+  }
+
+  const panelBlocks = content.match(/<form\b[^>]*class="[^"]*\bcrm-registry-filters\b[^"]*\bcrm-filter-panel\b[^"]*"[^>]*>[\s\S]*?<\/form>/gi) || [];
+  for (const panel of panelBlocks) {
+    if (/<div[^>]*class="[^"]*\bcrm-card\b[^"]*\bcrm-table\b[^"]*"/i.test(panel)) {
+      addError(file, '.crm-card.crm-table must not be inside .crm-filter-panel form');
+    }
+  }
+}
+
 
 function validateHandoffManifest() {
   const handoffManifest = parseJsonFile(handoffManifestFile, 'HANDOFF_MANIFEST.json');
@@ -617,6 +639,7 @@ for (const page of pageFiles) {
 
   if (!/<input[^>]*\bname="global-search"/i.test(content)) addError(file, 'missing topbar global search input[name="global-search"]');
   if (!/<button[^>]*\bdata-sidebar-toggle\b/i.test(content)) addError(file, 'missing sidebar toggle button[data-sidebar-toggle]');
+  validateRegistryFilterPanelStructure(file, content);
 
   const buttonRegex = /<button\b([^>]*)>/gi;
   for (const match of content.matchAll(buttonRegex)) {
