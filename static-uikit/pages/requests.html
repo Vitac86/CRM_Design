@@ -51,7 +51,7 @@
 </aside>
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
@@ -59,24 +59,26 @@
         <div class="crm-page-header crm-page-header-row">
           <h1>Поручения</h1>
           <div class="crm-page-actions">
-            <button class="uk-button uk-button-default crm-button" data-action="export-requests">Экспорт</button>
-            <button class="uk-button crm-button-primary crm-button">Закрыть форму</button>
+            <button class="uk-button uk-button-default crm-button" type="button" data-action="print-request">Печать</button>
+            <button class="uk-button uk-button-default crm-button" type="button" data-action="export-requests">Экспорт</button>
+            <button class="uk-button crm-button-primary crm-button" type="button">Создать поручение</button>
           </div>
         </div>
         
         <form action="#" method="post" data-form="request-create" data-action="create-request" class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
-          <div class="crm-section-head">
+          <div class="crm-form-section-head">
             <h3>Создание поручения</h3>
             <span class="crm-badge info" data-status="draft">Черновик</span>
           </div>
+          <span class="crm-form-hint">Поля, отмеченные <span class="crm-required">*</span>, обязательны для создания демо-поручения.</span>
           <div class="crm-form-grid uk-grid-small" uk-grid>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Тип поручения</label><select class="uk-select crm-select" name="request-type"><option>Поручение на вывод ДС</option><option>Поручение на перевод ЦБ</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Клиент</label><select class="uk-select crm-select" name="client"><option>АО «Восток Майнинг Системс»</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Договор</label><select class="uk-select crm-select" name="contract"><option>BR-8821</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Статус</label><select class="uk-select crm-select" name="request-status"><option>Новый</option><option>На согласовании</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Источник</label><select class="uk-select crm-select" name="source"><option>Личный кабинет</option><option>Операционист</option><option>Email</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Сумма</label><input class="uk-input crm-input" name="amount" value="2 450 000"/></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label">Валюта</label><select class="uk-select crm-select" name="currency"><option>RUB</option><option>USD</option><option>EUR</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-type">Тип поручения <span class="crm-required">*</span></label><select class="uk-select crm-select" id="request-type" name="request-type"><option>Поручение на вывод ДС</option><option>Поручение на перевод ЦБ</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-client">Клиент <span class="crm-required">*</span></label><select class="uk-select crm-select" id="request-client" name="client"><option>АО «Восток Майнинг Системс»</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-contract">Договор <span class="crm-required">*</span></label><select class="uk-select crm-select" id="request-contract" name="contract"><option>BR-8821</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-status">Статус</label><select class="uk-select crm-select" id="request-status" name="request-status"><option>Новый</option><option>На согласовании</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-source">Источник</label><select class="uk-select crm-select" id="request-source" name="source"><option>Личный кабинет</option><option>Операционист</option><option>Email</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-amount">Сумма <span class="crm-required">*</span></label><input class="uk-input crm-input" id="request-amount" name="amount" value="2 450 000"/></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-currency">Валюта</label><select class="uk-select crm-select" id="request-currency" name="currency"><option>RUB</option><option>USD</option><option>EUR</option></select></div>
           </div>
           <div class="crm-footer-actions">
             <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-request">Отмена</button>
@@ -86,11 +88,11 @@
         </form>
         
         <form action="#" method="post" data-form="requests-filters" data-action="filter-requests" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="requests">
-          <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" name="request-search" placeholder="Поиск по номеру/клиенту"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" name="filter-client-code" placeholder="Код клиента"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><input type="date" class="uk-input crm-input" name="request-date" value="2026-04-24"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="filter-source"><option>Источник</option><option>Личный кабинет</option><option>Операционист</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="filter-status"><option>Статус</option><option>Ожидает</option><option>Принято</option><option>Отклонено</option></select></div>
+          <div class="uk-width-1-1 uk-width-1-3@m"><label class="uk-form-label" for="request-search">Поиск</label><input class="uk-input crm-input" id="request-search" name="request-search" placeholder="Поиск по номеру/клиенту"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="filter-client-code">Код клиента</label><input class="uk-input crm-input" id="filter-client-code" name="filter-client-code" placeholder="CL-4401"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="request-date">Дата</label><input type="date" class="uk-input crm-input" id="request-date" name="request-date" value="2026-04-24"/></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="filter-source">Источник</label><select class="uk-select crm-select" id="filter-source" name="filter-source"><option>Источник</option><option>Личный кабинет</option><option>Операционист</option></select></div>
+          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="filter-status">Статус</label><select class="uk-select crm-select" id="filter-status" name="filter-status"><option>Статус</option><option>Ожидает</option><option>Принято</option><option>Отклонено</option></select></div>
           <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters" type="reset">Очистить фильтры</button></div>
         </form>
         
