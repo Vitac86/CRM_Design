@@ -79,9 +79,9 @@
               </div>
             </div>
             <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions">
-              <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
               <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
+              <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
             </div>
           </article>
 
@@ -118,17 +118,21 @@
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card subject-section" data-entity="addresses" data-role="addresses-section">
                   <div class="crm-form-section-head crm-section-head-inline">
                     <h3>Адреса</h3>
-                    <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false">Показать остальные адреса</button>
+                    <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
                   </div>
                   <div class="crm-address-stack subject-address-stack" data-role="addresses-list">
                     <div class="crm-address-row subject-data-field crm-data-field">
                       <div class="crm-profile-label">Адрес регистрации</div>
                       <div class="crm-profile-value">123112, Российская Федерация, г. Москва, Пресненская набережная, д. 8, стр. 1</div>
                     </div>
-                    <div data-role="addresses-extra" hidden>
+                    <div id="subject-addresses-extra" data-role="addresses-extra" hidden>
                       <div class="crm-address-row subject-data-field crm-data-field">
                         <div class="crm-profile-label">Юридический адрес / адрес местонахождения</div>
                         <div class="crm-profile-value">123112, г. Москва, Пресненская наб., д. 8, стр. 1, этаж 31, офис 3102</div>
+                      </div>
+                      <div class="crm-address-row subject-data-field crm-data-field">
+                        <div class="crm-profile-label">Фактический адрес</div>
+                        <div class="crm-profile-value">123290, г. Москва, 1-й Магистральный тупик, д. 5А, бизнес-центр «Магистраль Плаза», офис 406</div>
                       </div>
                       <div class="crm-address-row subject-data-field crm-data-field">
                         <div class="crm-profile-label">Почтовый адрес</div>
@@ -252,7 +256,7 @@
                     <h3>Банковские счета</h3>
                     <button class="uk-button uk-button-default crm-button" type="button" data-action="add-bank-account">+ Добавить счёт</button>
                   </div>
-                  <div class="crm-table-wrapper crm-table-card"><div class="crm-table"><table class="uk-table uk-table-divider uk-table-small"><thead><tr><th>Наименование банка</th><th>БИК</th><th>Валюта</th><th>Расчётный счёт</th><th>Корреспондентский счёт</th><th>Дата открытия</th><th>Назначение / тип счёта</th><th>Статус</th></tr></thead><tbody><tr><td>ПАО Сбербанк, г. Москва</td><td>044525225</td><td>RUB</td><td>40702810938000054210</td><td>30101810400000000225</td><td>22.01.2021</td><td>Основной расчётный счёт</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr><tr><td>АО «Альфа-Банк», г. Москва</td><td>044525593</td><td>USD</td><td>40702840102310001557</td><td>30101810200000000593</td><td>14.07.2023</td><td>Валютный операционный</td><td><span class="crm-badge info" data-status="limited">Ограниченно активен</span></td></tr></tbody></table></div></div>
+                  <div class="crm-table-wrapper crm-table-card"><div class="crm-table"><table class="uk-table uk-table-divider uk-table-small"><thead><tr><th>Наименование банка</th><th>БИК</th><th>Валюта</th><th>Расчётный счёт</th><th>Корреспондентский счёт</th><th>Дата открытия</th><th>Назначение / тип счёта</th><th>Статус</th></tr></thead><tbody><tr><td>ПАО Сбербанк, г. Москва</td><td>044525225</td><td>RUB</td><td>40702810938000054210</td><td>30101810400000000225</td><td>22.01.2021</td><td>Основной расчётный счёт</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr><tr><td>АО «Альфа-Банк», г. Москва</td><td>044525593</td><td>USD</td><td>40702840102310001557</td><td>30101810200000000593</td><td>14.07.2023</td><td>Валютный операционный</td><td><span class="crm-badge info" data-status="limited">Ограниченно активен</span></td></tr><tr><td>АО «Газпромбанк», г. Санкт-Петербург</td><td>044030653</td><td>CNY</td><td>40702810055030104412</td><td>30101810200000000653</td><td>11.03.2026</td><td>Расчёты с азиатскими контрагентами</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr></tbody></table></div></div>
                 </article>
               </section>
             </li>
@@ -316,7 +320,7 @@
             <h3 id="representative-modal-title">Добавить представителя</h3>
             <div class="crm-modal-form-grid">
               <label class="crm-modal-field"><span>Поиск субъекта</span><input class="uk-input crm-input" type="search" placeholder="Введите ФИО или организацию"/></label>
-              <label class="crm-modal-field"><span>Субъект</span><input class="uk-input crm-input" type="text" placeholder="Выберите субъекта"/></label>
+              <label class="crm-modal-field"><span>Субъект</span><select class="uk-select crm-input"><option>Соколова Мария Владимировна</option><option>Крылов Денис Олегович</option><option>Никифоров Артём Игоревич</option></select></label>
               <label class="crm-modal-field"><span>Роль</span><select class="uk-select crm-input"><option>Представитель по доверенности</option><option>Генеральный директор</option><option>Главный бухгалтер</option></select></label>
               <label class="crm-modal-field"><span>Основание полномочий</span><input class="uk-input crm-input" type="text" placeholder="Доверенность / приказ / устав"/></label>
               <label class="crm-modal-field crm-modal-field-wide"><span>Срок действия полномочий</span><input class="uk-input crm-input" type="date" data-role="representative-expiry"/></label>
