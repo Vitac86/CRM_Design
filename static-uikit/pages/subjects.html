@@ -60,13 +60,13 @@
       <section class="crm-page crm-registry-page" data-page="subjects">
         <section class="crm-registry-shell crm-subjects-shell">
           <div class="crm-page-header crm-page-header-row crm-registry-header crm-subjects-header">
-            <div>
+            <div class="crm-registry-title-block">
               <h1>Субъекты</h1>
               <p>Реестр клиентских карточек, статусов комплаенса и полноты досье.</p>
             </div>
             <div class="crm-header-actions crm-registry-actions">
-              <button class="uk-button uk-button-default crm-button crm-button-secondary" type="button" data-action="export-subjects">Экспорт</button>
               <a href="subject-register.html" class="uk-button crm-button-primary crm-button" data-action="open-subject-register">+ Добавить</a>
+              <button class="uk-button uk-button-default crm-button crm-button-secondary" type="button" data-action="export-subjects">Экспорт</button>
             </div>
           </div>
 
@@ -117,6 +117,7 @@
                 <th>Статус субъекта</th>
                 <th>Статус комплаенса</th>
                 <th>Полный комплект</th>
+                <th>ДС / ЦБ</th>
               </tr>
               </thead>
               <tbody>
@@ -128,6 +129,7 @@
                 <td><span class="crm-badge success" data-status="active-client">Активный клиент</span></td>
                 <td><span class="crm-badge success" data-status="approved">Пройден</span></td>
                 <td><span class="crm-badge success" data-status="yes">Да</span></td>
+                <td><span class="crm-inline-badges"><span class="crm-badge success" data-status="cash-account-yes">ДС: Да</span><span class="crm-badge muted" data-status="securities-account-no">ЦБ: Нет</span></span></td>
               </tr>
               <tr data-entity="subject" data-id="c-012" data-href="subject-card.html" data-status="on-compliance">
                 <td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · Персональный менеджер: Сафронов М.Г.</div></td>
@@ -137,6 +139,7 @@
                 <td><span class="crm-badge info" data-status="on-compliance">На комплаенсе</span></td>
                 <td><span class="crm-badge warning" data-status="pending-review">На проверке</span></td>
                 <td><span class="crm-badge warning" data-status="partial">Частично</span></td>
+                <td><span class="crm-inline-badges"><span class="crm-badge success" data-status="cash-account-yes">ДС: Да</span><span class="crm-badge success" data-status="securities-account-yes">ЦБ: Да</span></span></td>
               </tr>
               <tr data-entity="subject" data-id="c-013" data-href="subject-card.html" data-status="registration">
                 <td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412 · Персональный менеджер: Назарова Т.П.</div></td>
@@ -146,6 +149,7 @@
                 <td><span class="crm-badge warning" data-status="registration">Регистрация</span></td>
                 <td><span class="crm-badge warning" data-status="rework">На доработке</span></td>
                 <td><span class="crm-badge danger" data-status="no">Нет</span></td>
+                <td><span class="crm-inline-badges"><span class="crm-badge muted" data-status="cash-account-no">ДС: Нет</span><span class="crm-badge muted" data-status="securities-account-no">ЦБ: Нет</span></span></td>
               </tr>
               <tr data-entity="subject" data-id="c-014" data-href="subject-card.html" data-status="data-filled">
                 <td><div class="crm-row-main">ООО «Север Логистик Капитал»</div><div class="crm-row-sub">CL-4397 · Персональный менеджер: Власова К.О.</div></td>
@@ -155,6 +159,7 @@
                 <td><span class="crm-badge info" data-status="data-filled">Данные заполнены</span></td>
                 <td><span class="crm-badge success" data-status="approved">Пройден</span></td>
                 <td><span class="crm-badge success" data-status="yes">Да</span></td>
+                <td><span class="crm-inline-badges"><span class="crm-badge success" data-status="cash-account-yes">ДС: Да</span><span class="crm-badge warning" data-status="securities-account-partial">ЦБ: Частично</span></span></td>
               </tr>
               </tbody>
             </table>
