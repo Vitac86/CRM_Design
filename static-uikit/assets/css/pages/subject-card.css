@@ -11,10 +11,10 @@
   gap: 16px;
   align-items: start;
   padding: 18px;
-  border: 1px solid var(--crm-c24-border);
+  border: 1px solid var(--crm-umi-border);
   border-radius: var(--crm-radius-lg);
-  background: linear-gradient(180deg, var(--crm-c24-surface) 0%, var(--crm-c24-surface-muted) 100%);
-  box-shadow: var(--crm-c24-shadow-md);
+  background: linear-gradient(180deg, var(--crm-umi-surface) 0%, var(--crm-umi-surface-muted) 100%);
+  box-shadow: var(--crm-umi-shadow-md);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-hero-main {
@@ -25,9 +25,9 @@
   width: 52px;
   height: 52px;
   border-radius: var(--crm-radius-lg);
-  border: 1px solid var(--crm-c24-border);
+  border: 1px solid var(--crm-umi-border);
   background: var(--crm-primary-soft);
-  color: var(--crm-c24-primary-hover);
+  color: var(--crm-umi-primary-hover);
   font-size: 16px;
 }
 
@@ -35,13 +35,13 @@
   margin: 0 0 4px;
   font-size: 30px;
   line-height: 1.15;
-  color: var(--crm-c24-text);
+  color: var(--crm-umi-text);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-code {
   margin-bottom: 9px;
   font-size: 14px;
-  color: var(--crm-c24-text-muted);
+  color: var(--crm-umi-text-muted);
 }
 
 .crm-page[data-page="subject-card"] .crm-inline-badges {
@@ -67,10 +67,10 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs-wrap {
-  border: 1px solid var(--crm-c24-border);
-  border-radius: var(--crm-c24-radius);
-  background: var(--crm-c24-surface);
-  box-shadow: var(--crm-c24-shadow-sm);
+  border: 1px solid var(--crm-umi-border);
+  border-radius: var(--crm-umi-radius);
+  background: var(--crm-umi-surface);
+  box-shadow: var(--crm-umi-shadow-sm);
   overflow-x: auto;
 }
 
@@ -96,13 +96,13 @@
   border-radius: 8px;
   border: 1px solid transparent;
   font-size: 14px;
-  color: var(--crm-c24-text-secondary);
+  color: var(--crm-umi-text-secondary);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs > .uk-active > a {
-  background: var(--crm-c24-primary);
-  border-color: var(--crm-c24-primary);
-  color: var(--crm-c24-surface);
+  background: var(--crm-umi-primary);
+  border-color: var(--crm-umi-primary);
+  color: var(--crm-umi-surface);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-switcher,
@@ -127,10 +127,10 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-card.crm-subject-profile-section {
-  border: 1px solid var(--crm-c24-border);
-  border-radius: var(--crm-c24-radius);
-  background: var(--crm-c24-surface);
-  box-shadow: var(--crm-c24-shadow-sm);
+  border: 1px solid var(--crm-umi-border);
+  border-radius: var(--crm-umi-radius);
+  background: var(--crm-umi-surface);
+  box-shadow: var(--crm-umi-shadow-sm);
 }
 
 .crm-page[data-page="subject-card"] .crm-flat-group {
@@ -142,7 +142,7 @@
 .crm-page[data-page="subject-card"] .crm-flat-section {
   padding: 10px 0;
   border: 0;
-  border-top: 1px solid var(--crm-c24-border);
+  border-top: 1px solid var(--crm-umi-border);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -157,14 +157,14 @@
 .crm-page[data-page="subject-card"] .subject-section .crm-form-section-head {
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--crm-c24-border);
+  border-bottom: 1px solid var(--crm-umi-border);
 }
 
 .crm-page[data-page="subject-card"] .crm-form-section-head h3 {
   margin: 0;
   font-size: 18px;
   line-height: 1.2;
-  color: var(--crm-c24-text);
+  color: var(--crm-umi-text);
 }
 
 .crm-page[data-page="subject-card"] .crm-section-head-inline {
@@ -198,11 +198,11 @@
   line-height: 1.2;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--crm-c24-text-muted);
+  color: var(--crm-umi-text-muted);
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-value {
-  color: var(--crm-c24-text);
+  color: var(--crm-umi-text);
   font-size: 14px;
   line-height: 1.35;
   font-weight: 600;
@@ -212,14 +212,14 @@
   margin-top: 4px;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--crm-c24-text-secondary);
+  color: var(--crm-umi-text-secondary);
 }
 
 .crm-page[data-page="subject-card"] .crm-table .uk-table th { font-size: 12px; }
 .crm-page[data-page="subject-card"] .crm-table .uk-table td { font-size: 14px; }
 .crm-page[data-page="subject-card"] .crm-manager-comment {
   margin: 0;
-  color: var(--crm-c24-text-secondary);
+  color: var(--crm-umi-text-secondary);
   font-size: 14px;
   line-height: 1.55;
 }

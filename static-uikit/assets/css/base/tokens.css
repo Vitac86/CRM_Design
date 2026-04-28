@@ -31,22 +31,38 @@
   --crm-danger-bg: #fdecec;
   --crm-info: #3f5ec5;
   --crm-info-bg: #eaf0ff;
-  /* Corporate 24 semantic aliases */
-  --crm-c24-primary: var(--crm-primary);
-  --crm-c24-primary-hover: var(--crm-primary-hover);
-  --crm-c24-border: var(--crm-border);
-  --crm-c24-surface: var(--crm-surface);
-  --crm-c24-surface-muted: var(--crm-surface-muted);
-  --crm-c24-text: var(--crm-text);
-  --crm-c24-text-secondary: var(--crm-text-secondary);
-  --crm-c24-text-muted: var(--crm-muted);
-  --crm-c24-radius: var(--crm-radius-md);
-  --crm-c24-shadow-sm: var(--crm-shadow-sm);
-  --crm-c24-shadow-md: var(--crm-shadow-md);
-  --crm-c24-status-success: var(--crm-success);
-  --crm-c24-status-warning: var(--crm-warning);
-  --crm-c24-status-danger: var(--crm-danger);
-  --crm-c24-status-info: var(--crm-info);
+  /* UMI.CMS Corporate compatibility token layer (UMI.CMS 24-compatible static templates target) */
+  --crm-umi-primary: var(--crm-primary);
+  --crm-umi-primary-hover: var(--crm-primary-hover);
+  --crm-umi-border: var(--crm-border);
+  --crm-umi-surface: var(--crm-surface);
+  --crm-umi-surface-muted: var(--crm-surface-muted);
+  --crm-umi-text: var(--crm-text);
+  --crm-umi-text-secondary: var(--crm-text-secondary);
+  --crm-umi-text-muted: var(--crm-muted);
+  --crm-umi-radius: var(--crm-radius-md);
+  --crm-umi-shadow-sm: var(--crm-shadow-sm);
+  --crm-umi-shadow-md: var(--crm-shadow-md);
+  --crm-umi-status-success: var(--crm-success);
+  --crm-umi-status-warning: var(--crm-warning);
+  --crm-umi-status-danger: var(--crm-danger);
+  --crm-umi-status-info: var(--crm-info);
+  /* Deprecated compatibility aliases kept for migration from PR #255 naming. */
+  --crm-c24-primary: var(--crm-umi-primary);
+  --crm-c24-primary-hover: var(--crm-umi-primary-hover);
+  --crm-c24-border: var(--crm-umi-border);
+  --crm-c24-surface: var(--crm-umi-surface);
+  --crm-c24-surface-muted: var(--crm-umi-surface-muted);
+  --crm-c24-text: var(--crm-umi-text);
+  --crm-c24-text-secondary: var(--crm-umi-text-secondary);
+  --crm-c24-text-muted: var(--crm-umi-text-muted);
+  --crm-c24-radius: var(--crm-umi-radius);
+  --crm-c24-shadow-sm: var(--crm-umi-shadow-sm);
+  --crm-c24-shadow-md: var(--crm-umi-shadow-md);
+  --crm-c24-status-success: var(--crm-umi-status-success);
+  --crm-c24-status-warning: var(--crm-umi-status-warning);
+  --crm-c24-status-danger: var(--crm-umi-status-danger);
+  --crm-c24-status-info: var(--crm-umi-status-info);
   --crm-topbar-h: 62px;
   --crm-sidebar-w: 276px;
 }
