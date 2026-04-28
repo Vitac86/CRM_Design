@@ -571,10 +571,10 @@ function extractBalancedTagByAttribute(content, tagName, attrName, attrValue) {
 
   const voidElements = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
   const tagRegex = /<\/?([a-zA-Z][\w:-]*)\b[^>]*>/g;
-  tagRegex.lastIndex = openMatch.index;
+  const fragment = content.slice(openMatch.index);
   const stack = [];
 
-  for (const match of content.slice(openMatch.index).matchAll(tagRegex)) {
+  for (const match of fragment.matchAll(tagRegex)) {
     const tag = match[0];
     const currentTag = match[1].toLowerCase();
     const isClose = /^<\//.test(tag);
@@ -597,6 +597,50 @@ function extractBalancedTagByAttribute(content, tagName, attrName, attrValue) {
   }
 
   return null;
+}
+
+function validateBalancedTagHelperSelfTest() {
+  const file = path.join(rootDir, 'tools', 'validate-static-uikit.mjs');
+  const fixture = `
+<section>
+  <div data-role="main-data-grid" class="crm-grid">
+    <div class="crm-profile-row">A</div>
+  </div>
+  <div data-role="address-registration">
+    <div class="crm-address-row">Primary</div>
+  </div>
+  <div data-role="addresses-extra">
+    <div class="crm-address-row">One</div>
+    <div class="crm-address-row">Two</div>
+  </div>
+  <table>
+    <tbody data-role="representatives-table-body">
+      <tr><td>Rep 1</td></tr>
+      <tr><td>Rep 2</td></tr>
+    </tbody>
+  </table>
+</section>`.trim();
+
+  const mainDataGridBlock = extractBalancedTagByAttribute(fixture, 'div', 'data-role', 'main-data-grid');
+  if (!mainDataGridBlock || !mainDataGridBlock.startsWith('<div data-role="main-data-grid"') || !/class="crm-profile-row"/.test(mainDataGridBlock)) {
+    addError(file, 'balanced-tag helper self-test failed for div[data-role="main-data-grid"]');
+  }
+
+  const addressesExtraBlock = extractBalancedTagByAttribute(fixture, 'div', 'data-role', 'addresses-extra');
+  const addressRowsCount = (addressesExtraBlock?.match(/class="crm-address-row"/g) || []).length;
+  if (!addressesExtraBlock || !addressesExtraBlock.startsWith('<div data-role="addresses-extra"') || addressRowsCount !== 2) {
+    addError(file, 'balanced-tag helper self-test failed for div[data-role="addresses-extra"]');
+  }
+
+  const repsBlock = extractBalancedTagByAttribute(fixture, 'tbody', 'data-role', 'representatives-table-body');
+  const repsRowCount = (repsBlock?.match(/<tr\b/g) || []).length;
+  if (!repsBlock || !repsBlock.startsWith('<tbody data-role="representatives-table-body"') || repsRowCount < 1) {
+    addError(file, 'balanced-tag helper self-test failed for tbody[data-role="representatives-table-body"]');
+  }
+
+  if (extractBalancedTagByAttribute(fixture, 'div', 'data-role', 'missing-role') !== null) {
+    addError(file, 'balanced-tag helper self-test failed for missing attribute lookup');
+  }
 }
 
 function validateSubjectCardStaticRendering() {
@@ -780,6 +824,7 @@ validateStaticUikitLauncher();
 validateNoRawHexInPageCss();
 validateSubjectCardNoNestedCards();
 validateSubjectCardStaticRendering();
+validateBalancedTagHelperSelfTest();
 
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);
