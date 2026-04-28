@@ -10,7 +10,7 @@
 <body data-page="compliance">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -57,25 +57,25 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page crm-operations-layout" data-page="compliance">
-        <div class="crm-page-header crm-page-header-row">
+      <section class="crm-page crm-registry-page crm-compliance-registry crm-operations-layout" data-page="compliance">
+        <div class="crm-page-header crm-page-header-row crm-registry-header">
           <div>
             <h1>Комплаенс</h1>
             <p>Очередь проверок клиентов с приоритизацией риска и быстрым переходом к решению.</p>
           </div>
-          <div class="crm-page-actions">
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="reset-compliance-filters">Очистить фильтры</button>
+          <div class="crm-page-actions crm-registry-actions">
+            <button class="uk-button uk-button-default crm-button crm-filter-reset" type="button" data-action="reset-compliance-filters">Очистить фильтры</button>
             <button class="uk-button uk-button-default crm-button" type="button" data-action="export-compliance">Выгрузка реестра</button>
           </div>
         </div>
 
-        <form action="#" method="post" data-form="compliance-filters" data-action="filter-compliance" class="crm-toolbar crm-filter-panel crm-operations-filters uk-grid-small" uk-grid data-filter="compliance">
-          <div class="uk-width-1-1 uk-width-1-3@m"><label class="uk-form-label" for="compliance-search">Поиск</label><input class="uk-input crm-input" id="compliance-search" name="compliance-search" placeholder="Клиент, код или ИНН"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="risk-level">Риск</label><select class="uk-select crm-select" id="risk-level" name="risk-level"><option>Риск</option><option>Низкий</option><option>Средний</option><option>Высокий</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="compliance-status">Статус</label><select class="uk-select crm-select" id="compliance-status" name="compliance-status"><option>Статус</option><option>Пройден</option><option>На проверке</option><option>На доработке</option><option>Заблокирован</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="kyc-status">KYC</label><select class="uk-select crm-select" id="kyc-status" name="kyc-status"><option>KYC</option><option>Полный</option><option>Частичный</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="residency">Резидентство</label><select class="uk-select crm-select" id="residency" name="residency"><option>Резидентство</option><option>Резидент</option><option>Нерезидент</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m crm-filter-reset-cell"><button class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters" type="reset">Сбросить</button></div>
+        <form action="#" method="post" data-form="compliance-filters" data-action="filter-compliance" class="crm-registry-filters crm-operations-filters" data-filter="compliance">
+          <div class="crm-filter-control crm-registry-search"><label class="uk-form-label" for="compliance-search">Поиск</label><input class="uk-input crm-input" id="compliance-search" name="compliance-search" placeholder="Клиент, код или ИНН"/></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="risk-level">Риск</label><select class="uk-select crm-select" id="risk-level" name="risk-level"><option>Риск</option><option>Низкий</option><option>Средний</option><option>Высокий</option></select></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="compliance-status">Статус</label><select class="uk-select crm-select" id="compliance-status" name="compliance-status"><option>Статус</option><option>Пройден</option><option>На проверке</option><option>На доработке</option><option>Заблокирован</option></select></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="kyc-status">KYC</label><select class="uk-select crm-select" id="kyc-status" name="kyc-status"><option>KYC</option><option>Полный</option><option>Частичный</option></select></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="residency">Резидентство</label><select class="uk-select crm-select" id="residency" name="residency"><option>Резидентство</option><option>Резидент</option><option>Нерезидент</option></select></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить</button></div>
         </form>
 
         <div class="crm-card crm-table crm-table-wrapper crm-compliance-queue" data-entity="compliance-table">

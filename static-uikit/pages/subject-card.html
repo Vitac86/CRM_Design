@@ -10,7 +10,7 @@
 <body data-page="subject-card">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -60,8 +60,8 @@
       <section class="crm-page" data-page="subject-card">
         <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Карточка субъекта</span></div>
 
-        <article class="crm-card crm-subject-hero" data-entity="subject" data-id="c-011">
-          <div class="crm-subject-hero-main">
+        <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-011">
+          <div class="crm-subject-hero-main crm-detail-hero-main">
             <div class="crm-subject-avatar">ВМ</div>
             <div class="crm-subject-hero-text">
               <h1 data-entity="page-title">АО «Восток Майнинг Системс»</h1>
@@ -74,8 +74,8 @@
               </div>
             </div>
           </div>
-          <div class="crm-subject-hero-actions">
-            <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard">Оформить договор</a>
+          <div class="crm-subject-hero-actions crm-detail-actions">
+            <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
             <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
             <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
           </div>
@@ -91,28 +91,28 @@
         </ul>
 
         <section class="crm-subject-profile-grid">
-          <article class="crm-card crm-form-card">
+          <article class="crm-card crm-profile-section crm-form-card">
             <div class="crm-form-section-head"><h3>Основные данные</h3></div>
-            <div class="crm-form-grid uk-grid-small" uk-grid>
-              <div class="uk-width-1-2@m"><label class="uk-form-label">Полное наименование</label><div>АО «Восток Майнинг Системс»</div></div>
-              <div class="uk-width-1-2@m"><label class="uk-form-label">Дата регистрации</label><div>18.01.2021</div></div>
-              <div class="uk-width-1-2@m"><label class="uk-form-label">ОГРН</label><div>1027700132195</div></div>
-              <div class="uk-width-1-2@m"><label class="uk-form-label">ИНН</label><div>7704132901</div></div>
-              <div class="uk-width-1-2@m"><label class="uk-form-label">Телефон</label><div>+7 (495) 900-22-11</div></div>
-              <div class="uk-width-1-2@m"><label class="uk-form-label">Email</label><div>office@vms.ru</div></div>
+            <div class="crm-profile-grid">
+              <div class="crm-profile-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
+              <div class="crm-profile-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
+              <div class="crm-profile-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">1027700132195</div></div>
+              <div class="crm-profile-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">7704132901</div></div>
+              <div class="crm-profile-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
+              <div class="crm-profile-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
             </div>
           </article>
 
-          <article class="crm-card crm-form-card">
+          <article class="crm-card crm-profile-section crm-form-card">
             <div class="crm-form-section-head"><h3>Адреса</h3></div>
-            <div class="crm-form-grid uk-grid-small" uk-grid>
-              <div class="uk-width-1-1"><label class="uk-form-label">Юридический адрес</label><div>г. Москва, Пресненская набережная, 8 стр. 1</div></div>
-              <div class="uk-width-1-1"><label class="uk-form-label">Фактический адрес</label><div>г. Москва, ул. Тестовская, 10, БЦ Северная Башня</div></div>
-              <div class="uk-width-1-1"><label class="uk-form-label">Почтовый адрес</label><div>123112, г. Москва, а/я 241</div></div>
+            <div class="crm-profile-grid">
+              <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Юридический адрес</div><div class="crm-profile-value">г. Москва, Пресненская набережная, 8 стр. 1</div></div>
+              <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Фактический адрес</div><div class="crm-profile-value">г. Москва, ул. Тестовская, 10, БЦ Северная Башня</div></div>
+              <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Почтовый адрес</div><div class="crm-profile-value">123112, г. Москва, а/я 241</div></div>
             </div>
           </article>
 
-          <article class="crm-card crm-form-card">
+          <article class="crm-card crm-profile-section crm-form-card">
             <div class="crm-form-section-head"><h3>Комплаенс, права и сопровождение</h3></div>
             <div class="crm-subject-summary">
               <div><strong>Комплаенс статус</strong><small>Последняя проверка: 25.04.2026</small></div>
