@@ -1,0 +1,8 @@
+<div class="crm-card crm-table crm-table-wrapper" data-entity="archive-table">
+  <table class="uk-table uk-table-divider uk-table-hover">
+    <thead><tr><th>ID</th><th>Сущность</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+    <tbody>
+      <tr data-entity="archive-record" data-id="{{ archive.id }}"><td>{{ archive.number }}</td><td>{{ archive.entity }}</td><td>{{ archive.archivedAt }}</td><td><span class="crm-badge success" data-status="archived">Архивировано</span></td><td><button class="uk-button uk-button-default crm-button" type="button" data-action="restore-archive-record">Восстановить</button> <button class="uk-button uk-button-default crm-button" type="button" data-action="view-archive-record">Просмотр</button></td></tr>
+    </tbody>
+  </table>
+</div>

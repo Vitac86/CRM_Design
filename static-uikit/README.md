@@ -89,3 +89,9 @@ node static-uikit/tools/validate-static-uikit.mjs
 - Standalone pages остаются в `static-uikit/pages/`.
 - Перед использованием в реальном UMI.CMS-проекте замените placeholders на синтаксис проекта.
 - Дополнительно pack содержит manifest, integration inventory и handoff checklist.
+
+## UMI P1 extraction pack
+- `static-uikit/umi-p1/` содержит шаблонные заготовки для оставшихся operational pages.
+- Пак зависит от `static-uikit/umi-p0`.
+- Это не runtime и не build step.
+- Пак проверяется тем же validator: `node static-uikit/tools/validate-static-uikit.mjs`.

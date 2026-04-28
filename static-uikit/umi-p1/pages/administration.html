@@ -1,0 +1,12 @@
+<!-- Reference: static-uikit/pages/administration.html -->
+<!-- UMI TODO: render inside layout/base main content slot -->
+<section class="crm-page" data-page="administration">
+  <div class="crm-page-header"><h1 data-entity="page-title">Администрирование</h1></div>
+  <!-- UMI TODO: map admin section cards to real UMI modules -->
+  <div class="crm-option-grid" data-action="admin-section-select">
+    <a class="crm-option-card is-selected" href="administration.html" data-href="administration.html" data-entity="admin-section" data-id="users" data-action="admin-section-select"><span>Пользователи</span><small>Управление доступами сотрудников.</small><strong>{{ admin.usersCount }} записей</strong></a>
+    <a class="crm-option-card" href="administration.html" data-href="administration.html" data-entity="admin-section" data-id="roles" data-action="admin-section-select"><span>Роли</span><small>Матрица ролей и полномочий.</small><strong>{{ admin.rolesCount }} ролей</strong></a>
+    <a class="crm-option-card" href="administration.html" data-href="administration.html" data-entity="admin-section" data-id="refs" data-action="admin-section-select"><span>Справочники</span><small>Сервисные классификаторы.</small><strong>{{ admin.refsCount }} справочников</strong></a>
+    <a class="crm-option-card" href="administration.html" data-href="administration.html" data-entity="admin-section" data-id="audit" data-action="admin-section-select"><span>Аудит</span><small>Журнал действий пользователей.</small><strong>{{ admin.auditCount }} событий</strong></a>
+  </div>
+</section>

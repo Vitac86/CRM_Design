@@ -1,0 +1,135 @@
+{
+  "routes": [
+    {
+      "page": "contract-wizard",
+      "staticTemplate": "pages/contract-wizard.html",
+      "suggestedUmiRoute": "/subjects/{id}/contract-wizard",
+      "referenceStandalone": "../pages/contract-wizard.html"
+    },
+    {
+      "page": "brokerage",
+      "staticTemplate": "pages/brokerage.html",
+      "suggestedUmiRoute": "/brokerage",
+      "referenceStandalone": "../pages/brokerage.html"
+    },
+    {
+      "page": "trust-management",
+      "staticTemplate": "pages/trust-management.html",
+      "suggestedUmiRoute": "/trust-management",
+      "referenceStandalone": "../pages/trust-management.html"
+    },
+    {
+      "page": "agents",
+      "staticTemplate": "pages/agents.html",
+      "suggestedUmiRoute": "/agents",
+      "referenceStandalone": "../pages/agents.html"
+    },
+    {
+      "page": "middle-office-clients",
+      "staticTemplate": "pages/middle-office-clients.html",
+      "suggestedUmiRoute": "/middle-office/clients",
+      "referenceStandalone": "../pages/middle-office-clients.html"
+    },
+    {
+      "page": "middle-office-reports",
+      "staticTemplate": "pages/middle-office-reports.html",
+      "suggestedUmiRoute": "/middle-office/reports",
+      "referenceStandalone": "../pages/middle-office-reports.html"
+    },
+    {
+      "page": "depository",
+      "staticTemplate": "pages/depository.html",
+      "suggestedUmiRoute": "/depository",
+      "referenceStandalone": "../pages/depository.html"
+    },
+    {
+      "page": "back-office",
+      "staticTemplate": "pages/back-office.html",
+      "suggestedUmiRoute": "/back-office",
+      "referenceStandalone": "../pages/back-office.html"
+    },
+    {
+      "page": "trading-card",
+      "staticTemplate": "pages/trading-card.html",
+      "suggestedUmiRoute": "/trading/{id}",
+      "referenceStandalone": "../pages/trading-card.html"
+    },
+    {
+      "page": "administration",
+      "staticTemplate": "pages/administration.html",
+      "suggestedUmiRoute": "/administration",
+      "referenceStandalone": "../pages/administration.html"
+    },
+    {
+      "page": "archive",
+      "staticTemplate": "pages/archive.html",
+      "suggestedUmiRoute": "/archive",
+      "referenceStandalone": "../pages/archive.html"
+    }
+  ],
+  "entities": [
+    "contract",
+    "brokerage-contract",
+    "trust-contract",
+    "agent",
+    "middle-office-client",
+    "report",
+    "depository-report",
+    "back-office-report",
+    "trading-terminal",
+    "admin-section",
+    "archive-record"
+  ],
+  "actions": [
+    "filter-brokerage",
+    "filter-trust-management",
+    "filter-agents",
+    "filter-middle-office-clients",
+    "filter-middle-office-reports",
+    "filter-depository",
+    "filter-back-office",
+    "filter-archive",
+    "export-brokerage",
+    "export-reports",
+    "download-report",
+    "resend-report",
+    "issue-terminal",
+    "reset-terminal-password",
+    "admin-section-select",
+    "restore-archive-record"
+  ],
+  "forms": [
+    "contract-wizard",
+    "brokerage-filters",
+    "trust-management-filters",
+    "agents-filters",
+    "middle-office-clients-filters",
+    "middle-office-reports-filters",
+    "depository-filters",
+    "back-office-filters",
+    "archive-filters"
+  ],
+  "filters": [
+    "brokerage",
+    "trust-management",
+    "agents",
+    "middle-office-clients",
+    "middle-office-reports",
+    "depository",
+    "back-office",
+    "archive"
+  ],
+  "statuses": [
+    "active",
+    "paused",
+    "pending-approval",
+    "delivered",
+    "delivery-error",
+    "request-waiting",
+    "delivery-edo",
+    "delivery-email",
+    "delivery-sftp",
+    "archived",
+    "connected"
+  ]
+}

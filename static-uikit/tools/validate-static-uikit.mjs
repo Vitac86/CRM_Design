@@ -4,40 +4,66 @@ import path from 'node:path';
 
 const rootDir = path.resolve('static-uikit');
 const pagesDir = path.join(rootDir, 'pages');
-const umiP0Dir = path.join(rootDir, 'umi-p0');
-const umiPagesDir = path.join(umiP0Dir, 'pages');
-const manifestPath = path.join(umiP0Dir, 'manifest.json');
-const integrationInventoryPath = path.join(umiP0Dir, 'integration-inventory.json');
+
+const packs = [
+  {
+    name: 'umi-p0',
+    dir: path.join(rootDir, 'umi-p0'),
+    requiredTemplates: [
+      'layout/base.html',
+      'partials/sidebar.html',
+      'partials/topbar.html',
+      'partials/page-header.html',
+      'partials/filter-panel.html',
+      'partials/table.html',
+      'partials/badge.html',
+      'partials/action-row.html',
+      'partials/empty-state.html',
+      'pages/dashboard.html',
+      'pages/subjects.html',
+      'pages/subject-card.html',
+      'pages/requests.html',
+      'pages/compliance.html',
+      'pages/compliance-card.html',
+      'pages/trading.html',
+      'pages/error.html'
+    ]
+  },
+  {
+    name: 'umi-p1',
+    dir: path.join(rootDir, 'umi-p1'),
+    requiredTemplates: [
+      'pages/contract-wizard.html',
+      'pages/brokerage.html',
+      'pages/trust-management.html',
+      'pages/agents.html',
+      'pages/middle-office-clients.html',
+      'pages/middle-office-reports.html',
+      'pages/depository.html',
+      'pages/back-office.html',
+      'pages/trading-card.html',
+      'pages/administration.html',
+      'pages/archive.html',
+      'partials/report-split-view.html',
+      'partials/report-delivery-status.html',
+      'partials/contract-form-section.html',
+      'partials/admin-section-card.html',
+      'partials/archive-table.html',
+      'partials/trading-terminal-list.html'
+    ]
+  }
+];
+
 const scanDirs = [
   pagesDir,
   path.join(rootDir, 'partials'),
   path.join(rootDir, 'assets', 'js'),
-  umiP0Dir,
+  ...packs.map((pack) => pack.dir)
 ];
 const textExt = new Set(['.html', '.js', '.mjs', '.css', '.md', '.json']);
 
 const forbiddenExternalPattern = /(https?:\/\/|cdn|fonts\.googleapis|fonts\.gstatic|unpkg|jsdelivr|cloudflare|analytics|gtag|tagmanager|sentry|amplitude|mixpanel)/i;
 const forbiddenApiPattern = /(fetch\(|XMLHttpRequest|axios|WebSocket|EventSource|localStorage|sessionStorage|history\.pushState)/;
-
-const requiredP0Templates = [
-  'layout/base.html',
-  'partials/sidebar.html',
-  'partials/topbar.html',
-  'partials/page-header.html',
-  'partials/filter-panel.html',
-  'partials/table.html',
-  'partials/badge.html',
-  'partials/action-row.html',
-  'partials/empty-state.html',
-  'pages/dashboard.html',
-  'pages/subjects.html',
-  'pages/subject-card.html',
-  'pages/requests.html',
-  'pages/compliance.html',
-  'pages/compliance-card.html',
-  'pages/trading.html',
-  'pages/error.html',
-];
 
 const requiredInventoryArrays = ['routes', 'entities', 'actions', 'forms', 'filters', 'statuses'];
 const errors = [];
@@ -77,93 +103,85 @@ function parseJsonFile(file, label) {
   }
 }
 
-function ensureManifestFilesExist(manifest, manifestFile) {
+function ensureManifestFilesExist(manifest, manifestFile, packDir, packName) {
   if (!manifest || typeof manifest !== 'object') return;
 
-  if (manifest.runtime !== false) {
-    addError(manifestFile, 'manifest.runtime must be false');
-  }
-  if (manifest.buildStep !== false) {
-    addError(manifestFile, 'manifest.buildStep must be false');
-  }
+  if (manifest.runtime !== false) addError(manifestFile, `${packName}: manifest.runtime must be false`);
+  if (manifest.buildStep !== false) addError(manifestFile, `${packName}: manifest.buildStep must be false`);
 
-  const layoutPath = manifest.layout && typeof manifest.layout.base === 'string' ? manifest.layout.base : null;
-  if (!layoutPath) {
-    addError(manifestFile, 'manifest.layout.base is required');
-  } else if (!fs.existsSync(path.join(umiP0Dir, layoutPath))) {
-    addError(manifestFile, 'manifest layout/base file does not exist', layoutPath);
+  if (packName === 'umi-p0') {
+    const layoutPath = manifest.layout && typeof manifest.layout.base === 'string' ? manifest.layout.base : null;
+    if (!layoutPath) addError(manifestFile, 'umi-p0: manifest.layout.base is required');
+    else if (!fs.existsSync(path.join(packDir, layoutPath))) addError(manifestFile, 'umi-p0: manifest layout/base file does not exist', layoutPath);
   }
 
   if (!Array.isArray(manifest.partials)) {
-    addError(manifestFile, 'manifest.partials must be an array');
+    addError(manifestFile, `${packName}: manifest.partials must be an array`);
   } else {
     manifest.partials.forEach((partialPath) => {
       if (typeof partialPath !== 'string') {
-        addError(manifestFile, 'manifest.partials entries must be strings');
+        addError(manifestFile, `${packName}: manifest.partials entries must be strings`);
         return;
       }
-      if (!fs.existsSync(path.join(umiP0Dir, partialPath))) {
-        addError(manifestFile, 'manifest partial file does not exist', partialPath);
-      }
+      if (!fs.existsSync(path.join(packDir, partialPath))) addError(manifestFile, `${packName}: manifest partial file does not exist`, partialPath);
     });
   }
 
   if (!Array.isArray(manifest.pages)) {
-    addError(manifestFile, 'manifest.pages must be an array');
+    addError(manifestFile, `${packName}: manifest.pages must be an array`);
   } else {
     manifest.pages.forEach((pageItem, idx) => {
       if (!pageItem || typeof pageItem !== 'object') {
-        addError(manifestFile, `manifest.pages[${idx}] must be an object`);
+        addError(manifestFile, `${packName}: manifest.pages[${idx}] must be an object`);
         return;
       }
 
-      if (typeof pageItem.template !== 'string') {
-        addError(manifestFile, `manifest.pages[${idx}].template is required`);
-      } else if (!fs.existsSync(path.join(umiP0Dir, pageItem.template))) {
-        addError(manifestFile, `manifest page template does not exist`, pageItem.template);
-      }
+      if (typeof pageItem.template !== 'string') addError(manifestFile, `${packName}: manifest.pages[${idx}].template is required`);
+      else if (!fs.existsSync(path.join(packDir, pageItem.template))) addError(manifestFile, `${packName}: manifest page template does not exist`, pageItem.template);
 
-      if (typeof pageItem.reference !== 'string') {
-        addError(manifestFile, `manifest.pages[${idx}].reference is required`);
-      } else {
-        const referencePath = path.resolve(umiP0Dir, pageItem.reference);
-        if (!fs.existsSync(referencePath)) {
-          addError(manifestFile, `manifest page reference does not exist`, pageItem.reference);
-        }
+      if (typeof pageItem.reference !== 'string') addError(manifestFile, `${packName}: manifest.pages[${idx}].reference is required`);
+      else {
+        const referencePath = path.resolve(packDir, pageItem.reference);
+        if (!fs.existsSync(referencePath)) addError(manifestFile, `${packName}: manifest page reference does not exist`, pageItem.reference);
       }
     });
   }
 }
 
-function validateIntegrationInventory(inventory, inventoryFile) {
+function validateIntegrationInventory(inventory, inventoryFile, packName) {
   if (!inventory || typeof inventory !== 'object') return;
   for (const key of requiredInventoryArrays) {
-    if (!Array.isArray(inventory[key])) {
-      addError(inventoryFile, `integration inventory field must be an array`, key);
-    }
+    if (!Array.isArray(inventory[key])) addError(inventoryFile, `${packName}: integration inventory field must be an array`, key);
   }
 }
 
-function validateRequiredTemplates() {
-  for (const templatePath of requiredP0Templates) {
-    const absolute = path.join(umiP0Dir, templatePath);
-    if (!fs.existsSync(absolute)) {
-      addError(absolute, 'required P0 template/partial is missing');
-    }
+function validateRequiredTemplates(pack) {
+  for (const templatePath of pack.requiredTemplates) {
+    const absolute = path.join(pack.dir, templatePath);
+    if (!fs.existsSync(absolute)) addError(absolute, `${pack.name}: required template/partial is missing`);
   }
 }
 
 const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
-const umiPageFiles = fs.existsSync(umiPagesDir) ? fs.readdirSync(umiPagesDir).filter((f) => f.endsWith('.html')) : [];
-const knownHtmlTargets = new Set([...pageFiles, ...umiPageFiles]);
+const packPageFiles = packs.flatMap((pack) => {
+  const packPagesDir = path.join(pack.dir, 'pages');
+  if (!fs.existsSync(packPagesDir)) return [];
+  return fs.readdirSync(packPagesDir).filter((f) => f.endsWith('.html')).map((file) => ({ packName: pack.name, file: path.join(packPagesDir, file) }));
+});
+const knownHtmlTargets = new Set([...pageFiles, ...packPageFiles.map(({ file }) => path.basename(file))]);
 
-const manifest = parseJsonFile(manifestPath, 'manifest.json');
-ensureManifestFilesExist(manifest, manifestPath);
+for (const pack of packs) {
+  const manifestPath = path.join(pack.dir, 'manifest.json');
+  const inventoryPath = path.join(pack.dir, 'integration-inventory.json');
 
-const inventory = parseJsonFile(integrationInventoryPath, 'integration-inventory.json');
-validateIntegrationInventory(inventory, integrationInventoryPath);
+  const manifest = parseJsonFile(manifestPath, 'manifest.json');
+  ensureManifestFilesExist(manifest, manifestPath, pack.dir, pack.name);
 
-validateRequiredTemplates();
+  const inventory = parseJsonFile(inventoryPath, 'integration-inventory.json');
+  validateIntegrationInventory(inventory, inventoryPath, pack.name);
+
+  validateRequiredTemplates(pack);
+}
 
 const allFiles = scanDirs.flatMap((dir) => walk(dir)).filter((file) => textExt.has(path.extname(file)));
 
@@ -172,12 +190,8 @@ for (const file of allFiles) {
 
   const lines = content.split(/\r?\n/);
   lines.forEach((line, idx) => {
-    if (forbiddenExternalPattern.test(line)) {
-      addError(file, `forbidden external/CDN/analytics pattern on line ${idx + 1}`, line.trim());
-    }
-    if (forbiddenApiPattern.test(line)) {
-      addError(file, `forbidden API pattern on line ${idx + 1}`, line.trim());
-    }
+    if (forbiddenExternalPattern.test(line)) addError(file, `forbidden external/CDN/analytics pattern on line ${idx + 1}`, line.trim());
+    if (forbiddenApiPattern.test(line)) addError(file, `forbidden API pattern on line ${idx + 1}`, line.trim());
   });
 
   if (file.endsWith('.html')) {
@@ -185,9 +199,7 @@ for (const file of allFiles) {
     for (const m of dataHrefMatches) {
       const target = m[1];
       if (/^[a-z]+:/i.test(target) || target.startsWith('#') || target.startsWith('/') || target.includes('{{')) continue;
-      if (target.endsWith('.html') && !knownHtmlTargets.has(path.basename(target))) {
-        addError(file, 'data-href target does not exist in static-uikit/pages or static-uikit/umi-p0/pages', target);
-      }
+      if (target.endsWith('.html') && !knownHtmlTargets.has(path.basename(target))) addError(file, 'data-href target does not exist in static-uikit/pages or umi pack pages', target);
     }
 
     const hrefMatches = content.matchAll(/\bhref="([^"]+)"/g);
@@ -195,9 +207,7 @@ for (const file of allFiles) {
       const target = m[1];
       if (!target.endsWith('.html')) continue;
       if (/^[a-z]+:/i.test(target) || target.startsWith('/') || target.startsWith('#') || target.includes('{{')) continue;
-      if (!knownHtmlTargets.has(path.basename(target))) {
-        addError(file, 'href target does not exist in static-uikit/pages or static-uikit/umi-p0/pages', target);
-      }
+      if (!knownHtmlTargets.has(path.basename(target))) addError(file, 'href target does not exist in static-uikit/pages or umi pack pages', target);
     }
 
     const formRegex = /<form\b([^>]*)>([\s\S]*?)<\/form>/g;
@@ -215,9 +225,7 @@ for (const file of allFiles) {
         const fieldAttrs = fieldMatch[2];
         const type = (fieldAttrs.match(/\btype="([^"]+)"/) || [])[1] || '';
         if (['submit', 'reset', 'button'].includes(type.toLowerCase())) continue;
-        if (!/\bname=/.test(fieldAttrs)) {
-          addError(file, `<${tag}> inside form is missing name attribute`, fieldMatch[0]);
-        }
+        if (!/\bname=/.test(fieldAttrs)) addError(file, `<${tag}> inside form is missing name attribute`, fieldMatch[0]);
       }
     }
   }
@@ -226,30 +234,17 @@ for (const file of allFiles) {
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);
   const content = fs.readFileSync(file, 'utf8');
-  if (!/<body[^>]*\bdata-page="[^"]+"/i.test(content)) {
-    addError(file, 'missing body[data-page]');
-  }
-  if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) {
-    addError(file, 'missing section.crm-page[data-page]');
-  }
+  if (!/<body[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, 'missing body[data-page]');
+  if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, 'missing section.crm-page[data-page]');
 }
 
-for (const page of umiPageFiles) {
-  const file = path.join(umiPagesDir, page);
+for (const { packName, file } of packPageFiles) {
   const content = fs.readFileSync(file, 'utf8');
-
-  if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) {
-    addError(file, 'missing section.crm-page[data-page] in umi-p0 page template');
-  }
+  if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, `missing section.crm-page[data-page] in ${packName} page template`);
 
   const firstLines = content.split(/\r?\n/).slice(0, 12).join('\n');
-  if (!/<!--\s*Reference:\s*static-uikit\/pages\/[^\n]+-->/i.test(firstLines)) {
-    addError(file, 'missing near-top reference comment <!-- Reference: static-uikit/pages/... -->');
-  }
-
-  if (!/<!--\s*UMI TODO:/i.test(content)) {
-    addError(file, 'missing UMI TODO comment <!-- UMI TODO: ... -->');
-  }
+  if (!/<!--\s*Reference:\s*static-uikit\/pages\/[^\n]+-->/i.test(firstLines)) addError(file, 'missing near-top reference comment <!-- Reference: static-uikit/pages/... -->');
+  if (!/<!--\s*UMI TODO:/i.test(content)) addError(file, 'missing UMI TODO comment <!-- UMI TODO: ... -->');
 }
 
 if (errors.length) {
