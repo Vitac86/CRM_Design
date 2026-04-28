@@ -124,3 +124,9 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - Пак зависит от `static-uikit/umi-p0`.
 - Это не runtime и не build step.
 - Пак проверяется тем же validator: `node static-uikit/tools/validate-static-uikit.mjs`.
+
+## Corporate 24 token layer
+- Базовые дизайн-токены и семантическое сопоставление Corporate 24 находятся в `static-uikit/assets/css/base/tokens.css`.
+- Для page-level CSS используйте только токены (`var(--crm-...)` / `var(--crm-c24-...)`) вместо raw hex/shadow значений.
+- Минимальный слой Corporate 24 включает: primary/hover, border, surface/surface-muted, text/secondary/muted, radius, shadows, status colors.
+- Для страницы subject-card цвета/тени нормализуются через token layer без изменения standalone-структуры страницы.

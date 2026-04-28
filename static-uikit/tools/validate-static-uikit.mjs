@@ -507,6 +507,42 @@ for (const file of allFiles) {
 
 
 
+
+
+function validateNoRawHexInPageCss() {
+  const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
+  const hexPattern = /#[0-9a-fA-F]{3,8}\b/g;
+
+  for (const file of cssFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+    const lines = content.split(/\r?\n/);
+    lines.forEach((line, idx) => {
+      if (hexPattern.test(line)) addError(file, `raw hex color is forbidden in page-level CSS on line ${idx + 1}`, line.trim());
+    });
+  }
+}
+
+function validateSubjectCardNoNestedCards() {
+  const file = path.join(pagesDir, 'subject-card.html');
+  if (!fs.existsSync(file)) return;
+  const content = fs.readFileSync(file, 'utf8');
+  const tagRegex = /<\/?div\b[^>]*>/gi;
+  const stack = [];
+  for (const match of content.matchAll(tagRegex)) {
+    const tag = match[0];
+    const isClose = /^<\//.test(tag);
+    if (isClose) {
+      stack.pop();
+      continue;
+    }
+    const isCard = /\bclass="[^"]*\bcrm-card\b[^"]*"/i.test(tag);
+    if (isCard && stack.includes('crm-card')) {
+      addError(file, 'subject-card must not contain nested .crm-card inside .crm-card', tag);
+      break;
+    }
+    stack.push(isCard ? 'crm-card' : 'div');
+  }
+}
 function validatePartials() {
   const partialFiles = fs.existsSync(partialsDir) ? fs.readdirSync(partialsDir).filter((f) => f.endsWith('.html')).map((f) => path.join(partialsDir, f)) : [];
 
@@ -605,6 +641,8 @@ function validateStaticUikitLauncher() {
 
 validatePartials();
 validateStaticUikitLauncher();
+validateNoRawHexInPageCss();
+validateSubjectCardNoNestedCards();
 
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);

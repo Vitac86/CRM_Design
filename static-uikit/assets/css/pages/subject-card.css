@@ -11,10 +11,10 @@
   gap: 16px;
   align-items: start;
   padding: 18px;
-  border: 1px solid #d7e0ef;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #fff 0%, #f7faff 100%);
-  box-shadow: 0 4px 14px rgba(24, 39, 75, 0.06);
+  border: 1px solid var(--crm-c24-border);
+  border-radius: var(--crm-radius-lg);
+  background: linear-gradient(180deg, var(--crm-c24-surface) 0%, var(--crm-c24-surface-muted) 100%);
+  box-shadow: var(--crm-c24-shadow-md);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-hero-main {
@@ -24,10 +24,10 @@
 .crm-page[data-page="subject-card"] .crm-subject-avatar {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
-  border: 1px solid #d5e0f4;
-  background: #e9f0ff;
-  color: #2f4b95;
+  border-radius: var(--crm-radius-lg);
+  border: 1px solid var(--crm-c24-border);
+  background: var(--crm-primary-soft);
+  color: var(--crm-c24-primary-hover);
   font-size: 16px;
 }
 
@@ -35,13 +35,13 @@
   margin: 0 0 4px;
   font-size: 30px;
   line-height: 1.15;
-  color: #172643;
+  color: var(--crm-c24-text);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-code {
   margin-bottom: 9px;
   font-size: 14px;
-  color: #647897;
+  color: var(--crm-c24-text-muted);
 }
 
 .crm-page[data-page="subject-card"] .crm-inline-badges {
@@ -67,10 +67,10 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs-wrap {
-  border: 1px solid #d7e0ef;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(19, 34, 63, 0.05);
+  border: 1px solid var(--crm-c24-border);
+  border-radius: var(--crm-c24-radius);
+  background: var(--crm-c24-surface);
+  box-shadow: var(--crm-c24-shadow-sm);
   overflow-x: auto;
 }
 
@@ -96,13 +96,13 @@
   border-radius: 8px;
   border: 1px solid transparent;
   font-size: 14px;
-  color: #5c7395;
+  color: var(--crm-c24-text-secondary);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs > .uk-active > a {
-  background: #3f57c4;
-  border-color: #3f57c4;
-  color: #fff;
+  background: var(--crm-c24-primary);
+  border-color: var(--crm-c24-primary);
+  color: var(--crm-c24-surface);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-switcher,
@@ -127,10 +127,10 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-card.crm-subject-profile-section {
-  border: 1px solid #d7e0ef;
-  border-radius: 13px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  border: 1px solid var(--crm-c24-border);
+  border-radius: var(--crm-c24-radius);
+  background: var(--crm-c24-surface);
+  box-shadow: var(--crm-c24-shadow-sm);
 }
 
 .crm-page[data-page="subject-card"] .crm-flat-group {
@@ -142,7 +142,7 @@
 .crm-page[data-page="subject-card"] .crm-flat-section {
   padding: 10px 0;
   border: 0;
-  border-top: 1px solid #e3e9f3;
+  border-top: 1px solid var(--crm-c24-border);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -157,14 +157,14 @@
 .crm-page[data-page="subject-card"] .subject-section .crm-form-section-head {
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e7edf7;
+  border-bottom: 1px solid var(--crm-c24-border);
 }
 
 .crm-page[data-page="subject-card"] .crm-form-section-head h3 {
   margin: 0;
   font-size: 18px;
   line-height: 1.2;
-  color: #1f3151;
+  color: var(--crm-c24-text);
 }
 
 .crm-page[data-page="subject-card"] .crm-section-head-inline {
@@ -198,11 +198,11 @@
   line-height: 1.2;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: #687893;
+  color: var(--crm-c24-text-muted);
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-value {
-  color: #1f2f4a;
+  color: var(--crm-c24-text);
   font-size: 14px;
   line-height: 1.35;
   font-weight: 600;
@@ -212,14 +212,14 @@
   margin-top: 4px;
   font-size: 13px;
   line-height: 1.4;
-  color: #4f617e;
+  color: var(--crm-c24-text-secondary);
 }
 
 .crm-page[data-page="subject-card"] .crm-table .uk-table th { font-size: 12px; }
 .crm-page[data-page="subject-card"] .crm-table .uk-table td { font-size: 14px; }
 .crm-page[data-page="subject-card"] .crm-manager-comment {
   margin: 0;
-  color: #334968;
+  color: var(--crm-c24-text-secondary);
   font-size: 14px;
   line-height: 1.55;
 }
