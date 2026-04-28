@@ -4017,3 +4017,39 @@ a:focus-visible,
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Global registry filter search control fix ===== */
+.crm-page.crm-registry-page .crm-registry-filters .crm-filter-control-search {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  grid-column: span 2;
+}
+
+.crm-page.crm-registry-page .crm-registry-filters .crm-filter-control-search .uk-form-label {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.crm-page.crm-registry-page .crm-registry-filters .crm-filter-control-search .uk-input {
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  padding: 0 12px;
+}
+
+@media (max-width: 1366px) {
+  .crm-page.crm-registry-page .crm-registry-filters .crm-filter-control-search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .crm-page.crm-registry-page .crm-registry-filters .crm-filter-control-search {
+    grid-column: auto;
+  }
+}
