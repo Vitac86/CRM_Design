@@ -100,6 +100,12 @@ Validator также проверяет, что data-* hooks из UMI packs от
 Partials и UMI P0/P1 templates синхронизированы с финальными standalone page patterns.
 Перед handoff обязательно запускайте validator для проверки целостности пакета.
 
+
+## Handoff manifest
+- `static-uikit/HANDOFF_MANIFEST.json`
+- `static-uikit/HANDOFF_NOTES.md`
+- Validator (`node static-uikit/tools/validate-static-uikit.mjs`) проверяет оба файла перед handoff.
+
 ## Standalone QA checklist
 - Checklist: `static-uikit/STANDALONE_QA_CHECKLIST.md`
 - Перед handoff обязательно запустить:

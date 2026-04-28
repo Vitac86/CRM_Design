@@ -1,0 +1,86 @@
+{
+  "name": "CRM Design HTML5 UIkit Handoff",
+  "version": "1.0.0",
+  "type": "static-html-uikit-handoff",
+  "runtime": false,
+  "buildStep": false,
+  "localAssetsOnly": true,
+  "reactVitePrototypeUntouched": true,
+  "standalonePagesRoot": "static-uikit/pages",
+  "partialsRoot": "static-uikit/partials",
+  "umiP0Root": "static-uikit/umi-p0",
+  "umiP1Root": "static-uikit/umi-p1",
+  "validator": "static-uikit/tools/validate-static-uikit.mjs",
+  "qaChecklist": "static-uikit/STANDALONE_QA_CHECKLIST.md",
+  "standalonePages": [
+    "pages/dashboard.html",
+    "pages/subjects.html",
+    "pages/subject-card.html",
+    "pages/subject-register.html",
+    "pages/contract-wizard.html",
+    "pages/brokerage.html",
+    "pages/trust-management.html",
+    "pages/agents.html",
+    "pages/requests.html",
+    "pages/compliance.html",
+    "pages/compliance-card.html",
+    "pages/middle-office-clients.html",
+    "pages/middle-office-reports.html",
+    "pages/depository.html",
+    "pages/back-office.html",
+    "pages/trading.html",
+    "pages/trading-card.html",
+    "pages/administration.html",
+    "pages/archive.html",
+    "pages/error.html"
+  ],
+  "partials": [
+    "partials/action-row.html",
+    "partials/badge-examples.html",
+    "partials/filter-panel-example.html",
+    "partials/form-controls.html",
+    "partials/page-header.html",
+    "partials/sidebar.html",
+    "partials/split-view-example.html",
+    "partials/table-example.html",
+    "partials/topbar.html",
+    "partials/README.md"
+  ],
+  "umiPacks": [
+    {
+      "name": "umi-p0",
+      "root": "umi-p0",
+      "manifest": "umi-p0/manifest.json",
+      "inventory": "umi-p0/integration-inventory.json",
+      "checklist": "umi-p0/HANDOFF_CHECKLIST.md"
+    },
+    {
+      "name": "umi-p1",
+      "root": "umi-p1",
+      "manifest": "umi-p1/manifest.json",
+      "inventory": "umi-p1/integration-inventory.json",
+      "checklist": "umi-p1/HANDOFF_CHECKLIST.md"
+    }
+  ],
+  "localAssets": [
+    "assets/css/uikit.min.css",
+    "assets/css/crm-static.css",
+    "assets/js/uikit.min.js",
+    "assets/js/uikit-icons.min.js",
+    "assets/js/crm-static.js",
+    "assets/fonts/"
+  ],
+  "safetyConstraints": {
+    "noReactInStaticUikit": true,
+    "noViteBuildForStaticUikit": true,
+    "noCDN": true,
+    "noGoogleFonts": true,
+    "noExternalApi": true,
+    "noAnalytics": true,
+    "noFetchXHRWebSocketStorageRouter": true
+  },
+  "requiredChecks": [
+    "node static-uikit/tools/validate-static-uikit.mjs",
+    "npm run build"
+  ]
+}
