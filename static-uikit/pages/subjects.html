@@ -74,29 +74,47 @@
             <div class="crm-filter-search-row crm-filter-search"><input id="subject-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/></div>
             <div class="crm-filter-fields-row crm-filter-grid">
 
-            <div class="crm-filter-control crm-filter-field">
-              <label class="uk-form-label" for="subject-type">Тип</label>
-              <select id="subject-type" class="uk-select crm-select" name="subject-type"><option>Тип: Все</option></select>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+              <label class="uk-form-label crm-visually-hidden" for="subject-type">Тип</label>
+              <div class="crm-filter-pill">
+                <span class="crm-filter-pill-label">Тип:</span>
+                <select id="subject-type" class="uk-select crm-select crm-filter-pill-select" name="subject-type"><option>Все</option></select>
+              </div>
             </div>
-            <div class="crm-filter-control crm-filter-field">
-              <label class="uk-form-label" for="resident-type">Резидентство</label>
-              <select id="resident-type" class="uk-select crm-select" name="resident-type"><option>Резидентство: Все</option></select>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+              <label class="uk-form-label crm-visually-hidden" for="resident-type">Резидентство</label>
+              <div class="crm-filter-pill">
+                <span class="crm-filter-pill-label">Резидентство:</span>
+                <select id="resident-type" class="uk-select crm-select crm-filter-pill-select" name="resident-type"><option>Все</option></select>
+              </div>
             </div>
-            <div class="crm-filter-control crm-filter-field">
-              <label class="uk-form-label" for="subject-status">Статус субъекта</label>
-              <select id="subject-status" class="uk-select crm-select" name="subject-status"><option>Статус субъекта: Все</option></select>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+              <label class="uk-form-label crm-visually-hidden" for="subject-status">Статус субъекта</label>
+              <div class="crm-filter-pill">
+                <span class="crm-filter-pill-label">Статус субъекта:</span>
+                <select id="subject-status" class="uk-select crm-select crm-filter-pill-select" name="subject-status"><option>Все</option></select>
+              </div>
             </div>
-            <div class="crm-filter-control crm-filter-field">
-              <label class="uk-form-label" for="compliance-status">Комплаенс</label>
-              <select id="compliance-status" class="uk-select crm-select" name="compliance-status"><option>Комплаенс: Все</option></select>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+              <label class="uk-form-label crm-visually-hidden" for="compliance-status">Комплаенс</label>
+              <div class="crm-filter-pill">
+                <span class="crm-filter-pill-label">Комплаенс:</span>
+                <select id="compliance-status" class="uk-select crm-select crm-filter-pill-select" name="compliance-status"><option>Все</option></select>
+              </div>
             </div>
-            <div class="crm-filter-control crm-filter-field">
-              <label class="uk-form-label" for="subject-role">Роль</label>
-              <select id="subject-role" class="uk-select crm-select" name="subject-role"><option>Роль: Все</option></select>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+              <label class="uk-form-label crm-visually-hidden" for="subject-role">Роль</label>
+              <div class="crm-filter-pill">
+                <span class="crm-filter-pill-label">Роль:</span>
+                <select id="subject-role" class="uk-select crm-select crm-filter-pill-select" name="subject-role"><option>Все</option></select>
+              </div>
             </div>
-            <div class="crm-filter-control crm-filter-field">
-              <label class="uk-form-label" for="qualification">Квалификация</label>
-              <select id="qualification" class="uk-select crm-select" name="qualification"><option>Квалификация: Все</option></select>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+              <label class="uk-form-label crm-visually-hidden" for="qualification">Квалификация</label>
+              <div class="crm-filter-pill">
+                <span class="crm-filter-pill-label">Квалификация:</span>
+                <select id="qualification" class="uk-select crm-select crm-filter-pill-select" name="qualification"><option>Все</option></select>
+              </div>
             </div>
 
             <div class="crm-filter-actions">
@@ -109,6 +127,16 @@
             <div class="crm-table-wrapper crm-subjects-table">
               <div class="crm-table">
             <table class="uk-table uk-table-divider uk-table-hover">
+              <colgroup>
+                <col class="crm-col-subject-name"/>
+                <col class="crm-col-inn"/>
+                <col class="crm-col-type"/>
+                <col class="crm-col-residency"/>
+                <col class="crm-col-subject-status"/>
+                <col class="crm-col-compliance-status"/>
+                <col class="crm-col-full-package"/>
+                <col class="crm-col-accounts"/>
+              </colgroup>
               <thead>
               <tr>
                 <th>Наименование клиента</th>
