@@ -31,6 +31,22 @@
   --crm-danger-bg: #fdecec;
   --crm-info: #3f5ec5;
   --crm-info-bg: #eaf0ff;
+  /* Corporate 24 semantic aliases */
+  --crm-c24-primary: var(--crm-primary);
+  --crm-c24-primary-hover: var(--crm-primary-hover);
+  --crm-c24-border: var(--crm-border);
+  --crm-c24-surface: var(--crm-surface);
+  --crm-c24-surface-muted: var(--crm-surface-muted);
+  --crm-c24-text: var(--crm-text);
+  --crm-c24-text-secondary: var(--crm-text-secondary);
+  --crm-c24-text-muted: var(--crm-muted);
+  --crm-c24-radius: var(--crm-radius-md);
+  --crm-c24-shadow-sm: var(--crm-shadow-sm);
+  --crm-c24-shadow-md: var(--crm-shadow-md);
+  --crm-c24-status-success: var(--crm-success);
+  --crm-c24-status-warning: var(--crm-warning);
+  --crm-c24-status-danger: var(--crm-danger);
+  --crm-c24-status-info: var(--crm-info);
   --crm-topbar-h: 62px;
   --crm-sidebar-w: 276px;
 }
