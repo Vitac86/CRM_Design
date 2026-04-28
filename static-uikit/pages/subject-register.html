@@ -56,38 +56,58 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="subject-register">
-        
-<div class="crm-page-header crm-register-header">
-  <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Регистрация субъекта</span></div>
-  <h1 data-entity="page-title">Регистрация субъекта</h1>
-  <p class="crm-step-note">Шаг 1 из 3 · Идентификация клиента</p>
-</div>
-<form action="#" method="post" data-form="subject-register" data-action="create-subject" class="crm-card uk-card uk-card-body crm-section crm-register-card">
-  <div class="crm-form-section-head"><h3>Основные параметры регистрации</h3><span class="crm-step-note">Выберите тип субъекта и заполните обязательные поля</span></div>
-  <div class="crm-form-section">
-    <label class="uk-form-label">Тип субъекта <span class="crm-required">*</span></label>
-    <span class="crm-form-hint">Укажите формат клиентского профиля для дальнейшего мастера.</span>
-    <div class="crm-option-grid" data-form="subject-kind">
-      <label class="crm-option-card is-selected"><input type="radio" name="subject-kind" checked/><span>Юридическое лицо</span><small>Регистрация компании с полным комплектом реквизитов</small></label>
-      <label class="crm-option-card"><input type="radio" name="subject-kind"/><span>Физическое лицо</span><small>Упрощённый профиль клиента для розничного обслуживания</small></label>
-      <label class="crm-option-card"><input type="radio" name="subject-kind"/><span>ИП</span><small>Сочетание атрибутов ФЛ и ЮЛ для предпринимателей</small></label>
-    </div>
-  </div>
-  <div class="crm-form-section">
-    <div class="crm-form-grid uk-grid-small" uk-grid>
-      <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-inn">ИНН <span class="crm-required">*</span></label><input class="uk-input crm-input" id="subject-inn" name="inn" placeholder="7704132901"/><span class="crm-field-note">10 или 12 цифр без пробелов.</span></div>
-      <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-ogrn">ОГРН <span class="crm-required">*</span></label><input class="uk-input crm-input" id="subject-ogrn" name="ogrn" placeholder="1027700132195"/></div>
-      <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-reg-date">Дата регистрации</label><input class="uk-input crm-input" id="subject-reg-date" type="date" name="registration-date" value="2026-04-27"/></div>
-      <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-name">Полное наименование <span class="crm-required">*</span></label><input class="uk-input crm-input" id="subject-name" name="subject-name" placeholder="АО «Восток Майнинг Системс»"/></div>
-      <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-phone">Телефон</label><input class="uk-input crm-input" id="subject-phone" name="phone" placeholder="+7 (495) 000-00-00"/></div>
-      <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-email">Электронная почта</label><input class="uk-input crm-input" id="subject-email" name="email" placeholder="mail@company.ru"/></div>
-      <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-manager">Менеджер <span class="crm-required">*</span></label><select class="uk-select crm-select" id="subject-manager" name="manager"><option>Иванов И.И.</option></select></div>
-      <div class="uk-width-1-1"><label class="uk-form-label">Резидентство <span class="crm-required">*</span></label><div class="crm-binary-control"><label class="is-active"><input class="uk-radio" type="radio" name="resident" checked/><span>Резидент</span></label><label><input class="uk-radio" type="radio" name="resident"/><span>Нерезидент</span></label></div><span class="crm-field-note">Выберите налоговый статус клиента.</span></div>
-    </div>
-  </div>
-  <div class="crm-footer-actions crm-register-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="save-draft">Сохранить черновик</button><button class="uk-button crm-button-primary crm-button" type="submit" data-action="submit-subject">Далее</button></div>
-</form>
+        <div class="crm-wizard-shell">
+          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Регистрация субъекта</span></div>
+          <div class="crm-card uk-card uk-card-body crm-page-header">
+            <h1 data-entity="page-title">Регистрация субъекта</h1>
+            <p class="crm-step-note">Шаг 1 из 3 · Идентификация клиента</p>
+            <div class="crm-wizard-steps" aria-label="Шаги регистрации">
+              <div class="crm-wizard-step crm-wizard-step-active"><strong>1</strong><span>Базовые данные</span></div>
+              <div class="crm-wizard-step"><strong>2</strong><span>Проверка и документы</span></div>
+              <div class="crm-wizard-step"><strong>3</strong><span>Завершение</span></div>
+            </div>
+          </div>
 
+          <form action="#" method="post" data-form="subject-register" data-action="create-subject" class="crm-card uk-card uk-card-body crm-register-card">
+            <div class="crm-form-section">
+              <div class="crm-form-section-head"><h3>Тип субъекта</h3><span class="crm-step-note">Определяет набор полей в следующих шагах</span></div>
+              <span class="crm-form-hint">Выберите только один вариант, отмеченный тип применяется ко всей карточке клиента.</span>
+              <div class="crm-option-grid" data-form="subject-kind">
+                <label class="crm-option-card is-selected"><input type="radio" name="subject-kind" checked/><span>Юридическое лицо</span><small>Регистрация компании с полным комплектом реквизитов</small></label>
+                <label class="crm-option-card"><input type="radio" name="subject-kind"/><span>Физическое лицо</span><small>Упрощённый профиль клиента для розничного обслуживания</small></label>
+                <label class="crm-option-card"><input type="radio" name="subject-kind"/><span>ИП</span><small>Сочетание атрибутов ФЛ и ЮЛ для предпринимателей</small></label>
+              </div>
+            </div>
+
+            <div class="crm-form-section">
+              <div class="crm-form-section-head"><h3>Базовые реквизиты</h3><span class="crm-step-note">Поля с <span class="crm-required">*</span> обязательны</span></div>
+              <div class="crm-form-grid uk-grid-small" uk-grid>
+                <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-inn">ИНН <span class="crm-required">*</span></label><input class="uk-input crm-input" id="subject-inn" name="inn" placeholder="7704132901"/><span class="crm-field-note">10 или 12 цифр без пробелов.</span></div>
+                <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-ogrn">ОГРН <span class="crm-required">*</span></label><input class="uk-input crm-input" id="subject-ogrn" name="ogrn" placeholder="1027700132195"/></div>
+                <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-reg-date">Дата регистрации</label><input class="uk-input crm-input" id="subject-reg-date" type="date" name="registration-date" value="2026-04-27"/></div>
+                <div class="uk-width-2-3@m"><label class="uk-form-label" for="subject-name">Полное наименование <span class="crm-required">*</span></label><input class="uk-input crm-input" id="subject-name" name="subject-name" placeholder="АО «Восток Майнинг Системс»"/></div>
+                <div class="uk-width-1-3@m"><label class="uk-form-label" for="subject-short-name">Краткое наименование</label><input class="uk-input crm-input" id="subject-short-name" name="subject-short-name" placeholder="АО «ВМС»"/></div>
+              </div>
+            </div>
+
+            <div class="crm-form-section">
+              <div class="crm-form-section-head"><h3>Контакты и сопровождение</h3><span class="crm-step-note">Данные для связи и назначения ответственного</span></div>
+              <div class="crm-form-grid uk-grid-small" uk-grid>
+                <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-phone">Телефон</label><input class="uk-input crm-input" id="subject-phone" name="phone" placeholder="+7 (495) 000-00-00"/></div>
+                <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-email">Электронная почта</label><input class="uk-input crm-input" id="subject-email" name="email" placeholder="mail@company.ru"/></div>
+                <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-manager">Менеджер <span class="crm-required">*</span></label><select class="uk-select crm-select" id="subject-manager" name="manager"><option>Иванов И.И.</option><option>Петрова А.А.</option><option>Смирнов К.К.</option></select></div>
+                <div class="uk-width-1-2@m"><label class="uk-form-label" for="subject-role">Роль контакта</label><select class="uk-select crm-select" id="subject-role" name="contact-role"><option>Клиент</option><option>Представитель</option><option>Бенефициар</option></select></div>
+                <div class="uk-width-1-1"><label class="uk-form-label">Резидентство <span class="crm-required">*</span></label><div class="crm-binary-control"><label class="is-active"><input class="uk-radio" type="radio" name="resident" checked/><span>Резидент</span></label><label><input class="uk-radio" type="radio" name="resident"/><span>Нерезидент</span></label></div><span class="crm-field-note">Выберите налоговый статус клиента для комплаенс-проверки.</span></div>
+              </div>
+            </div>
+
+            <div class="crm-footer-actions crm-register-actions">
+              <a href="subjects.html" class="uk-button uk-button-default crm-button" data-action="cancel-register">Отмена</a>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="save-draft">Сохранить черновик</button>
+              <button class="uk-button crm-button-primary crm-button" type="submit" data-action="submit-subject">Далее</button>
+            </div>
+          </form>
+        </div>
       </section>
     </main>
   </div>
