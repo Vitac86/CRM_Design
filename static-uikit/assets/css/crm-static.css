@@ -4810,3 +4810,135 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
     margin-left: 0;
   }
 }
+
+/* subject-card hero composition refresh (strictly scoped) */
+.crm-page[data-page="subject-card"] .crm-subject-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  align-items: stretch;
+  gap: 24px;
+  padding: 22px 24px;
+  border: 1px solid #d7e0ef;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 6px 18px rgba(21, 35, 63, 0.08);
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-hero-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  border: 1px solid #cfdbf0;
+  background: #eaf1ff;
+  color: #2a448a;
+  font-size: 17px;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-identity h1 {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.13;
+  letter-spacing: -0.01em;
+  color: #162847;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-code {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.35;
+  color: #6e809b;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-badge-groups {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-inline-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crm-page[data-page="subject-card"] .crm-inline-badges .crm-badge {
+  min-height: 24px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  max-width: 220px;
+  padding: 8px;
+  border: 1px solid #e0e7f4;
+  border-radius: 12px;
+  background: #f9fbff;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-actions .uk-button,
+.crm-page[data-page="subject-card"] .crm-subject-actions .crm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 38px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-actions .crm-button-primary {
+  min-height: 40px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(45, 90, 199, 0.25);
+}
+
+@media (max-width: 1180px) {
+  .crm-page[data-page="subject-card"] .crm-subject-hero {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-subject-actions {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .crm-page[data-page="subject-card"] .crm-subject-hero-main {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-subject-avatar {
+    width: 52px;
+    height: 52px;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-subject-identity h1 {
+    font-size: 28px;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-subject-actions {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+}

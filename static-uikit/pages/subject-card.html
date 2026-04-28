@@ -67,18 +67,22 @@
               <div class="crm-subject-identity crm-subject-hero-text">
                 <h1 class="crm-page-title" data-entity="page-title">АО «Восток Майнинг Системс»</h1>
                 <div class="crm-subject-code">Код клиента: CL-4401</div>
-                <div class="crm-inline-badges">
-                  <span class="crm-badge info" data-status="type">Юр. лицо</span>
-                  <span class="crm-badge info" data-status="residency">Резидент РФ</span>
-                  <span class="crm-badge muted" data-status="qualified">Неквалифицированный инвестор</span>
-                  <span class="crm-badge warning" data-status="representative">Действует через представителей</span>
-                  <span class="crm-badge success" data-status="kyc">KYC пройден</span>
-                  <span class="crm-badge success" data-status="compliance">Комплаенс: пройден</span>
-                  <span class="crm-badge success" data-status="client-state">Статус: активный</span>
+                <div class="crm-subject-badge-groups" aria-label="Статусы клиента">
+                  <div class="crm-inline-badges crm-inline-badges-primary">
+                    <span class="crm-badge info" data-status="type">Юр. лицо</span>
+                    <span class="crm-badge info" data-status="residency">Резидент РФ</span>
+                    <span class="crm-badge muted" data-status="qualified">Неквалифицированный инвестор</span>
+                    <span class="crm-badge warning" data-status="representative">Действует через представителей</span>
+                  </div>
+                  <div class="crm-inline-badges crm-inline-badges-secondary">
+                    <span class="crm-badge success" data-status="compliance">Комплаенс: пройден</span>
+                    <span class="crm-badge success" data-status="kyc">КУС пройден</span>
+                    <span class="crm-badge success" data-status="client-state">Статус: активный</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions">
+            <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions" aria-label="Действия по клиенту">
               <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
               <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
               <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
