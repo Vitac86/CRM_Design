@@ -3015,3 +3015,226 @@ a:focus-visible,
 .crm-sidebar .crm-nav-group-toggle[aria-expanded="true"] .crm-nav-chevron {
   transform: rotate(180deg);
 }
+
+/* visual parity batch 2: subjects / subject-card / compliance */
+.crm-page.crm-registry-page {
+  gap: 12px;
+}
+
+.crm-registry-header {
+  margin-bottom: 6px;
+}
+
+.crm-registry-header h1 {
+  margin-bottom: 0;
+  font-size: 29px;
+}
+
+.crm-registry-header p {
+  margin-top: 5px;
+  max-width: 760px;
+}
+
+.crm-registry-actions {
+  gap: 10px;
+}
+
+.crm-registry-filters {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.6fr) repeat(6, minmax(148px, 1fr)) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d5deee;
+  border-radius: 14px;
+  background: #f6f9ff;
+}
+
+.crm-registry-filters .crm-registry-search {
+  min-width: 0;
+}
+
+.crm-filter-control .uk-form-label {
+  margin-bottom: 4px;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+.crm-registry-filters .uk-input,
+.crm-registry-filters .uk-select,
+.crm-registry-filters .uk-button {
+  min-height: 34px;
+  height: 34px;
+  font-size: 13px;
+}
+
+.crm-filter-reset {
+  color: #475d85;
+  background: #f4f7fd;
+  border-color: #ccd8ec;
+}
+
+.crm-filter-reset:hover {
+  background: #edf3ff;
+  border-color: #bfcde5;
+}
+
+.crm-registry-filters .crm-filter-actions {
+  align-self: end;
+}
+
+.crm-subjects-table .uk-table,
+.crm-compliance-queue .uk-table {
+  min-width: 960px;
+}
+
+.crm-subjects-table .uk-table th,
+.crm-compliance-queue .uk-table th {
+  background: #edf2fb;
+  font-size: 11px;
+  letter-spacing: .055em;
+  padding: 10px 12px;
+}
+
+.crm-subjects-table .uk-table td,
+.crm-compliance-queue .uk-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.crm-subjects-table .uk-table td:first-child,
+.crm-compliance-queue .uk-table td:first-child {
+  min-width: 300px;
+  border-left: 2px solid transparent;
+}
+
+.crm-subjects-table tbody tr[data-href]:hover td:first-child,
+.crm-compliance-queue tbody tr[data-href]:hover td:first-child {
+  border-left-color: #88a5e7;
+}
+
+.crm-compliance-queue tbody tr[data-status="risk-high"] {
+  background: #fff9f9;
+}
+
+.crm-compliance-queue tbody tr[data-status="risk-high"]:hover {
+  background: #fff2f2;
+}
+
+.crm-subject-profile-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.crm-profile-section {
+  padding: 16px 18px;
+  border: 1px solid #d7e0ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 9px rgba(22, 36, 58, 0.04);
+}
+
+.crm-profile-section .crm-form-section-head {
+  margin-bottom: 12px;
+}
+
+.crm-profile-section .crm-form-section-head h3 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.crm-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.crm-profile-field {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: 10px 11px;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  background: #fbfdff;
+}
+
+.crm-profile-field-full {
+  grid-column: 1 / -1;
+}
+
+.crm-profile-label {
+  color: #6c7d98;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.crm-profile-value {
+  color: #1e2f4c;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.crm-detail-tabs {
+  margin: 2px 0 2px;
+  border: 1px solid #d9e1ef;
+  border-radius: 12px;
+  background: #fff;
+  padding: 5px 7px 0;
+}
+
+.crm-detail-tabs > li > a {
+  min-height: 32px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #5c6f8f;
+}
+
+.crm-detail-tabs > .uk-active > a {
+  background: #ebf2ff;
+  color: #3353a4;
+}
+
+@media (max-width: 1439px) {
+  .crm-registry-filters {
+    grid-template-columns: minmax(220px, 1.5fr) repeat(4, minmax(140px, 1fr));
+  }
+
+  .crm-registry-filters .crm-filter-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 959px) {
+  .crm-registry-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .crm-registry-filters .crm-registry-search,
+  .crm-registry-filters .crm-filter-actions {
+    grid-column: 1 / -1;
+  }
+
+  .crm-profile-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .crm-profile-field,
+  .crm-profile-field-full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .crm-registry-actions .uk-button,
+  .crm-registry-actions a.uk-button {
+    width: 100%;
+  }
+}
