@@ -3,8 +3,8 @@
 /* ========================================================================== */
 @font-face {
   font-family: "Inter";
-  src: url("../fonts/inter/Inter-Cyrillic-Regular.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Latin-Regular.woff2") format("woff2");
+  src: url("../../fonts/inter/Inter-Cyrillic-Regular.woff2") format("woff2"),
+       url("../../fonts/inter/Inter-Latin-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -12,8 +12,8 @@
 
 @font-face {
   font-family: "Inter";
-  src: url("../fonts/inter/Inter-Cyrillic-Medium.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Latin-Medium.woff2") format("woff2");
+  src: url("../../fonts/inter/Inter-Cyrillic-Medium.woff2") format("woff2"),
+       url("../../fonts/inter/Inter-Latin-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -21,8 +21,8 @@
 
 @font-face {
   font-family: "Inter";
-  src: url("../fonts/inter/Inter-Cyrillic-SemiBold.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Latin-SemiBold.woff2") format("woff2");
+  src: url("../../fonts/inter/Inter-Cyrillic-SemiBold.woff2") format("woff2"),
+       url("../../fonts/inter/Inter-Latin-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -30,8 +30,8 @@
 
 @font-face {
   font-family: "Inter";
-  src: url("../fonts/inter/Inter-Cyrillic-Bold.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Latin-Bold.woff2") format("woff2");
+  src: url("../../fonts/inter/Inter-Cyrillic-Bold.woff2") format("woff2"),
+       url("../../fonts/inter/Inter-Latin-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -39,8 +39,8 @@
 
 @font-face {
   font-family: "Inter Tight";
-  src: url("../fonts/inter-tight/InterTight-Cyrillic-Regular.woff2") format("woff2"),
-       url("../fonts/inter-tight/InterTight-Latin-Regular.woff2") format("woff2");
+  src: url("../../fonts/inter-tight/InterTight-Cyrillic-Regular.woff2") format("woff2"),
+       url("../../fonts/inter-tight/InterTight-Latin-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -48,8 +48,8 @@
 
 @font-face {
   font-family: "Inter Tight";
-  src: url("../fonts/inter-tight/InterTight-Cyrillic-Medium.woff2") format("woff2"),
-       url("../fonts/inter-tight/InterTight-Latin-Medium.woff2") format("woff2");
+  src: url("../../fonts/inter-tight/InterTight-Cyrillic-Medium.woff2") format("woff2"),
+       url("../../fonts/inter-tight/InterTight-Latin-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -57,8 +57,8 @@
 
 @font-face {
   font-family: "Inter Tight";
-  src: url("../fonts/inter-tight/InterTight-Cyrillic-SemiBold.woff2") format("woff2"),
-       url("../fonts/inter-tight/InterTight-Latin-SemiBold.woff2") format("woff2");
+  src: url("../../fonts/inter-tight/InterTight-Cyrillic-SemiBold.woff2") format("woff2"),
+       url("../../fonts/inter-tight/InterTight-Latin-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -66,8 +66,8 @@
 
 @font-face {
   font-family: "Inter Tight";
-  src: url("../fonts/inter-tight/InterTight-Cyrillic-Bold.woff2") format("woff2"),
-       url("../fonts/inter-tight/InterTight-Latin-Bold.woff2") format("woff2");
+  src: url("../../fonts/inter-tight/InterTight-Cyrillic-Bold.woff2") format("woff2"),
+       url("../../fonts/inter-tight/InterTight-Latin-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
