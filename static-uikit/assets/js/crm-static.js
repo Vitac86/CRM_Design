@@ -20,6 +20,31 @@
       });
     });
   }
+  function findControlScope(element) {
+    return element.closest('form, fieldset, section, .crm-card, .crm-page') || document;
+  }
+
+  function syncRadioTileGroup(scope, radioName) {
+    if (!radioName) return;
+    scope.querySelectorAll('.crm-radio-tile input[type="radio"][name="' + CSS.escape(radioName) + '"]').forEach(function (radio) {
+      const tile = radio.closest('.crm-radio-tile');
+      if (tile) {
+        tile.classList.toggle('is-selected', radio.checked);
+      }
+    });
+  }
+
+  function syncSelectableControlState(scope) {
+    scope.querySelectorAll('.crm-radio-tile').forEach(function (tile) {
+      const radio = tile.querySelector('input[type="radio"]');
+      tile.classList.toggle('is-selected', !!(radio && radio.checked));
+    });
+
+    scope.querySelectorAll('.crm-check-row').forEach(function (row) {
+      const input = row.querySelector('input[type="checkbox"], input[type="radio"]');
+      row.classList.toggle('is-active', !!(input && input.checked));
+    });
+  }
 
   const mobileQuery = window.matchMedia('(max-width: 920px)');
 
@@ -134,6 +159,7 @@
 
   syncOptionGridState(document);
   syncBinaryPills(document);
+  syncSelectableControlState(document);
 
   document.addEventListener('click', function (event) {
     const target = event.target;
@@ -183,6 +209,24 @@
         radio.checked = true;
       }
     }
+
+    const radioTile = target.closest('.crm-radio-tile');
+    if (radioTile) {
+      const radio = radioTile.querySelector('input[type="radio"]');
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    const checkRow = target.closest('.crm-check-row');
+    if (checkRow) {
+      const input = checkRow.querySelector('input[type="checkbox"], input[type="radio"]');
+      if (input && input.type === 'radio') {
+        input.checked = true;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
     const hrefHost = target.closest('[data-href]');
     if (hrefHost) {
       const directAnchor = target.closest('a[href]');
@@ -206,6 +250,33 @@
     const form = event.target;
     if (form.matches('[data-form]')) {
       event.preventDefault();
+    }
+  });
+
+  document.addEventListener('change', function (event) {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+
+    if (target.matches('.crm-radio-tile input[type="radio"]')) {
+      const scope = findControlScope(target);
+      syncRadioTileGroup(scope, target.name);
+    }
+
+    if (target.matches('.crm-check-row input[type="checkbox"], .crm-check-row input[type="radio"]')) {
+      const row = target.closest('.crm-check-row');
+      if (row) {
+        row.classList.toggle('is-active', target.checked);
+      }
+
+      if (target.type === 'radio') {
+        const scope = findControlScope(target);
+        scope.querySelectorAll('.crm-check-row input[type="radio"][name="' + CSS.escape(target.name) + '"]').forEach(function (radio) {
+          const radioRow = radio.closest('.crm-check-row');
+          if (radioRow) {
+            radioRow.classList.toggle('is-active', radio.checked);
+          }
+        });
+      }
     }
   });
 

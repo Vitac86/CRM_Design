@@ -282,6 +282,61 @@ function validateRegistryFilterPanelStructure(file, content) {
   }
 }
 
+function validateFormControlPatterns(file, content) {
+  function validateControl(selector, checker) {
+    const regex = new RegExp(`<([a-z0-9-]+)\\b([^>]*)class="([^"]*\\b${selector}\\b[^"]*)"([^>]*)>([\\s\\S]*?)<\\/\\1>`, 'gi');
+    for (const match of content.matchAll(regex)) checker(match);
+  }
+
+  validateControl('crm-option-card', (match) => {
+    const attrs = `${match[2]} ${match[4]}`;
+    const inner = match[5];
+    const hasRadio = /<input\b[^>]*\btype="radio"[^>]*>/i.test(inner);
+    const isLinkTile = /\bhref="/i.test(attrs) || /\bdata-href="/i.test(attrs);
+    if (!hasRadio && !isLinkTile) addError(file, '.crm-option-card must contain input[type="radio"] unless it is a link/action tile');
+    if (hasRadio) {
+      const selected = /\bis-selected\b/.test(match[3]);
+      const checked = /<input\b[^>]*\btype="radio"[^>]*\bchecked\b[^>]*>/i.test(inner);
+      if (selected && !checked) addError(file, '.crm-option-card.is-selected must contain checked radio');
+      if (checked && !selected) addError(file, '.crm-option-card with checked radio must include .is-selected');
+    }
+  });
+
+  validateControl('crm-radio-tile', (match) => {
+    const inner = match[5];
+    const hasRadio = /<input\b[^>]*\btype="radio"[^>]*>/i.test(inner);
+    if (!hasRadio) addError(file, '.crm-radio-tile must contain input[type="radio"]');
+    const selected = /\bis-selected\b/.test(match[3]);
+    const checked = /<input\b[^>]*\btype="radio"[^>]*\bchecked\b[^>]*>/i.test(inner);
+    if (selected && !checked) addError(file, '.crm-radio-tile.is-selected must contain checked radio');
+    if (checked && !selected) addError(file, '.crm-radio-tile with checked radio must include .is-selected');
+  });
+
+  validateControl('crm-binary-control', (match) => {
+    const inner = match[5];
+    for (const labelMatch of inner.matchAll(/<label\b([^>]*)>([\s\S]*?)<\/label>/gi)) {
+      const labelClass = (labelMatch[1].match(/\bclass="([^"]+)"/i) || [])[1] || '';
+      const labelInner = labelMatch[2];
+      const hasRadio = /<input\b[^>]*\btype="radio"[^>]*>/i.test(labelInner);
+      if (!hasRadio) addError(file, '.crm-binary-control labels must contain input[type="radio"]');
+      const active = /\bis-active\b/.test(labelClass);
+      const checked = /<input\b[^>]*\btype="radio"[^>]*\bchecked\b[^>]*>/i.test(labelInner);
+      if (active && !checked) addError(file, '.crm-binary-control label.is-active must contain checked radio');
+      if (checked && !active) addError(file, '.crm-binary-control label with checked radio must include .is-active');
+    }
+  });
+
+  validateControl('crm-check-row', (match) => {
+    const inner = match[5];
+    const hasInput = /<input\b[^>]*\btype="(?:checkbox|radio)"[^>]*>/i.test(inner);
+    if (!hasInput) addError(file, '.crm-check-row must contain input[type="checkbox"|"radio"]');
+    const active = /\bis-active\b/.test(match[3]);
+    const checked = /<input\b[^>]*\btype="(?:checkbox|radio)"[^>]*\bchecked\b[^>]*>/i.test(inner);
+    if (active && !checked) addError(file, '.crm-check-row.is-active must contain checked input');
+    if (checked && !active) addError(file, '.crm-check-row with checked input must include .is-active');
+  });
+}
+
 function validateStandalonePageScriptRegistry(pageFiles) {
   const scriptDir = path.join(rootDir, 'assets', 'js', 'pages');
   const pageScripts = fs.existsSync(scriptDir) ? fs.readdirSync(scriptDir).filter((file) => file.endsWith('.js')) : [];
@@ -951,6 +1006,7 @@ for (const page of pageFiles) {
   if (!/<input[^>]*\bname="global-search"/i.test(content)) addError(file, 'missing topbar global search input[name="global-search"]');
   if (!/<button[^>]*\bdata-sidebar-toggle\b/i.test(content)) addError(file, 'missing sidebar toggle button[data-sidebar-toggle]');
   validateRegistryFilterPanelStructure(file, content);
+  validateFormControlPatterns(file, content);
 
   const buttonRegex = /<button\b([^>]*)>/gi;
   for (const match of content.matchAll(buttonRegex)) {

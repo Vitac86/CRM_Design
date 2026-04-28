@@ -28,3 +28,4 @@ Cross-page audit of standalone `static-uikit/pages/*.html` for global vs page-sp
 ## Registry result
 - Current standalone page-script registry: only `subject-card.html` owns `../assets/js/pages/subject-card.js`.
 - No additional page scripts were required by this audit.
+- Reusable form-control patterns (`.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row`) are global behavior owned by `assets/js/crm-static.js`; they only synchronize `.is-selected`/`.is-active` with native checked inputs.

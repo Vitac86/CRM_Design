@@ -76,6 +76,8 @@
 4. Подключайте `assets` локально (без внешних CDN/API).
 5. `pages/subject-card.html` теперь server-rendered/static-template-first: профиль, адреса и представители заданы в HTML и не заполняются через demo JSON в runtime.
 6. `assets/js/crm-static.js` используется только для глобального/переиспользуемого UI-поведения (tabs/sidebar/nav/filters/data-href), без subject-card-specific логики и без data-rendering.
+   - Включая переиспользуемые selectable-контролы: `.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row`.
+   - JS только синхронизирует визуальные классы `.is-selected` / `.is-active` из уже существующего `checked` состояния input и после пользовательского изменения.
 7. `assets/js/pages/subject-card.js` подключается только на странице карточки субъекта и содержит только page-specific поведение (модалка представителя, toggle адресов, срок действия), без генерации данных из JS.
 8. `assets/js/crm-static.js` не должен содержать `data-page` guards для конкретных страниц и не должен владеть page-only интеракциями.
 9. Любой page-specific JS размещается только в `assets/js/pages/<page>.js`, оборачивается в IIFE и защищается page guard (`body[data-page=...]` / `.crm-page[data-page=...]`).
