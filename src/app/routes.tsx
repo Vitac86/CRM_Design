@@ -17,6 +17,7 @@ import { AgentsPage } from '../pages/AgentsPage';
 import { ArchivesPage } from '../pages/ArchivesPage';
 import { AdministrationPage } from '../pages/AdministrationPage';
 import { ContractWizardPage } from '../pages/ContractWizardPage';
+import { DocumentWizardPage } from '../pages/DocumentWizardPage';
 import { MiddleOfficeClientsPage } from '../pages/MiddleOfficeClientsPage';
 import { MiddleOfficeReportsPage } from '../pages/MiddleOfficeReportsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: routes.subjectRegister.slice(1), element: <ClientRegistrationWizardPage /> },
       { path: `subjects/${routeParams.subjectId}`, element: <SubjectProfilePage /> },
       { path: `subjects/${routeParams.subjectId}/contract-wizard`, element: <ContractWizardPage /> },
+      { path: `subjects/${routeParams.subjectId}/document-wizard`, element: <DocumentWizardPage /> },
       { path: routes.brokerage.slice(1), element: <BrokeragePage /> },
       { path: routes.trustManagement.slice(1), element: <TrustManagementPage /> },
       { path: routes.agents.slice(1), element: <AgentsPage /> },

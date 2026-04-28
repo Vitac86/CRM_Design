@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDataAccess } from '../../app/dataAccess/useDataAccess';
 import type { ClientDocument } from '../../data/types';
+import { routes } from '../../routes/paths';
 import { Button, DataTable, DownloadIcon, EmptyState, PrintIcon, StatusBadge } from '../ui';
 
 type SubjectDocumentsTabProps = {
@@ -25,6 +27,7 @@ const defaultForm: NewDocumentForm = {
 };
 
 export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
+  const navigate = useNavigate();
   const { documents: documentsRepository } = useDataAccess();
 
   const [documents, setDocuments] = useState<ClientDocument[]>([]);
@@ -253,7 +256,10 @@ export const SubjectDocumentsTab = ({ clientId }: SubjectDocumentsTabProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button variant="secondary" onClick={() => navigate(routes.subjectDocumentWizard(clientId))}>
+          Открыть Document Wizard
+        </Button>
         <Button onClick={handleOpenCreate}>+ Добавить документ</Button>
       </div>
 

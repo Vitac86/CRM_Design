@@ -5,6 +5,7 @@ export const routes = {
   subjectRegister: '/subjects/register',
   subject: (id: string) => `/subjects/${id}`,
   subjectContractWizard: (id: string) => `/subjects/${id}/contract-wizard`,
+  subjectDocumentWizard: (id: string) => `/subjects/${id}/document-wizard`,
   compliance: '/compliance',
   complianceCard: (id: string) => `/compliance/${id}`,
   requests: '/requests',
