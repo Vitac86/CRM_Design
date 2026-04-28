@@ -1,0 +1,14 @@
+<!-- Reference: static-uikit/pages/trust-management.html -->
+<!-- UMI TODO: render inside layout/base main content slot -->
+<section class="crm-page" data-page="trust-management">
+  <div class="crm-page-header"><h1 data-entity="page-title">Доверительное управление</h1></div>
+  <!-- UMI TODO: fill trust contracts, strategy and status dictionaries -->
+  <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="trust-management">
+    <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" name="trust-search" placeholder="Поиск: договор/клиент/стратегия"/></div>
+    <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="trust-status"><option>Статус</option><option>Активен</option><option>На согласовании</option></select></div>
+    <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" type="reset" data-action="reset-filters">Очистить фильтры</button></div>
+  </form>
+  <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Договор ДУ</th><th>Клиент</th><th>Стратегия</th><th>Портфель</th><th>Статус</th></tr></thead><tbody>
+    <tr data-entity="trust-contract" data-id="{{ trust.id }}"><td>{{ trust.number }}</td><td>{{ trust.subject }}</td><td>{{ trust.strategy }}</td><td>{{ trust.portfolio }}</td><td><span class="crm-badge info" data-status="pending-approval">На согласовании</span></td></tr>
+  </tbody></table></div>
+</section>
