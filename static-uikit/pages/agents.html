@@ -57,23 +57,27 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page" data-page="agents">
-        <div class="crm-page-header crm-page-header-row"><h1 data-entity="page-title">Агенты</h1><div class="crm-header-actions"><button class="uk-button crm-button-primary crm-button" type="button" data-action="add-agent">+ Добавить агента</button></div></div>
-        <form action="#" method="post" data-form="agents-filters" data-action="filter-agents" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="agents">
-          <div class="uk-width-1-1"><input class="uk-input crm-input" name="agents-search" placeholder="Поиск по субъекту, договору, комиссии, телефону или email"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" type="reset" data-action="reset-filters">Очистить фильтры</button></div>
+      <section class="crm-page crm-registry-page" data-page="agents">
+        <div class="crm-page-header crm-page-header-row crm-registry-header">
+          <div class="crm-registry-title-block"><h1 data-entity="page-title">Агенты</h1><p>Реестр агентских подключений с деталями организации, комиссии и закрепления.</p></div>
+          <div class="crm-page-actions crm-registry-actions"><button class="uk-button crm-button-primary crm-button" type="button" data-action="add-agent">+ Добавить агента</button></div>
+        </div>
+        <form action="#" method="post" data-form="agents-filters" data-action="filter-agents" class="crm-registry-filters" data-filter="agents">
+          <div class="crm-filter-control crm-registry-search"><label class="uk-form-label" for="agents-search">Поиск</label><input id="agents-search" class="uk-input crm-input" name="agents-search" placeholder="Агент, договор, телефон или email"/></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="agent-status">Статус</label><select id="agent-status" class="uk-select crm-select" name="agent-status"><option>Все</option><option>Активен</option><option>На согласовании</option></select></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="agent-assignee">Закрепление</label><select id="agent-assignee" class="uk-select crm-select" name="agent-assignee"><option>Все</option><option>Иванов И.И.</option><option>Петрова Н.А.</option></select></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить</button></div>
         </form>
-        <div class="crm-card crm-table crm-table-wrapper">
+        <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="agent-table">
           <table class="uk-table uk-table-divider uk-table-hover">
-            <thead><tr><th>Субъект</th><th>Компания</th><th>Номер договора</th><th>Комиссия</th><th>Телефон</th><th>Email</th><th>Статус</th></tr></thead>
+            <thead><tr><th>Агент</th><th>Организация</th><th>Договор</th><th>Комиссия</th><th>Закрепление</th><th>Статус</th></tr></thead>
             <tbody>
-              <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html"><td><a href="subject-card.html" class="crm-link-action" data-action="open-agent-subject">ПАО «НеоЭнергоСбыт»</a></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>+7 (900) 100-11-03</td><td>corp@neoenergy.test</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
-              <tr data-entity="agent" data-id="AG-1988" data-href="subject-card.html"><td><a href="subject-card.html" class="crm-link-action" data-action="open-agent-subject">АО «Орбита ФинСервис»</a></td><td>АО «Орбита ФинСервис»</td><td>AG-1988</td><td>2.00%</td><td>+7 (900) 100-11-05</td><td>support@orbita-fin.test</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
-              <tr data-entity="agent" data-id="AG-1760" data-href="subject-card.html"><td><a href="subject-card.html" class="crm-link-action" data-action="open-agent-subject">ЗАО «Северо-Западный Трейд»</a></td><td>ЗАО «Северо-Западный Трейд»</td><td>AG-1760</td><td>0.90%</td><td>+7 (900) 100-11-14</td><td>contact@nw-trade.test</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
+              <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html"><td><div class="crm-row-main">ПАО «НеоЭнергоСбыт»</div><div class="crm-row-sub">+7 (900) 100-11-03 · corp@neoenergy.test</div></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>Иванов И.И.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
+              <tr data-entity="agent" data-id="AG-1988" data-href="subject-card.html"><td><div class="crm-row-main">АО «Орбита ФинСервис»</div><div class="crm-row-sub">+7 (900) 100-11-05 · support@orbita-fin.test</div></td><td>АО «Орбита ФинСервис»</td><td>AG-1988</td><td>2.00%</td><td>Петрова Н.А.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
             </tbody>
           </table>
+          <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет агентов</div><div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div></div>
         </div>
-        <div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет агентов</div><div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div></div>
       </section>
     </main>
   </div>

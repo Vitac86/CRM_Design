@@ -57,65 +57,31 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page crm-operations-layout" data-page="requests">
-        <div class="crm-page-header crm-page-header-row">
-          <div>
-            <h1>Поручения</h1>
-            <p>Операционный журнал поручений: создание, фильтрация и быстрые действия по заявкам.</p>
-          </div>
-          <div class="crm-page-actions">
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="print-request">Печать</button>
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="export-requests">Экспорт</button>
-            <button class="uk-button crm-button-primary crm-button" type="button" data-action="open-request-create">+ Новое поручение</button>
-          </div>
+      <section class="crm-page crm-registry-page crm-operations-layout" data-page="requests">
+        <div class="crm-page-header crm-page-header-row crm-registry-header">
+          <div class="crm-registry-title-block"><h1>Поручения</h1><p>Операционный журнал поручений: регистрация, контроль статуса и быстрые действия.</p></div>
+          <div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="print-request">Печать</button><button class="uk-button uk-button-default crm-button" type="button" data-action="export-requests">Экспорт</button></div>
         </div>
-
-        <form action="#" method="post" data-form="request-create" data-action="create-request" class="crm-card uk-card uk-card-body crm-section crm-create-panel crm-request-create uk-margin-bottom">
-          <div class="crm-form-section-head">
-            <div>
-              <h3>Создание поручения</h3>
-              <span class="crm-form-hint">Заполните ключевые поля для регистрации поручения в журнале.</span>
-            </div>
-            <span class="crm-badge info" data-status="draft">Черновик</span>
-          </div>
+        <form action="#" method="post" data-form="request-create" data-action="create-request" class="crm-card uk-card uk-card-body crm-section crm-create-panel crm-request-create">
+          <div class="crm-form-section-head"><div><h3>Создание поручения</h3><span class="crm-form-hint">Блок создания встроен в реестр и использует ту же визуальную сетку.</span></div><button class="uk-button crm-button-primary crm-button" type="submit" data-action="create-request">Сохранить поручение</button></div>
           <div class="crm-form-grid uk-grid-small" uk-grid>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-type">Тип поручения <span class="crm-required">*</span></label><select class="uk-select crm-select" id="request-type" name="request-type"><option>Поручение на вывод ДС</option><option>Поручение на перевод ЦБ</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-client">Клиент <span class="crm-required">*</span></label><select class="uk-select crm-select" id="request-client" name="client"><option>АО «Восток Майнинг Системс»</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-contract">Договор <span class="crm-required">*</span></label><select class="uk-select crm-select" id="request-contract" name="contract"><option>BR-8821</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-status">Статус</label><select class="uk-select crm-select" id="request-status" name="request-status"><option>Новый</option><option>На согласовании</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-source">Источник</label><select class="uk-select crm-select" id="request-source" name="source"><option>Личный кабинет</option><option>Операционист</option><option>Email</option></select></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-amount">Сумма <span class="crm-required">*</span></label><input class="uk-input crm-input" id="request-amount" name="amount" value="2 450 000"/></div>
-            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-currency">Валюта</label><select class="uk-select crm-select" id="request-currency" name="currency"><option>RUB</option><option>USD</option><option>EUR</option></select></div>
-          </div>
-          <div class="crm-footer-actions">
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-request">Отмена</button>
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="print-request">Распечатать поручение</button>
-            <button class="uk-button crm-button-primary crm-button" type="submit" data-action="create-request">Сохранить поручение</button>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-type">Тип поручения</label><select class="uk-select crm-select" id="request-type" name="request-type"><option>Поручение на вывод ДС</option><option>Поручение на перевод ЦБ</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-client">Клиент</label><select class="uk-select crm-select" id="request-client" name="client"><option>АО «Восток Майнинг Системс»</option></select></div>
+            <div class="uk-width-1-3@m"><label class="uk-form-label" for="request-contract">Договор</label><select class="uk-select crm-select" id="request-contract" name="contract"><option>BR-8821</option></select></div>
           </div>
         </form>
-
-        <form action="#" method="post" data-form="requests-filters" data-action="filter-requests" class="crm-toolbar crm-filter-panel crm-operations-filters uk-grid-small" uk-grid data-filter="requests">
-          <div class="uk-width-1-1 uk-width-1-3@m"><label class="uk-form-label" for="request-search">Поиск</label><input class="uk-input crm-input" id="request-search" name="request-search" placeholder="По номеру, клиенту, коду"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="filter-client-code">Код клиента</label><input class="uk-input crm-input" id="filter-client-code" name="filter-client-code" placeholder="CL-4401"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="request-date">Дата</label><input type="date" class="uk-input crm-input" id="request-date" name="request-date" value="2026-04-24"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="filter-source">Источник</label><select class="uk-select crm-select" id="filter-source" name="filter-source"><option>Источник</option><option>Личный кабинет</option><option>Операционист</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><label class="uk-form-label" for="filter-status">Статус</label><select class="uk-select crm-select" id="filter-status" name="filter-status"><option>Статус</option><option>Ожидает</option><option>Принято</option><option>Отклонено</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m crm-filter-reset-cell"><button class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters" type="reset">Очистить фильтры</button></div>
+        <form action="#" method="post" data-form="requests-filters" data-action="filter-requests" class="crm-registry-filters" data-filter="requests">
+          <div class="crm-filter-control crm-registry-search"><label class="uk-form-label" for="request-search">Поиск</label><input class="uk-input crm-input" id="request-search" name="request-search" placeholder="Номер, клиент, код"/></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="filter-source">Источник</label><select class="uk-select crm-select" id="filter-source" name="filter-source"><option>Все</option><option>Личный кабинет</option><option>Операционист</option></select></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="filter-status">Статус</label><select class="uk-select crm-select" id="filter-status" name="filter-status"><option>Все</option><option>Ожидает</option><option>Принято</option><option>Отклонено</option></select></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить</button></div>
         </form>
-
-        <div class="crm-card crm-table crm-table-wrapper crm-journal-table" data-entity="request-table">
-          <table class="uk-table uk-table-divider uk-table-hover">
-            <thead><tr><th>Номер поручения</th><th>Вид поручения</th><th>Клиент</th><th>Код клиента</th><th>Сумма</th><th>Валюта</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead>
-            <tbody>
-              <tr data-entity="request" data-id="P-24108" data-href="compliance-card.html"><td><div class="crm-row-main">P-24108</div><div class="crm-row-sub">Вывод ДС · 24.04.2026 · 10:14</div></td><td>Вывод ДС</td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">Код CL-4401</div></td><td>CL-4401</td><td>2 450 000</td><td>RUB</td><td><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></td><td>24.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="view-request">Открыть</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-request">Повторить</button></div></td></tr>
-              <tr data-entity="request" data-id="P-24103" data-href="compliance-card.html"><td><div class="crm-row-main">P-24103</div><div class="crm-row-sub">Перевод ЦБ · 23.04.2026 · 16:03</div></td><td>Перевод ЦБ</td><td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">Код CL-4412</div></td><td>CL-4412</td><td>340 000</td><td>RUB</td><td><span class="crm-badge info" data-status="request-accepted">Принято</span></td><td>23.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="view-request">Открыть</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="download-request">Скачать</button></div></td></tr>
-              <tr data-entity="request" data-id="P-24099" data-href="compliance-card.html"><td><div class="crm-row-main">P-24099</div><div class="crm-row-sub">Вывод ДС · 22.04.2026 · 12:40</div></td><td>Вывод ДС</td><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">Код CL-4408</div></td><td>CL-4408</td><td>7 900 000</td><td>RUB</td><td><span class="crm-badge danger" data-status="request-rejected">Отклонено</span></td><td>22.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="view-request">Открыть</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-request">Повторить</button></div></td></tr>
-            </tbody>
-          </table>
-          <div class="crm-empty-state" data-entity="empty-state" hidden>
-            <div class="crm-empty-state-title">Нет поручений</div>
-            <div class="crm-empty-state-text">Измените параметры поиска или создайте новое поручение.</div>
-          </div>
+        <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="request-table">
+          <table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Поручение</th><th>Клиент</th><th>Сумма</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead><tbody>
+            <tr data-entity="request" data-id="P-24108" data-href="compliance-card.html"><td><div class="crm-row-main">P-24108</div><div class="crm-row-sub">Вывод ДС · CL-4401</div></td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">BR-8821</div></td><td>2 450 000 RUB</td><td><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></td><td>24.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="view-request">Открыть</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-request">Повторить</button></div></td></tr>
+            <tr data-entity="request" data-id="P-24103" data-href="compliance-card.html"><td><div class="crm-row-main">P-24103</div><div class="crm-row-sub">Перевод ЦБ · CL-4412</div></td><td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">BR-8839</div></td><td>340 000 RUB</td><td><span class="crm-badge info" data-status="request-accepted">Принято</span></td><td>23.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="view-request">Открыть</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="download-request">Скачать</button></div></td></tr>
+          </tbody></table>
+          <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет поручений</div><div class="crm-empty-state-text">Измените параметры поиска или создайте новое поручение.</div></div>
         </div>
       </section>
     </main>
