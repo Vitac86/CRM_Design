@@ -82,5 +82,6 @@
   "requiredChecks": [
     "node static-uikit/tools/validate-static-uikit.mjs",
     "npm run build"
-  ]
+  ],
+  "readinessAudit": "static-uikit/HANDOFF_READINESS_AUDIT.md"
 }
