@@ -62,16 +62,17 @@
           <div class="crm-registry-title-block"><h1 class="crm-page-title" data-entity="page-title">Доверительное управление</h1><p class="crm-page-subtitle">Реестр договоров ДУ со статусом стратегии, портфеля и текущей проверки.</p></div>
           <div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-trust-management">Экспорт</button></div>
         </div>
-        <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-registry-filters crm-filter-panel crm-filter-grid" data-filter="trust-management">
-          <div class="crm-filter-search-row crm-filter-search crm-filter-field"><input id="trust-search" class="uk-input crm-input crm-filter-search-input crm-filter-search" type="search" data-filter="search" name="trust-search" placeholder="Договор, клиент или стратегия"/></div>
-
-            <div class="crm-filter-fields-row crm-filter-grid">
+        <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-registry-filters crm-filter-panel" data-filter="trust-management">
+          <div class="crm-filter-search-row crm-filter-search"><input id="trust-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trust-search" placeholder="Договор, клиент или стратегия"/></div>
+          <div class="crm-filter-fields-row crm-filter-grid">
           <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="trust-status">Статус</label><select id="trust-status" class="uk-select crm-select" name="trust-status"><option>Все</option><option>Активен</option><option>На согласовании</option></select></div>
           <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="trust-strategy">Стратегия</label><select id="trust-strategy" class="uk-select crm-select" name="trust-strategy"><option>Все</option><option>Сбалансированная</option><option>Консервативная</option></select></div>
-          <div class="crm-filter-actions crm-filter-field"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
-</form>
-        <div class="crm-card crm-table-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="trust-table">
+        </form>
+        <div class="crm-card crm-table-card crm-registry-table" data-entity="trust-table">
+          <div class="crm-table-wrapper">
+            <div class="crm-table crm-registry-table-compact">
           <table class="uk-table uk-table-divider uk-table-hover">
             <thead><tr><th>Договор ДУ</th><th>Клиент</th><th>Стратегия</th><th>Стоимость портфеля</th><th>Дата начала</th><th>Статус</th></tr></thead>
             <tbody>
@@ -79,6 +80,8 @@
               <tr data-entity="trust-contract" data-id="DU-1152" data-href="subject-card.html"><td><div class="crm-row-main">DU-1152</div><div class="crm-row-sub">CL-4401 · ДУ</div></td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">Резидент РФ</div></td><td>Консервативная</td><td>76 400 000 ₽</td><td>04.03.2026</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
             </tbody>
           </table>
+            </div>
+          </div>
           <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет договоров ДУ</div><div class="crm-empty-state-text">Уточните статус или стратегию.</div></div>
         </div>
       </section>

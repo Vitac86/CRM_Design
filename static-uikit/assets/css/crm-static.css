@@ -4600,7 +4600,8 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
   gap: var(--crm-layer-gap-sm);
 }
 
-.crm-filter-search {
+.crm-filter-search,
+.crm-filter-search-row {
   width: 100%;
 }
 
@@ -4635,6 +4636,7 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
   justify-content: flex-end;
   align-items: flex-end;
   display: flex;
+  align-self: end;
 }
 
 .crm-filter-reset {
@@ -4648,6 +4650,20 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
   box-shadow: var(--crm-layer-card-shadow);
   overflow: hidden;
   background: #fff;
+}
+
+.crm-table-card .crm-table-wrapper {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: auto;
+}
+
+.crm-table-card .crm-table {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .crm-table .uk-table {
