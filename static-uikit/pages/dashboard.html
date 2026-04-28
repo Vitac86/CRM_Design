@@ -57,102 +57,131 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page" data-page="dashboard">
-        <div class="crm-dashboard-shell">
-          <header class="crm-page-header crm-dashboard-header"><h1 data-entity="page-title">Операционный обзор</h1></header>
+      <section class="crm-page crm-dashboard-page" data-page="dashboard">
+        <section class="crm-dashboard-shell" data-entity="dashboard-shell">
+          <header class="crm-dashboard-header">
+            <h1 data-entity="page-title">Операционный обзор</h1>
+          </header>
 
-          <section class="crm-dashboard-kpis" data-entity="dashboard-kpi">
-            <article class="crm-card crm-kpi-card">
-              <div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="users"></span><span>Новые субъекты</span></div>
-              <div class="crm-kpi-value">17</div>
-              <div class="crm-kpi-note">+4 к вчерашнему дню</div>
+          <section class="crm-dashboard-kpi-grid" data-entity="dashboard-kpi">
+            <article class="crm-card crm-kpi-card crm-dashboard-kpi-card" data-id="metric-01" data-href="subjects.html?subjectStatus=Регистрация">
+              <div class="crm-dashboard-kpi-top">
+                <span class="crm-dashboard-kpi-icon" uk-icon="users" aria-hidden="true"></span>
+                <div class="crm-dashboard-kpi-meta">
+                  <p>Поток клиентов</p>
+                  <span class="crm-dashboard-kpi-delta is-up">+6.2%</span>
+                </div>
+              </div>
+              <p class="crm-dashboard-kpi-value">17</p>
+              <p class="crm-dashboard-kpi-label">Новые субъекты</p>
             </article>
-            <article class="crm-card crm-kpi-card">
-              <div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="shield"></span><span>Очередь комплаенса</span></div>
-              <div class="crm-kpi-value">43</div>
-              <div class="crm-kpi-note">11 карточек требуют приоритета</div>
+
+            <article class="crm-card crm-kpi-card crm-dashboard-kpi-card" data-id="metric-02" data-href="compliance.html?complianceStatus=НА%20ПРОВЕРКЕ">
+              <div class="crm-dashboard-kpi-top">
+                <span class="crm-dashboard-kpi-icon" uk-icon="shield" aria-hidden="true"></span>
+                <div class="crm-dashboard-kpi-meta">
+                  <p>Комплаенс</p>
+                  <span class="crm-dashboard-kpi-delta is-up">+4.1%</span>
+                </div>
+              </div>
+              <p class="crm-dashboard-kpi-value">43</p>
+              <p class="crm-dashboard-kpi-label">Очередь комплаенса</p>
             </article>
-            <article class="crm-card crm-kpi-card">
-              <div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="file-edit"></span><span>Поручения за день</span></div>
-              <div class="crm-kpi-value">24</div>
-              <div class="crm-kpi-note">19 завершены до SLA</div>
+
+            <article class="crm-card crm-kpi-card crm-dashboard-kpi-card" data-id="metric-03" data-href="requests.html?status=Ожидает">
+              <div class="crm-dashboard-kpi-top">
+                <span class="crm-dashboard-kpi-icon" uk-icon="file-edit" aria-hidden="true"></span>
+                <div class="crm-dashboard-kpi-meta">
+                  <p>Поручения</p>
+                  <span class="crm-dashboard-kpi-delta is-up">+8.7%</span>
+                </div>
+              </div>
+              <p class="crm-dashboard-kpi-value">24</p>
+              <p class="crm-dashboard-kpi-label">Новые поручения</p>
             </article>
-            <article class="crm-card crm-kpi-card">
-              <div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="warning"></span><span>Просроченные задачи</span></div>
-              <div class="crm-kpi-value">12</div>
-              <div class="crm-kpi-note">3 задачи старше 48 часов</div>
+
+            <article class="crm-card crm-kpi-card crm-dashboard-kpi-card" data-id="metric-04">
+              <div class="crm-dashboard-kpi-top">
+                <span class="crm-dashboard-kpi-icon" uk-icon="clock" aria-hidden="true"></span>
+                <div class="crm-dashboard-kpi-meta">
+                  <p>SLA-контроль</p>
+                  <span class="crm-dashboard-kpi-delta is-down">-2.4%</span>
+                </div>
+              </div>
+              <p class="crm-dashboard-kpi-value">12</p>
+              <p class="crm-dashboard-kpi-label">Просроченные задачи</p>
             </article>
           </section>
 
-          <section class="crm-dashboard-panel-grid" data-entity="dashboard-panels">
-            <section class="crm-card crm-dashboard-panel">
-              <div class="crm-section-head">
+          <section class="crm-dashboard-work-grid" data-entity="dashboard-panels">
+            <article class="crm-card crm-dashboard-panel">
+              <header class="crm-section-head">
                 <h3>Последние изменения по субъектам</h3>
-              </div>
+              </header>
               <div class="crm-dashboard-table-wrap">
                 <table class="uk-table uk-table-divider uk-table-hover crm-dashboard-table">
                   <thead>
-                  <tr><th>Субъект</th><th>Изменение</th></tr>
+                  <tr><th>Субъект</th><th>Изменения</th></tr>
                   </thead>
                   <tbody>
-                  <tr data-href="subject-card.html">
-                    <td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · Активный клиент · 10:48</div></td>
-                    <td><div class="crm-row-main">Обновлён комплект документов</div><div class="crm-row-sub">Добавлены анкета FATCA и заявление UBO</div></td>
+                  <tr data-href="subject-card.html" data-entity="subject-change" data-id="change-01">
+                    <td>ООО «Альфа Капитал»</td>
+                    <td>Обновлён риск-профиль и добавлен новый контакт комплаенса</td>
                   </tr>
-                  <tr data-href="subject-card.html">
-                    <td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · На комплаенсе · 10:12</div></td>
-                    <td><div class="crm-row-main">Изменён менеджер сопровождения</div><div class="crm-row-sub">Новая зона ответственности: доверительное управление</div></td>
+                  <tr data-href="subject-card.html" data-entity="subject-change" data-id="change-02">
+                    <td>ИП Петров А.А.</td>
+                    <td>Загружен обновлённый пакет документов по идентификации</td>
                   </tr>
-                  <tr data-href="subject-card.html">
-                    <td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412 · Регистрация · 09:54</div></td>
-                    <td><div class="crm-row-main">Обновлён статус резидентства</div><div class="crm-row-sub">Подтверждены паспортные данные и страна налогового учёта</div></td>
+                  <tr data-href="subject-card.html" data-entity="subject-change" data-id="change-03">
+                    <td>АО «Северный Портфель»</td>
+                    <td>Изменён статус проверки бенефициаров на «На проверке»</td>
                   </tr>
-                  <tr data-href="subject-card.html">
-                    <td><div class="crm-row-main">ООО «Север Логистик Капитал»</div><div class="crm-row-sub">CL-4397 · Данные заполнены · 09:17</div></td>
-                    <td><div class="crm-row-main">Загружен комплект по доверенному лицу</div><div class="crm-row-sub">Проверка подписи назначена на 15:00</div></td>
+                  <tr data-href="subject-card.html" data-entity="subject-change" data-id="change-04">
+                    <td>ООО «Бета Трейд»</td>
+                    <td>В карточке субъекта добавлен новый банковский счёт</td>
                   </tr>
                   </tbody>
                 </table>
               </div>
-            </section>
+            </article>
 
-            <section class="crm-card crm-dashboard-panel">
-              <div class="crm-section-head">
+            <article class="crm-card crm-dashboard-panel">
+              <header class="crm-section-head">
                 <h3>Последние поручения</h3>
                 <div class="crm-list-actions"><a class="crm-link-action" href="requests.html" data-href="requests.html" data-action="open-requests">Все поручения</a></div>
-              </div>
+              </header>
               <div class="crm-dashboard-table-wrap">
                 <table class="uk-table uk-table-divider uk-table-hover crm-dashboard-table">
                   <thead>
                   <tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr>
                   </thead>
                   <tbody>
-                  <tr data-href="requests.html">
-                    <td><div class="crm-row-main">P-24108</div><div class="crm-row-sub">Вывод ДС · CL-4401</div></td>
+                  <tr data-href="requests.html" data-id="request-24108">
+                    <td>P-24108</td>
                     <td><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></td>
-                    <td><div class="crm-row-main">24.04.2026</div><div class="crm-row-sub">11:26</div></td>
+                    <td>24.04.2026</td>
                   </tr>
-                  <tr data-href="requests.html">
-                    <td><div class="crm-row-main">P-24103</div><div class="crm-row-sub">Перевод ЦБ · CL-4412</div></td>
+                  <tr data-href="requests.html" data-id="request-24103">
+                    <td>P-24103</td>
                     <td><span class="crm-badge info" data-status="request-accepted">Принято</span></td>
-                    <td><div class="crm-row-main">23.04.2026</div><div class="crm-row-sub">17:03</div></td>
+                    <td>23.04.2026</td>
                   </tr>
-                  <tr data-href="requests.html">
-                    <td><div class="crm-row-main">P-24099</div><div class="crm-row-sub">Вывод ДС · CL-4408</div></td>
+                  <tr data-href="requests.html" data-id="request-24099">
+                    <td>P-24099</td>
                     <td><span class="crm-badge danger" data-status="request-rejected">Отклонено</span></td>
-                    <td><div class="crm-row-main">22.04.2026</div><div class="crm-row-sub">13:48</div></td>
+                    <td>22.04.2026</td>
                   </tr>
-                  <tr data-href="requests.html">
-                    <td><div class="crm-row-main">P-24094</div><div class="crm-row-sub">Перевод ДС · CL-4397</div></td>
+                  <tr data-href="requests.html" data-id="request-24094">
+                    <td>P-24094</td>
                     <td><span class="crm-badge info" data-status="request-accepted">Принято</span></td>
-                    <td><div class="crm-row-main">21.04.2026</div><div class="crm-row-sub">09:42</div></td>
+                    <td>21.04.2026</td>
                   </tr>
                   </tbody>
                 </table>
               </div>
-            </section>
+            </article>
           </section>
-        </div>
+        </section>
       </section>
     </main>
   </div>
