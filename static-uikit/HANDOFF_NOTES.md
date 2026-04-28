@@ -79,3 +79,7 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - Sticky/footer action containers must keep explicit button `type`; non-submit actions (export/download/view/open/print/resend/restore) must use `type="button"`.
 - Keep `crm-static.js` global-only; no runtime rendering/data hydration. Selectable controls are server-rendered with consistent `checked` + `.is-selected`/`.is-active`.
 - See `CARD_DETAIL_PAGE_AUDIT.md` for per-page mapping and follow-up notes.
+
+
+## Final readiness audit
+- `static-uikit/HANDOFF_READINESS_AUDIT.md` фиксирует итоговый handoff readiness snapshot по standalone pages, UMI P0/P1 и обязательным командам проверки.

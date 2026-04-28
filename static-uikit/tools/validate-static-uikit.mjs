@@ -8,6 +8,7 @@ const launcherFile = path.join(rootDir, 'index.html');
 const partialsDir = path.join(rootDir, 'partials');
 const handoffManifestFile = path.join(rootDir, 'HANDOFF_MANIFEST.json');
 const handoffNotesFile = path.join(rootDir, 'HANDOFF_NOTES.md');
+const handoffReadinessAuditFile = path.join(rootDir, 'HANDOFF_READINESS_AUDIT.md');
 const requiredHandoffChecks = [
   'node static-uikit/tools/validate-static-uikit.mjs',
   'npm run build'
@@ -26,6 +27,18 @@ const requiredHandoffNotesSnippets = [
   '.is-active'
 ];
 
+
+const requiredReadinessAuditSnippets = [
+  'standalone',
+  'UMI',
+  'umi-p0',
+  'umi-p1',
+  'validate-static-uikit',
+  'npm run build',
+  'server-rendered/static-template-first',
+  'global-only',
+  'crm-static.js'
+];
 const packs = [
   {
     name: 'umi-p0',
@@ -673,6 +686,21 @@ function validateHandoffManifest() {
   }
 }
 
+function validateHandoffReadinessAudit() {
+  if (!fs.existsSync(handoffReadinessAuditFile)) {
+    addError(handoffReadinessAuditFile, 'HANDOFF_READINESS_AUDIT.md is missing');
+    return;
+  }
+
+  const content = fs.readFileSync(handoffReadinessAuditFile, 'utf8').toLowerCase();
+  for (const snippet of requiredReadinessAuditSnippets) {
+    if (!content.includes(snippet.toLowerCase())) {
+      addError(handoffReadinessAuditFile, 'readiness audit missing required snippet', snippet);
+    }
+  }
+}
+
+
 function validateHandoffNotes() {
   if (!fs.existsSync(handoffNotesFile)) {
     addError(handoffNotesFile, 'HANDOFF_NOTES.md is missing');
@@ -687,6 +715,7 @@ function validateHandoffNotes() {
 
 validateHandoffManifest();
 validateHandoffNotes();
+validateHandoffReadinessAudit();
 validateUmiPageScriptNotes();
 
 const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
