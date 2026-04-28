@@ -47,3 +47,7 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - Treat `umi-p0/` and `umi-p1/` as extraction packs, not runtime.
 - Replace placeholders like `{{ ... }}` with project-specific UMI.CMS template syntax.
 - Keep assets local.
+- `assets/js/crm-static.js` должен оставаться global-only (layout/navigation/forms/tabs behavior).
+- `assets/js/pages/subject-card.js` — page-only behavior для `subject-card` и подключается только там, где реально нужен.
+- Subject-card данные (профиль/адреса/представители) остаются server-rendered/static-template-first: JS их не генерирует.
+

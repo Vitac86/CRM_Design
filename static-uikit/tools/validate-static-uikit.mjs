@@ -556,13 +556,57 @@ function validateSubjectCardNoNestedCards() {
   }
 }
 
+function findScriptIndex(content, scriptPath) {
+  const escaped = scriptPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`<script[^>]*\\bsrc="${escaped}"[^>]*>\\s*</script>`, 'gi');
+  const match = regex.exec(content);
+  return match ? match.index : -1;
+}
+
+function extractBalancedTagByAttribute(content, tagName, attrName, attrValue) {
+  const escapedAttrValue = attrValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const openTagRegex = new RegExp(`<${tagName}\\b[^>]*\\b${attrName}="${escapedAttrValue}"[^>]*>`, 'i');
+  const openMatch = openTagRegex.exec(content);
+  if (!openMatch) return null;
+
+  const voidElements = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+  const tagRegex = /<\/?([a-zA-Z][\w:-]*)\b[^>]*>/g;
+  tagRegex.lastIndex = openMatch.index;
+  const stack = [];
+
+  for (const match of content.slice(openMatch.index).matchAll(tagRegex)) {
+    const tag = match[0];
+    const currentTag = match[1].toLowerCase();
+    const isClose = /^<\//.test(tag);
+    const isSelfClosing = /\/>$/.test(tag) || voidElements.has(currentTag);
+
+    if (isClose) {
+      if (stack.length && stack[stack.length - 1] === currentTag) {
+        stack.pop();
+        if (!stack.length) {
+          const end = openMatch.index + match.index + tag.length;
+          return content.slice(openMatch.index, end);
+        }
+      }
+      continue;
+    }
+
+    if (!isSelfClosing) {
+      stack.push(currentTag);
+    }
+  }
+
+  return null;
+}
+
 function validateSubjectCardStaticRendering() {
   const standalone = path.join(rootDir, 'pages', 'subject-card.html');
   const umiP0 = path.join(rootDir, 'umi-p0', 'pages', 'subject-card.html');
   const scriptFile = path.join(rootDir, 'assets', 'js', 'crm-static.js');
+  const subjectCardScriptFile = path.join(rootDir, 'assets', 'js', 'pages', 'subject-card.js');
 
   const forbiddenPatterns = [/window\.subjectCardData/, /renderSubjectCardProfile\s*\(/, /createProfileRow\s*\(/, /createAddressCard\s*\(/];
-  for (const file of [standalone, umiP0, scriptFile]) {
+  for (const file of [standalone, umiP0, scriptFile, subjectCardScriptFile]) {
     if (!fs.existsSync(file)) continue;
     const content = fs.readFileSync(file, 'utf8');
     for (const pattern of forbiddenPatterns) {
@@ -570,24 +614,70 @@ function validateSubjectCardStaticRendering() {
     }
   }
 
+  if (fs.existsSync(scriptFile)) {
+    const content = fs.readFileSync(scriptFile, 'utf8');
+    const forbiddenTokens = [
+      'representative-modal',
+      'toggle-representative-expiry',
+      'representative-expiry',
+      'toggle-addresses',
+      'addresses-extra',
+      'addresses-section',
+      'open-representative-modal',
+      'close-representative-modal',
+      'save-representative'
+    ];
+    forbiddenTokens.forEach((token) => {
+      if (content.includes(token)) addError(scriptFile, 'crm-static.js must stay page-agnostic and must not include subject-card-specific token', token);
+    });
+  }
+
+  if (fs.existsSync(subjectCardScriptFile)) {
+    const content = fs.readFileSync(subjectCardScriptFile, 'utf8');
+    const pageGuardPattern = /(body\.getAttribute\(['"]data-page['"]\)\s*===\s*['"]subject-card['"]|\.crm-page\[data-page=['"]subject-card['"]\])/;
+    if (!pageGuardPattern.test(content)) addError(subjectCardScriptFile, 'subject-card.js must guard execution by subject-card page detection');
+    const forbiddenRenderingPatterns = [/createElement\(/, /innerHTML\s*=\s*/, /insertAdjacentHTML\s*\(/];
+    forbiddenRenderingPatterns.forEach((pattern) => {
+      if (pattern.test(content)) addError(subjectCardScriptFile, 'subject-card.js must be behavior-only and must not render subject-card content', pattern.toString());
+    });
+  }
+
   if (!fs.existsSync(standalone)) return;
   const content = fs.readFileSync(standalone, 'utf8');
 
-  const mainGridMatch = content.match(/<div[^>]*data-role="main-data-grid"[^>]*>([\s\S]*?)<\/div>/i);
-  if (!mainGridMatch || !/crm-profile-row/.test(mainGridMatch[1])) {
-    addError(standalone, 'subject-card main-data-grid must contain at least one .crm-profile-row');
+  const crmStaticIndex = findScriptIndex(content, '../assets/js/crm-static.js');
+  if (crmStaticIndex < 0) addError(standalone, 'subject-card must include ../assets/js/crm-static.js');
+
+  const subjectCardScriptIndex = findScriptIndex(content, '../assets/js/pages/subject-card.js');
+  if (subjectCardScriptIndex < 0) addError(standalone, 'subject-card must include ../assets/js/pages/subject-card.js');
+  if (crmStaticIndex >= 0 && subjectCardScriptIndex >= 0 && subjectCardScriptIndex < crmStaticIndex) {
+    addError(standalone, 'subject-card.js must be loaded after crm-static.js');
   }
 
-  const registrationMatch = content.match(/<div[^>]*data-role="address-registration"[^>]*>([\s\S]*?)<\/div>/i);
-  if (registrationMatch && !/crm-address-(row|card)|crm-address-fields/.test(registrationMatch[1])) {
-    addError(standalone, 'subject-card address-registration must contain rendered address markup when present');
+  const mainDataGridBlock = extractBalancedTagByAttribute(content, 'div', 'data-role', 'main-data-grid');
+  if (!mainDataGridBlock || !/class="[^"]*\bcrm-profile-row\b/i.test(mainDataGridBlock)) {
+    addError(standalone, 'data-role="main-data-grid" must contain at least one .crm-profile-row');
   }
 
-  const repsMatch = content.match(/<tbody[^>]*data-role="representatives-table-body"[^>]*>([\s\S]*?)<\/tbody>/i);
-  if (!repsMatch || !(repsMatch[1].match(/<tr\b/gi) || []).length) {
-    addError(standalone, 'subject-card representatives tbody must contain at least one row');
+  const addressRegistrationBlock = extractBalancedTagByAttribute(content, 'div', 'data-role', 'address-registration');
+  if (!addressRegistrationBlock || !/class="[^"]*\bcrm-address-(?:row|card)\b/i.test(addressRegistrationBlock)) {
+    addError(standalone, 'data-role="address-registration" must contain .crm-address-row or .crm-address-card');
+  }
+
+  const addressesExtraBlock = extractBalancedTagByAttribute(content, 'div', 'data-role', 'addresses-extra');
+  if (!addressesExtraBlock) {
+    addError(standalone, 'subject-card must include data-role="addresses-extra" block');
+  } else {
+    const rows = addressesExtraBlock.match(/class="[^"]*\bcrm-address-row\b/gi) || [];
+    if (rows.length < 2) addError(standalone, 'data-role="addresses-extra" must contain at least two .crm-address-row blocks');
+  }
+
+  const repsBlock = extractBalancedTagByAttribute(content, 'tbody', 'data-role', 'representatives-table-body');
+  if (!repsBlock || !(repsBlock.match(/<tr\b/gi) || []).length) {
+    addError(standalone, 'tbody[data-role="representatives-table-body"] must contain at least one <tr>');
   }
 }
+
 
 function validatePartials() {
   const partialFiles = fs.existsSync(partialsDir) ? fs.readdirSync(partialsDir).filter((f) => f.endsWith('.html')).map((f) => path.join(partialsDir, f)) : [];
@@ -714,6 +804,11 @@ for (const page of pageFiles) {
   if (bodyPageMatch && sectionPageMatch && bodyPageMatch[1].trim() !== sectionPageMatch[1].trim()) {
     addError(file, 'body[data-page] must match section.crm-page[data-page]', `${bodyPageMatch[1]} !== ${sectionPageMatch[1]}`);
   }
+
+  const requiresSubjectCardScript = page === 'subject-card.html';
+  const hasSubjectCardScript = /\bsrc="\.\.\/assets\/js\/pages\/subject-card\.js"/i.test(content);
+  if (requiresSubjectCardScript && !hasSubjectCardScript) addError(file, 'subject-card page must include ../assets/js/pages/subject-card.js');
+  if (!requiresSubjectCardScript && hasSubjectCardScript) addError(file, 'non-subject-card standalone page must not include subject-card page script');
 
   for (const requiredAssetRef of requiredStandaloneAssetRefs) {
     const escaped = requiredAssetRef.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

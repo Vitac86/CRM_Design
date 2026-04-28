@@ -75,7 +75,8 @@
 3. Demo-данные замените на UMI variables/macros.
 4. Подключайте `assets` локально (без внешних CDN/API).
 5. `pages/subject-card.html` теперь server-rendered/static-template-first: профиль, адреса и представители заданы в HTML и не заполняются через demo JSON в runtime.
-6. `assets/js/crm-static.js` используется только для UI-поведения (tabs/sidebar/modals/toggles), без data-rendering предметных карточек.
+6. `assets/js/crm-static.js` используется только для глобального/переиспользуемого UI-поведения (tabs/sidebar/nav/filters/data-href), без subject-card-specific логики и без data-rendering.
+7. `assets/js/pages/subject-card.js` подключается только на странице карточки субъекта и содержит только page-specific поведение (модалка представителя, toggle адресов, срок действия), без генерации данных из JS.
 
 
 ## Ограничения
