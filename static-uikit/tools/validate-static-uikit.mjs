@@ -511,7 +511,7 @@ for (const file of allFiles) {
 
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
-  const hexPattern = /#[0-9a-fA-F]{3,8}\b/g;
+  const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
 
   for (const file of cssFiles) {
     const content = fs.readFileSync(file, 'utf8');
@@ -526,21 +526,33 @@ function validateSubjectCardNoNestedCards() {
   const file = path.join(pagesDir, 'subject-card.html');
   if (!fs.existsSync(file)) return;
   const content = fs.readFileSync(file, 'utf8');
-  const tagRegex = /<\/?div\b[^>]*>/gi;
+  const tagRegex = /<\/?([a-zA-Z][\w:-]*)\b[^>]*>/g;
+  const voidElements = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
   const stack = [];
   for (const match of content.matchAll(tagRegex)) {
     const tag = match[0];
+    const tagName = match[1].toLowerCase();
     const isClose = /^<\//.test(tag);
+    const isSelfClosing = /\/>$/.test(tag) || voidElements.has(tagName);
+
     if (isClose) {
-      stack.pop();
+      for (let i = stack.length - 1; i >= 0; i -= 1) {
+        if (stack[i].tagName === tagName) {
+          stack.length = i;
+          break;
+        }
+      }
       continue;
     }
+
     const isCard = /\bclass="[^"]*\bcrm-card\b[^"]*"/i.test(tag);
-    if (isCard && stack.includes('crm-card')) {
-      addError(file, 'subject-card must not contain nested .crm-card inside .crm-card', tag);
+    // Scan every element type (not only <div>) because subject-card uses .crm-card on semantic tags like <article>.
+    if (isCard && stack.some((entry) => entry.isCard)) {
+      addError(file, 'subject-card must not contain nested .crm-card inside .crm-card', `<${tagName}> ${tag.trim()}`);
       break;
     }
-    stack.push(isCard ? 'crm-card' : 'div');
+
+    if (!isSelfClosing) stack.push({ tagName, isCard });
   }
 }
 function validatePartials() {
