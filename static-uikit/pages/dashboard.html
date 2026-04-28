@@ -57,9 +57,9 @@
       </header>
       <section class="crm-page" data-page="dashboard">
         <div class="crm-dashboard-shell">
-          <div class="crm-page-header crm-dashboard-header"><h1 data-entity="page-title">Операционный обзор</h1></div>
+          <header class="crm-page-header crm-dashboard-header"><h1 data-entity="page-title">Операционный обзор</h1></header>
 
-          <section class="crm-kpi-grid crm-dashboard-kpi-grid" data-entity="dashboard-kpi">
+          <section class="crm-dashboard-kpis" data-entity="dashboard-kpi">
             <article class="crm-card crm-kpi-card">
               <div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="users"></span><span>Новые субъекты</span></div>
               <div class="crm-kpi-value">17</div>
@@ -82,72 +82,72 @@
             </article>
           </section>
 
-          <section class="crm-grid-2 crm-dashboard-grid crm-dashboard-panels" data-entity="dashboard-panels">
-            <section class="crm-card crm-dashboard-panel crm-table crm-table-wrapper crm-table-compact">
+          <section class="crm-dashboard-panel-grid" data-entity="dashboard-panels">
+            <section class="crm-card crm-dashboard-panel">
               <div class="crm-section-head">
                 <h3>Последние изменения по субъектам</h3>
               </div>
-              <table class="uk-table uk-table-divider uk-table-hover crm-dashboard-table">
-                <thead>
-                <tr><th>Субъект</th><th>Изменение</th><th>Время</th></tr>
-                </thead>
-                <tbody>
-                <tr data-href="subject-card.html">
-                  <td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · Активный клиент</div></td>
-                  <td><div class="crm-row-main">Обновлён комплект документов</div><div class="crm-row-sub">Добавлены анкета FATCA и заявление UBO</div></td>
-                  <td><div class="crm-row-main">10:48</div><div class="crm-row-sub">сегодня</div></td>
-                </tr>
-                <tr data-href="subject-card.html">
-                  <td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · На комплаенсе</div></td>
-                  <td><div class="crm-row-main">Изменён менеджер сопровождения</div><div class="crm-row-sub">Новая зона ответственности: доверительное управление</div></td>
-                  <td><div class="crm-row-main">10:12</div><div class="crm-row-sub">сегодня</div></td>
-                </tr>
-                <tr data-href="subject-card.html">
-                  <td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412 · Регистрация</div></td>
-                  <td><div class="crm-row-main">Обновлён статус резидентства</div><div class="crm-row-sub">Подтверждены паспортные данные и страна налогового учёта</div></td>
-                  <td><div class="crm-row-main">09:54</div><div class="crm-row-sub">сегодня</div></td>
-                </tr>
-                <tr data-href="subject-card.html">
-                  <td><div class="crm-row-main">ООО «Север Логистик Капитал»</div><div class="crm-row-sub">CL-4397 · Данные заполнены</div></td>
-                  <td><div class="crm-row-main">Загружен комплект по доверенному лицу</div><div class="crm-row-sub">Проверка подписи назначена на 15:00</div></td>
-                  <td><div class="crm-row-main">09:17</div><div class="crm-row-sub">сегодня</div></td>
-                </tr>
-                </tbody>
-              </table>
+              <div class="crm-dashboard-table-wrap">
+                <table class="uk-table uk-table-divider uk-table-hover crm-dashboard-table">
+                  <thead>
+                  <tr><th>Субъект</th><th>Изменение</th></tr>
+                  </thead>
+                  <tbody>
+                  <tr data-href="subject-card.html">
+                    <td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · Активный клиент · 10:48</div></td>
+                    <td><div class="crm-row-main">Обновлён комплект документов</div><div class="crm-row-sub">Добавлены анкета FATCA и заявление UBO</div></td>
+                  </tr>
+                  <tr data-href="subject-card.html">
+                    <td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · На комплаенсе · 10:12</div></td>
+                    <td><div class="crm-row-main">Изменён менеджер сопровождения</div><div class="crm-row-sub">Новая зона ответственности: доверительное управление</div></td>
+                  </tr>
+                  <tr data-href="subject-card.html">
+                    <td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412 · Регистрация · 09:54</div></td>
+                    <td><div class="crm-row-main">Обновлён статус резидентства</div><div class="crm-row-sub">Подтверждены паспортные данные и страна налогового учёта</div></td>
+                  </tr>
+                  <tr data-href="subject-card.html">
+                    <td><div class="crm-row-main">ООО «Север Логистик Капитал»</div><div class="crm-row-sub">CL-4397 · Данные заполнены · 09:17</div></td>
+                    <td><div class="crm-row-main">Загружен комплект по доверенному лицу</div><div class="crm-row-sub">Проверка подписи назначена на 15:00</div></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
             </section>
 
-            <section class="crm-card crm-dashboard-panel crm-table crm-table-wrapper crm-table-compact">
+            <section class="crm-card crm-dashboard-panel">
               <div class="crm-section-head">
                 <h3>Последние поручения</h3>
                 <div class="crm-list-actions"><a class="crm-link-action" href="requests.html" data-href="requests.html" data-action="open-requests">Все поручения</a></div>
               </div>
-              <table class="uk-table uk-table-divider uk-table-hover crm-dashboard-table">
-                <thead>
-                <tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr>
-                </thead>
-                <tbody>
-                <tr data-href="requests.html">
-                  <td><div class="crm-row-main">P-24108</div><div class="crm-row-sub">Вывод ДС · CL-4401</div></td>
-                  <td><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></td>
-                  <td><div class="crm-row-main">24.04.2026</div><div class="crm-row-sub">11:26</div></td>
-                </tr>
-                <tr data-href="requests.html">
-                  <td><div class="crm-row-main">P-24103</div><div class="crm-row-sub">Перевод ЦБ · CL-4412</div></td>
-                  <td><span class="crm-badge info" data-status="request-accepted">Принято</span></td>
-                  <td><div class="crm-row-main">23.04.2026</div><div class="crm-row-sub">17:03</div></td>
-                </tr>
-                <tr data-href="requests.html">
-                  <td><div class="crm-row-main">P-24099</div><div class="crm-row-sub">Вывод ДС · CL-4408</div></td>
-                  <td><span class="crm-badge danger" data-status="request-rejected">Отклонено</span></td>
-                  <td><div class="crm-row-main">22.04.2026</div><div class="crm-row-sub">13:48</div></td>
-                </tr>
-                <tr data-href="requests.html">
-                  <td><div class="crm-row-main">P-24094</div><div class="crm-row-sub">Перевод ДС · CL-4397</div></td>
-                  <td><span class="crm-badge info" data-status="request-accepted">Принято</span></td>
-                  <td><div class="crm-row-main">21.04.2026</div><div class="crm-row-sub">09:42</div></td>
-                </tr>
-                </tbody>
-              </table>
+              <div class="crm-dashboard-table-wrap">
+                <table class="uk-table uk-table-divider uk-table-hover crm-dashboard-table">
+                  <thead>
+                  <tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr>
+                  </thead>
+                  <tbody>
+                  <tr data-href="requests.html">
+                    <td><div class="crm-row-main">P-24108</div><div class="crm-row-sub">Вывод ДС · CL-4401</div></td>
+                    <td><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></td>
+                    <td><div class="crm-row-main">24.04.2026</div><div class="crm-row-sub">11:26</div></td>
+                  </tr>
+                  <tr data-href="requests.html">
+                    <td><div class="crm-row-main">P-24103</div><div class="crm-row-sub">Перевод ЦБ · CL-4412</div></td>
+                    <td><span class="crm-badge info" data-status="request-accepted">Принято</span></td>
+                    <td><div class="crm-row-main">23.04.2026</div><div class="crm-row-sub">17:03</div></td>
+                  </tr>
+                  <tr data-href="requests.html">
+                    <td><div class="crm-row-main">P-24099</div><div class="crm-row-sub">Вывод ДС · CL-4408</div></td>
+                    <td><span class="crm-badge danger" data-status="request-rejected">Отклонено</span></td>
+                    <td><div class="crm-row-main">22.04.2026</div><div class="crm-row-sub">13:48</div></td>
+                  </tr>
+                  <tr data-href="requests.html">
+                    <td><div class="crm-row-main">P-24094</div><div class="crm-row-sub">Перевод ДС · CL-4397</div></td>
+                    <td><span class="crm-badge info" data-status="request-accepted">Принято</span></td>
+                    <td><div class="crm-row-main">21.04.2026</div><div class="crm-row-sub">09:42</div></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
             </section>
           </section>
         </div>
