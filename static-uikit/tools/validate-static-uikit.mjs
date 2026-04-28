@@ -132,6 +132,7 @@ const registryPages = new Set([
   'subjects.html', 'brokerage.html', 'trust-management.html', 'agents.html', 'requests.html', 'compliance.html',
   'middle-office-clients.html', 'middle-office-reports.html', 'depository.html', 'back-office.html', 'trading.html', 'archive.html'
 ]);
+const registryAuditFile = path.join(rootDir, 'REGISTRY_PAGE_AUDIT.md');
 const registryEmptyStateAllowlist = new Map();
 
 const errors = [];
@@ -312,17 +313,55 @@ function validateRegistryFilterPanelStructure(file, content) {
 function validateRegistryTableAndEmptyState(file, content) {
   const isStandaloneRegistry = file.includes('/static-uikit/pages/') && registryPages.has(path.basename(file));
   if (!isStandaloneRegistry) return;
-  const hasWrapper = /\bcrm-table-wrapper\b/.test(content);
-  const hasWrapperAndTableSameNode = /class="[^"]*\bcrm-table-wrapper\b[^"]*\bcrm-table\b[^"]*"/.test(content);
-  if (hasWrapper && !hasWrapperAndTableSameNode && !/\bcrm-table-wrapper\b[\s\S]*\bcrm-table\b/.test(content)) addError(file, '.crm-table-wrapper should contain .crm-table');
-  const hasCrmTable = /\bcrm-table\b/.test(content);
-  if (hasCrmTable && !/\bcrm-table\b[\s\S]*<table\b[^>]*class="[^"]*\buk-table\b/i.test(content)) addError(file, '.crm-table should contain table.uk-table');
+  if (!/<div[^>]*class="[^"]*\bcrm-registry-table\b[^"]*"[^>]*>[\s\S]*?<div[^>]*class="[^"]*\bcrm-table-wrapper\b[^"]*"[^>]*>[\s\S]*?<div[^>]*class="[^"]*\bcrm-table\b[^"]*"[^>]*>[\s\S]*?<table\b[^>]*class="[^"]*\buk-table\b/i.test(content)) {
+    addError(file, 'registry table must follow nesting: .crm-registry-table > .crm-table-wrapper > .crm-table > table.uk-table');
+  }
   for (const tm of content.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)) {
     const inner = tm[1];
     if (!/<thead\b/i.test(inner) || !/<tbody\b/i.test(inner)) addError(file, 'table.uk-table must include both thead and tbody');
   }
+  for (const tableMatch of content.matchAll(/<(table|thead|tbody|tr)\b[^>]*>[\s\S]*?<\/\1>/gi)) {
+    if (/\bcrm-empty-state\b/i.test(tableMatch[0])) {
+      addError(file, '.crm-empty-state must be outside table/thead/tbody/tr markup');
+      break;
+    }
+  }
   if (isStandaloneRegistry && !registryEmptyStateAllowlist.has(path.basename(file))) {
     if (!/<[^>]*class="[^"]*\bcrm-empty-state\b[^"]*"[^>]*\bdata-entity="empty-state"/i.test(content)) addError(file, 'registry page must include at least one .crm-empty-state[data-entity=\"empty-state\"]');
+  }
+}
+
+function validateRegistryAuditConsistency() {
+  if (!fs.existsSync(registryAuditFile)) {
+    addError(registryAuditFile, 'REGISTRY_PAGE_AUDIT.md is missing');
+    return;
+  }
+  const auditContent = fs.readFileSync(registryAuditFile, 'utf8');
+  const auditMap = new Map();
+  for (const rawLine of auditContent.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line.startsWith('|') || !line.endsWith('|') || /\|\s*---/.test(line)) continue;
+    const cols = line.split('|').slice(1, -1).map((c) => c.trim());
+    if (cols[0] === 'Page' || cols.length < 7) continue;
+    auditMap.set(cols[0], { emptyState: cols[3].toLowerCase(), dataHref: cols[4].toLowerCase() });
+  }
+  for (const page of registryPages) {
+    if (!auditMap.has(page)) addError(registryAuditFile, `registry audit table must include ${page}`);
+  }
+  for (const [page, flags] of auditMap.entries()) {
+    if (!registryPages.has(page)) continue;
+    const file = path.join(pagesDir, page);
+    if (!fs.existsSync(file)) {
+      addError(registryAuditFile, `audit lists missing page: ${page}`);
+      continue;
+    }
+    const content = fs.readFileSync(file, 'utf8');
+    if (flags.emptyState === 'yes' && !/<[^>]*class="[^"]*\bcrm-empty-state\b[^"]*"[^>]*\bdata-entity="empty-state"/i.test(content)) {
+      addError(file, 'REGISTRY_PAGE_AUDIT marks Empty state = yes, but page has no .crm-empty-state[data-entity="empty-state"]');
+    }
+    if (flags.dataHref === 'yes' && !/\bdata-href="[^"]+"/i.test(content)) {
+      addError(file, 'REGISTRY_PAGE_AUDIT marks data-href rows = yes, but page has no data-href rows/elements');
+    }
   }
 }
 
@@ -1048,6 +1087,7 @@ function validateStaticUikitLauncher() {
 
 validatePartials();
 validateStaticUikitLauncher();
+validateRegistryAuditConsistency();
 validateStandalonePageScriptRegistry(pageFiles);
 validatePageScriptsAndGlobalPurity();
 validateNoRawHexInPageCss();
