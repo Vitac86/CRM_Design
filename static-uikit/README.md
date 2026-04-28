@@ -158,5 +158,7 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 ## Registry/list-page pattern (standalone + UMI)
 - Registry pages are `server-rendered/static-template-first`: filters, table rows, badges/statuses, and empty states are rendered in HTML templates, not by runtime JS.
 - Standard structure: `crm-page-header` + `data-entity="page-title"`, `form.crm-registry-filters.crm-filter-panel` (`data-form`, `data-action`, one `crm-filter-search-row`, one `crm-filter-fields-row`), `crm-table-wrapper > crm-table > table.uk-table`, and `.crm-empty-state[data-entity="empty-state"]`.
+- Registry table shell is overflow-safe by contract: keep horizontal overflow handling on `.crm-table-wrapper`; table width/min-width must not create page-level horizontal scrolling outside wrapper.
+- `.crm-empty-state[data-entity="empty-state"]` lives inside registry card/shell but outside `<table>/<thead>/<tbody>/<tr>` markup and is hidden in demo mode via native `hidden` (unless an explicit demo-visible exception is documented).
 - Reset in filter forms uses `type="button"` + `data-action="reset-filters"`.
-- `crm-static.js` remains global-only reusable behavior (row `data-href`, generic form/reset helpers, prevention helpers), while registry-specific rendering/logic is not allowed.
+- `crm-static.js` remains global-only reusable behavior (row `data-href`, generic form/reset helpers, prevention helpers), while registry-specific rendering/logic is not allowed; UMI renders registry rows server-side.
