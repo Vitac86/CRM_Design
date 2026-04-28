@@ -33,3 +33,11 @@
 - [ ] Run `npm run build`
 - [ ] Check no external network dependencies
 - [ ] Check standalone pages still open
+
+
+## Static extraction contract
+- [ ] Confirm runtime=false/buildStep=false (extraction only).
+- [ ] Confirm templates are server-rendered/static-template-first (no JS data rendering).
+- [ ] Confirm only local assets are used.
+- [ ] Confirm page-specific scripts are included only on matching templates (subject-card only when needed).
+- [ ] Confirm selectable controls render checked + .is-active/.is-selected consistently server-side.

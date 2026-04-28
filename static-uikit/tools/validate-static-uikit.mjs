@@ -17,7 +17,13 @@ const requiredHandoffNotesSnippets = [
   'UMI P0 extraction pack',
   'UMI P1 extraction pack',
   'node static-uikit/tools/validate-static-uikit.mjs',
-  'npm run build'
+  'npm run build',
+  'extraction packs',
+  'server-rendered/static-template-first',
+  'global-only',
+  'checked',
+  '.is-selected',
+  '.is-active'
 ];
 
 const packs = [
@@ -424,6 +430,34 @@ function validatePageScriptsAndGlobalPurity() {
 }
 
 
+
+function validateUmiPageScriptNotes() {
+  for (const pack of packs) {
+    const pagesPath = path.join(pack.dir, 'pages');
+    if (!fs.existsSync(pagesPath)) continue;
+    const packPages = fs.readdirSync(pagesPath).filter((f) => f.endsWith('.html'));
+    for (const page of packPages) {
+      const scripts = standalonePageScriptRegistry[page];
+      if (!scripts || !scripts.length) continue;
+      const file = path.join(pagesPath, page);
+      const content = fs.readFileSync(file, 'utf8');
+      const mentionsScript = scripts.some((scriptPath) => content.includes(scriptPath) || content.includes(path.basename(scriptPath)));
+      const hasUmiNote = /UMI NOTE:[^\n]*(page script|include[^\n]*assets\/js\/pages)/i.test(content);
+      if (!mentionsScript && !hasUmiNote) {
+        addError(file, 'UMI template with standalone page-script owner must include script path or UMI NOTE about include requirement', scripts.join(', '));
+      }
+    }
+  }
+}
+
+function validateUmiRuntimeDataContract(file, content) {
+  if (!/\/umi-p[01]\//.test(file.replaceAll('\\', '/'))) return;
+  const forbiddenDataPattern = /window\.[a-z0-9_]*data/i;
+  const forbiddenRendererPattern = /(render[A-Z][a-zA-Z0-9]*|create[A-Z][a-zA-Z0-9]*(?:Row|Card|Profile))\s*\(/;
+  if (forbiddenDataPattern.test(content)) addError(file, 'UMI pack templates/scripts must not contain window.*Data runtime models');
+  if (forbiddenRendererPattern.test(content)) addError(file, 'UMI pack templates/scripts must not include runtime render/create helpers');
+}
+
 function validateHandoffManifest() {
   const handoffManifest = parseJsonFile(handoffManifestFile, 'HANDOFF_MANIFEST.json');
   if (!handoffManifest || typeof handoffManifest !== 'object') return;
@@ -528,6 +562,7 @@ function validateHandoffNotes() {
 
 validateHandoffManifest();
 validateHandoffNotes();
+validateUmiPageScriptNotes();
 
 const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
 const pageFilesSet = new Set(pageFiles);
@@ -570,6 +605,8 @@ for (const file of allFiles) {
     if (forbiddenExternalPattern.test(line)) addError(file, `forbidden external/CDN/analytics pattern on line ${idx + 1}`, line.trim());
     if (forbiddenApiPattern.test(line)) addError(file, `forbidden API pattern on line ${idx + 1}`, line.trim());
   });
+
+  validateUmiRuntimeDataContract(file, content);
 
   if (file.endsWith('.html')) {
     const dataHrefMatches = content.matchAll(/\bdata-href="([^"]+)"/g);
