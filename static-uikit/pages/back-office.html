@@ -57,22 +57,18 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page" data-page="back-office">
-        <div class="crm-page-header"><h1 data-entity="page-title">Бэк-офис</h1></div>
-        <form action="#" method="post" data-form="back-office-filters" data-action="filter-back-office" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="back-office">
-          <div class="uk-width-1-1 uk-width-1-4@m"><input class="uk-input crm-input" name="search" placeholder="Поиск по файлу/клиенту"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><input class="uk-input crm-input" name="client-code" placeholder="Код клиента"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><input type="date" class="uk-input crm-input" name="date" value="2026-04-24"/></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="report-type"><option>Вид отчёта</option><option>Операционный</option><option>Финансовый</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="delivery-channel"><option>Канал отправки</option><option>ЭДО</option><option>SFTP</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="delivery-result"><option>Результат доставки</option><option>Доставлен</option><option>Ошибка</option></select></div>
-          <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters" type="reset">Очистить фильтры</button></div>
+      <section class="crm-page crm-registry-page" data-page="back-office">
+        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 data-entity="page-title">Бэк-офис</h1><p>Реестр отправленных отчётов и операционных файлов с контролем доставки.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-back-office">Экспорт</button></div></div>
+        <form action="#" method="post" data-form="back-office-filters" data-action="filter-back-office" class="crm-registry-filters" data-filter="back-office">
+          <div class="crm-filter-control crm-registry-search"><label class="uk-form-label" for="bo-search">Поиск</label><input id="bo-search" class="uk-input crm-input" name="search" placeholder="Файл, клиент, код"/></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="bo-report-type">Вид отчёта</label><select id="bo-report-type" class="uk-select crm-select" name="report-type"><option>Все</option><option>Операционный</option><option>Финансовый</option></select></div>
+          <div class="crm-filter-control"><label class="uk-form-label" for="bo-delivery">Результат доставки</label><select id="bo-delivery" class="uk-select crm-select" name="delivery-result"><option>Все</option><option>Доставлен</option><option>Ошибка</option></select></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="reset">Сбросить</button></div>
         </form>
-        <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Имя файла</th><th>Дата и время отправки</th><th>Вид отчёта</th><th>Канал отправки</th><th>Результат доставки</th></tr></thead><tbody>
-        <tr data-entity="back-office-report" data-id="bo-oper-24042026-003"><td>bo_oper_24042026_003.xml</td><td>24.04.2026 11:08</td><td>Операционный</td><td><span class="crm-badge info" data-status="delivery-edo">ЭДО</span></td><td><span class="crm-badge success" data-status="delivered">Доставлен</span></td></tr>
-        <tr data-entity="back-office-report" data-id="bo-fin-24042026-005"><td>bo_fin_24042026_005.xml</td><td>24.04.2026 09:48</td><td>Финансовый</td><td><span class="crm-badge muted" data-status="delivery-email">Email</span></td><td><span class="crm-badge warning" data-status="request-waiting">Ожидает</span></td></tr>
-        <tr data-entity="back-office-report" data-id="bo-ops-23042026-014"><td>bo_ops_23042026_014.xml</td><td>23.04.2026 18:14</td><td>Операционный</td><td><span class="crm-badge info" data-status="delivery-sftp">SFTP</span></td><td><span class="crm-badge danger" data-status="delivery-error">Ошибка</span></td></tr>
-        </tbody></table><div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет отчётов</div><div class="crm-empty-state-text">Измените период или параметры фильтра.</div></div></div>
+        <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Файл</th><th>Тип</th><th>Канал</th><th>Отправка</th><th>Статус</th></tr></thead><tbody>
+          <tr data-entity="back-office-report" data-id="bo-oper-24042026-003"><td><div class="crm-row-main">bo_oper_24042026_003.xml</div><div class="crm-row-sub">CL-4401 · Операционный</div></td><td>Операционный</td><td><span class="crm-badge info" data-status="delivery-edo">ЭДО</span></td><td>24.04.2026 11:08</td><td><span class="crm-badge success" data-status="delivered">Доставлен</span></td></tr>
+          <tr data-entity="back-office-report" data-id="bo-ops-23042026-014"><td><div class="crm-row-main">bo_ops_23042026_014.xml</div><div class="crm-row-sub">CL-4412 · Операционный</div></td><td>Операционный</td><td><span class="crm-badge info" data-status="delivery-sftp">SFTP</span></td><td>23.04.2026 18:14</td><td><span class="crm-badge danger" data-status="delivery-error">Ошибка</span></td></tr>
+        </tbody></table><div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет отчётов</div><div class="crm-empty-state-text">Измените период или параметры фильтра.</div></div></div>
       </section>
     </main>
   </div>
