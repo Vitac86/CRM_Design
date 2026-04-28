@@ -64,8 +64,8 @@
   <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="file-edit"></span><span>Поручения за день</span></div><div class="crm-kpi-value">24</div><div class="crm-kpi-note">всего создано сегодня</div></article>
   <article class="crm-card crm-kpi-card"><div class="crm-kpi-meta"><span class="crm-kpi-icon" uk-icon="warning"></span><span>Просроченные задачи</span></div><div class="crm-kpi-value">12</div><div class="crm-kpi-note">требуют обработки</div></article>
 </div>
-<div class="crm-split-view">
-  <div class="crm-card crm-table-wrapper crm-table crm-dashboard-card">
+<div class="crm-grid-2 crm-dashboard-grid">
+  <section class="crm-card crm-table crm-table-wrapper crm-dashboard-card crm-table-compact">
     <div class="crm-section-head"><h3>Последние изменения по субъектам</h3></div>
     <table class="uk-table uk-table-divider uk-table-hover">
       <thead><tr><th>Субъект</th><th>Изменение</th><th>Время</th></tr></thead>
@@ -75,8 +75,8 @@
         <tr data-href="subject-card.html"><td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412</div></td><td>Обновлён статус резидентства</td><td>09:54</td></tr>
       </tbody>
     </table>
-  </div>
-  <div class="crm-card crm-table-wrapper crm-table crm-dashboard-card">
+  </section>
+  <section class="crm-card crm-table crm-table-wrapper crm-dashboard-card crm-table-compact">
     <div class="crm-section-head"><h3>Последние поручения</h3><div class="crm-list-actions"><a class="crm-link-action" href="requests.html" data-href="requests.html" data-action="open-requests">Все поручения</a></div></div>
     <table class="uk-table uk-table-divider uk-table-hover">
       <thead><tr><th>Номер поручения</th><th>Статус</th><th>Дата</th></tr></thead>
@@ -86,7 +86,7 @@
         <tr data-href="requests.html"><td><div class="crm-row-main">P-24099</div><div class="crm-row-sub">Вывод ДС · CL-4408</div></td><td><span class="crm-badge danger" data-status="request-rejected">Отклонено</span></td><td>22.04.2026</td></tr>
       </tbody>
     </table>
-  </div>
+  </section>
 </div>
 
       </section>
