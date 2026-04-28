@@ -58,13 +58,13 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page crm-registry-page" data-page="archive">
-        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 class="crm-page-title">Архив</h1><p class="crm-page-subtitle">Реестр архивных записей с быстрыми действиями просмотра и восстановления.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-archive">Экспорт</button></div></div>
+        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 class="crm-page-title" data-entity="page-title">Архив</h1><p class="crm-page-subtitle">Реестр архивных записей с быстрыми действиями просмотра и восстановления.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-archive">Экспорт</button></div></div>
         <form action="#" method="post" data-form="archive-filters" data-action="filter-archive" class="crm-registry-filters crm-filter-panel" data-filter="archive">
           <div class="crm-filter-search-row crm-filter-search"><input id="archive-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="search" placeholder="ID, сущность, причина"/></div>
           <div class="crm-filter-fields-row crm-filter-grid">
           <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="archive-type">Тип записи</label><select id="archive-type" class="uk-select crm-select" name="entity-type"><option>Все</option><option>Договор</option><option>Клиент</option><option>Поручение</option></select></div>
           <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="archive-date">Дата</label><input id="archive-date" type="date" class="uk-input crm-input" name="date" value="2026-02-14"/></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
         </form>
         <div class="crm-card crm-table-card crm-registry-table">

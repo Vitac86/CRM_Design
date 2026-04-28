@@ -128,6 +128,11 @@ const standalonePageScriptRegistry = {
   'subject-card.html': ['../assets/js/pages/subject-card.js']
 };
 const sharedPageUtilities = new Set([]);
+const registryPages = new Set([
+  'subjects.html', 'brokerage.html', 'trust-management.html', 'agents.html', 'requests.html', 'compliance.html',
+  'middle-office-clients.html', 'middle-office-reports.html', 'depository.html', 'back-office.html', 'trading.html', 'archive.html'
+]);
+const registryEmptyStateAllowlist = new Map();
 
 const errors = [];
 
@@ -267,6 +272,23 @@ function validatePackHooks(pack, inventory) {
 }
 
 function validateRegistryFilterPanelStructure(file, content) {
+  for (const formMatch of content.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
+    const attrs = formMatch[1];
+    const inner = formMatch[2];
+    const hasRegistry = /\bcrm-registry-filters\b/.test(attrs);
+    const hasPanel = /\bcrm-filter-panel\b/.test(attrs);
+    if (hasRegistry && !hasPanel) addError(file, 'form with .crm-registry-filters must also include .crm-filter-panel');
+    if (hasPanel && (!/\bdata-form=/.test(attrs) || !/\bdata-action=/.test(attrs))) addError(file, 'form with .crm-filter-panel must include data-form and data-action');
+    if (hasPanel || hasRegistry) {
+      for (const buttonMatch of inner.matchAll(/<button\b([^>]*)>/gi)) {
+        const b = buttonMatch[1];
+        const action = (b.match(/\bdata-action="([^"]+)"/i) || [,''])[1];
+        const type = (b.match(/\btype="([^"]+)"/i) || [,''])[1].toLowerCase();
+        if (action === 'reset-filters' && type !== 'button') addError(file, 'reset-filters button inside registry filter form must be type="button"');
+      }
+    }
+  }
+
   const filterFormRegex = /<form\b([^>]*)class="([^"]*\bcrm-registry-filters\b[^"]*\bcrm-filter-panel\b[^"]*)"([^>]*)>([\s\S]*?)<\/form>/gi;
   for (const match of content.matchAll(filterFormRegex)) {
     const formOpenTag = `<form ${match[1]}class="${match[2]}"${match[3]}>`;
@@ -285,6 +307,22 @@ function validateRegistryFilterPanelStructure(file, content) {
     if (/<div[^>]*class="[^"]*\bcrm-card\b[^"]*\bcrm-table\b[^"]*"/i.test(panel)) {
       addError(file, '.crm-card.crm-table must not be inside .crm-filter-panel form');
     }
+  }
+}
+function validateRegistryTableAndEmptyState(file, content) {
+  const isStandaloneRegistry = file.includes('/static-uikit/pages/') && registryPages.has(path.basename(file));
+  if (!isStandaloneRegistry) return;
+  const hasWrapper = /\bcrm-table-wrapper\b/.test(content);
+  const hasWrapperAndTableSameNode = /class="[^"]*\bcrm-table-wrapper\b[^"]*\bcrm-table\b[^"]*"/.test(content);
+  if (hasWrapper && !hasWrapperAndTableSameNode && !/\bcrm-table-wrapper\b[\s\S]*\bcrm-table\b/.test(content)) addError(file, '.crm-table-wrapper should contain .crm-table');
+  const hasCrmTable = /\bcrm-table\b/.test(content);
+  if (hasCrmTable && !/\bcrm-table\b[\s\S]*<table\b[^>]*class="[^"]*\buk-table\b/i.test(content)) addError(file, '.crm-table should contain table.uk-table');
+  for (const tm of content.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)) {
+    const inner = tm[1];
+    if (!/<thead\b/i.test(inner) || !/<tbody\b/i.test(inner)) addError(file, 'table.uk-table must include both thead and tbody');
+  }
+  if (isStandaloneRegistry && !registryEmptyStateAllowlist.has(path.basename(file))) {
+    if (!/<[^>]*class="[^"]*\bcrm-empty-state\b[^"]*"[^>]*\bdata-entity="empty-state"/i.test(content)) addError(file, 'registry page must include at least one .crm-empty-state[data-entity=\"empty-state\"]');
   }
 }
 
@@ -609,6 +647,8 @@ for (const file of allFiles) {
   validateUmiRuntimeDataContract(file, content);
 
   if (file.endsWith('.html')) {
+    validateRegistryFilterPanelStructure(file, content);
+    validateRegistryTableAndEmptyState(file, content);
     const dataHrefMatches = content.matchAll(/\bdata-href="([^"]+)"/g);
     for (const m of dataHrefMatches) {
       const target = m[1];

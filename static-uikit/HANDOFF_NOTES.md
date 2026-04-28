@@ -63,3 +63,8 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - `assets/js/crm-static.js` stays global-only; it does not render data.
 - Page script includes are template-specific; `assets/js/pages/subject-card.js` is only for subject-card when representative/address interactions are present.
 - Selectable controls (`.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row`) must be emitted with consistent `checked` + `.is-selected`/`.is-active`.
+
+## Registry/list-page pattern
+- Registry/list pages are kept `server-rendered/static-template-first`: demo rows and hooks are static HTML skeletons for UMI.CMS rendering.
+- Canonical registry shape: page header/title hook, registry filter panel, `crm-table-wrapper -> crm-table -> table.uk-table`, and `crm-empty-state[data-entity="empty-state"]`.
+- `crm-static.js` stays global-only and reusable (row `data-href`, reset helpers, non-submitting behavior), with no page runtime rendering.

@@ -6,7 +6,7 @@
   <form action="#" method="post" data-form="archive-filters" data-action="filter-archive" class="crm-toolbar crm-filter-panel uk-grid-small" uk-grid data-filter="archive">
     <div class="uk-width-1-1 uk-width-1-3@m"><input class="uk-input crm-input" name="archive-search" placeholder="Поиск в архиве"/></div>
     <div class="uk-width-1-2 uk-width-1-6@m"><select class="uk-select crm-select" name="archive-type"><option>Тип записи</option><option>Договор</option><option>Клиент</option><option>Поручение</option></select></div>
-    <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" type="reset" data-action="reset-filters">Очистить фильтры</button></div>
+    <div class="uk-width-1-2 uk-width-1-6@m"><button class="uk-button uk-button-default crm-button crm-button-ghost" type="button" data-action="reset-filters">Очистить фильтры</button></div>
   </form>
   <div class="crm-card crm-table crm-table-wrapper"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>ID</th><th>Сущность</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>
     <tr data-entity="archive-record" data-id="{{ archive.id }}"><td>{{ archive.number }}</td><td><div class="crm-row-main">{{ archive.entity }}</div><div class="crm-row-sub">{{ archive.clientCode }}</div></td><td>{{ archive.archivedAt }}</td><td><span class="crm-badge success" data-status="archived">Архивировано</span></td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="view-archive-record">Открыть</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="restore-archive-record">Восстановить</button></div></td></tr>

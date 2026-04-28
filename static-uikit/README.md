@@ -154,3 +154,9 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - `assets/js/crm-static.js` — только global reusable behavior.
 - Page scripts (`assets/js/pages/*.js`) подключаются только matching template (сейчас только `subject-card`).
 - Для `.crm-option-card`, `.crm-binary-control`, `.crm-radio-tile`, `.crm-check-row` сервер должен рендерить `checked` + `.is-selected`/`.is-active` консистентно.
+
+## Registry/list-page pattern (standalone + UMI)
+- Registry pages are `server-rendered/static-template-first`: filters, table rows, badges/statuses, and empty states are rendered in HTML templates, not by runtime JS.
+- Standard structure: `crm-page-header` + `data-entity="page-title"`, `form.crm-registry-filters.crm-filter-panel` (`data-form`, `data-action`, one `crm-filter-search-row`, one `crm-filter-fields-row`), `crm-table-wrapper > crm-table > table.uk-table`, and `.crm-empty-state[data-entity="empty-state"]`.
+- Reset in filter forms uses `type="button"` + `data-action="reset-filters"`.
+- `crm-static.js` remains global-only reusable behavior (row `data-href`, generic form/reset helpers, prevention helpers), while registry-specific rendering/logic is not allowed.
