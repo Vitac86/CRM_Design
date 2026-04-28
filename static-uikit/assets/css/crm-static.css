@@ -1078,13 +1078,18 @@ a:focus-visible {
 }
 
 .crm-toolbar.crm-filter-panel {
-  display: block;
   padding: 14px;
   border-radius: 14px;
   border: 1px solid #d6e0ef;
   background: #f5f8ff;
   box-shadow: none;
   margin-bottom: 14px;
+}
+
+.crm-toolbar.crm-filter-panel.uk-grid,
+.crm-toolbar.crm-filter-panel[uk-grid] {
+  display: flex;
+  align-items: flex-end;
 }
 
 .crm-filter-panel .uk-form-label {
