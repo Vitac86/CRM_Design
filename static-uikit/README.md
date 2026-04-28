@@ -9,7 +9,15 @@
 
 
 ## Review launcher
-Откройте локально: `http://localhost:8080/static-uikit/index.html`.
+Если сервер запущен из корня репозитория:
+- `cd CRM_Design`
+- `python -m http.server 8080`
+- launcher URL: `http://localhost:8080/static-uikit/index.html`
+
+Если сервер запущен из папки `static-uikit`:
+- `cd CRM_Design/static-uikit`
+- `python -m http.server 8080`
+- launcher URL: `http://localhost:8080/index.html`
 
 Страница содержит быстрые ссылки на standalone pages (`static-uikit/pages/*.html`), UMI P0/P1 extraction packs и команды локальной проверки/сборки.
 

@@ -9,114 +9,139 @@
 </head>
 <body data-page="static-uikit-index">
 <div class="crm-app">
-  <div class="crm-layout">
-    <main class="crm-main" style="margin-left:0; width:100%; min-height:100vh;">
-      <section class="crm-page" data-page="static-uikit-index">
-        <div class="crm-page-header">
-          <h1>CRM static-uikit review launcher</h1>
-          <p class="uk-text-meta">Локальная стартовая страница для просмотра standalone demo pages и UMI extraction packs.</p>
+  <section class="crm-page crm-launcher-page" data-page="static-uikit-index">
+    <header class="crm-card crm-launcher-hero">
+      <p class="crm-launcher-meta">CRM Static UI Kit</p>
+      <h1>Review launcher</h1>
+      <p>Локальная стартовая панель для standalone demo pages, UMI extraction packs и handoff-валидации без React/Vite runtime.</p>
+      <div class="crm-launcher-badges">
+        <span class="crm-badge info">local-only</span>
+        <span class="crm-badge muted">no CDN</span>
+        <span class="crm-badge muted">no API calls</span>
+      </div>
+      <div class="crm-launcher-meta">
+        <strong>Запуск из корня репозитория:</strong>
+        <code class="crm-launcher-code">cd CRM_Design &amp;&amp; python -m http.server 8080</code>
+        <span>→ <code class="crm-launcher-code">http://localhost:8080/static-uikit/index.html</code></span>
+      </div>
+      <div class="crm-launcher-meta">
+        <strong>Запуск из папки static-uikit:</strong>
+        <code class="crm-launcher-code">cd CRM_Design/static-uikit &amp;&amp; python -m http.server 8080</code>
+        <span>→ <code class="crm-launcher-code">http://localhost:8080/index.html</code></span>
+      </div>
+    </header>
+
+    <div class="crm-launcher-grid">
+      <article class="crm-card crm-launcher-card">
+        <div class="crm-section-head">
+          <h3>Standalone pages</h3>
+          <span class="crm-badge info">demo</span>
         </div>
 
-        <div class="crm-card" style="padding:20px; margin-bottom:20px;">
-          <div class="crm-section-head">
-            <h3>Standalone demo pages</h3>
-          </div>
-          <ul class="uk-list uk-list-divider">
-            <li><a href="pages/dashboard.html">Dashboard</a> — операционный обзор.</li>
-            <li><a href="pages/subjects.html">Subjects</a> — реестр субъектов.</li>
-            <li><a href="pages/subject-card.html">Subject card</a> — карточка субъекта.</li>
-            <li><a href="pages/subject-register.html">Subject register</a> — регистрационная форма субъекта.</li>
-            <li><a href="pages/contract-wizard.html">Contract wizard</a> — мастер оформления договора.</li>
-            <li><a href="pages/brokerage.html">Brokerage</a> — операции брокерского направления.</li>
-            <li><a href="pages/trust-management.html">Trust management</a> — управление доверительными активами.</li>
-            <li><a href="pages/agents.html">Agents</a> — список и статусы агентов.</li>
-            <li><a href="pages/requests.html">Requests</a> — поручения.</li>
-            <li><a href="pages/compliance.html">Compliance</a> — очередь комплаенса.</li>
-            <li><a href="pages/compliance-card.html">Compliance card</a> — карточка проверки комплаенса.</li>
-            <li><a href="pages/middle-office-clients.html">Middle-office clients</a> — журнал клиентов.</li>
-            <li><a href="pages/middle-office-reports.html">Middle-office reports</a> — журнал отправленных отчётов.</li>
-            <li><a href="pages/depository.html">Depository</a> — депозитарные операции.</li>
-            <li><a href="pages/back-office.html">Back office</a> — бэк-офисные задачи.</li>
-            <li><a href="pages/trading.html">Trading</a> — торговый обзор.</li>
-            <li><a href="pages/trading-card.html">Trading card</a> — карточка торгового кейса.</li>
-            <li><a href="pages/administration.html">Administration</a> — администрирование системы.</li>
-            <li><a href="pages/archive.html">Archive</a> — архивные записи.</li>
-            <li><a href="pages/error.html">Error</a> — шаблон страницы ошибки.</li>
-          </ul>
+        <h4>Core</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/dashboard.html">Dashboard</a></li>
+          <li><a class="crm-launcher-link" href="pages/subjects.html">Subjects</a></li>
+          <li><a class="crm-launcher-link" href="pages/subject-card.html">Subject card</a></li>
+          <li><a class="crm-launcher-link" href="pages/subject-register.html">Subject register</a></li>
+          <li><a class="crm-launcher-link" href="pages/contract-wizard.html">Contract wizard</a></li>
+          <li><a class="crm-launcher-link" href="pages/requests.html">Requests</a></li>
+        </ul>
+
+        <h4>Compliance / Trading</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/compliance.html">Compliance</a></li>
+          <li><a class="crm-launcher-link" href="pages/compliance-card.html">Compliance card</a></li>
+          <li><a class="crm-launcher-link" href="pages/trading.html">Trading</a></li>
+          <li><a class="crm-launcher-link" href="pages/trading-card.html">Trading card</a></li>
+        </ul>
+
+        <h4>Operations</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/brokerage.html">Brokerage</a></li>
+          <li><a class="crm-launcher-link" href="pages/trust-management.html">Trust management</a></li>
+          <li><a class="crm-launcher-link" href="pages/agents.html">Agents</a></li>
+          <li><a class="crm-launcher-link" href="pages/middle-office-clients.html">Middle-office clients</a></li>
+          <li><a class="crm-launcher-link" href="pages/middle-office-reports.html">Middle-office reports</a></li>
+          <li><a class="crm-launcher-link" href="pages/depository.html">Depository</a></li>
+          <li><a class="crm-launcher-link" href="pages/back-office.html">Back office</a></li>
+        </ul>
+
+        <h4>System</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/administration.html">Administration</a></li>
+          <li><a class="crm-launcher-link" href="pages/archive.html">Archive</a></li>
+          <li><a class="crm-launcher-link" href="pages/error.html">Error</a></li>
+        </ul>
+      </article>
+
+      <article class="crm-card crm-launcher-card">
+        <div class="crm-section-head">
+          <h3>UMI P0 extraction pack</h3>
         </div>
-
-        <div class="crm-card" style="padding:20px; margin-bottom:20px;">
-          <div class="crm-section-head">
-            <h3>UMI extraction packs</h3>
-          </div>
-
-          <h4>UMI P0</h4>
-          <ul class="uk-list uk-list-bullet">
-            <li><a href="umi-p0/README.md">umi-p0/README.md</a></li>
-            <li><a href="umi-p0/manifest.json">umi-p0/manifest.json</a></li>
-            <li><a href="umi-p0/integration-inventory.json">umi-p0/integration-inventory.json</a></li>
-            <li><a href="umi-p0/HANDOFF_CHECKLIST.md">umi-p0/HANDOFF_CHECKLIST.md</a></li>
-            <li><a href="umi-p0/layout/base.html">umi-p0/layout/base.html</a></li>
-            <li><a href="umi-p0/pages/dashboard.html">umi-p0/pages/dashboard.html</a></li>
-            <li><a href="umi-p0/pages/subjects.html">umi-p0/pages/subjects.html</a></li>
-            <li><a href="umi-p0/pages/subject-card.html">umi-p0/pages/subject-card.html</a></li>
-            <li><a href="umi-p0/pages/requests.html">umi-p0/pages/requests.html</a></li>
-            <li><a href="umi-p0/pages/compliance.html">umi-p0/pages/compliance.html</a></li>
-            <li><a href="umi-p0/pages/compliance-card.html">umi-p0/pages/compliance-card.html</a></li>
-            <li><a href="umi-p0/pages/trading.html">umi-p0/pages/trading.html</a></li>
-            <li><a href="umi-p0/pages/error.html">umi-p0/pages/error.html</a></li>
-          </ul>
-          <p class="uk-text-meta">UMI P0 pages are content-area templates, not full standalone pages.</p>
-
-          <h4>UMI P1</h4>
-          <ul class="uk-list uk-list-bullet">
-            <li><a href="umi-p1/README.md">umi-p1/README.md</a></li>
-            <li><a href="umi-p1/manifest.json">umi-p1/manifest.json</a></li>
-            <li><a href="umi-p1/integration-inventory.json">umi-p1/integration-inventory.json</a></li>
-            <li><a href="umi-p1/HANDOFF_CHECKLIST.md">umi-p1/HANDOFF_CHECKLIST.md</a></li>
-            <li><a href="umi-p1/pages/contract-wizard.html">umi-p1/pages/contract-wizard.html</a></li>
-            <li><a href="umi-p1/pages/brokerage.html">umi-p1/pages/brokerage.html</a></li>
-            <li><a href="umi-p1/pages/trust-management.html">umi-p1/pages/trust-management.html</a></li>
-            <li><a href="umi-p1/pages/agents.html">umi-p1/pages/agents.html</a></li>
-            <li><a href="umi-p1/pages/middle-office-clients.html">umi-p1/pages/middle-office-clients.html</a></li>
-            <li><a href="umi-p1/pages/middle-office-reports.html">umi-p1/pages/middle-office-reports.html</a></li>
-            <li><a href="umi-p1/pages/depository.html">umi-p1/pages/depository.html</a></li>
-            <li><a href="umi-p1/pages/back-office.html">umi-p1/pages/back-office.html</a></li>
-            <li><a href="umi-p1/pages/trading-card.html">umi-p1/pages/trading-card.html</a></li>
-            <li><a href="umi-p1/pages/administration.html">umi-p1/pages/administration.html</a></li>
-            <li><a href="umi-p1/pages/archive.html">umi-p1/pages/archive.html</a></li>
-          </ul>
-          <p class="uk-text-meta">UMI P1 depends on UMI P0 layout/sidebar/topbar.</p>
+        <div class="crm-launcher-badges">
+          <span class="crm-badge info">P0</span>
+          <span class="crm-badge success">handoff-ready</span>
+          <span class="crm-badge muted">content templates</span>
         </div>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="umi-p0/README.md">umi-p0/README.md</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/manifest.json">umi-p0/manifest.json</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/integration-inventory.json">umi-p0/integration-inventory.json</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/HANDOFF_CHECKLIST.md">umi-p0/HANDOFF_CHECKLIST.md</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/layout/base.html">umi-p0/layout/base.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/dashboard.html">umi-p0/pages/dashboard.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/subjects.html">umi-p0/pages/subjects.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/subject-card.html">umi-p0/pages/subject-card.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/requests.html">umi-p0/pages/requests.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/compliance.html">umi-p0/pages/compliance.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/compliance-card.html">umi-p0/pages/compliance-card.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/trading.html">umi-p0/pages/trading.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p0/pages/error.html">umi-p0/pages/error.html</a></li>
+        </ul>
+      </article>
 
-        <div class="crm-card" style="padding:20px; margin-bottom:20px;">
-          <div class="crm-section-head">
-            <h3>Local validation</h3>
-          </div>
-<pre><code>node static-uikit/tools/validate-static-uikit.mjs
+      <article class="crm-card crm-launcher-card">
+        <div class="crm-section-head">
+          <h3>UMI P1 extraction pack</h3>
+        </div>
+        <div class="crm-launcher-badges">
+          <span class="crm-badge warning">P1</span>
+          <span class="crm-badge info">depends on P0</span>
+          <span class="crm-badge muted">operational pages</span>
+        </div>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="umi-p1/README.md">umi-p1/README.md</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/manifest.json">umi-p1/manifest.json</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/integration-inventory.json">umi-p1/integration-inventory.json</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/HANDOFF_CHECKLIST.md">umi-p1/HANDOFF_CHECKLIST.md</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/contract-wizard.html">umi-p1/pages/contract-wizard.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/brokerage.html">umi-p1/pages/brokerage.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/trust-management.html">umi-p1/pages/trust-management.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/agents.html">umi-p1/pages/agents.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/middle-office-clients.html">umi-p1/pages/middle-office-clients.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/middle-office-reports.html">umi-p1/pages/middle-office-reports.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/depository.html">umi-p1/pages/depository.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/back-office.html">umi-p1/pages/back-office.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/trading-card.html">umi-p1/pages/trading-card.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/administration.html">umi-p1/pages/administration.html</a></li>
+          <li><a class="crm-launcher-link" href="umi-p1/pages/archive.html">umi-p1/pages/archive.html</a></li>
+        </ul>
+      </article>
+
+      <article class="crm-card crm-launcher-card">
+        <div class="crm-section-head">
+          <h3>Local validation</h3>
+          <span class="crm-badge muted">manual run</span>
+        </div>
+        <p class="crm-launcher-meta">Команды запускаются вручную из терминала (это текстовая памятка, не browser automation).</p>
+        <pre><code class="crm-launcher-code">node static-uikit/tools/validate-static-uikit.mjs
 npm run build
-python -m http.server 8080
-
-http://localhost:8080/static-uikit/index.html</code></pre>
-        </div>
-
-        <div class="crm-card" style="padding:20px; margin-bottom:20px;">
-          <div class="crm-section-head">
-            <h3>Safety constraints</h3>
-          </div>
-          <ul class="uk-list uk-list-bullet">
-            <li>No React inside static-uikit</li>
-            <li>No Vite build for static-uikit</li>
-            <li>No CDN / Google Fonts / external API</li>
-            <li>No telemetry/metrics trackers</li>
-            <li>No fetch/XHR/WebSocket/localStorage/sessionStorage</li>
-            <li>Standalone pages remain in static-uikit/pages</li>
-            <li>UMI packs are extraction packs, not runtime</li>
-          </ul>
-        </div>
-      </section>
-    </main>
-  </div>
+python -m http.server 8080</code></pre>
+        <p class="crm-launcher-meta">URL при запуске сервера из корня: <code class="crm-launcher-code">http://localhost:8080/static-uikit/index.html</code></p>
+      </article>
+    </div>
+  </section>
 </div>
 <script src="assets/js/uikit.min.js"></script>
 <script src="assets/js/uikit-icons.min.js"></script>
