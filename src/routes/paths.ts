@@ -1,6 +1,11 @@
 export const routes = {
   root: '/',
   dashboard: '/dashboard',
+  auth: '/auth',
+  login: '/login',
+  register: '/register',
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
   subjects: '/subjects',
   subjectRegister: '/subjects/register',
   subject: (id: string) => `/subjects/${id}`,
