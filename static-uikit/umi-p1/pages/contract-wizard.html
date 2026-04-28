@@ -10,7 +10,7 @@
   <!-- UMI TODO: resolve subject by route id -->
   <!-- UMI TODO: populate contract dictionaries and tariff options -->
   <!-- UMI TODO: handle contract create/update server-side -->
-  <form action="#" method="post" data-form="contract-wizard" data-action="submit-contract-wizard" class="crm-card uk-card uk-card-body crm-register-card" data-entity="contract" data-id="{{ contract.id }}">
+  <form action="#" method="post" data-form="contract-wizard" data-action="submit-contract-wizard" class="crm-card uk-card uk-card-body crm-register-card" data-entity="brokerage-contract" data-id="{{ contract.id }}">
     <div class="crm-form-grid uk-grid-small" uk-grid>
       <div class="uk-width-1-2"><label class="uk-form-label">Клиент</label><input class="uk-input crm-input" name="subject-name" value="{{ subject.name }}"/></div>
       <div class="uk-width-1-2"><label class="uk-form-label">Код клиента</label><input class="uk-input crm-input" name="client-code" value="{{ subject.code }}"/></div>
@@ -18,17 +18,17 @@
       <div class="uk-width-1-2"><label class="uk-form-label">Срок действия</label><input type="date" class="uk-input crm-input" name="end-date" value="{{ contract.endDate }}"/></div>
     </div>
 
-    <article class="crm-card crm-section uk-margin-top" data-entity="contract-settings">
-      <div class="crm-section-head"><h3>Настройки договора</h3></div>
+    <article class="crm-card crm-form-section uk-margin-top" data-entity="contract-settings">
+      <div class="crm-form-section-head"><h3>Настройки договора</h3><span class="crm-form-hint">Поля с <span class="crm-required">*</span> обязательны.</span></div>
       <div class="crm-form-grid uk-grid-small" uk-grid>
-        <div class="uk-width-1-2"><label class="uk-form-label">Продукт</label><select class="uk-select crm-select" name="product"><option value="brokerage">Брокерский договор</option><option value="trust-management">Договор ДУ</option><option value="depository">Депозитарный договор</option></select></div>
-        <div class="uk-width-1-2"><label class="uk-form-label">Тариф/стратегия</label><select class="uk-select crm-select" name="tariff"><option>{{ contract.tariff }}</option></select></div>
-        <div class="uk-width-1-1"><label class="uk-form-label">Комментарии</label><textarea class="uk-textarea crm-input" rows="3" name="special-terms" placeholder="Комментарий по условиям"></textarea></div>
+        <div class="uk-width-1-2"><label class="uk-form-label">Продукт <span class="crm-required">*</span></label><select class="uk-select crm-select" name="product"><option value="brokerage">Брокерский договор</option><option value="trust-management">Договор ДУ</option><option value="depository">Депозитарный договор</option></select></div>
+        <div class="uk-width-1-2"><label class="uk-form-label">Тариф/стратегия <span class="crm-required">*</span></label><select class="uk-select crm-select" name="tariff"><option>{{ contract.tariff }}</option></select></div>
+        <div class="uk-width-1-1"><label class="uk-form-label">Комментарии</label><textarea class="uk-textarea crm-input" rows="3" name="special-terms" placeholder="Комментарий по условиям"></textarea><span class="crm-field-note">Комментарий опционален и используется для внутренних пометок.</span></div>
       </div>
     </article>
 
-    <article class="crm-card crm-section uk-margin-top" data-entity="contract-delivery">
-      <div class="crm-section-head"><h3>Отчётность и доставка</h3></div>
+    <article class="crm-card crm-form-section uk-margin-top" data-entity="contract-delivery">
+      <div class="crm-form-section-head"><h3>Отчётность и доставка</h3></div>
       <div class="crm-form-grid uk-grid-small" uk-grid>
         <div class="uk-width-1-3"><label class="uk-form-label">Пакет отчётов</label><select class="uk-select crm-select" name="report-package"><option>{{ reports.package }}</option></select></div>
         <div class="uk-width-1-3"><label class="uk-form-label">Канал доставки</label><select class="uk-select crm-select" name="delivery-channel"><option>ЭДО</option><option>Email</option><option>SFTP</option></select></div>
