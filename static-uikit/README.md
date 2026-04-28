@@ -162,3 +162,12 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - `.crm-empty-state[data-entity="empty-state"]` lives inside registry card/shell but outside `<table>/<thead>/<tbody>/<tr>` markup and is hidden in demo mode via native `hidden` (unless an explicit demo-visible exception is documented).
 - Reset in filter forms uses `type="button"` + `data-action="reset-filters"`.
 - `crm-static.js` remains global-only reusable behavior (row `data-href`, generic form/reset helpers, prevention helpers), while registry-specific rendering/logic is not allowed; UMI renders registry rows server-side.
+
+## Non-registry page contracts (card/detail/wizard/admin)
+- Audited pages: `subject-register.html`, `contract-wizard.html`, `compliance-card.html`, `trading-card.html`, `administration.html`.
+- Require `body[data-page]` == `section.crm-page[data-page]` and `h1[data-entity="page-title"]`.
+- Wizard step groups (`.crm-wizard-steps`) must expose `aria-label` and exactly one current step (`aria-current="step"` or `data-status="current"`).
+- Forms based on `.crm-register-card` / `.crm-contract-wizard-form` must include `.crm-form-section` with heading (`h2/h3` or `.crm-form-section-head`).
+- Sticky/footer action containers must keep explicit button `type`; non-submit actions (export/download/view/open/print/resend/restore) must use `type="button"`.
+- Keep `crm-static.js` global-only; no runtime rendering/data hydration. Selectable controls are server-rendered with consistent `checked` + `.is-selected`/`.is-active`.
+- See `CARD_DETAIL_PAGE_AUDIT.md` for per-page mapping and follow-up notes.
