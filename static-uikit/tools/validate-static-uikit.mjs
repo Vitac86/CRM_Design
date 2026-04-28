@@ -67,6 +67,35 @@ const forbiddenExternalPattern = /(https?:\/\/(?!localhost(?::\d+)?|127\.0\.0\.1
 const forbiddenApiPattern = /(fetch\(|new\s+XMLHttpRequest|axios\(|new\s+WebSocket|new\s+EventSource|localStorage\.|sessionStorage\.|history\.pushState)/;
 
 const requiredInventoryArrays = ['routes', 'entities', 'actions', 'forms', 'filters', 'statuses'];
+const expectedStandalonePages = [
+  'dashboard.html',
+  'subjects.html',
+  'subject-card.html',
+  'subject-register.html',
+  'contract-wizard.html',
+  'brokerage.html',
+  'trust-management.html',
+  'agents.html',
+  'requests.html',
+  'compliance.html',
+  'compliance-card.html',
+  'middle-office-clients.html',
+  'middle-office-reports.html',
+  'depository.html',
+  'back-office.html',
+  'trading.html',
+  'trading-card.html',
+  'administration.html',
+  'archive.html',
+  'error.html'
+];
+const requiredStandaloneAssetRefs = [
+  '../assets/css/uikit.min.css',
+  '../assets/css/crm-static.css',
+  '../assets/js/uikit.min.js',
+  '../assets/js/uikit-icons.min.js',
+  '../assets/js/crm-static.js'
+];
 const hookKeys = {
   'data-entity': 'entities',
   'data-action': 'actions',
@@ -214,12 +243,20 @@ function validatePackHooks(pack, inventory) {
 }
 
 const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
+const pageFilesSet = new Set(pageFiles);
 const packPageFiles = packs.flatMap((pack) => {
   const packPagesDir = path.join(pack.dir, 'pages');
   if (!fs.existsSync(packPagesDir)) return [];
   return fs.readdirSync(packPagesDir).filter((f) => f.endsWith('.html')).map((file) => ({ packName: pack.name, file: path.join(packPagesDir, file) }));
 });
 const knownHtmlTargets = new Set([...pageFiles, ...packPageFiles.map(({ file }) => path.basename(file))]);
+
+for (const expectedPage of expectedStandalonePages) {
+  if (!pageFilesSet.has(expectedPage)) addError(path.join(pagesDir, expectedPage), 'required standalone page is missing');
+}
+for (const page of pageFiles) {
+  if (!expectedStandalonePages.includes(page)) addError(path.join(pagesDir, page), 'unexpected extra standalone page (not in release page list)');
+}
 
 for (const pack of packs) {
   const manifestPath = path.join(pack.dir, 'manifest.json');
@@ -375,8 +412,34 @@ validateStaticUikitLauncher();
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);
   const content = fs.readFileSync(file, 'utf8');
+  if (!/^\s*<!doctype html>/i.test(content)) addError(file, 'missing <!doctype html>');
+  if (!/<html[^>]*\blang="ru"/i.test(content)) addError(file, 'missing <html lang="ru">');
+  if (!/<meta[^>]*charset="utf-8"/i.test(content)) addError(file, 'missing <meta charset="utf-8">');
+  if (!/<meta[^>]*name="viewport"[^>]*content="width=device-width,\s*initial-scale=1"/i.test(content)) {
+    addError(file, 'missing required viewport meta tag');
+  }
+
+  if (!/<div[^>]*class="[^"]*\bcrm-app\b[^"]*"/i.test(content)) addError(file, 'missing .crm-app shell container');
+  if (!/<aside[^>]*class="[^"]*\bcrm-sidebar\b[^"]*"/i.test(content)) addError(file, 'missing .crm-sidebar shell block');
+  if (!/<main[^>]*class="[^"]*\bcrm-main\b[^"]*"/i.test(content)) addError(file, 'missing .crm-main shell block');
+  if (!/<header[^>]*class="[^"]*\bcrm-topbar\b[^"]*"/i.test(content)) addError(file, 'missing .crm-topbar shell block');
+
   if (!/<body[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, 'missing body[data-page]');
   if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, 'missing section.crm-page[data-page]');
+
+  const bodyPageMatch = content.match(/<body[^>]*\bdata-page="([^"]+)"/i);
+  const sectionPageMatch = content.match(/<section[^>]*class="[^"]*\bcrm-page\b[^"]*"[^>]*\bdata-page="([^"]+)"/i);
+  if (bodyPageMatch && sectionPageMatch && bodyPageMatch[1].trim() !== sectionPageMatch[1].trim()) {
+    addError(file, 'body[data-page] must match section.crm-page[data-page]', `${bodyPageMatch[1]} !== ${sectionPageMatch[1]}`);
+  }
+
+  for (const requiredAssetRef of requiredStandaloneAssetRefs) {
+    const escaped = requiredAssetRef.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!new RegExp(`\\b(?:href|src)="${escaped}"`, 'i').test(content)) {
+      addError(file, 'missing required local standalone asset reference', requiredAssetRef);
+    }
+  }
+
   if (!/<input[^>]*\bname="global-search"/i.test(content)) addError(file, 'missing topbar global search input[name="global-search"]');
   if (!/<button[^>]*\bdata-sidebar-toggle\b/i.test(content)) addError(file, 'missing sidebar toggle button[data-sidebar-toggle]');
 
