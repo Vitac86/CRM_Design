@@ -826,17 +826,19 @@ function validateNonRegistryPageContracts(file, content) {
     addError(file, 'audited non-registry page must include h1[data-entity="page-title"]');
   }
 
-  const wizardBlocks = [...content.matchAll(/<div\b([^>]*)class="([^"]*\bcrm-wizard-steps\b[^"]*)"([^>]*)>([\s\S]*?)<\/div>/gi)];
+  const wizardBlocks = extractBalancedElementsByClass(content, 'div', 'crm-wizard-steps');
   for (const block of wizardBlocks) {
-    const attrs = `${block[1]} ${block[3]}`;
-    const inner = block[4];
+    const attrs = getOpeningTagAttrs(block);
     if (!/\baria-label="[^"]+"/i.test(attrs)) addError(file, '.crm-wizard-steps must include aria-label');
 
-    const currentByAria = (inner.match(/\baria-current="step"/gi) || []).length;
-    const currentByStatus = (inner.match(/\bdata-status="current"/gi) || []).length;
-    const activeByClass = (inner.match(/\bcrm-wizard-step-active\b/gi) || []).length;
-    if (currentByAria + currentByStatus !== 1) addError(file, '.crm-wizard-steps must include exactly one current step via aria-current="step" or data-status="current"');
-    if (activeByClass !== 1) addError(file, '.crm-wizard-steps must include exactly one .crm-wizard-step-active');
+    const stepBlocks = extractBalancedElementsByClass(block, 'div', 'crm-wizard-step');
+    const currentSteps = stepBlocks.filter((step) => /\baria-current="step"/i.test(step) || /\bdata-status="current"/i.test(step));
+    const activeSteps = stepBlocks.filter((step) => /\bcrm-wizard-step-active\b/i.test(step));
+    if (currentSteps.length !== 1) addError(file, '.crm-wizard-steps must include exactly one current step via aria-current="step" or data-status="current"');
+    if (activeSteps.length !== 1) addError(file, '.crm-wizard-steps must include exactly one .crm-wizard-step-active');
+    if (currentSteps.length === 1 && activeSteps.length === 1 && currentSteps[0] !== activeSteps[0]) {
+      addError(file, '.crm-wizard-steps current step and .crm-wizard-step-active must be on the same .crm-wizard-step element');
+    }
   }
 
   for (const formMatch of content.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
@@ -844,7 +846,11 @@ function validateNonRegistryPageContracts(file, content) {
     const formInner = formMatch[2];
     const isTargetForm = /\bcrm-register-card\b/.test(formAttrs) || /\bcrm-contract-wizard-form\b/.test(formAttrs);
     if (isTargetForm) {
-      const sectionBlocks = formInner.match(/<[^>]*class="[^"]*\bcrm-form-section\b[^"]*"[^>]*>[\s\S]*?<\/[a-z0-9-]+>/gi) || [];
+      const sectionBlocks = [
+        ...extractBalancedElementsByClass(formInner, 'section', 'crm-form-section'),
+        ...extractBalancedElementsByClass(formInner, 'div', 'crm-form-section'),
+        ...extractBalancedElementsByClass(formInner, 'article', 'crm-form-section')
+      ];
       if (!sectionBlocks.length) addError(file, 'forms with .crm-register-card or .crm-contract-wizard-form must include at least one .crm-form-section');
       for (const section of sectionBlocks) {
         if (!/(<h2\b|<h3\b|\bcrm-form-section-head\b)/i.test(section)) addError(file, '.crm-form-section must include h2/h3 heading or .crm-form-section-head');
@@ -1017,6 +1023,11 @@ function extractBalancedElementsByClass(content, tagName, className) {
   return blocks;
 }
 
+function getOpeningTagAttrs(block) {
+  const openingTagMatch = block.match(/^<[^>\s]+\b([^>]*)>/i);
+  return openingTagMatch ? openingTagMatch[1] : '';
+}
+
 function validateBalancedTagHelperSelfTest() {
   const file = path.join(rootDir, 'tools', 'validate-static-uikit.mjs');
   const fixture = `
@@ -1106,6 +1117,61 @@ function validateBalancedTagHelperSelfTest() {
     errors.splice(beforeDemoVisibleCount);
     addError(file, 'empty-state self-test failed: data-demo-visible="true" should be allowed without hidden');
   }
+
+  const validWizardFixture = `
+<div class="crm-wizard-steps" aria-label="Wizard">
+  <div class="crm-wizard-step">A</div>
+  <div class="crm-wizard-step crm-wizard-step-active" aria-current="step" data-status="current"><div><span>B</span></div></div>
+  <div class="crm-wizard-step">C</div>
+</div>`.trim();
+  const beforeValidWizard = errors.length;
+  validateNonRegistryPageContracts(file, `<h1 data-entity="page-title">T</h1>${validWizardFixture}`);
+  if (errors.length !== beforeValidWizard) {
+    errors.splice(beforeValidWizard);
+    addError(file, 'wizard self-test failed: valid wizard fixture should pass');
+  }
+
+  const invalidWizardDuplicateCurrent = `
+<div class="crm-wizard-steps" aria-label="Wizard">
+  <div class="crm-wizard-step crm-wizard-step-active" aria-current="step">A</div>
+  <div class="crm-wizard-step" data-status="current">B</div>
+</div>`.trim();
+  const beforeDuplicateCurrent = errors.length;
+  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${invalidWizardDuplicateCurrent}`);
+  if (errors.length === beforeDuplicateCurrent) addError(file, 'wizard self-test failed: duplicate current step must be reported');
+  else errors.splice(beforeDuplicateCurrent);
+
+  const invalidWizardActiveMismatch = `
+<div class="crm-wizard-steps" aria-label="Wizard">
+  <div class="crm-wizard-step" aria-current="step" data-status="current">A</div>
+  <div class="crm-wizard-step crm-wizard-step-active">B</div>
+</div>`.trim();
+  const beforeActiveMismatch = errors.length;
+  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${invalidWizardActiveMismatch}`);
+  if (errors.length === beforeActiveMismatch) addError(file, 'wizard self-test failed: active/current mismatch must be reported');
+  else errors.splice(beforeActiveMismatch);
+
+  const validFormSectionsFixture = `
+<form class="crm-contract-wizard-form">
+  <section class="crm-form-section"><div><h2>Section A</h2></div></section>
+  <div class="crm-form-section"><article><div class="crm-form-section-head">Section B</div></article></div>
+  <article class="crm-form-section"><div><h3>Section C</h3></div></article>
+</form>`.trim();
+  const beforeValidSections = errors.length;
+  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${validFormSectionsFixture}`);
+  if (errors.length !== beforeValidSections) {
+    errors.splice(beforeValidSections);
+    addError(file, 'form-section self-test failed: valid nested section fixture should pass');
+  }
+
+  const invalidFormSectionFixture = `
+<form class="crm-contract-wizard-form">
+  <section class="crm-form-section"><div>No heading</div></section>
+</form>`.trim();
+  const beforeInvalidSection = errors.length;
+  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${invalidFormSectionFixture}`);
+  if (errors.length === beforeInvalidSection) addError(file, 'form-section self-test failed: missing heading must be reported');
+  else errors.splice(beforeInvalidSection);
 }
 
 function validateSubjectCardStaticRendering() {
