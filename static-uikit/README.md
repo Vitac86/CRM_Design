@@ -77,6 +77,9 @@
 5. `pages/subject-card.html` теперь server-rendered/static-template-first: профиль, адреса и представители заданы в HTML и не заполняются через demo JSON в runtime.
 6. `assets/js/crm-static.js` используется только для глобального/переиспользуемого UI-поведения (tabs/sidebar/nav/filters/data-href), без subject-card-specific логики и без data-rendering.
 7. `assets/js/pages/subject-card.js` подключается только на странице карточки субъекта и содержит только page-specific поведение (модалка представителя, toggle адресов, срок действия), без генерации данных из JS.
+8. `assets/js/crm-static.js` не должен содержать `data-page` guards для конкретных страниц и не должен владеть page-only интеракциями.
+9. Любой page-specific JS размещается только в `assets/js/pages/<page>.js`, оборачивается в IIFE и защищается page guard (`body[data-page=...]` / `.crm-page[data-page=...]`).
+10. UMI templates должны подключать page script только для matching template (без глобального include на все страницы).
 
 
 ## Ограничения
@@ -102,7 +105,11 @@ node static-uikit/tools/validate-static-uikit.mjs
 Скрипт проверяет отсутствие внешних зависимостей (CDN/analytics/API), валидность локальных `href`/`data-href`, корректность `form`/полей, наличие `body[data-page]` и `section.crm-page[data-page]`.
 Validator также проверяет, что data-* hooks из UMI packs отражены в integration-inventory.json.
 Partials и UMI P0/P1 templates синхронизированы с финальными standalone page patterns.
+Дополнительно validator проверяет реестр page scripts (`standalone page -> assets/js/pages/*.js`), ownership/ordering относительно `crm-static.js`, а также behavior-only ограничения для page scripts.
 Перед handoff обязательно запускайте validator для проверки целостности пакета.
+
+## Page script audit map
+- `static-uikit/PAGE_SCRIPT_AUDIT.md` содержит компактную карту по всем standalone pages: где global-only поведение, где page script и почему.
 
 
 ## Handoff manifest
