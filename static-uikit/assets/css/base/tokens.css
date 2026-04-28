@@ -1,0 +1,36 @@
+/* ========================================================================== */
+/* variables / tokens                                                          */
+/* ========================================================================== */
+:root {
+  --crm-bg: #f4f7fc;
+  --crm-surface: #ffffff;
+  --crm-surface-muted: #eef3fb;
+  --crm-sidebar: #0b1b4d;
+  --crm-sidebar-hover: rgba(155, 184, 255, 0.16);
+  --crm-sidebar-active: rgba(120, 162, 255, 0.22);
+  --crm-primary: #3f66d8;
+  --crm-primary-hover: #2f55be;
+  --crm-primary-soft: #e8efff;
+  --crm-border: #d7e0ef;
+  --crm-text: #17243a;
+  --crm-text-secondary: #3f4f68;
+  --crm-muted: #74839b;
+  --crm-input-bg: #ffffff;
+  --crm-input-border: #cad6e8;
+  --crm-focus-ring: 0 0 0 3px rgba(53, 96, 212, 0.18);
+  --crm-shadow-sm: 0 2px 7px rgba(15, 23, 42, 0.05);
+  --crm-shadow-md: 0 12px 24px rgba(15, 23, 42, 0.08);
+  --crm-radius-sm: 8px;
+  --crm-radius-md: 12px;
+  --crm-radius-lg: 14px;
+  --crm-success: #177c53;
+  --crm-success-bg: #e9f8f0;
+  --crm-warning: #9a5f18;
+  --crm-warning-bg: #fff4df;
+  --crm-danger: #b74a4a;
+  --crm-danger-bg: #fdecec;
+  --crm-info: #3f5ec5;
+  --crm-info-bg: #eaf0ff;
+  --crm-topbar-h: 62px;
+  --crm-sidebar-w: 276px;
+}

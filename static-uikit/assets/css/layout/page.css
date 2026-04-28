@@ -1,0 +1,120 @@
+/* static-uikit launcher */
+.crm-launcher-page {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding-top: 28px;
+  padding-bottom: 40px;
+}
+
+.crm-launcher-hero {
+  padding: 24px;
+  margin-bottom: 18px;
+  background: linear-gradient(140deg, #ffffff 0%, #f2f6ff 100%);
+  border-radius: 14px;
+}
+
+.crm-launcher-hero h1 {
+  margin-bottom: 8px;
+}
+
+.crm-launcher-hero p {
+  margin: 0 0 12px;
+  color: var(--crm-text-secondary);
+}
+
+.crm-launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.crm-launcher-card {
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.crm-launcher-card h4 {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #5b6c8a;
+}
+
+.crm-launcher-links {
+  margin: 0;
+}
+
+.crm-launcher-links > li {
+  margin: 0;
+  border-top: 1px solid #e7edf7;
+}
+
+.crm-launcher-links > li:first-child {
+  border-top: 0;
+}
+
+.crm-launcher-link {
+  display: block;
+  padding: 8px 0;
+  color: #314d9a;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.crm-launcher-link:hover {
+  color: #233f8f;
+  text-decoration: none;
+}
+
+.crm-launcher-meta {
+  display: block;
+  margin: 0 0 8px;
+  color: #5f6f89;
+  font-size: 13px;
+}
+
+.crm-launcher-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.crm-launcher-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.crm-launcher-card pre {
+  margin: 0 0 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #d9e3f3;
+  background: #f7faff;
+  overflow-x: auto;
+}
+
+@media (max-width: 1280px) {
+  .crm-launcher-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .crm-launcher-page {
+    padding-top: 18px;
+  }
+
+  .crm-launcher-hero,
+  .crm-launcher-card {
+    padding: 14px;
+  }
+
+  .crm-launcher-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

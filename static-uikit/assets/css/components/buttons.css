@@ -1,0 +1,15 @@
+/* action buttons */
+.crm-button,
+.uk-button.crm-button {
+  min-height: 36px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.crm-button-secondary,
+.uk-button.crm-button-secondary {
+  background: #fff;
+  border: 1px solid var(--crm-input-border);
+  color: var(--crm-text-secondary);
+}
+
