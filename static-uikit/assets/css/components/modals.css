@@ -1,0 +1,6 @@
+/* modals */
+.crm-modal .crm-modal-dialog {
+  border: var(--crm-layer-card-border);
+  border-radius: var(--crm-layer-card-radius);
+}
+

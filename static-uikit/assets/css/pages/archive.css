@@ -1,0 +1,113 @@
+/* visual parity batch 3: registry/list pages bulk pass */
+.crm-page.crm-registry-page {
+  overflow-x: hidden;
+}
+
+.crm-registry-title-block {
+  min-width: 0;
+}
+
+.crm-registry-filters {
+  grid-template-columns: minmax(260px, 1.5fr) repeat(auto-fit, minmax(152px, 1fr));
+  align-items: end;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.crm-registry-filters .crm-filter-control,
+.crm-registry-filters .crm-filter-actions,
+.crm-registry-search {
+  min-width: 0;
+}
+
+.crm-registry-search {
+  grid-column: span 2;
+}
+
+.crm-registry-filters .crm-filter-actions {
+  justify-self: end;
+}
+
+.crm-registry-filters .uk-input,
+.crm-registry-filters .uk-select,
+.crm-registry-filters .uk-button {
+  border-radius: 9px;
+}
+
+.crm-registry-table,
+.crm-compliance-queue,
+.crm-subjects-table,
+.crm-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.crm-registry-table .uk-table {
+  min-width: 900px;
+}
+
+.crm-registry-table-compact .uk-table th,
+.crm-registry-table-compact .uk-table td {
+  padding: 9px 11px;
+  font-size: 13px;
+}
+
+.crm-registry-table-compact .uk-table th {
+  font-size: 11px;
+  letter-spacing: .055em;
+}
+
+.crm-registry-table tbody tr[data-href],
+.crm-subjects-table tbody tr[data-href],
+.crm-compliance-queue tbody tr[data-href] {
+  cursor: pointer;
+}
+
+.crm-registry-table tbody tr[data-href]:hover td:first-child {
+  border-left: 2px solid #88a5e7;
+}
+
+.crm-table .crm-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+.crm-registry-empty {
+  margin: 10px;
+}
+
+@media (max-width: 1366px) {
+  .crm-registry-filters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .crm-registry-search {
+    grid-column: 1 / -1;
+  }
+
+  .crm-registry-filters .crm-filter-actions {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 959px) {
+  .crm-registry-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .crm-registry-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-registry-search,
+  .crm-registry-filters .crm-filter-actions {
+    grid-column: auto;
+  }
+}
+

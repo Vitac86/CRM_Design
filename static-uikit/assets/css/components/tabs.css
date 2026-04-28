@@ -1,0 +1,11 @@
+/* subject tabs */
+.crm-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.crm-tab {
+  color: var(--crm-text-secondary);
+}
+
