@@ -48,10 +48,12 @@ const Check = ({ checked, onChange, label }: { checked: boolean; onChange: (valu
 export const ContractWizardPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { subjectId } = useParams();
+  const params = useParams<{ id?: string; subjectId?: string }>();
+  const subjectId = params.id ?? params.subjectId;
   const { clients: clientsRepository, contracts: contractsRepository } = useDataAccess();
   const [client, setClient] = useState<Client | null>(null);
   const [editingContract, setEditingContract] = useState<ClientContract | null>(null);
+  const [hasInvalidContractContext, setHasInvalidContractContext] = useState(false);
 
   const contractId = searchParams.get('contractId')?.trim() || null;
   const isEditMode = Boolean(editingContract);
@@ -69,6 +71,7 @@ export const ContractWizardPage = () => {
           setClient(null);
           setEditingContract(null);
           setForm(null);
+          setHasInvalidContractContext(false);
           setIsLoading(false);
         }
         return;
@@ -82,6 +85,7 @@ export const ContractWizardPage = () => {
           setClient(null);
           setEditingContract(null);
           setForm(null);
+          setHasInvalidContractContext(false);
           setIsLoading(false);
         }
         return;
@@ -92,8 +96,10 @@ export const ContractWizardPage = () => {
         loadedContract = await contractsRepository.getContractById(contractId);
       }
 
+      const invalidContractContext = Boolean(contractId) && (!loadedContract || loadedContract.clientId !== loadedClient.id);
+
       let nextForm: ContractWizardConfig;
-      if (loadedContract && loadedContract.clientId === loadedClient.id) {
+      if (!invalidContractContext && loadedContract && loadedContract.clientId === loadedClient.id) {
         const storedConfig = await contractsRepository.getContractConfigById(loadedContract.id);
         nextForm =
           storedConfig ??
@@ -112,6 +118,7 @@ export const ContractWizardPage = () => {
         setClient(loadedClient);
         setEditingContract(loadedContract);
         setForm(nextForm);
+        setHasInvalidContractContext(invalidContractContext);
         setIsLoading(false);
       }
     };
@@ -127,7 +134,7 @@ export const ContractWizardPage = () => {
     return null;
   }
 
-  if (!client || !form || (editingContract && editingContract.clientId !== client.id)) {
+  if (!client || !form || hasInvalidContractContext || (editingContract && editingContract.clientId !== client.id)) {
     return (
       <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm sm:p-5">
         <EmptyState title="Клиент или договор не найден" description="Не удалось открыть мастер оформления договора для выбранного субъекта." />

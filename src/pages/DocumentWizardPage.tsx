@@ -29,7 +29,8 @@ const buildInitialDocuments = (): DocumentUploadState[] =>
 
 export const DocumentWizardPage = () => {
   const navigate = useNavigate();
-  const { subjectId } = useParams();
+  const params = useParams<{ id?: string; subjectId?: string }>();
+  const subjectId = params.id ?? params.subjectId;
 
   const [step, setStep] = useState(1);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
