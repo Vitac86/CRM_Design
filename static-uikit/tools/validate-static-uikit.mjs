@@ -1030,6 +1030,7 @@ function getOpeningTagAttrs(block) {
 
 function validateBalancedTagHelperSelfTest() {
   const file = path.join(rootDir, 'tools', 'validate-static-uikit.mjs');
+  const auditedTestPage = path.join(rootDir, 'pages', 'contract-wizard.html');
   const fixture = `
 <section>
   <div data-role="main-data-grid" class="crm-grid">
@@ -1125,7 +1126,7 @@ function validateBalancedTagHelperSelfTest() {
   <div class="crm-wizard-step">C</div>
 </div>`.trim();
   const beforeValidWizard = errors.length;
-  validateNonRegistryPageContracts(file, `<h1 data-entity="page-title">T</h1>${validWizardFixture}`);
+  validateNonRegistryPageContracts(auditedTestPage, `<h1 data-entity="page-title">T</h1>${validWizardFixture}`);
   if (errors.length !== beforeValidWizard) {
     errors.splice(beforeValidWizard);
     addError(file, 'wizard self-test failed: valid wizard fixture should pass');
@@ -1137,7 +1138,7 @@ function validateBalancedTagHelperSelfTest() {
   <div class="crm-wizard-step" data-status="current">B</div>
 </div>`.trim();
   const beforeDuplicateCurrent = errors.length;
-  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${invalidWizardDuplicateCurrent}`);
+  validateNonRegistryPageContracts(auditedTestPage, `<h1 data-entity="page-title">T</h1>${invalidWizardDuplicateCurrent}`);
   if (errors.length === beforeDuplicateCurrent) addError(file, 'wizard self-test failed: duplicate current step must be reported');
   else errors.splice(beforeDuplicateCurrent);
 
@@ -1147,7 +1148,7 @@ function validateBalancedTagHelperSelfTest() {
   <div class="crm-wizard-step crm-wizard-step-active">B</div>
 </div>`.trim();
   const beforeActiveMismatch = errors.length;
-  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${invalidWizardActiveMismatch}`);
+  validateNonRegistryPageContracts(auditedTestPage, `<h1 data-entity="page-title">T</h1>${invalidWizardActiveMismatch}`);
   if (errors.length === beforeActiveMismatch) addError(file, 'wizard self-test failed: active/current mismatch must be reported');
   else errors.splice(beforeActiveMismatch);
 
@@ -1158,7 +1159,7 @@ function validateBalancedTagHelperSelfTest() {
   <article class="crm-form-section"><div><h3>Section C</h3></div></article>
 </form>`.trim();
   const beforeValidSections = errors.length;
-  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${validFormSectionsFixture}`);
+  validateNonRegistryPageContracts(auditedTestPage, `<h1 data-entity="page-title">T</h1>${validFormSectionsFixture}`);
   if (errors.length !== beforeValidSections) {
     errors.splice(beforeValidSections);
     addError(file, 'form-section self-test failed: valid nested section fixture should pass');
@@ -1169,10 +1170,22 @@ function validateBalancedTagHelperSelfTest() {
   <section class="crm-form-section"><div>No heading</div></section>
 </form>`.trim();
   const beforeInvalidSection = errors.length;
-  validateNonRegistryPageContracts(path.join(rootDir, 'pages', 'contract-wizard.html'), `<h1 data-entity="page-title">T</h1>${invalidFormSectionFixture}`);
+  validateNonRegistryPageContracts(auditedTestPage, `<h1 data-entity="page-title">T</h1>${invalidFormSectionFixture}`);
   if (errors.length === beforeInvalidSection) addError(file, 'form-section self-test failed: missing heading must be reported');
   else errors.splice(beforeInvalidSection);
+  const invalidNonAuditedWizardFixture = `
+<div class="crm-wizard-steps" aria-label="Wizard">
+  <div class="crm-wizard-step crm-wizard-step-active" aria-current="step">A</div>
+  <div class="crm-wizard-step" data-status="current">B</div>
+</div>`.trim();
+  const beforeNonAuditedWizard = errors.length;
+  validateNonRegistryPageContracts(file, `<h1 data-entity="page-title">T</h1>${invalidNonAuditedWizardFixture}`);
+  if (errors.length !== beforeNonAuditedWizard) {
+    errors.splice(beforeNonAuditedWizard);
+    addError(file, 'wizard self-test failed: non-audited files must no-op in validateNonRegistryPageContracts');
+  }
 }
+
 
 function validateSubjectCardStaticRendering() {
   const standalone = path.join(rootDir, 'pages', 'subject-card.html');
