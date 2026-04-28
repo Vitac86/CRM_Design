@@ -4814,81 +4814,94 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
 /* subject-card hero composition refresh (strictly scoped) */
 .crm-page[data-page="subject-card"] .crm-subject-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  align-items: stretch;
-  gap: 24px;
-  padding: 22px 24px;
-  border: 1px solid #d7e0ef;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-  box-shadow: 0 6px 18px rgba(21, 35, 63, 0.08);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px 20px;
+  padding: 14px 18px;
+  border: 1px solid #dbe4f2;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(21, 35, 63, 0.06);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-hero-main {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-avatar {
-  width: 58px;
-  height: 58px;
-  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
   border: 1px solid #cfdbf0;
   background: #eaf1ff;
   color: #2a448a;
-  font-size: 17px;
+  font-size: 14px;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-identity h1 {
   margin: 0;
-  font-size: 34px;
-  line-height: 1.13;
+  font-size: 29px;
+  line-height: 1.16;
   letter-spacing: -0.01em;
   color: #162847;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-code {
-  margin: 8px 0 0;
-  font-size: 15px;
-  line-height: 1.35;
-  color: #6e809b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 3px 9px;
+  border: 1px solid #d9e2f1;
+  border-radius: 999px;
+  background: #f4f8ff;
+  font-size: 12px;
+  line-height: 1.2;
+  color: #5f7290;
+  width: fit-content;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-code-label {
+  font-weight: 500;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-code strong {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #233f74;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-badge-groups {
-  display: grid;
-  gap: 8px;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .crm-page[data-page="subject-card"] .crm-inline-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .crm-page[data-page="subject-card"] .crm-inline-badges .crm-badge {
-  min-height: 24px;
-  padding: 4px 10px;
+  min-height: 22px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.2;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-start;
   gap: 8px;
-  width: 100%;
-  max-width: 220px;
-  padding: 8px;
-  border: 1px solid #e0e7f4;
-  border-radius: 12px;
-  background: #f9fbff;
+  margin-top: 1px;
+  width: auto;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions .uk-button,
@@ -4896,28 +4909,30 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: 38px;
-  border-radius: 9px;
-  font-size: 13px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions .crm-button-primary {
-  min-height: 40px;
+  min-height: 34px;
   font-weight: 600;
-  box-shadow: 0 3px 10px rgba(45, 90, 199, 0.25);
+  box-shadow: 0 2px 6px rgba(45, 90, 199, 0.2);
 }
 
 @media (max-width: 1180px) {
   .crm-page[data-page="subject-card"] .crm-subject-hero {
     grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 18px;
+    gap: 12px;
+    padding: 14px;
   }
 
   .crm-page[data-page="subject-card"] .crm-subject-actions {
-    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }
 
@@ -4928,17 +4943,15 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
   }
 
   .crm-page[data-page="subject-card"] .crm-subject-avatar {
-    width: 52px;
-    height: 52px;
+    width: 42px;
+    height: 42px;
   }
 
   .crm-page[data-page="subject-card"] .crm-subject-identity h1 {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .crm-page[data-page="subject-card"] .crm-subject-actions {
-    padding: 0;
-    border: 0;
-    background: transparent;
+    gap: 6px;
   }
 }
