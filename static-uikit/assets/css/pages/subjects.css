@@ -439,34 +439,34 @@
 
 
 /* ===== subjects visual refinement against legacy Vite ===== */
-.crm-page[data-page="subjects"] .crm-topbar .crm-search {
+body[data-page="subjects"] .crm-topbar .crm-search {
   display: none;
 }
 
-.crm-page[data-page="subjects"] .crm-topbar {
+body[data-page="subjects"] .crm-topbar {
   justify-content: flex-end;
 }
 
-.crm-page[data-page="subjects"] .crm-topbar [data-sidebar-toggle] {
+body[data-page="subjects"] .crm-topbar [data-sidebar-toggle] {
   margin-right: auto;
 }
 
 .crm-page[data-page="subjects"] .crm-page-header.crm-registry-header {
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-title-block .crm-page-title {
-  font-size: 48px;
-  line-height: 1.1;
+  font-size: 30px;
+  line-height: 1.2;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-title-block .crm-page-subtitle {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-actions {
-  gap: 12px;
+  gap: 10px;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-actions .crm-button-primary,
@@ -474,24 +474,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 48px;
-  min-height: 48px;
-  padding: 0 20px;
-  border-radius: 10px !important;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
   line-height: 1;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-actions .crm-button-primary {
-  font-size: 32px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-actions .crm-button-secondary {
-  min-height: 44px;
-  height: 44px;
-  padding: 0 18px;
-  border-radius: 12px !important;
-  opacity: .92;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel {
@@ -517,7 +514,15 @@
 }
 
 .crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control .uk-form-label {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control .crm-select {
@@ -534,35 +539,72 @@
   min-height: 38px;
   height: 38px;
   padding: 0 14px;
-  border-radius: 12px !important;
+  border-radius: 10px;
   font-size: 13px;
 }
 
 .crm-page[data-page="subjects"] .crm-subjects-table .uk-table th {
-  padding: 10px 10px;
+  padding: 11px 10px;
   font-size: 11px;
-  background: #eef3fb;
+  font-weight: 600;
 }
 
 .crm-page[data-page="subjects"] .crm-subjects-table .uk-table td {
-  padding: 8px 10px;
+  padding: 9px 10px;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table th:nth-child(1),
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table td:nth-child(1) {
+  width: 24%;
 }
 
 .crm-page[data-page="subjects"] .crm-subjects-table .crm-row-main {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.crm-page[data-page="subjects"] .crm-subjects-table .crm-row-sub {
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .crm-page[data-page="subjects"] .crm-subjects-table .crm-badge {
-  min-height: 24px;
-  padding: 1px 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0 8px;
   font-size: 11px;
+  font-weight: 600;
+  border-width: 1px;
+  border-style: solid;
   border-radius: 999px;
-  line-height: 1.15;
+  line-height: 1;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge.muted {
+  color: var(--crm-text-secondary);
+  background: var(--crm-accent-soft);
+  border-color: var(--crm-border-strong);
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge.info {
+  color: #264373;
+  background: #e8f0ff;
+  border-color: #c6d8fb;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge.success {
+  color: #205636;
+  background: #e8f6ee;
+  border-color: #bde3ca;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge.warning {
+  color: #6c4b1f;
+  background: #fff4df;
+  border-color: #f2d8a6;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge.danger {
+  color: #7f1e26;
+  background: #fdecef;
+  border-color: #f4c6cd;
 }
 
 .crm-page[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
