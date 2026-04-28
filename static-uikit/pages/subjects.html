@@ -56,16 +56,19 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="subjects">
-        <section class="crm-registry-shell">
-          <div class="crm-page-header crm-page-header-row crm-registry-header">
-            <h1>Субъекты</h1>
+        <section class="crm-registry-shell crm-subjects-shell">
+          <div class="crm-page-header crm-page-header-row crm-registry-header crm-subjects-header">
+            <div>
+              <h1>Субъекты</h1>
+              <p>Реестр клиентских карточек, статусов комплаенса и полноты досье.</p>
+            </div>
             <div class="crm-header-actions">
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="export-subjects">Экспорт</button>
+              <button class="uk-button uk-button-default crm-button crm-button-secondary" type="button" data-action="export-subjects">Экспорт</button>
               <a href="subject-register.html" class="uk-button crm-button-primary crm-button" data-action="open-subject-register">+ Добавить</a>
             </div>
           </div>
 
-          <form action="#" method="post" data-form="subjects-filters" data-action="filter-subjects" class="crm-toolbar crm-registry-filters" data-filter="subjects">
+          <form action="#" method="post" data-form="subjects-filters" data-action="filter-subjects" class="crm-registry-filters" data-filter="subjects">
             <div class="crm-registry-search">
               <label class="uk-form-label" for="subject-search">Поиск</label>
               <input id="subject-search" class="uk-input crm-input" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/>
@@ -75,34 +78,29 @@
               <label class="uk-form-label" for="subject-type">Тип</label>
               <select id="subject-type" class="uk-select crm-select" name="subject-type"><option>Все</option></select>
             </div>
-
             <div class="crm-filter-pill">
               <label class="uk-form-label" for="resident-type">Резидентство</label>
               <select id="resident-type" class="uk-select crm-select" name="resident-type"><option>Все</option></select>
             </div>
-
             <div class="crm-filter-pill">
               <label class="uk-form-label" for="subject-status">Статус субъекта</label>
               <select id="subject-status" class="uk-select crm-select" name="subject-status"><option>Все</option></select>
             </div>
-
             <div class="crm-filter-pill">
               <label class="uk-form-label" for="compliance-status">Комплаенс</label>
               <select id="compliance-status" class="uk-select crm-select" name="compliance-status"><option>Все</option></select>
             </div>
-
             <div class="crm-filter-pill">
               <label class="uk-form-label" for="subject-role">Роль</label>
               <select id="subject-role" class="uk-select crm-select" name="subject-role"><option>Все</option></select>
             </div>
-
             <div class="crm-filter-pill">
               <label class="uk-form-label" for="qualification">Квалификация</label>
               <select id="qualification" class="uk-select crm-select" name="qualification"><option>Все</option></select>
             </div>
 
             <div class="crm-filter-actions">
-              <button type="reset" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters">Сбросить фильтры</button>
+              <button type="reset" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-filters">Сбросить</button>
             </div>
           </form>
 
