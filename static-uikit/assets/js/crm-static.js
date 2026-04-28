@@ -1,6 +1,7 @@
 (function () {
   const app = document.querySelector('.crm-app');
   const toggle = document.querySelector('[data-sidebar-toggle]');
+  const sidebar = document.querySelector('.crm-sidebar');
 
   function syncOptionGridState(scope) {
     scope.querySelectorAll('.crm-option-grid').forEach(function (group) {
@@ -20,9 +21,43 @@
     });
   }
 
+  const mobileQuery = window.matchMedia('(max-width: 920px)');
+
+  function isMobileViewport() {
+    return mobileQuery.matches;
+  }
+
+  function closeSidebar() {
+    if (app) {
+      app.classList.remove('sidebar-open');
+    }
+  }
+
+  function openSidebar() {
+    if (app) {
+      app.classList.add('sidebar-open');
+    }
+  }
+
   if (toggle && app) {
     toggle.addEventListener('click', function () {
-      app.classList.toggle('sidebar-open');
+      if (app.classList.contains('sidebar-open')) {
+        closeSidebar();
+        return;
+      }
+      openSidebar();
+    });
+  }
+
+  if (app) {
+    const overlay = document.createElement('button');
+    overlay.type = 'button';
+    overlay.className = 'crm-sidebar-overlay';
+    overlay.setAttribute('aria-label', 'Закрыть меню');
+    app.appendChild(overlay);
+
+    overlay.addEventListener('click', function () {
+      closeSidebar();
     });
   }
 
@@ -44,12 +79,12 @@
 
     function setExpanded(expanded) {
       group.classList.toggle('expanded', expanded);
-      group.classList.toggle('active', expanded && !hasActiveChild);
+      group.classList.toggle('active', hasActiveChild);
       if (groupToggle) groupToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       if (submenu) submenu.hidden = !expanded;
     }
 
-    setExpanded(hasActiveChild || group.dataset.group === 'front-office');
+    setExpanded(hasActiveChild);
 
     if (groupToggle) {
       groupToggle.addEventListener('click', function () {
@@ -57,6 +92,45 @@
       });
     }
   });
+
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      closeSidebar();
+    }
+  });
+
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener('change', function (event) {
+      if (!event.matches) {
+        closeSidebar();
+      }
+    });
+  }
+
+  document.addEventListener('click', function (event) {
+    if (!app || !sidebar || !isMobileViewport() || !app.classList.contains('sidebar-open')) {
+      return;
+    }
+
+    const target = event.target;
+    if (sidebar.contains(target) || (toggle && toggle.contains(target))) {
+      return;
+    }
+
+    closeSidebar();
+  });
+
+  if (sidebar) {
+    sidebar.addEventListener('click', function (event) {
+      const link = event.target.closest('a[href]');
+      if (!link || !isMobileViewport()) {
+        return;
+      }
+
+      closeSidebar();
+    });
+  }
 
   syncOptionGridState(document);
   syncBinaryPills(document);
