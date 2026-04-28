@@ -1,1 +1,66 @@
-/* intentionally left blank in this refactor; styles moved incrementally */
+/* Requests page */
+
+.crm-operations-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.crm-create-panel,
+.crm-compliance-queue,
+.crm-journal-table {
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.crm-create-panel .crm-form-section-head {
+  margin-bottom: 10px;
+}
+
+.crm-create-panel .crm-form-hint {
+  margin: 0;
+  color: var(--crm-muted);
+  font-size: 12px;
+}
+
+.crm-operations-filters {
+  margin-bottom: 2px;
+}
+
+.crm-filter-reset-cell {
+  display: flex;
+  align-items: flex-end;
+}
+
+.crm-filter-reset-cell .uk-button {
+  width: 100%;
+}
+
+.crm-journal-table .crm-row-main,
+.crm-compliance-queue .crm-row-main {
+  font-weight: 600;
+  color: #21304b;
+}
+
+.crm-row-sub {
+  margin-top: 2px;
+  color: #6f7f99;
+  font-size: 12px;
+}
+
+.crm-row-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.crm-journal-table tbody tr[data-href],
+.crm-compliance-queue tbody tr[data-href] {
+  cursor: pointer;
+}
+
+.crm-compliance-queue tbody tr[data-status="risk-high"] {
+  background: #fff7f7;
+}
+
+.crm-compliance-queue tbody tr[data-status="risk-high"]:hover {
+  background: #ffefef;
+}

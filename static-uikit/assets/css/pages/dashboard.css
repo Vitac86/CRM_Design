@@ -724,3 +724,119 @@
   }
 }
 
+/* Dashboard page */
+.crm-dashboard-shell,
+.crm-subjects-shell,
+.crm-contract-wizard-shell {
+  display: grid;
+  gap: 14px;
+}
+
+.crm-dashboard-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.crm-dashboard-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.crm-dashboard-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.crm-dashboard-panel .crm-section-head {
+  padding: 12px 14px;
+  margin: 0;
+  border-bottom: 1px solid #dce4f2;
+}
+
+.crm-dashboard-table-wrap {
+  overflow-x: auto;
+}
+
+.crm-dashboard-table {
+  margin: 0;
+  min-width: 0 !important;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.crm-dashboard-table th,
+.crm-dashboard-table td {
+  white-space: normal !important;
+  padding: 10px 12px !important;
+  vertical-align: top !important;
+}
+
+.crm-dashboard-table th:last-child,
+.crm-dashboard-table td:last-child {
+  width: auto !important;
+  text-align: left !important;
+}
+
+.crm-subjects-header {
+  margin-bottom: 4px;
+}
+
+.crm-registry-filters {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.6fr) repeat(3, minmax(150px, 1fr));
+  gap: 8px;
+  border: 1px solid #d7e0ef;
+  background: #eef3fc;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.crm-registry-search,
+.crm-filter-pill {
+  background: #fff;
+  border: 1px solid #d4deee;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+.crm-registry-search .uk-form-label,
+.crm-filter-pill .uk-form-label {
+  margin: 0 0 2px;
+  font-size: 10px;
+}
+
+.crm-registry-search .uk-input,
+.crm-filter-pill .uk-select {
+  border: 0;
+  min-height: 24px !important;
+  padding: 0 !important;
+  background: transparent;
+  box-shadow: none !important;
+  font-size: 13px;
+}
+
+.crm-filter-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  padding-top: 2px;
+}
+
+.crm-subjects-table .uk-table {
+  min-width: 1080px;
+}
+
+.crm-subjects-table .uk-table td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.crm-subjects-table .uk-table td:first-child {
+  min-width: 320px;
+}
+
+.crm-subjects-table tbody tr[data-href]:hover {
+  background: #eef4ff;
+}
+

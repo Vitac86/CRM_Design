@@ -245,3 +245,8 @@
   }
 }
 
+/* Topbar layout */
+.crm-topbar {
+  min-height: 64px;
+  padding: 0 22px;
+}
