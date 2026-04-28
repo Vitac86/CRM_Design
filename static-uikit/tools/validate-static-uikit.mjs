@@ -66,6 +66,14 @@ const forbiddenExternalPattern = /(https?:\/\/|cdn|fonts\.googleapis|fonts\.gsta
 const forbiddenApiPattern = /(fetch\(|XMLHttpRequest|axios|WebSocket|EventSource|localStorage|sessionStorage|history\.pushState)/;
 
 const requiredInventoryArrays = ['routes', 'entities', 'actions', 'forms', 'filters', 'statuses'];
+const hookKeys = {
+  'data-entity': 'entities',
+  'data-action': 'actions',
+  'data-form': 'forms',
+  'data-filter': 'filters',
+  'data-status': 'statuses'
+};
+
 const errors = [];
 
 function walk(dir) {
@@ -149,16 +157,57 @@ function ensureManifestFilesExist(manifest, manifestFile, packDir, packName) {
 }
 
 function validateIntegrationInventory(inventory, inventoryFile, packName) {
-  if (!inventory || typeof inventory !== 'object') return;
+  if (!inventory || typeof inventory !== 'object') return false;
+  let isValid = true;
   for (const key of requiredInventoryArrays) {
-    if (!Array.isArray(inventory[key])) addError(inventoryFile, `${packName}: integration inventory field must be an array`, key);
+    if (!Array.isArray(inventory[key])) {
+      addError(inventoryFile, `${packName}: integration inventory field must be an array`, key);
+      isValid = false;
+    }
   }
+  return isValid;
 }
 
 function validateRequiredTemplates(pack) {
   for (const templatePath of pack.requiredTemplates) {
     const absolute = path.join(pack.dir, templatePath);
     if (!fs.existsSync(absolute)) addError(absolute, `${pack.name}: required template/partial is missing`);
+  }
+}
+
+function collectPackHtmlFiles(pack) {
+  const files = [];
+  for (const dirName of ['pages', 'partials', 'layout']) {
+    const dirPath = path.join(pack.dir, dirName);
+    if (!fs.existsSync(dirPath)) continue;
+    files.push(...walk(dirPath).filter((file) => file.endsWith('.html')));
+  }
+  return files;
+}
+
+function validatePackHooks(pack, inventory) {
+  const packHtmlFiles = collectPackHtmlFiles(pack);
+
+  for (const file of packHtmlFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+
+    for (const [attrName, inventoryKey] of Object.entries(hookKeys)) {
+      const attrRegex = new RegExp(`\\b${attrName}="([^"]*)"`, 'g');
+      for (const match of content.matchAll(attrRegex)) {
+        const value = match[1].trim();
+
+        if (!value) {
+          addError(file, `${attrName} has empty value`);
+          continue;
+        }
+
+        if (/{{[\s\S]*?}}/.test(value)) continue;
+
+        if (!inventory[inventoryKey].includes(value)) {
+          addError(file, `${attrName} "${value}" is missing from ${pack.name} integration-inventory.${inventoryKey}`);
+        }
+      }
+    }
   }
 }
 
@@ -178,7 +227,8 @@ for (const pack of packs) {
   ensureManifestFilesExist(manifest, manifestPath, pack.dir, pack.name);
 
   const inventory = parseJsonFile(inventoryPath, 'integration-inventory.json');
-  validateIntegrationInventory(inventory, inventoryPath, pack.name);
+  const inventoryValid = validateIntegrationInventory(inventory, inventoryPath, pack.name);
+  if (inventoryValid) validatePackHooks(pack, inventory);
 
   validateRequiredTemplates(pack);
 }
@@ -254,3 +304,6 @@ if (errors.length) {
 }
 
 console.log('✅ static-uikit validation passed');
+console.log(`Checked packs: ${packs.map((pack) => pack.name).join(', ')}`);
+console.log(`Checked standalone pages: ${pageFiles.length}`);
+console.log('Checked inventory hooks: actions/forms/filters/statuses/entities');
