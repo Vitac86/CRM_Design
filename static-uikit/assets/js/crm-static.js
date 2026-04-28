@@ -202,16 +202,15 @@
 
     const toggleAddressesButton = target.closest('[data-action="toggle-addresses"]');
     if (toggleAddressesButton) {
-      const section = toggleAddressesButton.closest('[data-entity="addresses"]');
+      const section = toggleAddressesButton.closest('[data-role="addresses-section"], [data-entity="addresses"]');
       if (section) {
-        const extraRows = section.querySelectorAll('[data-role="addresses-extra"]');
-        const expanded = toggleAddressesButton.getAttribute('aria-expanded') === 'true';
-        const nextExpanded = !expanded;
-        extraRows.forEach(function (row) {
-          row.hidden = !nextExpanded;
-        });
-        toggleAddressesButton.setAttribute('aria-expanded', nextExpanded ? 'true' : 'false');
-        toggleAddressesButton.textContent = nextExpanded ? 'Скрыть остальные адреса' : 'Показать остальные адреса';
+        const extra = section.querySelector('[data-role="addresses-extra"]');
+        if (extra) {
+          const isExpanded = toggleAddressesButton.getAttribute('aria-expanded') === 'true';
+          extra.hidden = isExpanded;
+          toggleAddressesButton.setAttribute('aria-expanded', String(!isExpanded));
+          toggleAddressesButton.textContent = isExpanded ? 'Показать остальные адреса' : 'Скрыть остальные адреса';
+        }
       }
       event.preventDefault();
       return;
