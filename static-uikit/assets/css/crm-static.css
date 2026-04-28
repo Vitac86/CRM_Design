@@ -4272,6 +4272,48 @@ a:focus-visible,
   --sc-text: #1a2d4b;
 }
 
+.crm-page[data-page="subject-card"] .crm-subject-detail-shell {
+  max-width: 100%;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-hero {
+  align-items: flex-start;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-tabs > li {
+  flex: 0 0 auto;
+}
+
+.crm-page[data-page="subject-card"] .crm-profile-rows {
+  align-items: stretch;
+}
+
+.crm-page[data-page="subject-card"] .crm-double-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] .crm-address-stack {
+  grid-auto-rows: minmax(0, auto);
+}
+
+.crm-page[data-page="subject-card"] .crm-timeline {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-page[data-page="subject-card"] .crm-modal {
+  padding: 12px;
+}
+
 .crm-page[data-page="subject-card"] .crm-subject-detail-shell { gap: 10px; }
 
 .crm-page[data-page="subject-card"] .crm-subject-hero {
