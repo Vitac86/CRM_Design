@@ -4882,13 +4882,14 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
   align-items: center;
   gap: 6px;
   margin-top: 7px;
-  padding: 3px 9px;
-  border: 1px solid #d9e2f1;
-  border-radius: 999px;
-  background: #f4f8ff;
-  font-size: 12px;
-  line-height: 1.2;
-  color: #5f7290;
+  min-height: 24px;
+  padding: 3px 10px;
+  border: 1px solid #cfdcf5;
+  border-radius: 8px;
+  background: #eef4ff;
+  font-size: 13px;
+  line-height: 16px;
+  color: #506482;
   width: fit-content;
 }
 
@@ -4897,10 +4898,10 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-code strong {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: #233f74;
+  color: #2d4f92;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-badge-groups {
@@ -4914,11 +4915,74 @@ body[data-page="subject-card"].crm-modal-open { overflow: hidden; }
 }
 
 .crm-page[data-page="subject-card"] .crm-inline-badges .crm-badge {
+  min-height: 24px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+body[data-page="subject-card"] .crm-chip,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #f3f6fa;
+  color: #58677d;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+body[data-page="subject-card"] .crm-chip--blue,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.info {
+  background: #edf3ff;
+  border-color: #c9d8ff;
+  color: #3157b7;
+}
+
+body[data-page="subject-card"] .crm-chip--green,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.success {
+  background: #eefaf3;
+  border-color: #cbead7;
+  color: #2f7d4e;
+}
+
+body[data-page="subject-card"] .crm-chip--amber,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.warning {
+  background: #fff7e8;
+  border-color: #f2d7a3;
+  color: #95621a;
+}
+
+body[data-page="subject-card"] .crm-chip--red,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.danger {
+  background: #fff0f0;
+  border-color: #f0c7c7;
+  color: #a34545;
+}
+
+body[data-page="subject-card"] .crm-chip--gray,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-badge.muted {
+  background: #f3f6fa;
+  border-color: #d8e0ec;
+  color: #58677d;
+}
+
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-table .crm-badge,
+body[data-page="subject-card"] .crm-page[data-page="subject-card"] .crm-representatives-table .crm-badge {
   min-height: 22px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: 11px;
-  line-height: 1.2;
+  padding: 2px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 600;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions {
