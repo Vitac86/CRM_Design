@@ -437,3 +437,134 @@
   gap: 12px;
 }
 
+
+/* ===== subjects visual refinement against legacy Vite ===== */
+.crm-page[data-page="subjects"] .crm-topbar .crm-search {
+  display: none;
+}
+
+.crm-page[data-page="subjects"] .crm-topbar {
+  justify-content: flex-end;
+}
+
+.crm-page[data-page="subjects"] .crm-topbar [data-sidebar-toggle] {
+  margin-right: auto;
+}
+
+.crm-page[data-page="subjects"] .crm-page-header.crm-registry-header {
+  align-items: center;
+  gap: 14px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-title-block .crm-page-title {
+  font-size: 48px;
+  line-height: 1.1;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-title-block .crm-page-subtitle {
+  margin-top: 6px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-actions {
+  gap: 12px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-actions .crm-button-primary,
+.crm-page[data-page="subjects"] .crm-registry-actions .crm-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 10px !important;
+  line-height: 1;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-actions .crm-button-primary {
+  font-size: 32px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-actions .crm-button-secondary {
+  min-height: 44px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 12px !important;
+  opacity: .92;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel {
+  padding: 14px 18px;
+  gap: 10px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
+  width: min(500px, 100%);
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-fields-row {
+  gap: 10px;
+  align-items: center;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
+  flex: 0 1 226px;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control .uk-form-label {
+  display: none;
+}
+
+.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control .crm-select {
+  min-height: 38px;
+  height: 38px;
+  border-radius: 999px;
+  padding: 0 36px 0 14px;
+  font-size: 13px;
+  background-position: right 15px center;
+  background-size: 12px;
+}
+
+.crm-page[data-page="subjects"] .crm-filter-reset {
+  min-height: 38px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px !important;
+  font-size: 13px;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table th {
+  padding: 10px 10px;
+  font-size: 11px;
+  background: #eef3fb;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .uk-table td {
+  padding: 8px 10px;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-row-main {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-row-sub {
+  font-size: 11px;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-badge {
+  min-height: 24px;
+  padding: 1px 9px;
+  font-size: 11px;
+  border-radius: 999px;
+  line-height: 1.15;
+}
+
+.crm-page[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
+  gap: 6px;
+}
