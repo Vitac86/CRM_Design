@@ -68,17 +68,17 @@
             <div class="crm-filter-fields-row">
           <div class="crm-filter-control"><label class="uk-form-label" for="agent-status">Статус</label><select id="agent-status" class="uk-select crm-select" name="agent-status"><option>Все</option><option>Активен</option><option>На согласовании</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="agent-assignee">Закрепление</label><select id="agent-assignee" class="uk-select crm-select" name="agent-assignee"><option>Все</option><option>Иванов И.И.</option><option>Петрова Н.А.</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
 </form>
-        <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="agent-table">
+        <div class="crm-card crm-table-card crm-registry-table" data-entity="agent-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact">
           <table class="uk-table uk-table-divider uk-table-hover">
             <thead><tr><th>Агент</th><th>Организация</th><th>Договор</th><th>Комиссия</th><th>Закрепление</th><th>Статус</th></tr></thead>
             <tbody>
               <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html"><td><div class="crm-row-main">ПАО «НеоЭнергоСбыт»</div><div class="crm-row-sub">+7 (900) 100-11-03 · corp@neoenergy.test</div></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>Иванов И.И.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
               <tr data-entity="agent" data-id="AG-1988" data-href="subject-card.html"><td><div class="crm-row-main">АО «Орбита ФинСервис»</div><div class="crm-row-sub">+7 (900) 100-11-05 · support@orbita-fin.test</div></td><td>АО «Орбита ФинСервис»</td><td>AG-1988</td><td>2.00%</td><td>Петрова Н.А.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
             </tbody>
-          </table>
+          </table></div></div>
           <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет агентов</div><div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div></div>
         </div>
       </section>
