@@ -1,5 +1,10 @@
 # HANDOFF_READINESS_AUDIT
 
+## Terminology and target
+- **Target**: UMI.CMS Corporate edition / UMI.CMS 24-compatible static templates.
+- **Clarification**: "Corporate" refers to UMI.CMS Corporate edition, not a separate UIkit Corporate theme or design system.
+- UIkit remains the local static UI framework assets used by the handoff.
+
 ## Status summary
 - **Ready for handoff**: static-uikit remains standalone static HTML5 + local UIkit assets with server-rendered/static-template-first contracts.
 - `crm-static.js` is global-only reusable behavior; page-specific behavior remains isolated to `assets/js/pages/subject-card.js`.

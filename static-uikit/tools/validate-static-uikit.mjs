@@ -37,7 +37,10 @@ const requiredReadinessAuditSnippets = [
   'npm run build',
   'server-rendered/static-template-first',
   'global-only',
-  'crm-static.js'
+  'crm-static.js',
+  'UMI.CMS Corporate',
+  'UMI.CMS 24-compatible',
+  'not a separate UIkit Corporate theme'
 ];
 const packs = [
   {
@@ -179,6 +182,18 @@ function rel(file) {
 function addError(file, message, sample = '') {
   const suffix = sample ? ` :: ${sample}` : '';
   errors.push(`${rel(file)}: ${message}${suffix}`);
+}
+
+function resolveManifestPath(entry) {
+  if (typeof entry !== 'string' || !entry.trim()) return null;
+  const normalized = entry.replace(/\\/g, '/');
+  const repoRelative = path.resolve(normalized);
+  if (fs.existsSync(repoRelative)) return repoRelative;
+
+  const staticRelative = path.resolve(rootDir, normalized);
+  if (fs.existsSync(staticRelative)) return staticRelative;
+
+  return path.resolve(normalized.startsWith('static-uikit/') ? normalized.slice('static-uikit/'.length) : normalized);
 }
 
 function parseJsonFile(file, label) {
@@ -682,6 +697,18 @@ function validateHandoffManifest() {
       if (!handoffManifest.requiredChecks.includes(requiredCheck)) {
         addError(handoffManifestFile, 'handoff manifest missing required check command', requiredCheck);
       }
+    }
+  }
+
+  if (typeof handoffManifest.readinessAudit !== 'string') {
+    addError(handoffManifestFile, 'handoff manifest readinessAudit must be a string');
+  } else {
+    const readinessAuditTarget = resolveManifestPath(handoffManifest.readinessAudit);
+    const canonicalReadinessAudit = path.resolve(handoffReadinessAuditFile);
+    if (!fs.existsSync(readinessAuditTarget)) {
+      addError(handoffManifestFile, 'handoff manifest readinessAudit path does not exist', handoffManifest.readinessAudit);
+    } else if (path.resolve(readinessAuditTarget) !== canonicalReadinessAudit) {
+      addError(handoffManifestFile, 'handoff manifest readinessAudit must resolve to static-uikit/HANDOFF_READINESS_AUDIT.md', handoffManifest.readinessAudit);
     }
   }
 }
