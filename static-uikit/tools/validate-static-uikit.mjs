@@ -399,6 +399,12 @@ function validatePageScriptsAndGlobalPurity() {
     if (/body\.getAttribute\(['"]data-page['"]\)\s*===\s*['"][a-z0-9-]+['"]/.test(content) || /\[data-page=['"][a-z0-9-]+['"]\]/.test(content)) {
       addError(crmStaticFile, 'crm-static.js must not contain concrete page guards by data-page');
     }
+    if (!/function\s+escapeCssValue\s*\(/.test(content)) {
+      addError(crmStaticFile, 'crm-static.js must define local escapeCssValue helper before building name-based selectors');
+    }
+    if (/CSS\.escape\(/.test(content.replace(/function\s+escapeCssValue\s*\([\s\S]*?\}\n/, ''))) {
+      addError(crmStaticFile, 'crm-static.js must not call CSS.escape directly outside escapeCssValue helper');
+    }
   }
 
   const forbiddenDataPattern = /window\.[a-z0-9_]*data/i;

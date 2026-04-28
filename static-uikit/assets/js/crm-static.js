@@ -20,13 +20,18 @@
       });
     });
   }
+  function escapeCssValue(value) {
+    if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(value);
+    return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
   function findControlScope(element) {
     return element.closest('form, fieldset, section, .crm-card, .crm-page') || document;
   }
 
   function syncRadioTileGroup(scope, radioName) {
     if (!radioName) return;
-    scope.querySelectorAll('.crm-radio-tile input[type="radio"][name="' + CSS.escape(radioName) + '"]').forEach(function (radio) {
+    scope.querySelectorAll('.crm-radio-tile input[type="radio"][name="' + escapeCssValue(radioName) + '"]').forEach(function (radio) {
       const tile = radio.closest('.crm-radio-tile');
       if (tile) {
         tile.classList.toggle('is-selected', radio.checked);
@@ -171,6 +176,7 @@
         form.reset();
         syncOptionGridState(form);
         syncBinaryPills(form);
+        syncSelectableControlState(form);
       }
       event.preventDefault();
       return;
@@ -270,7 +276,7 @@
 
       if (target.type === 'radio') {
         const scope = findControlScope(target);
-        scope.querySelectorAll('.crm-check-row input[type="radio"][name="' + CSS.escape(target.name) + '"]').forEach(function (radio) {
+        scope.querySelectorAll('.crm-check-row input[type="radio"][name="' + escapeCssValue(target.name) + '"]').forEach(function (radio) {
           const radioRow = radio.closest('.crm-check-row');
           if (radioRow) {
             radioRow.classList.toggle('is-active', radio.checked);
