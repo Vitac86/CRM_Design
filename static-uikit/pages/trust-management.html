@@ -59,19 +59,19 @@
       </header>
       <section class="crm-page crm-registry-page" data-page="trust-management">
         <div class="crm-page-header crm-page-header-row crm-registry-header">
-          <div class="crm-registry-title-block"><h1 data-entity="page-title">Доверительное управление</h1><p>Реестр договоров ДУ со статусом стратегии, портфеля и текущей проверки.</p></div>
+          <div class="crm-registry-title-block"><h1 class="crm-page-title" data-entity="page-title">Доверительное управление</h1><p class="crm-page-subtitle">Реестр договоров ДУ со статусом стратегии, портфеля и текущей проверки.</p></div>
           <div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-trust-management">Экспорт</button></div>
         </div>
-        <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-registry-filters crm-filter-panel" data-filter="trust-management">
-          <div class="crm-filter-search-row"><input id="trust-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trust-search" placeholder="Договор, клиент или стратегия"/></div>
+        <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-registry-filters crm-filter-panel crm-filter-grid" data-filter="trust-management">
+          <div class="crm-filter-search-row crm-filter-search crm-filter-field"><input id="trust-search" class="uk-input crm-input crm-filter-search-input crm-filter-search" type="search" data-filter="search" name="trust-search" placeholder="Договор, клиент или стратегия"/></div>
 
-            <div class="crm-filter-fields-row">
-          <div class="crm-filter-control"><label class="uk-form-label" for="trust-status">Статус</label><select id="trust-status" class="uk-select crm-select" name="trust-status"><option>Все</option><option>Активен</option><option>На согласовании</option></select></div>
-          <div class="crm-filter-control"><label class="uk-form-label" for="trust-strategy">Стратегия</label><select id="trust-strategy" class="uk-select crm-select" name="trust-strategy"><option>Все</option><option>Сбалансированная</option><option>Консервативная</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
+            <div class="crm-filter-fields-row crm-filter-grid">
+          <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="trust-status">Статус</label><select id="trust-status" class="uk-select crm-select" name="trust-status"><option>Все</option><option>Активен</option><option>На согласовании</option></select></div>
+          <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="trust-strategy">Стратегия</label><select id="trust-strategy" class="uk-select crm-select" name="trust-strategy"><option>Все</option><option>Сбалансированная</option><option>Консервативная</option></select></div>
+          <div class="crm-filter-actions crm-filter-field"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
 </form>
-        <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="trust-table">
+        <div class="crm-card crm-table-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="trust-table">
           <table class="uk-table uk-table-divider uk-table-hover">
             <thead><tr><th>Договор ДУ</th><th>Клиент</th><th>Стратегия</th><th>Стоимость портфеля</th><th>Дата начала</th><th>Статус</th></tr></thead>
             <tbody>
