@@ -58,80 +58,86 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="subject-card">
-        <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Карточка субъекта</span></div>
+        <div class="crm-subject-detail-shell">
+          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Карточка субъекта</span></div>
 
-        <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-011">
-          <div class="crm-subject-hero-main crm-detail-hero-main">
-            <div class="crm-subject-avatar">ВМ</div>
-            <div class="crm-subject-hero-text">
-              <h1 data-entity="page-title">АО «Восток Майнинг Системс»</h1>
-              <div class="crm-subject-code">Код клиента: CL-4401</div>
-              <div class="crm-inline-badges">
-                <span class="crm-badge success" data-status="active-client">Активный клиент</span>
-                <span class="crm-badge success" data-status="approved">ПРОЙДЕН</span>
-                <span class="crm-badge muted" data-status="qualified">Неквалифицированный</span>
-                <span class="crm-badge info" data-status="type">АО · Резидент РФ</span>
+          <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-011">
+            <div class="crm-subject-hero-main crm-detail-hero-main">
+              <div class="crm-subject-avatar">ВМ</div>
+              <div class="crm-subject-identity crm-subject-hero-text">
+                <h1 data-entity="page-title">АО «Восток Майнинг Системс»</h1>
+                <div class="crm-subject-code">Код клиента: CL-4401</div>
+                <div class="crm-inline-badges">
+                  <span class="crm-badge success" data-status="active-client">Активный клиент</span>
+                  <span class="crm-badge success" data-status="approved">ПРОЙДЕН</span>
+                  <span class="crm-badge muted" data-status="qualified">Неквалифицированный</span>
+                  <span class="crm-badge info" data-status="type">АО · Резидент РФ</span>
+                </div>
               </div>
             </div>
+            <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions">
+              <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
+            </div>
+          </article>
+
+          <div class="crm-subject-tabs-wrap">
+            <ul class="crm-tabs crm-detail-tabs crm-subject-tabs" uk-tab data-action="switch-tab">
+              <li class="uk-active"><a href="#">Профиль</a></li>
+              <li><a href="#">Банковские реквизиты</a></li>
+              <li><a href="#">Документы</a></li>
+              <li><a href="#">Связи</a></li>
+              <li><a href="#">Договоры / Счета</a></li>
+              <li><a href="#">История</a></li>
+            </ul>
           </div>
-          <div class="crm-subject-hero-actions crm-detail-actions">
-            <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-subject">Редактировать</button>
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
-          </div>
-        </article>
 
-        <ul class="crm-tabs crm-detail-tabs crm-subject-tabs" uk-tab data-action="switch-tab">
-          <li class="uk-active"><a href="#">Профиль</a></li>
-          <li><a href="#">Банковские реквизиты</a></li>
-          <li><a href="#">Документы</a></li>
-          <li><a href="#">Связи</a></li>
-          <li><a href="#">Договоры / Счета</a></li>
-          <li><a href="#">История</a></li>
-        </ul>
+          <section class="crm-subject-profile-grid">
+            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card">
+              <div class="crm-form-section-head"><h3>Основные данные</h3></div>
+              <div class="crm-subject-info-grid crm-profile-grid">
+                <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
+                <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
+                <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">1027700132195</div></div>
+                <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">7704132901</div></div>
+                <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
+                <div class="crm-subject-info-cell crm-profile-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
+              </div>
+            </article>
 
-        <section class="crm-subject-profile-grid">
-          <article class="crm-card crm-profile-section crm-form-card">
-            <div class="crm-form-section-head"><h3>Основные данные</h3></div>
-            <div class="crm-profile-grid">
-              <div class="crm-profile-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
-              <div class="crm-profile-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
-              <div class="crm-profile-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">1027700132195</div></div>
-              <div class="crm-profile-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">7704132901</div></div>
-              <div class="crm-profile-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
-              <div class="crm-profile-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
-            </div>
-          </article>
+            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card">
+              <div class="crm-form-section-head"><h3>Адреса</h3></div>
+              <div class="crm-subject-info-grid crm-profile-grid crm-subject-addresses-grid">
+                <div class="crm-subject-info-cell crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Юридический адрес</div><div class="crm-profile-value">г. Москва, Пресненская набережная, 8 стр. 1</div></div>
+                <div class="crm-subject-info-cell crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Фактический адрес</div><div class="crm-profile-value">г. Москва, ул. Тестовская, 10, БЦ Северная Башня</div></div>
+                <div class="crm-subject-info-cell crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Почтовый адрес</div><div class="crm-profile-value">123112, г. Москва, а/я 241</div></div>
+              </div>
+            </article>
 
-          <article class="crm-card crm-profile-section crm-form-card">
-            <div class="crm-form-section-head"><h3>Адреса</h3></div>
-            <div class="crm-profile-grid">
-              <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Юридический адрес</div><div class="crm-profile-value">г. Москва, Пресненская набережная, 8 стр. 1</div></div>
-              <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Фактический адрес</div><div class="crm-profile-value">г. Москва, ул. Тестовская, 10, БЦ Северная Башня</div></div>
-              <div class="crm-profile-field crm-profile-field-full"><div class="crm-profile-label">Почтовый адрес</div><div class="crm-profile-value">123112, г. Москва, а/я 241</div></div>
-            </div>
-          </article>
-
-          <article class="crm-card crm-profile-section crm-form-card">
-            <div class="crm-form-section-head"><h3>Комплаенс, права и сопровождение</h3></div>
-            <div class="crm-subject-summary">
-              <div><strong>Комплаенс статус</strong><small>Последняя проверка: 25.04.2026</small></div>
-              <span class="crm-badge success" data-status="approved">ПРОЙДЕН</span>
-            </div>
-            <div class="crm-subject-summary">
-              <div><strong>Права по договору</strong><small>Доступ к денежным средствам и ценным бумагам</small></div>
-              <span class="crm-badge info" data-status="rights">Разрешено</span>
-            </div>
-            <div class="crm-subject-summary">
-              <div><strong>Персональный менеджер</strong><small>Иванов И.И.</small></div>
-              <span class="crm-badge muted" data-status="manager">Front Office</span>
-            </div>
-            <div class="crm-subject-summary">
-              <div><strong>Агент</strong><small>ООО «Регион Брокер Партнер»</small></div>
-              <span class="crm-badge muted" data-status="agent">Внешний агент</span>
-            </div>
-          </article>
-        </section>
+            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card">
+              <div class="crm-form-section-head"><h3>Комплаенс, права и сопровождение</h3></div>
+              <div class="crm-subject-status-list">
+                <div class="crm-subject-status-row crm-subject-summary">
+                  <div><strong>Комплаенс статус</strong><small>Последняя проверка: 25.04.2026</small></div>
+                  <span class="crm-badge success" data-status="approved">ПРОЙДЕН</span>
+                </div>
+                <div class="crm-subject-status-row crm-subject-summary">
+                  <div><strong>Права по договору</strong><small>Доступ к денежным средствам и ценным бумагам</small></div>
+                  <span class="crm-badge info" data-status="rights">Разрешено</span>
+                </div>
+                <div class="crm-subject-status-row crm-subject-summary">
+                  <div><strong>Персональный менеджер</strong><small>Иванов И.И.</small></div>
+                  <span class="crm-badge muted" data-status="manager">Front Office</span>
+                </div>
+                <div class="crm-subject-status-row crm-subject-summary">
+                  <div><strong>Агент</strong><small>ООО «Регион Брокер Партнер»</small></div>
+                  <span class="crm-badge muted" data-status="agent">Внешний агент</span>
+                </div>
+              </div>
+            </article>
+          </section>
+        </div>
       </section>
     </main>
   </div>
