@@ -51,7 +51,7 @@
 </aside>
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
@@ -71,7 +71,7 @@
         <div class="crm-grid-2">
           <div>
             <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
-              <h3>Карточка клиента</h3>
+              <div class="crm-form-section-head"><h3>Карточка клиента</h3><span class="crm-step-note">Профиль клиента и ключевые признаки риска.</span></div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-2"><label class="uk-form-label">Тип клиента</label><div>Юридическое лицо</div></div>
                 <div class="uk-width-1-2"><label class="uk-form-label">Резидентство</label><div>Нерезидент</div></div>
@@ -91,15 +91,21 @@
             </article>
           </div>
           <form action="#" method="post" data-form="compliance-decision" data-action="compliance-decision" class="crm-card uk-card uk-card-body crm-decision-panel">
-            <h3>Панель решения</h3>
+            <div class="crm-form-section-head"><h3>Панель решения</h3><span class="crm-badge warning" data-status="pending-review">Требует решения</span></div>
             <div class="crm-action-row">
               <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="approved">Одобрить</button>
               <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="rework">На доработку</button>
               <button type="button" class="uk-button uk-button-default crm-button" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
             </div>
-            <label class="uk-form-label">Комментарий комплаенса</label>
-            <textarea class="uk-textarea crm-input" name="compliance-comment" rows="8" placeholder="Укажите обоснование решения"></textarea>
-            <button type="submit" class="uk-button crm-button-primary crm-button uk-width-1-1" data-action="compliance-decision">Принять финальное решение</button>
+            <div class="crm-form-section">
+              <label class="uk-form-label" for="compliance-comment">Комментарий комплаенса <span class="crm-required">*</span></label>
+              <textarea class="uk-textarea crm-input" id="compliance-comment" name="compliance-comment" rows="8" placeholder="Укажите обоснование решения"></textarea>
+              <span class="crm-field-note">Для статусов «На доработку» и «Заблокировать» комментарий обязателен.</span>
+            </div>
+            <div class="crm-footer-actions">
+              <button type="button" class="uk-button uk-button-default crm-button" data-action="save-draft">Сохранить черновик</button>
+              <button type="submit" class="uk-button crm-button-primary crm-button" data-action="compliance-decision">Принять финальное решение</button>
+            </div>
           </form>
         </div>
       </section>

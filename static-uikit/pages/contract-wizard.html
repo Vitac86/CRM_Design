@@ -51,27 +51,35 @@
 </aside>
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="contract-wizard">
         <div class="crm-register-header">
-          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Мастер договора</span></div>
+          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><a href="subject-card.html">Карточка субъекта</a><span uk-icon="chevron-right"></span><span>Мастер договора</span></div>
           <div class="crm-page-header"><h1 data-entity="page-title">Мастер оформления договора</h1><p class="crm-step-note">Шаг 2 из 3 · Параметры договора</p></div>
         </div>
         <form action="#" method="post" data-form="contract-wizard" data-action="submit-contract-wizard" class="crm-card uk-card uk-card-body crm-register-card">
-          <div class="crm-option-grid" data-action="contract-product-select">
-            <label class="crm-option-card" data-entity="contract-product" data-id="brokerage"><input type="radio" name="product" value="brokerage" checked/><span>Брокерский договор</span><small>Открытие счёта и торговых доступов.</small></label>
-            <label class="crm-option-card is-selected" data-entity="contract-product" data-id="trust-management"><input type="radio" name="product" value="trust-management"/><span>Договор ДУ</span><small>Передача активов в доверительное управление.</small></label>
-            <label class="crm-option-card" data-entity="contract-product" data-id="depository"><input type="radio" name="product" value="depository"/><span>Депозитарный договор</span><small>Учёт и хранение ценных бумаг клиента.</small></label>
+          <div class="crm-form-section">
+            <div class="crm-form-section-head"><h3>Шаг 2: параметры продукта</h3><span class="crm-step-note">Выбор типа договора влияет на доступные тарифы и отчётность.</span></div>
+            <div class="crm-option-grid" data-action="contract-product-select">
+              <label class="crm-option-card" data-entity="contract-product" data-id="brokerage"><input type="radio" name="product" value="brokerage"/><span>Брокерский договор</span><small>Открытие счёта и торговых доступов.</small></label>
+              <label class="crm-option-card is-selected" data-entity="contract-product" data-id="trust-management"><input type="radio" name="product" value="trust-management" checked/><span>Договор ДУ</span><small>Передача активов в доверительное управление.</small></label>
+              <label class="crm-option-card" data-entity="contract-product" data-id="depository"><input type="radio" name="product" value="depository"/><span>Депозитарный договор</span><small>Учёт и хранение ценных бумаг клиента.</small></label>
+            </div>
           </div>
-          <div class="crm-form-grid uk-grid-small" uk-grid>
-            <div class="uk-width-1-2"><label class="uk-form-label">Клиент</label><input class="uk-input crm-input" name="subject-name" value="АО «Восток Майнинг Системс»"/></div>
-            <div class="uk-width-1-2"><label class="uk-form-label">Код клиента</label><input class="uk-input crm-input" name="client-code" value="CL-4401"/></div>
-            <div class="uk-width-1-2"><label class="uk-form-label">Тариф/стратегия</label><select class="uk-select crm-select" name="strategy"><option>Сбалансированная</option></select></div>
-            <div class="uk-width-1-2"><label class="uk-form-label">Дата начала</label><input type="date" class="uk-input crm-input" name="start-date" value="2026-04-27"/></div>
-            <div class="uk-width-1-1"><label class="uk-form-label">Особые условия</label><textarea rows="4" class="uk-textarea crm-input" name="special-terms" placeholder="Комментарий по условиям и ограничениям"></textarea></div>
+          <div class="crm-form-section">
+            <div class="crm-form-section-head"><h3>Клиент и параметры договора</h3><span class="crm-step-note">Проверьте идентификаторы и дату старта.</span></div>
+            <div class="crm-form-grid uk-grid-small" uk-grid>
+              <div class="uk-width-1-2"><label class="uk-form-label" for="wizard-subject-name">Клиент <span class="crm-required">*</span></label><input class="uk-input crm-input" id="wizard-subject-name" name="subject-name" value="АО «Восток Майнинг Системс»"/></div>
+              <div class="uk-width-1-2"><label class="uk-form-label" for="wizard-client-code">Код клиента <span class="crm-required">*</span></label><input class="uk-input crm-input" id="wizard-client-code" name="client-code" value="CL-4401"/></div>
+              <div class="uk-width-1-2"><label class="uk-form-label" for="wizard-strategy">Тариф/стратегия <span class="crm-required">*</span></label><select class="uk-select crm-select" id="wizard-strategy" name="strategy"><option>Сбалансированная</option></select></div>
+              <div class="uk-width-1-2"><label class="uk-form-label" for="wizard-start-date">Дата начала <span class="crm-required">*</span></label><input type="date" class="uk-input crm-input" id="wizard-start-date" name="start-date" value="2026-04-27"/></div>
+              <div class="uk-width-1-2"><label class="uk-form-label" for="wizard-reporting">Отчётность</label><select class="uk-select crm-select" id="wizard-reporting" name="reporting-format"><option>Ежедневная email-рассылка</option><option>Еженедельный отчёт</option></select></div>
+              <div class="uk-width-1-2"><label class="uk-form-label" for="wizard-delivery">Канал доставки</label><select class="uk-select crm-select" id="wizard-delivery" name="delivery-channel"><option>Личный кабинет + Email</option><option>Только личный кабинет</option></select></div>
+              <div class="uk-width-1-1"><label class="uk-form-label" for="wizard-terms">Комментарии/особые условия</label><textarea rows="4" class="uk-textarea crm-input" id="wizard-terms" name="special-terms" placeholder="Комментарий по условиям и ограничениям"></textarea><span class="crm-field-note">Комментарий опционален, используйте для внутренних пометок.</span></div>
+            </div>
           </div>
           <div class="crm-sticky-actions">
             <button type="button" class="uk-button uk-button-default crm-button" data-action="wizard-back">Назад</button>
