@@ -68,16 +68,17 @@
             <button class="uk-button uk-button-default crm-button" type="button" data-action="export-brokerage">Экспорт</button>
           </div>
         </div>
-        <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-registry-filters crm-filter-panel crm-filter-grid" data-filter="brokerage">
-          <div class="crm-filter-search-row crm-filter-search crm-filter-field"><input id="brokerage-search" class="uk-input crm-input crm-filter-search-input crm-filter-search" type="search" data-filter="search" name="brokerage-search" placeholder="Договор, клиент, менеджер"/></div>
-
-            <div class="crm-filter-fields-row crm-filter-grid">
+        <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-registry-filters crm-filter-panel" data-filter="brokerage">
+          <div class="crm-filter-search-row crm-filter-search"><input id="brokerage-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="brokerage-search" placeholder="Договор, клиент, менеджер"/></div>
+          <div class="crm-filter-fields-row crm-filter-grid">
           <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="brokerage-status">Статус</label><select id="brokerage-status" class="uk-select crm-select" name="brokerage-status"><option>Все</option><option>Активен</option><option>На паузе</option></select></div>
           <div class="crm-filter-control crm-filter-field"><label class="uk-form-label" for="brokerage-manager">Менеджер</label><select id="brokerage-manager" class="uk-select crm-select" name="brokerage-manager"><option>Все</option><option>Иванов И.И.</option><option>Петрова Н.А.</option></select></div>
-          <div class="crm-filter-actions crm-filter-field"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
-</form>
-        <div class="crm-card crm-table-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="brokerage-table">
+        </form>
+        <div class="crm-card crm-table-card crm-registry-table" data-entity="brokerage-table">
+          <div class="crm-table-wrapper">
+            <div class="crm-table crm-registry-table-compact">
           <table class="uk-table uk-table-divider uk-table-hover">
             <thead><tr><th>Договор</th><th>Клиент</th><th>Менеджер</th><th>Дата открытия</th><th>Статус</th></tr></thead>
             <tbody>
@@ -85,6 +86,8 @@
               <tr data-entity="brokerage-contract" data-id="BR-8890" data-href="subject-card.html"><td><div class="crm-row-main">BR-8890</div><div class="crm-row-sub">CL-4408 · Брокерский договор</div></td><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">ИНН 7705964812</div></td><td>Петрова Н.А.</td><td>18.02.2026</td><td><span class="crm-badge warning" data-status="paused">На паузе</span></td></tr>
             </tbody>
           </table>
+            </div>
+          </div>
           <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет договоров</div><div class="crm-empty-state-text">Измените фильтры или проверьте период.</div></div>
         </div>
       </section>
