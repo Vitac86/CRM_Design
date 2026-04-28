@@ -357,13 +357,40 @@ for (const page of pageFiles) {
     const attrs = match[2];
     const classValue = (attrs.match(/\bclass="([^"]+)"/i) || [])[1] || '';
     const classTokens = classValue.split(/\s+/).filter(Boolean);
-    if (!classTokens.includes('crm-empty-state')) continue;
+    const hasDataEntity = /\bdata-entity="([^"]*)"/i.exec(attrs);
+    const hasDataAction = /\bdata-action="([^"]*)"/i.exec(attrs);
+    const hasDataStatus = /\bdata-status="([^"]*)"/i.exec(attrs);
 
-    if (!/\bdata-entity="empty-state"/i.test(attrs)) {
-      addError(file, 'crm-empty-state block must include data-entity="empty-state"', match[0]);
+    if (hasDataEntity && !hasDataEntity[1].trim()) addError(file, 'data-entity must not be empty', match[0]);
+    if (hasDataAction && !hasDataAction[1].trim()) addError(file, 'data-action must not be empty', match[0]);
+    if (hasDataStatus && !hasDataStatus[1].trim()) addError(file, 'data-status must not be empty', match[0]);
+
+    if (classTokens.includes('crm-empty-state')) {
+      if (!/\bdata-entity="empty-state"/i.test(attrs)) {
+        addError(file, 'crm-empty-state block must include data-entity="empty-state"', match[0]);
+      }
+      if (!/\bhidden\b/i.test(attrs)) {
+        addError(file, 'demo empty-state must use native hidden attribute', match[0]);
+      }
+      if (/\bdemo-hidden\b/i.test(attrs) && !/\bhidden\b/i.test(attrs)) {
+        addError(file, 'demo-hidden empty-state must use native hidden attribute', match[0]);
+      }
     }
-    if (/\bdemo-hidden\b/i.test(attrs) && !/\bhidden\b/i.test(attrs)) {
-      addError(file, 'demo-hidden empty-state must use native hidden attribute', match[0]);
+
+    if (classTokens.includes('crm-badge') && !/\bdata-status="/i.test(attrs) && !/\bdata-entity="/i.test(attrs)) {
+      addError(file, 'crm-badge must include data-status or explicit data-entity for decorative badges', match[0]);
+    }
+  }
+
+  const breadcrumbsRegex = /<div[^>]*class="[^"]*\bcrm-breadcrumbs\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
+  for (const breadcrumbMatch of content.matchAll(breadcrumbsRegex)) {
+    const breadcrumbHtml = breadcrumbMatch[1];
+    for (const linkMatch of breadcrumbHtml.matchAll(/\bhref="([^"]+)"/gi)) {
+      const target = linkMatch[1].trim();
+      if (!target.endsWith('.html')) continue;
+      if (/^[a-z]+:/i.test(target) || target.startsWith('/') || target.startsWith('#') || target.includes('{{')) continue;
+      const resolved = path.resolve(path.dirname(file), target);
+      if (!fs.existsSync(resolved)) addError(file, 'breadcrumb href target path does not exist', target);
     }
   }
 }
