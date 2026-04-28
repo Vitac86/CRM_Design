@@ -313,24 +313,33 @@ function validateRegistryFilterPanelStructure(file, content) {
 function validateRegistryTableAndEmptyState(file, content) {
   const isStandaloneRegistry = file.includes('/static-uikit/pages/') && registryPages.has(path.basename(file));
   if (!isStandaloneRegistry) return;
-  const registryTableBlocks = content.match(/<div[^>]*class="[^"]*\bcrm-registry-table\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi) || [];
+  const registryTableBlocks = extractBalancedElementsByClass(content, 'div', 'crm-registry-table');
   if (!registryTableBlocks.length) {
     addError(file, 'registry page must include at least one .crm-registry-table block');
   }
   for (const block of registryTableBlocks) {
-    if (!/<div[^>]*class="[^"]*\bcrm-table-wrapper\b[^"]*"[^>]*>/i.test(block)) {
+    const wrapperBlocks = extractBalancedElementsByClass(block, 'div', 'crm-table-wrapper');
+    if (!wrapperBlocks.length) {
       addError(file, '.crm-registry-table must contain .crm-table-wrapper');
       continue;
     }
-    if (!/<div[^>]*class="[^"]*\bcrm-table-wrapper\b[^"]*"[^>]*>[\s\S]*?<div[^>]*class="[^"]*\bcrm-table\b[^"]*"[^>]*>/i.test(block)) {
+    const hasWrapperWithTable = wrapperBlocks.some((wrapper) => extractBalancedElementsByClass(wrapper, 'div', 'crm-table').length > 0);
+    if (!hasWrapperWithTable) {
       addError(file, '.crm-table-wrapper must contain .crm-table');
       continue;
     }
-    if (!/<div[^>]*class="[^"]*\bcrm-table\b[^"]*"[^>]*>[\s\S]*?<table\b[^>]*class="[^"]*\buk-table\b/i.test(block)) {
+    const crmTableBlocks = extractBalancedElementsByClass(block, 'div', 'crm-table');
+    const hasCrmTableWithUkTable = crmTableBlocks.some((crmTableBlock) => /<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>/i.test(crmTableBlock));
+    if (!hasCrmTableWithUkTable) {
       addError(file, '.crm-table must contain table.uk-table');
       continue;
     }
-    for (const tm of block.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)) {
+    const ukTables = [...block.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)];
+    if (!ukTables.length) {
+      addError(file, '.crm-registry-table must include at least one table.uk-table');
+      continue;
+    }
+    for (const tm of ukTables) {
       const inner = tm[1];
       if (!/<thead\b/i.test(inner) || !/<tbody\b/i.test(inner)) addError(file, 'table.uk-table must include both thead and tbody');
     }
@@ -889,6 +898,42 @@ function extractBalancedTagByAttribute(content, tagName, attrName, attrValue) {
   return null;
 }
 
+function extractBalancedElementsByClass(content, tagName, className) {
+  const voidElements = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+  const tagRegex = /<\/?([a-zA-Z][\w:-]*)\b[^>]*>/g;
+  const normalizedTagName = tagName.toLowerCase();
+  const normalizedClassName = className.toLowerCase();
+  const stack = [];
+  const blocks = [];
+
+  for (const match of content.matchAll(tagRegex)) {
+    const tag = match[0];
+    const currentTag = match[1].toLowerCase();
+    const isClose = /^<\//.test(tag);
+    const isSelfClosing = /\/>$/.test(tag) || voidElements.has(currentTag);
+
+    if (isClose) {
+      if (stack.length && stack[stack.length - 1].tagName === currentTag) {
+        const closed = stack.pop();
+        if (closed.matchesTarget) blocks.push(content.slice(closed.startIndex, match.index + tag.length));
+      }
+      continue;
+    }
+
+    const classAttr = (tag.match(/\bclass\s*=\s*"([^"]*)"/i) || [null, ''])[1];
+    const classTokens = classAttr.split(/\s+/).filter(Boolean).map((token) => token.toLowerCase());
+    const matchesTarget = currentTag === normalizedTagName && classTokens.includes(normalizedClassName);
+
+    if (!isSelfClosing) {
+      stack.push({ tagName: currentTag, startIndex: match.index, matchesTarget });
+    } else if (matchesTarget) {
+      blocks.push(tag);
+    }
+  }
+
+  return blocks;
+}
+
 function validateBalancedTagHelperSelfTest() {
   const file = path.join(rootDir, 'tools', 'validate-static-uikit.mjs');
   const fixture = `
@@ -935,6 +980,48 @@ function validateBalancedTagHelperSelfTest() {
   const brokenFixture = '<section><div data-role="broken"><span>Oops</section>';
   if (extractBalancedTagByAttribute(brokenFixture, 'div', 'data-role', 'broken') !== null) {
     addError(file, 'balanced-tag helper self-test failed for unbalanced target element');
+  }
+
+  const registryFixture = `
+<div class="crm-registry-table">
+  <div class="crm-table-wrapper">
+    <div class="crm-table">
+      <table class="uk-table">
+        <thead><tr><th>H</th></tr></thead>
+        <tbody><tr><td><div class="crm-row-main">Main</div><div class="crm-row-sub">Sub</div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>`.trim();
+  const registryBlocks = extractBalancedElementsByClass(registryFixture, 'div', 'crm-registry-table');
+  if (registryBlocks.length !== 1 || !registryBlocks[0].includes('</table>') || !registryBlocks[0].endsWith('</div>')) {
+    addError(file, 'registry balanced extraction self-test failed for nested divs in td');
+  }
+
+  const missingUkTableFixture = '<div class="crm-registry-table"><div class="crm-table-wrapper"><div class="crm-table"><div>No table</div></div></div></div>';
+  const missingUkTableBlock = extractBalancedElementsByClass(missingUkTableFixture, 'div', 'crm-registry-table')[0] || '';
+  if (!missingUkTableBlock || /<table\b[^>]*class="[^"]*\buk-table\b/i.test(missingUkTableBlock)) {
+    addError(file, 'registry self-test fixture for missing table.uk-table is invalid');
+  }
+
+  const missingTbodyFixture = '<div class="crm-registry-table"><div class="crm-table-wrapper"><div class="crm-table"><table class="uk-table"><thead><tr><th>A</th></tr></thead></table></div></div></div>';
+  const missingTbodyTable = (extractBalancedElementsByClass(missingTbodyFixture, 'div', 'crm-registry-table')[0] || '').match(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/i);
+  if (!missingTbodyTable || /<tbody\b/i.test(missingTbodyTable[1])) {
+    addError(file, 'registry self-test fixture for missing tbody is invalid');
+  }
+
+  const emptyStateMissingHiddenAttrs = 'class="crm-empty-state" data-entity="empty-state"';
+  const beforeMissingHiddenCount = errors.length;
+  validateEmptyStateContract(file, emptyStateMissingHiddenAttrs, '<div class="crm-empty-state">');
+  if (errors.length === beforeMissingHiddenCount) addError(file, 'empty-state self-test failed: missing hidden must be reported');
+  else errors.splice(beforeMissingHiddenCount);
+
+  const emptyStateDemoVisibleAttrs = 'class="crm-empty-state" data-entity="empty-state" data-demo-visible="true"';
+  const beforeDemoVisibleCount = errors.length;
+  validateEmptyStateContract(file, emptyStateDemoVisibleAttrs, '<div class="crm-empty-state">');
+  if (errors.length !== beforeDemoVisibleCount) {
+    errors.splice(beforeDemoVisibleCount);
+    addError(file, 'empty-state self-test failed: data-demo-visible="true" should be allowed without hidden');
   }
 }
 
