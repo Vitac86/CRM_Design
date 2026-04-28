@@ -1,0 +1,9 @@
+# CARD / DETAIL / WIZARD / ADMIN PAGE AUDIT
+
+| Page | Pattern type | Forms | Tabs | Sticky/footer actions | Selectable controls | UMI mapping | Follow-up notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `subject-register.html` | wizard + register card | `data-form="subject-register"`, `.crm-register-card` with `.crm-form-section` blocks | no | `.crm-footer-actions.crm-register-actions` | `.crm-option-card`, `.crm-binary-control` (checked + visual class aligned) | standalone only (flows into subject onboarding and contract wizard) | Current step now has `aria-current="step"`; keep server-side checked state authoritative. |
+| `contract-wizard.html` | wizard + contract form | `data-form="contract-wizard"`, `.crm-contract-wizard-form` sections | no | `.crm-sticky-actions.crm-wizard-actions` | `.crm-check-row`, `.crm-radio-tile` aligned | `umi-p1/pages/contract-wizard.html` | No page-specific JS required while behavior remains native/static controls only. |
+| `compliance-card.html` | detail card + decision panel | decision form `data-form="compliance-decision"` | no | `.crm-footer-actions.crm-decision-footer` | decision/status actions (no runtime rendering) | `umi-p0/pages/compliance-card.html` | Page title hook normalized to `h1[data-entity="page-title"]`. |
+| `trading-card.html` | detail card | no editable form | `uk-tab.crm-tabs` | terminal action row in `.crm-footer-actions` | none of radio/option tiles | `umi-p1/pages/trading-card.html` | Keep action hooks inventory-ready (`issue-terminal`, `disable-terminal`, `reset-terminal-password`). |
+| `administration.html` | admin card selector | no form | no | no sticky/footer form actions | `.crm-option-card` as link tiles | `umi-p1/pages/administration.html` | Link-tile option cards remain valid without embedded radio controls. |

@@ -134,6 +134,16 @@ const registryPages = new Set([
 ]);
 const registryAuditFile = path.join(rootDir, 'REGISTRY_PAGE_AUDIT.md');
 const registryEmptyStateAllowlist = new Map();
+const auditedNonRegistryPages = new Set([
+  'subject-register.html',
+  'contract-wizard.html',
+  'compliance-card.html',
+  'trading-card.html',
+  'administration.html'
+]);
+const nestedCardAllowlist = new Map([
+  ['subject-card.html', 'legacy exception covered by dedicated validator']
+]);
 
 const errors = [];
 
@@ -808,6 +818,79 @@ for (const file of allFiles) {
 
 
 
+function validateNonRegistryPageContracts(file, content) {
+  const pageName = path.basename(file);
+  if (!auditedNonRegistryPages.has(pageName)) return;
+
+  if (!/<h1\b[^>]*data-entity="page-title"[^>]*>/i.test(content)) {
+    addError(file, 'audited non-registry page must include h1[data-entity="page-title"]');
+  }
+
+  const wizardBlocks = [...content.matchAll(/<div\b([^>]*)class="([^"]*\bcrm-wizard-steps\b[^"]*)"([^>]*)>([\s\S]*?)<\/div>/gi)];
+  for (const block of wizardBlocks) {
+    const attrs = `${block[1]} ${block[3]}`;
+    const inner = block[4];
+    if (!/\baria-label="[^"]+"/i.test(attrs)) addError(file, '.crm-wizard-steps must include aria-label');
+
+    const currentByAria = (inner.match(/\baria-current="step"/gi) || []).length;
+    const currentByStatus = (inner.match(/\bdata-status="current"/gi) || []).length;
+    const activeByClass = (inner.match(/\bcrm-wizard-step-active\b/gi) || []).length;
+    if (currentByAria + currentByStatus !== 1) addError(file, '.crm-wizard-steps must include exactly one current step via aria-current="step" or data-status="current"');
+    if (activeByClass !== 1) addError(file, '.crm-wizard-steps must include exactly one .crm-wizard-step-active');
+  }
+
+  for (const formMatch of content.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
+    const formAttrs = formMatch[1];
+    const formInner = formMatch[2];
+    const isTargetForm = /\bcrm-register-card\b/.test(formAttrs) || /\bcrm-contract-wizard-form\b/.test(formAttrs);
+    if (isTargetForm) {
+      const sectionBlocks = formInner.match(/<[^>]*class="[^"]*\bcrm-form-section\b[^"]*"[^>]*>[\s\S]*?<\/[a-z0-9-]+>/gi) || [];
+      if (!sectionBlocks.length) addError(file, 'forms with .crm-register-card or .crm-contract-wizard-form must include at least one .crm-form-section');
+      for (const section of sectionBlocks) {
+        if (!/(<h2\b|<h3\b|\bcrm-form-section-head\b)/i.test(section)) addError(file, '.crm-form-section must include h2/h3 heading or .crm-form-section-head');
+      }
+    }
+
+    const hasStickyActions = /\bcrm-sticky-actions\b/.test(formInner) || /\bcrm-footer-actions\b/.test(formInner);
+    if (hasStickyActions) {
+      for (const buttonMatch of formInner.matchAll(/<button\b([^>]*)>/gi)) {
+        const attrs = buttonMatch[1];
+        const type = (attrs.match(/\btype="([^"]+)"/i) || [,''])[1].toLowerCase();
+        if (!type) addError(file, 'buttons in forms with .crm-sticky-actions/.crm-footer-actions must declare explicit type', buttonMatch[0]);
+        const action = (attrs.match(/\bdata-action="([^"]+)"/i) || [,''])[1].toLowerCase();
+        if (action && nonSubmitActionPrefixes.some((prefix) => action.startsWith(prefix)) && type !== 'button') {
+          addError(file, 'non-submit action buttons in sticky/footer form actions must use type="button"', buttonMatch[0]);
+        }
+      }
+    }
+  }
+
+  const tagRegex = /<\/?([a-zA-Z][\w:-]*)\b[^>]*>/g;
+  const voidElements = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+  const stack = [];
+  for (const match of content.matchAll(tagRegex)) {
+    const tag = match[0];
+    const tagName = match[1].toLowerCase();
+    const isClose = /^<\//.test(tag);
+    const isSelfClosing = /\/>$/.test(tag) || voidElements.has(tagName);
+    if (isClose) {
+      for (let i = stack.length - 1; i >= 0; i -= 1) {
+        if (stack[i].tagName === tagName) {
+          stack.length = i;
+          break;
+        }
+      }
+      continue;
+    }
+    const isCard = /\bclass="[^"]*\bcrm-card\b[^"]*"/i.test(tag);
+    if (isCard && stack.some((entry) => entry.isCard)) {
+      if (!nestedCardAllowlist.has(pageName)) addError(file, 'audited non-registry page must not nest .crm-card inside .crm-card', `<${tagName}> ${tag.trim()}`);
+      break;
+    }
+    if (!isSelfClosing) stack.push({ tagName, isCard });
+  }
+}
+
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1245,6 +1328,7 @@ for (const page of pageFiles) {
   if (!/<button[^>]*\bdata-sidebar-toggle\b/i.test(content)) addError(file, 'missing sidebar toggle button[data-sidebar-toggle]');
   validateRegistryFilterPanelStructure(file, content);
   validateFormControlPatterns(file, content);
+  validateNonRegistryPageContracts(file, content);
 
   const buttonRegex = /<button\b([^>]*)>/gi;
   for (const match of content.matchAll(buttonRegex)) {

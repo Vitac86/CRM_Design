@@ -70,3 +70,12 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 - Keep registry table wrappers overflow-safe: horizontal scrolling belongs to `.crm-table-wrapper` only, not to the full page canvas.
 - Keep empty states inside the registry shell/card but outside table markup (`table/thead/tbody/tr`) and hidden in demo mode via native `hidden`.
 - `crm-static.js` stays global-only and reusable (row `data-href`, reset helpers, non-submitting behavior), with no page runtime rendering; UMI templates render registry rows server-side.
+
+## Non-registry page contracts (card/detail/wizard/admin)
+- Audited pages: `subject-register.html`, `contract-wizard.html`, `compliance-card.html`, `trading-card.html`, `administration.html`.
+- Require `body[data-page]` == `section.crm-page[data-page]` and `h1[data-entity="page-title"]`.
+- Wizard step groups (`.crm-wizard-steps`) must expose `aria-label` and exactly one current step (`aria-current="step"` or `data-status="current"`).
+- Forms based on `.crm-register-card` / `.crm-contract-wizard-form` must include `.crm-form-section` with heading (`h2/h3` or `.crm-form-section-head`).
+- Sticky/footer action containers must keep explicit button `type`; non-submit actions (export/download/view/open/print/resend/restore) must use `type="button"`.
+- Keep `crm-static.js` global-only; no runtime rendering/data hydration. Selectable controls are server-rendered with consistent `checked` + `.is-selected`/`.is-active`.
+- See `CARD_DETAIL_PAGE_AUDIT.md` for per-page mapping and follow-up notes.
