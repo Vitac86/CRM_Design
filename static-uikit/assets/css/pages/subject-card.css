@@ -1019,6 +1019,36 @@ body[data-page="subject-card"] .crm-chip--gray,
   }
 }
 
+
+
+/* Soften visual weight of secondary profile sections */
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="registration-data"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="contacts"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="compliance"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="usage-rights"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="manager"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="agent"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="report-delivery"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="manager-comment"] {
+  padding: 14px 16px;
+  border-color: #e5ebf5;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="registration-data"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="contacts"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="compliance"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="usage-rights"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="manager"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="agent"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="report-delivery"] .crm-form-section-head,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="manager-comment"] .crm-form-section-head {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom-color: #e8edf6;
+}
+
 /* ===== Subject card responsive stabilization after font restore ===== */
 .crm-page[data-page="subject-card"] .crm-subject-hero {
   grid-template-columns: auto minmax(0, 1fr) 170px;
