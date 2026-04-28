@@ -7,6 +7,12 @@
 - `static-uikit` — независимый deliverable для шаблонной интеграции.
 - Используется единый дизайн: **Investica Light Executive**.
 
+
+## Review launcher
+Откройте локально: `http://localhost:8080/static-uikit/index.html`.
+
+Страница содержит быстрые ссылки на standalone pages (`static-uikit/pages/*.html`), UMI P0/P1 extraction packs и команды локальной проверки/сборки.
+
 ## Как открыть локально
 1. Откройте любой файл из `static-uikit/pages/*.html` в браузере.
 2. Для корректной работы путей используйте корень репозитория как base path.
