@@ -341,6 +341,31 @@ for (const page of pageFiles) {
   const content = fs.readFileSync(file, 'utf8');
   if (!/<body[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, 'missing body[data-page]');
   if (!/<section[^>]*class="[^"]*crm-page[^"]*"[^>]*\bdata-page="[^"]+"/i.test(content)) addError(file, 'missing section.crm-page[data-page]');
+  if (!/<input[^>]*\bname="global-search"/i.test(content)) addError(file, 'missing topbar global search input[name="global-search"]');
+  if (!/<button[^>]*\bdata-sidebar-toggle\b/i.test(content)) addError(file, 'missing sidebar toggle button[data-sidebar-toggle]');
+
+  const buttonRegex = /<button\b([^>]*)>/gi;
+  for (const match of content.matchAll(buttonRegex)) {
+    const attrs = match[1];
+    if (!/\btype="[^"]+"/i.test(attrs)) {
+      addError(file, '<button> is missing required type attribute', match[0]);
+    }
+  }
+
+  const elementRegex = /<([a-z0-9-]+)\b([^>]*)>/gi;
+  for (const match of content.matchAll(elementRegex)) {
+    const attrs = match[2];
+    const classValue = (attrs.match(/\bclass="([^"]+)"/i) || [])[1] || '';
+    const classTokens = classValue.split(/\s+/).filter(Boolean);
+    if (!classTokens.includes('crm-empty-state')) continue;
+
+    if (!/\bdata-entity="empty-state"/i.test(attrs)) {
+      addError(file, 'crm-empty-state block must include data-entity="empty-state"', match[0]);
+    }
+    if (/\bdemo-hidden\b/i.test(attrs) && !/\bhidden\b/i.test(attrs)) {
+      addError(file, 'demo-hidden empty-state must use native hidden attribute', match[0]);
+    }
+  }
 }
 
 for (const { packName, file } of packPageFiles) {
