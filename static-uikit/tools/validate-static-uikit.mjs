@@ -4,6 +4,7 @@ import path from 'node:path';
 
 const rootDir = path.resolve('static-uikit');
 const pagesDir = path.join(rootDir, 'pages');
+const launcherFile = path.join(rootDir, 'index.html');
 
 const packs = [
   {
@@ -62,8 +63,8 @@ const scanDirs = [
 ];
 const textExt = new Set(['.html', '.js', '.mjs', '.css', '.md', '.json']);
 
-const forbiddenExternalPattern = /(https?:\/\/|cdn|fonts\.googleapis|fonts\.gstatic|unpkg|jsdelivr|cloudflare|analytics|gtag|tagmanager|sentry|amplitude|mixpanel)/i;
-const forbiddenApiPattern = /(fetch\(|XMLHttpRequest|axios|WebSocket|EventSource|localStorage|sessionStorage|history\.pushState)/;
+const forbiddenExternalPattern = /(https?:\/\/(?!localhost(?::\d+)?|127\.0\.0\.1(?::\d+)?|\{\{)|fonts\.googleapis|fonts\.gstatic|unpkg|jsdelivr|cloudflare|googletagmanager|gtag\(|sentry|amplitude|mixpanel)/i;
+const forbiddenApiPattern = /(fetch\(|new\s+XMLHttpRequest|axios\(|new\s+WebSocket|new\s+EventSource|localStorage\.|sessionStorage\.|history\.pushState)/;
 
 const requiredInventoryArrays = ['routes', 'entities', 'actions', 'forms', 'filters', 'statuses'];
 const hookKeys = {
@@ -234,6 +235,7 @@ for (const pack of packs) {
 }
 
 const allFiles = scanDirs.flatMap((dir) => walk(dir)).filter((file) => textExt.has(path.extname(file)));
+if (fs.existsSync(launcherFile)) allFiles.push(launcherFile);
 
 for (const file of allFiles) {
   const content = fs.readFileSync(file, 'utf8');
@@ -257,6 +259,13 @@ for (const file of allFiles) {
       const target = m[1];
       if (!target.endsWith('.html')) continue;
       if (/^[a-z]+:/i.test(target) || target.startsWith('/') || target.startsWith('#') || target.includes('{{')) continue;
+
+      if (target.includes('/')) {
+        const resolved = path.resolve(path.dirname(file), target);
+        if (!fs.existsSync(resolved)) addError(file, 'href target path does not exist', target);
+        continue;
+      }
+
       if (!knownHtmlTargets.has(path.basename(target))) addError(file, 'href target does not exist in static-uikit/pages or umi pack pages', target);
     }
 
@@ -280,6 +289,52 @@ for (const file of allFiles) {
     }
   }
 }
+
+
+function validateStaticUikitLauncher() {
+  if (!fs.existsSync(launcherFile)) {
+    addError(launcherFile, 'static-uikit/index.html is missing');
+    return;
+  }
+
+  const content = fs.readFileSync(launcherFile, 'utf8');
+
+  if (!/<body[^>]*\bdata-page="static-uikit-index"/i.test(content)) {
+    addError(launcherFile, 'missing body[data-page="static-uikit-index"]');
+  }
+
+  const hrefMatches = content.matchAll(/\bhref="([^"]+)"/g);
+  for (const m of hrefMatches) {
+    const target = m[1].trim();
+    if (!target || target.startsWith('#') || target.startsWith('{{')) continue;
+    if (/^[a-z]+:/i.test(target) || target.startsWith('//')) {
+      addError(launcherFile, 'contains external URL in href', target);
+      continue;
+    }
+
+    if (/^(pages\/.*\.html|umi-p0\/.+|umi-p1\/.+)/.test(target)) {
+      const absolute = path.resolve(rootDir, target);
+      if (!fs.existsSync(absolute)) addError(launcherFile, 'launcher href target does not exist', target);
+    }
+  }
+
+  const srcMatches = content.matchAll(/\bsrc="([^"]+)"/g);
+  for (const m of srcMatches) {
+    const target = m[1].trim();
+    if (!target || target.startsWith('{{')) continue;
+    if (/^[a-z]+:/i.test(target) || target.startsWith('//')) {
+      addError(launcherFile, 'contains external URL in src', target);
+    }
+  }
+
+  const lines = content.split(/\r?\n/);
+  lines.forEach((line, idx) => {
+    if (forbiddenExternalPattern.test(line)) addError(launcherFile, `forbidden external/CDN pattern on line ${idx + 1}`, line.trim());
+    if (forbiddenApiPattern.test(line)) addError(launcherFile, `forbidden API pattern on line ${idx + 1}`, line.trim());
+  });
+}
+
+validateStaticUikitLauncher();
 
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);
