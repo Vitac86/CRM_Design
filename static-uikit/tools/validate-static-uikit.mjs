@@ -74,6 +74,7 @@ const hookKeys = {
   'data-filter': 'filters',
   'data-status': 'statuses'
 };
+const nonSubmitActionPrefixes = ['export', 'download', 'resend', 'view', 'open', 'restore', 'print'];
 
 const errors = [];
 
@@ -269,6 +270,18 @@ for (const file of allFiles) {
       if (!knownHtmlTargets.has(path.basename(target))) addError(file, 'href target does not exist in static-uikit/pages or umi pack pages', target);
     }
 
+    const linkishRegex = /<([a-z0-9-]+)\b([^>]*)>/gi;
+    for (const elementMatch of content.matchAll(linkishRegex)) {
+      const attrs = elementMatch[2];
+      const hrefMatch = attrs.match(/\bhref="([^"]+)"/i);
+      const dataHrefMatch = attrs.match(/\bdata-href="([^"]+)"/i);
+      if (!hrefMatch || !dataHrefMatch) continue;
+      const hrefTarget = hrefMatch[1].trim();
+      const dataHrefTarget = dataHrefMatch[1].trim();
+      if (!hrefTarget.endsWith('.html') || !dataHrefTarget.endsWith('.html')) continue;
+      if (hrefTarget !== dataHrefTarget) addError(file, 'href and data-href html targets must match on the same element', `${hrefTarget} !== ${dataHrefTarget}`);
+    }
+
     const formRegex = /<form\b([^>]*)>([\s\S]*?)<\/form>/g;
     for (const formMatch of content.matchAll(formRegex)) {
       const attrs = formMatch[1];
@@ -285,6 +298,29 @@ for (const file of allFiles) {
         const type = (fieldAttrs.match(/\btype="([^"]+)"/) || [])[1] || '';
         if (['submit', 'reset', 'button'].includes(type.toLowerCase())) continue;
         if (!/\bname=/.test(fieldAttrs)) addError(file, `<${tag}> inside form is missing name attribute`, fieldMatch[0]);
+      }
+
+      const buttonRegex = /<button\b([^>]*)>/gi;
+      for (const buttonMatch of formInner.matchAll(buttonRegex)) {
+        const buttonAttrs = buttonMatch[1];
+        const typeMatch = buttonAttrs.match(/\btype="([^"]+)"/i);
+        if (!typeMatch) {
+          addError(file, 'button inside form is missing required type attribute', buttonMatch[0]);
+          continue;
+        }
+        const buttonType = typeMatch[1].trim().toLowerCase();
+        if (!['submit', 'reset', 'button'].includes(buttonType)) {
+          addError(file, 'button inside form has unsupported type attribute', buttonMatch[0]);
+          continue;
+        }
+
+        const actionMatch = buttonAttrs.match(/\bdata-action="([^"]+)"/i);
+        if (buttonType === 'submit' && actionMatch) {
+          const action = actionMatch[1].trim().toLowerCase();
+          if (nonSubmitActionPrefixes.some((prefix) => action.startsWith(prefix))) {
+            addError(file, 'button action that starts with export/download/resend/view/open/restore/print must not use type="submit" inside forms', buttonMatch[0]);
+          }
+        }
       }
     }
   }
