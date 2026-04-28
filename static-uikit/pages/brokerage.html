@@ -68,11 +68,13 @@
             <button class="uk-button uk-button-default crm-button" type="button" data-action="export-brokerage">Экспорт</button>
           </div>
         </div>
-        <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-registry-filters" data-filter="brokerage">
-          <div class="crm-filter-control crm-filter-control-search crm-registry-search"><label class="uk-form-label" for="brokerage-search">Поиск</label><input id="brokerage-search" class="uk-input crm-input" type="search" data-filter="search" name="brokerage-search" placeholder="Договор, клиент, менеджер"/></div>
+        <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-registry-filters crm-filter-panel" data-filter="brokerage">
+          <div class="crm-filter-search-row"><input id="brokerage-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="brokerage-search" placeholder="Договор, клиент, менеджер"/></div>
+
+            <div class="crm-filter-fields-row">
           <div class="crm-filter-control"><label class="uk-form-label" for="brokerage-status">Статус</label><select id="brokerage-status" class="uk-select crm-select" name="brokerage-status"><option>Все</option><option>Активен</option><option>На паузе</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="brokerage-manager">Менеджер</label><select id="brokerage-manager" class="uk-select crm-select" name="brokerage-manager"><option>Все</option><option>Иванов И.И.</option><option>Петрова Н.А.</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
         </form>
         <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="brokerage-table">
           <table class="uk-table uk-table-divider uk-table-hover">

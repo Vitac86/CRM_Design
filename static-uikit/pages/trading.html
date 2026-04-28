@@ -59,11 +59,13 @@
       </header>
       <section class="crm-page crm-registry-page" data-page="trading">
         <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1>Трейдинг</h1><p>Реестр торговых профилей клиентов с контролем риска и терминалов.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-trading">Экспорт</button></div></div>
-        <form action="#" method="post" data-form="trading-filters" data-action="filter-trading" class="crm-registry-filters" data-filter="trading">
-          <div class="crm-filter-control crm-filter-control-search crm-registry-search"><label class="uk-form-label" for="trading-search">Поиск</label><input id="trading-search" class="uk-input crm-input" type="search" data-filter="search" name="trading-search" placeholder="Клиент, договор, код"/></div>
+        <form action="#" method="post" data-form="trading-filters" data-action="filter-trading" class="crm-registry-filters crm-filter-panel" data-filter="trading">
+          <div class="crm-filter-search-row"><input id="trading-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trading-search" placeholder="Клиент, договор, код"/></div>
+
+            <div class="crm-filter-fields-row">
           <div class="crm-filter-control"><label class="uk-form-label" for="trading-status">Статус</label><select id="trading-status" class="uk-select crm-select" name="trading-status"><option>Все</option><option>Активен</option><option>На проверке</option></select></div>
           <div class="crm-filter-control"><label class="uk-form-label" for="trading-risk">Риск</label><select id="trading-risk" class="uk-select crm-select" name="risk"><option>Все</option><option>Низкий</option><option>Средний</option></select></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="reset" data-action="reset-filters">Сбросить фильтры</button></div>
         </form>
         <div class="crm-card crm-table crm-table-wrapper crm-registry-table crm-registry-table-compact" data-entity="trading-table"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Профиль</th><th>Статус</th><th>Риск</th><th>Терминалы</th><th>Открыт</th><th>Ответственный</th></tr></thead><tbody>
           <tr data-entity="trading-profile" data-id="BR-8821" data-href="trading-card.html"><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · BR-8821</div></td><td><span class="crm-badge success" data-status="active">Активен</span></td><td><span class="crm-badge success" data-status="risk-low">Низкий</span></td><td>QUIK Desktop, WebQUIK</td><td>11.01.2026</td><td>Иванов И.И.</td></tr>
