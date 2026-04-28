@@ -6,6 +6,19 @@ const rootDir = path.resolve('static-uikit');
 const pagesDir = path.join(rootDir, 'pages');
 const launcherFile = path.join(rootDir, 'index.html');
 const partialsDir = path.join(rootDir, 'partials');
+const handoffManifestFile = path.join(rootDir, 'HANDOFF_MANIFEST.json');
+const handoffNotesFile = path.join(rootDir, 'HANDOFF_NOTES.md');
+const requiredHandoffChecks = [
+  'node static-uikit/tools/validate-static-uikit.mjs',
+  'npm run build'
+];
+const requiredHandoffNotesSnippets = [
+  'Standalone HTML demo pages',
+  'UMI P0 extraction pack',
+  'UMI P1 extraction pack',
+  'node static-uikit/tools/validate-static-uikit.mjs',
+  'npm run build'
+];
 
 const packs = [
   {
@@ -242,6 +255,112 @@ function validatePackHooks(pack, inventory) {
     }
   }
 }
+
+
+function validateHandoffManifest() {
+  const handoffManifest = parseJsonFile(handoffManifestFile, 'HANDOFF_MANIFEST.json');
+  if (!handoffManifest || typeof handoffManifest !== 'object') return;
+
+  if (handoffManifest.runtime !== false) addError(handoffManifestFile, 'handoff manifest runtime must be false');
+  if (handoffManifest.buildStep !== false) addError(handoffManifestFile, 'handoff manifest buildStep must be false');
+  if (handoffManifest.localAssetsOnly !== true) addError(handoffManifestFile, 'handoff manifest localAssetsOnly must be true');
+  if (handoffManifest.reactVitePrototypeUntouched !== true) addError(handoffManifestFile, 'handoff manifest reactVitePrototypeUntouched must be true');
+
+  if (!handoffManifest.safetyConstraints || typeof handoffManifest.safetyConstraints !== 'object') {
+    addError(handoffManifestFile, 'handoff manifest safetyConstraints must be an object');
+  } else {
+    for (const [key, value] of Object.entries(handoffManifest.safetyConstraints)) {
+      if (value !== true) addError(handoffManifestFile, 'handoff manifest safetyConstraints values must be true', key);
+    }
+  }
+
+  for (const [field, expectDir] of [
+    ['standalonePages', false],
+    ['partials', false],
+    ['localAssets', true]
+  ]) {
+    const entries = handoffManifest[field];
+    if (!Array.isArray(entries)) {
+      addError(handoffManifestFile, `handoff manifest ${field} must be an array`);
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (typeof entry !== 'string') {
+        addError(handoffManifestFile, `handoff manifest ${field} entries must be strings`);
+        continue;
+      }
+
+      const normalized = entry.replace(/\\/g, '/');
+      const target = path.join(rootDir, entry);
+      const isFontsDir = normalized.endsWith('assets/fonts/') || normalized.endsWith('assets/fonts');
+
+      if (isFontsDir) {
+        if (!fs.existsSync(target) || !fs.statSync(target).isDirectory()) {
+          addError(handoffManifestFile, 'handoff manifest localAssets fonts directory is missing', entry);
+          continue;
+        }
+        const fontFiles = walk(target).filter((file) => file.endsWith('.woff2'));
+        if (!fontFiles.length) addError(handoffManifestFile, 'handoff manifest fonts directory must contain at least one .woff2 file', entry);
+        continue;
+      }
+
+      if (!fs.existsSync(target)) {
+        addError(handoffManifestFile, `handoff manifest ${field} entry does not exist`, entry);
+        continue;
+      }
+
+      if (expectDir && normalized.endsWith('/')) {
+        if (!fs.statSync(target).isDirectory()) addError(handoffManifestFile, 'handoff manifest localAssets directory entry must be a directory', entry);
+      }
+    }
+  }
+
+  if (!Array.isArray(handoffManifest.umiPacks)) {
+    addError(handoffManifestFile, 'handoff manifest umiPacks must be an array');
+  } else {
+    handoffManifest.umiPacks.forEach((pack, idx) => {
+      if (!pack || typeof pack !== 'object') {
+        addError(handoffManifestFile, `handoff manifest umiPacks[${idx}] must be an object`);
+        return;
+      }
+
+      for (const field of ['root', 'manifest', 'inventory', 'checklist']) {
+        if (typeof pack[field] !== 'string') {
+          addError(handoffManifestFile, `handoff manifest umiPacks[${idx}].${field} must be a string`);
+          continue;
+        }
+        const target = path.join(rootDir, pack[field]);
+        if (!fs.existsSync(target)) addError(handoffManifestFile, `handoff manifest umiPacks[${idx}].${field} path does not exist`, pack[field]);
+      }
+    });
+  }
+
+  if (!Array.isArray(handoffManifest.requiredChecks)) {
+    addError(handoffManifestFile, 'handoff manifest requiredChecks must be an array');
+  } else {
+    for (const requiredCheck of requiredHandoffChecks) {
+      if (!handoffManifest.requiredChecks.includes(requiredCheck)) {
+        addError(handoffManifestFile, 'handoff manifest missing required check command', requiredCheck);
+      }
+    }
+  }
+}
+
+function validateHandoffNotes() {
+  if (!fs.existsSync(handoffNotesFile)) {
+    addError(handoffNotesFile, 'HANDOFF_NOTES.md is missing');
+    return;
+  }
+
+  const content = fs.readFileSync(handoffNotesFile, 'utf8');
+  for (const snippet of requiredHandoffNotesSnippets) {
+    if (!content.includes(snippet)) addError(handoffNotesFile, 'handoff notes missing required snippet', snippet);
+  }
+}
+
+validateHandoffManifest();
+validateHandoffNotes();
 
 const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
 const pageFilesSet = new Set(pageFiles);
