@@ -71,11 +71,13 @@ body[data-page="subjects"] .crm-filter-search-input {
   min-height: 40px;
   height: 40px;
   border-radius: 10px;
-  padding: 0 12px 0 40px;
+  box-sizing: border-box;
+  padding: 0 12px 0 44px;
   border-color: #dbe2f0;
   background: #ffffff;
   color: #0f172a;
   font-size: 14px;
+  line-height: 40px;
 }
 
 body[data-page="subjects"] .crm-filter-search-shell {
@@ -184,7 +186,7 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
 body[data-page="subjects"] .crm-subjects-table .crm-table {
   border-radius: 16px 16px 0 0;
   overflow: hidden;
-  background: var(--subjects-header-bg);
+  background: #ffffff;
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table {
@@ -192,6 +194,10 @@ body[data-page="subjects"] .crm-subjects-table .uk-table {
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
+}
+
+body[data-page="subjects"] .crm-subjects-table .uk-table thead {
+  background: var(--subjects-header-bg);
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table thead th {
@@ -220,6 +226,17 @@ body[data-page="subjects"] .crm-subjects-table .uk-table thead th .crm-th-sort {
   margin-left: 5px;
   opacity: 0.55;
   font-size: 11px;
+}
+
+
+body[data-page="subjects"] .crm-subjects-table .uk-table tbody,
+body[data-page="subjects"] .crm-subjects-table .uk-table tbody tr,
+body[data-page="subjects"] .crm-subjects-table .uk-table tbody td {
+  background: #ffffff;
+}
+
+body[data-page="subjects"] .crm-subjects-table .uk-table.uk-table-hover tbody tr:hover td {
+  background: #f8fbff;
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table tbody td {

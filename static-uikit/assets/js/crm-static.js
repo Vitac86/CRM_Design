@@ -154,10 +154,25 @@
     return false;
   }
 
+  function getFilterPanels(scope) {
+    if (!scope) return [];
+
+    const panels = [];
+    if (scope.matches && scope.matches('.crm-filter-panel')) {
+      panels.push(scope);
+    }
+
+    scope.querySelectorAll('.crm-filter-panel').forEach(function (panel) {
+      panels.push(panel);
+    });
+
+    return panels;
+  }
+
   function syncResetButtonState(scope) {
     if (!scope) return;
 
-    scope.querySelectorAll('.crm-filter-panel').forEach(function (panel) {
+    getFilterPanels(scope).forEach(function (panel) {
       const isDirty = isFilterPanelDirty(panel);
       panel.querySelectorAll('[data-action="reset-filters"]').forEach(function (button) {
         const isDisabled = !isDirty;
