@@ -1097,6 +1097,23 @@ function validateTabsCssOwnership() {
   if (!tabsContent.includes('.crm-tabs')) addError(tabsFile, 'tabs CSS ownership violation: .crm-tabs must be defined in components/tabs.css');
 }
 
+
+function validateErrorPageCssOwnership() {
+  const cardsFile = path.join(rootDir, 'assets', 'css', 'components', 'cards.css');
+  const errorFile = path.join(rootDir, 'assets', 'css', 'pages', 'error.css');
+
+  if (!fs.existsSync(cardsFile) || !fs.existsSync(errorFile)) return;
+
+  const stripComments = (content) => content.replace(/\/\*[\s\S]*?\*\//g, '');
+  const cardsContent = stripComments(fs.readFileSync(cardsFile, 'utf8'));
+  const errorContent = stripComments(fs.readFileSync(errorFile, 'utf8'));
+
+  if (cardsContent.includes('.crm-error-state')) addError(cardsFile, 'error-page CSS ownership violation: .crm-error-state must not be defined in components/cards.css');
+  if (cardsContent.includes('.crm-error-card')) addError(cardsFile, 'error-page CSS ownership violation: .crm-error-card must not be defined in components/cards.css');
+  if (!errorContent.includes('.crm-error-state')) addError(errorFile, 'error-page CSS ownership violation: .crm-error-state must be defined in pages/error.css');
+  if (!errorContent.includes('.crm-error-card')) addError(errorFile, 'error-page CSS ownership violation: .crm-error-card must be defined in pages/error.css');
+}
+
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1690,6 +1707,7 @@ validateStandalonePageScriptRegistry(pageFiles);
 validatePageScriptsAndGlobalPurity();
 validateCardsCssOwnershipAuditPresence();
 validateTabsCssOwnership();
+validateErrorPageCssOwnership();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();
