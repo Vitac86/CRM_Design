@@ -1186,3 +1186,95 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Relations tab */
+.crm-page[data-page="subject-card"] .crm-relations-section {
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-header {
+  margin-bottom: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  margin: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+  line-height: 1.4;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-umi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-link {
+  color: var(--crm-umi-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-link:hover {
+  text-decoration: underline;
+  color: var(--crm-umi-primary-hover, var(--crm-umi-primary));
+}
+
+/* History tab */
+.crm-page[data-page="subject-card"] .crm-history-section {
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-header {
+  margin-bottom: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  margin: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+  line-height: 1.4;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-umi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-datetime {
+  white-space: nowrap;
+  color: var(--crm-umi-text-secondary);
+  font-size: 13px;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.crm-page[data-page="subject-card"] .crm-history-arrow {
+  font-size: 12px;
+  color: var(--crm-umi-text-muted);
+  flex-shrink: 0;
+}
