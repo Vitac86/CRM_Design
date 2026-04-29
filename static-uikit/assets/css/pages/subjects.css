@@ -178,7 +178,7 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
   overflow-x: auto;
   overflow-y: visible;
   border-radius: 16px 16px 0 0;
-  scrollbar-gutter: stable both-edges;
+  scrollbar-gutter: stable;
   background: #ffffff;
   border-bottom: 1px solid #e1e8f3;
 }
