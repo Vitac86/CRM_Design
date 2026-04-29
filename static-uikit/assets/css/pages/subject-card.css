@@ -658,3 +658,261 @@
     grid-column: auto;
   }
 }
+
+/* ─── Banking accounts tab ─────────────────────────────────────────────────── */
+
+.crm-page[data-page="subject-card"] .crm-bank-accounts-section {
+  gap: 10px;
+}
+
+/* Header card */
+.crm-page[data-page="subject-card"] .crm-bank-accounts-header {
+  padding: 14px 16px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+  box-shadow: var(--crm-umi-shadow-sm);
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-accounts-header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-accounts-title {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-accounts-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+  line-height: 1.35;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Add account form card */
+.crm-page[data-page="subject-card"] .crm-bank-account-form {
+  padding: 16px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+  box-shadow: var(--crm-umi-shadow-sm);
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-form-title {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-form-error {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-form-field-full {
+  grid-column: 1 / -1;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--crm-umi-text-muted);
+  line-height: 1.25;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-input {
+  height: 38px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-input-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Account list */
+.crm-page[data-page="subject-card"] .crm-bank-account-list {
+  display: grid;
+  gap: 10px;
+}
+
+/* Account card */
+.crm-page[data-page="subject-card"] .crm-bank-account-card {
+  padding: 14px 16px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+  box-shadow: var(--crm-umi-shadow-sm);
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  line-height: 1.3;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+  line-height: 1.3;
+}
+
+/* Account data grid */
+.crm-page[data-page="subject-card"] .crm-bank-account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-field {
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-account-field-wide {
+  grid-column: 1 / -1;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-field-label {
+  display: block;
+  margin: 0 0 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-umi-text-muted);
+  line-height: 1.25;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-field-value {
+  display: block;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.crm-page[data-page="subject-card"] .crm-bank-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Account footer actions */
+.crm-page[data-page="subject-card"] .crm-bank-account-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--crm-umi-border);
+}
+
+/* Brand badge (Основной) — scoped, does not affect shared badge styles */
+.crm-page[data-page="subject-card"] .crm-badge.brand {
+  background: color-mix(in srgb, var(--crm-umi-primary) 12%, transparent);
+  color: var(--crm-umi-primary-hover);
+  border: 1px solid color-mix(in srgb, var(--crm-umi-primary) 30%, transparent);
+}
+
+@media (max-width: 960px) {
+  .crm-page[data-page="subject-card"] .crm-bank-account-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .crm-page[data-page="subject-card"] .crm-bank-account-form-grid,
+  .crm-page[data-page="subject-card"] .crm-bank-account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-bank-account-field-wide {
+    grid-column: auto;
+  }
+}

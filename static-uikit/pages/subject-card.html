@@ -292,14 +292,170 @@
             </li>
 
             <li class="crm-subject-tab-panel" data-tab-panel="bank">
-              <section class="crm-subject-section-layout">
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-section" data-entity="bank-details">
-                  <div class="crm-form-section-head crm-section-head-inline">
-                    <h3>Банковские счета</h3>
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="add-bank-account">+ Добавить счёт</button>
+              <section class="crm-subject-section-layout crm-bank-accounts-section" data-entity="bank-accounts">
+
+                <div class="crm-card crm-subject-profile-section crm-bank-accounts-header">
+                  <div class="crm-bank-accounts-header-inner">
+                    <div>
+                      <h2 class="crm-bank-accounts-title">Банковские реквизиты</h2>
+                      <p class="crm-bank-accounts-subtitle">Расчётные и специальные счета клиента</p>
+                    </div>
+                    <button class="uk-button uk-button-default crm-button crm-bank-add-button" type="button" data-action="open-bank-account-form">+ Добавить счёт</button>
                   </div>
-                  <div class="crm-table-wrapper crm-table-card"><div class="crm-table"><table class="uk-table uk-table-divider uk-table-small"><thead><tr><th>Наименование банка</th><th>БИК</th><th>Валюта</th><th>Расчётный счёт</th><th>Корреспондентский счёт</th><th>Дата открытия</th><th>Назначение / тип счёта</th><th>Статус</th></tr></thead><tbody><tr><td>ПАО Сбербанк, г. Москва</td><td>044525225</td><td>RUB</td><td>40702810938000054210</td><td>30101810400000000225</td><td>22.01.2021</td><td>Основной расчётный счёт</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr><tr><td>АО «Альфа-Банк», г. Москва</td><td>044525593</td><td>USD</td><td>40702840102310001557</td><td>30101810200000000593</td><td>14.07.2023</td><td>Валютный операционный</td><td><span class="crm-badge info" data-status="limited">Ограниченно активен</span></td></tr><tr><td>АО «Газпромбанк», г. Санкт-Петербург</td><td>044030653</td><td>CNY</td><td>40702810055030104412</td><td>30101810200000000653</td><td>11.03.2026</td><td>Расчёты с азиатскими контрагентами</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr></tbody></table></div></div>
-                </article>
+                </div>
+
+                <div class="crm-card crm-bank-account-form" data-entity="bank-account-form" hidden>
+                  <h3 class="crm-bank-account-form-title">Новый счёт</h3>
+                  <div class="crm-bank-account-form-error" data-role="bank-form-error" hidden></div>
+                  <div class="crm-bank-account-form-grid">
+                    <label class="crm-bank-form-field">
+                      <span class="crm-bank-form-label">Наименование банка *</span>
+                      <input class="uk-input crm-input crm-bank-input" type="text" name="bankName" autocomplete="off"/>
+                    </label>
+                    <label class="crm-bank-form-field">
+                      <span class="crm-bank-form-label">БИК *</span>
+                      <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="bik" autocomplete="off"/>
+                    </label>
+                    <label class="crm-bank-form-field">
+                      <span class="crm-bank-form-label">Валюта *</span>
+                      <select class="uk-select crm-input crm-bank-input" name="currency">
+                        <option value="RUB">RUB</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="CNY">CNY</option>
+                      </select>
+                    </label>
+                    <label class="crm-bank-form-field">
+                      <span class="crm-bank-form-label">Расчётный счёт *</span>
+                      <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="accountNumber" autocomplete="off"/>
+                    </label>
+                    <label class="crm-bank-form-field">
+                      <span class="crm-bank-form-label">Корреспондентский счёт *</span>
+                      <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="correspondentAccount" autocomplete="off"/>
+                    </label>
+                    <label class="crm-bank-form-field">
+                      <span class="crm-bank-form-label">Дата открытия</span>
+                      <input class="uk-input crm-input crm-bank-input" type="date" name="openedAt"/>
+                    </label>
+                    <label class="crm-bank-form-field crm-bank-form-field-full">
+                      <span class="crm-bank-form-label">Назначение</span>
+                      <input class="uk-input crm-input crm-bank-input" type="text" name="purpose" autocomplete="off"/>
+                    </label>
+                  </div>
+                  <div class="crm-bank-account-form-actions">
+                    <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="cancel-bank-account-form">Отмена</button>
+                    <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="submit-bank-account-form">Добавить</button>
+                  </div>
+                </div>
+
+                <div class="crm-bank-account-list" data-entity="bank-account-list">
+
+                  <article class="crm-bank-account-card">
+                    <div class="crm-bank-account-head">
+                      <div>
+                        <div class="crm-bank-account-title">ПАО Сбербанк, г. Москва</div>
+                        <div class="crm-bank-account-subtitle">Основной расчётный счёт</div>
+                      </div>
+                      <div class="crm-bank-account-badges">
+                        <span class="crm-badge brand">Основной</span>
+                      </div>
+                    </div>
+                    <dl class="crm-bank-account-grid">
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">БИК</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">044525225</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Валюта</dt>
+                        <dd class="crm-bank-field-value">RUB</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Расчётный счёт</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">40702810938000054210</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Дата открытия</dt>
+                        <dd class="crm-bank-field-value">22.01.2021</dd>
+                      </div>
+                      <div class="crm-bank-account-field crm-bank-account-field-wide">
+                        <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">30101810400000000225</dd>
+                      </div>
+                    </dl>
+                    <div class="crm-bank-account-actions">
+                      <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
+                    </div>
+                  </article>
+
+                  <article class="crm-bank-account-card">
+                    <div class="crm-bank-account-head">
+                      <div>
+                        <div class="crm-bank-account-title">АО «Альфа-Банк», г. Москва</div>
+                        <div class="crm-bank-account-subtitle">Валютный операционный</div>
+                      </div>
+                    </div>
+                    <dl class="crm-bank-account-grid">
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">БИК</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">044525593</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Валюта</dt>
+                        <dd class="crm-bank-field-value">USD</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Расчётный счёт</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">40702840102310001557</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Дата открытия</dt>
+                        <dd class="crm-bank-field-value">14.07.2023</dd>
+                      </div>
+                      <div class="crm-bank-account-field crm-bank-account-field-wide">
+                        <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">30101810200000000593</dd>
+                      </div>
+                    </dl>
+                    <div class="crm-bank-account-actions">
+                      <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
+                    </div>
+                  </article>
+
+                  <article class="crm-bank-account-card">
+                    <div class="crm-bank-account-head">
+                      <div>
+                        <div class="crm-bank-account-title">АО «Газпромбанк», г. Санкт-Петербург</div>
+                        <div class="crm-bank-account-subtitle">Расчёты с азиатскими контрагентами</div>
+                      </div>
+                    </div>
+                    <dl class="crm-bank-account-grid">
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">БИК</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">044030653</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Валюта</dt>
+                        <dd class="crm-bank-field-value">CNY</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Расчётный счёт</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">40702810055030104412</dd>
+                      </div>
+                      <div class="crm-bank-account-field">
+                        <dt class="crm-bank-field-label">Дата открытия</dt>
+                        <dd class="crm-bank-field-value">11.03.2026</dd>
+                      </div>
+                      <div class="crm-bank-account-field crm-bank-account-field-wide">
+                        <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
+                        <dd class="crm-bank-field-value crm-bank-mono">30101810200000000653</dd>
+                      </div>
+                    </dl>
+                    <div class="crm-bank-account-actions">
+                      <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
+                    </div>
+                  </article>
+
+                </div>
               </section>
             </li>
 
