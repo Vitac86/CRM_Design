@@ -67,6 +67,7 @@ http://localhost:8080/static-uikit/pages/dashboard.html
 ## Registry/list-page pattern
 - Registry/list pages are kept `server-rendered/static-template-first`: demo rows and hooks are static HTML skeletons for UMI.CMS rendering.
 - Canonical registry shape: page header/title hook, registry filter panel, `crm-table-wrapper -> crm-table -> table.uk-table`, and `crm-empty-state[data-entity="empty-state"]`.
+- Registry tables may use shared `colgroup` utilities (`crm-col-name`, `crm-col-id`, `crm-col-type`, `crm-col-status`, `crm-col-date`, `crm-col-amount`, `crm-col-actions`, `crm-col-compact`, `crm-col-medium`, `crm-col-wide`) and UMI templates should render matching `colgroup` markup server-side when adopting these layouts.
 - Keep registry table wrappers overflow-safe: horizontal scrolling belongs to `.crm-table-wrapper` only, not to the full page canvas.
 - Keep empty states inside the registry shell/card but outside table markup (`table/thead/tbody/tr`) and hidden in demo mode via native `hidden`.
 - `crm-static.js` stays global-only and reusable (row `data-href`, reset helpers, non-submitting behavior), with no page runtime rendering; UMI templates render registry rows server-side.

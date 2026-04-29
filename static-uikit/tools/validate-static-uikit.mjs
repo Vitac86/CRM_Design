@@ -148,6 +148,11 @@ const registryPages = new Set([
   'subjects.html', 'brokerage.html', 'trust-management.html', 'agents.html', 'requests.html', 'compliance.html',
   'middle-office-clients.html', 'middle-office-reports.html', 'depository.html', 'back-office.html', 'trading.html', 'archive.html'
 ]);
+const sharedRegistryColClasses = new Set([
+  'crm-col-name', 'crm-col-id', 'crm-col-type', 'crm-col-status', 'crm-col-date',
+  'crm-col-amount', 'crm-col-actions', 'crm-col-compact', 'crm-col-medium', 'crm-col-wide'
+]);
+const allowedPageSpecificColClasses = new Set([]);
 const registryAuditFile = path.join(rootDir, 'REGISTRY_PAGE_AUDIT.md');
 const registryEmptyStateAllowlist = new Map();
 const auditedNonRegistryPages = new Set([
@@ -390,6 +395,53 @@ function validateRegistryTableAndEmptyState(file, content) {
   }
   if (isStandaloneRegistry && !registryEmptyStateAllowlist.has(path.basename(file))) {
     if (!/<[^>]*class="[^"]*\bcrm-empty-state\b[^"]*"[^>]*\bdata-entity="empty-state"/i.test(content)) addError(file, 'registry page must include at least one .crm-empty-state[data-entity=\"empty-state\"]');
+  }
+}
+
+function validateRegistryColgroups(file, content) {
+  const pageName = path.basename(file);
+  const isStandaloneRegistry = file.includes('/static-uikit/pages/') && registryPages.has(pageName);
+  if (!isStandaloneRegistry) return;
+
+  const tables = [...content.matchAll(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi)];
+  for (const tableMatch of tables) {
+    const tableHtml = tableMatch[0];
+    const colgroupMatch = tableHtml.match(/<colgroup\b[^>]*>([\s\S]*?)<\/colgroup>/i);
+    if (!colgroupMatch) continue;
+
+    const firstHeadRow = tableHtml.match(/<thead\b[^>]*>[\s\S]*?<tr\b[^>]*>([\s\S]*?)<\/tr>/i);
+    if (!firstHeadRow) continue;
+    const thCount = (firstHeadRow[1].match(/<th\b/gi) || []).length;
+    const cols = [...colgroupMatch[1].matchAll(/<col\b([^>]*)\/?>/gi)];
+    if (cols.length !== thCount) addError(file, 'colgroup <col> count must match first thead row <th> count');
+
+    cols.forEach((colMatch) => {
+      const attrs = colMatch[1];
+      const classValue = (attrs.match(/\bclass="([^"]+)"/i) || [null, ''])[1];
+      const tokens = classValue.split(/\s+/).filter(Boolean);
+      if (!tokens.length) {
+        addError(file, '<col> inside colgroup must include a class');
+        return;
+      }
+      const hasAllowed = tokens.some((token) => sharedRegistryColClasses.has(token) || allowedPageSpecificColClasses.has(token));
+      if (!hasAllowed) addError(file, '<col> must use shared crm-col-* utility class or allowed page-specific class', colMatch[0]);
+      if (tokens.some((token) => /^crm-col-subject-/.test(token))) {
+        addError(file, 'legacy subjects-specific crm-col-subject-* class is forbidden in colgroup', colMatch[0]);
+      }
+    });
+  }
+
+  if (pageName === 'subjects.html') {
+    const subjectsTable = content.match(/<table\b[^>]*class="[^"]*\buk-table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/i);
+    if (!subjectsTable) return;
+    const colgroupMatch = subjectsTable[1].match(/<colgroup\b[^>]*>([\s\S]*?)<\/colgroup>/i);
+    if (!colgroupMatch) addError(file, 'subjects registry table must include a colgroup');
+    else {
+      const firstCol = colgroupMatch[1].match(/<col\b([^>]*)\/?>/i);
+      if (!firstCol || !/\bclass="[^"]*\bcrm-col-name\b/i.test(firstCol[1])) {
+        addError(file, 'subjects first col must use shared .crm-col-name class');
+      }
+    }
   }
 }
 
@@ -792,6 +844,7 @@ for (const file of allFiles) {
   if (file.endsWith('.html')) {
     validateRegistryFilterPanelStructure(file, content);
     validateRegistryTableAndEmptyState(file, content);
+    validateRegistryColgroups(file, content);
     const dataHrefMatches = content.matchAll(/\bdata-href="([^"]+)"/g);
     for (const m of dataHrefMatches) {
       const target = m[1];

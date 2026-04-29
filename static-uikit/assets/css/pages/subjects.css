@@ -101,10 +101,6 @@ body[data-page="subjects"] .crm-subjects-table .uk-table {
   border-spacing: 0;
 }
 
-body[data-page="subjects"] .crm-col-subject-name {
-  width: clamp(250px, 22vw, 270px);
-}
-
 body[data-page="subjects"] .crm-subjects-table .uk-table thead th {
   background: var(--subjects-header-bg);
   border-bottom: 1px solid var(--subjects-header-border);
