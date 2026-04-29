@@ -113,6 +113,9 @@
     const selectedValue = filterOption.getAttribute('data-filter-value') || '';
     syncFilterMenuState(filterMenu, selectedValue);
     filterMenu.removeAttribute('open');
+    const panel = getFilterPanelOwner(filterMenu);
+    syncFilterPanelMenuState(panel);
+    syncResetButtonState(panel || document);
   }
 
   function resetFilterMenu(filterMenu) {
@@ -126,6 +129,43 @@
   function resetFilterMenus(form) {
     if (!form) return;
     form.querySelectorAll('.crm-filter-menu').forEach(resetFilterMenu);
+  }
+
+
+  function isFieldDirty(field) {
+    if (!field || field.disabled) return false;
+    const type = (field.type || '').toLowerCase();
+
+    if (type === 'checkbox' || type === 'radio') {
+      return field.checked !== field.defaultChecked;
+    }
+
+    return field.value !== field.defaultValue;
+  }
+
+  function isFilterPanelDirty(panel) {
+    if (!panel) return false;
+
+    const fields = panel.querySelectorAll('input, select, textarea');
+    for (let index = 0; index < fields.length; index += 1) {
+      if (isFieldDirty(fields[index])) return true;
+    }
+
+    return false;
+  }
+
+  function syncResetButtonState(scope) {
+    if (!scope) return;
+
+    scope.querySelectorAll('.crm-filter-panel').forEach(function (panel) {
+      const isDirty = isFilterPanelDirty(panel);
+      panel.querySelectorAll('[data-action="reset-filters"]').forEach(function (button) {
+        const isDisabled = !isDirty;
+        button.disabled = isDisabled;
+        button.classList.toggle('is-disabled', isDisabled);
+        button.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
+      });
+    });
   }
 
   function initFilterMenus() {
@@ -278,6 +318,7 @@
         syncOptionGridState(form);
         syncBinaryPills(form);
         syncSelectableControlState(form);
+        syncResetButtonState(form);
       }
       event.preventDefault();
       return;
@@ -397,6 +438,17 @@
     }
   });
 
+
+  document.addEventListener('input', function (event) {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const panel = target.closest('.crm-filter-panel');
+    if (panel) {
+      syncResetButtonState(panel);
+    }
+  });
+
   document.addEventListener('change', function (event) {
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
@@ -422,9 +474,15 @@
         });
       }
     }
+
+    const panel = target.closest('.crm-filter-panel');
+    if (panel) {
+      syncResetButtonState(panel);
+    }
   });
 
   initFilterMenus();
+  syncResetButtonState(document);
 
   if (window.UIkit) {
     document.querySelectorAll('ul[uk-tab], .crm-tabs[uk-tab]').forEach(function (tab) {
