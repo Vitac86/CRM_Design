@@ -97,3 +97,6 @@
   min-height: 38px;
   border-radius: 11px;
 }
+
+.crm-sidebar::-webkit-scrollbar { width: 6px; }
+.crm-sidebar::-webkit-scrollbar-thumb { background: rgba(205, 221, 255, 0.4); }

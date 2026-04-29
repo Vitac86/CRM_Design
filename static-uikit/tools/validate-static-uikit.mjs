@@ -1144,6 +1144,39 @@ function validateCardsCssOwnershipBatchMoves() {
   }
 }
 
+
+function validateScrollbarAndEmptyMediaOwnership() {
+  const cardsFile = path.join(rootDir, 'assets', 'css', 'components', 'cards.css');
+  const appFile = path.join(rootDir, 'assets', 'css', 'layout', 'app.css');
+  const sidebarFile = path.join(rootDir, 'assets', 'css', 'layout', 'sidebar.css');
+
+  if (!fs.existsSync(cardsFile) || !fs.existsSync(appFile) || !fs.existsSync(sidebarFile)) return;
+
+  const stripComments = (content) => content.replace(/\/\*[\s\S]*?\*\//g, '');
+  const cardsContent = stripComments(fs.readFileSync(cardsFile, 'utf8'));
+  const appContent = stripComments(fs.readFileSync(appFile, 'utf8'));
+  const sidebarContent = stripComments(fs.readFileSync(sidebarFile, 'utf8'));
+
+  if (/::\-webkit\-scrollbar/.test(cardsContent)) {
+    addError(cardsFile, 'scrollbar ownership violation: components/cards.css must not contain ::-webkit-scrollbar selectors');
+  }
+
+  if (/@media[^{}]*\{\s*\}/m.test(cardsContent)) {
+    addError(cardsFile, 'cleanup violation: components/cards.css must not contain empty @media blocks');
+  }
+
+  for (const selector of ['*::-webkit-scrollbar', '*::-webkit-scrollbar-thumb']) {
+    if (!appContent.includes(selector)) addError(appFile, `scrollbar ownership violation: ${selector} must be defined in layout/app.css`);
+  }
+
+  const appHasSidebarScrollbar = appContent.includes('.crm-sidebar::-webkit-scrollbar') || appContent.includes('.crm-sidebar::-webkit-scrollbar-thumb');
+  const sidebarHasSidebarScrollbar = sidebarContent.includes('.crm-sidebar::-webkit-scrollbar') || sidebarContent.includes('.crm-sidebar::-webkit-scrollbar-thumb');
+
+  if (!appHasSidebarScrollbar && !sidebarHasSidebarScrollbar) {
+    addError(sidebarFile, 'scrollbar ownership violation: sidebar scrollbar selectors must exist in layout/sidebar.css or layout/app.css');
+  }
+}
+
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1739,6 +1772,7 @@ validateCardsCssOwnershipAuditPresence();
 validateTabsCssOwnership();
 validateErrorPageCssOwnership();
 validateCardsCssOwnershipBatchMoves();
+validateScrollbarAndEmptyMediaOwnership();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();
