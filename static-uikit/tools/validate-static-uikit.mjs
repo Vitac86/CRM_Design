@@ -445,6 +445,16 @@ function validateRegistryColgroups(file, content) {
   }
 }
 
+function validateRegistryPageTitleHook(file, content) {
+  const pageName = path.basename(file);
+  const isStandaloneRegistry = file.includes('/static-uikit/pages/') && registryPages.has(pageName);
+  if (!isStandaloneRegistry) return;
+
+  if (!/<h1\b[^>]*\bdata-entity="page-title"[^>]*>/i.test(content)) {
+    addError(file, 'registry page must include data-entity="page-title" on the main title');
+  }
+}
+
 function validateEmptyStateContract(file, attrs, sample) {
   if (!/\bdata-entity="empty-state"/i.test(attrs)) {
     addError(file, 'crm-empty-state block must include data-entity="empty-state"', sample);
@@ -845,6 +855,7 @@ for (const file of allFiles) {
     validateRegistryFilterPanelStructure(file, content);
     validateRegistryTableAndEmptyState(file, content);
     validateRegistryColgroups(file, content);
+    validateRegistryPageTitleHook(file, content);
     const dataHrefMatches = content.matchAll(/\bdata-href="([^"]+)"/g);
     for (const m of dataHrefMatches) {
       const target = m[1];
