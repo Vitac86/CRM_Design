@@ -485,6 +485,7 @@
 /* ===== Dashboard screen parity (single-screen PR) ===== */
 .crm-dashboard-page {
   padding-top: 20px;
+  background: #f3f6fb;
 }
 
 .crm-dashboard-page > .crm-dashboard-shell {
@@ -494,8 +495,8 @@
 .crm-dashboard-shell {
   border: 1px solid #d6dfed;
   border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  background: #f8fafd;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   padding: 16px;
   gap: 24px;
 }
@@ -516,14 +517,30 @@
 
 .crm-dashboard-kpi-card {
   border-radius: 12px;
-  border: 1px solid #d6dfed;
+  border: 1px solid #d4deec;
   background: #ffffff;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-  padding: 14px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  padding: 15px;
   min-height: 136px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.crm-dashboard-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
+  border-color: #c9d6e8;
+}
+
+.crm-dashboard-kpi-card:focus-visible,
+.crm-dashboard-kpi-card:focus-within {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(50, 94, 212, 0.16), 0 8px 18px rgba(15, 23, 42, 0.10);
+  border-color: #9db3df;
+  outline: none;
 }
 
 .crm-dashboard-kpi-top {
@@ -550,7 +567,7 @@
   margin-left: auto;
   text-align: right;
   display: grid;
-  gap: 2px;
+  gap: 3px;
 }
 
 .crm-dashboard-kpi-meta p {
@@ -579,14 +596,14 @@
 
 .crm-dashboard-kpi-value {
   margin: 0;
-  font-size: 32px;
-  line-height: 1;
+  font-size: 34px;
+  line-height: 1.02;
   font-weight: 600;
   color: #0f172a;
 }
 
 .crm-dashboard-kpi-label {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 14px;
   line-height: 1.35;
   color: #64748b;
@@ -604,14 +621,14 @@
   border-radius: 12px;
   border: 1px solid #d6dfed;
   background: #ffffff;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   padding: 0;
   overflow: hidden;
 }
 
 .crm-dashboard-panel .crm-section-head {
   margin: 0;
-  padding: 11px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid #d6dfed;
   display: flex;
   align-items: center;
@@ -643,23 +660,23 @@
 }
 
 .crm-dashboard-table thead th {
-  padding: 11px 14px;
-  background: #f8fafc;
-  font-size: 12px;
+  padding: 12px 16px;
+  background: #f2f5fb;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1.3;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   border-bottom: 1px solid #d6dfed;
 }
 
 .crm-dashboard-table tbody td {
-  padding: 12px 14px;
+  padding: 13px 16px;
   font-size: 14px;
   line-height: 1.35;
   color: #0f172a;
-  vertical-align: top;
+  vertical-align: middle;
   border-bottom: 1px solid #e2e8f0;
   word-break: break-word;
 }
