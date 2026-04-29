@@ -164,6 +164,8 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - `crm-static.js` remains global-only reusable behavior (row `data-href`, generic form/reset helpers, prevention helpers), while registry-specific rendering/logic is not allowed; UMI renders registry rows server-side.
 - CRM status badges use shared semantic classes: `.crm-badge.muted|info|success|warning|danger` from `assets/css/components/badges.css`; classes express semantic state (taxonomy/passive, workflow, normal/healthy, attention, problem) rather than decorative color choice.
 - Normal/healthy values should stay calm and non-intrusive, warning/danger must be reserved for attention/problem states, and page CSS must not redefine badge palettes locally.
+- `assets/css/components/filters.css` owns shared registry filter primitives (`.crm-registry-filters`, `.crm-filter-panel`, `.crm-filter-search-row`, `.crm-filter-fields-row`, `.crm-filter-control`, `.crm-filter-field`, `.crm-filter-actions`, `.crm-filter-reset`).
+- Page CSS may keep page-specific filter variants (for example, subjects compact pill filters in `assets/css/pages/subjects.css`) until full filter consolidation; no JS is required for these visual variants.
 
 ## Non-registry page contracts (card/detail/wizard/admin)
 - Audited pages: `subject-register.html`, `contract-wizard.html`, `compliance-card.html`, `trading-card.html`, `administration.html`.

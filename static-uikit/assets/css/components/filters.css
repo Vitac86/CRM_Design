@@ -47,9 +47,6 @@
   max-width: 240px;
 }
 
-.crm-page[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
-  flex-basis: 180px;
-}
 
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-control .uk-form-label {
   margin-bottom: 4px;
