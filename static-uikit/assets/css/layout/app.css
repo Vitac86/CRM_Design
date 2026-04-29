@@ -3,6 +3,17 @@
 /* ========================================================================== */
 .crm-app { min-height: 100vh; }
 
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: #c2cfe6;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: #aab9d6; border: 2px solid transparent; background-clip: padding-box; }
+
+
 .crm-layout {
   display: grid;
   grid-template-columns: var(--crm-sidebar-w) 1fr;

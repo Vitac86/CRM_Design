@@ -201,21 +201,6 @@
 
 
 
-*::-webkit-scrollbar { width: 8px; height: 8px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb {
-  background: #c2cfe6;
-  border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-*::-webkit-scrollbar-thumb:hover { background: #aab9d6; border: 2px solid transparent; background-clip: padding-box; }
-.crm-sidebar::-webkit-scrollbar { width: 6px; }
-.crm-sidebar::-webkit-scrollbar-thumb { background: rgba(205, 221, 255, 0.4); }
-
-@media (max-width: 1200px) {
-}
-
 @media (max-width: 920px) {
   .crm-layout { grid-template-columns: 1fr; }
 
