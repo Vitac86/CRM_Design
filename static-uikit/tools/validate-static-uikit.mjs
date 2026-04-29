@@ -1040,6 +1040,38 @@ function validatePageCssBadgePaletteOverrides() {
   }
 }
 
+
+function validateBadgeLabelSemantics(file, content) {
+  const strictDangerLabels = new Set(['отклонено', 'ошибка', 'заблокирован']);
+  const attentionLabels = new Set(['ожидает', 'на доработке', 'частично', 'регистрация']);
+  const healthyLabels = new Set(['пройден', 'доставлен', 'активный клиент']);
+  const acceptedLabels = new Set(['принято']);
+  const badgeRegex = /<span\b([^>]*)class="([^"]*\bcrm-badge\b[^"]*)"([^>]*)>([\s\S]*?)<\/span>/gi;
+
+  for (const match of content.matchAll(badgeRegex)) {
+    const attrs = `${match[1]} ${match[3]}`;
+    const classes = (match[2] || '').split(/\s+/).filter(Boolean).map((token) => token.toLowerCase());
+    const text = (match[4] || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!text) continue;
+
+    if ([...strictDangerLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
+      if (classes.some((token) => ['success', 'info', 'muted'].includes(token))) addError(file, `badge label "${text}" must not use muted/info/success`, match[0]);
+    }
+
+    if ([...attentionLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
+      if (classes.includes('success')) addError(file, `badge label "${text}" must not use success`, match[0]);
+    }
+
+    if ([...healthyLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
+      if (classes.includes('warning') || classes.includes('danger')) addError(file, `badge label "${text}" must not use warning/danger`, match[0]);
+    }
+
+    if ([...acceptedLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
+      if (classes.includes('warning') || classes.includes('danger')) addError(file, `badge label "${text}" must not use warning/danger`, match[0]);
+    }
+  }
+}
+
 function validateSubjectCardNoNestedCards() {
   const file = path.join(pagesDir, 'subject-card.html');
   if (!fs.existsSync(file)) return;
@@ -1494,6 +1526,9 @@ function validateStaticUikitLauncher() {
 }
 
 validatePartials();
+for (const partial of fs.existsSync(partialsDir) ? fs.readdirSync(partialsDir).filter((f) => f.endsWith('.html')).map((f) => path.join(partialsDir, f)) : []) {
+  validateBadgeLabelSemantics(partial, fs.readFileSync(partial, 'utf8'));
+}
 validateStaticUikitLauncher();
 validateRegistryAuditConsistency();
 validateStandalonePageScriptRegistry(pageFiles);
@@ -1507,6 +1542,7 @@ validateBalancedTagHelperSelfTest();
 for (const page of pageFiles) {
   const file = path.join(pagesDir, page);
   const content = fs.readFileSync(file, 'utf8');
+  validateBadgeLabelSemantics(file, content);
   if (!/^\s*<!doctype html>/i.test(content)) addError(file, 'missing <!doctype html>');
   if (!/<html[^>]*\blang="ru"/i.test(content)) addError(file, 'missing <html lang="ru">');
   if (!/<meta[^>]*charset="utf-8"/i.test(content)) addError(file, 'missing <meta charset="utf-8">');
