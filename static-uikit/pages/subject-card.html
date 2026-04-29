@@ -58,7 +58,7 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page" data-page="subject-card">
-        <div class="crm-subject-detail-shell">
+        <div class="crm-registry-shell crm-subject-detail-shell crm-subject-card-shell">
           <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Карточка субъекта</span></div>
 
           <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-011">
@@ -236,32 +236,56 @@
                 <section class="crm-flat-group" data-entity="manager-report-group">
                   <article class="crm-subject-profile-section crm-flat-section" data-entity="manager-agent">
                     <div class="crm-form-section-head"><h3>Менеджер и агент</h3></div>
-                    <div class="crm-double-grid">
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-2">
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Менеджер · ФИО</div><div class="crm-profile-value">Иванов Илья Игоревич</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Менеджер · Должность</div><div class="crm-profile-value">Старший менеджер фронт-офиса</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Менеджер · Телефон</div><div class="crm-profile-value">+7 (495) 780-15-03 доб. 214</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Менеджер · Email</div><div class="crm-profile-value">i.ivanov@investika.ru</div></div>
-                      </div>
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-2">
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Агент · ФИО / организация</div><div class="crm-profile-value">ООО «Регион Брокер Партнер»</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Агент · Код агента</div><div class="crm-profile-value">AG-1097</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Агент · Телефон</div><div class="crm-profile-value">+7 (343) 351-88-21</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Агент · Email</div><div class="crm-profile-value">partner@rbp-agent.ru</div></div>
-                      </div>
+                    <div class="crm-person-card-grid">
+                      <article class="crm-person-card">
+                        <div class="crm-person-avatar" aria-hidden="true">ИИ</div>
+                        <div class="crm-person-content">
+                          <div class="crm-person-title">Иванов Илья Игоревич</div>
+                          <div class="crm-person-meta">Старший менеджер фронт-офиса</div>
+                          <div class="crm-person-line">+7 (495) 780-15-03 доб. 214</div>
+                          <div class="crm-person-line">i.ivanov@investika.ru</div>
+                        </div>
+                      </article>
+                      <article class="crm-person-card">
+                        <div class="crm-person-avatar" aria-hidden="true">РБ</div>
+                        <div class="crm-person-content">
+                          <div class="crm-person-title">ООО «Регион Брокер Партнер»</div>
+                          <div class="crm-person-meta">Агент · AG-1097</div>
+                          <div class="crm-person-line">+7 (343) 351-88-21</div>
+                          <div class="crm-person-line">partner@rbp-agent.ru</div>
+                        </div>
+                      </article>
                     </div>
                   </article>
                   <article class="crm-subject-profile-section crm-flat-section" data-entity="report-delivery">
                     <div class="crm-form-section-head"><h3>Способ получения отчётов</h3></div>
-                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-1">
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Электронная почта</div><div class="crm-profile-value"><span class="crm-badge success" data-status="enabled">Включён</span></div><div class="crm-profile-note">Отчёты направляются на reporting@vms.ru ежедневно до 11:00 МСК.</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Личный кабинет</div><div class="crm-profile-value"><span class="crm-badge success" data-status="enabled">Включён</span></div><div class="crm-profile-note">Права доступа у пользователей: Крылов Д.О., Соколова М.В.</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Бумажный отчёт</div><div class="crm-profile-value"><span class="crm-badge muted" data-status="disabled">Выключен</span></div><div class="crm-profile-note">Печатные отчёты не требуются, доставка курьером отключена.</div></div>
+                    <div class="crm-report-delivery-grid">
+                      <div class="crm-report-delivery-card">
+                        <div class="crm-report-delivery-head">
+                          <div class="crm-report-delivery-title">Электронная почта</div>
+                          <span class="crm-badge success" data-status="enabled">Включён</span>
+                        </div>
+                        <div class="crm-report-delivery-note">Отчёты направляются на reporting@vms.ru ежедневно до 11:00 МСК.</div>
+                      </div>
+                      <div class="crm-report-delivery-card">
+                        <div class="crm-report-delivery-head">
+                          <div class="crm-report-delivery-title">Личный кабинет</div>
+                          <span class="crm-badge success" data-status="enabled">Включён</span>
+                        </div>
+                        <div class="crm-report-delivery-note">Права доступа у пользователей: Крылов Д.О., Соколова М.В.</div>
+                      </div>
+                      <div class="crm-report-delivery-card">
+                        <div class="crm-report-delivery-head">
+                          <div class="crm-report-delivery-title">Бумажный отчёт</div>
+                          <span class="crm-badge muted" data-status="disabled">Выключен</span>
+                        </div>
+                        <div class="crm-report-delivery-note">Печатные отчёты не требуются, доставка курьером отключена.</div>
+                      </div>
                     </div>
                   </article>
                   <article class="crm-subject-profile-section crm-flat-section" data-entity="manager-comment">
                     <div class="crm-form-section-head"><h3>Комментарий менеджера</h3></div>
-                    <div class="crm-manager-comment">Клиент активен в брокерском сегменте с умеренным рисковым профилем, в апреле 2026 актуализирован пакет KYC/FATCA. По документам юридического блока замечаний нет. Рекомендована плановая сверка учредительных документов и доверенностей до 31.10.2026, а также контроль продления доверенности №44/25 в январе 2027.</div>
+                    <p class="crm-manager-comment">Клиент активен в брокерском сегменте с умеренным рисковым профилем, в апреле 2026 актуализирован пакет KYC/FATCA. По документам юридического блока замечаний нет. Рекомендована плановая сверка учредительных документов и доверенностей до 31.10.2026, а также контроль продления доверенности №44/25 в январе 2027.</p>
                   </article>
                 </section>
               </section>
