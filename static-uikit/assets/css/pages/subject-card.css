@@ -274,3 +274,109 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Profile content parity refinements */
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="main-data"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="registration-data"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="contacts"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="compliance"],
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="usage-rights"] {
+  border-radius: 9px;
+}
+
+.crm-page[data-page="subject-card"] .crm-profile-rows-main {
+  gap: 8px 14px;
+}
+
+.crm-page[data-page="subject-card"] .crm-profile-rows-main .crm-profile-value {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 2px 0;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--crm-umi-text-secondary);
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px 12px;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-field {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-field strong {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--crm-umi-text);
+  font-weight: 600;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-field-street {
+  grid-column: span 2;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-table-wrapper {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  overflow-x: auto;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table thead th {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--crm-umi-border);
+  background: transparent;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table td {
+  padding: 8px;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > tr:not(:first-child),
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > :not(:first-child) > tr,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > :first-child > tr:not(:first-child) {
+  border-top: 1px solid var(--crm-umi-border-soft, #eceff4);
+}
+
+.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-rows {
+  gap: 8px;
+}
+
+@media (max-width: 959px) {
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-field-street {
+    grid-column: auto;
+  }
+}
