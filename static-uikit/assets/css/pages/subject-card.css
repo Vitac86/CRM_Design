@@ -13,7 +13,7 @@
 
 .crm-page[data-page="subject-card"] .crm-subject-hero {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) 170px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
   padding: 14px 16px;
@@ -58,20 +58,23 @@
 
 .crm-page[data-page="subject-card"] .crm-subject-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   justify-self: end;
   align-self: center;
   gap: 6px;
-  width: 164px;
+  width: auto;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions .uk-button,
 .crm-page[data-page="subject-card"] .crm-subject-actions .crm-button {
-  width: 100%;
+  width: auto;
   min-height: 34px;
   height: 34px;
   border-radius: 8px;
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs-wrap {
@@ -322,16 +325,23 @@
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-link-action {
   min-height: 30px;
-  padding: 0;
-  border-color: transparent;
-  background: transparent;
+  padding: 0 12px;
+  border-color: var(--crm-umi-border);
+  background: var(--crm-umi-surface);
   box-shadow: none;
-  color: var(--crm-umi-primary);
+  color: var(--crm-umi-text-secondary);
 }
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-link-action:hover {
-  background: transparent;
+  border-color: var(--crm-umi-primary);
+  background: var(--crm-umi-surface-muted);
   color: var(--crm-umi-primary-hover);
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-stack {
@@ -384,34 +394,31 @@
   grid-column: span 2;
 }
 
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-table-wrapper {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
-  overflow-x: auto;
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-representatives-list {
+  display: grid;
+  gap: 8px;
 }
 
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table {
-  border-collapse: separate;
-  border-spacing: 0;
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-representative-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 14px;
+  padding: 12px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 8px;
+  background: var(--crm-umi-surface-muted);
 }
 
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table thead th {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--crm-umi-border);
-  background: transparent;
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-representative-cell {
+  min-width: 0;
 }
 
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table td {
-  padding: 8px;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > tr:not(:first-child),
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > :not(:first-child) > tr,
-.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > :first-child > tr:not(:first-child) {
-  border-top: 1px solid var(--crm-umi-border);
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-representative-cell strong {
+  display: block;
+  color: var(--crm-umi-text);
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
 }
 
 .crm-page[data-page="subject-card"] [data-entity="registration-contacts-group"],
@@ -426,18 +433,41 @@
   box-shadow: none;
 }
 
-.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-rows {
-  gap: 8px;
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="registration-data"] .crm-profile-rows,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="contacts"] .crm-profile-rows,
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="compliance"] .crm-profile-rows {
+  gap: 10px 18px;
 }
 
-.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-row {
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--crm-umi-border);
+.crm-page[data-page="subject-card"] [data-entity="compliance"] .crm-compliance-panel {
+  padding: 12px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 8px;
+  background: var(--crm-umi-surface-muted);
 }
 
-.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-row:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
+.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-usage-rights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-usage-right-card {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 8px;
+  background: var(--crm-umi-surface-muted);
+}
+
+@media (max-width: 960px) {
+  .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-representative-row,
+  .crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-usage-rights-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -445,9 +475,13 @@
     align-items: flex-start;
   }
 
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-actions {
+    justify-content: stretch;
+  }
+
   .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-link-action {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields {

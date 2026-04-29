@@ -120,7 +120,6 @@
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card subject-section" data-entity="addresses" data-role="addresses-section">
                   <div class="crm-form-section-head crm-section-head-inline">
                     <h3>Адреса</h3>
-                    <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
                   </div>
                   <div class="crm-address-stack subject-address-stack" data-role="addresses-list">
                     <div data-role="address-registration">
@@ -161,6 +160,9 @@
                       </article>
                     </div>
                   </div>
+                  <div class="crm-address-actions">
+                    <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
+                  </div>
                 </article>
 
                 <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="representatives">
@@ -168,56 +170,51 @@
                     <h3>Представители</h3>
                     <button class="uk-button uk-button-default crm-button" type="button" data-action="open-representative-modal">+ Добавить представителя</button>
                   </div>
-                  <div class="crm-table-wrapper crm-table-card">
-                    <div class="crm-table crm-table-compact crm-representatives-table">
-                      <table class="uk-table uk-table-divider uk-table-small">
-                        <thead>
-                        <tr>
-                          <th>ФИО / название</th><th>Роль / должность</th><th>Документ / основание полномочий</th><th>Срок действия</th><th>Статус</th>
-                        </tr>
-                        </thead>
-                        <tbody data-role="representatives-table-body">
-                        <tr><td><strong>Крылов Денис Олегович</strong></td><td>Генеральный директор</td><td>Устав АО, протокол №3 от 15.01.2021</td><td>Бессрочно</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr>
-                        <tr><td><strong>Соколова Мария Владимировна</strong></td><td>Представитель по доверенности</td><td>Доверенность №44/25 от 02.02.2025</td><td>до 01.02.2027</td><td><span class="crm-badge warning" data-status="attention">Требует продления</span></td></tr>
-                        <tr><td><strong>Никифоров Артём Игоревич</strong></td><td>Главный бухгалтер</td><td>Приказ о назначении №12-к от 11.03.2022</td><td>Бессрочно</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr>
-                        </tbody>
-                      </table>
+                  <div class="crm-representatives-list" data-role="representatives-list">
+                    <div class="crm-representative-row">
+                      <div class="crm-representative-cell"><span class="crm-profile-label">Должность</span><strong>Генеральный директор</strong></div>
+                      <div class="crm-representative-cell"><span class="crm-profile-label">Субъект</span><strong>ЗАО «Вектор Данных»</strong></div>
+                      <div class="crm-representative-cell"><span class="crm-profile-label">Основание полномочий</span><strong>Устав общества</strong></div>
+                      <div class="crm-representative-cell"><span class="crm-profile-label">Срок действия</span><strong>Без срока действия</strong></div>
                     </div>
                   </div>
+                  <table class="crm-representatives-contract-hook" hidden>
+                    <tbody data-role="representatives-table-body">
+                    <tr><td>Генеральный директор</td></tr>
+                    </tbody>
+                  </table>
                 </article>
 
                 <section class="crm-flat-group" data-entity="registration-contacts-group">
-                  <div class="crm-double-grid">
-                    <article class="crm-subject-profile-section crm-flat-section" data-entity="registration-data">
-                      <div class="crm-form-section-head"><h3>Регистрационные данные</h3></div>
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-2">
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Регистрирующий орган</div><div class="crm-profile-value">Межрайонная ИФНС России №46 по г. Москве</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Уставный капитал</div><div class="crm-profile-value">300 000 000 ₽</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Страна регистрации</div><div class="crm-profile-value">Российская Федерация</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Регистрационный номер</div><div class="crm-profile-value">1217700011256</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Налоговый статус</div><div class="crm-profile-value">Плательщик налога на прибыль (ОСНО)</div></div>
-                      </div>
-                    </article>
-                    <article class="crm-subject-profile-section crm-flat-section" data-entity="contacts">
-                      <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-2">
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дополнительный телефон</div><div class="crm-profile-value">+7 (495) 900-22-18 (приёмная)</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Сайт</div><div class="crm-profile-value">www.vostokms.ru</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Контактное лицо</div><div class="crm-profile-value">Соколова Мария Владимировна</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Ответственный представитель</div><div class="crm-profile-value">Крылов Денис Олегович</div></div>
-                      </div>
-                    </article>
-                  </div>
+                  <article class="crm-subject-profile-section crm-flat-section" data-entity="registration-data">
+                    <div class="crm-form-section-head"><h3>Регистрационные данные</h3></div>
+                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Регистрирующий орган</div><div class="crm-profile-value">Межрайонная ИФНС России №46 по г. Москве</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Уставный капитал</div><div class="crm-profile-value">300 000 000 ₽</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Страна регистрации</div><div class="crm-profile-value">Российская Федерация</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Регистрационный номер</div><div class="crm-profile-value">1217700011256</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Налоговый статус</div><div class="crm-profile-value">Плательщик налога на прибыль (ОСНО)</div></div>
+                    </div>
+                  </article>
+                  <article class="crm-subject-profile-section crm-flat-section" data-entity="contacts">
+                    <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
+                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дополнительный телефон</div><div class="crm-profile-value">+7 (495) 900-22-18 (приёмная)</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Сайт</div><div class="crm-profile-value">www.vostokms.ru</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Контактное лицо</div><div class="crm-profile-value">Соколова Мария Владимировна</div></div>
+                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Ответственный представитель</div><div class="crm-profile-value">Крылов Денис Олегович</div></div>
+                    </div>
+                  </article>
                 </section>
 
                 <section class="crm-flat-group" data-entity="compliance-rights-group">
-                  <div class="crm-double-grid">
-                    <article class="crm-subject-profile-section crm-flat-section" data-entity="compliance">
-                      <div class="crm-form-section-head"><h3>Комплаенс</h3></div>
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-2">
+                  <article class="crm-subject-profile-section crm-flat-section" data-entity="compliance">
+                    <div class="crm-form-section-head"><h3>Комплаенс</h3></div>
+                    <div class="crm-compliance-panel">
+                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
                         <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Статус комплаенса</div><div class="crm-profile-value"><span class="crm-badge success" data-status="passed">Пройден</span></div></div>
                         <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дата прохождения</div><div class="crm-profile-value">25.04.2026</div></div>
                         <div class="crm-profile-row crm-profile-row-full"><div class="crm-profile-label">Комментарий</div><div class="crm-profile-value">Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено.</div></div>
@@ -225,15 +222,15 @@
                         <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Последняя проверка</div><div class="crm-profile-value">25.04.2026 11:40</div></div>
                         <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Риск-профиль</div><div class="crm-profile-value">Средний (MR-2)</div></div>
                       </div>
-                    </article>
-                    <article class="crm-subject-profile-section crm-flat-section" data-entity="usage-rights">
-                      <div class="crm-form-section-head"><h3>Права использования</h3></div>
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-1">
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования денежных средств</div><div class="crm-profile-value"><span class="crm-badge success" data-status="allowed">Да</span></div><div class="crm-profile-note">Разрешено в рамках действующих брокерских договоров и лимитов риска.</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования ценных бумаг</div><div class="crm-profile-value"><span class="crm-badge info" data-status="restricted">Ограничено</span></div><div class="crm-profile-note">Только по операциям РЕПО и под залог в пределах утверждённого обеспечения.</div></div>
-                      </div>
-                    </article>
-                  </div>
+                    </div>
+                  </article>
+                  <article class="crm-subject-profile-section crm-flat-section" data-entity="usage-rights">
+                    <div class="crm-form-section-head"><h3>Права использования</h3></div>
+                    <div class="crm-usage-rights-grid">
+                      <div class="crm-usage-right-card crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования денежных средств</div><div class="crm-profile-value"><span class="crm-badge success" data-status="allowed">Да</span></div><div class="crm-profile-note">Разрешено в рамках действующих брокерских договоров и лимитов риска.</div></div>
+                      <div class="crm-usage-right-card crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования ценных бумаг</div><div class="crm-profile-value"><span class="crm-badge info" data-status="restricted">Ограничено</span></div><div class="crm-profile-note">Только по операциям РЕПО и под залог в пределах утверждённого обеспечения.</div></div>
+                    </div>
+                  </article>
                 </section>
 
                 <section class="crm-flat-group" data-entity="manager-report-group">
