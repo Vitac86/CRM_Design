@@ -123,7 +123,7 @@
     return card;
   }
 
-  function getFieldValue(form, name) {
+  function getBankFieldValue(form, name) {
     var el = form.querySelector('[name="' + name + '"]');
     return el ? el.value : '';
   }
@@ -140,13 +140,13 @@
 
     var form = getBankForm();
     var data = {
-      bankName: getFieldValue(form, 'bankName'),
-      bik: getFieldValue(form, 'bik'),
-      currency: getFieldValue(form, 'currency') || 'RUB',
-      accountNumber: getFieldValue(form, 'accountNumber'),
-      correspondentAccount: getFieldValue(form, 'correspondentAccount'),
-      openedAt: getFieldValue(form, 'openedAt'),
-      purpose: getFieldValue(form, 'purpose'),
+      bankName: getBankFieldValue(form, 'bankName'),
+      bik: getBankFieldValue(form, 'bik'),
+      currency: getBankFieldValue(form, 'currency') || 'RUB',
+      accountNumber: getBankFieldValue(form, 'accountNumber'),
+      correspondentAccount: getBankFieldValue(form, 'correspondentAccount'),
+      openedAt: getBankFieldValue(form, 'openedAt'),
+      purpose: getBankFieldValue(form, 'purpose'),
     };
 
     var list = getBankList();
@@ -157,11 +157,191 @@
     hideBankForm();
   }
 
+  /* ─── Documents ─────────────────────────────────────────────────────────── */
+
+  function getDocumentModal() {
+    return document.querySelector('[data-role="document-modal"]');
+  }
+
+  function getDocumentForm() {
+    return document.querySelector('[data-entity="document-form"]');
+  }
+
+  function getDocumentFormError() {
+    var form = getDocumentForm();
+    return form ? form.querySelector('[data-role="document-form-error"]') : null;
+  }
+
+  function setDocumentModalState(isOpen) {
+    var modal = getDocumentModal();
+    if (!modal) return;
+    modal.hidden = !isOpen;
+    document.body.classList.toggle('crm-modal-open', isOpen);
+  }
+
+  function clearDocumentForm() {
+    var form = getDocumentForm();
+    if (!form) return;
+    form.querySelectorAll('input').forEach(function (input) {
+      input.value = '';
+    });
+    form.querySelectorAll('select').forEach(function (select) {
+      select.value = '';
+    });
+    var errEl = getDocumentFormError();
+    if (errEl) errEl.hidden = true;
+  }
+
+  function openDocumentForm() {
+    clearDocumentForm();
+    setDocumentModalState(true);
+    var form = getDocumentForm();
+    if (form) {
+      var firstInput = form.querySelector('input[name="title"]');
+      if (firstInput) firstInput.focus();
+    }
+  }
+
+  function cancelDocumentForm() {
+    setDocumentModalState(false);
+    clearDocumentForm();
+  }
+
+  function getDocFormFieldValue(name) {
+    var form = getDocumentForm();
+    if (!form) return '';
+    var el = form.querySelector('[name="' + name + '"]');
+    return el ? el.value.trim() : '';
+  }
+
+  function isDocumentFormValid() {
+    return (
+      getDocFormFieldValue('title') &&
+      getDocFormFieldValue('documentType') &&
+      getDocFormFieldValue('status') &&
+      getDocFormFieldValue('date')
+    );
+  }
+
+  function getDocStatusBadgeClass(status) {
+    if (status === 'Действующий') return 'success';
+    if (status === 'На подписи') return 'warning';
+    if (status === 'Архивный') return 'muted';
+    if (status === 'Черновик') return 'muted';
+    return 'muted';
+  }
+
+  function buildDocumentRow(data) {
+    var badgeClass = getDocStatusBadgeClass(data.status);
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="crm-documents-td-title">' + escapeHtml(data.title) + '</td>' +
+      '<td>' + escapeHtml(data.documentType) + '</td>' +
+      '<td><span class="crm-badge ' + badgeClass + '">' + escapeHtml(data.status) + '</span></td>' +
+      '<td>' + escapeHtml(data.date) + '</td>' +
+      '<td class="crm-documents-td-actions">' +
+        '<div class="crm-documents-row-actions">' +
+          '<button class="uk-button uk-button-default crm-button crm-document-action-button" type="button"' +
+            ' data-action="download-document"' +
+            ' data-doc-title="' + escapeHtml(data.title) + '"' +
+            ' data-doc-type="' + escapeHtml(data.documentType) + '"' +
+            ' data-doc-status="' + escapeHtml(data.status) + '"' +
+            ' data-doc-date="' + escapeHtml(data.date) + '">' +
+            'Скачать' +
+          '</button>' +
+          '<button class="uk-button uk-button-default crm-button crm-document-action-button" type="button"' +
+            ' data-action="print-document"' +
+            ' data-doc-title="' + escapeHtml(data.title) + '">' +
+            'Распечатать' +
+          '</button>' +
+        '</div>' +
+      '</td>';
+    return tr;
+  }
+
+  function submitDocumentForm() {
+    if (!isDocumentFormValid()) {
+      var errEl = getDocumentFormError();
+      if (errEl) errEl.hidden = false;
+      return;
+    }
+
+    var data = {
+      title: getDocFormFieldValue('title'),
+      documentType: getDocFormFieldValue('documentType'),
+      status: getDocFormFieldValue('status'),
+      date: getDocFormFieldValue('date'),
+    };
+
+    var tbody = subjectCardPage.querySelector('[data-role="documents-tbody"]');
+    if (tbody) {
+      tbody.insertBefore(buildDocumentRow(data), tbody.firstChild);
+    }
+
+    setDocumentModalState(false);
+    clearDocumentForm();
+  }
+
+  var transliterationMap = {
+    'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e','ж':'zh','з':'z',
+    'и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r',
+    'с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh',
+    'щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'
+  };
+
+  function sanitizeFileName(raw) {
+    var lower = raw.toLowerCase();
+    var transliterated = lower.split('').map(function (ch) {
+      return transliterationMap[ch] !== undefined ? transliterationMap[ch] : ch;
+    }).join('');
+    return transliterated
+      .replace(/[^a-z0-9._\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '_')
+      .replace(/_+/g, '_');
+  }
+
+  function downloadDocument(btn) {
+    var title = btn.getAttribute('data-doc-title') || 'document';
+    var type = btn.getAttribute('data-doc-type') || '';
+    var status = btn.getAttribute('data-doc-status') || '';
+    var date = btn.getAttribute('data-doc-date') || '';
+
+    var content = [
+      'Название документа: ' + title,
+      'Вид документа: ' + type,
+      'Статус: ' + status,
+      'Дата: ' + date,
+      '',
+      'Это mock-файл, сгенерированный в интерфейсе CRM.'
+    ].join('\n');
+
+    var sanitized = sanitizeFileName(title);
+    var fileName = sanitized ? (sanitized + '.txt') : 'document.txt';
+
+    var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    var objectUrl = URL.createObjectURL(blob);
+    var anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  function printDocument(btn) {
+    var title = btn.getAttribute('data-doc-title') || 'документ';
+    window.alert('Подготовка документа «' + title + '» к печати');
+    window.print();
+  }
+
   /* ─── Global keyboard handler ───────────────────────────────────────────── */
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       setRepresentativeModalState(false);
+      setDocumentModalState(false);
     }
   });
 
@@ -218,6 +398,43 @@
 
     if (target.closest('[data-action="submit-bank-account-form"]')) {
       submitBankForm();
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="open-document-form"]')) {
+      openDocumentForm();
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="cancel-document-form"]')) {
+      cancelDocumentForm();
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="submit-document-form"]')) {
+      submitDocumentForm();
+      event.preventDefault();
+      return;
+    }
+
+    var downloadBtn = target.closest('[data-action="download-document"]');
+    if (downloadBtn) {
+      downloadDocument(downloadBtn);
+      event.preventDefault();
+      return;
+    }
+
+    var printBtn = target.closest('[data-action="print-document"]');
+    if (printBtn) {
+      printDocument(printBtn);
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="open-document-wizard"]')) {
       event.preventDefault();
       return;
     }
