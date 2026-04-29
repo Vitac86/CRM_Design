@@ -59,6 +59,33 @@
     });
   }
 
+  function applyFilterOptionSelection(filterOption) {
+    const filterMenu = filterOption.closest('.crm-filter-menu');
+    if (!filterMenu) return;
+
+    const selectedValue = filterOption.getAttribute('data-filter-value') || '';
+    const selectedTextNode = filterOption.querySelector('span');
+    const selectedText = selectedTextNode ? selectedTextNode.textContent.trim() : filterOption.textContent.trim();
+
+    filterMenu.querySelectorAll('.crm-filter-option[data-filter-option]').forEach(function (option) {
+      const isSelected = option === filterOption;
+      option.classList.toggle('is-selected', isSelected);
+      option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+
+    const triggerValue = filterMenu.querySelector('.crm-filter-trigger-value');
+    if (triggerValue && selectedText) {
+      triggerValue.textContent = selectedText;
+    }
+
+    const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
+    if (hiddenInput) {
+      hiddenInput.value = selectedValue;
+    }
+
+    filterMenu.removeAttribute('open');
+  }
+
   const mobileQuery = window.matchMedia('(max-width: 920px)');
 
   function isMobileViewport() {
@@ -148,40 +175,46 @@
   }
 
   document.addEventListener('click', function (event) {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      closeOpenFilterMenus();
+      return;
+    }
+
+    const filterOption = target.closest('.crm-filter-option[data-filter-option]');
+    if (filterOption) {
+      applyFilterOptionSelection(filterOption);
+      event.preventDefault();
+      return;
+    }
+
+    const filterTrigger = target.closest('.crm-filter-trigger');
+    if (filterTrigger) {
+      const filterMenu = filterTrigger.closest('.crm-filter-menu');
+      if (filterMenu) {
+        requestAnimationFrame(function () {
+          if (filterMenu.open) {
+            closeOpenFilterMenus(filterMenu);
+          }
+        });
+      }
+      return;
+    }
+
+    if (target.closest('.crm-filter-menu')) {
+      return;
+    }
+
+    closeOpenFilterMenus();
+  });
+
+  document.addEventListener('click', function (event) {
     if (!app || !sidebar || !isMobileViewport() || !app.classList.contains('sidebar-open')) {
       return;
     }
 
     const target = event.target;
-    const filterOption = target.closest('.crm-filter-option[data-filter-option]');
-    if (filterOption) {
-      const filterMenu = filterOption.closest('.crm-filter-menu');
-      if (filterMenu) {
-        const selectedValue = filterOption.getAttribute('data-filter-value') || '';
-        const selectedTextNode = filterOption.querySelector('span');
-        const selectedText = selectedTextNode ? selectedTextNode.textContent.trim() : filterOption.textContent.trim();
 
-        filterMenu.querySelectorAll('.crm-filter-option[data-filter-option]').forEach(function (option) {
-          const isSelected = option === filterOption;
-          option.classList.toggle('is-selected', isSelected);
-          option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-        });
-
-        const triggerValue = filterMenu.querySelector('.crm-filter-trigger-value');
-        if (triggerValue && selectedText) {
-          triggerValue.textContent = selectedText;
-        }
-
-        const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
-        if (hiddenInput) {
-          hiddenInput.value = selectedValue;
-        }
-
-        filterMenu.removeAttribute('open');
-        event.preventDefault();
-      }
-      return;
-    }
     if (sidebar.contains(target) || (toggle && toggle.contains(target))) {
       return;
     }
@@ -200,11 +233,17 @@
   }, true);
 
   document.addEventListener('pointerdown', function (event) {
-    if (event.target.closest('.crm-filter-menu')) {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      closeOpenFilterMenus();
+      return;
+    }
+
+    if (target.closest('.crm-filter-menu')) {
       return;
     }
     closeOpenFilterMenus();
-  });
+  }, true);
 
   if (sidebar) {
     sidebar.addEventListener('click', function (event) {
