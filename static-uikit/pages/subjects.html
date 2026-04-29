@@ -71,54 +71,109 @@
           </div>
 
           <form action="#" method="post" data-form="subjects-filters" data-action="filter-subjects" class="crm-registry-filters crm-filter-panel" data-filter="subjects">
-            <div class="crm-filter-search-row crm-filter-search"><input id="subject-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/></div>
+            <div class="crm-filter-search-row crm-filter-search">
+              <label class="crm-filter-search-shell" for="subject-search">
+                <span class="crm-filter-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <input id="subject-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="subject-search" placeholder="Поиск по клиенту, коду, ИНН или email"/>
+              </label>
+            </div>
             <div class="crm-filter-fields-row crm-filter-grid">
               <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <label class="uk-form-label crm-visually-hidden" for="subject-type">Тип</label>
-                <div class="crm-filter-pill">
-                  <span class="crm-filter-pill-label">Тип:</span>
-                  <select id="subject-type" class="uk-select crm-select crm-filter-pill-select" name="subject-type"><option>Все</option></select>
-                </div>
+                <details class="crm-filter-menu" data-filter-menu="subject-type">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Тип">
+                    <span class="crm-filter-trigger-label">Тип:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Тип">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="company"><span>Юр. лицо</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="person"><span>Физ. лицо</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="ip"><span>ИП</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="subject-type" value="all" data-filter="subject-type"/>
+                </details>
               </div>
 
               <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <label class="uk-form-label crm-visually-hidden" for="resident-type">Резидентство</label>
-                <div class="crm-filter-pill">
-                  <span class="crm-filter-pill-label">Резидентство:</span>
-                  <select id="resident-type" class="uk-select crm-select crm-filter-pill-select" name="resident-type"><option>Все</option></select>
-                </div>
+                <details class="crm-filter-menu" data-filter-menu="resident-type">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Резидентство">
+                    <span class="crm-filter-trigger-label">Резидентство:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Резидентство">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="resident"><span>Резидент РФ</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="non-resident"><span>Нерезидент</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="resident-type" value="all" data-filter="resident-type"/>
+                </details>
               </div>
 
               <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <label class="uk-form-label crm-visually-hidden" for="subject-status">Статус субъекта</label>
-                <div class="crm-filter-pill">
-                  <span class="crm-filter-pill-label">Статус субъекта:</span>
-                  <select id="subject-status" class="uk-select crm-select crm-filter-pill-select" name="subject-status"><option>Все</option></select>
-                </div>
+                <details class="crm-filter-menu" data-filter-menu="subject-status" open>
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Статус субъекта">
+                    <span class="crm-filter-trigger-label">Статус субъекта:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Статус субъекта">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="active-client"><span>Активный клиент</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="on-compliance"><span>На комплаенсе</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="data-filled"><span>Данные заполнены</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="registration"><span>Регистрация</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="blocked"><span>Заблокирован</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="subject-status" value="all" data-filter="subject-status"/>
+                </details>
               </div>
 
               <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <label class="uk-form-label crm-visually-hidden" for="compliance-status">Комплаенс</label>
-                <div class="crm-filter-pill">
-                  <span class="crm-filter-pill-label">Комплаенс:</span>
-                  <select id="compliance-status" class="uk-select crm-select crm-filter-pill-select" name="compliance-status"><option>Все</option></select>
-                </div>
+                <details class="crm-filter-menu" data-filter-menu="compliance-status">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Комплаенс">
+                    <span class="crm-filter-trigger-label">Комплаенс:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Комплаенс">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="approved"><span>Пройден</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="pending-review"><span>На проверке</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="rework"><span>На доработке</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="blocked"><span>Заблокирован</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="compliance-status" value="all" data-filter="compliance-status"/>
+                </details>
               </div>
 
               <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <label class="uk-form-label crm-visually-hidden" for="subject-role">Роль</label>
-                <div class="crm-filter-pill">
-                  <span class="crm-filter-pill-label">Роль:</span>
-                  <select id="subject-role" class="uk-select crm-select crm-filter-pill-select" name="subject-role"><option>Все</option></select>
-                </div>
+                <details class="crm-filter-menu" data-filter-menu="subject-role">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Роль">
+                    <span class="crm-filter-trigger-label">Роль:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Роль">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="client"><span>Клиент</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="representative"><span>Представитель</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="beneficiary"><span>Бенефициар</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="agent"><span>Агент</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="subject-role" value="all" data-filter="subject-role"/>
+                </details>
               </div>
 
               <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <label class="uk-form-label crm-visually-hidden" for="qualification">Квалификация</label>
-                <div class="crm-filter-pill">
-                  <span class="crm-filter-pill-label">Квалификация:</span>
-                  <select id="qualification" class="uk-select crm-select crm-filter-pill-select" name="qualification"><option>Все</option></select>
-                </div>
+                <details class="crm-filter-menu" data-filter-menu="qualification">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Квалификация">
+                    <span class="crm-filter-trigger-label">Квалификация:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Квалификация">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="qualified"><span>Квалифицированный</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="unqualified"><span>Неквалифицированный</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="cour"><span>КОУР</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="qualification" value="all" data-filter="qualification"/>
+                </details>
               </div>
 
               <div class="crm-filter-actions">
