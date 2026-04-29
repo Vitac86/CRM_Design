@@ -159,10 +159,6 @@
 
   /* ─── Documents ─────────────────────────────────────────────────────────── */
 
-  function getDocumentModal() {
-    return document.querySelector('[data-role="document-modal"]');
-  }
-
   function getDocumentForm() {
     return document.querySelector('[data-entity="document-form"]');
   }
@@ -170,13 +166,6 @@
   function getDocumentFormError() {
     var form = getDocumentForm();
     return form ? form.querySelector('[data-role="document-form-error"]') : null;
-  }
-
-  function setDocumentModalState(isOpen) {
-    var modal = getDocumentModal();
-    if (!modal) return;
-    modal.hidden = !isOpen;
-    document.body.classList.toggle('crm-modal-open', isOpen);
   }
 
   function clearDocumentForm() {
@@ -194,16 +183,16 @@
 
   function openDocumentForm() {
     clearDocumentForm();
-    setDocumentModalState(true);
     var form = getDocumentForm();
-    if (form) {
-      var firstInput = form.querySelector('input[name="title"]');
-      if (firstInput) firstInput.focus();
-    }
+    if (!form) return;
+    form.hidden = false;
+    var firstInput = form.querySelector('input[name="title"]');
+    if (firstInput) firstInput.focus();
   }
 
   function cancelDocumentForm() {
-    setDocumentModalState(false);
+    var form = getDocumentForm();
+    if (form) form.hidden = true;
     clearDocumentForm();
   }
 
@@ -278,8 +267,95 @@
       tbody.insertBefore(buildDocumentRow(data), tbody.firstChild);
     }
 
-    setDocumentModalState(false);
-    clearDocumentForm();
+    cancelDocumentForm();
+  }
+
+  /* ─── Client accounts ───────────────────────────────────────────────────── */
+
+  function getClientAccountForm() {
+    return subjectCardPage.querySelector('[data-entity="client-account-form"]');
+  }
+
+  function getClientAccountFormError() {
+    var form = getClientAccountForm();
+    return form ? form.querySelector('[data-role="client-account-form-error"]') : null;
+  }
+
+  function getClientAccountFieldValue(name) {
+    var form = getClientAccountForm();
+    if (!form) return '';
+    var el = form.querySelector('[name="' + name + '"]');
+    return el ? el.value.trim() : '';
+  }
+
+  function isClientAccountFormValid() {
+    return !!(getClientAccountFieldValue('accountNumber') && getClientAccountFieldValue('accountOpenDate'));
+  }
+
+  function clearClientAccountForm() {
+    var form = getClientAccountForm();
+    if (!form) return;
+    form.querySelectorAll('input').forEach(function (input) {
+      input.value = '';
+    });
+    var typeSelect = form.querySelector('select[name="accountType"]');
+    if (typeSelect) typeSelect.value = 'broker';
+    var errEl = getClientAccountFormError();
+    if (errEl) errEl.hidden = true;
+  }
+
+  function openClientAccountForm() {
+    clearClientAccountForm();
+    var form = getClientAccountForm();
+    if (!form) return;
+    form.hidden = false;
+    var firstInput = form.querySelector('input[name="accountNumber"]');
+    if (firstInput) firstInput.focus();
+  }
+
+  function cancelClientAccountForm() {
+    var form = getClientAccountForm();
+    if (form) form.hidden = true;
+    clearClientAccountForm();
+  }
+
+  var accountTypeLabelMap = {
+    broker: 'Брокерский',
+    depository: 'Депозитарный',
+    trust: 'Доверительное управление',
+    iis: 'ИИС',
+    other: 'Иной',
+  };
+
+  function buildClientAccountRow(data) {
+    var tr = document.createElement('tr');
+    var typeLabel = accountTypeLabelMap[data.accountType] || escapeHtml(data.accountType);
+    tr.innerHTML =
+      '<td>' + escapeHtml(data.accountNumber) + '</td>' +
+      '<td>' + typeLabel + '</td>' +
+      '<td>' + escapeHtml(data.accountOpenDate) + '</td>';
+    return tr;
+  }
+
+  function submitClientAccountForm() {
+    if (!isClientAccountFormValid()) {
+      var errEl = getClientAccountFormError();
+      if (errEl) errEl.hidden = false;
+      return;
+    }
+
+    var data = {
+      accountNumber: getClientAccountFieldValue('accountNumber'),
+      accountType: getClientAccountFieldValue('accountType') || 'broker',
+      accountOpenDate: getClientAccountFieldValue('accountOpenDate'),
+    };
+
+    var tbody = subjectCardPage.querySelector('[data-role="client-accounts-tbody"]');
+    if (tbody) {
+      tbody.insertBefore(buildClientAccountRow(data), tbody.firstChild);
+    }
+
+    cancelClientAccountForm();
   }
 
   var transliterationMap = {
@@ -341,7 +417,7 @@
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       setRepresentativeModalState(false);
-      setDocumentModalState(false);
+      cancelDocumentForm();
     }
   });
 
@@ -435,6 +511,24 @@
     }
 
     if (target.closest('[data-action="open-document-wizard"]')) {
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="open-client-account-form"]')) {
+      openClientAccountForm();
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="cancel-client-account-form"]')) {
+      cancelClientAccountForm();
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="submit-client-account-form"]')) {
+      submitClientAccountForm();
       event.preventDefault();
       return;
     }

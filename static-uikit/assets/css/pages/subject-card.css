@@ -1008,7 +1008,22 @@
   color: var(--crm-umi-text-secondary);
 }
 
-/* Document add modal */
+/* Document inline add form */
+.crm-page[data-page="subject-card"] .crm-document-form {
+  padding: 16px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+  box-shadow: var(--crm-umi-shadow-sm);
+}
+
+.crm-page[data-page="subject-card"] .crm-document-form-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  margin: 0;
+}
+
 .crm-page[data-page="subject-card"] .crm-document-form-subtitle {
   margin: 4px 0 0;
   font-size: 13px;
@@ -1016,15 +1031,130 @@
   line-height: 1.4;
 }
 
+.crm-page[data-page="subject-card"] .crm-document-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-document-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crm-page[data-page="subject-card"] .crm-document-form-field-full {
+  grid-column: 1 / -1;
+}
+
+.crm-page[data-page="subject-card"] .crm-document-form-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--crm-umi-text-muted);
+}
+
 .crm-page[data-page="subject-card"] .crm-document-form-error {
   margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid #fecdd3;
+  border-radius: 6px;
+  background: #fff1f2;
   font-size: 13px;
   color: #be123c;
   line-height: 1.4;
 }
 
 .crm-page[data-page="subject-card"] .crm-document-form-actions {
-  margin-top: 20px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Contracts / Accounts tab */
+.crm-page[data-page="subject-card"] .crm-contracts-accounts-section {
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-section-head-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-section-head-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  margin: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-contracts-table th,
+.crm-page[data-page="subject-card"] .crm-accounts-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-umi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Client account inline form */
+.crm-page[data-page="subject-card"] .crm-client-account-form {
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 8px;
+  background: var(--crm-umi-surface-muted, var(--crm-umi-surface));
+}
+
+.crm-page[data-page="subject-card"] .crm-client-account-form-error {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border: 1px solid #fecdd3;
+  border-radius: 6px;
+  background: #fff1f2;
+  font-size: 13px;
+  color: #be123c;
+  line-height: 1.4;
+}
+
+.crm-page[data-page="subject-card"] .crm-client-account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-client-account-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crm-page[data-page="subject-card"] .crm-client-account-form-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--crm-umi-text-muted);
+}
+
+.crm-page[data-page="subject-card"] .crm-client-account-form-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .crm-page[data-page="subject-card"] .crm-client-account-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1046,5 +1176,13 @@
   .crm-page[data-page="subject-card"] .crm-documents-th-actions,
   .crm-page[data-page="subject-card"] .crm-documents-td-actions {
     text-align: left;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-document-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="subject-card"] .crm-client-account-form-grid {
+    grid-template-columns: 1fr;
   }
 }

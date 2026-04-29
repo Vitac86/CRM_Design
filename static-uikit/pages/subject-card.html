@@ -467,6 +467,50 @@
                   <button class="uk-button crm-button-primary crm-button crm-doc-action-btn" type="button" data-action="open-document-form">+ Добавить документ</button>
                 </div>
 
+                <div class="crm-document-form" data-entity="document-form" hidden>
+                  <div class="crm-document-form-head">
+                    <h3 class="crm-document-form-title">Новый документ</h3>
+                    <p class="crm-document-form-subtitle">Заполните поля для добавления документа в список субъекта.</p>
+                  </div>
+                  <div class="crm-document-form-grid">
+                    <div class="crm-document-form-field crm-document-form-field-full">
+                      <label class="crm-document-form-label" for="doc-title">Название документа *</label>
+                      <input class="uk-input crm-input" id="doc-title" type="text" name="title" autocomplete="off"/>
+                    </div>
+                    <div class="crm-document-form-field">
+                      <label class="crm-document-form-label" for="doc-type">Вид документа *</label>
+                      <select class="uk-select crm-input" id="doc-type" name="documentType">
+                        <option value="">Выберите вид</option>
+                        <option value="Договор ДУ">Договор ДУ</option>
+                        <option value="Депозитарный">Депозитарный</option>
+                        <option value="Анкета">Анкета</option>
+                        <option value="Паспорт">Паспорт</option>
+                        <option value="Доверенность">Доверенность</option>
+                        <option value="Иной документ">Иной документ</option>
+                      </select>
+                    </div>
+                    <div class="crm-document-form-field">
+                      <label class="crm-document-form-label" for="doc-status">Статус документа *</label>
+                      <select class="uk-select crm-input" id="doc-status" name="status">
+                        <option value="">Выберите статус</option>
+                        <option value="Действующий">Действующий</option>
+                        <option value="На подписи">На подписи</option>
+                        <option value="Архивный">Архивный</option>
+                        <option value="Черновик">Черновик</option>
+                      </select>
+                    </div>
+                    <div class="crm-document-form-field">
+                      <label class="crm-document-form-label" for="doc-date">Дата *</label>
+                      <input class="uk-input crm-input" id="doc-date" type="date" name="date"/>
+                    </div>
+                  </div>
+                  <p class="crm-document-form-error" data-role="document-form-error" hidden>Заполните все обязательные поля.</p>
+                  <div class="crm-document-form-actions">
+                    <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-document-form">Отмена</button>
+                    <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-document-form">Сохранить</button>
+                  </div>
+                </div>
+
                 <div class="crm-card crm-subject-profile-section" data-entity="documents-list">
                   <div class="crm-table-wrapper crm-table-card">
                     <div class="crm-table">
@@ -542,22 +586,119 @@
             </li>
 
             <li class="crm-subject-tab-panel" data-tab-panel="contracts">
-              <section class="crm-subject-section-layout">
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-section" data-entity="contracts-accounts">
-                  <div class="crm-form-section-head"><h3>Договоры / Счета</h3></div>
-                  <section class="crm-flat-group" data-entity="contracts-accounts-group">
-                    <div class="crm-double-grid">
-                      <article class="crm-subject-profile-section crm-flat-section" data-entity="contracts">
-                        <div class="crm-form-section-head crm-section-head-inline"><h3>Договоры</h3><button class="uk-button uk-button-default crm-button" type="button" data-action="add-contract">+ Добавить договор</button></div>
-                        <div class="crm-table-wrapper crm-table-card"><div class="crm-table crm-table-compact"><table class="uk-table uk-table-divider uk-table-small"><thead><tr><th>Номер договора</th><th>Вид договора</th><th>Дата открытия</th><th>Дата закрытия</th><th>Статус</th></tr></thead><tbody><tr><td>BR-4401/21</td><td>Брокерское обслуживание</td><td>22.01.2021</td><td>—</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr><tr><td>DU-4401/24</td><td>Доверительное управление</td><td>14.06.2024</td><td>—</td><td><span class="crm-badge success" data-status="active">Действует</span></td></tr><tr><td>DP-2026/00041</td><td>Депозитарное обслуживание</td><td>26.04.2026</td><td>—</td><td><span class="crm-badge info" data-status="pending">На активации</span></td></tr></tbody></table></div></div>
-                      </article>
-                      <article class="crm-subject-profile-section crm-flat-section" data-entity="accounts">
-                        <div class="crm-form-section-head crm-section-head-inline"><h3>Счета</h3><button class="uk-button uk-button-default crm-button" type="button" data-action="add-account">+ Добавить счёт</button></div>
-                        <div class="crm-table-wrapper crm-table-card"><div class="crm-table crm-table-compact"><table class="uk-table uk-table-divider uk-table-small"><thead><tr><th>Номер счёта</th><th>Вид счёта</th><th>Валюта</th><th>Дата открытия</th><th>Статус</th></tr></thead><tbody><tr><td>30601-000-4401</td><td>Брокерский</td><td>RUB</td><td>22.01.2021</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr><tr><td>40701-USD-4401</td><td>Валютный</td><td>USD</td><td>14.07.2023</td><td><span class="crm-badge info" data-status="limited">Ограничен</span></td></tr><tr><td>30-016-00041-DP</td><td>Депозитарный</td><td>RUB</td><td>26.04.2026</td><td><span class="crm-badge info" data-status="pending">На активации</span></td></tr></tbody></table></div></div>
-                      </article>
+              <section class="crm-subject-section-layout crm-contracts-accounts-section" data-entity="contracts-accounts">
+
+                <article class="crm-card crm-subject-profile-section" data-entity="contracts">
+                  <div class="crm-section-head-inline">
+                    <h3 class="crm-section-head-title">Договоры</h3>
+                    <button class="uk-button uk-button-default crm-button" type="button" data-action="add-contract">+ Добавить договор</button>
+                  </div>
+                  <div class="crm-table-wrapper crm-table-card">
+                    <div class="crm-table crm-table-compact">
+                      <table class="uk-table uk-table-divider uk-table-small crm-contracts-table">
+                        <thead>
+                          <tr>
+                            <th>Номер договора</th>
+                            <th>Вид договора</th>
+                            <th>Дата открытия</th>
+                            <th>Дата закрытия</th>
+                            <th>Статус</th>
+                          </tr>
+                        </thead>
+                        <tbody data-role="contracts-tbody">
+                          <tr>
+                            <td><button type="button" class="crm-link" data-action="open-contract" data-contract-id="IN-2026/00011">IN-2026/00011</button></td>
+                            <td>Иной</td>
+                            <td>18.01.2021</td>
+                            <td>—</td>
+                            <td><span class="crm-badge success">Действующий</span></td>
+                          </tr>
+                          <tr>
+                            <td><button type="button" class="crm-link" data-action="open-contract" data-contract-id="BR-2026/00444">BR-2026/00444</button></td>
+                            <td>Брокерский</td>
+                            <td>22.01.2021</td>
+                            <td>—</td>
+                            <td><span class="crm-badge success">Действующий</span></td>
+                          </tr>
+                          <tr>
+                            <td><button type="button" class="crm-link" data-action="open-contract" data-contract-id="DP-2026/00445">DP-2026/00445</button></td>
+                            <td>Депозитарный</td>
+                            <td>26.04.2026</td>
+                            <td>—</td>
+                            <td><span class="crm-badge success">Действующий</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
-                  </section>
+                  </div>
                 </article>
+
+                <article class="crm-card crm-subject-profile-section" data-entity="client-accounts">
+                  <div class="crm-section-head-inline">
+                    <h3 class="crm-section-head-title">Счета</h3>
+                    <button class="uk-button uk-button-default crm-button" type="button" data-action="open-client-account-form">+ Добавить счёт</button>
+                  </div>
+
+                  <div class="crm-client-account-form" data-entity="client-account-form" hidden>
+                    <p class="crm-client-account-form-error" data-role="client-account-form-error" hidden>Заполните номер счёта и дату открытия.</p>
+                    <div class="crm-client-account-form-grid">
+                      <div class="crm-client-account-form-field">
+                        <label class="crm-client-account-form-label" for="acct-number">Номер счёта</label>
+                        <input class="uk-input crm-input" id="acct-number" type="text" name="accountNumber" autocomplete="off"/>
+                      </div>
+                      <div class="crm-client-account-form-field">
+                        <label class="crm-client-account-form-label" for="acct-type">Вид счёта</label>
+                        <select class="uk-select crm-input" id="acct-type" name="accountType">
+                          <option value="broker">Брокерский</option>
+                          <option value="depository">Депозитарный</option>
+                          <option value="trust">Доверительное управление</option>
+                          <option value="iis">ИИС</option>
+                          <option value="other">Иной</option>
+                        </select>
+                      </div>
+                      <div class="crm-client-account-form-field">
+                        <label class="crm-client-account-form-label" for="acct-open-date">Дата открытия</label>
+                        <input class="uk-input crm-input" id="acct-open-date" type="date" name="accountOpenDate"/>
+                      </div>
+                    </div>
+                    <div class="crm-client-account-form-actions">
+                      <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-client-account-form">Отмена</button>
+                      <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-client-account-form">Сохранить</button>
+                    </div>
+                  </div>
+
+                  <div class="crm-table-wrapper crm-table-card">
+                    <div class="crm-table crm-table-compact">
+                      <table class="uk-table uk-table-divider uk-table-small crm-accounts-table">
+                        <thead>
+                          <tr>
+                            <th>Номер счёта</th>
+                            <th>Вид счёта</th>
+                            <th>Дата открытия</th>
+                          </tr>
+                        </thead>
+                        <tbody data-role="client-accounts-tbody">
+                          <tr>
+                            <td>30601-000-4401</td>
+                            <td>Брокерский</td>
+                            <td>22.01.2021</td>
+                          </tr>
+                          <tr>
+                            <td>40701-USD-4401</td>
+                            <td>Иной</td>
+                            <td>14.07.2023</td>
+                          </tr>
+                          <tr>
+                            <td>30-016-00041-DP</td>
+                            <td>Депозитарный</td>
+                            <td>26.04.2026</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </article>
+
               </section>
             </li>
 
@@ -600,25 +741,6 @@
           </div>
         </div>
 
-        <div class="crm-modal crm-document-modal" data-role="document-modal" hidden>
-          <div class="crm-modal-backdrop" data-action="cancel-document-form"></div>
-          <div class="crm-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="document-modal-title" data-entity="document-form">
-            <button class="crm-modal-close" type="button" aria-label="Закрыть" data-action="cancel-document-form">×</button>
-            <h3 id="document-modal-title">Новый документ</h3>
-            <p class="crm-document-form-subtitle">Заполните поля для добавления документа в список субъекта.</p>
-            <div class="crm-modal-form-grid">
-              <label class="crm-modal-field crm-modal-field-wide"><span>Название документа *</span><input class="uk-input crm-input" type="text" name="title" autocomplete="off"/></label>
-              <label class="crm-modal-field"><span>Вид документа *</span><select class="uk-select crm-input" name="documentType"><option value="">Выберите вид</option><option value="Договор ДУ">Договор ДУ</option><option value="Депозитарный">Депозитарный</option><option value="Анкета">Анкета</option><option value="Паспорт">Паспорт</option><option value="Доверенность">Доверенность</option><option value="Иной документ">Иной документ</option></select></label>
-              <label class="crm-modal-field"><span>Статус документа *</span><select class="uk-select crm-input" name="status"><option value="">Выберите статус</option><option value="Действующий">Действующий</option><option value="На подписи">На подписи</option><option value="Архивный">Архивный</option><option value="Черновик">Черновик</option></select></label>
-              <label class="crm-modal-field"><span>Дата *</span><input class="uk-input crm-input" type="date" name="date"/></label>
-            </div>
-            <p class="crm-document-form-error" data-role="document-form-error" hidden>Заполните все обязательные поля.</p>
-            <div class="crm-modal-actions crm-document-form-actions">
-              <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-document-form">Сохранить</button>
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-document-form">Отмена</button>
-            </div>
-          </div>
-        </div>
 </section>
     </main>
   </div>
