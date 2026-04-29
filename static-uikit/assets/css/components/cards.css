@@ -204,24 +204,6 @@
 
 .crm-table tbody tr:hover { background: #f5f8ff; cursor: pointer; }
 
-.crm-badge {
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1.1;
-  padding: 4px 10px;
-  border: 1px solid transparent;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  min-height: 24px;
-}
-
-.crm-badge.success { background: var(--crm-success-bg); color: var(--crm-success); border-color: #c8e8d8; }
-.crm-badge.warning { background: var(--crm-warning-bg); color: var(--crm-warning); border-color: #f2dfc0; }
-.crm-badge.danger { background: var(--crm-danger-bg); color: var(--crm-danger); border-color: #f5cccc; }
-.crm-badge.info { background: var(--crm-info-bg); color: var(--crm-info); border-color: #d1ddff; }
-.crm-badge.muted { background: #eef2f8; color: #5f708b; border-color: #d7dfea; }
 
 .crm-grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
 .crm-split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -400,13 +382,6 @@
   background: #f2f6ff;
 }
 
-.crm-badge {
-  min-height: 22px;
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  border-color: rgba(127, 147, 178, 0.28);
-}
 
 .crm-inline-badges {
   display: inline-flex;
@@ -625,12 +600,6 @@ a:focus-visible,
   margin-top: auto;
 }
 
-.crm-badge {
-  border-radius: 999px;
-  min-height: 20px;
-  padding: 2px 10px;
-  font-weight: 600;
-}
 
 .crm-option-card {
   min-height: 108px;

@@ -1041,6 +1041,50 @@ function validatePageCssBadgePaletteOverrides() {
 }
 
 
+function validateBadgeCssOwnership() {
+  const cssRoot = path.join(rootDir, 'assets', 'css');
+  if (!fs.existsSync(cssRoot)) return;
+
+  const ownerFile = path.join(cssRoot, 'components', 'badges.css');
+  const semanticSelectorPattern = /\.crm-badge\s*\.(?:muted|info|success|warning|danger)\b/;
+  const visualProps = new Set([
+    'background', 'background-color', 'color', 'border', 'border-color', 'border-radius',
+    'padding', 'font-size', 'font-weight', 'line-height', 'min-height', 'box-shadow'
+  ]);
+
+  const cssFiles = walk(cssRoot).filter((file) => file.endsWith('.css') && path.resolve(file) !== path.resolve(ownerFile));
+
+  for (const file of cssFiles) {
+    const content = fs.readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const ruleRegex = /([^{}]+)\{([^{}]*)\}/g;
+
+    for (const match of content.matchAll(ruleRegex)) {
+      const selector = (match[1] || '').trim().replace(/\s+/g, ' ');
+      const body = (match[2] || '').trim();
+      if (!selector || !body) continue;
+      if (selector.includes('.crm-inline-badges')) continue;
+
+      if (semanticSelectorPattern.test(selector)) {
+        addError(file, 'badge CSS ownership violation: semantic badge selector is only allowed in assets/css/components/badges.css', selector);
+        continue;
+      }
+
+      if (!/\.crm-badge\b/.test(selector)) continue;
+
+      const declarations = body.split(';').map((part) => part.trim()).filter(Boolean);
+      for (const decl of declarations) {
+        const colon = decl.indexOf(':');
+        if (colon <= 0) continue;
+        const prop = decl.slice(0, colon).trim().toLowerCase();
+        if (visualProps.has(prop)) {
+          addError(file, `badge CSS ownership violation: .crm-badge visual property is only allowed in assets/css/components/badges.css`, `${selector} -> ${prop}`);
+        }
+      }
+    }
+  }
+}
+
+
 function validateBadgeLabelSemantics(file, content) {
   const strictDangerLabels = new Set(['отклонено', 'ошибка', 'заблокирован']);
   const attentionLabels = new Set(['ожидает', 'на доработке', 'частично', 'регистрация']);
@@ -1555,6 +1599,7 @@ validateStandalonePageScriptRegistry(pageFiles);
 validatePageScriptsAndGlobalPurity();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
+validateBadgeCssOwnership();
 validateSubjectCardNoNestedCards();
 validateSubjectCardStaticRendering();
 validateBalancedTagHelperSelfTest();
