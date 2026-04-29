@@ -80,6 +80,10 @@ body[data-page="subjects"] .crm-filter-search-input {
   line-height: 40px;
 }
 
+body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
+  padding-left: 44px;
+}
+
 body[data-page="subjects"] .crm-filter-search-shell {
   position: relative;
   display: block;
@@ -179,7 +183,7 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
   overflow-y: visible;
   border-radius: 16px 16px 0 0;
   scrollbar-gutter: stable;
-  background: #ffffff;
+  background: var(--subjects-header-bg);
   border-bottom: 1px solid #e1e8f3;
 }
 

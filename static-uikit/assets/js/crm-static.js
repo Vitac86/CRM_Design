@@ -80,7 +80,7 @@
     if (!filterMenu) return;
 
     const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
-    const defaultValue = hiddenInput ? (hiddenInput.defaultValue || hiddenInput.getAttribute('value') || 'all') : 'all';
+    const defaultValue = hiddenInput ? (ensureFilterFieldDefault(hiddenInput) || 'all') : 'all';
     const selectedValue = typeof value === 'string' ? value : (hiddenInput && hiddenInput.value ? hiddenInput.value : defaultValue);
 
     let selectedOption = filterMenu.querySelector('.crm-filter-option[data-filter-option][data-filter-value="' + escapeCssValue(selectedValue) + '"]');
@@ -121,7 +121,7 @@
   function resetFilterMenu(filterMenu) {
     if (!filterMenu) return;
     const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
-    const defaultValue = hiddenInput ? (hiddenInput.defaultValue || hiddenInput.getAttribute('value') || 'all') : 'all';
+    const defaultValue = hiddenInput ? (ensureFilterFieldDefault(hiddenInput) || 'all') : 'all';
     syncFilterMenuState(filterMenu, defaultValue);
     filterMenu.removeAttribute('open');
   }
@@ -131,16 +131,54 @@
     form.querySelectorAll('.crm-filter-menu').forEach(resetFilterMenu);
   }
 
+  function getInitialFilterFieldDefault(field) {
+    if (!field) return '';
+
+    const type = (field.type || '').toLowerCase();
+
+    if (type === 'checkbox' || type === 'radio') {
+      return field.defaultChecked ? 'checked' : 'unchecked';
+    }
+
+    if (type === 'hidden' && field.matches('[data-filter]')) {
+      const attributeValue = field.getAttribute('value');
+      return attributeValue && attributeValue.trim() ? attributeValue : 'all';
+    }
+
+    if (field.hasAttribute('value')) {
+      return field.getAttribute('value') || '';
+    }
+
+    return field.defaultValue || '';
+  }
+
+  function ensureFilterFieldDefault(field) {
+    if (!field || !field.dataset) return '';
+
+    if (!Object.prototype.hasOwnProperty.call(field.dataset, 'filterDefaultValue')) {
+      field.dataset.filterDefaultValue = getInitialFilterFieldDefault(field);
+    }
+
+    return field.dataset.filterDefaultValue;
+  }
+
+  function initFilterPanelDefaults(scope) {
+    getFilterPanels(scope || document).forEach(function (panel) {
+      panel.querySelectorAll('input, select, textarea').forEach(ensureFilterFieldDefault);
+    });
+  }
 
   function isFieldDirty(field) {
     if (!field || field.disabled) return false;
     const type = (field.type || '').toLowerCase();
+    const defaultValue = ensureFilterFieldDefault(field);
 
     if (type === 'checkbox' || type === 'radio') {
-      return field.checked !== field.defaultChecked;
+      const checkedState = field.checked ? 'checked' : 'unchecked';
+      return checkedState !== defaultValue;
     }
 
-    return field.value !== field.defaultValue;
+    return field.value !== defaultValue;
   }
 
   function isFilterPanelDirty(panel) {
@@ -497,6 +535,7 @@
   });
 
   initFilterMenus();
+  initFilterPanelDefaults(document);
   syncResetButtonState(document);
 
   if (window.UIkit) {
