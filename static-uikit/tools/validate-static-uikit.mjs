@@ -391,6 +391,29 @@ function validateRegistryFilterPanelStructure(file, content) {
     if (!/<div[^>]*class="[^"]*\bcrm-filter-fields-row\b[^"]*"/i.test(inner)) {
       addError(file, 'registry filter panel is missing .crm-filter-fields-row', formOpenTag);
     }
+
+    const hasCustomMenus = /\bcrm-filter-menu\b/.test(inner);
+    if (hasCustomMenus) {
+      if (/<select\b[^>]*class="[^"]*\buk-select\b[^"]*\bcrm-select\b[^"]*"[^>]*>/i.test(inner)) {
+        addError(file, 'custom filter panel must not include visible native select controls', formOpenTag);
+      }
+
+      for (const menuMatch of inner.matchAll(/<details\b[^>]*class="[^"]*\bcrm-filter-menu\b[^"]*"[^>]*>([\s\S]*?)<\/details>/gi)) {
+        const menuInner = menuMatch[1];
+        if (!/<input\b[^>]*type="hidden"[^>]*\bdata-filter\b[^>]*>/i.test(menuInner)) {
+          addError(file, '.crm-filter-menu must include input[type="hidden"][data-filter]');
+        }
+        for (const optionMatch of menuInner.matchAll(/<(?:button|a|div)\b[^>]*class="[^"]*\bcrm-filter-option\b[^"]*"[^>]*\bdata-filter-option\b[^>]*>/gi)) {
+          if (!/\bdata-filter-value\s*=/.test(optionMatch[0])) {
+            addError(file, '.crm-filter-option must include data-filter-value', optionMatch[0]);
+          }
+        }
+      }
+    }
+
+    if (/\bdata-action="reset-filters"\b/.test(inner) && hasCustomMenus && !/\bcrm-filter-option\b/.test(inner)) {
+      addError(file, 'reset-filters form with custom menu must include crm-filter-option items', formOpenTag);
+    }
   }
 
   const panelBlocks = content.match(/<form\b[^>]*class="[^"]*\bcrm-registry-filters\b[^"]*\bcrm-filter-panel\b[^"]*"[^>]*>[\s\S]*?<\/form>/gi) || [];

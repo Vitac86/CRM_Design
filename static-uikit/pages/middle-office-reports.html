@@ -64,7 +64,12 @@
 
             <div class="crm-filter-fields-row">
           <div class="crm-filter-control"><label class="uk-form-label" for="mo-period">Период</label><input id="mo-period" class="uk-input crm-input" type="month" name="period" value="2026-04"/></div>
-          <div class="crm-filter-control"><label class="uk-form-label" for="mo-channel">Канал</label><select id="mo-channel" class="uk-select crm-select" name="delivery-channel"><option>Все</option><option>ЭДО</option><option>Email</option><option>SFTP</option></select></div>
+          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="delivery-channel"><summary class="crm-filter-trigger" aria-label="Фильтр: Канал"><span class="crm-filter-trigger-label">Канал:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Канал">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>ЭДО</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="email"><span>Email</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="sftp"><span>SFTP</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div><input type="hidden" name="delivery-channel" value="all" data-filter="delivery-channel"/></details></div>
           <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
 </form>
