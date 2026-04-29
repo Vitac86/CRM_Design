@@ -1,0 +1,262 @@
+/* ============================================================================
+   subject-register — page-scoped styles
+   Scope: body[data-page="subject-register"], .crm-page[data-page="subject-register"]
+   ============================================================================ */
+
+/* ── option-card sizing for wizard (override global 108px) ─────────────────── */
+body[data-page="subject-register"] .crm-option-card,
+.crm-page[data-page="subject-register"] .crm-option-card {
+  min-height: 64px;
+}
+
+/* ── 2-column type grid (legacy: grid-cols-2) ───────────────────────────────── */
+body[data-page="subject-register"] .reg-type-grid,
+.crm-page[data-page="subject-register"] .reg-type-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ── 3-column method grid (legacy: grid-cols-3) ─────────────────────────────── */
+body[data-page="subject-register"] .reg-method-grid,
+.crm-page[data-page="subject-register"] .reg-method-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* ── step section header (border-b separator, mirrors RegistrationStepHeader) ─ */
+body[data-page="subject-register"] .reg-step-header,
+.crm-page[data-page="subject-register"] .reg-step-header {
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e3ecf6;
+}
+
+body[data-page="subject-register"] .reg-step-header h2,
+.crm-page[data-page="subject-register"] .reg-step-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--crm-text);
+  line-height: 1.25;
+}
+
+/* ── group title inside step 1 (smaller than h2) ────────────────────────────── */
+body[data-page="subject-register"] .reg-group,
+.crm-page[data-page="subject-register"] .reg-group {
+  margin-bottom: 18px;
+}
+
+body[data-page="subject-register"] .reg-group:last-child,
+.crm-page[data-page="subject-register"] .reg-group:last-child {
+  margin-bottom: 0;
+}
+
+body[data-page="subject-register"] .reg-group-title,
+.crm-page[data-page="subject-register"] .reg-group-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin: 0 0 10px;
+}
+
+/* ── binary control row wrapper (label + pills) ─────────────────────────────── */
+body[data-page="subject-register"] .reg-binary-row,
+.crm-page[data-page="subject-register"] .reg-binary-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+body[data-page="subject-register"] .reg-binary-row > p,
+.crm-page[data-page="subject-register"] .reg-binary-row > p {
+  font-size: 13px;
+  color: var(--crm-text-secondary);
+  margin: 0;
+}
+
+/* ── spacing between text grid and binary grid inside a form section ─────────── */
+body[data-page="subject-register"] .reg-binary-grid,
+.crm-page[data-page="subject-register"] .reg-binary-grid {
+  margin-top: 12px;
+}
+
+/* ── wizard action bar ───────────────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-wizard-actions,
+.crm-page[data-page="subject-register"] .reg-wizard-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+body[data-page="subject-register"] .reg-wizard-actions .reg-back,
+.crm-page[data-page="subject-register"] .reg-wizard-actions .reg-back {
+  margin-left: auto;
+}
+
+/* ── validation error message ────────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-error-msg,
+.crm-page[data-page="subject-register"] .reg-error-msg {
+  color: var(--crm-danger);
+  font-size: 13px;
+  margin: 10px 0 0;
+}
+
+/* ── INN lookup step: constrained input width ────────────────────────────────── */
+body[data-page="subject-register"] .reg-inn-field,
+.crm-page[data-page="subject-register"] .reg-inn-field {
+  max-width: 340px;
+}
+
+/* ── bank account list empty text ────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-bank-empty,
+.crm-page[data-page="subject-register"] .reg-bank-empty {
+  font-size: 13px;
+  color: var(--crm-muted);
+  margin: 10px 0 0;
+}
+
+/* ── bank account row ────────────────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-bank-row,
+.crm-page[data-page="subject-register"] .reg-bank-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #d7e0ef;
+  border-radius: 10px;
+  padding: 7px 12px;
+  background: #f8faff;
+  font-size: 13px;
+  color: var(--crm-text);
+  margin-top: 8px;
+}
+
+body[data-page="subject-register"] .reg-bank-row strong,
+.crm-page[data-page="subject-register"] .reg-bank-row strong {
+  font-weight: 600;
+}
+
+body[data-page="subject-register"] .reg-bank-badge,
+.crm-page[data-page="subject-register"] .reg-bank-badge {
+  display: inline-block;
+  background: #e8efff;
+  color: var(--crm-primary);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  margin-left: 6px;
+}
+
+body[data-page="subject-register"] .reg-bank-delete,
+.crm-page[data-page="subject-register"] .reg-bank-delete {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-danger);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+body[data-page="subject-register"] .reg-bank-delete:hover,
+.crm-page[data-page="subject-register"] .reg-bank-delete:hover {
+  color: #9e2b2b;
+}
+
+/* ── bank account add form box ───────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-bank-add-form,
+.crm-page[data-page="subject-register"] .reg-bank-add-form {
+  border: 1px solid #d7e0ef;
+  border-radius: 12px;
+  background: #f8faff;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+/* ── disabled option card (INN when FL selected) ─────────────────────────────── */
+body[data-page="subject-register"] .crm-option-card.is-disabled,
+.crm-page[data-page="subject-register"] .crm-option-card.is-disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── wizard step "done" state ────────────────────────────────────────────────── */
+body[data-page="subject-register"] .crm-wizard-step-done,
+.crm-page[data-page="subject-register"] .crm-wizard-step-done {
+  border-color: #8eaedd;
+  background: #f0f5ff;
+  color: #3a5a90;
+}
+
+body[data-page="subject-register"] .crm-wizard-step-done strong,
+.crm-page[data-page="subject-register"] .crm-wizard-step-done strong {
+  background: #8eaedd;
+  color: #fff;
+}
+
+/* ── step 3 — success banner ─────────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-success-banner,
+.crm-page[data-page="subject-register"] .reg-success-banner {
+  border: 1px solid #7fc8a7;
+  background: #e9f8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--crm-success);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ── step 3 — result dl grid ─────────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-result-grid,
+.crm-page[data-page="subject-register"] .reg-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  font-size: 13px;
+}
+
+body[data-page="subject-register"] .reg-result-grid dt,
+.crm-page[data-page="subject-register"] .reg-result-grid dt {
+  color: var(--crm-muted);
+  margin: 0 0 2px;
+}
+
+body[data-page="subject-register"] .reg-result-grid dd,
+.crm-page[data-page="subject-register"] .reg-result-grid dd {
+  font-weight: 600;
+  color: var(--crm-text);
+  margin: 0;
+}
+
+body[data-page="subject-register"] .reg-result-code,
+.crm-page[data-page="subject-register"] .reg-result-code {
+  font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+}
+
+/* ── step 3 — small ID note ──────────────────────────────────────────────────── */
+body[data-page="subject-register"] .reg-result-id,
+.crm-page[data-page="subject-register"] .reg-result-id {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--crm-muted);
+}
+
+/* ── responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  body[data-page="subject-register"] .reg-type-grid,
+  .crm-page[data-page="subject-register"] .reg-type-grid,
+  body[data-page="subject-register"] .reg-method-grid,
+  .crm-page[data-page="subject-register"] .reg-method-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="subject-register"] .reg-result-grid,
+  .crm-page[data-page="subject-register"] .reg-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
