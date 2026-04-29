@@ -525,18 +525,22 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
-.crm-dashboard-kpi-card:hover {
+.crm-dashboard-kpi-card[href] {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.crm-dashboard-kpi-card[href]:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
   border-color: #c9d6e8;
 }
 
-.crm-dashboard-kpi-card:focus-visible,
-.crm-dashboard-kpi-card:focus-within {
+.crm-dashboard-kpi-card[href]:focus-visible {
   transform: translateY(-1px);
   box-shadow: 0 0 0 3px rgba(50, 94, 212, 0.16), 0 8px 18px rgba(15, 23, 42, 0.10);
   border-color: #9db3df;
@@ -561,6 +565,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.crm-dashboard-kpi-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .crm-dashboard-kpi-meta {
@@ -952,7 +962,7 @@ body[data-page="dashboard"] .crm-dashboard-kpi-card {
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07);
 }
 
-body[data-page="dashboard"] .crm-dashboard-kpi-card:hover {
+body[data-page="dashboard"] .crm-dashboard-kpi-card[href]:hover {
   transform: translateY(-1px);
   box-shadow: 0 5px 14px rgba(15, 23, 42, 0.09);
 }
