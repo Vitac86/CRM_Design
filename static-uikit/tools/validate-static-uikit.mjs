@@ -1114,6 +1114,36 @@ function validateErrorPageCssOwnership() {
   if (!errorContent.includes('.crm-error-card')) addError(errorFile, 'error-page CSS ownership violation: .crm-error-card must be defined in pages/error.css');
 }
 
+
+function validateCardsCssOwnershipBatchMoves() {
+  const cardsFile = path.join(rootDir, 'assets', 'css', 'components', 'cards.css');
+  const badgesFile = path.join(rootDir, 'assets', 'css', 'components', 'badges.css');
+  const dashboardFile = path.join(rootDir, 'assets', 'css', 'pages', 'dashboard.css');
+  const pageLayoutFile = path.join(rootDir, 'assets', 'css', 'layout', 'page.css');
+
+  if (!fs.existsSync(cardsFile) || !fs.existsSync(badgesFile) || !fs.existsSync(dashboardFile) || !fs.existsSync(pageLayoutFile)) return;
+
+  const stripComments = (content) => content.replace(/\/\*[\s\S]*?\*\//g, '');
+  const cardsContent = stripComments(fs.readFileSync(cardsFile, 'utf8'));
+  const badgesContent = stripComments(fs.readFileSync(badgesFile, 'utf8'));
+  const dashboardContent = stripComments(fs.readFileSync(dashboardFile, 'utf8'));
+  const pageLayoutContent = stripComments(fs.readFileSync(pageLayoutFile, 'utf8'));
+
+  if (cardsContent.includes('.crm-inline-badges')) addError(cardsFile, 'badge utility ownership violation: .crm-inline-badges must not be defined in components/cards.css');
+  if (!badgesContent.includes('.crm-inline-badges')) addError(badgesFile, 'badge utility ownership violation: .crm-inline-badges must be defined in components/badges.css');
+
+  if (/\.crm-kpi-/m.test(cardsContent)) addError(cardsFile, 'dashboard CSS ownership violation: .crm-kpi-* selectors must not be defined in components/cards.css');
+  if (cardsContent.includes('.crm-dashboard-card')) addError(cardsFile, 'dashboard CSS ownership violation: .crm-dashboard-card must not be defined in components/cards.css');
+  if (!dashboardContent.includes('.crm-kpi-grid')) addError(dashboardFile, 'dashboard CSS ownership violation: .crm-kpi-grid must be defined in pages/dashboard.css');
+  if (!dashboardContent.includes('.crm-dashboard-card')) addError(dashboardFile, 'dashboard CSS ownership violation: .crm-dashboard-card must be defined in pages/dashboard.css');
+
+  const layoutSelectors = ['.crm-grid-2', '.crm-split-view', '.crm-sticky-actions', '.crm-footer-actions'];
+  for (const selector of layoutSelectors) {
+    if (cardsContent.includes(selector)) addError(cardsFile, `layout utility ownership violation: ${selector} must not be defined in components/cards.css`);
+    if (!pageLayoutContent.includes(selector)) addError(pageLayoutFile, `layout utility ownership violation: ${selector} must be defined in layout/page.css`);
+  }
+}
+
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1708,6 +1738,7 @@ validatePageScriptsAndGlobalPurity();
 validateCardsCssOwnershipAuditPresence();
 validateTabsCssOwnership();
 validateErrorPageCssOwnership();
+validateCardsCssOwnershipBatchMoves();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();

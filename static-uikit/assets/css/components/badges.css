@@ -43,3 +43,9 @@
   color: #8a2d34;
   border-color: #efc8ce;
 }
+
+.crm-inline-badges {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
