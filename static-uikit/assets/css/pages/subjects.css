@@ -185,7 +185,6 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
   overflow-x: auto;
   overflow-y: hidden;
   border-radius: 10px 10px 0 0;
-  scrollbar-gutter: stable both-edges;
   background: #ffffff;
   border-bottom: 1px solid #e1e8f3;
   scrollbar-width: thin;
@@ -205,6 +204,10 @@ body[data-page="subjects"] .crm-subjects-table .uk-table {
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
+}
+
+body[data-page="subjects"] .crm-subjects-table .uk-table thead tr {
+  background: var(--subjects-header-bg);
 }
 
 
@@ -245,13 +248,6 @@ body[data-page="subjects"] .crm-subjects-table .uk-table thead th {
   white-space: nowrap;
 }
 
-body[data-page="subjects"] .crm-subjects-table .uk-table thead th:first-child {
-  border-top-left-radius: 10px;
-}
-
-body[data-page="subjects"] .crm-subjects-table .uk-table thead th:last-child {
-  border-top-right-radius: 10px;
-}
 
 body[data-page="subjects"] .crm-subjects-table .uk-table thead th .crm-th-sort {
   margin-left: 5px;
