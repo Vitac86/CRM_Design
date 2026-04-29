@@ -171,6 +171,8 @@
 .crm-filter-menu {
   position: relative;
   min-width: 0;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .crm-filter-trigger {
@@ -178,7 +180,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   min-height: 36px;
   padding: 0 10px 0 12px;
   border: 1px solid #c8d4e6;
@@ -201,6 +204,7 @@
   font-size: 13px;
   color: #1f304d;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .crm-filter-trigger-chevron {
@@ -229,12 +233,14 @@
   top: calc(100% + 6px);
   left: 0;
   min-width: 100%;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 24px));
   background: #f4f8ff;
   border: 1px solid #d2ddee;
   border-radius: 12px;
   box-shadow: 0 10px 22px rgba(45, 75, 124, 0.18);
   padding: 6px;
-  z-index: 80;
+  z-index: 12;
 }
 
 .crm-filter-option {
