@@ -124,6 +124,10 @@
   gap: 8px;
 }
 
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-subject-section-layout {
+  gap: 12px;
+}
+
 .crm-page[data-page="subject-card"] .crm-double-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -139,6 +143,11 @@
   border-radius: 10px;
   background: var(--crm-umi-surface);
   box-shadow: var(--crm-umi-shadow-sm);
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-card.crm-subject-profile-section {
+  padding: 14px 16px;
+  box-shadow: none;
 }
 
 .crm-page[data-page="subject-card"] .crm-flat-group {
@@ -168,6 +177,15 @@
   color: var(--crm-umi-text);
 }
 
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-form-section-head {
+  margin-bottom: 10px;
+  padding-bottom: 9px;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-form-section-head h3 {
+  font-weight: 700;
+}
+
 .crm-page[data-page="subject-card"] .crm-section-head-inline {
   display: flex;
   align-items: center;
@@ -178,7 +196,7 @@
 
 .crm-page[data-page="subject-card"] .crm-profile-rows {
   display: grid;
-  gap: 7px 10px;
+  gap: 9px 14px;
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-rows-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -187,6 +205,7 @@
 .crm-page[data-page="subject-card"] .crm-profile-row-full { grid-column: 1 / -1; }
 
 .crm-page[data-page="subject-card"] .crm-profile-row {
+  min-width: 0;
   padding: 2px 0;
   border: 0;
   background: transparent;
@@ -194,11 +213,13 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-label {
+  display: block;
   margin-bottom: 3px;
-  font-size: 10px;
-  line-height: 1.2;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--crm-umi-text-muted);
 }
 
@@ -210,29 +231,33 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-note {
-  margin-top: 4px;
+  margin-top: 3px;
   font-size: 13px;
   line-height: 1.4;
   color: var(--crm-umi-text-secondary);
 }
 
-.crm-page[data-page="subject-card"] .crm-table-wrapper {
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-table-wrapper {
   border: 1px solid var(--crm-umi-border);
   border-radius: 8px;
   padding: 2px 8px;
 }
 
-.crm-page[data-page="subject-card"] .crm-table .uk-table {
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-table-wrapper::after {
+  display: none;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-table .uk-table {
   margin: 0;
 }
 
-.crm-page[data-page="subject-card"] .crm-table .uk-table th {
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-table .uk-table th {
   font-size: 11px;
   font-weight: 600;
   color: var(--crm-umi-text-muted);
 }
 
-.crm-page[data-page="subject-card"] .crm-table .uk-table td {
+.crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-table .uk-table td {
   font-size: 13px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -266,6 +291,7 @@
 @media (max-width: 960px) {
   .crm-page[data-page="subject-card"] .crm-subject-identity h1 { font-size: 22px; }
   .crm-page[data-page="subject-card"] .crm-profile-rows-3 { grid-template-columns: 1fr; }
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 959px) {
@@ -285,8 +311,8 @@
   border-radius: 9px;
 }
 
-.crm-page[data-page="subject-card"] .crm-profile-rows-main {
-  gap: 8px 14px;
+.crm-page[data-page="subject-card"] [data-entity="main-data"] .crm-profile-rows-main {
+  gap: 10px 18px;
 }
 
 .crm-page[data-page="subject-card"] .crm-profile-rows-main .crm-profile-value {
@@ -294,9 +320,23 @@
   line-height: 1.35;
 }
 
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-link-action {
+  min-height: 30px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--crm-umi-primary);
+}
+
+.crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-link-action:hover {
+  background: transparent;
+  color: var(--crm-umi-primary-hover);
+}
+
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-stack {
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-card {
@@ -304,11 +344,17 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  padding: 2px 0;
+  padding: 0;
+}
+
+.crm-page[data-page="subject-card"] [data-role="addresses-extra"] .crm-address-card {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--crm-umi-border);
 }
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-title {
-  margin: 0 0 6px;
+  margin: 0 0 10px;
   font-size: 13px;
   line-height: 1.3;
   color: var(--crm-umi-text-secondary);
@@ -317,7 +363,7 @@
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px 12px;
+  gap: 9px 14px;
 }
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-field {
@@ -327,6 +373,7 @@
 }
 
 .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-field strong {
+  display: block;
   font-size: 13px;
   line-height: 1.35;
   color: var(--crm-umi-text);
@@ -364,14 +411,45 @@
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > tr:not(:first-child),
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > :not(:first-child) > tr,
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .uk-table-divider > :first-child > tr:not(:first-child) {
-  border-top: 1px solid var(--crm-umi-border-soft, #eceff4);
+  border-top: 1px solid var(--crm-umi-border);
+}
+
+.crm-page[data-page="subject-card"] [data-entity="registration-contacts-group"],
+.crm-page[data-page="subject-card"] [data-entity="compliance-rights-group"] {
+  gap: 12px;
+  padding: 0;
+}
+
+.crm-page[data-page="subject-card"] [data-entity="registration-contacts-group"] .crm-flat-section,
+.crm-page[data-page="subject-card"] [data-entity="compliance-rights-group"] .crm-flat-section {
+  padding: 14px 16px;
+  box-shadow: none;
 }
 
 .crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-rows {
   gap: 8px;
 }
 
-@media (max-width: 959px) {
+.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-row {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--crm-umi-border);
+}
+
+.crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-profile-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-section-head-inline {
+    align-items: flex-start;
+  }
+
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-link-action {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields {
     grid-template-columns: 1fr;
   }
