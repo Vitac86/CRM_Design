@@ -1177,6 +1177,35 @@ function validateScrollbarAndEmptyMediaOwnership() {
   }
 }
 
+
+function validateFormAndButtonPrimitiveOwnership() {
+  const cardsFile = path.join(rootDir, 'assets', 'css', 'components', 'cards.css');
+  const formsFile = path.join(rootDir, 'assets', 'css', 'components', 'forms.css');
+  const buttonsFile = path.join(rootDir, 'assets', 'css', 'components', 'buttons.css');
+
+  if (!fs.existsSync(cardsFile) || !fs.existsSync(formsFile) || !fs.existsSync(buttonsFile)) return;
+
+  const stripComments = (content) => content.replace(/\/\*[\s\S]*?\*\//g, '');
+  const cardsContent = stripComments(fs.readFileSync(cardsFile, 'utf8'));
+  const formsContent = stripComments(fs.readFileSync(formsFile, 'utf8'));
+  const buttonsContent = stripComments(fs.readFileSync(buttonsFile, 'utf8'));
+
+  const disallowedInCards = [
+    '.crm-form-grid', '.crm-input', '.crm-select', '.uk-form-label', '.uk-radio', 'input[type="date"]',
+    '.crm-button', '.crm-button-primary', '.uk-button-default', '.crm-button-ghost', '.crm-link-action'
+  ];
+  for (const selector of disallowedInCards) {
+    if (cardsContent.includes(selector)) addError(cardsFile, `primitive ownership violation: ${selector} must not be defined in components/cards.css`);
+  }
+
+  for (const selector of ['.uk-input', '.uk-select', '.uk-form-label', '.uk-radio']) {
+    if (!formsContent.includes(selector)) addError(formsFile, `primitive ownership violation: ${selector} must be defined in components/forms.css`);
+  }
+
+  for (const selector of ['.uk-button', '.crm-button-primary', '.uk-button-default', '.crm-link-action']) {
+    if (!buttonsContent.includes(selector)) addError(buttonsFile, `primitive ownership violation: ${selector} must be defined in components/buttons.css`);
+  }
+}
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1773,6 +1802,7 @@ validateTabsCssOwnership();
 validateErrorPageCssOwnership();
 validateCardsCssOwnershipBatchMoves();
 validateScrollbarAndEmptyMediaOwnership();
+validateFormAndButtonPrimitiveOwnership();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();
