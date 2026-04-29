@@ -166,6 +166,7 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - Normal/healthy values should stay calm and non-intrusive, warning/danger must be reserved for attention/problem states, and page CSS must not redefine badge palettes locally.
 - `assets/css/components/filters.css` owns shared registry filter primitives (`.crm-registry-filters`, `.crm-filter-panel`, `.crm-filter-search-row`, `.crm-filter-fields-row`, `.crm-filter-control`, `.crm-filter-field`, `.crm-filter-actions`, `.crm-filter-reset`).
 - Page CSS may keep page-specific filter variants (for example, subjects compact pill filters in `assets/css/pages/subjects.css`) until full filter consolidation; no JS is required for these visual variants.
+- `assets/css/components/cards.css` is currently under ownership audit; do not add new unrelated component rules there, and move styles incrementally per `CARDS_CSS_OWNERSHIP_AUDIT.md`.
 
 ## Non-registry page contracts (card/detail/wizard/admin)
 - Audited pages: `subject-register.html`, `contract-wizard.html`, `compliance-card.html`, `trading-card.html`, `administration.html`.

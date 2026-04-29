@@ -1060,6 +1060,29 @@ function validateNonRegistryPageContracts(file, content) {
   }
 }
 
+
+function validateCardsCssOwnershipAuditPresence() {
+  const auditFile = path.join(rootDir, 'CARDS_CSS_OWNERSHIP_AUDIT.md');
+  if (!fs.existsSync(auditFile)) {
+    addError(auditFile, 'cards css ownership audit file is missing');
+    return;
+  }
+
+  const content = fs.readFileSync(auditFile, 'utf8');
+  const requiredMentions = [
+    'components/cards.css',
+    'components/forms.css',
+    'components/buttons.css',
+    'components/tables.css',
+    'layout/page.css',
+    'pages/dashboard.css'
+  ];
+
+  for (const token of requiredMentions) {
+    if (!content.includes(token)) addError(auditFile, `cards css ownership audit must mention ${token}`);
+  }
+}
+
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1651,6 +1674,7 @@ validateStaticUikitLauncher();
 validateRegistryAuditConsistency();
 validateStandalonePageScriptRegistry(pageFiles);
 validatePageScriptsAndGlobalPurity();
+validateCardsCssOwnershipAuditPresence();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();
