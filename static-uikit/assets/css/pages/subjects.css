@@ -95,26 +95,43 @@ body[data-page="subjects"] .crm-filter-search-input::placeholder {
 }
 
 body[data-page="subjects"] .crm-filter-fields-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: 7px;
-  align-items: center;
+  align-items: flex-end;
   position: relative;
   overflow: visible;
 }
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
-  flex-basis: 180px;
+  flex: 1 1 180px;
+  min-width: 150px;
+  max-width: 230px;
 }
 
 body[data-page="subjects"] .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: auto;
-  min-width: fit-content;
-  max-width: 100%;
+  flex: 1 1 180px;
+  width: clamp(150px, 16vw, 230px);
+  min-width: 150px;
+  max-width: 230px;
 }
 
 body[data-page="subjects"] .crm-filter-menu {
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
+}
+
+body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"],
+body[data-page="subjects"] .crm-filter-menu[data-filter-menu="compliance-status"],
+body[data-page="subjects"] .crm-filter-menu[data-filter-menu="qualification"] {
+  max-width: 280px;
+}
+
+body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"] .crm-filter-trigger,
+body[data-page="subjects"] .crm-filter-menu[data-filter-menu="compliance-status"] .crm-filter-trigger,
+body[data-page="subjects"] .crm-filter-menu[data-filter-menu="qualification"] .crm-filter-trigger {
+  width: min(100%, 280px);
 }
 
 body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"] .crm-filter-dropdown {
@@ -129,11 +146,20 @@ body[data-page="subjects"] .crm-filter-reset {
   font-size: 12px;
 }
 
+body[data-page="subjects"] .crm-filter-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+  align-self: flex-end;
+  max-width: 100%;
+}
+
 body[data-page="subjects"] .crm-table-card.crm-subjects-registry {
   overflow: hidden;
   border-radius: 14px;
   border-color: #d5e0f0;
   background: #f6f9ff;
+  position: relative;
+  z-index: 1;
 }
 
 body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {

@@ -86,6 +86,40 @@
     filterMenu.removeAttribute('open');
   }
 
+  function syncFilterMenuState(filterMenu) {
+    if (!filterMenu) return;
+
+    const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
+    const defaultValue = hiddenInput && hiddenInput.defaultValue ? hiddenInput.defaultValue : 'all';
+    const selectedValue = hiddenInput && hiddenInput.value ? hiddenInput.value : defaultValue;
+
+    let selectedOption = filterMenu.querySelector('.crm-filter-option[data-filter-option][data-filter-value="' + escapeCssValue(selectedValue) + '"]');
+    if (!selectedOption) {
+      selectedOption = filterMenu.querySelector('.crm-filter-option[data-filter-option][data-filter-value="' + escapeCssValue(defaultValue) + '"]');
+    }
+    if (!selectedOption) {
+      selectedOption = filterMenu.querySelector('.crm-filter-option[data-filter-option]');
+    }
+    if (!selectedOption) return;
+
+    if (hiddenInput) {
+      hiddenInput.value = selectedOption.getAttribute('data-filter-value') || defaultValue;
+    }
+
+    filterMenu.querySelectorAll('.crm-filter-option[data-filter-option]').forEach(function (option) {
+      const isSelected = option === selectedOption;
+      option.classList.toggle('is-selected', isSelected);
+      option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+
+    const optionTextNode = selectedOption.querySelector('span');
+    const optionText = optionTextNode ? optionTextNode.textContent.trim() : selectedOption.textContent.trim();
+    const triggerValue = filterMenu.querySelector('.crm-filter-trigger-value');
+    if (triggerValue && optionText) {
+      triggerValue.textContent = optionText;
+    }
+  }
+
   const mobileQuery = window.matchMedia('(max-width: 920px)');
 
   function isMobileViewport() {
@@ -268,6 +302,11 @@
       const form = resetButton.closest('form');
       if (form) {
         form.reset();
+        closeOpenFilterMenus();
+        form.querySelectorAll('.crm-filter-menu').forEach(function (filterMenu) {
+          syncFilterMenuState(filterMenu);
+          filterMenu.removeAttribute('open');
+        });
         syncOptionGridState(form);
         syncBinaryPills(form);
         syncSelectableControlState(form);
