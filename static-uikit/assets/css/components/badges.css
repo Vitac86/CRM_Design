@@ -15,31 +15,31 @@
 }
 
 .crm-badge.muted {
-  background: #eef3fa;
-  color: #506381;
-  border-color: #d4deeb;
+  background: #edf2f9;
+  color: #4f627f;
+  border-color: #d2dceb;
 }
 
 .crm-badge.info {
-  background: #eaf0ff;
-  color: #35558b;
-  border-color: #d1dcf5;
+  background: #ebefff;
+  color: #3c5487;
+  border-color: #d5ddf4;
 }
 
 .crm-badge.success {
-  background: #eaf6ef;
-  color: #2e6346;
-  border-color: #c8e3d4;
+  background: #eaf4ef;
+  color: #365f4a;
+  border-color: #cfe0d6;
 }
 
 .crm-badge.warning {
-  background: #fff5e5;
-  color: #735223;
-  border-color: #efd8b4;
+  background: #fff4df;
+  color: #745422;
+  border-color: #ecd6ae;
 }
 
 .crm-badge.danger {
   background: #fdecef;
-  color: #8b2932;
-  border-color: #f2c9cf;
+  color: #8a2d34;
+  border-color: #efc8ce;
 }
