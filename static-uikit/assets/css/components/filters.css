@@ -124,6 +124,17 @@
   gap: var(--crm-layer-gap-sm);
 }
 
+.crm-registry-filters.crm-filter-panel,
+.crm-filter-panel {
+  position: relative;
+  overflow: visible;
+}
+
+.crm-registry-filters.crm-filter-panel.is-filter-menu-open,
+.crm-filter-panel.is-filter-menu-open {
+  z-index: 50;
+}
+
 .crm-filter-search,
 .crm-filter-search-row {
   width: 100%;
@@ -144,6 +155,7 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 10px;
   align-items: end;
+  overflow: visible;
 }
 
 .crm-filter-field {
@@ -173,6 +185,11 @@
   min-width: 0;
   width: 100%;
   max-width: 100%;
+  overflow: visible;
+}
+
+.crm-filter-menu[open] {
+  z-index: 60;
 }
 
 .crm-filter-trigger {
@@ -242,7 +259,7 @@
   border-radius: 12px;
   box-shadow: 0 10px 22px rgba(45, 75, 124, 0.18);
   padding: 6px;
-  z-index: 30;
+  z-index: 70;
 }
 
 .crm-filter-option {

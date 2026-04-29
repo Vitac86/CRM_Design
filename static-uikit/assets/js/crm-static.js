@@ -65,6 +65,17 @@
     });
   }
 
+  function getFilterPanelOwner(filterMenu) {
+    if (!filterMenu) return null;
+    return filterMenu.closest('.crm-registry-filters.crm-filter-panel, .crm-filter-panel');
+  }
+
+  function syncFilterPanelMenuState(panel) {
+    if (!panel) return;
+    const hasOpenMenu = !!panel.querySelector('.crm-filter-menu[open]');
+    panel.classList.toggle('is-filter-menu-open', hasOpenMenu);
+  }
+
   function syncFilterMenuState(filterMenu, value) {
     if (!filterMenu) return;
 
@@ -233,6 +244,8 @@
     if (filterMenu.open) {
       closeOpenFilterMenus(filterMenu);
     }
+    filterMenu.classList.toggle('is-filter-menu-open', filterMenu.open);
+    syncFilterPanelMenuState(getFilterPanelOwner(filterMenu));
   }, true);
 
   if (sidebar) {
