@@ -1083,6 +1083,20 @@ function validateCardsCssOwnershipAuditPresence() {
   }
 }
 
+
+function validateTabsCssOwnership() {
+  const cardsFile = path.join(rootDir, 'assets', 'css', 'components', 'cards.css');
+  const tabsFile = path.join(rootDir, 'assets', 'css', 'components', 'tabs.css');
+
+  if (!fs.existsSync(cardsFile) || !fs.existsSync(tabsFile)) return;
+
+  const cardsContent = fs.readFileSync(cardsFile, 'utf8');
+  const tabsContent = fs.readFileSync(tabsFile, 'utf8');
+
+  if (cardsContent.includes('.crm-tabs')) addError(cardsFile, 'tabs CSS ownership violation: .crm-tabs must not be defined in components/cards.css');
+  if (!tabsContent.includes('.crm-tabs')) addError(tabsFile, 'tabs CSS ownership violation: .crm-tabs must be defined in components/tabs.css');
+}
+
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;
@@ -1675,6 +1689,7 @@ validateRegistryAuditConsistency();
 validateStandalonePageScriptRegistry(pageFiles);
 validatePageScriptsAndGlobalPurity();
 validateCardsCssOwnershipAuditPresence();
+validateTabsCssOwnership();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();

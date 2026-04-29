@@ -211,22 +211,6 @@
 .crm-split-view > * { min-width: 0; }
 .crm-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
 
-.crm-tabs {
-  margin: 12px 0 14px;
-}
-
-.crm-tabs > li > a {
-  border-radius: 8px;
-  color: var(--crm-text-secondary);
-  font-size: 13px;
-  padding: 8px 12px;
-}
-
-.crm-tabs > .uk-active > a {
-  background: var(--crm-primary-soft);
-  color: var(--crm-primary);
-  border-color: transparent;
-}
 
 .crm-kpi-card {
   padding: 14px;
