@@ -577,11 +577,49 @@
             </li>
 
             <li class="crm-subject-tab-panel" data-tab-panel="relations">
-              <section class="crm-subject-section-layout">
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-section" data-entity="relations">
-                  <div class="crm-form-section-head"><h3>Связи</h3></div>
-                  <div class="crm-table-wrapper crm-table-card"><div class="crm-table crm-table-compact"><table class="uk-table uk-table-divider uk-table-small"><thead><tr><th>Связанное лицо / организация</th><th>Тип</th><th>Роль</th><th>Дата начала</th><th>Статус</th></tr></thead><tbody><tr><td>АО «Восток Холдинг»</td><td>Материнская компания</td><td>Контролирующее лицо</td><td>18.01.2021</td><td><span class="crm-badge success" data-status="active">Активна</span></td></tr><tr><td>Белов Сергей Константинович</td><td>Бенефициар</td><td>Косвенное владение 27%</td><td>18.01.2021</td><td><span class="crm-badge success" data-status="active">Подтверждён</span></td></tr><tr><td>ООО «ВМС Логистика»</td><td>Аффилированная компания</td><td>Операционный подрядчик</td><td>03.06.2022</td><td><span class="crm-badge muted" data-status="monitoring">На мониторинге</span></td></tr></tbody></table></div></div>
+              <section class="crm-subject-section-layout crm-relations-section" data-entity="relations">
+
+                <article class="crm-card crm-subject-profile-section" data-entity="relations-list">
+                  <div class="crm-relations-header">
+                    <h3 class="crm-relations-title">Связи</h3>
+                    <p class="crm-relations-subtitle">Связанные лица и организации субъекта</p>
+                  </div>
+                  <div class="crm-table-wrapper crm-table-card">
+                    <div class="crm-table crm-table-compact">
+                      <table class="uk-table uk-table-divider uk-table-small crm-relations-table">
+                        <thead>
+                          <tr>
+                            <th>Связанное лицо / организация</th>
+                            <th>Тип</th>
+                            <th>Роль</th>
+                            <th>Дата начала</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">ЗАО «Вектор Данных»</a></td>
+                            <td>Юр. лицо</td>
+                            <td>Представитель</td>
+                            <td>15.01.2021</td>
+                          </tr>
+                          <tr>
+                            <td><a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">Крылов Денис Олегович</a></td>
+                            <td>Физ. лицо</td>
+                            <td>Генеральный директор</td>
+                            <td>18.01.2021</td>
+                          </tr>
+                          <tr>
+                            <td><a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">ООО «Регион Брокер Партнер»</a></td>
+                            <td>Агент</td>
+                            <td>Агент</td>
+                            <td>22.01.2021</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </article>
+
               </section>
             </li>
 
@@ -591,7 +629,7 @@
                 <article class="crm-card crm-subject-profile-section" data-entity="contracts">
                   <div class="crm-section-head-inline">
                     <h3 class="crm-section-head-title">Договоры</h3>
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="add-contract">+ Добавить договор</button>
+                    <a href="contract-wizard.html" class="uk-button uk-button-default crm-button">+ Добавить договор</a>
                   </div>
                   <div class="crm-table-wrapper crm-table-card">
                     <div class="crm-table crm-table-compact">
@@ -703,19 +741,82 @@
             </li>
 
             <li class="crm-subject-tab-panel" data-tab-panel="history">
-              <section class="crm-subject-section-layout">
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-section" data-entity="history">
-                  <div class="crm-form-section-head"><h3>История</h3></div>
-                  <div class="crm-timeline">
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">18.01.2021 · 09:42</div><div class="crm-timeline-text">Создан клиент АО «Восток Майнинг Системс», присвоен код CL-4401.</div><div class="crm-timeline-author">Оператор: Морозова А.А.</div></div>
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">22.01.2021 · 14:10</div><div class="crm-timeline-text">Открыт брокерский договор BR-4401/21.</div><div class="crm-timeline-author">Менеджер: Иванов И.И.</div></div>
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">02.02.2025 · 10:05</div><div class="crm-timeline-text">Загружены документы и добавлена доверенность №44/25.</div><div class="crm-timeline-author">Юридический отдел: Котова Е.В.</div></div>
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">25.04.2026 · 11:40</div><div class="crm-timeline-text">Пройден KYC и обновлены FATCA/CRS формы.</div><div class="crm-timeline-author">Комплаенс: Петрова Е.С.</div></div>
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">26.04.2026 · 09:15</div><div class="crm-timeline-text">Обновлены банковские реквизиты, добавлен валютный контур.</div><div class="crm-timeline-author">Бэк-офис: Назаров П.П.</div></div>
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">26.04.2026 · 12:18</div><div class="crm-timeline-text">Изменён менеджер сопровождения клиента.</div><div class="crm-timeline-author">Руководитель ФО: Семёнов Д.Д.</div></div>
-                    <div class="crm-timeline-item"><div class="crm-timeline-meta">26.04.2026 · 15:37</div><div class="crm-timeline-text">Пройден комплаенс, статус клиента подтверждён как «Активный».</div><div class="crm-timeline-author">Комплаенс: Петрова Е.С.</div></div>
+              <section class="crm-subject-section-layout crm-history-section" data-entity="history">
+
+                <article class="crm-card crm-subject-profile-section" data-entity="history-list">
+                  <div class="crm-history-header">
+                    <h3 class="crm-history-title">История изменений</h3>
+                    <p class="crm-history-subtitle">События и изменения по карточке субъекта</p>
+                  </div>
+                  <div class="crm-table-wrapper crm-table-card">
+                    <div class="crm-table crm-table-compact">
+                      <table class="uk-table uk-table-divider uk-table-small crm-history-table">
+                        <thead>
+                          <tr>
+                            <th>Дата и время</th>
+                            <th>Раздел</th>
+                            <th>Поле</th>
+                            <th>Изменение</th>
+                            <th>Пользователь</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td class="crm-history-datetime">25.04.2026 11:40</td>
+                            <td>Комплаенс</td>
+                            <td>Статус комплаенса</td>
+                            <td>
+                              <div class="crm-history-change">
+                                <span class="crm-badge warning">На проверке</span>
+                                <span class="crm-history-arrow">→</span>
+                                <span class="crm-badge success">Пройден</span>
+                              </div>
+                            </td>
+                            <td>Петрова Е.С.</td>
+                          </tr>
+                          <tr>
+                            <td class="crm-history-datetime">24.04.2026 16:20</td>
+                            <td>Профиль</td>
+                            <td>Контактный телефон</td>
+                            <td>
+                              <div class="crm-history-change">
+                                <span class="crm-history-arrow">→</span>
+                                <span class="crm-badge success">+7 (495) 900-22-11</span>
+                              </div>
+                            </td>
+                            <td>Иванов И.И.</td>
+                          </tr>
+                          <tr>
+                            <td class="crm-history-datetime">18.04.2026 09:15</td>
+                            <td>Документы</td>
+                            <td>Анкета клиента KYC</td>
+                            <td>
+                              <div class="crm-history-change">
+                                <span class="crm-badge warning">Черновик</span>
+                                <span class="crm-history-arrow">→</span>
+                                <span class="crm-badge success">Действующий</span>
+                              </div>
+                            </td>
+                            <td>Соколова М.В.</td>
+                          </tr>
+                          <tr>
+                            <td class="crm-history-datetime">02.04.2026 14:05</td>
+                            <td>Документы</td>
+                            <td>Выписка ЕГРЮЛ</td>
+                            <td>
+                              <div class="crm-history-change">
+                                <span class="crm-history-arrow">→</span>
+                                <span class="crm-badge success">Добавлен документ</span>
+                              </div>
+                            </td>
+                            <td>Рябцев Н.О.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </article>
+
               </section>
             </li>
           </ul>
