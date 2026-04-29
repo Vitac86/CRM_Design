@@ -51,6 +51,12 @@
     });
   }
 
+  function getFilterOptionText(option) {
+    if (!option) return '';
+    const selectedTextNode = option.querySelector('span');
+    return selectedTextNode ? selectedTextNode.textContent.trim() : option.textContent.trim();
+  }
+
   function closeOpenFilterMenus(exceptMenu) {
     document.querySelectorAll('.crm-filter-menu[open]').forEach(function (menu) {
       if (menu !== exceptMenu) {
@@ -59,39 +65,12 @@
     });
   }
 
-  function applyFilterOptionSelection(filterOption) {
-    const filterMenu = filterOption.closest('.crm-filter-menu');
-    if (!filterMenu) return;
-
-    const selectedValue = filterOption.getAttribute('data-filter-value') || '';
-    const selectedTextNode = filterOption.querySelector('span');
-    const selectedText = selectedTextNode ? selectedTextNode.textContent.trim() : filterOption.textContent.trim();
-
-    filterMenu.querySelectorAll('.crm-filter-option[data-filter-option]').forEach(function (option) {
-      const isSelected = option === filterOption;
-      option.classList.toggle('is-selected', isSelected);
-      option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-    });
-
-    const triggerValue = filterMenu.querySelector('.crm-filter-trigger-value');
-    if (triggerValue && selectedText) {
-      triggerValue.textContent = selectedText;
-    }
-
-    const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
-    if (hiddenInput) {
-      hiddenInput.value = selectedValue;
-    }
-
-    filterMenu.removeAttribute('open');
-  }
-
-  function syncFilterMenuState(filterMenu) {
+  function syncFilterMenuState(filterMenu, value) {
     if (!filterMenu) return;
 
     const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
-    const defaultValue = hiddenInput && hiddenInput.defaultValue ? hiddenInput.defaultValue : 'all';
-    const selectedValue = hiddenInput && hiddenInput.value ? hiddenInput.value : defaultValue;
+    const defaultValue = hiddenInput ? (hiddenInput.defaultValue || hiddenInput.getAttribute('value') || 'all') : 'all';
+    const selectedValue = typeof value === 'string' ? value : (hiddenInput && hiddenInput.value ? hiddenInput.value : defaultValue);
 
     let selectedOption = filterMenu.querySelector('.crm-filter-option[data-filter-option][data-filter-value="' + escapeCssValue(selectedValue) + '"]');
     if (!selectedOption) {
@@ -102,9 +81,8 @@
     }
     if (!selectedOption) return;
 
-    if (hiddenInput) {
-      hiddenInput.value = selectedOption.getAttribute('data-filter-value') || defaultValue;
-    }
+    const normalizedValue = selectedOption.getAttribute('data-filter-value') || defaultValue;
+    if (hiddenInput) hiddenInput.value = normalizedValue;
 
     filterMenu.querySelectorAll('.crm-filter-option[data-filter-option]').forEach(function (option) {
       const isSelected = option === selectedOption;
@@ -112,12 +90,37 @@
       option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
     });
 
-    const optionTextNode = selectedOption.querySelector('span');
-    const optionText = optionTextNode ? optionTextNode.textContent.trim() : selectedOption.textContent.trim();
     const triggerValue = filterMenu.querySelector('.crm-filter-trigger-value');
-    if (triggerValue && optionText) {
-      triggerValue.textContent = optionText;
-    }
+    const selectedText = getFilterOptionText(selectedOption);
+    if (triggerValue && selectedText) triggerValue.textContent = selectedText;
+  }
+
+  function applyFilterOptionSelection(filterOption) {
+    const filterMenu = filterOption.closest('.crm-filter-menu');
+    if (!filterMenu) return;
+
+    const selectedValue = filterOption.getAttribute('data-filter-value') || '';
+    syncFilterMenuState(filterMenu, selectedValue);
+    filterMenu.removeAttribute('open');
+  }
+
+  function resetFilterMenu(filterMenu) {
+    if (!filterMenu) return;
+    const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
+    const defaultValue = hiddenInput ? (hiddenInput.defaultValue || hiddenInput.getAttribute('value') || 'all') : 'all';
+    syncFilterMenuState(filterMenu, defaultValue);
+    filterMenu.removeAttribute('open');
+  }
+
+  function resetFilterMenus(form) {
+    if (!form) return;
+    form.querySelectorAll('.crm-filter-menu').forEach(resetFilterMenu);
+  }
+
+  function initFilterMenus() {
+    document.querySelectorAll('.crm-filter-menu').forEach(function (filterMenu) {
+      syncFilterMenuState(filterMenu);
+    });
   }
 
   const mobileQuery = window.matchMedia('(max-width: 920px)');
@@ -209,40 +212,6 @@
   }
 
   document.addEventListener('click', function (event) {
-    const target = event.target;
-    if (!(target instanceof Element)) {
-      closeOpenFilterMenus();
-      return;
-    }
-
-    const filterOption = target.closest('.crm-filter-option[data-filter-option]');
-    if (filterOption) {
-      applyFilterOptionSelection(filterOption);
-      event.preventDefault();
-      return;
-    }
-
-    const filterTrigger = target.closest('.crm-filter-trigger');
-    if (filterTrigger) {
-      const filterMenu = filterTrigger.closest('.crm-filter-menu');
-      if (filterMenu) {
-        requestAnimationFrame(function () {
-          if (filterMenu.open) {
-            closeOpenFilterMenus(filterMenu);
-          }
-        });
-      }
-      return;
-    }
-
-    if (target.closest('.crm-filter-menu')) {
-      return;
-    }
-
-    closeOpenFilterMenus();
-  });
-
-  document.addEventListener('click', function (event) {
     if (!app || !sidebar || !isMobileViewport() || !app.classList.contains('sidebar-open')) {
       return;
     }
@@ -266,19 +235,6 @@
     }
   }, true);
 
-  document.addEventListener('pointerdown', function (event) {
-    const target = event.target;
-    if (!(target instanceof Element)) {
-      closeOpenFilterMenus();
-      return;
-    }
-
-    if (target.closest('.crm-filter-menu')) {
-      return;
-    }
-    closeOpenFilterMenus();
-  }, true);
-
   if (sidebar) {
     sidebar.addEventListener('click', function (event) {
       const link = event.target.closest('a[href]');
@@ -296,17 +252,14 @@
 
   document.addEventListener('click', function (event) {
     const target = event.target;
+    if (!(target instanceof Element)) return;
 
     const resetButton = target.closest('[data-action="reset-filters"]');
     if (resetButton) {
       const form = resetButton.closest('form');
       if (form) {
         form.reset();
-        closeOpenFilterMenus();
-        form.querySelectorAll('.crm-filter-menu').forEach(function (filterMenu) {
-          syncFilterMenuState(filterMenu);
-          filterMenu.removeAttribute('open');
-        });
+        resetFilterMenus(form);
         syncOptionGridState(form);
         syncBinaryPills(form);
         syncSelectableControlState(form);
@@ -366,6 +319,27 @@
         input.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
+
+    const filterOption = target.closest('.crm-filter-option[data-filter-option]');
+    if (filterOption) {
+      applyFilterOptionSelection(filterOption);
+      event.preventDefault();
+      return;
+    }
+
+    const filterTrigger = target.closest('.crm-filter-trigger');
+    if (filterTrigger) {
+      const filterMenu = filterTrigger.closest('.crm-filter-menu');
+      if (filterMenu) {
+        requestAnimationFrame(function () {
+          if (filterMenu.open) closeOpenFilterMenus(filterMenu);
+        });
+      }
+      return;
+    }
+
+    if (!target.closest('.crm-filter-menu')) closeOpenFilterMenus();
+
     const hrefHost = target.closest('[data-href]');
     if (hrefHost) {
       const directAnchor = target.closest('a[href]');
@@ -419,6 +393,7 @@
     }
   });
 
+  initFilterMenus();
 
   if (window.UIkit) {
     document.querySelectorAll('ul[uk-tab], .crm-tabs[uk-tab]').forEach(function (tab) {

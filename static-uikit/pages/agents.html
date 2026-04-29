@@ -66,8 +66,16 @@
           <div class="crm-filter-search-row"><input id="agents-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="agents-search" placeholder="Агент, договор, телефон или email"/></div>
 
             <div class="crm-filter-fields-row">
-          <div class="crm-filter-control"><label class="uk-form-label" for="agent-status">Статус</label><select id="agent-status" class="uk-select crm-select" name="agent-status"><option>Все</option><option>Активен</option><option>На согласовании</option></select></div>
-          <div class="crm-filter-control"><label class="uk-form-label" for="agent-assignee">Закрепление</label><select id="agent-assignee" class="uk-select crm-select" name="agent-assignee"><option>Все</option><option>Иванов И.И.</option><option>Петрова Н.А.</option></select></div>
+          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="agent-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>На согласовании</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div><input type="hidden" name="agent-status" value="all" data-filter="agent-status"/></details></div>
+          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="agent-assignee"><summary class="crm-filter-trigger" aria-label="Фильтр: Закрепление"><span class="crm-filter-trigger-label">Закрепление:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Закрепление">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Иванов И.И.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Петрова Н.А.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div><input type="hidden" name="agent-assignee" value="all" data-filter="agent-assignee"/></details></div>
           <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
 </form>
