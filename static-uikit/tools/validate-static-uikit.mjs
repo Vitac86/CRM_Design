@@ -1205,6 +1205,26 @@ function validateFormAndButtonPrimitiveOwnership() {
   for (const selector of ['.uk-button', '.crm-button-primary', '.uk-button-default', '.crm-link-action']) {
     if (!buttonsContent.includes(selector)) addError(buttonsFile, `primitive ownership violation: ${selector} must be defined in components/buttons.css`);
   }
+
+  const countSimpleSelector = (content, selector) => {
+    const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const blockPattern = new RegExp(`${escapedSelector}\\s*\\{`, 'g');
+    return (content.match(blockPattern) || []).length;
+  };
+
+  const singleDefinitionSelectors = [
+    { file: formsFile, content: formsContent, selector: '.uk-radio' },
+    { file: formsFile, content: formsContent, selector: '.uk-radio:checked' },
+    { file: formsFile, content: formsContent, selector: 'input[type="date"].uk-input' },
+    { file: formsFile, content: formsContent, selector: 'input[type="date"]::-webkit-calendar-picker-indicator' },
+    { file: buttonsFile, content: buttonsContent, selector: '.crm-link-action' }
+  ];
+
+  for (const { file, content, selector } of singleDefinitionSelectors) {
+    if (countSimpleSelector(content, selector) > 1) {
+      addError(file, `duplicate selector regression: ${selector} must be defined only once in its owner file`);
+    }
+  }
 }
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
