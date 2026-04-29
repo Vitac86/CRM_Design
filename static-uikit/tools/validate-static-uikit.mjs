@@ -1046,12 +1046,20 @@ function validateBadgeLabelSemantics(file, content) {
   const attentionLabels = new Set(['ожидает', 'на доработке', 'частично', 'регистрация']);
   const healthyLabels = new Set(['пройден', 'доставлен', 'активный клиент']);
   const acceptedLabels = new Set(['принято']);
+  const partialLabels = new Set(['частичный', 'частично']);
+  const riskStatusRules = new Map([
+    ['risk-low', { label: 'низкий', forbidden: new Set(['warning', 'danger']), message: 'must not use warning/danger' }],
+    ['risk-medium', { label: 'средний', forbidden: new Set(['muted', 'info', 'success', 'danger']), message: 'must use warning' }],
+    ['risk-high', { label: 'высокий', forbidden: new Set(['muted', 'info', 'success', 'warning']), message: 'must use danger' }]
+  ]);
   const badgeRegex = /<span\b([^>]*)class="([^"]*\bcrm-badge\b[^"]*)"([^>]*)>([\s\S]*?)<\/span>/gi;
 
   for (const match of content.matchAll(badgeRegex)) {
     const attrs = `${match[1]} ${match[3]}`;
     const classes = (match[2] || '').split(/\s+/).filter(Boolean).map((token) => token.toLowerCase());
     const text = (match[4] || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+    const statusMatch = attrs.match(/data-status="([^"]+)"/i);
+    const dataStatus = statusMatch ? statusMatch[1].trim().toLowerCase() : '';
     if (!text) continue;
 
     if ([...strictDangerLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
@@ -1068,6 +1076,18 @@ function validateBadgeLabelSemantics(file, content) {
 
     if ([...acceptedLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
       if (classes.includes('warning') || classes.includes('danger')) addError(file, `badge label "${text}" must not use warning/danger`, match[0]);
+    }
+
+    if ([...partialLabels].some((label) => text === label || text.endsWith(`: ${label}`))) {
+      if (classes.some((token) => ['muted', 'info', 'success'].includes(token))) addError(file, `badge label "${text}" must not use muted/info/success`, match[0]);
+      if (!classes.includes('warning')) addError(file, `badge label "${text}" must use warning`, match[0]);
+    }
+
+    if (riskStatusRules.has(dataStatus)) {
+      const rule = riskStatusRules.get(dataStatus);
+      if (text === rule.label || text.endsWith(`: ${rule.label}`) || text.includes(`риск: ${rule.label}`) || text.includes(`${rule.label} риск`)) {
+        if (classes.some((token) => rule.forbidden.has(token))) addError(file, `risk badge "${text}" ${rule.message}`, match[0]);
+      }
     }
   }
 }
