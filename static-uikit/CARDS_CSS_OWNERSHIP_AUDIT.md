@@ -20,7 +20,7 @@ Scope: `static-uikit/assets/css/components/cards.css` (migration-era monolith) w
 | Dashboard KPI/selectors (`.crm-kpi-*`, `.crm-dashboard-card`) | Dashboard-only KPI/card presentation | `assets/css/pages/dashboard.css` | Medium | Gradually move after confirming no cross-page reuse. |
 | Register/option/binary/selectable controls (`.crm-option-*`, `.crm-binary-control`, `.crm-check-row`, `.crm-radio-tile`, `.crm-register-*`) | Register/wizard form patterns and selectable controls | `assets/css/pages/subject-register.css` and shared `assets/css/components/forms.css` | High | Split by ownership: page-specific structure vs shared selectable control primitives. |
 | Detail/report selectors (`.crm-detail-header`, `.crm-decision-panel`, `.crm-action-row`, `.crm-report-*`) | Detail card/report page-specific styles | `assets/css/pages/compliance-card.css`, `assets/css/pages/trading-card.css`, `assets/css/pages/subject-card.css` (by usage) | Medium | Map per-page usage first; then move page by page. |
-| `.crm-error-state`, `.crm-error-card` | Error page styling | `assets/css/pages/error.css` (or keep under page-specific owner) | Low | Move with an error-page cleanup PR. |
+| `.crm-error-state`, `.crm-error-card` | Error page styling | `assets/css/pages/error.css` | Low | ✅ Extracted to `assets/css/pages/error.css` (ownership moved from cards.css). |
 | Print/mobile blocks (`@media print`, mobile overrides for detail/report/option grid) | Cross-cutting responsive/print behavior mixed with page/layout rules | Mixed: `layout/page.css`, layout files, and page files | High | Decompose last, after base ownership moves stabilize. |
 
 ## Proposed decomposition order (safe, incremental)

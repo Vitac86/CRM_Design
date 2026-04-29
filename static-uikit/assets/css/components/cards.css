@@ -738,11 +738,6 @@ a:focus-visible,
   color: #2f4773;
 }
 
-.crm-error-state {
-  max-width: 560px;
-  margin: 56px auto;
-}
-
 @media (max-width: 960px) {
   .crm-detail-header {
     flex-direction: column;
@@ -753,8 +748,4 @@ a:focus-visible,
     flex-direction: column;
     align-items: flex-start;
   }
-}
-
-.crm-error-card {
-  text-align: center;
 }
