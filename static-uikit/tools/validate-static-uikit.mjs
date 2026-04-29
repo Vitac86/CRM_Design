@@ -132,6 +132,11 @@ const requiredStandaloneAssetRefs = [
   '../assets/js/uikit-icons.min.js',
   '../assets/js/crm-static.js'
 ];
+const requiredStandaloneScriptOrder = [
+  '../assets/js/uikit.min.js',
+  '../assets/js/uikit-icons.min.js',
+  '../assets/js/crm-static.js'
+];
 const hookKeys = {
   'data-entity': 'entities',
   'data-action': 'actions',
@@ -1885,6 +1890,33 @@ for (const page of pageFiles) {
     if (!new RegExp(`\\b(?:href|src)="${escaped}"`, 'i').test(content)) {
       addError(file, 'missing required local standalone asset reference', requiredAssetRef);
     }
+  }
+  const scriptSrcMatches = [...content.matchAll(/<script[^>]*\bsrc="([^"]+)"[^>]*>/gi)];
+  const scriptSrcList = scriptSrcMatches.map((match) => match[1].trim());
+
+  const crmStaticRefs = scriptSrcList.filter((src) => src === '../assets/js/crm-static.js');
+  if (crmStaticRefs.length !== 1) {
+    addError(file, 'standalone page must include ../assets/js/crm-static.js exactly once');
+  }
+
+  for (const scriptSrc of scriptSrcList) {
+    if (/^(?:https?:)?\/\//i.test(scriptSrc) || /^(?:https?:)?\/\/|^(?:data|blob):/i.test(scriptSrc)) {
+      addError(file, 'standalone pages must not include CDN/external script sources', scriptSrc);
+    }
+  }
+
+  const orderIndexes = requiredStandaloneScriptOrder.map((scriptPath) => findScriptIndex(content, scriptPath));
+  const hasCrmStatic = orderIndexes[2] >= 0;
+  const hasLocalUikit = orderIndexes[0] >= 0;
+  const hasLocalUikitIcons = orderIndexes[1] >= 0;
+  if (hasCrmStatic && hasLocalUikit && orderIndexes[2] < orderIndexes[0]) {
+    addError(file, 'crm-static.js must be loaded after ../assets/js/uikit.min.js');
+  }
+  if (hasCrmStatic && hasLocalUikitIcons && orderIndexes[2] < orderIndexes[1]) {
+    addError(file, 'crm-static.js must be loaded after ../assets/js/uikit-icons.min.js');
+  }
+  if (hasLocalUikit && hasLocalUikitIcons && orderIndexes[1] < orderIndexes[0]) {
+    addError(file, '../assets/js/uikit-icons.min.js must be loaded after ../assets/js/uikit.min.js');
   }
 
   if (!/<input[^>]*\bname="global-search"/i.test(content)) addError(file, 'missing topbar global search input[name="global-search"]');
