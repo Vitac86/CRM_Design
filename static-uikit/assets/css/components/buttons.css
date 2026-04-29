@@ -60,16 +60,11 @@
 .crm-link-action {
   font-size: 13px;
   font-weight: 600;
-  color: #4a67bf;
-  text-decoration: none;
-}
-
-.crm-link-action:hover { color: #3554b1; text-decoration: none; }
-
-.crm-link-action {
   color: var(--crm-primary);
   text-decoration: none !important;
 }
+
+.crm-link-action:hover { color: #3554b1; text-decoration: none; }
 
 .crm-button-ghost {
   background: #f6f9ff;
