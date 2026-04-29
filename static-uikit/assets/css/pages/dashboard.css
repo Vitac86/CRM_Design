@@ -125,14 +125,6 @@
   background: #f8faff;
 }
 
-.crm-badge {
-  min-height: 22px;
-  padding: 3px 10px;
-  font-size: 11px;
-  line-height: 1.15;
-  border-radius: 999px;
-  font-weight: 600;
-}
 
 .crm-tabs {
   margin-top: 10px;
@@ -685,14 +677,6 @@
   white-space: nowrap;
 }
 
-.crm-dashboard-table .crm-badge {
-  min-height: 20px;
-  border-radius: 6px;
-  padding: 0 7px;
-  font-size: 12px;
-  line-height: 18px;
-  font-weight: 500;
-}
 
 @media (max-width: 1280px) {
   .crm-dashboard-kpi-grid {

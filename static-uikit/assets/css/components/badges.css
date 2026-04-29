@@ -1,6 +1,45 @@
 /* badges */
 .crm-badge {
-  min-height: 22px;
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: none;
 }
 
+.crm-badge.muted {
+  background: #eef3fa;
+  color: #506381;
+  border-color: #d4deeb;
+}
+
+.crm-badge.info {
+  background: #eaf0ff;
+  color: #35558b;
+  border-color: #d1dcf5;
+}
+
+.crm-badge.success {
+  background: #eaf6ef;
+  color: #2e6346;
+  border-color: #c8e3d4;
+}
+
+.crm-badge.warning {
+  background: #fff5e5;
+  color: #735223;
+  border-color: #efd8b4;
+}
+
+.crm-badge.danger {
+  background: #fdecef;
+  color: #8b2932;
+  border-color: #f2c9cf;
+}

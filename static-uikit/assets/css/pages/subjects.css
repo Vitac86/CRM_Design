@@ -4,21 +4,6 @@ body[data-page="subjects"] {
   --subjects-text-muted: #5c6f8e;
   --subjects-pill-border: #cfd9ea;
   --subjects-pill-bg: #ffffff;
-  --subjects-badge-muted-bg: #edf3fb;
-  --subjects-badge-muted-text: #435b7d;
-  --subjects-badge-muted-border: #cfdae9;
-  --subjects-badge-info-bg: #e9efff;
-  --subjects-badge-info-text: #2a4b82;
-  --subjects-badge-info-border: #ccdaf7;
-  --subjects-badge-success-bg: #e8f6ee;
-  --subjects-badge-success-text: #245e3d;
-  --subjects-badge-success-border: #c2e2cf;
-  --subjects-badge-warning-bg: #fff5e3;
-  --subjects-badge-warning-text: #704f22;
-  --subjects-badge-warning-border: #efd8ad;
-  --subjects-badge-danger-bg: #fdecee;
-  --subjects-badge-danger-text: #8a242b;
-  --subjects-badge-danger-border: #f2c7ce;
 }
 
 body[data-page="subjects"] .crm-visually-hidden {
@@ -155,25 +140,6 @@ body[data-page="subjects"] .crm-subjects-table tbody tr[data-href] {
   cursor: pointer;
 }
 
-body[data-page="subjects"] .crm-subjects-table .crm-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 22px;
-  padding: 0 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  line-height: 1;
-  border: 1px solid transparent;
-  box-shadow: none;
-  white-space: nowrap;
-}
-
-body[data-page="subjects"] .crm-subjects-table .crm-badge.muted { color: var(--subjects-badge-muted-text); background: var(--subjects-badge-muted-bg); border-color: var(--subjects-badge-muted-border); }
-body[data-page="subjects"] .crm-subjects-table .crm-badge.info { color: var(--subjects-badge-info-text); background: var(--subjects-badge-info-bg); border-color: var(--subjects-badge-info-border); }
-body[data-page="subjects"] .crm-subjects-table .crm-badge.success { color: var(--subjects-badge-success-text); background: var(--subjects-badge-success-bg); border-color: var(--subjects-badge-success-border); }
-body[data-page="subjects"] .crm-subjects-table .crm-badge.warning { color: var(--subjects-badge-warning-text); background: var(--subjects-badge-warning-bg); border-color: var(--subjects-badge-warning-border); }
-body[data-page="subjects"] .crm-subjects-table .crm-badge.danger { color: var(--subjects-badge-danger-text); background: var(--subjects-badge-danger-bg); border-color: var(--subjects-badge-danger-border); }
 
 body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
   gap: 4px;
