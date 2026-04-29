@@ -52,10 +52,6 @@ body[data-page="subjects"] .crm-registry-filters.crm-filter-panel {
   padding: 10px 14px;
   gap: 8px;
   border-radius: 12px;
-  position: relative;
-  overflow: visible;
-  isolation: isolate;
-  z-index: 3;
 }
 
 body[data-page="subjects"] .crm-filter-search-input {
@@ -100,8 +96,6 @@ body[data-page="subjects"] .crm-filter-fields-row {
   justify-content: flex-start;
   gap: 7px;
   align-items: flex-end;
-  position: relative;
-  overflow: visible;
 }
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
@@ -158,8 +152,6 @@ body[data-page="subjects"] .crm-table-card.crm-subjects-registry {
   border-radius: 14px;
   border-color: #d5e0f0;
   background: #f6f9ff;
-  position: relative;
-  z-index: 1;
 }
 
 body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
