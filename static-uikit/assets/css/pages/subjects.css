@@ -52,6 +52,10 @@ body[data-page="subjects"] .crm-registry-filters.crm-filter-panel {
   padding: 10px 14px;
   gap: 8px;
   border-radius: 12px;
+  position: relative;
+  overflow: visible;
+  isolation: isolate;
+  z-index: 3;
 }
 
 body[data-page="subjects"] .crm-filter-search-input {
@@ -94,7 +98,7 @@ body[data-page="subjects"] .crm-filter-fields-row {
   gap: 7px;
   align-items: center;
   position: relative;
-  z-index: 2;
+  overflow: visible;
 }
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
@@ -102,12 +106,15 @@ body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-co
 }
 
 body[data-page="subjects"] .crm-filter-pill-control {
-  flex: 0 1 220px;
-  min-width: 0;
+  flex: 0 1 auto;
+  width: auto;
+  min-width: fit-content;
+  max-width: 100%;
 }
 
 body[data-page="subjects"] .crm-filter-menu {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
 }
 
 body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"] .crm-filter-dropdown {
