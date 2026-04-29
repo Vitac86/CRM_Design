@@ -333,6 +333,30 @@ function validateSharedFilterCssOwnership() {
   });
 }
 
+function validateContractWizardSelectableCssOwnership() {
+  const wizardCssFile = path.join(rootDir, 'assets', 'css', 'pages', 'contract-wizard.css');
+  if (!fs.existsSync(wizardCssFile)) return;
+
+  const css = fs.readFileSync(wizardCssFile, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const selectors = ['crm-option-card', 'crm-check-row', 'crm-radio-tile', 'crm-binary-control'];
+  const ruleRegex = /([^{}]+)\{/g;
+
+  for (const match of css.matchAll(ruleRegex)) {
+    const selectorList = (match[1] || '').trim();
+    if (!selectorList) continue;
+    const chunks = selectorList.split(',').map((chunk) => chunk.trim()).filter(Boolean);
+    for (const chunk of chunks) {
+      for (const controlClass of selectors) {
+        if (!new RegExp(`\\.${controlClass}\\b`).test(chunk)) continue;
+        const isPageScoped = /body\[data-page="contract-wizard"\]|\.(?:crm-page)\[data-page="contract-wizard"\]/.test(chunk);
+        if (!isPageScoped) {
+          addError(wizardCssFile, `unscoped reusable selectable-control selector is forbidden in pages/contract-wizard.css: .${controlClass}`, chunk);
+        }
+      }
+    }
+  }
+}
+
 function validateRegistryFilterPanelStructure(file, content) {
   for (const formMatch of content.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
     const attrs = formMatch[1];
@@ -824,6 +848,7 @@ validateHandoffManifest();
 validateHandoffNotes();
 validateHandoffReadinessAudit();
 validateUmiPageScriptNotes();
+validateContractWizardSelectableCssOwnership();
 
 const pageFiles = fs.existsSync(pagesDir) ? fs.readdirSync(pagesDir).filter((f) => f.endsWith('.html')) : [];
 const pageFilesSet = new Set(pageFiles);
