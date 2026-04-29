@@ -966,6 +966,27 @@ function validateNoRawHexInPageCss() {
   }
 }
 
+
+const badgeSemanticTokens = new Set(['muted', 'info', 'success', 'warning', 'danger']);
+
+function hasSemanticBadgeClass(classTokens) {
+  return classTokens.some((token) => badgeSemanticTokens.has(token));
+}
+
+function validatePageCssBadgePaletteOverrides() {
+  const pagesCssDir = path.join(rootDir, 'assets', 'css', 'pages');
+  if (!fs.existsSync(pagesCssDir)) return;
+  const cssFiles = fs.readdirSync(pagesCssDir).filter((name) => name.endsWith('.css')).map((name) => path.join(pagesCssDir, name));
+  const paletteSelectorPattern = /\.crm-badge\s*\.(?:muted|info|success|warning|danger)\b/;
+
+  for (const file of cssFiles) {
+    const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+    lines.forEach((line, idx) => {
+      if (paletteSelectorPattern.test(line)) addError(file, `page CSS must not redefine semantic crm-badge palette on line ${idx + 1}`, line.trim());
+    });
+  }
+}
+
 function validateSubjectCardNoNestedCards() {
   const file = path.join(pagesDir, 'subject-card.html');
   if (!fs.existsSync(file)) return;
@@ -1366,6 +1387,7 @@ function validatePartials() {
         const hasStatus = /\bdata-status="[^"]+"/i.test(attrs);
         const hasDecorativeEntity = /\bdata-entity="[^"]+"/i.test(attrs);
         if (!hasStatus && !hasDecorativeEntity) addError(file, 'crm-badge must include data-status or explicit decorative data-entity', match[0]);
+        if (!hasSemanticBadgeClass(classTokens) && !classTokens.includes('crm-badge-neutral') && !hasDecorativeEntity) addError(file, 'crm-badge must include one semantic class: muted/info/success/warning/danger', match[0]);
       }
 
       if (classTokens.includes('crm-empty-state')) {
@@ -1424,6 +1446,7 @@ validateRegistryAuditConsistency();
 validateStandalonePageScriptRegistry(pageFiles);
 validatePageScriptsAndGlobalPurity();
 validateNoRawHexInPageCss();
+validatePageCssBadgePaletteOverrides();
 validateSubjectCardNoNestedCards();
 validateSubjectCardStaticRendering();
 validateBalancedTagHelperSelfTest();
@@ -1490,8 +1513,12 @@ for (const page of pageFiles) {
       validateEmptyStateContract(file, attrs, match[0]);
     }
 
-    if (classTokens.includes('crm-badge') && !/\bdata-status="/i.test(attrs) && !/\bdata-entity="/i.test(attrs)) {
-      addError(file, 'crm-badge must include data-status or explicit data-entity for decorative badges', match[0]);
+    if (classTokens.includes('crm-badge')) {
+      const hasDecorativeEntity = /\bdata-entity="[^"]+"/i.test(attrs);
+      if (!/\bdata-status="/i.test(attrs) && !hasDecorativeEntity) {
+        addError(file, 'crm-badge must include data-status or explicit data-entity for decorative badges', match[0]);
+      }
+      if (!hasSemanticBadgeClass(classTokens) && !classTokens.includes('crm-badge-neutral') && !hasDecorativeEntity) addError(file, 'crm-badge must include one semantic class: muted/info/success/warning/danger', match[0]);
     }
   }
 

@@ -162,6 +162,7 @@ Partials и UMI P0/P1 templates синхронизированы с финаль
 - `.crm-empty-state[data-entity="empty-state"]` lives inside registry card/shell but outside `<table>/<thead>/<tbody>/<tr>` markup and is hidden in demo mode via native `hidden` (unless an explicit demo-visible exception is documented).
 - Reset in filter forms uses `type="button"` + `data-action="reset-filters"`.
 - `crm-static.js` remains global-only reusable behavior (row `data-href`, generic form/reset helpers, prevention helpers), while registry-specific rendering/logic is not allowed; UMI renders registry rows server-side.
+- CRM status badges use shared semantic classes: `.crm-badge.muted|info|success|warning|danger` from `assets/css/components/badges.css`; dashboard compact badge style is the common baseline, and page CSS must not redefine status palettes locally.
 
 ## Non-registry page contracts (card/detail/wizard/admin)
 - Audited pages: `subject-register.html`, `contract-wizard.html`, `compliance-card.html`, `trading-card.html`, `administration.html`.
