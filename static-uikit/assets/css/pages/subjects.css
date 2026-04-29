@@ -184,29 +184,40 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
-  border-radius: 10px 10px 0 0;
+  border: 0;
+  border-radius: 0;
   background: #ffffff;
-  border-bottom: 1px solid #e1e8f3;
+  border-bottom: 0;
+  scrollbar-gutter: auto;
   scrollbar-width: thin;
   scrollbar-color: #9ba9bf #e9eef8;
 }
 
+body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table::after {
+  display: none;
+  content: none;
+}
+
 body[data-page="subjects"] .crm-subjects-table .crm-table {
-  border-radius: 10px 10px 0 0;
-  overflow: hidden;
-  width: max-content;
-  min-width: 100%;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  width: 100%;
+  min-width: 1240px;
   background: #ffffff;
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table {
+  width: 100%;
   min-width: 1240px;
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
 }
 
-body[data-page="subjects"] .crm-subjects-table .uk-table thead tr {
+body[data-page="subjects"] .crm-subjects-table .uk-table thead,
+body[data-page="subjects"] .crm-subjects-table .uk-table thead tr,
+body[data-page="subjects"] .crm-subjects-table .uk-table thead th {
   background: var(--subjects-header-bg);
 }
 
@@ -230,12 +241,7 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table::-webkit-scroll
   background-color: #8192ab;
 }
 
-body[data-page="subjects"] .crm-subjects-table .uk-table thead {
-  background: var(--subjects-header-bg);
-}
-
 body[data-page="subjects"] .crm-subjects-table .uk-table thead th {
-  background: var(--subjects-header-bg);
   border-bottom: 1px solid var(--subjects-header-border);
   padding: 14px 12px 12px;
   font-size: 12px;
@@ -296,13 +302,13 @@ body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
 
 body[data-page="subjects"] .crm-subjects-table-footer {
   display: flex;
-  border-radius: 0 0 10px 10px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
-  background: #ffffff;
-  border-top: 1px solid #dbe2f0;
+  padding: 10px 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 body[data-page="subjects"] .crm-subjects-footer-page-size,
