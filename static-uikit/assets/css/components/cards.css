@@ -538,7 +538,10 @@ a:focus-visible,
 .crm-nav-link:focus-visible,
 .crm-nav-group-toggle:focus-visible,
 .crm-option-card:focus-visible,
-.crm-binary-control label:focus-within {
+.crm-option-card:focus-within,
+.crm-binary-control label:focus-within,
+.crm-radio-tile:focus-within,
+.crm-check-row:focus-within {
   outline: none;
   box-shadow: var(--crm-focus-ring);
 }
