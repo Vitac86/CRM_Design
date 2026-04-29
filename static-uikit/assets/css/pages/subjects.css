@@ -7,18 +7,25 @@ body[data-page="subjects"] {
 }
 
 body[data-page="subjects"] .crm-registry-shell {
-  gap: 14px;
+  gap: 16px;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid #d7e2f2;
+  background: #f7faff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 body[data-page="subjects"] .crm-subjects-header {
-  align-items: flex-start;
-  gap: 14px;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 2px;
 }
 
 body[data-page="subjects"] .crm-page-title {
   font-size: 30px;
-  line-height: 1.1;
-  margin-bottom: 6px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
 }
 
 body[data-page="subjects"] .crm-page-subtitle {
@@ -27,13 +34,16 @@ body[data-page="subjects"] .crm-page-subtitle {
 }
 
 body[data-page="subjects"] .crm-registry-actions {
-  padding-top: 4px;
+  padding-top: 0;
+  gap: 10px;
 }
 
 body[data-page="subjects"] .crm-registry-actions .crm-button {
-  min-height: 38px;
-  height: 38px;
-  padding: 0 14px;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 body[data-page="subjects"] .crm-visually-hidden {
@@ -49,29 +59,33 @@ body[data-page="subjects"] .crm-visually-hidden {
 }
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel {
-  padding: 10px 14px;
-  gap: 8px;
-  border-radius: 12px;
+  padding: 14px;
+  gap: 12px;
+  border-radius: 16px;
+  border-color: #d9e3f1;
+  background: #eef3fa;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 body[data-page="subjects"] .crm-filter-search-input {
-  min-height: 38px;
-  height: 38px;
-  border-radius: 9px;
-  padding: 0 12px 0 34px;
-  border-color: #ced9ea;
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  padding: 0 12px 0 38px;
+  border-color: #cfdcec;
+  font-size: 14px;
 }
 
 body[data-page="subjects"] .crm-filter-search-shell {
   position: relative;
   display: block;
-  width: min(560px, 100%);
+  width: min(520px, 100%);
   max-width: 100%;
 }
 
 body[data-page="subjects"] .crm-filter-search-icon {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   width: 15px;
@@ -94,21 +108,21 @@ body[data-page="subjects"] .crm-filter-fields-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 7px;
-  align-items: flex-end;
+  gap: 10px;
+  align-items: center;
 }
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
-  flex: 1 1 180px;
-  min-width: 150px;
-  max-width: 230px;
+  flex: 0 1 auto;
+  min-width: 176px;
+  max-width: 252px;
 }
 
 body[data-page="subjects"] .crm-filter-pill-control {
-  flex: 1 1 180px;
-  width: clamp(150px, 16vw, 230px);
-  min-width: 150px;
-  max-width: 230px;
+  flex: 0 1 auto;
+  width: clamp(176px, 18vw, 252px);
+  min-width: 176px;
+  max-width: 252px;
 }
 
 body[data-page="subjects"] .crm-filter-menu {
@@ -133,11 +147,11 @@ body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"] .
 }
 
 body[data-page="subjects"] .crm-filter-reset {
-  min-height: 34px;
-  height: 34px;
-  border-radius: 9px;
-  padding-inline: 12px;
-  font-size: 12px;
+  min-height: 36px;
+  height: 36px;
+  border-radius: 999px;
+  padding-inline: 14px;
+  font-size: 13px;
 }
 
 body[data-page="subjects"] .crm-filter-actions {
@@ -149,9 +163,9 @@ body[data-page="subjects"] .crm-filter-actions {
 
 body[data-page="subjects"] .crm-table-card.crm-subjects-registry {
   overflow: hidden;
-  border-radius: 14px;
-  border-color: #d5e0f0;
-  background: #f6f9ff;
+  border-radius: 16px;
+  border-color: #d9e3f1;
+  background: #f8fbff;
 }
 
 body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
@@ -161,7 +175,7 @@ body[data-page="subjects"] .crm-table-wrapper.crm-subjects-table {
   overflow-y: hidden;
   scrollbar-gutter: stable both-edges;
   background: #fff;
-  border-bottom: 1px solid #dce6f4;
+  border-bottom: 1px solid #e1e8f3;
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table {
@@ -174,12 +188,12 @@ body[data-page="subjects"] .crm-subjects-table .uk-table {
 body[data-page="subjects"] .crm-subjects-table .uk-table thead th {
   background: var(--subjects-header-bg);
   border-bottom: 1px solid var(--subjects-header-border);
-  padding: 10px 10px;
-  font-size: 11px;
+  padding: 13px 12px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: #506381;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: #586e8e;
   line-height: 1.2;
   vertical-align: middle;
   white-space: nowrap;
@@ -192,10 +206,11 @@ body[data-page="subjects"] .crm-subjects-table .uk-table thead th .crm-th-sort {
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table tbody td {
-  padding: 8px 10px;
+  padding: 12px 12px;
   font-size: 13px;
-  line-height: 1.25;
+  line-height: 1.35;
   vertical-align: middle;
+  border-bottom-color: #e4ebf5;
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table tbody tr:last-child td {
@@ -203,8 +218,8 @@ body[data-page="subjects"] .crm-subjects-table .uk-table tbody tr:last-child td 
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-row-main {
-  font-size: 13px;
-  line-height: 1.25;
+  font-size: 14px;
+  line-height: 1.35;
   font-weight: 600;
   color: #1b2b46;
 }
@@ -219,8 +234,9 @@ body[data-page="subjects"] .crm-subjects-table-footer {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 12px;
-  background: #f6f9ff;
+  padding: 10px 14px;
+  background: #f8fbff;
+  border-top: 1px solid #e1e8f3;
 }
 
 body[data-page="subjects"] .crm-subjects-footer-page-size,
@@ -239,12 +255,12 @@ body[data-page="subjects"] .crm-subjects-footer-caption {
 }
 
 body[data-page="subjects"] .crm-subjects-footer-chip {
-  min-width: 32px;
-  height: 28px;
+  min-width: 36px;
+  height: 32px;
   border: 1px solid #c8d4e6;
   background: #ffffff;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 10px;
+  font-size: 13px;
   color: #4e6383;
   cursor: default;
 }
@@ -263,10 +279,10 @@ body[data-page="subjects"] .crm-subjects-footer-page {
 }
 
 body[data-page="subjects"] .crm-subjects-footer-nav-button {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #c8d4e6;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #fff;
   color: #4f6483;
   display: inline-flex;
