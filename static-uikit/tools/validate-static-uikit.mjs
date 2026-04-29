@@ -1226,6 +1226,30 @@ function validateFormAndButtonPrimitiveOwnership() {
     }
   }
 }
+
+
+function validateTablePrimitiveOwnership() {
+  const cardsFile = path.join(rootDir, 'assets', 'css', 'components', 'cards.css');
+  const tablesFile = path.join(rootDir, 'assets', 'css', 'components', 'tables.css');
+
+  if (!fs.existsSync(cardsFile) || !fs.existsSync(tablesFile)) return;
+
+  const stripComments = (content) => content.replace(/\/\*[\s\S]*?\*\//g, '');
+  const cardsContent = stripComments(fs.readFileSync(cardsFile, 'utf8'));
+  const tablesContent = stripComments(fs.readFileSync(tablesFile, 'utf8'));
+
+  for (const selector of ['.crm-table-wrapper', '.crm-table .uk-table', '.crm-table tbody tr:hover']) {
+    if (cardsContent.includes(selector)) addError(cardsFile, `table primitive ownership violation: ${selector} must not be defined in components/cards.css`);
+  }
+
+  if (/\.crm-table\s*\{/.test(cardsContent)) {
+    addError(cardsFile, 'table primitive ownership violation: .crm-table must not be defined in components/cards.css');
+  }
+
+  for (const selector of ['.crm-table-wrapper', '.crm-table', '.crm-table .uk-table', '.crm-table .uk-table th', '.crm-table .uk-table td']) {
+    if (!tablesContent.includes(selector)) addError(tablesFile, `table primitive ownership violation: ${selector} must be defined in components/tables.css`);
+  }
+}
 function validateNoRawHexInPageCss() {
   const cssFiles = [path.join(rootDir, 'assets', 'css', 'pages', 'subject-card.css')];
   const hexPattern = /#[0-9a-fA-F]{3,8}\b/;

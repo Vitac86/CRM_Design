@@ -66,56 +66,6 @@
   color: var(--crm-primary);
 }
 
-.crm-table-wrapper { border-radius: 12px; overflow: auto; max-width: 100%; }
-.crm-table-wrapper { scrollbar-width: thin; scrollbar-color: #bfcbdf transparent; }
-
-.crm-table {
-  border: 1px solid var(--crm-border);
-  border-radius: 12px;
-  overflow: auto;
-  background: #fff;
-}
-
-.crm-table .uk-table {
-  margin: 0;
-  min-width: 100%;
-  font-size: 14px;
-}
-
-.crm-table .uk-table th {
-  background: #eff4fb;
-  color: #607189;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--crm-border);
-  padding: 10px 12px;
-}
-
-.crm-table .uk-table td {
-  vertical-align: middle;
-  padding: 12px 12px;
-  color: var(--crm-text-secondary);
-  line-height: 1.35;
-  font-weight: 400;
-}
-
-.crm-table .uk-table td:first-child {
-  color: #24324d;
-  font-weight: 500;
-}
-
-.crm-table .uk-table-divider > tr:not(:first-child),
-.crm-table .uk-table-divider > :not(:first-child) > tr,
-.crm-table .uk-table-divider > :first-child > tr:not(:first-child) {
-  border-top-color: #e5ecf7;
-}
-
-.crm-table tbody tr:hover { background: #f5f8ff; cursor: pointer; }
-
-
 
 @media (max-width: 920px) {
   .crm-layout { grid-template-columns: 1fr; }
@@ -195,23 +145,6 @@
 
 .crm-sidebar-overlay {
   display: none;
-}
-
-.crm-table-wrapper {
-  scrollbar-gutter: stable both-edges;
-}
-
-.crm-table .uk-table td,
-.crm-table .uk-table th {
-  white-space: nowrap;
-}
-
-.crm-table .uk-table td:first-child {
-  white-space: normal;
-}
-
-.crm-table tbody tr:hover {
-  background: #f2f6ff;
 }
 
 
