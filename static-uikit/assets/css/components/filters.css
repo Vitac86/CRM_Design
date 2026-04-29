@@ -1,4 +1,4 @@
-/* ===== Global registry filter panel redesign ===== */
+/* ===== Registry filter panel layout ===== */
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel {
   display: flex;
   flex-direction: column;
@@ -73,7 +73,7 @@
   white-space: nowrap;
 }
 
-/* Backward compatibility for legacy classes from old filter layout. */
+/* ===== Legacy/native select compatibility (for non-migrated pages) ===== */
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-registry-search,
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-control-search {
   width: 100%;
@@ -113,7 +113,7 @@
     width: 100%;
   }
 }
-/* filter panel */
+/* ===== Shared filter panel primitives ===== */
 .crm-filter-panel {
   border: var(--crm-layer-card-border);
   border-radius: var(--crm-layer-card-radius);
@@ -167,6 +167,7 @@
   margin-left: auto;
 }
 
+/* ===== Custom CRM filter menu primitive (details/summary) ===== */
 .crm-filter-menu {
   position: relative;
   min-width: 0;

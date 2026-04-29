@@ -51,6 +51,14 @@
     });
   }
 
+  function closeOpenFilterMenus(exceptMenu) {
+    document.querySelectorAll('.crm-filter-menu[open]').forEach(function (menu) {
+      if (menu !== exceptMenu) {
+        menu.removeAttribute('open');
+      }
+    });
+  }
+
   const mobileQuery = window.matchMedia('(max-width: 920px)');
 
   function isMobileViewport() {
@@ -127,6 +135,7 @@
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       closeSidebar();
+      closeOpenFilterMenus();
     }
   });
 
@@ -144,11 +153,57 @@
     }
 
     const target = event.target;
+    const filterOption = target.closest('.crm-filter-option[data-filter-option]');
+    if (filterOption) {
+      const filterMenu = filterOption.closest('.crm-filter-menu');
+      if (filterMenu) {
+        const selectedValue = filterOption.getAttribute('data-filter-value') || '';
+        const selectedTextNode = filterOption.querySelector('span');
+        const selectedText = selectedTextNode ? selectedTextNode.textContent.trim() : filterOption.textContent.trim();
+
+        filterMenu.querySelectorAll('.crm-filter-option[data-filter-option]').forEach(function (option) {
+          const isSelected = option === filterOption;
+          option.classList.toggle('is-selected', isSelected);
+          option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        });
+
+        const triggerValue = filterMenu.querySelector('.crm-filter-trigger-value');
+        if (triggerValue && selectedText) {
+          triggerValue.textContent = selectedText;
+        }
+
+        const hiddenInput = filterMenu.querySelector('input[type="hidden"][data-filter]');
+        if (hiddenInput) {
+          hiddenInput.value = selectedValue;
+        }
+
+        filterMenu.removeAttribute('open');
+        event.preventDefault();
+      }
+      return;
+    }
     if (sidebar.contains(target) || (toggle && toggle.contains(target))) {
       return;
     }
 
     closeSidebar();
+  });
+
+  document.addEventListener('toggle', function (event) {
+    const filterMenu = event.target;
+    if (!filterMenu || !filterMenu.matches('.crm-filter-menu')) {
+      return;
+    }
+    if (filterMenu.open) {
+      closeOpenFilterMenus(filterMenu);
+    }
+  }, true);
+
+  document.addEventListener('pointerdown', function (event) {
+    if (event.target.closest('.crm-filter-menu')) {
+      return;
+    }
+    closeOpenFilterMenus();
   });
 
   if (sidebar) {
