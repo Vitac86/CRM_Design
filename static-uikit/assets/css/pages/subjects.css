@@ -34,6 +34,10 @@ body[data-page="subjects"] .crm-filter-fields-row {
   align-items: center;
 }
 
+body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
+  flex-basis: 180px;
+}
+
 body[data-page="subjects"] .crm-filter-pill-control {
   flex: 0 1 220px;
   min-width: 0;

@@ -315,6 +315,24 @@ function validatePackHooks(pack, inventory) {
   }
 }
 
+
+function validateSharedFilterCssOwnership() {
+  const filtersCssFile = path.join(rootDir, 'assets', 'css', 'components', 'filters.css');
+  if (!fs.existsSync(filtersCssFile)) return;
+
+  const css = fs.readFileSync(filtersCssFile, 'utf8');
+  const forbiddenPatterns = [
+    /\[data-page="subjects"\]/,
+    /body\[data-page=/,
+    /\.crm-page\[data-page=/,
+    /\.crm-subjects-/
+  ];
+
+  forbiddenPatterns.forEach((pattern) => {
+    if (pattern.test(css)) addError(filtersCssFile, `components/filters.css must not contain page-specific selector pattern: ${pattern}`);
+  });
+}
+
 function validateRegistryFilterPanelStructure(file, content) {
   for (const formMatch of content.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
     const attrs = formMatch[1];
@@ -1611,6 +1629,7 @@ validatePageScriptsAndGlobalPurity();
 validateNoRawHexInPageCss();
 validatePageCssBadgePaletteOverrides();
 validateBadgeCssOwnership();
+validateSharedFilterCssOwnership();
 validateSubjectCardNoNestedCards();
 validateSubjectCardStaticRendering();
 validateBalancedTagHelperSelfTest();
