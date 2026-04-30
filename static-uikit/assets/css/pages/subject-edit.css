@@ -1,0 +1,263 @@
+/* Subject edit page — scoped to body[data-page="subject-edit"] */
+
+body[data-page="subject-edit"] .crm-page,
+.crm-page[data-page="subject-edit"] {
+  background: #f3f6fb;
+}
+
+/* ── Shell ───────────────────────────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .crm-subject-edit-shell {
+  display: grid;
+  gap: 12px;
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── Header card ─────────────────────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-header {
+  padding: 14px 18px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: none;
+}
+
+body[data-page="subject-edit"] .crm-edit-header-body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+body[data-page="subject-edit"] .crm-edit-header-info {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+body[data-page="subject-edit"] .crm-edit-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+body[data-page="subject-edit"] .crm-edit-client-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+}
+
+body[data-page="subject-edit"] .crm-edit-client-name {
+  font-weight: 600;
+  color: var(--crm-umi-text);
+}
+
+body[data-page="subject-edit"] .crm-edit-client-meta strong {
+  color: var(--crm-umi-text);
+  font-weight: 600;
+}
+
+body[data-page="subject-edit"] .crm-edit-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+body[data-page="subject-edit"] .crm-edit-header-actions .uk-button,
+body[data-page="subject-edit"] .crm-edit-header-actions .crm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ── Edit form card ──────────────────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-form-card {
+  padding: 0;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+body[data-page="subject-edit"] .crm-edit-form-card .crm-form-section {
+  padding: 16px 18px;
+  border: 0;
+  border-bottom: 1px solid #eef1f7;
+  border-radius: 0;
+  background: transparent;
+  margin-bottom: 0;
+}
+
+body[data-page="subject-edit"] .crm-edit-form-card .crm-form-section:last-child {
+  border-bottom: 0;
+}
+
+body[data-page="subject-edit"] .crm-form-section-head {
+  margin-bottom: 12px;
+  padding-bottom: 0;
+}
+
+body[data-page="subject-edit"] .crm-form-section-head h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+/* ── Form grid labels ────────────────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .uk-form-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--crm-umi-text-muted);
+  line-height: 1.25;
+}
+
+body[data-page="subject-edit"] .uk-input.crm-input,
+body[data-page="subject-edit"] .uk-select.crm-select,
+body[data-page="subject-edit"] .uk-textarea.crm-input {
+  height: 36px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+body[data-page="subject-edit"] .uk-textarea.crm-input {
+  height: auto;
+  resize: vertical;
+}
+
+/* ── Report delivery checkboxes ──────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+body[data-page="subject-edit"] .crm-edit-checkboxes .crm-check-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid #dbe3ee;
+  border-radius: 7px;
+  background: #f8fbff;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--crm-umi-text);
+  font-weight: 500;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+body[data-page="subject-edit"] .crm-edit-checkboxes .crm-check-row.is-active {
+  border-color: #bfd0e8;
+  background: #eef3fb;
+}
+
+body[data-page="subject-edit"] .crm-edit-checkboxes .crm-check-row:hover {
+  border-color: var(--crm-umi-primary);
+}
+
+/* ── Textarea ────────────────────────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-textarea {
+  width: 100%;
+  min-height: 90px;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9000;
+  background: #1a273a;
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.22);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+body[data-page="subject-edit"] .crm-edit-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  body[data-page="subject-edit"] .crm-edit-header-body {
+    flex-direction: column;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  body[data-page="subject-edit"] .crm-edit-form-card .crm-form-section {
+    padding: 14px;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-header {
+    padding: 12px 14px;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-checkboxes {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-header-actions .uk-button,
+  body[data-page="subject-edit"] .crm-edit-header-actions .crm-button {
+    width: 100%;
+    height: auto;
+    min-height: 36px;
+    justify-content: center;
+  }
+}
