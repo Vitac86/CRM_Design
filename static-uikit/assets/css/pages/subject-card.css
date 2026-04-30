@@ -23,13 +23,13 @@
 .crm-page[data-page="subject-card"] .crm-subject-hero {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: center;
-  padding: 14px 16px;
+  gap: 14px;
+  align-items: start;
+  padding: 12px 14px;
   border: 1px solid var(--crm-umi-border);
   border-radius: 10px;
   background: var(--crm-umi-surface);
-  box-shadow: var(--crm-umi-shadow-sm);
+  box-shadow: none;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-hero-main {
@@ -37,44 +37,59 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  border: 1px solid var(--crm-umi-border);
-  background: var(--crm-primary-soft);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--crm-umi-border) 70%, #fff 30%);
+  background: color-mix(in srgb, var(--crm-primary-soft) 60%, #fff 40%);
   color: var(--crm-umi-primary-hover);
-  font-size: 16px;
+  font-size: 15px;
+  margin-top: 2px;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-identity h1 {
-  margin: 0 0 2px;
-  font-size: 24px;
+  margin: 0 0 3px;
+  font-size: 23px;
   line-height: 1.2;
   color: var(--crm-umi-text);
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-code {
-  margin-bottom: 6px;
-  font-size: 13px;
+  margin-bottom: 5px;
+  font-size: 12px;
   color: var(--crm-umi-text-muted);
 }
 
 .crm-page[data-page="subject-card"] .crm-inline-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--crm-umi-border) 78%, #fff 22%);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
   justify-self: end;
-  align-self: center;
-  gap: 8px;
+  align-self: start;
+  gap: 6px;
   width: auto;
+  margin-top: 1px;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-actions .uk-button,
@@ -83,11 +98,11 @@
   align-items: center;
   justify-content: center;
   width: auto;
-  min-height: 32px;
-  height: 32px;
-  padding: 0 12px;
+  min-height: 30px;
+  height: 30px;
+  padding: 0 11px;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 7px;
   font-size: 12px;
   line-height: 1;
   white-space: nowrap;
@@ -96,7 +111,7 @@
 .crm-page[data-page="subject-card"] .crm-subject-tabs-wrap {
   border: 1px solid var(--crm-umi-border);
   border-radius: 10px;
-  background: var(--crm-umi-surface);
+  background: #fff;
   box-shadow: none;
   overflow-x: auto;
 }
@@ -105,8 +120,8 @@
   display: flex;
   min-width: max-content;
   margin: 0;
-  padding: 4px 6px;
-  gap: 2px;
+  padding: 5px 8px;
+  gap: 4px;
   border: 0;
 }
 
@@ -118,12 +133,14 @@
 .crm-page[data-page="subject-card"] .crm-subject-tabs > * { padding-left: 0; }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs > li > a {
-  min-height: 34px;
-  padding: 7px 12px;
+  min-height: 32px;
+  padding: 6px 11px;
   border-radius: 7px;
   border: 1px solid transparent;
   font-size: 13px;
+  font-weight: 500;
   color: var(--crm-umi-text-secondary);
+  background: transparent;
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs > .uk-active > a {
@@ -1502,4 +1519,3 @@
   font-weight: 600;
   line-height: 1.2;
 }
-
