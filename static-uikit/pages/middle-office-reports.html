@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Мидл-офис — Журнал отправленных отчётов</title>
+  <title>Журнал отправленных отчётов — Мидл-офис</title>
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
 <body data-page="middle-office-reports">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -34,13 +35,13 @@
         <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><span uk-icon="check"></span>Комплаенс</span></a>
 
         <div class="crm-nav-group" data-group="middle-office">
-          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="true">
             <span><span uk-icon="album"></span>Мидл-офис</span>
             <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
           </button>
           <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
             <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><span uk-icon="file-text"></span>Журнал клиентов</span></a>
-            <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><span uk-icon="file-text"></span>Журнал отправленных отчётов</span></a>
+            <a class="crm-nav-link crm-nav-item is-active" href="middle-office-reports.html" aria-current="page"><span><span uk-icon="file-text"></span>Журнал отправленных отчётов</span></a>
           </div>
         </div>
 
@@ -57,32 +58,283 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page crm-registry-page" data-page="middle-office-reports">
-        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 data-entity="page-title">Мидл-офис — Журнал отправленных отчётов</h1><p>Контроль всех отправок с быстрыми действиями по скачиванию и повторной отправке.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-mo-reports">Экспорт</button></div></div>
-        <form action="#" method="post" data-form="mo-reports-filters" data-action="filter-mo-reports" class="crm-registry-filters crm-filter-panel" data-filter="middle-office-reports">
-          <div class="crm-filter-search-row"><input id="mo-report-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="q" placeholder="Файл, клиент, договор"/></div>
 
-            <div class="crm-filter-fields-row">
-          <div class="crm-filter-control"><label class="uk-form-label" for="mo-period">Период</label><input id="mo-period" class="uk-input crm-input" type="month" name="period" value="2026-04"/></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="delivery-channel"><summary class="crm-filter-trigger" aria-label="Фильтр: Канал"><span class="crm-filter-trigger-label">Канал:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Канал">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>ЭДО</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="email"><span>Email</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="sftp"><span>SFTP</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="delivery-channel" value="all" data-filter="delivery-channel"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
+      <section class="crm-page crm-mo-page" data-page="middle-office-reports">
+        <div class="crm-mo-shell">
+
+          <!-- Page header -->
+          <div class="crm-page-header crm-page-header-row">
+            <div>
+              <h1 class="crm-page-title">Мидл-офис</h1>
+              <p class="crm-page-subtitle">Журнал отправленных отчётов</p>
+            </div>
+            <div class="crm-header-actions">
+              <button type="button" class="uk-button uk-button-default crm-button crm-button-secondary" data-action="export-mo-reports">Экспорт</button>
+            </div>
           </div>
-</form>
-        <div class="crm-card crm-table-card crm-registry-table" data-entity="mo-reports-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><colgroup><col class="crm-col-medium"/><col class="crm-col-name"/><col class="crm-col-compact"/><col class="crm-col-status"/><col class="crm-col-date"/><col class="crm-col-actions"/></colgroup><thead><tr><th>Отчёт</th><th>Клиент</th><th>Канал</th><th>Статус</th><th>Отправка</th><th>Действия</th></tr></thead><tbody>
-          <tr data-entity="report" data-id="mo-report-001"><td><div class="crm-row-main">mo_report_24042026_001.xml</div><div class="crm-row-sub">Отчёт по операциям</div></td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · BR-8821</div></td><td><span class="crm-badge muted" data-status="delivery-edo">ЭДО</span></td><td><span class="crm-badge success" data-status="delivered">Доставлен</span></td><td>24.04.2026 10:21</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="download-report">Скачать</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-report">Повторить</button></div></td></tr>
-          <tr data-entity="report" data-id="mo-report-003"><td><div class="crm-row-main">mo_kyc_status_23042026_006.xml</div><div class="crm-row-sub">KYC-статусы</div></td><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · DU-1144</div></td><td><span class="crm-badge muted" data-status="delivery-sftp">SFTP</span></td><td><span class="crm-badge danger" data-status="delivery-error">Ошибка</span></td><td>23.04.2026 18:40</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="download-report">Скачать</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-report">Повторить</button></div></td></tr>
-        </tbody></table></div></div><div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Отчётов нет</div><div class="crm-empty-state-text">Измените период или канал отправки.</div></div></div>
+
+          <!-- Split layout -->
+          <div class="crm-mo-split">
+
+            <!-- Left: toolbar + list -->
+            <div class="crm-mo-split-left">
+
+              <!-- Toolbar -->
+              <div class="crm-card crm-mo-toolbar">
+                <div class="crm-mo-toolbar-search">
+                  <label class="crm-mo-toolbar-search-shell" for="mo-reports-search">
+                    <span class="crm-mo-toolbar-search-icon" aria-hidden="true">
+                      <svg viewBox="0 0 16 16" fill="none" width="15" height="15">
+                        <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <input id="mo-reports-search" class="uk-input" type="search" data-filter="report-search" placeholder="Поиск по клиенту или отчёту..." autocomplete="off"/>
+                  </label>
+                </div>
+                <div class="crm-mo-toolbar-filters">
+                  <select class="crm-mo-select" data-filter="report-status" aria-label="Статус">
+                    <option value="all">Статус</option>
+                    <option value="Доставлен">Доставлен</option>
+                    <option value="Ошибка">Ошибка</option>
+                  </select>
+                  <select class="crm-mo-select" data-filter="report-channel" aria-label="Канал">
+                    <option value="all">Канал</option>
+                    <option value="E-mail">E-mail</option>
+                    <option value="Личный кабинет">Личный кабинет</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Report list -->
+              <div class="crm-mo-report-list-wrap" data-entity="mo-report-list">
+
+                <!-- Report 1 -->
+                <button type="button" class="crm-mo-report-item"
+                  data-client="ООО «Альфа Инвест»"
+                  data-client-code="КЛ-001"
+                  data-report-title="Квартальный отчёт по брокерскому счёту"
+                  data-report-type="Брокерский"
+                  data-period="Q1 2026"
+                  data-channel="E-mail"
+                  data-status="Доставлен"
+                  data-sent-at="14.04.2026 10:48"
+                  data-address="alpha@alphainvest.ru"
+                  data-contract="БД-2021-001"
+                  data-created-by="Сидорова А.В."
+                  data-file-name="report_alpha_invest_2026_q1.pdf"
+                  data-file-size="184 КБ"
+                >
+                  <div class="crm-mo-report-item-head">
+                    <span class="crm-mo-report-item-name">ООО «Альфа Инвест»</span>
+                    <span class="crm-mo-report-item-date">14.04.2026</span>
+                  </div>
+                  <div class="crm-mo-report-item-title">Квартальный отчёт по брокерскому счёту</div>
+                  <div class="crm-mo-report-item-meta">
+                    <span class="crm-badge muted">E-mail</span>
+                    <span class="crm-badge muted">Брокерский</span>
+                    <span class="crm-badge success">Доставлен</span>
+                  </div>
+                </button>
+
+                <!-- Report 2 (active) -->
+                <button type="button" class="crm-mo-report-item is-active"
+                  data-client="АО «Север Капитал»"
+                  data-client-code="КЛ-003"
+                  data-report-title="Отчёт об операциях с ЦБ за март 2026"
+                  data-report-type="Брокерский"
+                  data-period="Март 2026"
+                  data-channel="E-mail"
+                  data-status="Доставлен"
+                  data-sent-at="15.04.2026 09:12"
+                  data-address="capital@severcap.ru"
+                  data-contract="ДУ-2022-012"
+                  data-created-by="Иванов И.И."
+                  data-file-name="report_sever_capital_2026_03.pdf"
+                  data-file-size="248 КБ"
+                >
+                  <div class="crm-mo-report-item-head">
+                    <span class="crm-mo-report-item-name">АО «Север Капитал»</span>
+                    <span class="crm-mo-report-item-date">15.04.2026</span>
+                  </div>
+                  <div class="crm-mo-report-item-title">Отчёт об операциях с ЦБ за март 2026</div>
+                  <div class="crm-mo-report-item-meta">
+                    <span class="crm-badge muted">E-mail</span>
+                    <span class="crm-badge muted">Брокерский</span>
+                    <span class="crm-badge success">Доставлен</span>
+                  </div>
+                </button>
+
+                <!-- Report 3 -->
+                <button type="button" class="crm-mo-report-item"
+                  data-client="Смирнов А.И."
+                  data-client-code="КЛ-002"
+                  data-report-title="Налоговый отчёт 2025"
+                  data-report-type="Налоговый"
+                  data-period="2025"
+                  data-channel="Личный кабинет"
+                  data-status="Ошибка"
+                  data-sent-at="10.04.2026 16:33"
+                  data-address="smirnov_ai@mail.ru"
+                  data-contract="БД-2021-045"
+                  data-created-by="Петрова Е.С."
+                  data-file-name="tax_report_smirnov_2025.pdf"
+                  data-file-size="96 КБ"
+                >
+                  <div class="crm-mo-report-item-head">
+                    <span class="crm-mo-report-item-name">Смирнов А.И.</span>
+                    <span class="crm-mo-report-item-date">10.04.2026</span>
+                  </div>
+                  <div class="crm-mo-report-item-title">Налоговый отчёт 2025</div>
+                  <div class="crm-mo-report-item-meta">
+                    <span class="crm-badge muted">Личный кабинет</span>
+                    <span class="crm-badge muted">Налоговый</span>
+                    <span class="crm-badge danger">Ошибка</span>
+                  </div>
+                </button>
+
+                <!-- Report 4 -->
+                <button type="button" class="crm-mo-report-item"
+                  data-client="Петров К.С."
+                  data-client-code="КЛ-004"
+                  data-report-title="Брокерский отчёт за Q1 2026"
+                  data-report-type="Брокерский"
+                  data-period="Q1 2026"
+                  data-channel="E-mail"
+                  data-status="Доставлен"
+                  data-sent-at="09.04.2026 14:05"
+                  data-address="petrov_ks@bk.ru"
+                  data-contract="ДП-2020-088"
+                  data-created-by="Иванов И.И."
+                  data-file-name="report_petrov_2026_q1.pdf"
+                  data-file-size="132 КБ"
+                >
+                  <div class="crm-mo-report-item-head">
+                    <span class="crm-mo-report-item-name">Петров К.С.</span>
+                    <span class="crm-mo-report-item-date">09.04.2026</span>
+                  </div>
+                  <div class="crm-mo-report-item-title">Брокерский отчёт за Q1 2026</div>
+                  <div class="crm-mo-report-item-meta">
+                    <span class="crm-badge muted">E-mail</span>
+                    <span class="crm-badge muted">Брокерский</span>
+                    <span class="crm-badge success">Доставлен</span>
+                  </div>
+                </button>
+
+                <!-- Report 5 -->
+                <button type="button" class="crm-mo-report-item"
+                  data-client="ООО «Регион Брокер»"
+                  data-client-code="КЛ-007"
+                  data-report-title="Сводный отчёт ДУ за март 2026"
+                  data-report-type="ДУ"
+                  data-period="Март 2026"
+                  data-channel="Личный кабинет"
+                  data-status="Доставлен"
+                  data-sent-at="07.04.2026 11:20"
+                  data-address="broker@region-broker.ru"
+                  data-contract="ДУ-2021-033"
+                  data-created-by="Сидорова А.В."
+                  data-file-name="du_report_region_broker_2026_03.pdf"
+                  data-file-size="312 КБ"
+                >
+                  <div class="crm-mo-report-item-head">
+                    <span class="crm-mo-report-item-name">ООО «Регион Брокер»</span>
+                    <span class="crm-mo-report-item-date">07.04.2026</span>
+                  </div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт ДУ за март 2026</div>
+                  <div class="crm-mo-report-item-meta">
+                    <span class="crm-badge muted">Личный кабинет</span>
+                    <span class="crm-badge muted">ДУ</span>
+                    <span class="crm-badge success">Доставлен</span>
+                  </div>
+                </button>
+
+                <!-- List empty state (hidden by default) -->
+                <div class="crm-mo-report-list-empty" data-entity="mo-report-list-empty" hidden>
+                  <p class="crm-mo-report-list-empty-title">Отчёты не найдены</p>
+                  <p class="crm-mo-report-list-empty-text">Измените параметры поиска или фильтры.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: detail panel (pre-populated with report 2 — АО «Север Капитал») -->
+            <div class="crm-mo-details-card">
+              <h2 class="crm-mo-details-title" data-detail="title">Отчёт об операциях с ЦБ за март 2026</h2>
+
+              <div class="crm-mo-details-grid">
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Клиент</p>
+                  <p class="crm-mo-detail-field-value" data-detail="client">АО «Север Капитал»</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Код клиента</p>
+                  <p class="crm-mo-detail-field-value" data-detail="client-code">КЛ-003</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Тип отчёта</p>
+                  <p class="crm-mo-detail-field-value" data-detail="report-type">Брокерский</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Период</p>
+                  <p class="crm-mo-detail-field-value" data-detail="period">Март 2026</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Способ отправки</p>
+                  <p class="crm-mo-detail-field-value" data-detail="channel">E-mail</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Статус</p>
+                  <p class="crm-mo-detail-field-value crm-mo-status-ok" data-detail="status">Доставлен</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Время отправки</p>
+                  <p class="crm-mo-detail-field-value" data-detail="sent-at">15.04.2026 09:12</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Адрес</p>
+                  <p class="crm-mo-detail-field-value" data-detail="address">capital@severcap.ru</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Договор</p>
+                  <p class="crm-mo-detail-field-value" data-detail="contract">ДУ-2022-012</p>
+                </div>
+                <div class="crm-mo-detail-field">
+                  <p class="crm-mo-detail-field-label">Сформировал</p>
+                  <p class="crm-mo-detail-field-value" data-detail="created-by">Иванов И.И.</p>
+                </div>
+              </div>
+
+              <div class="crm-mo-file-card">
+                <div class="crm-mo-file-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="crm-mo-file-name" data-detail="file-name">report_sever_capital_2026_03.pdf</p>
+                  <p class="crm-mo-file-size" data-detail="file-size">248 КБ</p>
+                </div>
+              </div>
+
+              <div class="crm-mo-details-actions">
+                <button type="button" class="uk-button uk-button-default crm-button" data-action="resend-report">Отправить повторно</button>
+                <button type="button" class="uk-button crm-button-primary crm-button" data-action="download-report">Скачать</button>
+              </div>
+            </div>
+
+          </div><!-- /.crm-mo-split -->
+        </div><!-- /.crm-mo-shell -->
       </section>
     </main>
   </div>
 </div>
+
+<div class="crm-mo-toast" data-entity="mo-toast" role="status" aria-live="polite"></div>
+
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/middle-office.js"></script>
 </body>
 </html>

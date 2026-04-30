@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Мидл-офис — Журнал клиентов</title>
+  <title>Журнал клиентов — Мидл-офис</title>
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
 <body data-page="middle-office-clients">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -34,12 +35,12 @@
         <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><span uk-icon="check"></span>Комплаенс</span></a>
 
         <div class="crm-nav-group" data-group="middle-office">
-          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="true">
             <span><span uk-icon="album"></span>Мидл-офис</span>
             <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
           </button>
           <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
-            <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><span uk-icon="file-text"></span>Журнал клиентов</span></a>
+            <a class="crm-nav-link crm-nav-item is-active" href="middle-office-clients.html" aria-current="page"><span><span uk-icon="file-text"></span>Журнал клиентов</span></a>
             <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><span uk-icon="file-text"></span>Журнал отправленных отчётов</span></a>
           </div>
         </div>
@@ -57,35 +58,227 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page crm-registry-page" data-page="middle-office-clients">
-        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 data-entity="page-title">Мидл-офис — Журнал клиентов</h1><p>Единый журнал клиентов для операционного сопровождения, контроля договоров и прав.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-mo-clients">Экспорт</button></div></div>
-        <form action="#" method="post" data-form="mo-clients-filters" data-action="filter-mo-clients" class="crm-registry-filters crm-filter-panel" data-filter="middle-office-clients">
-          <div class="crm-filter-search-row"><input id="client-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="client-search" placeholder="Клиент, код, ИНН"/></div>
 
-            <div class="crm-filter-fields-row">
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="client-type"><summary class="crm-filter-trigger" aria-label="Фильтр: Тип клиента"><span class="crm-filter-trigger-label">Тип клиента:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Тип клиента">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>ФЛ</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>ЮЛ</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="client-type" value="all" data-filter="client-type"/></details></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="contract-type"><summary class="crm-filter-trigger" aria-label="Фильтр: Вид договора"><span class="crm-filter-trigger-label">Вид договора:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Вид договора">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Брокерский</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>ДУ</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="contract-type" value="all" data-filter="contract-type"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="button">Сбросить фильтры</button></div>
+      <section class="crm-page crm-mo-page" data-page="middle-office-clients">
+        <div class="crm-mo-shell">
+
+          <!-- Page header -->
+          <div class="crm-page-header crm-page-header-row">
+            <div>
+              <h1 class="crm-page-title">Мидл-офис</h1>
+              <p class="crm-page-subtitle">Журнал клиентов</p>
+            </div>
+            <div class="crm-header-actions">
+              <button type="button" class="uk-button uk-button-default crm-button crm-button-secondary" data-action="export-mo-clients">Экспорт</button>
+            </div>
           </div>
-</form>
-        <div class="crm-card crm-table-card crm-registry-table" data-entity="mo-client-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Клиент</th><th>Договор</th><th>ИНН</th><th>Резидентство</th><th>Права ДС / ЦБ</th></tr></thead><tbody>
-          <tr data-entity="subject" data-id="c-011" data-href="subject-card.html"><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · ЮЛ</div></td><td><div class="crm-row-main">BR-8821</div><div class="crm-row-sub">Брокерский · 11.01.2026</div></td><td>7704132901</td><td><span class="crm-badge success" data-status="resident">Резидент РФ</span></td><td><span class="crm-inline-badges"><span class="crm-badge muted" data-status="cash-account-yes">ДС: Да</span><span class="crm-badge muted" data-status="securities-account-no">ЦБ: Нет</span></span></td></tr>
-          <tr data-entity="subject" data-id="c-012" data-href="subject-card.html"><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · ЮЛ</div></td><td><div class="crm-row-main">DU-1144</div><div class="crm-row-sub">ДУ · 18.02.2026</div></td><td>7705964812</td><td><span class="crm-badge warning" data-status="non-resident">Нерезидент</span></td><td><span class="crm-inline-badges"><span class="crm-badge muted" data-status="cash-account-yes">ДС: Да</span><span class="crm-badge muted" data-status="securities-account-yes">ЦБ: Да</span></span></td></tr>
-        </tbody></table></div></div><div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Журнал пуст</div><div class="crm-empty-state-text">Измените фильтры или добавьте клиента.</div></div></div>
+
+          <!-- Toolbar -->
+          <div class="crm-card crm-mo-toolbar">
+            <div class="crm-mo-toolbar-search">
+              <label class="crm-mo-toolbar-search-shell" for="mo-clients-search">
+                <span class="crm-mo-toolbar-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" width="15" height="15">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <input id="mo-clients-search" class="uk-input" type="search" data-filter="search" placeholder="Поиск по коду, клиенту, ИНН или договору..." autocomplete="off"/>
+              </label>
+            </div>
+            <div class="crm-mo-toolbar-filters">
+              <select class="crm-mo-select" data-filter="client-type" aria-label="Тип клиента">
+                <option value="all">Тип клиента</option>
+                <option value="Физ. лицо">Физ. лицо</option>
+                <option value="Юр. лицо">Юр. лицо</option>
+                <option value="ИП">ИП</option>
+              </select>
+              <select class="crm-mo-select" data-filter="contract-kind" aria-label="Вид договора">
+                <option value="all">Вид договора</option>
+                <option value="БО">БО</option>
+                <option value="Депозитарный">Депозитарный</option>
+                <option value="ДУ">ДУ</option>
+                <option value="ИИС">ИИС</option>
+                <option value="Дилерский">Дилерский</option>
+              </select>
+              <select class="crm-mo-select" data-filter="account-status" aria-label="Статус счёта">
+                <option value="all">Статус счёта</option>
+                <option value="Открыт">Открыт</option>
+                <option value="Закрыт">Закрыт</option>
+              </select>
+              <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-mo-clients-filters">Сбросить фильтры</button>
+            </div>
+          </div>
+
+          <!-- Table card -->
+          <div class="crm-card crm-table-card" data-entity="mo-clients-table">
+            <div class="crm-table-wrapper">
+              <div class="crm-table">
+                <table class="uk-table uk-table-divider uk-table-hover">
+                  <colgroup>
+                    <col style="width:100px"/>
+                    <col style="width:120px"/>
+                    <col style="width:220px"/>
+                    <col style="width:130px"/>
+                    <col style="width:110px"/>
+                    <col style="width:140px"/>
+                    <col style="width:120px"/>
+                    <col style="width:150px"/>
+                    <col style="width:100px"/>
+                    <col style="width:110px"/>
+                    <col style="width:160px"/>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>Код клиента</th>
+                      <th>Вид договора</th>
+                      <th>Наименование клиента</th>
+                      <th>ИНН</th>
+                      <th>Тип клиента</th>
+                      <th>Номер договора</th>
+                      <th>Дата договора</th>
+                      <th>Статус резидентства</th>
+                      <th>Тип счёта</th>
+                      <th>Статус счёта</th>
+                      <th>Права ДС / ЦБ</th>
+                    </tr>
+                  </thead>
+                  <tbody data-role="mo-clients-tbody">
+                    <tr
+                      data-href="subject-card.html"
+                      data-search-text="КЛ-001 ООО «Альфа Инвест» 7701234567 БД-2021-001"
+                      data-client-type="Юр. лицо"
+                      data-contract-kind="БО"
+                      data-account-status="Открыт"
+                    >
+                      <td>КЛ-001</td>
+                      <td>БО</td>
+                      <td>ООО «Альфа Инвест»</td>
+                      <td>7701234567</td>
+                      <td><span class="crm-badge muted">Юр. лицо</span></td>
+                      <td>БД-2021-001</td>
+                      <td>15.01.2021</td>
+                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>обычный</td>
+                      <td><span class="crm-badge success">Открыт</span></td>
+                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                    </tr>
+                    <tr
+                      data-href="subject-card.html"
+                      data-search-text="КЛ-002 Смирнов Алексей Иванович 501234567890 БД-2021-045"
+                      data-client-type="Физ. лицо"
+                      data-contract-kind="ИИС"
+                      data-account-status="Открыт"
+                    >
+                      <td>КЛ-002</td>
+                      <td>ИИС</td>
+                      <td>Смирнов Алексей Иванович</td>
+                      <td>501234567890</td>
+                      <td><span class="crm-badge info">Физ. лицо</span></td>
+                      <td>БД-2021-045</td>
+                      <td>20.02.2021</td>
+                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>ИИС</td>
+                      <td><span class="crm-badge success">Открыт</span></td>
+                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                    </tr>
+                    <tr
+                      data-href="subject-card.html"
+                      data-search-text="КЛ-003 АО «Север Капитал» 7712345678 ДУ-2022-012"
+                      data-client-type="Юр. лицо"
+                      data-contract-kind="ДУ"
+                      data-account-status="Открыт"
+                    >
+                      <td>КЛ-003</td>
+                      <td>ДУ</td>
+                      <td>АО «Север Капитал»</td>
+                      <td>7712345678</td>
+                      <td><span class="crm-badge muted">Юр. лицо</span></td>
+                      <td>ДУ-2022-012</td>
+                      <td>10.05.2022</td>
+                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>обычный</td>
+                      <td><span class="crm-badge success">Открыт</span></td>
+                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge muted">ЦБ: Нет</span></div></td>
+                    </tr>
+                    <tr
+                      data-href="subject-card.html"
+                      data-search-text="КЛ-004 Петров Кирилл Сергеевич 502345678901 ДП-2020-088"
+                      data-client-type="Физ. лицо"
+                      data-contract-kind="Депозитарный"
+                      data-account-status="Закрыт"
+                    >
+                      <td>КЛ-004</td>
+                      <td>Депозитарный</td>
+                      <td>Петров Кирилл Сергеевич</td>
+                      <td>502345678901</td>
+                      <td><span class="crm-badge info">Физ. лицо</span></td>
+                      <td>ДП-2020-088</td>
+                      <td>05.11.2020</td>
+                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>обычный</td>
+                      <td><span class="crm-badge muted">Закрыт</span></td>
+                      <td><div class="crm-mo-permissions"><span class="crm-badge muted">ДС: Нет</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                    </tr>
+                    <tr
+                      data-href="subject-card.html"
+                      data-search-text="КЛ-005 ИП Захарова М.А. 770112345678 БД-2023-007"
+                      data-client-type="ИП"
+                      data-contract-kind="БО"
+                      data-account-status="Открыт"
+                    >
+                      <td>КЛ-005</td>
+                      <td>БО</td>
+                      <td>ИП Захарова М.А.</td>
+                      <td>770112345678</td>
+                      <td><span class="crm-badge warning">ИП</span></td>
+                      <td>БД-2023-007</td>
+                      <td>18.03.2023</td>
+                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>обычный</td>
+                      <td><span class="crm-badge success">Открыт</span></td>
+                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                    </tr>
+                    <tr
+                      data-href="subject-card.html"
+                      data-search-text="КЛ-006 Новикова Елена Павловна 503456789012 ДЛ-2019-021"
+                      data-client-type="Физ. лицо"
+                      data-contract-kind="Дилерский"
+                      data-account-status="Закрыт"
+                    >
+                      <td>КЛ-006</td>
+                      <td>Дилерский</td>
+                      <td>Новикова Елена Павловна</td>
+                      <td>503456789012</td>
+                      <td><span class="crm-badge info">Физ. лицо</span></td>
+                      <td>ДЛ-2019-021</td>
+                      <td>12.09.2019</td>
+                      <td><span class="crm-badge muted">Нерезидент</span></td>
+                      <td>обычный</td>
+                      <td><span class="crm-badge muted">Закрыт</span></td>
+                      <td><div class="crm-mo-permissions"><span class="crm-badge muted">ДС: Нет</span><span class="crm-badge muted">ЦБ: Нет</span></div></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="crm-empty-state" data-entity="mo-clients-empty" hidden>
+              <p class="crm-empty-state-title">Записи не найдены</p>
+              <p class="crm-empty-state-text">По заданным фильтрам клиенты не найдены. Измените параметры поиска или сбросьте фильтры.</p>
+            </div>
+          </div>
+
+        </div>
       </section>
     </main>
   </div>
 </div>
+
+<div class="crm-mo-toast" data-entity="mo-toast" role="status" aria-live="polite"></div>
+
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/middle-office.js"></script>
 </body>
 </html>
