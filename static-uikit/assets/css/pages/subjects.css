@@ -401,7 +401,8 @@ body[data-page="subjects"] .crm-subjects-footer-nav-button:disabled {
 .crm-page[data-page="subjects"] .crm-subjects-table-actions {
   display: flex;
   justify-content: flex-end;
-  margin: 6px 0 10px;
+  margin: 2px 0 6px;
+  min-height: 0;
 }
 
 .crm-page[data-page="subjects"] .crm-button-export-light {
