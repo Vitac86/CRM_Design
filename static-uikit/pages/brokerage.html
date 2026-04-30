@@ -23,7 +23,7 @@
           <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
             <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><span uk-icon="grid"></span>Дашборд</span></a>
             <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><span uk-icon="users"></span>Субъекты</span></a>
-            <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
+            <a class="crm-nav-link crm-nav-item" href="brokerage.html" data-match="contract-edit.html"><span><span uk-icon="briefcase"></span>Брок. деятельность</span></a>
             <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
             <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
             <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="database"></span>Архив</span></a>
@@ -58,42 +58,91 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page crm-registry-page" data-page="brokerage">
-        <div class="crm-page-header crm-page-header-row crm-registry-header">
+        <div class="crm-page-header crm-registry-header">
           <div class="crm-registry-title-block">
             <h1 class="crm-page-title" data-entity="page-title">Брокерская деятельность</h1>
             <p class="crm-page-subtitle">Реестр брокерских договоров с контролем статуса обслуживания и ответственного менеджера.</p>
           </div>
-          <div class="crm-page-actions crm-registry-actions">
-            <button class="uk-button uk-button-default crm-button crm-filter-reset" type="button" data-action="reset-brokerage-filters">Очистить фильтры</button>
-            <button class="uk-button uk-button-default crm-button" type="button" data-action="export-brokerage">Экспорт</button>
-          </div>
         </div>
         <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-registry-filters crm-filter-panel" data-filter="brokerage">
-          <div class="crm-filter-search-row crm-filter-search"><input id="brokerage-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="brokerage-search" placeholder="Договор, клиент, менеджер"/></div>
+          <div class="crm-filter-search-row crm-filter-search">
+            <input id="brokerage-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="brokerage-search" placeholder="Поиск по договору, коду клиента, клиенту или менеджеру"/>
+          </div>
           <div class="crm-filter-fields-row crm-filter-grid">
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="brokerage-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>На паузе</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="brokerage-status" value="all" data-filter="brokerage-status"/></details></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="brokerage-manager"><summary class="crm-filter-trigger" aria-label="Фильтр: Менеджер"><span class="crm-filter-trigger-label">Менеджер:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Менеджер">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Иванов И.И.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Петрова Н.А.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="brokerage-manager" value="all" data-filter="brokerage-manager"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="brokerage-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
+                  <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="active"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="paused"><span>Приостановлен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="closed"><span>Закрыт</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                </div><input type="hidden" name="brokerage-status" value="all" data-filter="brokerage-status"/></details></div>
+            <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="brokerage-manager"><summary class="crm-filter-trigger" aria-label="Фильтр: Менеджер"><span class="crm-filter-trigger-label">Менеджер:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Менеджер">
+                  <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="ivanov"><span>Иванов И.И.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="petrova"><span>Петрова Н.А.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                </div><input type="hidden" name="brokerage-manager" value="all" data-filter="brokerage-manager"/></details></div>
+            <div class="crm-filter-actions crm-brokerage-filter-actions">
+              <button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить</button>
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="export-brokerage">Экспорт</button>
+            </div>
           </div>
         </form>
         <div class="crm-card crm-table-card crm-registry-table" data-entity="brokerage-table">
           <div class="crm-table-wrapper">
             <div class="crm-table crm-registry-table-compact">
-          <table class="uk-table uk-table-divider uk-table-hover">
-            <thead><tr><th>Договор</th><th>Клиент</th><th>Менеджер</th><th>Дата открытия</th><th>Статус</th></tr></thead>
-            <tbody>
-              <tr data-entity="brokerage-contract" data-id="BR-8821" data-href="subject-card.html"><td><div class="crm-row-main">BR-8821</div><div class="crm-row-sub">CL-4401 · Брокерский договор</div></td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">ИНН 7704132901</div></td><td>Иванов И.И.</td><td>11.01.2026</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
-              <tr data-entity="brokerage-contract" data-id="BR-8890" data-href="subject-card.html"><td><div class="crm-row-main">BR-8890</div><div class="crm-row-sub">CL-4408 · Брокерский договор</div></td><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">ИНН 7705964812</div></td><td>Петрова Н.А.</td><td>18.02.2026</td><td><span class="crm-badge warning" data-status="paused">На паузе</span></td></tr>
-            </tbody>
-          </table>
+              <table class="uk-table uk-table-divider uk-table-hover">
+                <thead>
+                  <tr>
+                    <th>Договор</th>
+                    <th>Код клиента</th>
+                    <th>Клиент</th>
+                    <th>Менеджер</th>
+                    <th>Дата открытия</th>
+                    <th>Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-entity="brokerage-contract" data-id="BR-2026/00444" data-status="active" data-manager="ivanov">
+                    <td class="crm-brok-contract-cell"><a href="contract-edit.html" class="crm-link">BR-2026/00444</a></td>
+                    <td class="crm-brok-code-cell">INV-1011</td>
+                    <td><a href="subject-card.html" class="crm-link">АО «Восток Майнинг Системс»</a></td>
+                    <td class="crm-brok-nowrap">Иванов И.И.</td>
+                    <td class="crm-brok-nowrap">22.01.2021</td>
+                    <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                  </tr>
+                  <tr data-entity="brokerage-contract" data-id="BR-2026/00457" data-status="active" data-manager="ivanov">
+                    <td class="crm-brok-contract-cell"><a href="contract-edit.html" class="crm-link">BR-2026/00457</a></td>
+                    <td class="crm-brok-code-cell">INV-1020</td>
+                    <td><a href="subject-card.html" class="crm-link">ПАО «Ритм Индустрия»</a></td>
+                    <td class="crm-brok-nowrap">Иванов И.И.</td>
+                    <td class="crm-brok-nowrap">10.01.2026</td>
+                    <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                  </tr>
+                  <tr data-entity="brokerage-contract" data-id="BR-2025/00003" data-status="paused" data-manager="petrova">
+                    <td class="crm-brok-contract-cell"><a href="contract-edit.html" class="crm-link">BR-2025/00003</a></td>
+                    <td class="crm-brok-code-cell">INV-1001</td>
+                    <td><a href="subject-card.html" class="crm-link">ООО «Северный Вектор Капитал»</a></td>
+                    <td class="crm-brok-nowrap">Петрова Н.А.</td>
+                    <td class="crm-brok-nowrap">15.01.2025</td>
+                    <td><span class="crm-badge warning" data-status="paused">Приостановлен</span></td>
+                  </tr>
+                  <tr data-entity="brokerage-contract" data-id="BR-2026/00440" data-status="active" data-manager="ivanov">
+                    <td class="crm-brok-contract-cell"><a href="contract-edit.html" class="crm-link">BR-2026/00440</a></td>
+                    <td class="crm-brok-code-cell">INV-1002</td>
+                    <td><a href="subject-card.html" class="crm-link">ИП Мельникова Ирина Павловна</a></td>
+                    <td class="crm-brok-nowrap">Иванов И.И.</td>
+                    <td class="crm-brok-nowrap">03.02.2026</td>
+                    <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                  </tr>
+                  <tr data-entity="brokerage-contract" data-id="BR-2025/01988" data-status="closed" data-manager="petrova">
+                    <td class="crm-brok-contract-cell"><a href="contract-edit.html" class="crm-link">BR-2025/01988</a></td>
+                    <td class="crm-brok-code-cell">INV-1003</td>
+                    <td><a href="subject-card.html" class="crm-link">ПАО «НеоЭнергоСбыт»</a></td>
+                    <td class="crm-brok-nowrap">Петрова Н.А.</td>
+                    <td class="crm-brok-nowrap">22.11.2025</td>
+                    <td><span class="crm-badge muted" data-status="closed">Закрыт</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
           <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет договоров</div><div class="crm-empty-state-text">Измените фильтры или проверьте период.</div></div>

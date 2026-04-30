@@ -1,0 +1,51 @@
+/* ============================================================
+   Contract edit page — scoped styles
+   body[data-page="contract-edit"]
+   .crm-page[data-page="contract-edit"]
+   ============================================================ */
+
+/* 4-column client summary (wizard uses 3) */
+body[data-page="contract-edit"] .crm-contract-edit-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1180px) {
+  body[data-page="contract-edit"] .crm-contract-edit-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 960px) {
+  body[data-page="contract-edit"] .crm-contract-edit-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Actions bar */
+body[data-page="contract-edit"] .crm-contract-edit-actions {
+  margin-top: 2px;
+}
+
+/* Toast */
+.crm-contract-edit-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  background: #1e2d45;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.crm-contract-edit-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
