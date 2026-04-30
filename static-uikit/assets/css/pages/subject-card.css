@@ -690,6 +690,14 @@
   line-height: 1.2;
 }
 
+.crm-page[data-page="subject-card"] .crm-subject-label {
+  min-height: 20px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .crm-page[data-page="subject-card"] .crm-bank-accounts-subtitle {
   margin: 0;
   font-size: 13px;
@@ -1495,26 +1503,3 @@
   line-height: 1.2;
 }
 
-.crm-page[data-page="subject-card"] .crm-badge.success {
-  background: #eff9f2;
-  border-color: #c9e8d2;
-  color: #2f7a43;
-}
-
-.crm-page[data-page="subject-card"] .crm-badge.info {
-  background: #eef4fd;
-  border-color: #ccddf6;
-  color: #2d5f98;
-}
-
-.crm-page[data-page="subject-card"] .crm-badge.warning {
-  background: #fff7ea;
-  border-color: #f2debc;
-  color: #8a6431;
-}
-
-.crm-page[data-page="subject-card"] .crm-badge.muted {
-  background: #f3f5f8;
-  border-color: #dde3eb;
-  color: #5a6677;
-}
