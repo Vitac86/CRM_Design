@@ -18,12 +18,12 @@
 }
 
 .crm-sidebar-brand {
-  min-height: var(--crm-topbar-h);
-  padding: 12px 16px;
+  height: var(--crm-topbar-h);
+  padding: 0 18px;
 }
 
 .crm-sidebar nav {
-  gap: 6px;
+  gap: 4px;
   padding: 12px 10px 18px;
 }
 
@@ -40,7 +40,8 @@
 .crm-nav-link {
   min-height: 38px;
   padding: 8px 11px;
-  border-radius: 10px;
+  border-radius: 8px;
+  line-height: 1.4;
 }
 
 .crm-nav-link > span:first-child {
@@ -48,24 +49,28 @@
 }
 
 .crm-nav-link [uk-icon] {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   color: rgba(231, 239, 255, 0.84);
 }
 
-.crm-nav-link.active {
+.crm-nav-link.active,
+.crm-nav-link.is-active {
   background: rgba(120, 162, 255, 0.24);
+  color: #fff;
   box-shadow: inset 0 0 0 1px rgba(176, 202, 255, 0.26);
 }
 
 .crm-nav-group .crm-nav-submenu {
-  margin: 2px 0 4px 11px;
-  padding-left: 10px;
+  margin: 2px 0 4px 10px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(224, 235, 255, 0.22);
 }
 
 .crm-sidebar .crm-nav-submenu .crm-nav-link {
   min-height: 32px;
   padding: 6px 10px;
+  border-radius: 7px;
   font-size: 13px;
 }
 
@@ -78,7 +83,7 @@
 }
 
 .crm-search {
-  max-width: 640px;
+  max-width: 520px;
 }
 
 .crm-search .uk-input {
@@ -239,8 +244,3 @@
   }
 }
 
-/* Topbar layout */
-.crm-topbar {
-  min-height: 64px;
-  padding: 0 22px;
-}

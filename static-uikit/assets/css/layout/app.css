@@ -35,19 +35,26 @@
 }
 
 .crm-sidebar-brand {
-  min-height: var(--crm-topbar-h);
+  height: var(--crm-topbar-h);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 18px;
+  padding: 0 18px;
   border-bottom: 1px solid rgba(214, 228, 255, 0.2);
   margin: 0;
   border-radius: 0;
+  overflow: hidden;
 }
 
-.crm-sidebar-brand img { width: 182px; max-width: 100%; }
+.crm-sidebar-brand img {
+  max-width: 192px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
-.crm-sidebar nav { display: flex; flex-direction: column; gap: 8px; padding: 12px 10px 16px; }
+.crm-sidebar nav { display: flex; flex-direction: column; gap: 4px; padding: 12px 10px 16px; }
 .crm-nav-section { margin-bottom: 0; }
 
 .crm-nav-heading {
@@ -66,24 +73,36 @@
   justify-content: space-between;
   color: rgba(236, 243, 255, 0.92);
   text-decoration: none;
-  border-radius: 10px;
-  padding: 8px 10px;
-  min-height: 36px;
+  border-radius: 8px;
+  padding: 8px 11px;
+  min-height: 38px;
   font-size: 14px;
   font-weight: 500;
+  line-height: 1.4;
   letter-spacing: 0.01em;
   transition: background-color .14s ease, color .14s ease;
 }
 .crm-nav-item { width: 100%; }
-.crm-sidebar .crm-nav-link > span { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.crm-sidebar .crm-nav-link > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 0;
+}
 .crm-sidebar .crm-nav-link [uk-icon] {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 14px;
+  flex: 0 0 16px;
   color: rgba(232, 240, 255, 0.78);
+}
+.crm-nav-chevron {
+  flex: 0 0 auto;
+  transition: transform 0.18s ease;
+  color: rgba(200, 220, 255, 0.7);
 }
 
 .crm-sidebar .crm-nav-group-toggle {
@@ -105,7 +124,7 @@
 }
 
 .crm-nav-submenu {
-  margin: 2px 0 2px 8px;
+  margin: 2px 0 4px 10px;
   border-left: 1px solid rgba(224, 235, 255, 0.22);
   padding-left: 8px;
 }
@@ -114,9 +133,10 @@
 }
 .crm-sidebar .crm-nav-submenu .crm-nav-link {
   font-size: 13px;
-  min-height: 30px;
-  padding: 6px 9px;
-  color: rgba(224, 234, 255, 0.8);
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  color: rgba(224, 234, 255, 0.82);
 }
 
 .crm-main { min-width: 0; }
