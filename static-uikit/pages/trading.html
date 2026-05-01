@@ -10,7 +10,7 @@
 <body data-page="trading">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -27,7 +27,7 @@
             <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><span uk-icon="credit-card"></span>Дов. управление</span></a>
             <a class="crm-nav-link crm-nav-item" href="agents.html"><span><span uk-icon="user"></span>Агенты</span></a>
             <a class="crm-nav-link crm-nav-item" href="archive.html"><span><span uk-icon="database"></span>Архив</span></a>
-            <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="file-edit"></span>Поручения</span></a>
+            <a class="crm-nav-link crm-nav-item" href="requests.html"><span><span uk-icon="pencil"></span>Поручения</span></a>
           </div>
         </div>
 
@@ -57,29 +57,176 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page crm-registry-page" data-page="trading">
-        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 data-entity="page-title">Трейдинг</h1><p>Реестр торговых профилей клиентов с контролем риска и терминалов.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-trading">Экспорт</button></div></div>
-        <form action="#" method="post" data-form="trading-filters" data-action="filter-trading" class="crm-registry-filters crm-filter-panel" data-filter="trading">
-          <div class="crm-filter-search-row"><input id="trading-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trading-search" placeholder="Клиент, договор, код"/></div>
 
-            <div class="crm-filter-fields-row">
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="trading-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>На проверке</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="trading-status" value="all" data-filter="trading-status"/></details></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="risk"><summary class="crm-filter-trigger" aria-label="Фильтр: Риск"><span class="crm-filter-trigger-label">Риск:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Риск">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Низкий</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Средний</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="risk" value="all" data-filter="risk"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
+      <section class="crm-page crm-registry-page" data-page="trading">
+        <section class="crm-registry-shell crm-trading-shell">
+
+          <div class="crm-page-header crm-page-header-row crm-registry-header crm-trading-header">
+            <div class="crm-registry-title-block">
+              <h1 class="crm-page-title" data-entity="page-title">Трейдинг</h1>
+            </div>
           </div>
-</form>
-        <div class="crm-card crm-table-card crm-registry-table" data-entity="trading-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Профиль</th><th>Статус</th><th>Риск</th><th>Терминалы</th><th>Открыт</th><th>Ответственный</th></tr></thead><tbody>
-          <tr data-entity="trading-profile" data-id="BR-8821" data-href="trading-card.html"><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401 · BR-8821</div></td><td><span class="crm-badge success" data-status="active">Активен</span></td><td><span class="crm-badge success" data-status="risk-low">Низкий</span></td><td>QUIK Desktop, WebQUIK</td><td>11.01.2026</td><td>Иванов И.И.</td></tr>
-          <tr data-entity="trading-profile" data-id="DU-1144" data-href="trading-card.html"><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">CL-4408 · DU-1144</div></td><td><span class="crm-badge warning" data-status="pending-review">На проверке</span></td><td><span class="crm-badge warning" data-status="risk-medium">Средний</span></td><td>QUIK Desktop</td><td>18.02.2026</td><td>Петрова Н.А.</td></tr>
-        </tbody></table></div></div><div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет торговых профилей</div><div class="crm-empty-state-text">Измените фильтры для отображения результатов.</div></div></div>
+
+          <form action="#" method="post" data-form="trading-filters" data-action="filter-trading" class="crm-registry-filters crm-filter-panel" data-filter="trading">
+            <div class="crm-filter-search-row crm-filter-search">
+              <label class="crm-filter-search-shell" for="trading-search">
+                <span class="crm-filter-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <input id="trading-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trading-search" placeholder="Поиск по клиенту, коду, договору или распорядителю"/>
+              </label>
+            </div>
+            <div class="crm-filter-fields-row crm-filter-grid">
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="qualification">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Квалификация">
+                    <span class="crm-filter-trigger-label">Квалификация:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Квалификация">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="yes"><span>Да</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="no"><span>Нет</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="qualification" value="all" data-filter="qualification"/>
+                </details>
+              </div>
+
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="aml-status">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: ПОД / ФТ">
+                    <span class="crm-filter-trigger-label">ПОД / ФТ:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="ПОД / ФТ">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="yes"><span>Да</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="no"><span>Нет</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+                  </div>
+                  <input type="hidden" name="aml-status" value="all" data-filter="aml-status"/>
+                </details>
+              </div>
+
+              <div class="crm-filter-actions">
+                <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters">Сбросить всё</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="crm-trading-table-actions">
+            <button class="uk-button uk-button-default crm-button crm-button-secondary crm-button-export-light" type="button" data-action="export-trading">Экспорт</button>
+          </div>
+
+          <div class="crm-card crm-table-card crm-registry-table crm-trading-registry" data-entity="trading-table">
+            <div class="crm-table-wrapper crm-trading-table">
+              <div class="crm-table">
+                <table class="uk-table uk-table-divider uk-table-hover">
+                  <colgroup>
+                    <col style="min-width:200px"/>
+                    <col style="width:100px"/>
+                    <col style="width:90px"/>
+                    <col style="width:120px"/>
+                    <col style="width:140px"/>
+                    <col style="min-width:160px"/>
+                    <col style="min-width:160px"/>
+                    <col style="width:120px"/>
+                    <col style="width:100px"/>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th><span class="crm-th-label">Клиент</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Код</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Инвестор</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Риск</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Распорядитель</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Способ торговли</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Полномочия до</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                      <th><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr data-entity="trading-profile" data-id="INV-1011" data-href="trading-card.html">
+                      <td><div class="crm-row-main"><a href="trading-card.html" class="crm-link">АО «Восток Майнинг Системс»</a></div></td>
+                      <td>INV-1011</td>
+                      <td><span class="crm-badge success" data-status="qualified">Квал</span></td>
+                      <td><span class="crm-badge success" data-status="risk-standard">Стандартный</span></td>
+                      <td><a href="contract-edit.html" class="crm-link">BR-2026/00444</a></td>
+                      <td>Крылов Денис Олегович</td>
+                      <td>QUIK / WebQUIK</td>
+                      <td>31.12.2026</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                    <tr data-entity="trading-profile" data-id="INV-1001" data-href="trading-card.html">
+                      <td><div class="crm-row-main"><a href="trading-card.html" class="crm-link">ООО «Северный Вектор Капитал»</a></div></td>
+                      <td>INV-1001</td>
+                      <td><span class="crm-badge muted" data-status="unqualified">Неквал</span></td>
+                      <td><span class="crm-badge success" data-status="risk-initial">Начальный</span></td>
+                      <td><a href="contract-edit.html" class="crm-link">BR-2025/00003</a></td>
+                      <td>Соколова Мария Владимировна</td>
+                      <td>QUIK</td>
+                      <td>15.01.2027</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                    <tr data-entity="trading-profile" data-id="INV-1006" data-href="trading-card.html">
+                      <td><div class="crm-row-main"><a href="trading-card.html" class="crm-link">Ковалёв Даниил Олегович</a></div></td>
+                      <td>INV-1006</td>
+                      <td><span class="crm-badge muted" data-status="unqualified">Неквал</span></td>
+                      <td><span class="crm-badge warning" data-status="risk-elevated">Повышенный</span></td>
+                      <td><a href="contract-edit.html" class="crm-link">BR-2026/00440</a></td>
+                      <td>Ковалёв Д.О.</td>
+                      <td>QUIK Mobile</td>
+                      <td>20.02.2027</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                    <tr data-entity="trading-profile" data-id="INV-1020" data-href="trading-card.html">
+                      <td><div class="crm-row-main"><a href="trading-card.html" class="crm-link">ПАО «Ритм Индустрия»</a></div></td>
+                      <td>INV-1020</td>
+                      <td><span class="crm-badge success" data-status="qualified">Квал</span></td>
+                      <td><span class="crm-badge danger" data-status="risk-special">Особый</span></td>
+                      <td><a href="contract-edit.html" class="crm-link">BR-2026/00457</a></td>
+                      <td>Рябцев Николай Олегович</td>
+                      <td>QUIK / WebQUIK</td>
+                      <td>10.01.2027</td>
+                      <td><span class="crm-badge warning" data-status="expired">Истёк</span></td>
+                    </tr>
+                    <tr data-entity="trading-profile" data-id="INV-1012" data-href="trading-card.html">
+                      <td><div class="crm-row-main"><a href="trading-card.html" class="crm-link">АО «Глобал Ресурс Траст»</a></div></td>
+                      <td>INV-1012</td>
+                      <td><span class="crm-badge muted" data-status="unqualified">Неквал</span></td>
+                      <td><span class="crm-badge success" data-status="risk-standard">Стандартный</span></td>
+                      <td><a href="contract-edit.html" class="crm-link">BR-2026/00412</a></td>
+                      <td>Иванов И.И.</td>
+                      <td>WebQUIK</td>
+                      <td>01.03.2027</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="crm-empty-state" data-entity="empty-state" hidden>
+              <div class="crm-empty-state-title">Нет торговых профилей</div>
+              <div class="crm-empty-state-text">Измените фильтры для отображения результатов.</div>
+            </div>
+          </div>
+
+          <div class="crm-trading-table-footer" aria-label="Навигация по таблице">
+            <div class="crm-trading-footer-page-size" data-page-size-group>
+              <span class="crm-trading-footer-caption">СТРОК НА СТРАНИЦЕ</span>
+              <button type="button" class="crm-trading-footer-chip is-active" aria-pressed="true">25</button>
+              <button type="button" class="crm-trading-footer-chip" aria-pressed="false">50</button>
+              <button type="button" class="crm-trading-footer-chip" aria-pressed="false">100</button>
+            </div>
+            <div class="crm-trading-footer-nav">
+              <span class="crm-trading-footer-page">1 из 1</span>
+              <button type="button" class="crm-trading-footer-nav-button" aria-label="Предыдущая страница" disabled><span aria-hidden="true">‹</span></button>
+              <button type="button" class="crm-trading-footer-nav-button" aria-label="Следующая страница" disabled><span aria-hidden="true">›</span></button>
+            </div>
+          </div>
+
+        </section>
       </section>
     </main>
   </div>

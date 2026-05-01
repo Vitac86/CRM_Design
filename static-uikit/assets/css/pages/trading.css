@@ -1,0 +1,779 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CSS variables
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body[data-page="trading"],
+body[data-page="trading-card"] {
+  --trading-header-bg: #e8edfb;
+  --trading-header-border: #dbe2f0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PART A — trading.html (registry / list)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.crm-page[data-page="trading"] .crm-trading-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid #d7e2f2;
+  background: #f5f8ff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.crm-page[data-page="trading"] .crm-trading-header {
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 2px;
+}
+
+.crm-page[data-page="trading"] .crm-page-title {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
+}
+
+/* ── Filter panel ──────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading"] .crm-registry-filters.crm-filter-panel {
+  padding: 14px;
+  gap: 12px;
+  border-radius: 16px;
+  border-color: #d9e3f1;
+  background: #e9eefb;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  margin-bottom: 0;
+}
+
+.crm-page[data-page="trading"] .crm-filter-search-shell {
+  position: relative;
+  display: block;
+  width: min(520px, 100%);
+  max-width: 100%;
+}
+
+.crm-page[data-page="trading"] .crm-filter-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.crm-page[data-page="trading"] .crm-filter-search-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.crm-page[data-page="trading"] .crm-filter-search-input {
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  padding: 0 12px 0 44px;
+  border-color: #dbe2f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 40px;
+  width: 100%;
+}
+
+.crm-page[data-page="trading"] .crm-filter-search-input::placeholder {
+  color: #8b9eb8;
+}
+
+.crm-page[data-page="trading"] .crm-filter-fields-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+}
+
+.crm-page[data-page="trading"] .crm-filter-pill-control {
+  flex: 0 1 auto;
+  width: clamp(176px, 18vw, 252px);
+  min-width: 176px;
+  max-width: 252px;
+}
+
+.crm-page[data-page="trading"] .crm-filter-menu {
+  width: 100%;
+}
+
+.crm-page[data-page="trading"] .crm-filter-reset {
+  min-height: 36px;
+  height: 36px;
+  border-radius: 999px;
+  padding-inline: 14px;
+  font-size: 13px;
+}
+
+.crm-page[data-page="trading"] .crm-filter-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+/* ── Table actions row (export) ───────────────────────────────────────── */
+
+.crm-page[data-page="trading"] .crm-trading-table-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 2px 0 6px;
+  min-height: 0;
+}
+
+.crm-page[data-page="trading"] .crm-button-export-light {
+  min-height: 30px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
+  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
+  color: var(--crm-umi-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+/* ── Table card ───────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading"] .crm-trading-registry {
+  overflow: hidden;
+  border-radius: 10px;
+  border-color: #d9e3f1;
+  background: #ffffff;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  border-bottom: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #9ba9bf #e9eef8;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table::after {
+  display: none;
+  content: none;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .crm-table {
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  width: 100%;
+  min-width: 1380px;
+  background: #ffffff;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table {
+  width: 100%;
+  min-width: 1380px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table thead,
+.crm-page[data-page="trading"] .crm-trading-table .uk-table thead tr,
+.crm-page[data-page="trading"] .crm-trading-table .uk-table thead th {
+  background: var(--trading-header-bg);
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table thead th {
+  border-bottom: 1px solid var(--trading-header-border);
+  padding: 14px 12px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: #475569;
+  line-height: 1.3;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table thead th .crm-th-sort {
+  margin-left: 5px;
+  opacity: 0.55;
+  font-size: 11px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table tbody,
+.crm-page[data-page="trading"] .crm-trading-table .uk-table tbody tr,
+.crm-page[data-page="trading"] .crm-trading-table .uk-table tbody td {
+  background: #ffffff;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table.uk-table-hover tbody tr:hover td {
+  background: #f8fbff;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table tbody td {
+  padding: 12px 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  vertical-align: middle;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table tbody tr:first-child td {
+  border-top: 1px solid #dbe2f0;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .crm-row-main {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b2b46;
+  line-height: 1.35;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .crm-link {
+  color: var(--crm-umi-primary);
+  text-decoration: none;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .crm-link:hover {
+  text-decoration: underline;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table::-webkit-scrollbar-track {
+  background: #e9eef8;
+  border-radius: 999px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table::-webkit-scrollbar-thumb {
+  background-color: #9ba9bf;
+  border-radius: 999px;
+  border: 1px solid #e9eef8;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table::-webkit-scrollbar-thumb:hover {
+  background-color: #8192ab;
+}
+
+/* ── Footer / pagination ──────────────────────────────────────────────── */
+
+.crm-page[data-page="trading"] .crm-trading-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 4px 0;
+  background: transparent;
+  border: 0;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-page-size,
+.crm-page[data-page="trading"] .crm-trading-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #607494;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-chip {
+  min-width: 36px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  background: #ffffff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #4e6383;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-chip.is-active {
+  border-color: #8ea5c9;
+  background: #dce8f8;
+  color: #203a61;
+  font-weight: 600;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-chip:hover {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-chip:focus-visible,
+.crm-page[data-page="trading"] .crm-trading-footer-nav-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-page {
+  font-size: 12px;
+  color: #4f6483;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-nav-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #4f6483;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-nav-button:hover:not(:disabled) {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="trading"] .crm-trading-footer-nav-button:disabled {
+  cursor: not-allowed;
+  color: #a0aec0;
+  border-color: #dbe2f0;
+  background: #f3f6fb;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PART B — trading-card.html (detail / card)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.crm-page[data-page="trading-card"] .crm-breadcrumbs {
+  display: none;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-detail-shell {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-card-shell {
+  padding: 18px 18px 16px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--crm-primary-soft) 28%, var(--crm-umi-surface) 72%);
+  box-shadow: var(--crm-umi-shadow-sm);
+}
+
+/* ── Hero card ─────────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-trading-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 12px 14px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+  box-shadow: none;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-hero-main {
+  display: contents;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--crm-umi-border) 70%, #fff 30%);
+  background: color-mix(in srgb, var(--crm-primary-soft) 60%, #fff 40%);
+  color: var(--crm-umi-primary-hover);
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-identity h1 {
+  margin: 0 0 3px;
+  font-size: 23px;
+  line-height: 1.2;
+  color: var(--crm-umi-text);
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-meta {
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--crm-umi-text-muted);
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-meta .crm-link {
+  color: var(--crm-umi-primary);
+  text-decoration: none;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-meta .crm-link:hover {
+  text-decoration: underline;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-sep {
+  margin: 0 5px;
+  opacity: 0.55;
+}
+
+.crm-page[data-page="trading-card"] .crm-inline-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--crm-umi-border) 78%, #fff 22%);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+/* ── Hero actions ──────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-trading-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+  justify-self: end;
+  align-self: start;
+  gap: 6px;
+  margin-top: 1px;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-actions .uk-button,
+.crm-page[data-page="trading-card"] .crm-trading-actions .crm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs-wrap {
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: #fff;
+  overflow-x: auto;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs {
+  display: flex;
+  min-width: max-content;
+  margin: 0;
+  padding: 5px 8px;
+  gap: 4px;
+  border: 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs::before,
+.crm-page[data-page="trading-card"] .crm-trading-tabs > *::before {
+  display: none;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs > * {
+  padding-left: 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs > li > a {
+  min-height: 32px;
+  padding: 6px 11px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--crm-umi-text-secondary);
+  background: transparent;
+  text-decoration: none;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs > li > a:hover {
+  color: var(--crm-umi-text);
+  background: color-mix(in srgb, var(--crm-primary-soft) 40%, transparent);
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-tabs > .uk-active > a {
+  background: var(--crm-umi-primary);
+  border-color: var(--crm-umi-primary);
+  color: var(--crm-umi-surface);
+}
+
+/* ── Tab panels ─────────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-trading-switcher,
+.crm-page[data-page="trading-card"] .crm-trading-tab-panel {
+  margin: 0;
+  padding: 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-trading-section-layout {
+  display: grid;
+  gap: 8px;
+}
+
+/* ── Section cards ──────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-trading-section {
+  padding: 14px 16px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+  box-shadow: none;
+}
+
+.crm-page[data-page="trading-card"] .crm-form-section-head {
+  margin-bottom: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--crm-umi-border);
+}
+
+.crm-page[data-page="trading-card"] .crm-form-section-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--crm-umi-text);
+}
+
+/* ── Profile data grid ───────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-profile-rows {
+  display: grid;
+  gap: 9px 14px;
+}
+
+.crm-page[data-page="trading-card"] .crm-profile-rows-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.crm-page[data-page="trading-card"] .crm-profile-rows-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.crm-page[data-page="trading-card"] .crm-profile-row {
+  min-width: 0;
+  padding: 2px 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-profile-label {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--crm-umi-text-muted);
+}
+
+.crm-page[data-page="trading-card"] .crm-profile-value {
+  color: var(--crm-umi-text);
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+/* Code word */
+.crm-page[data-page="trading-card"] .crm-code-word {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--crm-umi-primary);
+}
+
+/* ── Order methods ───────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-order-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.crm-page[data-page="trading-card"] .crm-order-method-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--crm-umi-surface) 92%, var(--crm-primary-soft) 8%);
+}
+
+.crm-page[data-page="trading-card"] .crm-order-method-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--crm-umi-text);
+}
+
+/* ── Terminal cards ──────────────────────────────────────────────────────── */
+
+.crm-page[data-page="trading-card"] .crm-terminals-list {
+  display: grid;
+  gap: 10px;
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-card {
+  padding: 12px 14px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--crm-umi-surface) 90%, var(--crm-primary-soft) 10%);
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-field {
+  min-width: 0;
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-field dt {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--crm-umi-text-muted);
+  margin-bottom: 2px;
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-field dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.crm-page[data-page="trading-card"] .crm-terminal-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+
+.crm-trading-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  background: #1e2d45;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.crm-trading-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 1180px) {
+  .crm-page[data-page="trading-card"] .crm-trading-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .crm-page[data-page="trading-card"] .crm-trading-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .crm-page[data-page="trading-card"] .crm-profile-rows-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crm-page[data-page="trading-card"] .crm-terminal-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .crm-page[data-page="trading-card"] .crm-profile-rows-3,
+  .crm-page[data-page="trading-card"] .crm-profile-rows-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="trading-card"] .crm-order-methods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="trading-card"] .crm-terminal-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
