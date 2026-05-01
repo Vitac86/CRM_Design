@@ -10,7 +10,13 @@
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-fields-row { display:flex; flex-wrap:wrap; justify-content:flex-start; gap:10px; align-items:center; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control { flex:0 1 auto; width:clamp(176px,18vw,252px); min-width:176px; max-width:252px; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control { position:relative; flex:0 1 auto; width:clamp(176px,18vw,252px); min-width:176px; max-width:252px; }
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control input[type="date"] { padding-right:40px !important; }
+.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control input[type="date"] {
+  padding-right:40px !important;
+  background-image:none;
+  background-position:initial;
+  background-size:initial;
+  background-repeat:no-repeat;
+}
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#6d7d98; pointer-events:none; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control input[type="date"]::-webkit-calendar-picker-indicator { opacity:0; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-actions { flex:0 0 auto; margin-left:auto; align-self:flex-end; max-width:100%; }
