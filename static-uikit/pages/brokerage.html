@@ -87,17 +87,25 @@
           </div>
         </form>
         <div class="crm-card crm-table-card crm-registry-table" data-entity="brokerage-table">
-          <div class="crm-table-wrapper">
+          <div class="crm-table-wrapper crm-brokerage-table">
             <div class="crm-table crm-registry-table-compact">
               <table class="uk-table uk-table-divider uk-table-hover">
+                <colgroup>
+                  <col class="crm-brokerage-col-contract"/>
+                  <col class="crm-brokerage-col-code"/>
+                  <col class="crm-brokerage-col-client"/>
+                  <col class="crm-brokerage-col-manager"/>
+                  <col class="crm-brokerage-col-date"/>
+                  <col class="crm-brokerage-col-status"/>
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>Договор</th>
-                    <th>Код клиента</th>
-                    <th>Клиент</th>
-                    <th>Менеджер</th>
-                    <th>Дата открытия</th>
-                    <th>Статус</th>
+                    <th><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th><span class="crm-th-label">Клиент</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th><span class="crm-th-label">Менеджер</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th><span class="crm-th-label">Дата открытия</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
                   </tr>
                 </thead>
                 <tbody>
