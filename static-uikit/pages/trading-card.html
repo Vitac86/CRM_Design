@@ -78,11 +78,6 @@
                 </div>
               </div>
             </div>
-            <div class="crm-trading-actions crm-detail-actions" aria-label="Действия по профилю">
-              <a href="trading.html" class="uk-button uk-button-default crm-button" data-action="back-to-trading">← Назад</a>
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="edit-trading-params">Редактировать параметры</button>
-              <button class="uk-button crm-button-primary crm-button" type="button" data-action="issue-terminal">Выдать терминал</button>
-            </div>
           </article>
 
           <!-- ── Tabs bar ──────────────────────────────────────────────────── -->
@@ -226,7 +221,10 @@
               <section class="crm-trading-section-layout">
 
                 <article class="crm-card crm-trading-section" data-entity="terminals">
-                  <div class="crm-form-section-head"><h3>Терминалы и подключения</h3></div>
+                  <div class="crm-form-section-head crm-section-head-with-action">
+                    <h3>Терминалы и подключения</h3>
+                    <button class="uk-button crm-button-primary crm-button crm-section-head-btn" type="button" data-action="issue-terminal">+ Выдать терминал</button>
+                  </div>
                   <div class="crm-terminals-list">
 
                     <!-- QUIK Desktop -->

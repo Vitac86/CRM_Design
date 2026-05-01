@@ -37,7 +37,8 @@ body[data-page="trading-card"] {
 
 /* ── Filter panel ──────────────────────────────────────────────────────── */
 
-.crm-page[data-page="trading"] .crm-registry-filters.crm-filter-panel {
+/* (0,5,0) — beats global filters.css (0,4,0) */
+.crm-page[data-page="trading"] .crm-trading-shell .crm-registry-filters.crm-filter-panel {
   padding: 14px;
   gap: 12px;
   border-radius: 16px;
@@ -47,14 +48,14 @@ body[data-page="trading-card"] {
   margin-bottom: 0;
 }
 
-.crm-page[data-page="trading"] .crm-filter-search-shell {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-search-shell {
   position: relative;
   display: block;
   width: min(520px, 100%);
   max-width: 100%;
 }
 
-.crm-page[data-page="trading"] .crm-filter-search-icon {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-search-icon {
   position: absolute;
   left: 14px;
   top: 50%;
@@ -65,13 +66,15 @@ body[data-page="trading-card"] {
   pointer-events: none;
 }
 
-.crm-page[data-page="trading"] .crm-filter-search-icon svg {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-search-icon svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.crm-page[data-page="trading"] .crm-filter-search-input {
+/* (0,6,0) — beats global filters.css (0,5,0) */
+.crm-page[data-page="trading"] .crm-trading-shell .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
+  width: 100%;
   min-height: 40px;
   height: 40px;
   border-radius: 10px;
@@ -82,14 +85,13 @@ body[data-page="trading-card"] {
   color: #0f172a;
   font-size: 14px;
   line-height: 40px;
-  width: 100%;
 }
 
-.crm-page[data-page="trading"] .crm-filter-search-input::placeholder {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-registry-filters.crm-filter-panel .crm-filter-search-input::placeholder {
   color: #8b9eb8;
 }
 
-.crm-page[data-page="trading"] .crm-filter-fields-row {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-fields-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -97,18 +99,18 @@ body[data-page="trading-card"] {
   align-items: center;
 }
 
-.crm-page[data-page="trading"] .crm-filter-pill-control {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control {
   flex: 0 1 auto;
   width: clamp(176px, 18vw, 252px);
   min-width: 176px;
   max-width: 252px;
 }
 
-.crm-page[data-page="trading"] .crm-filter-menu {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-menu {
   width: 100%;
 }
 
-.crm-page[data-page="trading"] .crm-filter-reset {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-reset {
   min-height: 36px;
   height: 36px;
   border-radius: 999px;
@@ -116,7 +118,7 @@ body[data-page="trading-card"] {
   font-size: 13px;
 }
 
-.crm-page[data-page="trading"] .crm-filter-actions {
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-actions {
   flex: 0 0 auto;
   margin-left: auto;
   align-self: flex-end;
@@ -395,7 +397,7 @@ body[data-page="trading-card"] {
 
 .crm-page[data-page="trading-card"] .crm-trading-hero {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 14px;
   align-items: start;
   padding: 12px 14px;
@@ -469,34 +471,6 @@ body[data-page="trading-card"] {
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
-}
-
-/* ── Hero actions ──────────────────────────────────────────────────────── */
-
-.crm-page[data-page="trading-card"] .crm-trading-actions {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: flex-end;
-  justify-self: end;
-  align-self: start;
-  gap: 6px;
-  margin-top: 1px;
-}
-
-.crm-page[data-page="trading-card"] .crm-trading-actions .uk-button,
-.crm-page[data-page="trading-card"] .crm-trading-actions .crm-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  height: 30px;
-  padding: 0 11px;
-  border-radius: 7px;
-  font-size: 12px;
-  line-height: 1;
-  white-space: nowrap;
 }
 
 /* ── Tabs ──────────────────────────────────────────────────────────────── */
@@ -586,6 +560,24 @@ body[data-page="trading-card"] {
   color: var(--crm-umi-text);
 }
 
+.crm-page[data-page="trading-card"] .crm-form-section-head.crm-section-head-with-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.crm-page[data-page="trading-card"] .crm-section-head-btn {
+  flex-shrink: 0;
+  min-height: 30px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 /* ── Profile data grid ───────────────────────────────────────────────────── */
 
 .crm-page[data-page="trading-card"] .crm-profile-rows {
@@ -622,7 +614,6 @@ body[data-page="trading-card"] {
   font-weight: 600;
 }
 
-/* Code word */
 .crm-page[data-page="trading-card"] .crm-code-word {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 14px;
@@ -743,17 +734,6 @@ body[data-page="trading-card"] {
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 1180px) {
-  .crm-page[data-page="trading-card"] .crm-trading-hero {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .crm-page[data-page="trading-card"] .crm-trading-actions {
-    grid-column: 1 / -1;
-    width: 100%;
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-
   .crm-page[data-page="trading-card"] .crm-profile-rows-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
