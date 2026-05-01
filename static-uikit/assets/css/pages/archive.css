@@ -17,7 +17,7 @@
   background-size:initial;
   background-repeat:no-repeat;
 }
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#6d7d98; pointer-events:none; }
+.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; padding:0; border:0; background:transparent; color:#6d7d98; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control input[type="date"]::-webkit-calendar-picker-indicator { opacity:0; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-actions { flex:0 0 auto; margin-left:auto; align-self:flex-end; max-width:100%; }
 .crm-page[data-page="archive"] .crm-archive-registry { width:100%; max-width:100%; min-width:0; margin-top:8px; overflow:hidden; border-radius:10px; border-color:#d9e3f1; background:#fff; }
