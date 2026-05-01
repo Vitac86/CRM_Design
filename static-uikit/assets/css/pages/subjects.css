@@ -164,7 +164,10 @@ body[data-page="subjects"] .crm-filter-reset {
   font-size: 13px;
 }
 
-body[data-page="subjects"] .crm-filter-actions {
+.crm-page[data-page="subjects"] .crm-filter-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex: 0 0 auto;
   margin-left: auto;
   align-self: flex-end;
@@ -398,18 +401,12 @@ body[data-page="subjects"] .crm-subjects-footer-nav-button:disabled {
   background: #f3f6fb;
 }
 
-.crm-page[data-page="subjects"] .crm-subjects-table-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin: 2px 0 6px;
-  min-height: 0;
-}
 
 .crm-page[data-page="subjects"] .crm-button-export-light {
-  min-height: 30px;
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 7px;
+  min-height: 36px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
   border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
   background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
   color: var(--crm-umi-text-secondary);
