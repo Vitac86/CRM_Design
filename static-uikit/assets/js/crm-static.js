@@ -379,11 +379,11 @@
 
 
 
-    const pageSizeChip = target.closest('.crm-subjects-footer-chip');
+    const pageSizeChip = target.closest('[data-page-size-group] button');
     if (pageSizeChip) {
       const chipGroup = pageSizeChip.closest('[data-page-size-group]');
       if (chipGroup) {
-        chipGroup.querySelectorAll('.crm-subjects-footer-chip').forEach(function (chip) {
+        chipGroup.querySelectorAll('button').forEach(function (chip) {
           const isActive = chip === pageSizeChip;
           chip.classList.toggle('is-active', isActive);
           chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
