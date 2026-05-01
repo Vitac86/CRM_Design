@@ -59,14 +59,21 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page crm-registry-page" data-page="agents">
-        <div class="crm-page-header crm-page-header-row crm-registry-header">
+        <section class="crm-registry-shell crm-agents-shell">
+
+          <div class="crm-page-header crm-page-header-row crm-registry-header crm-agents-header">
           <div class="crm-registry-title-block"><h1 data-entity="page-title">Агенты</h1><p>Реестр агентских подключений с деталями организации, комиссии и закрепления.</p></div>
-          <div class="crm-page-actions crm-registry-actions"><button class="uk-button crm-button-primary crm-button" type="button" data-action="add-agent">+ Добавить агента</button></div>
+          <div class="crm-header-actions crm-registry-actions crm-agents-actions"><button class="uk-button crm-button-primary crm-button" type="button" data-action="add-agent">+ Добавить агента</button></div>
         </div>
         <form action="#" method="post" data-form="agents-filters" data-action="filter-agents" class="crm-registry-filters crm-filter-panel" data-filter="agents">
-          <div class="crm-filter-search-row"><input id="agents-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="agents-search" placeholder="Агент, договор, телефон или email"/></div>
+          <div class="crm-filter-search-row crm-filter-search"><label class="crm-filter-search-shell" for="agents-search">
+                <span class="crm-filter-search-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+<input id="agents-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="agents-search" placeholder="Агент, договор, телефон или email"/>
+              </label></div>
 
-            <div class="crm-filter-fields-row">
+            <div class="crm-filter-fields-row crm-filter-grid">
           <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="agent-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
                     <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
                     <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
@@ -77,11 +84,12 @@
                     <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Иванов И.И.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
                     <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Петрова Н.А.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
                   </div><input type="hidden" name="agent-assignee" value="all" data-filter="agent-assignee"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
+          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить всё</button></div>
           </div>
 </form>
         <div class="crm-card crm-table-card crm-registry-table crm-agents-registry" data-entity="agent-table"><div class="crm-table-wrapper crm-agents-table"><div class="crm-table crm-registry-table-compact">
           <table class="uk-table uk-table-divider uk-table-hover">
+            <colgroup><col style="min-width:220px"/><col style="min-width:180px"/><col style="width:160px"/><col style="width:170px"/><col style="width:140px"/><col style="width:140px"/></colgroup>
             <thead><tr><th><span class="crm-th-label">Агент</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Организация</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Комиссия</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Закрепление</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></th></tr></thead>
             <tbody>
               <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html"><td><div class="crm-row-main">ПАО «НеоЭнергоСбыт»</div><div class="crm-row-sub">+7 (900) 100-11-03 · corp@neoenergy.test</div></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>Иванов И.И.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
@@ -90,6 +98,23 @@
           </table></div></div>
           <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет агентов</div><div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div></div>
         </div>
+
+
+          <div class="crm-agents-table-footer" aria-label="Навигация по таблице">
+            <div class="crm-agents-footer-page-size" data-page-size-group>
+              <span class="crm-agents-footer-caption">СТРОК НА СТРАНИЦЕ</span>
+              <button type="button" class="crm-agents-footer-chip is-active" aria-pressed="true">25</button>
+              <button type="button" class="crm-agents-footer-chip" aria-pressed="false">50</button>
+              <button type="button" class="crm-agents-footer-chip" aria-pressed="false">100</button>
+            </div>
+            <div class="crm-agents-footer-nav">
+              <span class="crm-agents-footer-page">1 из 1</span>
+              <button type="button" class="crm-agents-footer-nav-button" aria-label="Предыдущая страница" disabled><span aria-hidden="true">‹</span></button>
+              <button type="button" class="crm-agents-footer-nav-button" aria-label="Следующая страница" disabled><span aria-hidden="true">›</span></button>
+            </div>
+          </div>
+
+        </section>
       </section>
     </main>
   </div>
