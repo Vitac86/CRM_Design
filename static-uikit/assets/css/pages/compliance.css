@@ -85,6 +85,15 @@
   border-color: #bfcde5;
 }
 
+.crm-page[data-page="compliance"] .crm-filter-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+  align-self: flex-end;
+  display: flex;
+  gap: 8px;
+  max-width: 100%;
+}
+
 .crm-page[data-page="compliance"] .crm-button-export-light {
   min-height: 36px;
   height: 36px;
