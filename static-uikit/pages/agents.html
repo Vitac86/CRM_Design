@@ -6,6 +6,7 @@
   <title>Агенты</title>
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/agents.css"/>
 </head>
 <body data-page="agents">
 <div class="crm-app">
@@ -79,9 +80,9 @@
           <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
           </div>
 </form>
-        <div class="crm-card crm-table-card crm-registry-table" data-entity="agent-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact">
+        <div class="crm-card crm-table-card crm-registry-table crm-agents-registry" data-entity="agent-table"><div class="crm-table-wrapper crm-agents-table"><div class="crm-table crm-registry-table-compact">
           <table class="uk-table uk-table-divider uk-table-hover">
-            <thead><tr><th>Агент</th><th>Организация</th><th>Договор</th><th>Комиссия</th><th>Закрепление</th><th>Статус</th></tr></thead>
+            <thead><tr><th><span class="crm-th-label">Агент</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Организация</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Комиссия</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Закрепление</span><span class="crm-th-sort" aria-hidden="true">▾</span></th><th><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></th></tr></thead>
             <tbody>
               <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html"><td><div class="crm-row-main">ПАО «НеоЭнергоСбыт»</div><div class="crm-row-sub">+7 (900) 100-11-03 · corp@neoenergy.test</div></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>Иванов И.И.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
               <tr data-entity="agent" data-id="AG-1988" data-href="subject-card.html"><td><div class="crm-row-main">АО «Орбита ФинСервис»</div><div class="crm-row-sub">+7 (900) 100-11-05 · support@orbita-fin.test</div></td><td>АО «Орбита ФинСервис»</td><td>AG-1988</td><td>2.00%</td><td>Петрова Н.А.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
