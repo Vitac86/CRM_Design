@@ -360,6 +360,24 @@
     const target = event.target;
     if (!(target instanceof Element)) return;
 
+    const datePickerTrigger = target.closest('[data-date-picker-trigger]');
+    if (datePickerTrigger) {
+      const inputId = datePickerTrigger.getAttribute('data-date-picker-trigger');
+      const input = inputId ? document.getElementById(inputId) : null;
+
+      if (input instanceof HTMLInputElement) {
+        if (typeof input.showPicker === 'function') {
+          input.showPicker();
+        } else {
+          input.focus();
+          input.click();
+        }
+      }
+
+      event.preventDefault();
+      return;
+    }
+
     const resetButton = target.closest('[data-action="reset-filters"]');
     if (resetButton) {
       const form = resetButton.closest('form');
