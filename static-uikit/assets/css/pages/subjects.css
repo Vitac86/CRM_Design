@@ -315,7 +315,7 @@ body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip {
   padding: 2px 8px;
   font-size: 12px;
   font-weight: 500;
-  line-height: 1.25;
+  line-height: 1.6667;
   letter-spacing: 0;
 }
 
@@ -327,56 +327,56 @@ body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
 /* neutral chip: type, residency, and negative boolean states */
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip,
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip.is-muted {
-  background: color-mix(in srgb, var(--color-muted-surface) 55%, transparent);
-  color: var(--color-text-secondary);
-  border-color: color-mix(in srgb, var(--color-text-secondary) 18%, var(--color-border));
+  background: #eff3f8;
+  color: #64748b;
+  border-color: #cbd3de;
 }
 
 /* success chip: boolean positive states */
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip[data-status*="да"],
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip[data-status*="yes"],
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip[data-status="yes"] {
-  background: color-mix(in srgb, var(--color-success) 11%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-success) 72%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-success) 28%, var(--color-border));
+  background: #d7e7e7;
+  color: #075d4a;
+  border-color: #a4c9c5;
 }
 
 /* warning chip (for partial values still present in static sample rows) */
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip.is-soft-warning {
-  background: color-mix(in srgb, var(--color-warning) 11%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-warning) 70%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-warning) 28%, var(--color-border));
+  background: #eae3df;
+  color: #824113;
+  border-color: #d5beaf;
 }
 
 /* danger chip (for negative / blocked sample values) */
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip.is-soft-negative {
-  background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-danger) 70%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-danger) 28%, var(--color-border));
+  background: #efdfe7;
+  color: #a21b3f;
+  border-color: #e2afc1;
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-badge.success {
-  background: color-mix(in srgb, var(--color-success) 11%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-success) 72%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-success) 28%, var(--color-border));
+  background: #d7e7e7;
+  color: #075d4a;
+  border-color: #a4c9c5;
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-badge.info {
-  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-primary) 66%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-primary) 26%, var(--color-border));
+  background: #dde6f8;
+  color: #1e49a9;
+  border-color: #b1c5ef;
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-badge.warning {
-  background: color-mix(in srgb, var(--color-warning) 11%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-warning) 70%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-warning) 28%, var(--color-border));
+  background: #eae3df;
+  color: #824113;
+  border-color: #d5beaf;
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-badge.danger {
-  background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
-  color: color-mix(in srgb, var(--color-danger) 70%, var(--color-text-primary));
-  border-color: color-mix(in srgb, var(--color-danger) 28%, var(--color-border));
+  background: #efdfe7;
+  color: #a21b3f;
+  border-color: #e2afc1;
 }
 
 body[data-page="subjects"] .crm-subjects-table-footer {
