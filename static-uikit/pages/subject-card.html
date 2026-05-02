@@ -178,6 +178,40 @@
                       <div class="crm-representative-cell"><span class="crm-profile-label">Срок действия</span><strong>Без срока действия</strong></div>
                     </div>
                   </div>
+                  <div class="crm-representative-form-slot" data-role="representative-form-slot" hidden>
+                    <div class="crm-bank-account-form crm-representative-add-form">
+                      <h4 class="crm-bank-account-form-title">Добавить представителя</h4>
+                      <div class="crm-representative-form-grid">
+                        <div class="crm-bank-form-field">
+                          <label class="crm-bank-form-label" for="rep-subject-search">Поиск субъекта</label>
+                          <input id="rep-subject-search" class="uk-input crm-input crm-bank-input" type="search" placeholder="Введите ФИО или организацию"/>
+                        </div>
+                        <div class="crm-bank-form-field">
+                          <label class="crm-bank-form-label" for="rep-subject">Субъект</label>
+                          <select id="rep-subject" class="uk-select crm-input crm-bank-input"><option>Соколова Мария Владимировна</option><option>Крылов Денис Олегович</option><option>Никифоров Артём Игоревич</option></select>
+                        </div>
+                        <div class="crm-bank-form-field">
+                          <label class="crm-bank-form-label" for="rep-role">Роль</label>
+                          <select id="rep-role" class="uk-select crm-input crm-bank-input"><option>Представитель по доверенности</option><option>Генеральный директор</option><option>Главный бухгалтер</option></select>
+                        </div>
+                        <div class="crm-bank-form-field">
+                          <label class="crm-bank-form-label" for="rep-authority">Основание полномочий</label>
+                          <input id="rep-authority" class="uk-input crm-input crm-bank-input" type="text" placeholder="Доверенность / приказ / устав"/>
+                        </div>
+                        <div class="crm-bank-form-field crm-representative-form-field-full">
+                          <label class="crm-bank-form-label" for="rep-expiry">Срок действия полномочий</label>
+                          <input id="rep-expiry" class="uk-input crm-input crm-bank-input" type="date" data-role="representative-expiry"/>
+                        </div>
+                        <div class="crm-representative-form-field-full">
+                          <label class="crm-representative-expiry-toggle"><input type="checkbox" data-action="toggle-representative-expiry"/> Без срока действия</label>
+                        </div>
+                      </div>
+                      <div class="crm-bank-account-form-actions">
+                        <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="save-representative">Сохранить</button>
+                        <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="close-representative-modal">Закрыть</button>
+                      </div>
+                    </div>
+                  </div>
                   <table class="crm-representatives-contract-hook" hidden>
                     <tbody data-role="representatives-table-body">
                     <tr><td>Генеральный директор</td></tr>
@@ -822,25 +856,6 @@
           </ul>
         </div>
       
-        <div class="crm-modal" data-role="representative-modal" hidden>
-          <div class="crm-modal-backdrop" data-action="close-representative-modal"></div>
-          <div class="crm-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="representative-modal-title">
-            <button class="crm-modal-close" type="button" aria-label="Закрыть" data-action="close-representative-modal">×</button>
-            <h3 id="representative-modal-title">Добавить представителя</h3>
-            <div class="crm-modal-form-grid">
-              <label class="crm-modal-field"><span>Поиск субъекта</span><input class="uk-input crm-input" type="search" placeholder="Введите ФИО или организацию"/></label>
-              <label class="crm-modal-field"><span>Субъект</span><select class="uk-select crm-input"><option>Соколова Мария Владимировна</option><option>Крылов Денис Олегович</option><option>Никифоров Артём Игоревич</option></select></label>
-              <label class="crm-modal-field"><span>Роль</span><select class="uk-select crm-input"><option>Представитель по доверенности</option><option>Генеральный директор</option><option>Главный бухгалтер</option></select></label>
-              <label class="crm-modal-field"><span>Основание полномочий</span><input class="uk-input crm-input" type="text" placeholder="Доверенность / приказ / устав"/></label>
-              <label class="crm-modal-field crm-modal-field-wide"><span>Срок действия полномочий</span><input class="uk-input crm-input" type="date" data-role="representative-expiry"/></label>
-              <label class="crm-modal-checkbox crm-modal-field-wide"><input type="checkbox" data-action="toggle-representative-expiry"/> Без срока действия</label>
-            </div>
-            <div class="crm-modal-actions">
-              <button class="uk-button crm-button-primary crm-button" type="button" data-action="save-representative">Сохранить</button>
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="close-representative-modal">Закрыть</button>
-            </div>
-          </div>
-        </div>
 
 </section>
     </main>

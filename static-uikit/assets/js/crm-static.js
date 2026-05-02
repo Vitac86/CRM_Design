@@ -561,4 +561,53 @@
       window.UIkit.tab(tab);
     });
   }
+
+  // ── Inline representative add-form ────────────────────────────────────────
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!(target instanceof Element)) return;
+
+    var openBtn = target.closest('[data-action="open-representative-modal"]');
+    if (openBtn) {
+      var section = openBtn.closest('[data-entity="representatives"]');
+      var slot = section ? section.querySelector('[data-role="representative-form-slot"]') : null;
+      if (slot) {
+        slot.hidden = false;
+        var firstField = slot.querySelector('input:not([type="checkbox"]), select');
+        if (firstField) firstField.focus();
+      }
+      event.preventDefault();
+      return;
+    }
+
+    var closeBtn = target.closest('[data-action="close-representative-modal"]');
+    if (closeBtn) {
+      var slot = closeBtn.closest('[data-role="representative-form-slot"]');
+      if (slot) slot.hidden = true;
+      event.preventDefault();
+      return;
+    }
+
+    var saveBtn = target.closest('[data-action="save-representative"]');
+    if (saveBtn) {
+      var slot = saveBtn.closest('[data-role="representative-form-slot"]');
+      if (slot) slot.hidden = true;
+      event.preventDefault();
+      return;
+    }
+  });
+
+  document.addEventListener('change', function (event) {
+    var target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    var toggle = target.closest('[data-action="toggle-representative-expiry"]');
+    if (toggle) {
+      var slot = toggle.closest('[data-role="representative-form-slot"]');
+      var expiry = slot ? slot.querySelector('[data-role="representative-expiry"]') : null;
+      if (expiry) {
+        expiry.disabled = toggle.checked;
+        if (toggle.checked) expiry.value = '';
+      }
+    }
+  });
 })();

@@ -305,12 +305,13 @@ body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
 
 /* Compact table chip overrides — subjects registry only */
 body[data-page="subjects"] .crm-subjects-table .crm-badge {
-  min-height: 18px;
-  padding: 0 5px;
-  border-radius: 4px;
-  font-size: 11px;
-  line-height: 16px;
-  letter-spacing: 0.01em;
+  min-height: 20px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-badge.success {
@@ -338,6 +339,55 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge.danger {
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-badge.muted {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
+/* ── Noise-reduction overrides ──────────────────────────────────────────────
+   Резидент, Полный комплект, and account inline badges are secondary
+   attributes; they use neutral chips so color emphasis stays on status cols.
+   Specificity (0,4,1) matches the class-based rules above; source order wins.
+*/
+
+/* Резидент — neutral for both row batches */
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-entity="badge-residency"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="резидент-рф"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="нерезидент"] {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
+/* Полный комплект — Да: neutral */
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="yes"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="да"] {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
+/* Полный комплект — Частично: mild warm tint, not alarming */
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="partial"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="частично"] {
+  background: #fdf7e8;
+  color: #7a621e;
+  border-color: #e4d09c;
+}
+
+/* Полный комплект — Нет: softer negative, still readable as "no" */
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="no"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="нет"] {
+  background: #fce8ec;
+  color: #7a2a31;
+  border-color: #e8b2ba;
+}
+
+/* Account inline badges — all neutral regardless of class */
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status^="cash-account"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status^="securities-account"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status^="дс-"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status^="цб-"] {
   background: #eaeff7;
   color: #455572;
   border-color: #c8d2e4;

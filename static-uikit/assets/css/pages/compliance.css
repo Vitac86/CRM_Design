@@ -251,6 +251,83 @@
   color: #1b2b46;
 }
 
+/* Compact table chip overrides — compliance registry only */
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge {
+  min-height: 20px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge.success {
+  background: #e2f0e8;
+  color: #265c3a;
+  border-color: #b6d9c4;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge.info {
+  background: #e4eaff;
+  color: #2e4680;
+  border-color: #c4cfef;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge.warning {
+  background: #fef0d4;
+  color: #6b4a18;
+  border-color: #e8cc96;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge.danger {
+  background: #fde4e7;
+  color: #7e2229;
+  border-color: #edb5bc;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge.muted {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
+/* ── Noise-reduction overrides — compliance registry ────────────────────────
+   Резидент and Полный комплект are secondary attributes; neutral chips keep
+   color emphasis on the Статус комплаенса column only.
+*/
+
+/* Резидент — always neutral */
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-entity="badge-residency"] {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
+/* Полный комплект — Да: neutral */
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="yes"],
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="да"] {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
+/* Полный комплект — Частично: mild warm tint */
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="partial"],
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="частично"] {
+  background: #fdf7e8;
+  color: #7a621e;
+  border-color: #e4d09c;
+}
+
+/* Полный комплект — Нет: soft negative */
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="no"],
+.crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="нет"] {
+  background: #fce8ec;
+  color: #7a2a31;
+  border-color: #e8b2ba;
+}
+
 /* Compliance card page styles */
 .crm-decision-hero {
   border-left: 4px solid #d3def8;
