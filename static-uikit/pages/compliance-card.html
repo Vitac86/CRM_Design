@@ -57,38 +57,154 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
+
       <section class="crm-page" data-page="compliance-card">
         <div class="crm-breadcrumbs"><a href="compliance.html">Комплаенс</a><span uk-icon="chevron-right"></span><span>Проверка CL-4408</span></div>
 
-        <article class="crm-detail-header crm-card uk-card uk-card-body crm-decision-hero uk-margin-bottom">
-          <div>
-            <h1 data-entity="page-title">АО «Глобал Ресурс Траст»</h1>
-            <p>Код CL-4408 · ИНН 7705964812 · ЮЛ · Нерезидент · Последняя проверка 24.04.2026 10:18</p>
+        <!-- ── Client profile card ── -->
+        <article class="crm-card crm-compliance-profile-card">
+          <div class="crm-compliance-profile-main">
+            <div class="crm-compliance-avatar">ГР</div>
+
+            <div class="crm-compliance-profile-content">
+              <div class="crm-compliance-code">CL-4408</div>
+              <div class="crm-compliance-title-row">
+                <h1 data-entity="page-title">АО «Глобал Ресурс Траст»</h1>
+              </div>
+              <div class="crm-inline-badges crm-compliance-profile-badges">
+                <span class="crm-badge warning" data-status="risk-medium">Риск: Средний</span>
+                <span class="crm-badge info"    data-status="pending-review">На проверке</span>
+                <span class="crm-badge muted">ЮЛ</span>
+                <span class="crm-badge muted">Нерезидент</span>
+                <span class="crm-badge muted"   data-status="docs-partial">Документы: частично</span>
+              </div>
+            </div>
           </div>
-          <div class="crm-inline-badges crm-risk-summary">
-            <span class="crm-badge warning" data-status="risk-medium">Риск: Средний</span>
-            <span class="crm-badge warning" data-status="pending-review">Статус: На проверке</span>
-            <span class="crm-badge info" data-status="docs-partial">Документы: Частичный комплект</span>
-            <span class="crm-badge muted" data-status="officer">Аналитик: Иванов И.И.</span>
+
+          <div class="crm-compliance-profile-divider"></div>
+
+          <div class="crm-compliance-profile-meta">
+            <div>
+              <span class="crm-compliance-meta-label">Представитель</span>
+              <strong>Иванов И.И.</strong>
+            </div>
+            <div>
+              <span class="crm-compliance-meta-label">Статус комплаенса</span>
+              <strong>На проверке</strong>
+            </div>
+            <div>
+              <span class="crm-compliance-meta-label">Последнее обновление</span>
+              <strong>24.04.2026, 10:18</strong>
+            </div>
           </div>
         </article>
 
-        <div class="crm-grid-2 crm-compliance-card-layout">
-          <div>
-            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
-              <div class="crm-form-section-head"><h3>Сводка по клиенту</h3><span class="crm-step-note">Быстрый профиль для принятия решения.</span></div>
-              <div class="crm-risk-grid uk-grid-small" uk-grid>
-                <div class="uk-width-1-2"><label class="uk-form-label">Тип клиента</label><div>Юридическое лицо</div></div>
-                <div class="uk-width-1-2"><label class="uk-form-label">Резидентство</label><div>Нерезидент</div></div>
-                <div class="uk-width-1-2"><label class="uk-form-label">Ответственный менеджер</label><div>Иванов И.И.</div></div>
-                <div class="uk-width-1-2"><label class="uk-form-label">Источник средств</label><div>Подтверждён частично</div></div>
-                <div class="uk-width-1-2"><label class="uk-form-label">Бенефициар</label><div>Смирнов П.В.</div></div>
-                <div class="uk-width-1-2"><label class="uk-form-label">Группа риска</label><div><span class="crm-badge warning" data-status="risk-medium">Средний риск</span></div></div>
+        <!-- ── Two-column main layout ── -->
+        <div class="crm-compliance-detail-layout">
+
+          <!-- Left content column -->
+          <div class="crm-compliance-detail-main">
+
+            <!-- Identification card -->
+            <article class="crm-card crm-compliance-info-card">
+              <div class="crm-compliance-info-head">
+                <h2>Идентификация клиента</h2>
+              </div>
+              <div class="crm-compliance-info-grid">
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Код клиента</span>
+                  <strong>CL-4408</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Тип клиента</span>
+                  <strong>Юридическое лицо</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">ИНН</span>
+                  <strong>7705964812</strong>
+                </div>
+                <div class="crm-compliance-info-item span-full">
+                  <span class="crm-compliance-info-label">Наименование клиента</span>
+                  <strong>АО «Глобал Ресурс Траст»</strong>
+                </div>
+                <div class="crm-compliance-info-item span-full">
+                  <span class="crm-compliance-info-label">Полное наименование</span>
+                  <strong>Акционерное общество «Глобал Ресурс Траст»</strong>
+                </div>
+                <div class="crm-compliance-info-item span-full">
+                  <span class="crm-compliance-info-label">Английское наименование</span>
+                  <strong>JSC Global Resource Trust</strong>
+                </div>
+                <div class="crm-compliance-info-item span-full">
+                  <span class="crm-compliance-info-label">Полное английское наименование</span>
+                  <strong>Joint Stock Company Global Resource Trust</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">КПП</span>
+                  <strong>770501001</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">ОГРН</span>
+                  <strong>1027700132195</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Дата регистрации</span>
+                  <strong>15.03.2010</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Резидентство</span>
+                  <strong>Нерезидент</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Признак инвестора</span>
+                  <strong>Квалифицированный</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Полный комплект документов</span>
+                  <strong><span class="crm-badge warning" data-status="docs-partial">Частично</span></strong>
+                </div>
+                <div class="crm-compliance-info-item span-full">
+                  <span class="crm-compliance-info-label">Родительская компания</span>
+                  <strong>Global Resource Holdings Ltd.</strong>
+                </div>
               </div>
             </article>
 
-            <article class="crm-card uk-card uk-card-body crm-section uk-margin-bottom">
-              <div class="crm-form-section-head"><h3>KYC / AML / Риск-факторы</h3><span class="crm-step-note">Критичные проверки перед финальным решением.</span></div>
+            <!-- Contacts card -->
+            <article class="crm-card crm-compliance-info-card">
+              <div class="crm-compliance-info-head">
+                <h2>Контактные данные</h2>
+              </div>
+              <div class="crm-compliance-info-grid">
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Номера телефонов</span>
+                  <strong>+7 (495) 123-45-67</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">E-mail</span>
+                  <strong>info@globalresource.ru</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Страна</span>
+                  <strong>Россия</strong>
+                </div>
+                <div class="crm-compliance-info-item">
+                  <span class="crm-compliance-info-label">Город</span>
+                  <strong>Москва</strong>
+                </div>
+                <div class="crm-compliance-info-item span-full">
+                  <span class="crm-compliance-info-label">Адрес</span>
+                  <strong>г. Москва, ул. Профсоюзная, д. 93, корп. 2, офис 503</strong>
+                </div>
+              </div>
+            </article>
+
+            <!-- KYC / AML checks -->
+            <article class="crm-card crm-compliance-info-card">
+              <div class="crm-compliance-info-head crm-compliance-info-head--flex">
+                <h2>KYC / AML / Риск-факторы</h2>
+                <span class="crm-step-note">Критичные проверки перед финальным решением.</span>
+              </div>
               <div class="crm-doc-checklist">
                 <div class="crm-doc-checklist-item">
                   <div>
@@ -121,7 +237,8 @@
               </div>
             </article>
 
-            <article class="crm-card crm-table crm-table-wrapper crm-section">
+            <!-- Documents table -->
+            <article class="crm-card crm-table crm-table-wrapper">
               <table class="uk-table uk-table-divider">
                 <thead><tr><th>Документ</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr></thead>
                 <tbody>
@@ -131,30 +248,56 @@
                 </tbody>
               </table>
             </article>
-          </div>
 
-          <form action="#" method="post" data-form="compliance-decision" data-action="compliance-decision" class="crm-card uk-card uk-card-body crm-decision-panel">
-            <div class="crm-form-section-head"><h3>Панель решения</h3><span class="crm-badge warning" data-status="pending-review">Требует решения</span></div>
-            <p class="crm-form-hint">Выберите решение по кейсу. Для «На доработку» и «Заблокировать» комментарий обязателен.</p>
+          </div><!-- /.crm-compliance-detail-main -->
 
-            <div class="crm-decision-actions">
-              <button type="button" class="uk-button crm-button-primary crm-button crm-decision-action is-approve" data-action="compliance-decision" data-status="approved">Одобрить</button>
-              <button type="button" class="uk-button uk-button-default crm-button crm-decision-action is-rework" data-action="compliance-decision" data-status="rework">На доработку</button>
-              <button type="button" class="uk-button uk-button-default crm-button crm-decision-action is-block" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
+          <!-- ── Right decision panel ── -->
+          <aside class="crm-card crm-compliance-decision-panel">
+
+            <div class="crm-compliance-panel-head">
+              <h3>Панель принятия решения</h3>
+              <span class="crm-badge warning" data-status="pending-review">Требует решения</span>
             </div>
 
-            <div class="crm-form-section">
-              <label class="uk-form-label" for="compliance-comment">Комментарий комплаенса</label>
-              <textarea class="uk-textarea crm-input" id="compliance-comment" name="compliance-comment" rows="8" placeholder="Укажите обоснование решения"></textarea>
-              <span class="crm-field-note">Комментарий обязателен для статусов «На доработку» и «Заблокировать».</span>
+            <div class="crm-compliance-panel-actions">
+              <button type="button" class="uk-button crm-button-primary crm-button crm-compliance-panel-btn" data-action="compliance-decision" data-status="approved">Одобрить</button>
+              <button type="button" class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-rework" data-action="compliance-decision" data-status="rework">На доработку</button>
+              <button type="button" class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-block" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
             </div>
 
-            <div class="crm-footer-actions crm-decision-footer">
-              <button type="button" class="uk-button uk-button-default crm-button" data-action="save-draft">Сохранить черновик</button>
-              <button type="submit" class="uk-button crm-button-primary crm-button" data-action="compliance-decision" data-status="approved">Принять финальное решение</button>
+            <div class="crm-compliance-panel-divider"></div>
+
+            <div class="crm-compliance-panel-summary">
+              <div class="crm-compliance-panel-summary-row">
+                <span class="crm-compliance-meta-label">Текущее решение</span>
+                <span class="crm-badge info" data-status="pending-review">На проверке</span>
+              </div>
+              <div class="crm-compliance-panel-summary-row">
+                <span class="crm-compliance-meta-label">Офицер</span>
+                <span class="crm-compliance-panel-summary-val">Иванов И.И.</span>
+              </div>
+              <div class="crm-compliance-panel-summary-row">
+                <span class="crm-compliance-meta-label">Обновлено</span>
+                <span class="crm-compliance-panel-summary-val">24.04.2026</span>
+              </div>
             </div>
-          </form>
-        </div>
+
+            <div class="crm-compliance-panel-divider"></div>
+
+            <div class="crm-compliance-panel-comment">
+              <label class="uk-form-label" for="compliance-comment">Комментарий</label>
+              <textarea class="uk-textarea crm-input" id="compliance-comment" name="compliance-comment" rows="4" placeholder="Обоснование решения"></textarea>
+              <span class="crm-field-note">Обязателен для «На доработку» и «Заблокировать».</span>
+            </div>
+
+            <div class="crm-compliance-panel-footer">
+              <button type="button" class="uk-button uk-button-default crm-button crm-compliance-panel-btn" data-action="save-draft">Сохранить черновик</button>
+              <button type="submit" class="uk-button crm-button-primary crm-button crm-compliance-panel-btn" data-action="compliance-decision" data-status="approved">Принять финальное решение</button>
+            </div>
+
+          </aside><!-- /.crm-compliance-decision-panel -->
+
+        </div><!-- /.crm-compliance-detail-layout -->
       </section>
     </main>
   </div>

@@ -303,6 +303,46 @@ body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
   flex-wrap: nowrap;
 }
 
+/* Compact table chip overrides — subjects registry only */
+body[data-page="subjects"] .crm-subjects-table .crm-badge {
+  min-height: 18px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+}
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge.success {
+  background: #e2f0e8;
+  color: #265c3a;
+  border-color: #b6d9c4;
+}
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge.info {
+  background: #e4eaff;
+  color: #2e4680;
+  border-color: #c4cfef;
+}
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge.warning {
+  background: #fef0d4;
+  color: #6b4a18;
+  border-color: #e8cc96;
+}
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge.danger {
+  background: #fde4e7;
+  color: #7e2229;
+  border-color: #edb5bc;
+}
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge.muted {
+  background: #eaeff7;
+  color: #455572;
+  border-color: #c8d2e4;
+}
+
 body[data-page="subjects"] .crm-subjects-table-footer {
   display: flex;
   align-items: center;
