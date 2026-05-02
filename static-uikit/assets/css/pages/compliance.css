@@ -48,6 +48,60 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
+
+.crm-page[data-page="compliance"] .crm-filter-search-row {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.crm-page[data-page="compliance"] .crm-filter-search-input {
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  padding: 0 12px 0 44px;
+  border-color: #dbe2f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 40px;
+}
+
+.crm-page[data-page="compliance"] .crm-registry-filters.crm-filter-panel .crm-filter-search-row .crm-filter-search-shell .crm-filter-search-input {
+  box-sizing: border-box;
+  padding-inline-start: 44px;
+  padding-left: 44px;
+}
+
+.crm-page[data-page="compliance"] .crm-filter-search-shell {
+  position: relative;
+  display: block;
+  width: min(520px, 100%);
+  max-width: 100%;
+}
+
+.crm-page[data-page="compliance"] .crm-filter-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.crm-page[data-page="compliance"] .crm-filter-search-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.crm-page[data-page="compliance"] .crm-filter-search-input::placeholder {
+  color: #8b9eb8;
+}
 .crm-page[data-page="compliance"] .crm-filter-fields-row {
   display: flex;
   flex-wrap: wrap;
