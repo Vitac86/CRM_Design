@@ -276,9 +276,9 @@ body[data-page="subjects"] .crm-subjects-table .uk-table.uk-table-hover tbody tr
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table tbody td {
-  padding: 12px 12px;
+  padding: 8px 12px;
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.25;
   vertical-align: middle;
   border-bottom: 1px solid #e2e8f0;
 }
@@ -320,8 +320,11 @@ body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip {
 }
 
 body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
-  gap: 6px;
-  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 /* neutral chip: type, residency, and negative boolean states */
@@ -377,6 +380,26 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge.danger {
   background: #efdfe7;
   color: #a21b3f;
   border-color: #e2afc1;
+}
+
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="data-filled"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="данные-заполнены"] {
+  background: #e9eef8;
+  color: #4f6383;
+  border-color: #c9d5e8;
+}
+
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registration"],
+body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="регистрация"] {
+  background: #f2ebe4;
+  color: #7a5632;
+  border-color: #ddccb8;
+}
+
+body[data-page="subjects"] .crm-subjects-table .uk-table thead th:last-child,
+body[data-page="subjects"] .crm-subjects-table .uk-table tbody td:last-child {
+  min-width: 140px;
 }
 
 body[data-page="subjects"] .crm-subjects-table-footer {
