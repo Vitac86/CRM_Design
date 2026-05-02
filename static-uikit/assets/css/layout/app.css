@@ -90,14 +90,12 @@
   min-width: 0;
   flex: 1 1 0;
 }
-.crm-sidebar .crm-nav-link [uk-icon] {
-  width: 16px;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 16px;
-  color: rgba(232, 240, 255, 0.78);
+.crm-sidebar .crm-nav-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  flex: 0 0 24px;
+  color: currentColor;
 }
 .crm-nav-chevron {
   flex: 0 0 auto;
