@@ -144,9 +144,12 @@ body[data-page="middle-office-clients"] .crm-table-card {
 }
 
 body[data-page="middle-office-clients"] .crm-table-card .crm-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  max-width: 100%;
+  scrollbar-gutter: auto;
 }
 
 /* Reset the inner crm-table overflow so the wrapper is the single scroll context */
@@ -154,19 +157,29 @@ body[data-page="middle-office-clients"] .crm-table-card .crm-table {
   overflow: visible;
 }
 
+body[data-page="middle-office-clients"] .crm-table {
+  min-width: 1240px;
+}
+
 body[data-page="middle-office-clients"] .crm-table .uk-table {
-  min-width: 1320px;
+  min-width: 1240px;
+}
+
+body[data-page="middle-office-clients"] .crm-table .uk-table thead,
+body[data-page="middle-office-clients"] .crm-table .uk-table thead tr,
+body[data-page="middle-office-clients"] .crm-table .uk-table thead th {
+  background: #e8edfb;
 }
 
 body[data-page="middle-office-clients"] .crm-table .uk-table th {
-  background: #eff4fb;
-  color: #607189;
-  font-size: 11px;
+  border-bottom: 1px solid #dbe2f0;
+  padding: 14px 12px 12px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--crm-border);
-  padding: 10px 12px;
+  letter-spacing: 0.01em;
+  color: #475569;
+  line-height: 1.3;
+  vertical-align: middle;
   white-space: nowrap;
 }
 
