@@ -10,15 +10,6 @@
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-fields-row { display:flex; flex-wrap:wrap; justify-content:flex-start; gap:10px; align-items:center; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control { flex:0 1 auto; width:clamp(176px,18vw,252px); min-width:176px; max-width:252px; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control.crm-date-field { position:relative; flex:0 1 auto; width:clamp(176px,18vw,252px); min-width:176px; max-width:252px; }
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control .crm-date-input {
-  padding-right:40px !important;
-  background-image:none;
-  background-position:initial;
-  background-size:initial;
-  background-repeat:no-repeat;
-}
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control .crm-date-trigger { right:12px; }
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control .crm-date-input::-webkit-calendar-picker-indicator { opacity:0; }
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-actions { flex:0 0 auto; margin-left:auto; align-self:flex-end; max-width:100%; }
 .crm-page[data-page="archive"] .crm-archive-registry { width:100%; max-width:100%; min-width:0; margin-top:8px; overflow:hidden; border-radius:10px; border-color:#d9e3f1; background:#fff; padding:0; }
 .crm-page[data-page="archive"] .crm-archive-table { display:block; width:100%; max-width:100%; min-width:0; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; scrollbar-gutter:auto; border:0; border-radius:0; background:#fff; border-bottom:0; scrollbar-width:thin; scrollbar-color:#9ba9bf #e9eef8; }

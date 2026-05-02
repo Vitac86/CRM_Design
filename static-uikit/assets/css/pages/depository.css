@@ -130,15 +130,14 @@
 /* Date fields */
 .crm-page[data-page="depository"] .crm-dep-date-wrap {
   position: relative;
-  display: inline-flex;
-  align-items: center;
+  display: block;
   flex: 0 0 auto;
   width: 148px;
 }
 
 .crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-input {
-  min-width: 148px;
   width: 100%;
+  min-width: 0;
 }
 
 .crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-trigger {
