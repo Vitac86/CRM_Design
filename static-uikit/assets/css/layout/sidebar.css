@@ -42,12 +42,27 @@
   flex: 1 1 0;
 }
 
+.crm-sidebar .crm-nav-link svg.crm-nav-icon,
 .crm-sidebar .crm-nav-icon {
   width: 24px;
   height: 24px;
+  min-width: 24px;
+  max-width: 24px;
+  min-height: 24px;
+  max-height: 24px;
   flex: 0 0 24px;
-  display: inline-block;
+  display: block;
   color: currentColor;
+  overflow: visible;
+}
+
+.crm-sidebar .crm-nav-link [uk-icon] {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .crm-sidebar .crm-nav-group-toggle {
