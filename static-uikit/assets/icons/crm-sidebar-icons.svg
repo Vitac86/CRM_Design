@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon-dashboard" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h8v8H3V3Zm10 0h8v5h-8V3ZM3 13h5v8H3v-8Zm7 0h11v8H10v-8Z"/></symbol>
+  <symbol id="icon-subjects" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11a4 4 0 1 0-3.999-4A4 4 0 0 0 16 11Zm-8-1a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.67 0-8 1.34-8 4v2h10v-2c0-1.16.58-2.2 1.5-3C10.18 12.38 8.86 12 8 12Zm8 1c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"/></symbol>
+  <symbol id="icon-brokerage" viewBox="0 0 24 24"><path fill="currentColor" d="M10 4h4a2 2 0 0 1 2 2v2h4a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-9a2 2 0 0 1 2-2h4V6a2 2 0 0 1 2-2Zm0 4h4V6h-4v2Z"/></symbol>
+  <symbol id="icon-trust" viewBox="0 0 24 24"><path fill="currentColor" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5Zm3 2a1 1 0 0 0-1 1v1h12V8a1 1 0 0 0-1-1H7Zm11 5H6v7a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-7Z"/></symbol>
+  <symbol id="icon-agents" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.02-8 4.5V21h16v-2.5c0-2.48-3.58-4.5-8-4.5Z"/></symbol>
+  <symbol id="icon-archive" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2H3V5Zm0 4h18v10a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9Zm6 3v2h6v-2H9Z"/></symbol>
+  <symbol id="icon-requests" viewBox="0 0 24 24"><path fill="currentColor" d="M5 2h10l4 4v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm9 1.5V7h3.5L14 3.5Zm-6 7.8 4.6 4.7 6.4-6.4-1.4-1.4-5 5-3.2-3.3L8 11.3Z"/></symbol>
+  <symbol id="icon-compliance" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 4 5v6c0 5.26 3.4 10.16 8 11.75 4.6-1.59 8-6.49 8-11.75V5l-8-3Zm-1.2 14.2-3.3-3.3 1.4-1.4 1.9 1.9 4.3-4.3 1.4 1.4-5.7 5.7Z"/></symbol>
+  <symbol id="icon-journal" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h11a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H6a4 4 0 0 1 0-8h10V5a1 1 0 0 0-1-1H6v10a4 4 0 0 0 0 8V2Zm2 6h6v2H8V8Zm0 4h8v2H8v-2Z"/></symbol>
+  <symbol id="icon-trading" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></symbol>
+  <symbol id="icon-depository" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6a3 3 0 0 1 3-3h4l2 2h6a3 3 0 0 1 3 3v2H3V6Zm0 5h18v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-7Z"/></symbol>
+  <symbol id="icon-administration" viewBox="0 0 24 24"><path fill="currentColor" d="m19.14 12.94.86-1.49-1.52-2.63-1.72.28a5.91 5.91 0 0 0-1.2-.7L15 6h-3l-.56 2.4c-.42.16-.82.39-1.2.66l-1.72-.28L7 11.4l.86 1.5a5.7 5.7 0 0 0 0 1.2L7 15.6l1.52 2.63 1.72-.28c.38.27.78.5 1.2.66L12 21h3l.56-2.4c.42-.16.82-.39 1.2-.66l1.72.28L20 15.6l-.86-1.5a5.7 5.7 0 0 0 0-1.16ZM13.5 15A2.5 2.5 0 1 1 16 12.5 2.5 2.5 0 0 1 13.5 15Z"/></symbol>
+</svg>

@@ -42,10 +42,12 @@
   flex: 1 1 0;
 }
 
-.crm-sidebar .crm-nav-link [uk-icon] {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
+.crm-sidebar .crm-nav-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: inline-block;
+  color: currentColor;
 }
 
 .crm-sidebar .crm-nav-group-toggle {
