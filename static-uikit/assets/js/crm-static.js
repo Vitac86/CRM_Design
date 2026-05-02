@@ -610,4 +610,36 @@
       }
     }
   });
+
+  // ── Inline add-agent form (agents.html) ──────────────────────────────────
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!(target instanceof Element)) return;
+
+    if (target.closest('[data-action="add-agent"]')) {
+      var form = document.querySelector('[data-agent-form]');
+      if (form) {
+        form.hidden = false;
+        var firstField = form.querySelector('input:not([type="hidden"]), select');
+        if (firstField) firstField.focus();
+      }
+      event.preventDefault();
+      return;
+    }
+
+    if (target.closest('[data-action="close-agent-form"]')) {
+      var form = document.querySelector('[data-agent-form]');
+      if (form) form.hidden = true;
+      event.preventDefault();
+      return;
+    }
+  });
+
+  document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (form.matches('[data-form="agent-create"]')) {
+      var agentForm = document.querySelector('[data-agent-form]');
+      if (agentForm) agentForm.hidden = true;
+    }
+  });
 })();

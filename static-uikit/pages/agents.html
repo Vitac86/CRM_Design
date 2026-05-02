@@ -87,6 +87,59 @@
           <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить всё</button></div>
           </div>
 </form>
+        <section class="crm-card crm-agents-inline-form" data-agent-form hidden>
+          <div class="crm-agents-inline-form-header">
+            <div>
+              <h2 class="crm-agents-inline-form-title">Добавить агента</h2>
+              <p class="crm-agents-inline-form-subtitle">Заполните данные агентского подключения.</p>
+            </div>
+            <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="close-agent-form">Закрыть</button>
+          </div>
+          <form action="#" method="post" data-form="agent-create">
+            <div class="crm-agents-form-grid">
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-org">Агент / организация</label>
+                <input id="agent-org" class="uk-input crm-input crm-agents-form-input" type="text" name="agent-org" placeholder="Наименование организации" autocomplete="off"/>
+              </div>
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-contract">Договор</label>
+                <input id="agent-contract" class="uk-input crm-input crm-agents-form-input" type="text" name="agent-contract" placeholder="AG-XXXX" autocomplete="off"/>
+              </div>
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-commission">Комиссия</label>
+                <input id="agent-commission" class="uk-input crm-input crm-agents-form-input" type="text" name="agent-commission" placeholder="0.00%" autocomplete="off"/>
+              </div>
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-phone">Телефон</label>
+                <input id="agent-phone" class="uk-input crm-input crm-agents-form-input" type="tel" name="agent-phone" placeholder="+7 (XXX) XXX-XX-XX" autocomplete="off"/>
+              </div>
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-email">Email</label>
+                <input id="agent-email" class="uk-input crm-input crm-agents-form-input" type="email" name="agent-email" placeholder="agent@example.com" autocomplete="off"/>
+              </div>
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-assignee">Закрепление</label>
+                <select id="agent-assignee" class="uk-select crm-input crm-agents-form-input" name="agent-assignee">
+                  <option value="">— Выберите —</option>
+                  <option value="ivanov">Иванов И.И.</option>
+                  <option value="petrova">Петрова Н.А.</option>
+                </select>
+              </div>
+              <div class="crm-agents-form-field">
+                <label class="crm-agents-form-label" for="agent-status-field">Статус</label>
+                <select id="agent-status-field" class="uk-select crm-input crm-agents-form-input" name="agent-status">
+                  <option value="active">Активен</option>
+                  <option value="pending">На согласовании</option>
+                </select>
+              </div>
+            </div>
+            <div class="crm-agents-form-actions">
+              <button type="button" class="uk-button uk-button-default crm-button" data-action="close-agent-form">Отмена</button>
+              <button type="submit" class="uk-button crm-button-primary crm-button">Сохранить</button>
+            </div>
+          </form>
+        </section>
+
         <div class="crm-card crm-table-card crm-registry-table crm-agents-registry" data-entity="agent-table"><div class="crm-table-wrapper crm-agents-table"><div class="crm-table crm-registry-table-compact">
           <table class="uk-table uk-table-divider uk-table-hover">
             <colgroup><col style="min-width:220px"/><col style="min-width:180px"/><col style="width:160px"/><col style="width:170px"/><col style="width:140px"/><col style="width:140px"/></colgroup>
