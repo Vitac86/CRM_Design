@@ -46,6 +46,60 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
 }
 
+.crm-date-field {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.crm-date-field .crm-date-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 40px !important;
+  background-image: none !important;
+  background-position: initial;
+  background-size: initial;
+  background-repeat: no-repeat;
+}
+
+.crm-date-field .crm-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.crm-date-trigger {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6d7d98;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm-date-trigger:focus-visible {
+  outline: 2px solid var(--crm-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.crm-date-trigger .uk-icon,
+.crm-date-trigger svg {
+  pointer-events: none;
+}
+
+.crm-date-input:disabled + .crm-date-trigger {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .uk-radio {
   border-color: #b9c8e2;
   width: 15px;

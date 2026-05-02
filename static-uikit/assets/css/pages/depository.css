@@ -132,31 +132,17 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
+  width: 148px;
 }
 
-.crm-page[data-page="depository"] .crm-dep-date-input {
-  padding-right: 34px !important;
-  background-image: none !important;
+.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-input {
   min-width: 148px;
+  width: 100%;
 }
 
-.crm-page[data-page="depository"] .crm-dep-date-input::-webkit-calendar-picker-indicator { opacity: 0; }
-
-.crm-page[data-page="depository"] .crm-dep-date-icon {
-  position: absolute;
+.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-trigger {
   right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #6d7d98;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* ── Master-detail split ─────────────────────────────────────────────── */

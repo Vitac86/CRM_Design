@@ -360,15 +360,25 @@
     const target = event.target;
     if (!(target instanceof Element)) return;
 
-    const datePickerTrigger = target.closest('[data-date-picker-trigger]');
+    const datePickerTrigger = target.closest('[data-date-trigger], [data-date-picker-trigger]');
     if (datePickerTrigger) {
       const inputId = datePickerTrigger.getAttribute('data-date-picker-trigger');
-      const input = inputId ? document.getElementById(inputId) : null;
+      const dateField = datePickerTrigger.closest('.crm-date-field, .crm-filter-date-control, .crm-dep-date-wrap');
+      let input = inputId ? document.getElementById(inputId) : null;
+
+      if (!(input instanceof HTMLInputElement) && dateField) {
+        input = dateField.querySelector('[data-date-input], input[type="date"]');
+      }
 
       if (input instanceof HTMLInputElement) {
-        if (typeof input.showPicker === 'function') {
-          input.showPicker();
-        } else {
+        try {
+          if (typeof input.showPicker === 'function') {
+            input.showPicker();
+          } else {
+            input.focus();
+            input.click();
+          }
+        } catch (error) {
           input.focus();
           input.click();
         }
