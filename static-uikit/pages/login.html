@@ -22,21 +22,23 @@
     </section>
 
     <section class="crm-auth-main" aria-label="Форма входа">
-      <form class="crm-auth-card" action="#" method="post">
+      <form class="crm-auth-card" action="#" method="post" data-auth-form="login">
         <h2>Вход</h2>
         <p class="crm-auth-subtitle">Введите учётные данные для доступа к CRM</p>
 
         <div class="crm-auth-field">
           <label for="login-email">Email / Логин</label>
-          <input class="crm-auth-input" id="login-email" name="email" type="email" placeholder="name@company.ru" autocomplete="username"/>
+          <input class="crm-auth-input" id="login-email" name="email" type="email" placeholder="name@company.ru" autocomplete="username" data-auth-required/>
+          <p class="crm-auth-error" data-auth-error-for="login-email" hidden>Поле обязательно для заполнения.</p>
         </div>
 
         <div class="crm-auth-field">
           <label for="login-password">Пароль</label>
           <div class="crm-auth-password-wrap">
-            <input id="login-password" name="password" type="password" autocomplete="current-password"/>
+            <input id="login-password" name="password" type="password" autocomplete="current-password" data-auth-required/>
             <button type="button" class="crm-auth-password-toggle" data-password-toggle data-password-target="login-password">Показать</button>
           </div>
+          <p class="crm-auth-error" data-auth-error-for="login-password" hidden>Поле обязательно для заполнения.</p>
         </div>
 
         <div class="crm-auth-options">
@@ -46,7 +48,7 @@
           </label>
           <a class="crm-auth-link" href="#">Забыли пароль?</a>
         </div>
-
+        <div class="crm-auth-alert" data-auth-alert hidden>Заполните email и пароль, чтобы продолжить.</div>
         <button class="crm-auth-submit" type="button">Войти в систему</button>
         <p class="crm-auth-footer">Нет учётной записи? <a class="crm-auth-link" href="register.html">Зарегистрироваться</a></p>
       </form>
