@@ -515,48 +515,6 @@ body[data-page="subjects"] .crm-subjects-footer-nav-button:disabled {
 }
 
 /* ── Sortable table header styling ────────────────────────────────────────── */
-body[data-page="subjects"] .crm-th-sort-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-size: inherit;
-  font-weight: inherit;
-  color: inherit;
-  line-height: inherit;
-  font-family: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-body[data-page="subjects"] .crm-th-sort-button:hover {
-  opacity: 0.85;
-}
-
-body[data-page="subjects"] .crm-th-sort-button:focus-visible {
-  outline: 2px solid rgba(59, 130, 246, 0.3);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-body[data-page="subjects"] th[data-sort-key] .crm-th-sort {
-  margin-left: 4px;
-  opacity: 0.5;
-  font-size: 11px;
-  transition: opacity 0.2s ease;
-  display: inline-block;
-  min-width: 10px;
-  text-align: center;
-}
-
-body[data-page="subjects"] th.is-sorted-asc .crm-th-sort,
-body[data-page="subjects"] th.is-sorted-desc .crm-th-sort {
-  opacity: 1;
-}
 
 
 

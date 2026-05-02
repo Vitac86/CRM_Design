@@ -288,3 +288,35 @@
 .crm-table tbody tr:hover {
   background: #f2f6ff;
 }
+
+
+[data-sortable-table] .crm-th-sort-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+[data-sortable-table] th[data-sort-key] .crm-th-sort {
+  opacity: 0.45;
+  transition: opacity 0.2s ease;
+}
+
+[data-sortable-table] th.is-sorted-asc .crm-th-sort,
+[data-sortable-table] th.is-sorted-desc .crm-th-sort {
+  opacity: 0.95;
+}
+
+[data-sortable-table] .crm-th-sort-button:focus-visible {
+  outline: 2px solid #90aef7;
+  outline-offset: 2px;
+  border-radius: 4px;
+}

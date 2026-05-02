@@ -126,7 +126,7 @@
         <div class="crm-card crm-table-card crm-registry-table crm-compliance-registry" data-entity="compliance-table">
           <div class="crm-table-wrapper crm-compliance-table">
             <div class="crm-table">
-              <table class="uk-table uk-table-divider uk-table-hover">
+              <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
                 <colgroup>
                   <col class="crm-col-id"/>
                   <col class="crm-col-name"/>
@@ -138,13 +138,13 @@
                 </colgroup>
                 <thead>
                   <tr>
-                    <th><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Наименование клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">ИНН</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Тип</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Резидент</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Статус комплаенса</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Полный комплект</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th data-sort-key="client-code" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="client-name" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Наименование клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="inn" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">ИНН</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="client-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Тип</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="residency" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Резидент</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="compliance-status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус комплаенса</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="documents" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Полный комплект</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
                   </tr>
                 </thead>
                 <tbody>
