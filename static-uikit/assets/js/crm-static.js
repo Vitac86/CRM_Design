@@ -691,7 +691,7 @@
     var tbody = table.querySelector('tbody');
     if (!tbody) return;
 
-    var rows = Array.from(tbody.querySelectorAll('tr[data-entity="subject"]'));
+    var rows = Array.from(tbody.querySelectorAll('> tr:not([hidden]):not(.is-hidden):not([data-sort-ignore])'.replace('> ', ':scope > ')));
     if (rows.length === 0) return;
 
     // Find the column index
@@ -717,32 +717,60 @@
     });
   });
 
-  function getCellSortValue(cell, sortType) {
-    var text = cell.textContent.trim();
-    // Normalize whitespace
-    text = text.replace(/\s+/g, ' ');
+  function normalizeSortText(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function parseSortValue(value, sortType) {
+    var normalized = normalizeSortText(value);
 
     if (sortType === 'number') {
-      // Extract numeric value
-      var match = text.match(/\d+/);
-      return match ? parseInt(match[0], 10) : 0;
+      var number = Number(normalized.replace(/\s+/g, '').replace(/,/g, '.').replace(/[^0-9.-]/g, ''));
+      return Number.isFinite(number) ? number : null;
     }
 
-    return text;
+    if (sortType === 'money') {
+      var money = Number(normalized.replace(/\s+/g, '').replace(/,/g, '.').replace(/[^0-9.-]/g, ''));
+      return Number.isFinite(money) ? money : null;
+    }
+
+    if (sortType === 'percent') {
+      var percent = Number(normalized.replace(/\s+/g, '').replace('%', '').replace(/,/g, '.').replace(/[^0-9.-]/g, ''));
+      return Number.isFinite(percent) ? percent : null;
+    }
+
+    if (sortType === 'date') {
+      var isoMatch = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (isoMatch) {
+        var isoDate = new Date(Date.UTC(Number(isoMatch[1]), Number(isoMatch[2]) - 1, Number(isoMatch[3])));
+        return Number.isNaN(isoDate.getTime()) ? null : isoDate.getTime();
+      }
+      var ruMatch = normalized.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      if (ruMatch) {
+        var ruDate = new Date(Date.UTC(Number(ruMatch[3]), Number(ruMatch[2]) - 1, Number(ruMatch[1])));
+        return Number.isNaN(ruDate.getTime()) ? null : ruDate.getTime();
+      }
+      return null;
+    }
+
+    return normalized;
+  }
+
+  function getCellSortValue(cell, sortType) {
+    if (!cell) return { parsed: null, text: '' };
+    var sourceValue = cell.getAttribute('data-sort-value');
+    var rawValue = sourceValue != null ? sourceValue : cell.textContent;
+    var text = normalizeSortText(rawValue);
+    return { parsed: parseSortValue(text, sortType), text: text };
   }
 
   function compareValues(a, b, sortType) {
-    if (sortType === 'number') {
-      return a - b;
+    if (a.parsed !== null && b.parsed !== null) {
+      if (a.parsed < b.parsed) return -1;
+      if (a.parsed > b.parsed) return 1;
+      return 0;
     }
 
-    // Text comparison with Russian locale support
-    if (typeof a === 'string' && typeof b === 'string') {
-      return a.localeCompare(b, 'ru', { numeric: false, sensitivity: 'base' });
-    }
-
-    if (a < b) return -1;
-    if (a > b) return 1;
-    return 0;
+    return a.text.localeCompare(b.text, 'ru', { numeric: true, sensitivity: 'base' });
   }
 })();

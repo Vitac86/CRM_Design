@@ -90,7 +90,7 @@
         <div class="crm-card crm-table-card crm-registry-table crm-brokerage-registry" data-entity="brokerage-table">
           <div class="crm-table-wrapper crm-brokerage-table">
             <div class="crm-table">
-              <table class="uk-table uk-table-divider uk-table-hover">
+              <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
                 <colgroup>
                   <col class="crm-brokerage-col-contract"/>
                   <col class="crm-brokerage-col-code"/>
@@ -101,12 +101,12 @@
                 </colgroup>
                 <thead>
                   <tr>
-                    <th><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Клиент</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Менеджер</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Дата открытия</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
-                    <th><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></th>
+                    <th data-sort-key="agreement" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="client-code" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="client" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Клиент</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="manager" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Менеджер</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="open-date" data-sort-type="date" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Дата открытия</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                    <th data-sort-key="status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
                   </tr>
                 </thead>
                 <tbody>

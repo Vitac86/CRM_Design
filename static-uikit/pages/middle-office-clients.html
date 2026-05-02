@@ -114,7 +114,7 @@
           <div class="crm-card crm-table-card" data-entity="mo-clients-table">
             <div class="crm-table-wrapper">
               <div class="crm-table">
-                <table class="uk-table uk-table-divider uk-table-hover">
+                <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
                   <colgroup>
                     <col style="width:100px"/>
                     <col style="width:120px"/>
@@ -130,17 +130,7 @@
                   </colgroup>
                   <thead>
                     <tr>
-                      <th>Код клиента</th>
-                      <th>Вид договора</th>
-                      <th>Наименование клиента</th>
-                      <th>ИНН</th>
-                      <th>Тип клиента</th>
-                      <th>Номер договора</th>
-                      <th>Дата договора</th>
-                      <th>Статус резидентства</th>
-                      <th>Тип счёта</th>
-                      <th>Статус счёта</th>
-                      <th>Права ДС / ЦБ</th>
+                      <th data-sort-key="client-code" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Вид договора</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="client-name" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Наименование клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="inn" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">ИНН</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="client-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Тип клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement-number" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Номер договора</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement-date" data-sort-type="date" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Дата договора</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="residency" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус резидентства</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="account-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Тип счёта</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="account-status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус счёта</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="rights" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Права ДС / ЦБ</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
                     </tr>
                   </thead>
                   <tbody data-role="mo-clients-tbody">
