@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CRM — Вход</title>
+  <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
+  <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/auth.css"/>
+</head>
+<body class="crm-auth-page" data-page="login">
+  <main class="crm-auth-shell">
+    <section class="crm-auth-brand" aria-label="Бренд">
+      <a class="crm-auth-logo" href="../index.html" aria-label="На стартовую панель CRM Static UI Kit">
+        <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+      </a>
+      <div class="crm-auth-copy">
+        <h1>Авторизуйтесь для работы с CRM</h1>
+        <p>Единое пространство для операций, комплаенса и сопровождения клиентов.</p>
+        <p class="crm-auth-label">INVESTICA CRM</p>
+      </div>
+    </section>
+
+    <section class="crm-auth-main" aria-label="Форма входа">
+      <form class="crm-auth-card" action="#" method="post">
+        <h2>Вход</h2>
+        <p class="crm-auth-subtitle">Введите учётные данные для доступа к CRM</p>
+
+        <div class="crm-auth-field">
+          <label for="login-email">Email / Логин</label>
+          <input class="crm-auth-input" id="login-email" name="email" type="email" placeholder="name@company.ru" autocomplete="username"/>
+        </div>
+
+        <div class="crm-auth-field">
+          <label for="login-password">Пароль</label>
+          <div class="crm-auth-password-wrap">
+            <input id="login-password" name="password" type="password" autocomplete="current-password"/>
+            <button type="button" class="crm-auth-password-toggle" data-password-toggle data-password-target="login-password">Показать</button>
+          </div>
+        </div>
+
+        <div class="crm-auth-options">
+          <label class="crm-auth-check" for="remember-me">
+            <input id="remember-me" name="remember" type="checkbox"/>
+            <span>Запомнить меня</span>
+          </label>
+          <a class="crm-auth-link" href="#">Забыли пароль?</a>
+        </div>
+
+        <button class="crm-auth-submit" type="button">Войти в систему</button>
+        <p class="crm-auth-footer">Нет учётной записи? <a class="crm-auth-link" href="register.html">Зарегистрироваться</a></p>
+      </form>
+    </section>
+  </main>
+<script src="../assets/js/crm-static.js"></script>
+</body>
+</html>

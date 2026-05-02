@@ -783,4 +783,27 @@
 
     return a.text.localeCompare(b.text, 'ru', { numeric: true, sensitivity: 'base' });
   }
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!(target instanceof Element)) return;
+
+    var toggleButton = target.closest('[data-password-toggle]');
+    if (!toggleButton) return;
+
+    var targetId = toggleButton.getAttribute('data-password-target');
+    var passwordInput = targetId ? document.getElementById(targetId) : null;
+
+    if (!passwordInput) {
+      var wrapper = toggleButton.closest('.crm-auth-password-wrap');
+      passwordInput = wrapper ? wrapper.querySelector('input[type="password"], input[type="text"]') : null;
+    }
+
+    if (!passwordInput) return;
+
+    var makeVisible = passwordInput.type === 'password';
+    passwordInput.type = makeVisible ? 'text' : 'password';
+    toggleButton.textContent = makeVisible ? 'Скрыть' : 'Показать';
+    toggleButton.setAttribute('aria-pressed', makeVisible ? 'true' : 'false');
+  });
+
 })();
