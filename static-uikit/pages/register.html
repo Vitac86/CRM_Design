@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CRM — Регистрация</title>
+  <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
+  <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/auth.css"/>
+</head>
+<body class="crm-auth-page" data-page="register">
+  <main class="crm-auth-shell">
+    <section class="crm-auth-brand" aria-label="Бренд">
+      <a class="crm-auth-logo" href="../index.html" aria-label="На стартовую панель CRM Static UI Kit">
+        <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+      </a>
+      <div class="crm-auth-copy">
+        <h1>Регистрация для работы с CRM</h1>
+        <p>Единое пространство для операций, комплаенса и сопровождения клиентов.</p>
+        <p class="crm-auth-label">INVESTICA CRM</p>
+      </div>
+    </section>
+
+    <section class="crm-auth-main" aria-label="Форма регистрации">
+      <form class="crm-auth-card" action="#" method="post">
+        <h2>Регистрация</h2>
+        <p class="crm-auth-subtitle">Создайте учётную запись для работы в CRM</p>
+
+        <div class="crm-auth-field">
+          <label for="register-email">Email</label>
+          <input class="crm-auth-input" id="register-email" name="email" type="email" placeholder="name@company.ru" autocomplete="email"/>
+        </div>
+        <div class="crm-auth-field">
+          <label for="register-fullname">ФИО</label>
+          <input class="crm-auth-input" id="register-fullname" name="fullname" type="text" autocomplete="name"/>
+        </div>
+        <div class="crm-auth-field">
+          <label for="register-password">Пароль</label>
+          <div class="crm-auth-password-wrap">
+            <input id="register-password" name="password" type="password" autocomplete="new-password"/>
+            <button type="button" class="crm-auth-password-toggle" data-password-toggle data-password-target="register-password">Показать</button>
+          </div>
+        </div>
+        <div class="crm-auth-field">
+          <label for="register-password-confirm">Подтвердите пароль</label>
+          <div class="crm-auth-password-wrap">
+            <input id="register-password-confirm" name="password_confirm" type="password" autocomplete="new-password"/>
+            <button type="button" class="crm-auth-password-toggle" data-password-toggle data-password-target="register-password-confirm">Показать</button>
+          </div>
+        </div>
+
+        <div class="crm-auth-options">
+          <label class="crm-auth-check" for="consent-personal-data">
+            <input id="consent-personal-data" name="consent" type="checkbox"/>
+            <span>Согласен на обработку персональных данных</span>
+          </label>
+        </div>
+
+        <button class="crm-auth-submit" type="button">Зарегистрироваться</button>
+        <p class="crm-auth-footer">Есть учётная запись? <a class="crm-auth-link" href="login.html">Авторизация</a></p>
+      </form>
+    </section>
+  </main>
+<script src="../assets/js/crm-static.js"></script>
+</body>
+</html>
