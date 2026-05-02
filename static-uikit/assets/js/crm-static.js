@@ -642,4 +642,107 @@
       if (agentForm) agentForm.hidden = true;
     }
   });
+
+  // ── Sortable table implementation ────────────────────────────────────────
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!(target instanceof Element)) return;
+
+    var sortButton = target.closest('[data-sortable-table] .crm-th-sort-button');
+    if (!sortButton) return;
+
+    var th = sortButton.closest('th[data-sort-key]');
+    if (!th) return;
+
+    var table = sortButton.closest('[data-sortable-table]');
+    if (!table) return;
+
+    event.preventDefault();
+
+    var sortKey = th.getAttribute('data-sort-key');
+    var sortType = th.getAttribute('data-sort-type') || 'text';
+    var currentSort = th.getAttribute('aria-sort');
+
+    // Determine next sort direction
+    var nextSort = 'ascending';
+    if (currentSort === 'ascending') {
+      nextSort = 'descending';
+    }
+
+    // Get all th elements with sort functionality
+    table.querySelectorAll('th[data-sort-key]').forEach(function (otherTh) {
+      otherTh.setAttribute('aria-sort', 'none');
+      otherTh.classList.remove('is-sorted-asc', 'is-sorted-desc');
+      var sortSpan = otherTh.querySelector('.crm-th-sort');
+      if (sortSpan) {
+        sortSpan.textContent = '▾';
+      }
+    });
+
+    // Set the current header's sort state
+    th.setAttribute('aria-sort', nextSort);
+    th.classList.add(nextSort === 'ascending' ? 'is-sorted-asc' : 'is-sorted-desc');
+    var sortSpan = th.querySelector('.crm-th-sort');
+    if (sortSpan) {
+      sortSpan.textContent = nextSort === 'ascending' ? '▴' : '▾';
+    }
+
+    // Get table body and rows
+    var tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    var rows = Array.from(tbody.querySelectorAll('tr[data-entity="subject"]'));
+    if (rows.length === 0) return;
+
+    // Find the column index
+    var columnIndex = Array.from(th.parentElement.children).indexOf(th);
+
+    // Sort rows
+    rows.sort(function (rowA, rowB) {
+      var cellA = rowA.children[columnIndex];
+      var cellB = rowB.children[columnIndex];
+
+      if (!cellA || !cellB) return 0;
+
+      var valueA = getCellSortValue(cellA, sortType);
+      var valueB = getCellSortValue(cellB, sortType);
+
+      var comparison = compareValues(valueA, valueB, sortType);
+      return nextSort === 'ascending' ? comparison : -comparison;
+    });
+
+    // Re-append sorted rows to tbody
+    rows.forEach(function (row) {
+      tbody.appendChild(row);
+    });
+  });
+
+  function getCellSortValue(cell, sortType) {
+    var text = cell.textContent.trim();
+    // Normalize whitespace
+    text = text.replace(/\s+/g, ' ');
+
+    if (sortType === 'number') {
+      // Extract numeric value
+      var match = text.match(/\d+/);
+      return match ? parseInt(match[0], 10) : 0;
+    }
+
+    return text;
+  }
+
+  function compareValues(a, b, sortType) {
+    if (sortType === 'number') {
+      return a - b;
+    }
+
+    // Text comparison with Russian locale support
+    if (typeof a === 'string' && typeof b === 'string') {
+      return a.localeCompare(b, 'ru', { numeric: false, sensitivity: 'base' });
+    }
+
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+  }
 })();
