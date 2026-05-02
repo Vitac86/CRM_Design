@@ -1326,98 +1326,52 @@
   color: var(--crm-umi-primary-hover, var(--crm-umi-primary));
 }
 
-/* ── Contracts / Accounts table wrapper + rhythm ─────────────────────────── */
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table-wrapper {
-  border: 1px solid var(--crm-umi-border);
-  border-radius: 8px;
-  padding: 2px 0;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table-wrapper::after {
-  display: none;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table {
-  margin: 0;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table th {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--crm-umi-text-muted);
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table td {
-  font-size: 13px;
-  padding-top: 9px;
-  padding-bottom: 9px;
-  vertical-align: middle;
-}
-
-/* ── Relations table wrapper + rhythm ────────────────────────────────────── */
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table-wrapper {
-  border: 1px solid var(--crm-umi-border);
-  border-radius: 8px;
-  padding: 2px 0;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table-wrapper::after {
-  display: none;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table {
-  margin: 0;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table th {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--crm-umi-text-muted);
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table td {
-  font-size: 13px;
-  padding-top: 9px;
-  padding-bottom: 9px;
-  vertical-align: middle;
-}
-
-/* ── History table wrapper + rhythm ──────────────────────────────────────── */
+/* Unified compliance-style table framing for subject-card data tabs */
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper,
+.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table-wrapper,
+.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table-wrapper,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table-wrapper,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: auto;
   border: 1px solid var(--crm-umi-border);
   border-radius: 8px;
-  padding: 2px 0;
+  background: #ffffff;
 }
 
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper::after,
+.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table-wrapper::after,
+.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table-wrapper::after,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table-wrapper::after,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table-wrapper::after {
   display: none;
 }
 
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper .crm-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table-wrapper .crm-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table-wrapper .crm-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table-wrapper .crm-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table-wrapper .crm-table {
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background: #ffffff;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table .uk-table,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table {
-  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
 }
 
-.crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table th {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--crm-umi-text-muted);
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table td {
-  font-size: 13px;
-  padding-top: 9px;
-  padding-bottom: 9px;
-  vertical-align: middle;
-}
-
-
-/* Unified registry-style table headers for subject-card data tabs */
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table thead,
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table thead tr,
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table thead th,
@@ -1427,6 +1381,9 @@
 .crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table thead,
 .crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table thead tr,
 .crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table thead th,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table .uk-table thead,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table .uk-table thead tr,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table .uk-table thead th,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table thead,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table thead tr,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table thead th {
@@ -1436,31 +1393,18 @@
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table thead th,
 .crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table thead th,
 .crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table thead th,
+.crm-page[data-page="subject-card"] [data-tab-panel="accounts"] .crm-table .uk-table thead th,
 .crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table thead th {
-  padding: 14px 12px 12px;
   border-bottom: 1px solid #dbe2f0;
+  padding: 14px 12px 12px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
+  text-transform: none;
   color: #475569;
   line-height: 1.3;
-  text-transform: none;
   vertical-align: middle;
   white-space: nowrap;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table thead th:first-child,
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table thead th:first-child,
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table thead th:first-child,
-.crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table thead th:first-child {
-  border-top-left-radius: 8px;
-}
-
-.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table thead th:last-child,
-.crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table .uk-table thead th:last-child,
-.crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table .uk-table thead th:last-child,
-.crm-page[data-page="subject-card"] [data-tab-panel="history"] .crm-table .uk-table thead th:last-child {
-  border-top-right-radius: 8px;
 }
 
 .crm-page[data-page="subject-card"] {
