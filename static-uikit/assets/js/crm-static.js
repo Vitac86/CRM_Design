@@ -29,6 +29,52 @@
     return element.closest('form, fieldset, section, .crm-card, .crm-page') || document;
   }
 
+  function getAuthErrorNode(control) {
+    if (!control || !control.id) return null;
+    return document.querySelector('[data-auth-error-for="' + escapeCssValue(control.id) + '"]');
+  }
+
+  function setAuthControlValidState(control, isValid) {
+    if (!control) return;
+    const errorNode = getAuthErrorNode(control);
+    const controlId = control.id || '';
+
+    control.classList.toggle('is-invalid', !isValid);
+    control.setAttribute('aria-invalid', isValid ? 'false' : 'true');
+
+    if (!isValid && errorNode && controlId) {
+      errorNode.hidden = false;
+      errorNode.id = errorNode.id || (controlId + '-error');
+      control.setAttribute('aria-describedby', errorNode.id);
+    } else {
+      if (errorNode) errorNode.hidden = true;
+      control.removeAttribute('aria-describedby');
+    }
+
+    if (control.type === 'checkbox') {
+      const checkLabel = control.closest('.crm-auth-check');
+      if (checkLabel) checkLabel.classList.toggle('is-invalid', !isValid);
+    }
+  }
+
+  function validateAuthForm(form) {
+    if (!form || !form.matches('[data-auth-form]')) return true;
+
+    let hasErrors = false;
+    form.querySelectorAll('[data-auth-required]').forEach(function (control) {
+      const isCheckbox = control instanceof HTMLInputElement && control.type === 'checkbox';
+      const value = isCheckbox ? '' : (control.value || '').trim();
+      const isValid = isCheckbox ? control.checked : value.length > 0;
+      setAuthControlValidState(control, isValid);
+      if (!isValid) hasErrors = true;
+    });
+
+    const authAlert = form.querySelector('[data-auth-alert]');
+    if (authAlert) authAlert.hidden = !hasErrors;
+
+    return !hasErrors;
+  }
+
   function syncRadioTileGroup(scope, radioName) {
     if (!radioName) return;
     scope.querySelectorAll('.crm-radio-tile input[type="radio"][name="' + escapeCssValue(radioName) + '"]').forEach(function (radio) {
@@ -359,6 +405,15 @@
   document.addEventListener('click', function (event) {
     const target = event.target;
     if (!(target instanceof Element)) return;
+    const authSubmit = target.closest('[data-auth-form] .crm-auth-submit');
+    if (authSubmit) {
+      const authForm = authSubmit.closest('[data-auth-form]');
+      if (authForm) {
+        validateAuthForm(authForm);
+        event.preventDefault();
+        return;
+      }
+    }
 
     const datePickerTrigger = target.closest('[data-date-trigger], [data-date-picker-trigger]');
     if (datePickerTrigger) {
@@ -524,6 +579,18 @@
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
 
+    if (target.matches('[data-auth-form] [data-auth-required]:not([type="checkbox"])')) {
+      const targetValue = target.value ? target.value.trim() : '';
+      if (target.classList.contains('is-invalid') && targetValue.length > 0) {
+        setAuthControlValidState(target, true);
+        const form = target.closest('[data-auth-form]');
+        if (form && !form.querySelector('[data-auth-required].is-invalid')) {
+          const authAlert = form.querySelector('[data-auth-alert]');
+          if (authAlert) authAlert.hidden = true;
+        }
+      }
+    }
+
     const panel = target.closest('.crm-filter-panel');
     if (panel) {
       syncResetButtonState(panel);
@@ -533,6 +600,15 @@
   document.addEventListener('change', function (event) {
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
+
+    if (target.matches('[data-auth-form] [data-auth-required][type="checkbox"]') && target.classList.contains('is-invalid') && target.checked) {
+      setAuthControlValidState(target, true);
+      const form = target.closest('[data-auth-form]');
+      if (form && !form.querySelector('[data-auth-required].is-invalid')) {
+        const authAlert = form.querySelector('[data-auth-alert]');
+        if (authAlert) authAlert.hidden = true;
+      }
+    }
 
     if (target.matches('.crm-radio-tile input[type="radio"]')) {
       const scope = findControlScope(target);

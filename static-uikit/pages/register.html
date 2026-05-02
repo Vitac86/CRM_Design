@@ -22,40 +22,45 @@
     </section>
 
     <section class="crm-auth-main" aria-label="Форма регистрации">
-      <form class="crm-auth-card" action="#" method="post">
+      <form class="crm-auth-card" action="#" method="post" data-auth-form="register">
         <h2>Регистрация</h2>
         <p class="crm-auth-subtitle">Создайте учётную запись для работы в CRM</p>
 
         <div class="crm-auth-field">
           <label for="register-email">Email</label>
-          <input class="crm-auth-input" id="register-email" name="email" type="email" placeholder="name@company.ru" autocomplete="email"/>
+          <input class="crm-auth-input" id="register-email" name="email" type="email" placeholder="name@company.ru" autocomplete="email" data-auth-required/>
+          <p class="crm-auth-error" data-auth-error-for="register-email" hidden>Поле обязательно для заполнения.</p>
         </div>
         <div class="crm-auth-field">
           <label for="register-fullname">ФИО</label>
-          <input class="crm-auth-input" id="register-fullname" name="fullname" type="text" autocomplete="name"/>
+          <input class="crm-auth-input" id="register-fullname" name="fullname" type="text" autocomplete="name" data-auth-required/>
+          <p class="crm-auth-error" data-auth-error-for="register-fullname" hidden>Поле обязательно для заполнения.</p>
         </div>
         <div class="crm-auth-field">
           <label for="register-password">Пароль</label>
           <div class="crm-auth-password-wrap">
-            <input id="register-password" name="password" type="password" autocomplete="new-password"/>
+            <input id="register-password" name="password" type="password" autocomplete="new-password" data-auth-required/>
             <button type="button" class="crm-auth-password-toggle" data-password-toggle data-password-target="register-password">Показать</button>
           </div>
+          <p class="crm-auth-error" data-auth-error-for="register-password" hidden>Поле обязательно для заполнения.</p>
         </div>
         <div class="crm-auth-field">
           <label for="register-password-confirm">Подтвердите пароль</label>
           <div class="crm-auth-password-wrap">
-            <input id="register-password-confirm" name="password_confirm" type="password" autocomplete="new-password"/>
+            <input id="register-password-confirm" name="password_confirm" type="password" autocomplete="new-password" data-auth-required/>
             <button type="button" class="crm-auth-password-toggle" data-password-toggle data-password-target="register-password-confirm">Показать</button>
           </div>
+          <p class="crm-auth-error" data-auth-error-for="register-password-confirm" hidden>Поле обязательно для заполнения.</p>
         </div>
 
         <div class="crm-auth-options">
           <label class="crm-auth-check" for="consent-personal-data">
-            <input id="consent-personal-data" name="consent" type="checkbox"/>
+            <input id="consent-personal-data" name="consent" type="checkbox" data-auth-required/>
             <span>Согласен на обработку персональных данных</span>
           </label>
+          <p class="crm-auth-error crm-auth-error-consent" data-auth-error-for="consent-personal-data" hidden>Необходимо согласие на обработку персональных данных.</p>
         </div>
-
+        <div class="crm-auth-alert" data-auth-alert hidden>Заполните обязательные поля, чтобы продолжить.</div>
         <button class="crm-auth-submit" type="button">Зарегистрироваться</button>
         <p class="crm-auth-footer">Есть учётная запись? <a class="crm-auth-link" href="login.html">Авторизация</a></p>
       </form>
