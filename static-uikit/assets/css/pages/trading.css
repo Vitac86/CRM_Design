@@ -37,16 +37,21 @@ body[data-page="trading-card"] {
 }
 
 .crm-page[data-page="trading"] .crm-trading-header {
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   margin: 0;
   padding-bottom: 2px;
 }
 
+.crm-page[data-page="trading"] .crm-registry-title-block {
+  min-width: 0;
+}
+
 .crm-page[data-page="trading"] .crm-trading-actions {
   flex: 0 0 auto;
   gap: 10px;
-  padding-top: 0;
+  margin-left: auto;
+  padding-top: 2px;
 }
 
 .crm-page[data-page="trading"] .crm-page-title {
@@ -54,6 +59,14 @@ body[data-page="trading-card"] {
   font-weight: 600;
   line-height: 1.15;
   margin: 0;
+}
+
+.crm-page[data-page="trading"] .crm-page-subtitle {
+  max-width: 720px;
+  margin: 4px 0 0;
+  color: #69809f;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 /* ── Filter panel ──────────────────────────────────────────────────────── */
@@ -150,14 +163,14 @@ body[data-page="trading-card"] {
 }
 
 .crm-page[data-page="trading"] .crm-button-export-light {
-  min-height: 30px;
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 7px;
+  min-height: 36px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px !important;
   border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
   background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
   color: var(--crm-umi-text-secondary);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   box-shadow: none;
 }
@@ -168,7 +181,7 @@ body[data-page="trading-card"] {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  margin-top: 8px;
+  margin-top: 0;
   overflow: hidden;
   border-radius: 10px;
   border-color: #d9e3f1;
@@ -758,6 +771,16 @@ body[data-page="trading-card"] {
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 1180px) {
+  .crm-page[data-page="trading"] .crm-trading-header {
+    flex-direction: column;
+  }
+
+  .crm-page[data-page="trading"] .crm-trading-actions {
+    justify-content: flex-start;
+    margin-left: 0;
+    padding-top: 0;
+  }
+
   .crm-page[data-page="trading-card"] .crm-profile-rows-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

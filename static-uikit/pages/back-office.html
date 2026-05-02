@@ -58,7 +58,8 @@
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
       <section class="crm-page crm-registry-page" data-page="back-office">
-        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 data-entity="page-title">Бэк-офис</h1><p>Реестр отправленных отчётов и операционных файлов с контролем доставки.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-back-office">Экспорт</button></div></div>
+        <section class="crm-registry-shell crm-back-office-shell">
+        <div class="crm-page-header crm-page-header-row crm-registry-header crm-back-office-header"><div class="crm-registry-title-block"><h1 class="crm-page-title" data-entity="page-title">Бэк-офис</h1><p class="crm-page-subtitle">Реестр отправленных отчётов и операционных файлов с контролем доставки.</p></div><div class="crm-header-actions crm-registry-actions crm-back-office-actions"><button class="uk-button uk-button-default crm-button crm-button-secondary" type="button" data-action="export-back-office">Экспорт</button></div></div>
         <form action="#" method="post" data-form="back-office-filters" data-action="filter-back-office" class="crm-registry-filters crm-filter-panel" data-filter="back-office">
           <div class="crm-filter-search-row"><input id="bo-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="search" placeholder="Файл, клиент, код"/></div>
 
@@ -76,10 +77,11 @@
           <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters" type="button">Сбросить фильтры</button></div>
           </div>
 </form>
-        <div class="crm-card crm-table-card crm-registry-table" data-entity="back-office-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Файл</th><th>Тип</th><th>Канал</th><th>Отправка</th><th>Статус</th></tr></thead><tbody>
+        <div class="crm-card crm-table-card crm-registry-table crm-back-office-registry" data-entity="back-office-table"><div class="crm-table-wrapper crm-back-office-table"><div class="crm-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><thead><tr><th>Файл</th><th>Тип</th><th>Канал</th><th>Отправка</th><th>Статус</th></tr></thead><tbody>
           <tr data-entity="back-office-report" data-id="bo-oper-24042026-003"><td><div class="crm-row-main">bo_oper_24042026_003.xml</div><div class="crm-row-sub">CL-4401 · Операционный</div></td><td>Операционный</td><td><span class="crm-badge muted" data-status="delivery-edo">ЭДО</span></td><td>24.04.2026 11:08</td><td><span class="crm-badge success" data-status="delivered">Доставлен</span></td></tr>
           <tr data-entity="back-office-report" data-id="bo-ops-23042026-014"><td><div class="crm-row-main">bo_ops_23042026_014.xml</div><div class="crm-row-sub">CL-4412 · Операционный</div></td><td>Операционный</td><td><span class="crm-badge muted" data-status="delivery-sftp">SFTP</span></td><td>23.04.2026 18:14</td><td><span class="crm-badge danger" data-status="delivery-error">Ошибка</span></td></tr>
         </tbody></table></div></div><div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет отчётов</div><div class="crm-empty-state-text">Измените период или параметры фильтра.</div></div></div>
+        </section>
       </section>
     </main>
   </div>
