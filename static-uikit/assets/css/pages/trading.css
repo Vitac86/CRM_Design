@@ -194,6 +194,7 @@ body[data-page="trading-card"] {
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  scrollbar-gutter: auto;
   overflow-x: auto;
   overflow-y: hidden;
   border: 0;
@@ -804,4 +805,3 @@ body[data-page="trading-card"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
