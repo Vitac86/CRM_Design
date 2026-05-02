@@ -1,0 +1,433 @@
+/* ── Depository page shell ───────────────────────────────────────────── */
+.crm-page[data-page="depository"] { min-width: 0; overflow-x: hidden; }
+
+.crm-page[data-page="depository"] .crm-dep-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid #d7e2f2;
+  background: #f5f8ff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  min-width: 0;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-page-title {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--crm-text);
+}
+
+.crm-page[data-page="depository"] .crm-page-subtitle {
+  color: #69809f;
+  margin: 3px 0 0;
+  font-size: 14px;
+}
+
+.crm-page[data-page="depository"] .crm-page-header-row {
+  align-items: flex-start;
+}
+
+.crm-page[data-page="depository"] .crm-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.crm-page[data-page="depository"] .crm-header-actions .crm-button {
+  min-height: 40px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ── Filter toolbar ──────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-search {
+  width: 100%;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--crm-input-border);
+  border-radius: 8px;
+  background: var(--crm-input-bg);
+  padding: 0 10px;
+  height: 38px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: text;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell:focus-within {
+  border-color: var(--crm-primary);
+  box-shadow: var(--crm-focus-ring);
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-icon {
+  color: #8fa3bf;
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  height: 36px;
+  font-size: 13px;
+  width: 100%;
+  box-shadow: none;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-filter-input {
+  height: 38px;
+  font-size: 13px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--crm-input-border);
+  background: var(--crm-input-bg);
+  color: var(--crm-text);
+  min-width: 110px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.crm-page[data-page="depository"] .crm-dep-filter-input:focus {
+  border-color: var(--crm-primary);
+  box-shadow: var(--crm-focus-ring);
+  outline: none;
+}
+
+/* Date fields */
+.crm-page[data-page="depository"] .crm-dep-date-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.crm-page[data-page="depository"] .crm-dep-date-input {
+  padding-right: 34px !important;
+  background-image: none !important;
+  min-width: 148px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-date-input::-webkit-calendar-picker-indicator { opacity: 0; }
+
+.crm-page[data-page="depository"] .crm-dep-date-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6d7d98;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Master-detail split ─────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-split {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.crm-page[data-page="depository"] .crm-dep-split-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* ── Report list ─────────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-report-list-wrap {
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px;
+  max-height: 580px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #bfcbdf transparent;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item {
+  width: 100%;
+  display: block;
+  text-align: left;
+  border: 1px solid var(--crm-border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item:hover {
+  border-color: rgba(63, 102, 216, 0.3);
+  background: rgba(63, 102, 216, 0.04);
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item.is-active {
+  border-color: #4f6bdc;
+  background: rgba(79, 107, 220, 0.08);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #223250;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item-date {
+  font-size: 11px;
+  color: #74839b;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item-sub {
+  font-size: 11px;
+  color: #74839b;
+  margin-top: 1px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item-title {
+  font-size: 12px;
+  color: #4f627a;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-item-meta {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-list-empty {
+  padding: 36px 16px;
+  text-align: center;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-list-empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a3958;
+  margin: 0 0 4px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-report-list-empty-text {
+  font-size: 13px;
+  color: #60718c;
+  margin: 0;
+}
+
+/* ── Details panel ───────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-details-card {
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+  padding: 20px;
+  position: sticky;
+  top: 16px;
+  min-width: 0;
+}
+
+.crm-page[data-page="depository"] .crm-dep-details-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-text);
+  margin: 0 0 14px;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.crm-page[data-page="depository"] .crm-dep-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-detail-field {
+  border: 1px solid var(--crm-border);
+  border-radius: 6px;
+  background: #f5f8ff;
+  padding: 8px 10px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-detail-field-label {
+  font-size: 11px;
+  color: #74839b;
+  margin: 0 0 3px;
+}
+
+.crm-page[data-page="depository"] .crm-dep-detail-field-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--crm-text);
+  margin: 0;
+  word-break: break-word;
+}
+
+.crm-page[data-page="depository"] .crm-dep-status-ok    { color: var(--crm-success); }
+.crm-page[data-page="depository"] .crm-dep-status-error { color: var(--crm-danger); }
+.crm-page[data-page="depository"] .crm-dep-status-warn  { color: #b45309; }
+
+/* ── File card ───────────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-file-card {
+  border: 1px solid var(--crm-border);
+  border-radius: 6px;
+  background: #f5f8ff;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  min-width: 0;
+}
+
+.crm-page[data-page="depository"] .crm-dep-file-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--crm-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #74839b;
+  flex-shrink: 0;
+}
+
+.crm-page[data-page="depository"] .crm-dep-file-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.crm-page[data-page="depository"] .crm-dep-file-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--crm-text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crm-page[data-page="depository"] .crm-dep-file-size {
+  font-size: 11px;
+  color: #74839b;
+  margin: 2px 0 0;
+}
+
+/* ── Action buttons ──────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-details-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+.crm-page[data-page="depository"] .crm-dep-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9000;
+  background: #1a273a;
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.22);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.crm-page[data-page="depository"] .crm-dep-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .crm-page[data-page="depository"] .crm-dep-split {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .crm-page[data-page="depository"] .crm-dep-split {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="depository"] .crm-dep-details-card {
+    position: static;
+  }
+
+  .crm-page[data-page="depository"] .crm-dep-details-grid {
+    grid-template-columns: 1fr;
+  }
+}

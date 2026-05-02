@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Депозитарий</title>
+  <title>Отчёты депозитария</title>
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/depository.css"/>
 </head>
 <body data-page="depository">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -46,7 +48,7 @@
 
         <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><span uk-icon="database"></span>Бэк-офис</span></a>
         <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><span uk-icon="bolt"></span>Трейдинг</span></a>
-        <a class="crm-nav-link crm-nav-item" href="depository.html"><span><span uk-icon="folder"></span>Депозитарий</span></a>
+        <a class="crm-nav-link crm-nav-item is-active" href="depository.html" aria-current="page"><span><span uk-icon="folder"></span>Депозитарий</span></a>
         <a class="crm-nav-link crm-nav-item" href="administration.html"><span><span uk-icon="settings"></span>Администрирование</span></a>
       </nav>
     </aside>
@@ -57,35 +59,429 @@
         <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
         <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
       </header>
-      <section class="crm-page crm-registry-page" data-page="depository">
-        <div class="crm-page-header crm-page-header-row crm-registry-header"><div class="crm-registry-title-block"><h1 data-entity="page-title">Депозитарий</h1><p>Реестр депозитарных отчётов и операций с контролем доставки и статусов.</p></div><div class="crm-page-actions crm-registry-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-depository">Экспорт</button></div></div>
-        <form action="#" method="post" data-form="depository-filters" data-action="filter-depository" class="crm-registry-filters crm-filter-panel" data-filter="depository">
-          <div class="crm-filter-search-row"><input id="depository-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="search" placeholder="Файл, клиент, отчёт"/></div>
 
-            <div class="crm-filter-fields-row">
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="report-type"><summary class="crm-filter-trigger" aria-label="Фильтр: Вид отчёта"><span class="crm-filter-trigger-label">Вид отчёта:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Вид отчёта">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Отчёт депозитария за день</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Реестр поручений</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="report-type" value="all" data-filter="report-type"/></details></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="delivery-result"><summary class="crm-filter-trigger" aria-label="Фильтр: Результат"><span class="crm-filter-trigger-label">Результат:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Результат">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Доставлен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Ошибка</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="delivery-result" value="all" data-filter="delivery-result"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить фильтры</button></div>
+      <section class="crm-page crm-dep-page" data-page="depository">
+        <div class="crm-dep-shell">
+
+          <!-- Page header -->
+          <div class="crm-page-header crm-page-header-row">
+            <div>
+              <h1 class="crm-page-title">Отчёты депозитария</h1>
+              <p class="crm-page-subtitle">Реестр депозитарных отчётов и операций с контролем доставки и статусов.</p>
+            </div>
+            <div class="crm-header-actions">
+              <button type="button" class="uk-button uk-button-default crm-button crm-button-secondary" data-action="export-dep-reports">Экспорт</button>
+            </div>
           </div>
-</form>
-        <div class="crm-card crm-table-card crm-registry-table" data-entity="depository-table"><div class="crm-table-wrapper"><div class="crm-table crm-registry-table-compact"><table class="uk-table uk-table-divider uk-table-hover"><colgroup><col class="crm-col-medium"/><col class="crm-col-name"/><col class="crm-col-compact"/><col class="crm-col-status"/><col class="crm-col-date"/><col class="crm-col-actions"/></colgroup><thead><tr><th>Отчёт</th><th>Клиент</th><th>Канал</th><th>Статус</th><th>Дата</th><th>Действия</th></tr></thead><tbody>
-          <tr data-entity="depository-report" data-id="dep-report-001"><td><div class="crm-row-main">dep_day_24042026_001.xml</div><div class="crm-row-sub">Отчёт депозитария за день</div></td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">CL-4401</div></td><td><span class="crm-badge muted" data-status="delivery-edo">ЭДО</span></td><td><span class="crm-badge success" data-status="delivered">Доставлен</span></td><td>24.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="download-report">Скачать</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-report">Повторить</button></div></td></tr>
-          <tr data-entity="depository-report" data-id="dep-report-003"><td><div class="crm-row-main">dep_register_23042026_007.xml</div><div class="crm-row-sub">Реестр поручений</div></td><td><div class="crm-row-main">Громова Алина Сергеевна</div><div class="crm-row-sub">CL-4412</div></td><td><span class="crm-badge muted" data-status="delivery-sftp">SFTP</span></td><td><span class="crm-badge danger" data-status="delivery-error">Ошибка</span></td><td>23.04.2026</td><td><div class="crm-row-actions"><button class="uk-button uk-button-text crm-link-action" type="button" data-action="download-report">Скачать</button><button class="uk-button uk-button-text crm-link-action" type="button" data-action="resend-report">Повторить</button></div></td></tr>
-        </tbody></table></div></div><div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет отчётов</div><div class="crm-empty-state-text">Проверьте фильтры и период выгрузки.</div></div></div>
+
+          <!-- Filter toolbar -->
+          <div class="crm-card crm-dep-toolbar">
+            <div class="crm-dep-toolbar-search">
+              <label class="crm-dep-toolbar-search-shell" for="dep-search">
+                <span class="crm-dep-toolbar-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" width="15" height="15">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <input id="dep-search" class="uk-input" type="search" data-filter="dep-search" placeholder="Поиск по клиенту, файлу или отчёту..." autocomplete="off"/>
+              </label>
+            </div>
+            <div class="crm-dep-toolbar-filters">
+              <input type="text" class="crm-dep-filter-input" data-filter="dep-client-code" placeholder="Код клиента" aria-label="Код клиента" autocomplete="off"/>
+              <div class="crm-dep-date-wrap">
+                <input type="date" class="crm-dep-filter-input crm-dep-date-input" id="dep-date-from" name="date-from" aria-label="Дата с"/>
+                <button class="crm-dep-date-icon" type="button" data-date-picker-trigger="dep-date-from" aria-label="Открыть календарь" uk-icon="calendar"></button>
+              </div>
+              <div class="crm-dep-date-wrap">
+                <input type="date" class="crm-dep-filter-input crm-dep-date-input" id="dep-date-to" name="date-to" aria-label="Дата по"/>
+                <button class="crm-dep-date-icon" type="button" data-date-picker-trigger="dep-date-to" aria-label="Открыть календарь" uk-icon="calendar"></button>
+              </div>
+              <select class="crm-dep-filter-input" data-filter="dep-report-type" aria-label="Вид отчёта">
+                <option value="all">Вид отчёта</option>
+                <option value="Отчёт за день">Отчёт за день</option>
+                <option value="Квартальный отчёт">Квартальный отчёт</option>
+                <option value="Еженедельный отчёт">Еженедельный отчёт</option>
+                <option value="Ежемесячный отчёт">Ежемесячный отчёт</option>
+                <option value="Реестр поручений">Реестр поручений</option>
+              </select>
+              <select class="crm-dep-filter-input" data-filter="dep-channel" aria-label="Канал отправки">
+                <option value="all">Канал отправки</option>
+                <option value="ЭДО">ЭДО</option>
+                <option value="E-mail">E-mail</option>
+                <option value="Личный кабинет">Личный кабинет</option>
+                <option value="SFTP">SFTP</option>
+              </select>
+              <select class="crm-dep-filter-input" data-filter="dep-status" aria-label="Результат доставки">
+                <option value="all">Результат доставки</option>
+                <option value="Доставлено">Доставлено</option>
+                <option value="Не доставлено">Не доставлено</option>
+                <option value="Ошибка">Ошибка</option>
+                <option value="На проверке">На проверке</option>
+              </select>
+              <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-dep-filters">Очистить фильтры</button>
+            </div>
+          </div>
+
+          <!-- Master-detail split -->
+          <div class="crm-dep-split">
+
+            <!-- Left: scrollable report list -->
+            <div class="crm-dep-split-left">
+              <div class="crm-dep-report-list-wrap" data-entity="dep-report-list">
+
+                <!-- Item 1 -->
+                <button type="button" class="crm-dep-report-item"
+                  data-client="АО «Восток Майнинг Системс»"
+                  data-client-code="CL-910204"
+                  data-report-title="DEP_daily_CL-910204_2026-04-21_0745.xlsx"
+                  data-report-type="Отчёт за день"
+                  data-period="21.04.2026"
+                  data-channel="ЭДО"
+                  data-status="Доставлено"
+                  data-sent-at="21.04.2026 07:45"
+                  data-address="edo@vms-invest.ru"
+                  data-contract="ДП-2024-0018"
+                  data-created-by="Иванов И.И."
+                  data-file-name="DEP_daily_CL-910204_2026-04-21_0745.xlsx"
+                  data-file-size="142 КБ"
+                >
+                  <div class="crm-dep-report-item-head">
+                    <span class="crm-dep-report-item-name">АО «Восток Майнинг Системс»</span>
+                    <span class="crm-dep-report-item-date">21.04.2026</span>
+                  </div>
+                  <div class="crm-dep-report-item-sub">CL-910204 · 07:45</div>
+                  <div class="crm-dep-report-item-title">DEP_daily_CL-910204_2026-04-21_0745.xlsx</div>
+                  <div class="crm-dep-report-item-meta">
+                    <span class="crm-badge muted">ЭДО</span>
+                    <span class="crm-badge muted">Отчёт за день</span>
+                    <span class="crm-badge success">Доставлено</span>
+                  </div>
+                </button>
+
+                <!-- Item 2 — active -->
+                <button type="button" class="crm-dep-report-item is-active"
+                  data-client="ООО «Северный Альянс»"
+                  data-client-code="CL-103908"
+                  data-report-title="DEP_quarterly_CL-103908_2026-Q1_1020.xlsx"
+                  data-report-type="Квартальный отчёт"
+                  data-period="Q1 2026"
+                  data-channel="E-mail"
+                  data-status="Не доставлено"
+                  data-sent-at="20.04.2026 10:20"
+                  data-address="fin@sevaliance.ru"
+                  data-contract="ДУ-2023-0047"
+                  data-created-by="Сидорова А.В."
+                  data-file-name="DEP_quarterly_CL-103908_2026-Q1_1020.xlsx"
+                  data-file-size="318 КБ"
+                >
+                  <div class="crm-dep-report-item-head">
+                    <span class="crm-dep-report-item-name">ООО «Северный Альянс»</span>
+                    <span class="crm-dep-report-item-date">20.04.2026</span>
+                  </div>
+                  <div class="crm-dep-report-item-sub">CL-103908 · 10:20</div>
+                  <div class="crm-dep-report-item-title">DEP_quarterly_CL-103908_2026-Q1_1020.xlsx</div>
+                  <div class="crm-dep-report-item-meta">
+                    <span class="crm-badge muted">E-mail</span>
+                    <span class="crm-badge muted">Квартальный отчёт</span>
+                    <span class="crm-badge warning">Не доставлено</span>
+                  </div>
+                </button>
+
+                <!-- Item 3 -->
+                <button type="button" class="crm-dep-report-item"
+                  data-client="Громова Алина Сергеевна"
+                  data-client-code="CL-224781"
+                  data-report-title="DEP_weekly_CL-224781_2026-04-21_0835.xlsx"
+                  data-report-type="Еженедельный отчёт"
+                  data-period="Неделя 16, 2026"
+                  data-channel="Личный кабинет"
+                  data-status="На проверке"
+                  data-sent-at="21.04.2026 08:35"
+                  data-address="—"
+                  data-contract="БД-2022-0091"
+                  data-created-by="Петрова Е.С."
+                  data-file-name="DEP_weekly_CL-224781_2026-04-21_0835.xlsx"
+                  data-file-size="87 КБ"
+                >
+                  <div class="crm-dep-report-item-head">
+                    <span class="crm-dep-report-item-name">Громова Алина Сергеевна</span>
+                    <span class="crm-dep-report-item-date">21.04.2026</span>
+                  </div>
+                  <div class="crm-dep-report-item-sub">CL-224781 · 08:35</div>
+                  <div class="crm-dep-report-item-title">DEP_weekly_CL-224781_2026-04-21_0835.xlsx</div>
+                  <div class="crm-dep-report-item-meta">
+                    <span class="crm-badge muted">Личный кабинет</span>
+                    <span class="crm-badge muted">Еженедельный отчёт</span>
+                    <span class="crm-badge info">На проверке</span>
+                  </div>
+                </button>
+
+                <!-- Item 4 -->
+                <button type="button" class="crm-dep-report-item"
+                  data-client="Смирнов Константин Петрович"
+                  data-client-code="CL-784512"
+                  data-report-title="DEP_monthly_CL-784512_2026-03_0910.xlsx"
+                  data-report-type="Ежемесячный отчёт"
+                  data-period="Март 2026"
+                  data-channel="SFTP"
+                  data-status="Доставлено"
+                  data-sent-at="01.04.2026 09:10"
+                  data-address="sftp://smk-depot.ru/reports"
+                  data-contract="ДУ-2021-0034"
+                  data-created-by="Иванов И.И."
+                  data-file-name="DEP_monthly_CL-784512_2026-03_0910.xlsx"
+                  data-file-size="204 КБ"
+                >
+                  <div class="crm-dep-report-item-head">
+                    <span class="crm-dep-report-item-name">Смирнов Константин Петрович</span>
+                    <span class="crm-dep-report-item-date">01.04.2026</span>
+                  </div>
+                  <div class="crm-dep-report-item-sub">CL-784512 · 09:10</div>
+                  <div class="crm-dep-report-item-title">DEP_monthly_CL-784512_2026-03_0910.xlsx</div>
+                  <div class="crm-dep-report-item-meta">
+                    <span class="crm-badge muted">SFTP</span>
+                    <span class="crm-badge muted">Ежемесячный отчёт</span>
+                    <span class="crm-badge success">Доставлено</span>
+                  </div>
+                </button>
+
+                <!-- Item 5 -->
+                <button type="button" class="crm-dep-report-item"
+                  data-client="ООО «Регион Брокер»"
+                  data-client-code="CL-4412"
+                  data-report-title="DEP_registry_CL-4412_2026-04-23_1140.xml"
+                  data-report-type="Реестр поручений"
+                  data-period="23.04.2026"
+                  data-channel="SFTP"
+                  data-status="Ошибка"
+                  data-sent-at="23.04.2026 11:40"
+                  data-address="sftp://region-broker.ru/dep"
+                  data-contract="БД-2023-0056"
+                  data-created-by="Сидорова А.В."
+                  data-file-name="DEP_registry_CL-4412_2026-04-23_1140.xml"
+                  data-file-size="56 КБ"
+                >
+                  <div class="crm-dep-report-item-head">
+                    <span class="crm-dep-report-item-name">ООО «Регион Брокер»</span>
+                    <span class="crm-dep-report-item-date">23.04.2026</span>
+                  </div>
+                  <div class="crm-dep-report-item-sub">CL-4412 · 11:40</div>
+                  <div class="crm-dep-report-item-title">DEP_registry_CL-4412_2026-04-23_1140.xml</div>
+                  <div class="crm-dep-report-item-meta">
+                    <span class="crm-badge muted">SFTP</span>
+                    <span class="crm-badge muted">Реестр поручений</span>
+                    <span class="crm-badge danger">Ошибка</span>
+                  </div>
+                </button>
+
+                <div class="crm-dep-report-list-empty" data-entity="dep-report-list-empty" hidden>
+                  <p class="crm-dep-report-list-empty-title">Отчёты не найдены</p>
+                  <p class="crm-dep-report-list-empty-text">Измените параметры поиска или фильтры.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: details panel — pre-populated with item 2 -->
+            <div class="crm-dep-details-card">
+              <h2 class="crm-dep-details-title" data-detail="title">DEP_quarterly_CL-103908_2026-Q1_1020.xlsx</h2>
+
+              <div class="crm-dep-details-grid">
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Клиент</p>
+                  <p class="crm-dep-detail-field-value" data-detail="client">ООО «Северный Альянс»</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Код клиента</p>
+                  <p class="crm-dep-detail-field-value" data-detail="client-code">CL-103908</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Вид отчёта</p>
+                  <p class="crm-dep-detail-field-value" data-detail="report-type">Квартальный отчёт</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Период</p>
+                  <p class="crm-dep-detail-field-value" data-detail="period">Q1 2026</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Способ отправки</p>
+                  <p class="crm-dep-detail-field-value" data-detail="channel">E-mail</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Статус</p>
+                  <p class="crm-dep-detail-field-value crm-dep-status-error" data-detail="status">Не доставлено</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Время отправки</p>
+                  <p class="crm-dep-detail-field-value" data-detail="sent-at">20.04.2026 10:20</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Адрес</p>
+                  <p class="crm-dep-detail-field-value" data-detail="address">fin@sevaliance.ru</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Договор</p>
+                  <p class="crm-dep-detail-field-value" data-detail="contract">ДУ-2023-0047</p>
+                </div>
+                <div class="crm-dep-detail-field">
+                  <p class="crm-dep-detail-field-label">Сформировал</p>
+                  <p class="crm-dep-detail-field-value" data-detail="created-by">Сидорова А.В.</p>
+                </div>
+              </div>
+
+              <div class="crm-dep-file-card">
+                <div class="crm-dep-file-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                </div>
+                <div class="crm-dep-file-info">
+                  <p class="crm-dep-file-name" data-detail="file-name">DEP_quarterly_CL-103908_2026-Q1_1020.xlsx</p>
+                  <p class="crm-dep-file-size" data-detail="file-size">318 КБ</p>
+                </div>
+              </div>
+
+              <div class="crm-dep-details-actions">
+                <button type="button" class="uk-button uk-button-default crm-button" data-action="resend-dep-report">Отправить повторно</button>
+                <button type="button" class="uk-button crm-button-primary crm-button" data-action="download-dep-report">Скачать</button>
+              </div>
+            </div>
+
+          </div><!-- /.crm-dep-split -->
+
+          <div class="crm-dep-toast" data-entity="dep-toast" role="status" aria-live="polite"></div>
+
+        </div><!-- /.crm-dep-shell -->
       </section>
     </main>
   </div>
 </div>
+
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script>
+(function () {
+  'use strict';
+  if (document.body.getAttribute('data-page') !== 'depository') return;
+
+  var toastEl = document.querySelector('[data-entity="dep-toast"]');
+  var toastTimer = null;
+  function showToast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('is-visible'); }, 2400);
+  }
+
+  var listWrap         = document.querySelector('[data-entity="dep-report-list"]');
+  var listEmptyEl      = document.querySelector('[data-entity="dep-report-list-empty"]');
+  var items            = listWrap ? Array.prototype.slice.call(listWrap.querySelectorAll('.crm-dep-report-item')) : [];
+  var searchInput      = document.querySelector('[data-filter="dep-search"]');
+  var clientCodeInput  = document.querySelector('[data-filter="dep-client-code"]');
+  var reportTypeFilter = document.querySelector('[data-filter="dep-report-type"]');
+  var channelFilter    = document.querySelector('[data-filter="dep-channel"]');
+  var statusFilter     = document.querySelector('[data-filter="dep-status"]');
+
+  var detailKeys = [
+    'title', 'client', 'client-code', 'report-type', 'period',
+    'channel', 'status', 'sent-at', 'address', 'contract',
+    'created-by', 'file-name', 'file-size'
+  ];
+
+  function updateDetails(item) {
+    detailKeys.forEach(function (key) {
+      var el = document.querySelector('[data-detail="' + key + '"]');
+      if (!el) return;
+      var dataAttr = key === 'title' ? 'data-report-title' : 'data-' + key;
+      var val = item.getAttribute(dataAttr) || '';
+      el.textContent = val;
+      if (key === 'status') {
+        el.className = 'crm-dep-detail-field-value';
+        if (val === 'Доставлено')                          el.classList.add('crm-dep-status-ok');
+        else if (val === 'Ошибка' || val === 'Не доставлено') el.classList.add('crm-dep-status-error');
+        else if (val === 'На проверке')                    el.classList.add('crm-dep-status-warn');
+      }
+    });
+  }
+
+  function selectReport(item) {
+    items.forEach(function (i) { i.classList.remove('is-active'); });
+    item.classList.add('is-active');
+    updateDetails(item);
+  }
+
+  function applyFilters() {
+    var search     = searchInput     ? searchInput.value.trim().toLowerCase()     : '';
+    var clientCode = clientCodeInput ? clientCodeInput.value.trim().toLowerCase() : '';
+    var reportType = reportTypeFilter ? reportTypeFilter.value : 'all';
+    var channel    = channelFilter    ? channelFilter.value    : 'all';
+    var status     = statusFilter     ? statusFilter.value     : 'all';
+
+    var firstVisible       = null;
+    var activeStillVisible = false;
+
+    items.forEach(function (item) {
+      var text = [
+        item.getAttribute('data-client')       || '',
+        item.getAttribute('data-client-code')  || '',
+        item.getAttribute('data-report-title') || '',
+        item.getAttribute('data-file-name')    || ''
+      ].join(' ').toLowerCase();
+
+      var itemCode    = (item.getAttribute('data-client-code')  || '').toLowerCase();
+      var itemType    = item.getAttribute('data-report-type')   || '';
+      var itemChannel = item.getAttribute('data-channel')       || '';
+      var itemStatus  = item.getAttribute('data-status')        || '';
+
+      var show = true;
+      if (search     && text.indexOf(search) === -1)          show = false;
+      if (clientCode && itemCode.indexOf(clientCode) === -1)  show = false;
+      if (reportType !== 'all' && itemType    !== reportType) show = false;
+      if (channel    !== 'all' && itemChannel !== channel)    show = false;
+      if (status     !== 'all' && itemStatus  !== status)     show = false;
+
+      item.hidden = !show;
+      if (show) {
+        if (!firstVisible) firstVisible = item;
+        if (item.classList.contains('is-active')) activeStillVisible = true;
+      }
+    });
+
+    if (listEmptyEl) listEmptyEl.hidden = firstVisible !== null;
+    if (!activeStillVisible && firstVisible) selectReport(firstVisible);
+  }
+
+  if (searchInput)      searchInput.addEventListener('input',  applyFilters);
+  if (clientCodeInput)  clientCodeInput.addEventListener('input', applyFilters);
+  if (reportTypeFilter) reportTypeFilter.addEventListener('change', applyFilters);
+  if (channelFilter)    channelFilter.addEventListener('change',    applyFilters);
+  if (statusFilter)     statusFilter.addEventListener('change',     applyFilters);
+
+  document.addEventListener('click', function (e) {
+    var item = e.target.closest('.crm-dep-report-item');
+    if (item && !item.hidden) { selectReport(item); return; }
+
+    if (e.target.closest('[data-action="resend-dep-report"]'))  { showToast('Отчёт отправлен повторно');      return; }
+    if (e.target.closest('[data-action="download-dep-report"]')){ showToast('Файл подготовлен к скачиванию'); return; }
+    if (e.target.closest('[data-action="export-dep-reports"]')) { showToast('CSV-экспорт выполнен');          return; }
+
+    if (e.target.closest('[data-action="reset-dep-filters"]')) {
+      if (searchInput)      searchInput.value      = '';
+      if (clientCodeInput)  clientCodeInput.value  = '';
+      var df = document.getElementById('dep-date-from');
+      var dt = document.getElementById('dep-date-to');
+      if (df) df.value = '';
+      if (dt) dt.value = '';
+      if (reportTypeFilter) reportTypeFilter.value = 'all';
+      if (channelFilter)    channelFilter.value    = 'all';
+      if (statusFilter)     statusFilter.value     = 'all';
+      applyFilters();
+    }
+  });
+})();
+</script>
 </body>
 </html>
