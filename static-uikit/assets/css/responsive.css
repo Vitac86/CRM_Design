@@ -1,1 +1,318 @@
-/* intentionally left blank in this refactor; styles moved incrementally */
+/* ===========================================================================
+   RESPONSIVE LAYER — CRM Static UIKit
+   Desktop-first: every rule below lives inside a media query.
+
+   Breakpoints used in this file
+     ≤1024px  Tablet – table containment
+     ≤920px   Mobile sidebar (matches matchMedia in crm-static.js)
+     ≤768px   Mobile layout
+     ≤640px   Narrow mobile
+     ≤480px   Very narrow / small phone
+
+   Specificity note
+   Most rules below use .crm-page[data-page] as an ancestor to reach
+   (0,3,0) specificity, which is enough to override the page-scoped rules
+   that set layout properties at desktop size (they sit at (0,2,1) or
+   (0,3,0), and the later cascade position in this file breaks any tie).
+   =========================================================================== */
+
+
+/* ── 1. BODY OVERFLOW GUARD ──────────────────────────────────────────────────
+   Prevents page-level horizontal scroll created by wide tables or flex
+   children that don't shrink. Tables continue to scroll inside their own
+   .crm-table-wrapper containers (overflow-x: auto set in tables.css).
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+
+/* ── 2. APP SHELL — off-canvas sidebar ───────────────────────────────────────
+   crm-static.js uses matchMedia('(max-width: 920px)') and toggles
+   .sidebar-open on .crm-app to open/close the sidebar.
+   The overlay is injected as <button class="crm-sidebar-overlay"> by JS.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 920px) {
+
+  /* Drop the two-column layout to a single column */
+  .crm-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-main {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Slide the sidebar off-canvas by default */
+  .crm-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Width is already defined via --crm-sidebar-w in sidebar.css */
+  }
+
+  /* Slide in when .crm-app has .sidebar-open */
+  .crm-app.sidebar-open .crm-sidebar {
+    transform: translateX(0);
+    box-shadow: 4px 0 28px rgba(9, 20, 58, 0.28);
+  }
+
+  /* Overlay — JS creates this element inside .crm-app */
+  .crm-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 199;
+    background: rgba(9, 20, 58, 0.44);
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .crm-app.sidebar-open .crm-sidebar-overlay {
+    display: block;
+  }
+
+  /* Show the hamburger button — overrides display:none !important in app.css */
+  [data-sidebar-toggle] {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+
+/* ── 3. TOPBAR — compress user info on small screens ─────────────────────────
+   topbar.css already reduces padding to 14px and max-width: none at 920px.
+   Below 768px we hide the name/role text to save horizontal space;
+   the avatar stays for identity.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .crm-user > div:first-child {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .crm-topbar {
+    gap: 6px;
+    padding: 0 10px;
+  }
+}
+
+
+/* ── 4. PAGE PADDING ─────────────────────────────────────────────────────────
+   topbar.css already reduces .crm-page padding to 16px/14px at 920px.
+   Squeeze a bit more on very narrow screens.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .crm-page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+/* ── 5. PAGE HEADER — stack title + actions on mobile ────────────────────────
+   All registry and detail pages use .crm-page-header-row.
+   Using .crm-page[data-page] ancestor gives (0,3,0) specificity so the
+   column direction and flex-start alignment beat the page-scoped desktop
+   align-items rules.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .crm-page[data-page] .crm-page-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .crm-page[data-page] .crm-header-actions,
+  .crm-page[data-page] .crm-registry-actions,
+  .crm-page[data-page] .crm-page-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+
+/* ── 6. REGISTRY / PAGE SHELLS — reduce padding on mobile ───────────────────
+   Almost every page shell also carries .crm-registry-shell (verified in HTML).
+   Exceptions: middle-office (.crm-mo-shell) and depository (.crm-dep-shell)
+   use standalone classes without .crm-registry-shell.
+   .crm-page[data-page] ancestor gives (0,3,0) — ties or beats all page-scoped
+   desktop padding rules; later cascade position breaks the tie.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .crm-page[data-page] .crm-registry-shell,
+  .crm-page[data-page] .crm-mo-shell,
+  .crm-page[data-page] .crm-dep-shell {
+    padding: 14px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .crm-page[data-page] .crm-registry-shell,
+  .crm-page[data-page] .crm-mo-shell,
+  .crm-page[data-page] .crm-dep-shell {
+    padding: 10px;
+    border-radius: 10px;
+  }
+}
+
+
+/* ── 7. FILTER PANEL — search full-width on narrow screens ───────────────────
+   Page-specific CSS already sets width: min(520px, 100%) on the search shell,
+   which auto-collapses. This rule ensures full-width on very small viewports
+   where the min() might still leave a sub-pixel gap from surrounding gaps.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .crm-filter-search-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .crm-filter-search-input {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+}
+
+
+/* ── 8. TABLE CARD — overflow containment ────────────────────────────────────
+   .crm-table-wrapper already has overflow-x: auto (tables.css).
+   The parent .crm-table-card needs overflow: hidden so the card border-radius
+   clips the scroll area and the card itself doesn't extend the viewport.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .crm-table-card {
+    overflow: hidden;
+  }
+}
+
+
+/* ── 9. STICKY ACTIONS BAR — unstick on mobile ───────────────────────────────
+   The fixed bottom bar in edit/detail forms overlaps content on short screens.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .crm-sticky-actions {
+    position: static;
+    bottom: auto;
+  }
+}
+
+
+/* ── 10. REGISTRY FOOTERS — wrap page-size chips + nav on narrow screens ─────
+   All registry pages use a footer with display:flex; justify-content:space-between.
+   On narrow viewports the two groups (chip row / nav row) stack vertically;
+   the nav group aligns to the right for easy thumb access.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* ── Footer containers: column stack ── */
+  body[data-page="subjects"]            .crm-subjects-table-footer,
+  .crm-page[data-page="archive"]        .crm-archive-table-footer,
+  .crm-page[data-page="back-office"]    .crm-back-office-table-footer,
+  .crm-page[data-page="agents"]         .crm-agents-table-footer,
+  .crm-page[data-page="compliance"]     .crm-compliance-table-footer,
+  .crm-page[data-page="brokerage"]      .crm-brokerage-table-footer,
+  .crm-page[data-page="requests"]       .crm-requests-table-footer,
+  body[data-page="middle-office-clients"] .crm-mo-clients-table-footer,
+  .crm-page[data-page="trust-management"] .crm-trust-management-table-footer,
+  .crm-page[data-page="trading"]        .crm-trading-table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* ── Nav sub-group: align to the right for thumb reach ── */
+  body[data-page="subjects"]            .crm-subjects-footer-nav,
+  .crm-page[data-page="archive"]        .crm-archive-footer-nav,
+  .crm-page[data-page="back-office"]    .crm-back-office-footer-nav,
+  .crm-page[data-page="agents"]         .crm-agents-footer-nav,
+  .crm-page[data-page="compliance"]     .crm-compliance-footer-nav,
+  .crm-page[data-page="brokerage"]      .crm-brokerage-footer-nav,
+  .crm-page[data-page="requests"]       .crm-requests-footer-nav,
+  body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav,
+  .crm-page[data-page="trust-management"] .crm-trust-management-footer-nav,
+  .crm-page[data-page="trading"]        .crm-trading-footer-nav {
+    align-self: flex-end;
+  }
+}
+
+
+/* ── 11. MASTER-DETAIL — sticky panel top offset between 769px and 920px ─────
+   Between 769px and 920px the two-column master-detail layout is still shown
+   but the sidebar is now off-canvas (no left gutter).  The sticky details
+   panel needs its top to account for the topbar height only.
+   At ≤768px the panel becomes position:static (already handled in
+   middle-office.css and depository.css).
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 920px) {
+  .crm-mo-details-card {
+    top: calc(var(--crm-topbar-h) + 12px);
+  }
+
+  .crm-page[data-page="depository"] .crm-dep-details-card {
+    top: calc(var(--crm-topbar-h) + 12px);
+  }
+}
+
+
+/* ── 12. SUBJECT CARD — tabs usable on narrow screens ────────────────────────
+   .crm-subject-tabs-wrap already has overflow-x: auto (subject-card.css).
+   Ensure the outer shell card doesn't create a second scroll context.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .crm-page[data-page="subject-card"] .crm-subject-card-shell {
+    overflow-x: hidden;
+  }
+
+  /* Subject detail shell: single column gap on mobile */
+  .crm-page[data-page="subject-card"] .crm-subject-detail-shell {
+    gap: 10px;
+  }
+}
+
+
+/* ── 13. FORM GRIDS — collapse on mobile ─────────────────────────────────────
+   subject-edit and subject-edit-individual use UIKit uk-width-*@m classes
+   which already collapse at UIKit's 960px medium breakpoint.
+   The compliance-card and trading-card detail grids use .crm-profile-rows-*
+   which are handled in their respective page CSS files.
+   The remaining class below handles inline forms that use 3-col CSS grids
+   not covered by UIKit.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Representative form inside subject-card */
+  .crm-page[data-page="subject-card"] .crm-representative-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ── 14. FOOTER ACTIONS — stack on narrow screens ────────────────────────────
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .crm-footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crm-footer-actions .uk-button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
