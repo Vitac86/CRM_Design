@@ -67,6 +67,17 @@
         </div>
 
         <form action="#" method="post" data-form="compliance-filters" data-action="filter-compliance" class="crm-registry-filters crm-filter-panel" data-filter="compliance">
+          <div class="crm-filter-search-row crm-filter-search">
+            <label class="crm-filter-search-shell" for="compliance-search">
+              <span class="crm-filter-search-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" role="img" aria-hidden="true" focusable="false">
+                  <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.8"></circle>
+                  <path d="M16 16L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                </svg>
+              </span>
+              <input id="compliance-search" class="uk-input crm-input crm-filter-search-input" type="search" name="compliance-search" placeholder="Поиск по клиенту, коду, ИНН или статусу" autocomplete="off" data-filter-search/>
+            </label>
+          </div>
           <div class="crm-filter-fields-row crm-filter-grid">
             <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
               <details class="crm-filter-menu" data-filter-menu="client-type">
