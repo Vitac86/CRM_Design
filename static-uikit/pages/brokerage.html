@@ -59,10 +59,13 @@
       </header>
       <section class="crm-page crm-registry-page" data-page="brokerage">
         <section class="crm-registry-shell crm-brokerage-shell">
-        <div class="crm-page-header crm-registry-header crm-brokerage-header">
+        <div class="crm-page-header crm-page-header-row crm-registry-header crm-brokerage-header">
           <div class="crm-registry-title-block">
             <h1 class="crm-page-title" data-entity="page-title">Брокерская деятельность</h1>
             <p class="crm-page-subtitle">Реестр брокерских договоров с контролем статуса обслуживания и ответственного менеджера.</p>
+          </div>
+          <div class="crm-header-actions crm-registry-actions crm-brokerage-actions">
+            <button class="uk-button uk-button-default crm-button crm-button-secondary crm-button-export-light" type="button" data-action="export-brokerage">Экспорт</button>
           </div>
         </div>
         <form action="#" method="post" data-form="brokerage-filters" data-action="filter-brokerage" class="crm-registry-filters crm-filter-panel" data-filter="brokerage">
@@ -84,9 +87,8 @@
                   <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="ivanov"><span>Иванов И.И.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
                   <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="petrova"><span>Петрова Н.А.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
                 </div><input type="hidden" name="brokerage-manager" value="all" data-filter="brokerage-manager"/></details></div>
-            <div class="crm-filter-actions crm-brokerage-filter-actions">
-              <button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить</button>
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="export-brokerage">Экспорт</button>
+            <div class="crm-filter-actions">
+              <button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить всё</button>
             </div>
           </div>
         </form>

@@ -94,8 +94,7 @@
   height: 100%;
 }
 
-/* Selector raised to (0,5,0) to beat the filters.css .crm-page.crm-registry-page
-   rule that inadvertently overrides padding to 0 14px, causing icon overlap. */
+/* Keep explicit left padding so the search icon never overlaps placeholder text. */
 .crm-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
   width: 100%;
   min-height: 40px;
@@ -114,15 +113,6 @@
   color: #8b9eb8;
 }
 
-.crm-page[data-page="brokerage"] .crm-brokerage-filter-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex: 0 0 auto;
-  min-width: auto;
-  max-width: none;
-}
 
 .crm-page[data-page="brokerage"] .crm-table-card.crm-brokerage-registry {
   overflow: hidden;
