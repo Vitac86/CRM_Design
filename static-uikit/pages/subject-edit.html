@@ -54,9 +54,30 @@
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button
+          class="uk-button uk-button-default"
+          type="button"
+          data-sidebar-toggle
+          aria-label="Открыть меню"
+        >
+          <span uk-icon="menu"></span>
+        </button>
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input
+            class="uk-input crm-input"
+            type="search"
+            name="global-search"
+            placeholder="Глобальный поиск"
+            autocomplete="off" />
+        </div>
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
 
       <section class="crm-page" data-page="subject-edit">
@@ -81,9 +102,18 @@
                 </div>
               </div>
               <div class="crm-edit-header-actions">
-                <a href="subject-card.html" class="uk-button uk-button-default crm-button" data-action="cancel-edit">Отмена</a>
-                <button type="button" class="uk-button uk-button-default crm-button" data-action="save-draft-edit">Сохранить как черновик</button>
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="save-edit">Сохранить</button>
+                <a
+                  href="subject-card.html"
+                  class="uk-button uk-button-default crm-button"
+                  data-action="cancel-edit">Отмена</a>
+                <button
+                  type="button"
+                  class="uk-button uk-button-default crm-button"
+                  data-action="save-draft-edit">Сохранить как черновик</button>
+                <button
+                  type="button"
+                  class="uk-button crm-button-primary crm-button"
+                  data-action="save-edit">Сохранить</button>
               </div>
             </div>
           </div>
@@ -91,23 +121,46 @@
           <form class="crm-card crm-edit-form-card" data-entity="subject-edit-form" novalidate>
 
             <section class="crm-form-section" data-entity="edit-main-data">
-              <div class="crm-form-section-head"><h3>Основные данные</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Основные данные</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-client-name">Наименование клиента</label>
-                  <input id="edit-client-name" class="uk-input crm-input" type="text" name="clientName" value="АО «Восток Майнинг Системс»" autocomplete="off"/>
+                  <input
+                    id="edit-client-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="clientName"
+                    value="АО «Восток Майнинг Системс»"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-full-name">Полное наименование</label>
-                  <input id="edit-full-name" class="uk-input crm-input" type="text" name="fullName" value="АО «Восток Майнинг Системс» (полное наименование)" autocomplete="off"/>
+                  <input
+                    id="edit-full-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="fullName"
+                    value="АО «Восток Майнинг Системс» (полное наименование)"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-english-name">Английское наименование</label>
-                  <input id="edit-english-name" class="uk-input crm-input" type="text" name="englishName" value="АО Восток Майнинг Системс" autocomplete="off"/>
+                  <input
+                    id="edit-english-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="englishName"
+                    value="АО Восток Майнинг Системс"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-client-type">Тип клиента</label>
-                  <select id="edit-client-type" class="uk-select crm-select" name="clientType">
+                  <select
+                    id="edit-client-type"
+                    class="uk-select crm-select"
+                    name="clientType">
                     <option value="legal" selected>Юр. лицо</option>
                     <option value="individual">Физ. лицо</option>
                     <option value="entrepreneur">ИП</option>
@@ -115,26 +168,50 @@
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-residency">Признак резидентства</label>
-                  <select id="edit-residency" class="uk-select crm-select" name="residency">
+                  <select
+                    id="edit-residency"
+                    class="uk-select crm-select"
+                    name="residency">
                     <option value="resident" selected>Резидент РФ</option>
                     <option value="nonresident">Нерезидент</option>
                   </select>
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-inn">ИНН</label>
-                  <input id="edit-inn" class="uk-input crm-input" type="text" name="inn" value="2721123456" autocomplete="off"/>
+                  <input
+                    id="edit-inn"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="inn"
+                    value="2721123456"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-kpp">КПП</label>
-                  <input id="edit-kpp" class="uk-input crm-input" type="text" name="kpp" value="771011001" autocomplete="off"/>
+                  <input
+                    id="edit-kpp"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="kpp"
+                    value="771011001"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-ogrn">ОГРН</label>
-                  <input id="edit-ogrn" class="uk-input crm-input" type="text" name="ogrn" value="10277V-10111234" autocomplete="off"/>
+                  <input
+                    id="edit-ogrn"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="ogrn"
+                    value="10277V-10111234"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-qualification">Квалификация инвестора</label>
-                  <select id="edit-qualification" class="uk-select crm-select" name="qualification">
+                  <select
+                    id="edit-qualification"
+                    class="uk-select crm-select"
+                    name="qualification">
                     <option value="qualified" selected>Квалифицированный</option>
                     <option value="unqualified">Неквалифицированный</option>
                   </select>
@@ -143,64 +220,144 @@
             </section>
 
             <section class="crm-form-section" data-entity="edit-address">
-              <div class="crm-form-section-head"><h3>Адрес регистрации</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Адрес регистрации</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-addr-country">Страна</label>
-                  <input id="edit-addr-country" class="uk-input crm-input" type="text" name="addrCountry" value="Россия" autocomplete="off"/>
+                  <input
+                    id="edit-addr-country"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrCountry"
+                    value="Россия"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-addr-region">Регион</label>
-                  <input id="edit-addr-region" class="uk-input crm-input" type="text" name="addrRegion" value="Хабаровск" autocomplete="off"/>
+                  <input
+                    id="edit-addr-region"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrRegion"
+                    value="Хабаровск"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-addr-city">Город</label>
-                  <input id="edit-addr-city" class="uk-input crm-input" type="text" name="addrCity" value="Хабаровск" autocomplete="off"/>
+                  <input
+                    id="edit-addr-city"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrCity"
+                    value="Хабаровск"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-addr-street">Улица</label>
-                  <input id="edit-addr-street" class="uk-input crm-input" type="text" name="addrStreet" value="ул. Муравьёва-Амурского, д. 25" autocomplete="off"/>
+                  <input
+                    id="edit-addr-street"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrStreet"
+                    value="ул. Муравьёва-Амурского, д. 25"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-addr-house">Дом</label>
-                  <input id="edit-addr-house" class="uk-input crm-input" type="text" name="addrHouse" value="" placeholder="—" autocomplete="off"/>
+                  <input
+                    id="edit-addr-house"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrHouse"
+                    value=""
+                    placeholder="—"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-addr-index">Индекс</label>
-                  <input id="edit-addr-index" class="uk-input crm-input" type="text" name="addrIndex" value="101000" autocomplete="off"/>
+                  <input
+                    id="edit-addr-index"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrIndex"
+                    value="101000"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-registration">
-              <div class="crm-form-section-head"><h3>Регистрационные данные</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Регистрационные данные</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-reg-date">Дата регистрации</label>
                   <div class="crm-date-field">
-                    <input id="edit-reg-date" class="uk-input crm-input crm-date-input" type="date" name="regDate" value="2021-01-18" placeholder="дд.мм.гггг" data-date-input/>
-                    <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                    <input
+                      id="edit-reg-date"
+                      class="uk-input crm-input crm-date-input"
+                      type="date"
+                      name="regDate"
+                      value="2021-01-18"
+                      placeholder="дд.мм.гггг"
+                      data-date-input />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"></button>
                   </div>
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-reg-authority">Регистрирующий орган</label>
-                  <input id="edit-reg-authority" class="uk-input crm-input" type="text" name="regAuthority" value="Межрайонная ИФНС России №46 по г. Москве" autocomplete="off"/>
+                  <input
+                    id="edit-reg-authority"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="regAuthority"
+                    value="Межрайонная ИФНС России №46 по г. Москве"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-auth-capital">Уставный капитал</label>
-                  <input id="edit-auth-capital" class="uk-input crm-input" type="text" name="authCapital" value="300 000 000 ₽" autocomplete="off"/>
+                  <input
+                    id="edit-auth-capital"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="authCapital"
+                    value="300 000 000 ₽"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-reg-country">Страна регистрации</label>
-                  <input id="edit-reg-country" class="uk-input crm-input" type="text" name="regCountry" value="Российская Федерация" autocomplete="off"/>
+                  <input
+                    id="edit-reg-country"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="regCountry"
+                    value="Российская Федерация"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-reg-number">Регистрационный номер</label>
-                  <input id="edit-reg-number" class="uk-input crm-input" type="text" name="regNumber" value="1217700011256" autocomplete="off"/>
+                  <input
+                    id="edit-reg-number"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="regNumber"
+                    value="1217700011256"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-tax-status">Налоговый статус</label>
-                  <select id="edit-tax-status" class="uk-select crm-select" name="taxStatus">
+                  <select
+                    id="edit-tax-status"
+                    class="uk-select crm-select"
+                    name="taxStatus">
                     <option value="osno" selected>Плательщик налога на прибыль (ОСНО)</option>
                     <option value="usn">УСН</option>
                     <option value="exempt">Освобождён от налогообложения</option>
@@ -210,41 +367,84 @@
             </section>
 
             <section class="crm-form-section" data-entity="edit-contacts">
-              <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Контактные данные</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="edit-phone">Телефон</label>
-                  <input id="edit-phone" class="uk-input crm-input" type="tel" name="phone" value="+7 (495) 900-22-11" autocomplete="off"/>
+                  <input
+                    id="edit-phone"
+                    class="uk-input crm-input"
+                    type="tel"
+                    name="phone"
+                    value="+7 (495) 900-22-11"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="edit-phone2">Дополнительный телефон</label>
-                  <input id="edit-phone2" class="uk-input crm-input" type="tel" name="phone2" value="+7 (495) 900-22-18 (приёмная)" autocomplete="off"/>
+                  <input
+                    id="edit-phone2"
+                    class="uk-input crm-input"
+                    type="tel"
+                    name="phone2"
+                    value="+7 (495) 900-22-18 (приёмная)"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="edit-email">Email</label>
-                  <input id="edit-email" class="uk-input crm-input" type="email" name="email" value="office@vms.ru" autocomplete="off"/>
+                  <input
+                    id="edit-email"
+                    class="uk-input crm-input"
+                    type="email"
+                    name="email"
+                    value="office@vms.ru"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="edit-website">Сайт</label>
-                  <input id="edit-website" class="uk-input crm-input" type="text" name="website" value="www.vostokms.ru" autocomplete="off"/>
+                  <input
+                    id="edit-website"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="website"
+                    value="www.vostokms.ru"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="edit-contact-person">Контактное лицо</label>
-                  <input id="edit-contact-person" class="uk-input crm-input" type="text" name="contactPerson" value="Соколова Мария Владимировна" autocomplete="off"/>
+                  <input
+                    id="edit-contact-person"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="contactPerson"
+                    value="Соколова Мария Владимировна"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="edit-responsible">Ответственный представитель</label>
-                  <input id="edit-responsible" class="uk-input crm-input" type="text" name="responsible" value="Крылов Денис Олегович" autocomplete="off"/>
+                  <input
+                    id="edit-responsible"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="responsible"
+                    value="Крылов Денис Олегович"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-compliance">
-              <div class="crm-form-section-head"><h3>Комплаенс</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Комплаенс</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-compliance-status">Статус комплаенса</label>
-                  <select id="edit-compliance-status" class="uk-select crm-select" name="complianceStatus">
+                  <select
+                    id="edit-compliance-status"
+                    class="uk-select crm-select"
+                    name="complianceStatus">
                     <option value="passed" selected>Пройден</option>
                     <option value="in-progress">На проверке</option>
                     <option value="failed">Не пройден</option>
@@ -254,17 +454,38 @@
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-compliance-date">Дата прохождения</label>
                   <div class="crm-date-field">
-                    <input id="edit-compliance-date" class="uk-input crm-input crm-date-input" type="date" name="complianceDate" value="2026-04-25" placeholder="дд.мм.гггг" data-date-input/>
-                    <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                    <input
+                      id="edit-compliance-date"
+                      class="uk-input crm-input crm-date-input"
+                      type="date"
+                      name="complianceDate"
+                      value="2026-04-25"
+                      placeholder="дд.мм.гггг"
+                      data-date-input />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"></button>
                   </div>
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-compliance-officer">Комплаенс офицер</label>
-                  <input id="edit-compliance-officer" class="uk-input crm-input" type="text" name="complianceOfficer" value="Петрова Елена Сергеевна" autocomplete="off"/>
+                  <input
+                    id="edit-compliance-officer"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="complianceOfficer"
+                    value="Петрова Елена Сергеевна"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="edit-risk-profile">Риск-профиль</label>
-                  <select id="edit-risk-profile" class="uk-select crm-select" name="riskProfile">
+                  <select
+                    id="edit-risk-profile"
+                    class="uk-select crm-select"
+                    name="riskProfile">
                     <option value="low">Низкий (LR-1)</option>
                     <option value="medium" selected>Средний (MR-2)</option>
                     <option value="high">Высокий (HR-3)</option>
@@ -272,21 +493,38 @@
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-compliance-comment">Комментарий</label>
-                  <input id="edit-compliance-comment" class="uk-input crm-input" type="text" name="complianceComment" value="Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено." autocomplete="off"/>
+                  <input
+                    id="edit-compliance-comment"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="complianceComment"
+                    value="Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено."
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-last-check">Последняя проверка</label>
-                  <input id="edit-last-check" class="uk-input crm-input" type="text" name="lastCheck" value="25.04.2026 11:40" autocomplete="off"/>
+                  <input
+                    id="edit-last-check"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="lastCheck"
+                    value="25.04.2026 11:40"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-rights">
-              <div class="crm-form-section-head"><h3>Права использования</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Права использования</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-cash-right">Право использования денежных средств</label>
-                  <select id="edit-cash-right" class="uk-select crm-select" name="cashRight">
+                  <select
+                    id="edit-cash-right"
+                    class="uk-select crm-select"
+                    name="cashRight">
                     <option value="yes" selected>Да</option>
                     <option value="no">Нет</option>
                     <option value="restricted">Ограничено</option>
@@ -294,7 +532,10 @@
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="edit-securities-right">Право использования ценных бумаг</label>
-                  <select id="edit-securities-right" class="uk-select crm-select" name="securitiesRight">
+                  <select
+                    id="edit-securities-right"
+                    class="uk-select crm-select"
+                    name="securitiesRight">
                     <option value="yes">Да</option>
                     <option value="no">Нет</option>
                     <option value="restricted" selected>Ограничено</option>
@@ -304,26 +545,41 @@
             </section>
 
             <section class="crm-form-section" data-entity="edit-report-delivery">
-              <div class="crm-form-section-head"><h3>Способ получения отчётов</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Способ получения отчётов</h3>
+              </div>
               <div class="crm-edit-checkboxes">
                 <label class="crm-check-row is-active">
-                  <input type="checkbox" name="delivery-email" checked/>
+                  <input
+                    type="checkbox"
+                    name="delivery-email"
+                    checked />
                   <span>Электронная почта</span>
                 </label>
                 <label class="crm-check-row is-active">
-                  <input type="checkbox" name="delivery-cabinet" checked/>
+                  <input
+                    type="checkbox"
+                    name="delivery-cabinet"
+                    checked />
                   <span>Личный кабинет</span>
                 </label>
                 <label class="crm-check-row">
-                  <input type="checkbox" name="delivery-paper"/>
+                  <input
+                    type="checkbox"
+                    name="delivery-paper" />
                   <span>Бумажный отчёт</span>
                 </label>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-manager-comment">
-              <div class="crm-form-section-head"><h3>Комментарий менеджера</h3></div>
-              <textarea class="uk-textarea crm-input crm-edit-textarea" name="managerComment" rows="4">Пакет KYC/FATCA актуализирован, критичных замечаний по карточке нет.</textarea>
+              <div class="crm-form-section-head">
+                <h3>Комментарий менеджера</h3>
+              </div>
+              <textarea
+                class="uk-textarea crm-input crm-edit-textarea"
+                name="managerComment"
+                rows="4">Пакет KYC/FATCA актуализирован, критичных замечаний по карточке нет.</textarea>
             </section>
 
           </form>

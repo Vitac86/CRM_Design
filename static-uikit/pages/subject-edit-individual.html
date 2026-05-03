@@ -54,9 +54,30 @@
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button
+          class="uk-button uk-button-default"
+          type="button"
+          data-sidebar-toggle
+          aria-label="Открыть меню"
+        >
+          <span uk-icon="menu"></span>
+        </button>
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input
+            class="uk-input crm-input"
+            type="search"
+            name="global-search"
+            placeholder="Глобальный поиск"
+            autocomplete="off" />
+        </div>
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
 
       <section class="crm-page" data-page="subject-edit">
@@ -81,9 +102,18 @@
                 </div>
               </div>
               <div class="crm-edit-header-actions">
-                <a href="subject-card.html" class="uk-button uk-button-default crm-button" data-action="cancel-edit">Отмена</a>
-                <button type="button" class="uk-button uk-button-default crm-button" data-action="save-draft-edit">Сохранить как черновик</button>
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="save-edit">Сохранить</button>
+                <a
+                  href="subject-card.html"
+                  class="uk-button uk-button-default crm-button"
+                  data-action="cancel-edit">Отмена</a>
+                <button
+                  type="button"
+                  class="uk-button uk-button-default crm-button"
+                  data-action="save-draft-edit">Сохранить как черновик</button>
+                <button
+                  type="button"
+                  class="uk-button crm-button-primary crm-button"
+                  data-action="save-edit">Сохранить</button>
               </div>
             </div>
           </div>
@@ -91,27 +121,56 @@
           <form class="crm-card crm-edit-form-card" data-entity="subject-edit-form" novalidate>
 
             <section class="crm-form-section" data-entity="edit-main-data">
-              <div class="crm-form-section-head"><h3>Основные данные</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Основные данные</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-last-name">Фамилия</label>
-                  <input id="ind-last-name" class="uk-input crm-input" type="text" name="lastName" value="Ковалёв" autocomplete="off"/>
+                  <input
+                    id="ind-last-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="lastName"
+                    value="Ковалёв"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-first-name">Имя</label>
-                  <input id="ind-first-name" class="uk-input crm-input" type="text" name="firstName" value="Даниил" autocomplete="off"/>
+                  <input
+                    id="ind-first-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="firstName"
+                    value="Даниил"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-middle-name">Отчество</label>
-                  <input id="ind-middle-name" class="uk-input crm-input" type="text" name="middleName" value="Олегович" autocomplete="off"/>
+                  <input
+                    id="ind-middle-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="middleName"
+                    value="Олегович"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-full-name">Полное имя</label>
-                  <input id="ind-full-name" class="uk-input crm-input" type="text" name="fullName" value="Ковалёв Даниил Олегович" autocomplete="off"/>
+                  <input
+                    id="ind-full-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="fullName"
+                    value="Ковалёв Даниил Олегович"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-client-type">Тип клиента</label>
-                  <select id="ind-client-type" class="uk-select crm-select" name="clientType">
+                  <select
+                    id="ind-client-type"
+                    class="uk-select crm-select"
+                    name="clientType">
                     <option value="individual" selected>Физ. лицо</option>
                     <option value="legal">Юр. лицо</option>
                     <option value="entrepreneur">ИП</option>
@@ -119,18 +178,30 @@
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-residency">Признак резидентства</label>
-                  <select id="ind-residency" class="uk-select crm-select" name="residency">
+                  <select
+                    id="ind-residency"
+                    class="uk-select crm-select"
+                    name="residency">
                     <option value="resident" selected>Резидент РФ</option>
                     <option value="nonresident">Нерезидент</option>
                   </select>
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-inn">ИНН</label>
-                  <input id="ind-inn" class="uk-input crm-input" type="text" name="inn" value="772201234567" autocomplete="off"/>
+                  <input
+                    id="ind-inn"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="inn"
+                    value="772201234567"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-qualification">Квалификация инвестора</label>
-                  <select id="ind-qualification" class="uk-select crm-select" name="qualification">
+                  <select
+                    id="ind-qualification"
+                    class="uk-select crm-select"
+                    name="qualification">
                     <option value="qualified">Квалифицированный</option>
                     <option value="unqualified" selected>Неквалифицированный</option>
                   </select>
@@ -139,36 +210,73 @@
             </section>
 
             <section class="crm-form-section" data-entity="edit-personal">
-              <div class="crm-form-section-head"><h3>Персональные данные</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Персональные данные</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-birth-date">Дата рождения</label>
                   <div class="crm-date-field">
-                    <input id="ind-birth-date" class="uk-input crm-input crm-date-input" type="date" name="birthDate" value="1988-03-15" placeholder="дд.мм.гггг" data-date-input/>
-                    <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                    <input
+                      id="ind-birth-date"
+                      class="uk-input crm-input crm-date-input"
+                      type="date"
+                      name="birthDate"
+                      value="1988-03-15"
+                      placeholder="дд.мм.гггг"
+                      data-date-input />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"></button>
                   </div>
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-birth-place">Место рождения</label>
-                  <input id="ind-birth-place" class="uk-input crm-input" type="text" name="birthPlace" value="г. Москва" autocomplete="off"/>
+                  <input
+                    id="ind-birth-place"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="birthPlace"
+                    value="г. Москва"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-citizenship">Гражданство</label>
-                  <input id="ind-citizenship" class="uk-input crm-input" type="text" name="citizenship" value="Россия" autocomplete="off"/>
+                  <input
+                    id="ind-citizenship"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="citizenship"
+                    value="Россия"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-snils">СНИЛС</label>
-                  <input id="ind-snils" class="uk-input crm-input" type="text" name="snils" value="123-456-789 01" autocomplete="off"/>
+                  <input
+                    id="ind-snils"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="snils"
+                    value="123-456-789 01"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-document">
-              <div class="crm-form-section-head"><h3>Документ, удостоверяющий личность</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Документ, удостоверяющий личность</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="ind-doc-type">Тип документа</label>
-                  <select id="ind-doc-type" class="uk-select crm-select" name="docType">
+                  <select
+                    id="ind-doc-type"
+                    class="uk-select crm-select"
+                    name="docType">
                     <option value="passport_rf" selected>Паспорт РФ</option>
                     <option value="foreign_passport">Загранпаспорт</option>
                     <option value="other">Иной документ</option>
@@ -176,92 +284,204 @@
                 </div>
                 <div class="uk-width-1-6@m">
                   <label class="uk-form-label" for="ind-doc-series">Серия</label>
-                  <input id="ind-doc-series" class="uk-input crm-input" type="text" name="docSeries" value="4510" autocomplete="off"/>
+                  <input
+                    id="ind-doc-series"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="docSeries"
+                    value="4510"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-6@m">
                   <label class="uk-form-label" for="ind-doc-number">Номер</label>
-                  <input id="ind-doc-number" class="uk-input crm-input" type="text" name="docNumber" value="234567" autocomplete="off"/>
+                  <input
+                    id="ind-doc-number"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="docNumber"
+                    value="234567"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="ind-doc-issued-by">Кем выдан</label>
-                  <input id="ind-doc-issued-by" class="uk-input crm-input" type="text" name="docIssuedBy" value="ОВД района Пресненский г. Москвы" autocomplete="off"/>
+                  <input
+                    id="ind-doc-issued-by"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="docIssuedBy"
+                    value="ОВД района Пресненский г. Москвы"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-doc-issued-date">Дата выдачи</label>
                   <div class="crm-date-field">
-                    <input id="ind-doc-issued-date" class="uk-input crm-input crm-date-input" type="date" name="docIssuedDate" value="2008-04-20" placeholder="дд.мм.гггг" data-date-input/>
-                    <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                    <input
+                      id="ind-doc-issued-date"
+                      class="uk-input crm-input crm-date-input"
+                      type="date"
+                      name="docIssuedDate"
+                      value="2008-04-20"
+                      placeholder="дд.мм.гггг"
+                      data-date-input />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"></button>
                   </div>
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-doc-division-code">Код подразделения</label>
-                  <input id="ind-doc-division-code" class="uk-input crm-input" type="text" name="docDivisionCode" value="770-001" autocomplete="off"/>
+                  <input
+                    id="ind-doc-division-code"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="docDivisionCode"
+                    value="770-001"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-address">
-              <div class="crm-form-section-head"><h3>Адрес регистрации</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Адрес регистрации</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-addr-country">Страна</label>
-                  <input id="ind-addr-country" class="uk-input crm-input" type="text" name="addrCountry" value="Россия" autocomplete="off"/>
+                  <input
+                    id="ind-addr-country"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrCountry"
+                    value="Россия"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-addr-region">Регион</label>
-                  <input id="ind-addr-region" class="uk-input crm-input" type="text" name="addrRegion" value="Москва" autocomplete="off"/>
+                  <input
+                    id="ind-addr-region"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrRegion"
+                    value="Москва"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-addr-city">Город</label>
-                  <input id="ind-addr-city" class="uk-input crm-input" type="text" name="addrCity" value="Москва" autocomplete="off"/>
+                  <input
+                    id="ind-addr-city"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrCity"
+                    value="Москва"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="ind-addr-street">Улица</label>
-                  <input id="ind-addr-street" class="uk-input crm-input" type="text" name="addrStreet" value="ул. Тверская" autocomplete="off"/>
+                  <input
+                    id="ind-addr-street"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrStreet"
+                    value="ул. Тверская"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-6@m">
                   <label class="uk-form-label" for="ind-addr-house">Дом</label>
-                  <input id="ind-addr-house" class="uk-input crm-input" type="text" name="addrHouse" value="14" autocomplete="off"/>
+                  <input
+                    id="ind-addr-house"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrHouse"
+                    value="14"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-6@m">
                   <label class="uk-form-label" for="ind-addr-flat">Квартира</label>
-                  <input id="ind-addr-flat" class="uk-input crm-input" type="text" name="addrFlat" value="38" autocomplete="off"/>
+                  <input
+                    id="ind-addr-flat"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrFlat"
+                    value="38"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-6@m">
                   <label class="uk-form-label" for="ind-addr-index">Индекс</label>
-                  <input id="ind-addr-index" class="uk-input crm-input" type="text" name="addrIndex" value="125009" autocomplete="off"/>
+                  <input
+                    id="ind-addr-index"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="addrIndex"
+                    value="125009"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-contacts">
-              <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Контактные данные</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="ind-phone">Телефон</label>
-                  <input id="ind-phone" class="uk-input crm-input" type="tel" name="phone" value="+7 (903) 215-44-89" autocomplete="off"/>
+                  <input
+                    id="ind-phone"
+                    class="uk-input crm-input"
+                    type="tel"
+                    name="phone"
+                    value="+7 (903) 215-44-89"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="ind-phone2">Дополнительный телефон</label>
-                  <input id="ind-phone2" class="uk-input crm-input" type="tel" name="phone2" value="" placeholder="—" autocomplete="off"/>
+                  <input
+                    id="ind-phone2"
+                    class="uk-input crm-input"
+                    type="tel"
+                    name="phone2"
+                    value=""
+                    placeholder="—"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-3@m">
                   <label class="uk-form-label" for="ind-email">Email</label>
-                  <input id="ind-email" class="uk-input crm-input" type="email" name="email" value="d.kovalev@mail.ru" autocomplete="off"/>
+                  <input
+                    id="ind-email"
+                    class="uk-input crm-input"
+                    type="email"
+                    name="email"
+                    value="d.kovalev@mail.ru"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-1">
                   <label class="uk-form-label" for="ind-correspondence-addr">Адрес для корреспонденции</label>
-                  <input id="ind-correspondence-addr" class="uk-input crm-input" type="text" name="correspondenceAddr" value="125009, г. Москва, ул. Тверская, д. 14, кв. 38" autocomplete="off"/>
+                  <input
+                    id="ind-correspondence-addr"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="correspondenceAddr"
+                    value="125009, г. Москва, ул. Тверская, д. 14, кв. 38"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-compliance">
-              <div class="crm-form-section-head"><h3>Комплаенс</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Комплаенс</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-compliance-status">Статус комплаенса</label>
-                  <select id="ind-compliance-status" class="uk-select crm-select" name="complianceStatus">
+                  <select
+                    id="ind-compliance-status"
+                    class="uk-select crm-select"
+                    name="complianceStatus">
                     <option value="passed" selected>Пройден</option>
                     <option value="in-progress">На проверке</option>
                     <option value="failed">Не пройден</option>
@@ -271,17 +491,38 @@
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-compliance-date">Дата прохождения</label>
                   <div class="crm-date-field">
-                    <input id="ind-compliance-date" class="uk-input crm-input crm-date-input" type="date" name="complianceDate" value="2026-04-22" placeholder="дд.мм.гггг" data-date-input/>
-                    <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                    <input
+                      id="ind-compliance-date"
+                      class="uk-input crm-input crm-date-input"
+                      type="date"
+                      name="complianceDate"
+                      value="2026-04-22"
+                      placeholder="дд.мм.гггг"
+                      data-date-input />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"></button>
                   </div>
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-compliance-officer">Комплаенс офицер</label>
-                  <input id="ind-compliance-officer" class="uk-input crm-input" type="text" name="complianceOfficer" value="Петрова Елена Сергеевна" autocomplete="off"/>
+                  <input
+                    id="ind-compliance-officer"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="complianceOfficer"
+                    value="Петрова Елена Сергеевна"
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-4@m">
                   <label class="uk-form-label" for="ind-risk-profile">Риск-профиль</label>
-                  <select id="ind-risk-profile" class="uk-select crm-select" name="riskProfile">
+                  <select
+                    id="ind-risk-profile"
+                    class="uk-select crm-select"
+                    name="riskProfile">
                     <option value="low">Низкий (LR-1)</option>
                     <option value="medium" selected>Средний (MR-2)</option>
                     <option value="high">Высокий (HR-3)</option>
@@ -289,21 +530,38 @@
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="ind-compliance-comment">Комментарий</label>
-                  <input id="ind-compliance-comment" class="uk-input crm-input" type="text" name="complianceComment" value="Профиль актуализирован, источник дохода подтверждён." autocomplete="off"/>
+                  <input
+                    id="ind-compliance-comment"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="complianceComment"
+                    value="Профиль актуализирован, источник дохода подтверждён."
+                    autocomplete="off" />
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="ind-last-check">Последняя проверка</label>
-                  <input id="ind-last-check" class="uk-input crm-input" type="text" name="lastCheck" value="22.04.2026 14:15" autocomplete="off"/>
+                  <input
+                    id="ind-last-check"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="lastCheck"
+                    value="22.04.2026 14:15"
+                    autocomplete="off" />
                 </div>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-rights">
-              <div class="crm-form-section-head"><h3>Права использования</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Права использования</h3>
+              </div>
               <div class="crm-form-grid uk-grid-small" uk-grid>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="ind-cash-right">Право использования денежных средств</label>
-                  <select id="ind-cash-right" class="uk-select crm-select" name="cashRight">
+                  <select
+                    id="ind-cash-right"
+                    class="uk-select crm-select"
+                    name="cashRight">
                     <option value="yes" selected>Да</option>
                     <option value="no">Нет</option>
                     <option value="restricted">Ограничено</option>
@@ -311,7 +569,10 @@
                 </div>
                 <div class="uk-width-1-2@m">
                   <label class="uk-form-label" for="ind-securities-right">Право использования ценных бумаг</label>
-                  <select id="ind-securities-right" class="uk-select crm-select" name="securitiesRight">
+                  <select
+                    id="ind-securities-right"
+                    class="uk-select crm-select"
+                    name="securitiesRight">
                     <option value="yes" selected>Да</option>
                     <option value="no">Нет</option>
                     <option value="restricted">Ограничено</option>
@@ -321,26 +582,41 @@
             </section>
 
             <section class="crm-form-section" data-entity="edit-report-delivery">
-              <div class="crm-form-section-head"><h3>Способ получения отчётов</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Способ получения отчётов</h3>
+              </div>
               <div class="crm-edit-checkboxes">
                 <label class="crm-check-row is-active">
-                  <input type="checkbox" name="delivery-email" checked/>
+                  <input
+                    type="checkbox"
+                    name="delivery-email"
+                    checked />
                   <span>Электронная почта</span>
                 </label>
                 <label class="crm-check-row is-active">
-                  <input type="checkbox" name="delivery-cabinet" checked/>
+                  <input
+                    type="checkbox"
+                    name="delivery-cabinet"
+                    checked />
                   <span>Личный кабинет</span>
                 </label>
                 <label class="crm-check-row">
-                  <input type="checkbox" name="delivery-paper"/>
+                  <input
+                    type="checkbox"
+                    name="delivery-paper" />
                   <span>Бумажный отчёт</span>
                 </label>
               </div>
             </section>
 
             <section class="crm-form-section" data-entity="edit-manager-comment">
-              <div class="crm-form-section-head"><h3>Комментарий менеджера</h3></div>
-              <textarea class="uk-textarea crm-input crm-edit-textarea" name="managerComment" rows="4">Клиент прошёл верификацию, профиль в порядке.</textarea>
+              <div class="crm-form-section-head">
+                <h3>Комментарий менеджера</h3>
+              </div>
+              <textarea
+                class="uk-textarea crm-input crm-edit-textarea"
+                name="managerComment"
+                rows="4">Клиент прошёл верификацию, профиль в порядке.</textarea>
             </section>
 
           </form>

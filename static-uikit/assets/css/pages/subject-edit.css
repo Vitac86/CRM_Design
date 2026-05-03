@@ -1,11 +1,9 @@
-/* Subject edit page — scoped to body[data-page="subject-edit"] */
+/* Shared subject edit page shell */
 
 body[data-page="subject-edit"] .crm-page,
 .crm-page[data-page="subject-edit"] {
   background: #f3f6fb;
 }
-
-/* ── Shell ───────────────────────────────────────────────────────────────── */
 
 body[data-page="subject-edit"] .crm-subject-edit-shell {
   display: grid;
@@ -16,7 +14,7 @@ body[data-page="subject-edit"] .crm-subject-edit-shell {
   min-width: 0;
 }
 
-/* ── Header card ─────────────────────────────────────────────────────────── */
+/* Header / breadcrumbs / title area */
 
 body[data-page="subject-edit"] .crm-edit-header {
   padding: 14px 18px;
@@ -89,7 +87,7 @@ body[data-page="subject-edit"] .crm-edit-header-actions .crm-button {
   white-space: nowrap;
 }
 
-/* ── Edit form card ──────────────────────────────────────────────────────── */
+/* Form cards and sections */
 
 body[data-page="subject-edit"] .crm-edit-form-card {
   padding: 0;
@@ -126,7 +124,7 @@ body[data-page="subject-edit"] .crm-form-section-head h3 {
   line-height: 1.2;
 }
 
-/* ── Form grid labels ────────────────────────────────────────────────────── */
+/* Form grids and fields */
 
 body[data-page="subject-edit"] .uk-form-label {
   display: block;
@@ -152,7 +150,7 @@ body[data-page="subject-edit"] .uk-textarea.crm-input {
   resize: vertical;
 }
 
-/* ── Report delivery checkboxes ──────────────────────────────────────────── */
+/* Binary controls / option controls */
 
 body[data-page="subject-edit"] .crm-edit-checkboxes {
   display: flex;
@@ -186,7 +184,27 @@ body[data-page="subject-edit"] .crm-edit-checkboxes .crm-check-row:hover {
   border-color: var(--crm-umi-primary);
 }
 
-/* ── Textarea ────────────────────────────────────────────────────────────── */
+/* Date fields */
+
+/* Date field layout is provided by the shared crm-date-field rules. */
+
+/* Sticky/footer actions */
+
+/* No page-specific sticky/footer action rules are required here. */
+
+/* Legal entity page-specific rules */
+
+/* Legal entity edit currently uses the shared rules above. */
+
+/* Individual page-specific rules */
+
+/* Individual edit currently uses the shared rules above. */
+
+/* Validation/error states */
+
+/* No page-specific validation state rules are currently present. */
+
+/* Form comments */
 
 body[data-page="subject-edit"] .crm-edit-textarea {
   width: 100%;
@@ -196,7 +214,7 @@ body[data-page="subject-edit"] .crm-edit-textarea {
   line-height: 1.5;
 }
 
-/* ── Toast ───────────────────────────────────────────────────────────────── */
+/* Save feedback */
 
 body[data-page="subject-edit"] .crm-edit-toast {
   position: fixed;
@@ -221,7 +239,7 @@ body[data-page="subject-edit"] .crm-edit-toast.is-visible {
   pointer-events: auto;
 }
 
-/* ── Responsive ──────────────────────────────────────────────────────────── */
+/* Mobile rules */
 
 @media (max-width: 900px) {
   body[data-page="subject-edit"] .crm-edit-header-body {
