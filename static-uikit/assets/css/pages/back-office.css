@@ -1,3 +1,4 @@
+/* Page Variables and Page Shell */
 .crm-page[data-page="back-office"] {
   min-width: 0;
   overflow-x: hidden;
@@ -23,6 +24,7 @@
   max-width: 100%;
 }
 
+/* Header and Actions */
 .crm-page[data-page="back-office"] .crm-back-office-header {
   align-items: flex-start;
   gap: 12px;
@@ -64,6 +66,7 @@
   font-size: 13px;
 }
 
+/* Filter Panel */
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-registry-filters.crm-filter-panel {
   gap: 12px;
   width: 100%;
@@ -76,6 +79,43 @@
   overflow: visible;
 }
 
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control {
+  flex: 0 1 auto;
+  width: clamp(176px, 18vw, 252px);
+  min-width: 176px;
+  max-width: 252px;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-menu {
+  width: 100%;
+  max-width: 100%;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin-left: auto;
+  max-width: 100%;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-reset {
+  min-height: 36px;
+  height: 36px;
+  padding-inline: 14px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* Search Input */
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-search-row {
   display: flex;
   width: 100%;
@@ -124,42 +164,7 @@
   color: #8b9eb8;
 }
 
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  min-width: 0;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px, 18vw, 252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-menu {
-  width: 100%;
-  max-width: 100%;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions {
-  flex: 0 0 auto;
-  align-self: flex-end;
-  margin-left: auto;
-  max-width: 100%;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-reset {
-  min-height: 36px;
-  height: 36px;
-  padding-inline: 14px;
-  border-radius: 999px;
-  font-size: 13px;
-}
-
+/* Table Card and Wrapper */
 .crm-page[data-page="back-office"] .crm-back-office-registry {
   width: 100%;
   max-width: 100%;
@@ -190,6 +195,7 @@
   content: none;
 }
 
+/* Table Structure and Scrollbars */
 .crm-page[data-page="back-office"] .crm-back-office-table .crm-table {
   width: 100%;
   min-width: 760px;
@@ -208,6 +214,7 @@
   border-spacing: 0;
 }
 
+/* Table Header */
 .crm-page[data-page="back-office"] .crm-back-office-table .uk-table thead,
 .crm-page[data-page="back-office"] .crm-back-office-table .uk-table thead tr,
 .crm-page[data-page="back-office"] .crm-back-office-table .uk-table thead th {
@@ -227,6 +234,7 @@
   white-space: nowrap;
 }
 
+/* Table Body */
 .crm-page[data-page="back-office"] .crm-back-office-table .uk-table tbody td {
   padding: 12px;
   border-bottom: 1px solid #e2e8f0;
@@ -243,6 +251,103 @@
   border-bottom: 0;
 }
 
+/* Cell Helpers / Row Helpers
+   Row helper visuals are shared; no back-office-only rules are needed here. */
+
+/* Footer and Pagination */
+.crm-page[data-page="back-office"] .crm-back-office-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 4px 0;
+  background: transparent;
+  border: 0;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-page-size,
+.crm-page[data-page="back-office"] .crm-back-office-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  color: #607494;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-chip {
+  min-width: 36px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #4e6383;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-chip.is-active {
+  border-color: #8ea5c9;
+  background: #dce8f8;
+  color: #203a61;
+  font-weight: 600;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-chip:hover {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-chip:focus-visible,
+.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-page {
+  font-size: 12px;
+  color: #4f6483;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  border-radius: 10px;
+  background: #fff;
+  color: #4f6483;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button:hover:not(:disabled) {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button:disabled {
+  cursor: not-allowed;
+  color: #a0aec0;
+  border-color: #dbe2f0;
+  background: #f3f6fb;
+}
+
+/* Empty State
+   Shared registry empty-state rules apply; no page-specific overrides are needed here. */
+
+/* Mobile Rules */
 @media (max-width: 760px) {
   .crm-page[data-page="back-office"] .crm-back-office-header {
     flex-direction: column;
@@ -263,16 +368,3 @@
     margin-left: 0;
   }
 }
-
-.crm-page[data-page="back-office"] .crm-back-office-table-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 4px 0; background:transparent; border:0; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-page-size, .crm-page[data-page="back-office"] .crm-back-office-footer-nav { display:flex; align-items:center; gap:8px; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-caption { font-size:11px; font-weight:600; letter-spacing:.05em; color:#607494; margin-right:2px; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-chip { min-width:36px; height:32px; border:1px solid #c8d4e6; background:#fff; border-radius:10px; font-size:13px; color:#4e6383; cursor:pointer; transition:border-color .18s ease, background-color .18s ease, color .18s ease; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-chip.is-active { border-color:#8ea5c9; background:#dce8f8; color:#203a61; font-weight:600; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-chip:hover { border-color:#b8c6de; background:#f8fbff; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-chip:focus-visible, .crm-page[data-page="back-office"] .crm-back-office-footer-nav-button:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(59,130,246,.2); }
-.crm-page[data-page="back-office"] .crm-back-office-footer-page { font-size:12px; color:#4f6483; margin-right:2px; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button { width:32px; height:32px; border:1px solid #c8d4e6; border-radius:10px; background:#fff; color:#4f6483; display:inline-flex; align-items:center; justify-content:center; font-size:16px; line-height:1; cursor:pointer; transition:border-color .18s ease, background-color .18s ease; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button:hover:not(:disabled) { border-color:#b8c6de; background:#f8fbff; }
-.crm-page[data-page="back-office"] .crm-back-office-footer-nav-button:disabled { cursor:not-allowed; color:#a0aec0; border-color:#dbe2f0; background:#f3f6fb; }
-
