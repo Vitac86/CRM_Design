@@ -10,135 +10,362 @@
 <body data-page="contract-wizard">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
+
       <nav class="crm-nav" aria-label="Основная навигация">
         <div class="crm-nav-group" data-group="front-office">
           <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
-            <span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Фронт-офис</span>
+            <span>
+              <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use>
+              </svg>Фронт-офис
+            </span>
             <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
           </button>
+
           <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
-            <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use></svg>Дашборд</span></a>
-            <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Субъекты</span></a>
-            <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use></svg>Брок. деятельность</span></a>
-            <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trust"></use></svg>Дов. управление</span></a>
-            <a class="crm-nav-link crm-nav-item" href="agents.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-agents"></use></svg>Агенты</span></a>
-            <a class="crm-nav-link crm-nav-item" href="archive.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Архив</span></a>
-            <a class="crm-nav-link crm-nav-item" href="requests.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-requests"></use></svg>Поручения</span></a>
+            <a class="crm-nav-link crm-nav-item" href="dashboard.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use>
+                </svg>Дашборд
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use>
+                </svg>Субъекты
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="brokerage.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use>
+                </svg>Брок. деятельность
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="trust-management.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-trust"></use>
+                </svg>Дов. управление
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="agents.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-agents"></use>
+                </svg>Агенты
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="archive.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use>
+                </svg>Архив
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="requests.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-requests"></use>
+                </svg>Поручения
+              </span>
+            </a>
           </div>
         </div>
 
-        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-compliance"></use></svg>Комплаенс</span></a>
+        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-compliance"></use>
+            </svg>Комплаенс
+          </span>
+        </a>
 
         <div class="crm-nav-group" data-group="middle-office">
           <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
-            <span><span uk-icon="album"></span>Мидл-офис</span>
+            <span>
+              <span uk-icon="album"></span>Мидл-офис
+            </span>
             <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
           </button>
+
           <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
-            <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал клиентов</span></a>
-            <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал отправленных отчётов</span></a>
+            <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use>
+                </svg>Журнал клиентов
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use>
+                </svg>Журнал отправленных отчётов
+              </span>
+            </a>
           </div>
         </div>
 
-        <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
-        <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
-        <a class="crm-nav-link crm-nav-item" href="depository.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
-        <a class="crm-nav-link crm-nav-item" href="administration.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
+        <a class="crm-nav-link crm-nav-item" href="back-office.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use>
+            </svg>Бэк-офис
+          </span>
+        </a>
+
+        <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use>
+            </svg>Трейдинг
+          </span>
+        </a>
+
+        <a class="crm-nav-link crm-nav-item" href="depository.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use>
+            </svg>Депозитарий
+          </span>
+        </a>
+
+        <a class="crm-nav-link crm-nav-item" href="administration.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use>
+            </svg>Администрирование
+          </span>
+        </a>
       </nav>
     </aside>
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню">
+          <span uk-icon="menu"></span>
+        </button>
+
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/>
+        </div>
+
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
+
       <section class="crm-page" data-page="contract-wizard">
         <div class="crm-wizard-shell crm-contract-wizard-shell">
-          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><a href="subject-card.html">Карточка субъекта</a><span uk-icon="chevron-right"></span><span>Новый договор</span></div>
+          <div class="crm-breadcrumbs">
+            <a href="subjects.html">Субъекты</a>
+            <span uk-icon="chevron-right"></span>
+            <a href="subject-card.html">Карточка субъекта</a>
+            <span uk-icon="chevron-right"></span>
+            <span>Новый договор</span>
+          </div>
 
           <div class="crm-card crm-contract-wizard-header">
             <div class="crm-contract-wizard-title">
               <h1 class="crm-page-title" data-entity="page-title">Новый договор</h1>
               <p class="crm-step-note">Настройка параметров заявления о присоединении и договоров клиента.</p>
             </div>
+
             <div class="crm-contract-client-summary">
-              <div><span>Клиент</span><strong>АО «Восток Майнинг Системс»</strong></div>
-              <div><span>ИНН</span><strong>7704132901</strong></div>
-              <div><span>Email</span><strong>office@vms.ru</strong></div>
+              <div>
+                <span>Клиент</span>
+                <strong>АО «Восток Майнинг Системс»</strong>
+              </div>
+
+              <div>
+                <span>ИНН</span>
+                <strong>7704132901</strong>
+              </div>
+
+              <div>
+                <span>Email</span>
+                <strong>office@vms.ru</strong>
+              </div>
             </div>
           </div>
 
           <form action="#" method="post" data-form="contract-wizard" data-action="submit-contract-wizard" class="crm-register-card crm-contract-wizard-form">
             <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Присоединение по ст. 428 ГК РФ</h3></div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="joined-broker" checked/><span>Договор о брокерском обслуживании</span></label>
-              <label class="crm-check-row is-active"><input type="checkbox" name="joined-depository" checked/><span>Депозитарный договор</span></label>
+              <div class="crm-form-section-head">
+                <h3>Присоединение по ст. 428 ГК РФ</h3>
+              </div>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="joined-broker" checked/><span>Договор о брокерском обслуживании</span>
+              </label>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="joined-depository" checked/><span>Депозитарный договор</span>
+              </label>
             </section>
 
             <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Тип лица</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Тип лица</h3>
+              </div>
+
               <div class="crm-radio-grid">
-                <label class="crm-radio-tile is-selected"><input type="radio" name="personType" value="legal" checked/><span>Юридическое лицо</span></label>
-                <label class="crm-radio-tile"><input type="radio" name="personType" value="individual"/><span>Физическое лицо</span></label>
-                <label class="crm-radio-tile"><input type="radio" name="personType" value="entrepreneur"/><span>ИП</span></label>
+                <label class="crm-radio-tile is-selected">
+                  <input type="radio" name="personType" value="legal" checked/><span>Юридическое лицо</span>
+                </label>
+
+                <label class="crm-radio-tile">
+                  <input type="radio" name="personType" value="individual"/><span>Физическое лицо</span>
+                </label>
+
+                <label class="crm-radio-tile">
+                  <input type="radio" name="personType" value="entrepreneur"/><span>ИП</span>
+                </label>
               </div>
             </section>
 
             <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Открыть счёт депо</h3></div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="depo-owner" checked/><span>Владельца</span></label>
-              <label class="crm-check-row"><input type="checkbox" name="depo-nominee"/><span>Номинального держателя</span></label>
-              <label class="crm-check-row"><input type="checkbox" name="depo-trust-manager"/><span>Доверительного управляющего</span></label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Оператор счёта депо</h3></div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="depo-operator" checked/><span>ООО «Инвестика» оператором счёта депо</span></label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Открыть торговый счёт депо</h3></div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="trading-depo-owner" checked/><span>Владельца</span></label>
-              <label class="crm-check-row"><input type="checkbox" name="trading-depo-nominee"/><span>Номинального держателя</span></label>
-              <label class="crm-check-row"><input type="checkbox" name="trading-depo-trust-manager"/><span>Доверительного управляющего</span></label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Оператор торгового счёта депо</h3></div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="trading-depo-operator" checked/><span>ООО «Инвестика» оператор торгового счёта депо</span></label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Брокерское обслуживание на рынках</h3></div>
-              <div class="crm-form-grid uk-grid-small" uk-grid>
-                <div class="uk-width-1-2@m"><label class="uk-form-label" for="wizard-tariff">Тариф для всех счетов</label><select id="wizard-tariff" class="uk-select crm-select" name="tariff"><option>Универсальный</option><option>Инвестор</option><option>Премиум</option></select></div>
+              <div class="crm-form-section-head">
+                <h3>Открыть счёт депо</h3>
               </div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="market-stock" checked/><span>Фондовый рынок</span></label>
-              <label class="crm-check-row"><input type="checkbox" name="market-futures"/><span>Срочный рынок</span></label>
-              <label class="crm-check-row is-active"><input type="checkbox" name="market-currency" checked/><span>Валютный рынок и рынок драгоценных металлов</span></label>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="depo-owner" checked/><span>Владельца</span>
+              </label>
+
+              <label class="crm-check-row">
+                <input type="checkbox" name="depo-nominee"/><span>Номинального держателя</span>
+              </label>
+
+              <label class="crm-check-row">
+                <input type="checkbox" name="depo-trust-manager"/><span>Доверительного управляющего</span>
+              </label>
             </section>
 
             <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Электронный документооборот</h3></div>
-              <label class="crm-check-row is-active"><input type="checkbox" name="edo-signature" checked/><span>Использование электронной подписи и обмен электронными документами</span></label>
-              <label class="crm-check-row is-active"><input type="checkbox" name="edo-enable" checked/><span>Подключить систему ЭДО</span></label>
+              <div class="crm-form-section-head">
+                <h3>Оператор счёта депо</h3>
+              </div>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="depo-operator" checked/><span>ООО «Инвестика» оператором счёта депо</span>
+              </label>
             </section>
 
             <section class="crm-form-section">
-              <div class="crm-form-section-head"><h3>Перечисление доходов</h3></div>
+              <div class="crm-form-section-head">
+                <h3>Открыть торговый счёт депо</h3>
+              </div>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="trading-depo-owner" checked/><span>Владельца</span>
+              </label>
+
+              <label class="crm-check-row">
+                <input type="checkbox" name="trading-depo-nominee"/><span>Номинального держателя</span>
+              </label>
+
+              <label class="crm-check-row">
+                <input type="checkbox" name="trading-depo-trust-manager"/><span>Доверительного управляющего</span>
+              </label>
+            </section>
+
+            <section class="crm-form-section">
+              <div class="crm-form-section-head">
+                <h3>Оператор торгового счёта депо</h3>
+              </div>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="trading-depo-operator" checked/><span>ООО «Инвестика» оператор торгового счёта депо</span>
+              </label>
+            </section>
+
+            <section class="crm-form-section">
+              <div class="crm-form-section-head">
+                <h3>Брокерское обслуживание на рынках</h3>
+              </div>
+
               <div class="crm-form-grid uk-grid-small" uk-grid>
-                <div class="uk-width-1-2@m"><label class="uk-form-label" for="wizard-delivery">Способ перечисления</label><select class="uk-select crm-select" id="wizard-delivery" name="income-transfer"><option>Специальный брокерский счёт</option><option>Расчётный счёт клиента</option></select></div>
-                <div class="uk-width-1-2@m"><label class="uk-form-label" for="wizard-mail">Email для отчётов</label><input class="uk-input crm-input" id="wizard-mail" name="report-email" value="office@vms.ru"/></div>
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="wizard-tariff">Тариф для всех счетов</label>
+                  <select id="wizard-tariff" class="uk-select crm-select" name="tariff">
+                    <option>Универсальный</option>
+                    <option>Инвестор</option>
+                    <option>Премиум</option>
+                  </select>
+                </div>
+              </div>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="market-stock" checked/><span>Фондовый рынок</span>
+              </label>
+
+              <label class="crm-check-row">
+                <input type="checkbox" name="market-futures"/><span>Срочный рынок</span>
+              </label>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="market-currency" checked/><span>Валютный рынок и рынок драгоценных металлов</span>
+              </label>
+            </section>
+
+            <section class="crm-form-section">
+              <div class="crm-form-section-head">
+                <h3>Электронный документооборот</h3>
+              </div>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="edo-signature" checked/><span>Использование электронной подписи и обмен электронными документами</span>
+              </label>
+
+              <label class="crm-check-row is-active">
+                <input type="checkbox" name="edo-enable" checked/><span>Подключить систему ЭДО</span>
+              </label>
+            </section>
+
+            <section class="crm-form-section">
+              <div class="crm-form-section-head">
+                <h3>Перечисление доходов</h3>
+              </div>
+
+              <div class="crm-form-grid uk-grid-small" uk-grid>
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="wizard-delivery">Способ перечисления</label>
+                  <select class="uk-select crm-select" id="wizard-delivery" name="income-transfer">
+                    <option>Специальный брокерский счёт</option>
+                    <option>Расчётный счёт клиента</option>
+                  </select>
+                </div>
+
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="wizard-mail">Email для отчётов</label>
+                  <input class="uk-input crm-input" id="wizard-mail" name="report-email" value="office@vms.ru"/>
+                </div>
               </div>
             </section>
 
             <div class="crm-sticky-actions crm-wizard-actions">
               <a href="subject-card.html" class="uk-button uk-button-default crm-button" data-action="wizard-back">Назад к договорам</a>
+
               <div class="crm-page-actions crm-actions">
                 <button type="button" class="uk-button uk-button-default crm-button" data-action="save-draft">Сохранить настройки заявления</button>
                 <button type="submit" class="uk-button crm-button-primary crm-button" data-action="submit-contract-wizard">Заключить договор</button>
