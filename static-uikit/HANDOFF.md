@@ -374,7 +374,7 @@ The static kit implements the following core UI patterns consistently:
 ### ⚠️ File modifications
 - **Do not** edit vendor files (UIKit, fonts, icons in `assets/vendor/`)
 - **Do not** manually edit UMI generated packs (`umi-p0/`, `umi-p1/`) unless approved
-- Use extraction tools / documeextraction packs (`umi-p0/`, `umi-p1/`)
+- Do not manually edit UMI extraction/reference packs (`umi-p0/`, `umi-p1/`) unless explicitly requested.
 - static-uikit/pages/ is the primary editable reference; packs are generated/reference only
 ### ⚠️ Static HTML values
 - All page data is **sample / placeholder only**
@@ -401,8 +401,8 @@ Developers/designers should manually verify the following items as part of accep
 - [ ] **Table horizontal scrolling** — Tables scroll without breaking page layout; headers remain visible
 - [ ] **Date field behavior** — Calendar icon triggers date picker; works on mobile/touch
 - [ ] **Subject card tabs** — Tabs switch content; no overflow on mobile; scroll available if needed
-- [ ] **Auth validation** — Required fields show error state; buttons disable appropriately
-- [ ] **Master-detail pages** — Detail panel updates when mastalert appears on empty submissionable)
+- [ ] **Auth validation** — Required fields show error state and empty submissions show prototype alerts.
+- [ ] **Master-detail pages** — Detail panel selection and details layout remain usable on tablet/mobile.
 - [ ] **Responsive grid layouts** — Layouts reflow from multi-column to single-column appropriately
 - [ ] **Breadcrumbs** — Clickable breadcrumbs navigate to parent pages correctly
 - [ ] **Link targets** — All navigation links point to existing pages (see LINK_INVENTORY.md)
