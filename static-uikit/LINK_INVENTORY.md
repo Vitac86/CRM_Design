@@ -78,7 +78,7 @@ The launcher page (`static-uikit/index.html`) links to all demo pages. All targe
 
 ## B. Sidebar Navigation Links
 
-All application pages (except auth pages) share the **same sidebar navigation structure**. The following is from representative pages:
+Most application pages (except auth pages and placeholder pages) share a similar sidebar navigation structure. The following is documented from representative pages:
 - pages/dashboard.html
 - pages/subjects.html
 - pages/subject-card.html
@@ -132,8 +132,9 @@ All application pages (except auth pages) share the **same sidebar navigation st
 | Администрирование (Administration) | administration.html | pages/administration.html | ✓ | **Placeholder / developer-owned** |
 
 ### Sidebar Summary
-- **All pages use identical sidebar structure** (except auth pages, which have no sidebar)
-- All sidebar links point to existing pages
+- Most app pages share the same sidebar/app shell pattern
+- Auth pages (login.html, register.html) have no sidebar
+- Administration page (administration.html) is placeholder / developer-owned
 - `data-match` attributes indicate pages that inherit the parent navigation active state (e.g., subject-card.html, subject-register.html, and contract-wizard.html all match subjects.html)
 - Active state is managed by URL pattern matching (see crm-static.js)
 
@@ -165,12 +166,12 @@ All application pages (except auth pages) share the **same sidebar navigation st
 ### Subject Edit (pages/subject-edit.html)
 | Source | Href | Target | Target Exists | Notes |
 |--------|------|--------|---|---|
-| Breadcrumb or back button | subject-card.html (inferred) | pages/subject-card.html | ✓ | Navigation to previous detail view |
+| Breadcrumb or back button | subject-card.html | pages/subject-card.html | ✓ | Navigation to previous detail view |
 
 ### Subject Register (pages/subject-register.html)
 | Source | Href | Target | Target Exists | Notes |
 |--------|------|--------|---|---|
-| Breadcrumb or back button | subjects.html (inferred) | pages/subjects.html | ✓ | Navigation to parent list |
+| Breadcrumb or back button | subjects.html | pages/subjects.html | ✓ | Navigation to parent list |
 
 ### Compliance (pages/compliance.html)
 | Source | Href | Target | Target Exists | Notes |
@@ -209,24 +210,28 @@ All application pages (except auth pages) share the **same sidebar navigation st
 | (Placeholder — minimal content) | — | — | — | **Developer-owned; no internal links documented** |
 
 ### Other Pages
-All other pages (archive.html, requests.html, agents.html, depository.html, back-office.html, brokerage.html, trust-management.html, middle-office-clients.html, middle-office-reports.html, subject-edit-individual.html, contract-wizard.html, contract-edit.html, error.html) follow similar patterns:
-- Sidebar navigation to other modules (all working as above)
+Other pages follow similar patterns:
+- Sidebar navigation to other modules
 - Breadcrumbs to parent list/launcher pages
 - Table rows with data-href attributes for row click navigation
 - Action buttons to related pages or forms
+Note: Not all links on every page were exhaustively inspected.
 
 ---
 
-## D. Missing or Placeholder Targets
+## D. Link Status
 
-### No missing launcher links
-- All 54 links in the launcher index.html point to existing files ✓
+### Launcher links
+- Launcher index.html contains 54 documented links to pages and UMI packs
+- No missing targets were identified during documentation review
 
-### No missing sidebar links
-- All sidebar navigation links across app pages point to existing files ✓
+### Sidebar navigation
+- Sidebar links found on representative pages point to existing targets
+- All primary navigation appears functional
 
-### No missing in-page navigation links
-- All key navigation links (breadcrumbs, action buttons, table row hrefs) point to existing pages ✓
+### In-page navigation
+- Key navigation patterns (KPI cards, breadcrumbs, action buttons) documented
+- Pages not exhaustively inspected; manual verification recommended
 
 ### Placeholder / Developer-owned Pages
 | Page | Status | Notes |
@@ -243,102 +248,64 @@ All other pages (archive.html, requests.html, agents.html, depository.html, back
 
 ## E. Asset Link Verification
 
-### CSS Files
-All CSS references in pages point to these files:
-- `../assets/css/uikit.min.css` — UIKit framework ✓
-- `../assets/css/crm-static.css` — Main CRM styles ✓
-- `../assets/css/pages/*.css` — Page-specific styles (dynamically loaded per page) ✓
-- `../assets/css/responsive.css` — Responsive styles ✓
+### CSS/JS Asset References
+Documented asset references on representative pages:
+- `../assets/css/uikit.min.css`, `crm-static.css`, page-specific CSS, `responsive.css`
+- `../assets/js/uikit.min.js`, `uikit-icons.min.js`, `crm-static.js`
 
-### JS Files
-All JS references:
-- `../assets/js/uikit.min.js` — UIKit framework ✓
-- `../assets/js/uikit-icons.min.js` — UIKit icons plugin ✓
-- `../assets/js/crm-static.js` — CRM prototype behaviors ✓
+### Brand & Icon Assets
+Documented asset references:
+- `../assets/brand/logo-full-ru-white.svg` — Used in app pages and auth pages
+- `../assets/icons/crm-sidebar-icons.svg` — Used for sidebar nav icons
+- Font files: Inter, Inter Tight, Montserrat
 
-### Image & Brand Assets
-- `../assets/brand/logo-full-ru-white.svg` — Used in all app pages and login.html ✓
-- `../assets/icons/crm-sidebar-icons.svg` — Used for all sidebar nav icons ✓
-- `../assets/brand/investica/` — Brand assets directory (referenced in launcher) ✓
-
-### Fonts
-- `../assets/fonts/inter/` — Inter font family ✓
-- `../assets/fonts/inter-tight/` — Inter Tight font family ✓
-- `../assets/fonts/montserrat/` — Montserrat font family ✓
-
-**Asset Summary**: All CSS, JS, image, and font asset links resolve correctly.
+Note: Asset paths were documented but not exhaustively verified for availability.
 
 ---
 
-## F. Link Resolution Summary
+## F. Common Navigation Patterns
 
-| Category | Total | Working | Issues | Status |
-|----------|-------|---------|--------|--------|
-| Launcher links | 54 | 54 | 0 | ✓ All working |
-| Sidebar nav links | ~10+ | 10+ | 0 | ✓ All working |
-| In-page navigation | ~30+ | 30+ | 0 | ✓ All working |
-| Asset links (CSS/JS) | 6 | 6 | 0 | ✓ All working |
-| Asset links (images/fonts) | 4 | 4 | 0 | ✓ All working |
-| **Total** | **100+** | **100+** | **0** | **✓ PASS** |
-
----
-
-## G. Link Categories
-
-### Master-detail navigation (registry → card → detail/edit)
-- subjects.html → subject-card.html → subject-edit.html ✓
-- compliance.html → compliance-card.html (no further detail) ✓
-- trading.html → trading-card.html (no further detail) ✓
-
-### Wizard/multi-step navigation
-- subjects.html → subject-register.html ✓
-- subject-card.html → contract-wizard.html ✓
-
-### Cross-module navigation
-- dashboard.html → subjects.html, compliance.html, requests.html (via KPI cards) ✓
-- dashboard.html → subject-card.html (via table rows) ✓
-
-### Authentication flow
-- login.html ↔ register.html ✓
-
-### Sidebar context navigation
-- Any app page → any other module (via sidebar) ✓
+| Pattern | Example | Notes |
+|---------|---------|-------|
+| Master-detail | subjects.html → subject-card.html | Registry page to detail view |
+| Wizard/multi-step | subjects.html → subject-register.html | Registry page to form |
+| Cross-module | dashboard.html → subjects/compliance/requests | Via KPI cards |
+| Auth flow | login.html ↔ register.html | Two-page flow |
+| Sidebar context | Any app page → any module | Sidebar navigation |
 
 ---
 
-## H. Notes for Developers
+## G. Developer Notes
 
 ### Query parameters
-- Some navigation links include query parameters for sample filtering (e.g., `?subjectStatus=Регистрация`)
-- These are **prototype behavior only** and do not affect page structure
-- Real implementation should use router/URL state for filtering
+- Dashboard KPI cards use query parameters for sample filtering (e.g., `?subjectStatus=Регистрация`)
+- Prototype behavior only; real implementation should use router/URL state
 
-### Data attributes
-- Navigation is driven by `data-href` attributes on table rows
-- Sidebar active state is managed by `data-match` patterns in crm-static.js
-- These are all **prototype patterns**; replace with real routing during development
+### Data attributes & prototype behavior
+- Table rows use `data-href` for click navigation
+- Sidebar active state managed by `data-match` patterns in crm-static.js
+- These are prototype patterns; replace with real routing during development
 
 ### Relative paths
-- All inter-page links use relative paths (e.g., `dashboard.html`, `../index.html`)
-- Asset paths use relative paths (e.g., `../assets/css/crm-static.css`)
+- All links and assets use relative paths
 - Adjust paths when integrating into production build/router
-
-### Launcher / static-uikit context
-- Launcher assumes pages are in `static-uikit/pages/` directory
-- If pages are moved or restructured, update launcher links and relative paths
 
 ---
 
-## I. Link Inventory Summary
+## H. Inventory Notes
 
-- **Launcher page**: 54 links to demo pages and extraction packs → all targets exist ✓
-- **Sidebar navigation**: Consistent across all app pages → all links working ✓
-- **In-page navigation**: Breadcrumbs, action buttons, table rows → all working ✓
-- **Asset references**: CSS, JS, images, fonts → all resolved ✓
-- **Missing links**: None identified ✓
-- **Placeholder pages**: administration.html marked as developer-owned ✓
+**This is a static documentation inventory** — not an automated scan or exhaustive verification.
 
-**Link Inventory Status**: **PASS** — All links resolve to existing pages or assets.
+**Documented coverage:**
+- Launcher page (54 links inventoried)
+- Sidebar navigation (representative pages inspected)
+- Key in-page navigation patterns (dashboard, subjects, compliance, trading workflows)
+- Asset path conventions (CSS, JS, fonts, icons)
+
+**For comprehensive verification:**
+- Manual QA browser testing recommended
+- Follow the Known Limitations & Manual QA Checklist in HANDOFF.md
+- Test all page transitions, form submissions, and responsive behavior
 
 ---
 

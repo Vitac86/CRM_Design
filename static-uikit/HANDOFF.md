@@ -33,9 +33,9 @@ The **static UMI Kit is the handoff reference** for this phase. The React/Vite a
 - **static-uikit/assets/js/crm-static.js** — CRM static prototype behaviors (see JS Inventory below)
 - **static-uikit/assets/vendor/** — Third-party dependencies (fonts, icons, vendor libraries)
 
-### UMI Extraction Packs
-- **static-uikit/umi-p0/** — P0 priority handoff-ready extraction pack (core/compliance/trading pages)
-- **static-uikit/umi-p1/** — P1 priority operational pages pack (middle-office, back-office, additional pages)
+### UMI Extraction Packs (reference only)
+- **static-uikit/umi-p0/** — P0 priority extraction/reference pack; do not manually edit
+- **static-uikit/umi-p1/** — P1 priority extraction/reference pack; do not manually edit
 
 ---
 
@@ -170,7 +170,7 @@ The static kit implements the following core UI patterns consistently:
 
 ### Table Footer (Page-size controls)
 - Footer chip buttons use `.crm-footer-chip` class
-- Each chip has `data-page-size-value="10"` (or 25, 50, etc.)
+- Each chip has `data-page-size-value="25"`, `data-page-size-value="50"`, or `data-page-size-value="100"`
 - Chips are styled as muted/secondary buttons
 - Active page size is indicated with selected state
 
@@ -250,7 +250,7 @@ The static kit implements the following core UI patterns consistently:
 
 ### Footer Page-size Buttons
 - Container: `.crm-footer-pagination` or `.crm-page-size-control`
-- Button: `.crm-footer-chip` (data-page-size-value="10|25|50|100")
+- Button: `.crm-footer-chip` with `data-page-size-value="25"`, `data-page-size-value="50"`, or `data-page-size-value="100"`
 - Styling: Muted/secondary button appearance by default
 - Active state: `.is-active` or similar class
 
@@ -312,12 +312,13 @@ The static kit implements the following core UI patterns consistently:
 
 ### Password Show/Hide (Auth Pages)
 - Toggle button (`.crm-auth-password-toggle`) reveals/masks password input
-- Label changes from "Show" to "Hide"
+- Button label: "Показать" or "Скрыть" (Show / Hide in Russian)
 
 ### Auth Inline Validation
 - Required field validation on form submission
-- Error message display / hide based on field focus and input state
-- Submit button enabled/disabled based on form validity
+- Error message display/hide based on field focus and input state
+- Alert message shown for empty required fields
+- Prototype behavior only; no backend validation
 
 ### Tabs / Section Switching
 - Tab click switches active tab and corresponding panel
@@ -344,8 +345,7 @@ The static kit implements the following core UI patterns consistently:
 
 ### Table behavior on mobile
 - Tables remain **horizontally scrollable** on mobile (pragmatic choice)
-- Wrappers own overflow; content doesn't break layout
-- Column visibility may be reduced via CSS `display: none` for very narrow screens
+- Wrappers own overflow; content doesn't break page layout
 
 ### Mobile improvements
 - Touch-friendly button sizing
@@ -374,8 +374,8 @@ The static kit implements the following core UI patterns consistently:
 ### ⚠️ File modifications
 - **Do not** edit vendor files (UIKit, fonts, icons in `assets/vendor/`)
 - **Do not** manually edit UMI generated packs (`umi-p0/`, `umi-p1/`) unless approved
-- Use extraction tools / documented processes for pack updates
-
+- Use extraction tools / documeextraction packs (`umi-p0/`, `umi-p1/`)
+- static-uikit/pages/ is the primary editable reference; packs are generated/reference only
 ### ⚠️ Static HTML values
 - All page data is **sample / placeholder only**
 - Substitute with real data during backend integration
@@ -402,7 +402,7 @@ Developers/designers should manually verify the following items as part of accep
 - [ ] **Date field behavior** — Calendar icon triggers date picker; works on mobile/touch
 - [ ] **Subject card tabs** — Tabs switch content; no overflow on mobile; scroll available if needed
 - [ ] **Auth validation** — Required fields show error state; buttons disable appropriately
-- [ ] **Master-detail pages** — Detail panel updates when master row is selected (if applicable)
+- [ ] **Master-detail pages** — Detail panel updates when mastalert appears on empty submissionable)
 - [ ] **Responsive grid layouts** — Layouts reflow from multi-column to single-column appropriately
 - [ ] **Breadcrumbs** — Clickable breadcrumbs navigate to parent pages correctly
 - [ ] **Link targets** — All navigation links point to existing pages (see LINK_INVENTORY.md)
