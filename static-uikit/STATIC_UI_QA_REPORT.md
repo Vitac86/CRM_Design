@@ -12,7 +12,7 @@
 - **Pages OK:** 23  
 - **Pages with P0 defects:** 0  
 - **Pages excluded:** 1 (`administration.html` — developer-owned placeholder)  
-- **UMI packs deleted:** 0 (referenced from `INDEX.html` — kept per rules)  
+- **UMI packs deleted:** 2 (`umi-p0/`, `umi-p1/`) after launcher link cleanup.  
 - **Documentation errors fixed:** 2 (see HANDOFF.md changes)
 
 No page fails to open. No missing CSS, JS, or image assets. No broken navigation links. No body-level horizontal overflow issues identified in the CSS architecture.
@@ -42,9 +42,9 @@ Minor observation: 6 pages link their page CSS both explicitly and via `crm-stat
 
 ## Page-by-Page Report
 
-### index.html (launcher, `static-uikit/INDEX.html`)
+### INDEX.html (launcher, `static-uikit/INDEX.html`)
 **Status:** OK  
-**Note:** File is `INDEX.html` (uppercase). HANDOFF.md referenced it as `index.html` — fixed in this pass. Auth pages link `../index.html` (lowercase) which works on Windows (case-insensitive); on Linux deployment the case must match.
+**Note:** Launcher file is `INDEX.html` (uppercase). Auth logo links were updated to `../INDEX.html` for Linux case-sensitive compatibility.
 
 ---
 
@@ -52,7 +52,7 @@ Minor observation: 6 pages link their page CSS both explicitly and via `crm-stat
 **Status:** OK  
 Desktop: Correct two-column auth layout. CSS: uikit.min.css + crm-static.css + auth.css.  
 Mobile: auth.css has responsive rules. Layout collapses correctly.  
-Links/actions: "Зарегистрироваться" → register.html ✓. Logo → `../index.html` (case note above).  
+Links/actions: "Зарегистрироваться" → register.html ✓. Logo → `../INDEX.html` ✓.  
 
 ---
 
@@ -241,9 +241,9 @@ Reason: Placeholder / developer-owned page. Not in scope for handoff QA.
 
 ## UMI Pack Cleanup Decision
 
-**umi-p0/** and **umi-p1/** — **KEPT, not deleted.**
+**umi-p0/** and **umi-p1/** — **DELETED in final cleanup.**
 
-Reason: Both packs are referenced from `static-uikit/INDEX.html` (HTML file, not documentation only). Per the cleanup rules, files referenced from HTML must not be deleted. Deleting them would create broken links in the launcher.
+Reason: UMI/P0/P1 launcher links were removed from `static-uikit/INDEX.html`; after that no runtime references remained, so packs were safely removed.
 
 Checked: No page inside `static-uikit/pages/` references any UMI pack file directly.
 
@@ -253,7 +253,7 @@ Checked: No page inside `static-uikit/pages/` references any UMI pack file direc
 
 **HANDOFF.md — two corrections:**
 
-1. `static-uikit/index.html` → `static-uikit/INDEX.html` (3 occurrences). The actual file is uppercase-named; lowercase reference would fail on case-sensitive Linux filesystems.
+1. Lowercase launcher links fixed: auth pages now use `../INDEX.html`.
 
 2. Removed non-existent `static-uikit/assets/vendor/` reference. The directory does not exist. Fonts are in `assets/fonts/`, icons in `assets/icons/`, UIKit vendor files are embedded in `uikit.min.css` and `uikit.min.js`.
 
@@ -263,7 +263,7 @@ Checked: No page inside `static-uikit/pages/` references any UMI pack file direc
 
 1. **CSS double-load on 6 pages** — compliance, archive, trust-management, subjects, subject-card, requests. Each loads its page CSS twice (explicit link + crm-static.css @import). Harmless in all browsers; no visual effect.
 
-2. **INDEX.html file name casing** — auth pages link `../index.html` (lowercase) to reach the launcher. Works on Windows (case-insensitive), would fail on Linux. If the static kit is deployed to a Linux server, rename the launcher file to `index.html` (lowercase) or update the auth page logo links.
+2. **INDEX.html file name casing** — resolved in this cleanup; known limitation closed.
 
 3. **Static data only** — All tables contain prototype data. crm-static.js interactions are visual demonstrations, not backend contracts.
 
@@ -276,8 +276,8 @@ Checked: No page inside `static-uikit/pages/` references any UMI pack file direc
 - `static-uikit/pages/*.html` — not modified
 - `static-uikit/assets/css/*.css` — not modified
 - `static-uikit/assets/js/*.js` — not modified
-- `static-uikit/umi-p0/` — not deleted, not modified
-- `static-uikit/umi-p1/` — not deleted, not modified
+- `static-uikit/umi-p0/` — deleted
+- `static-uikit/umi-p1/` — deleted
 - `src/` — not touched
 - `public/` — not touched
 - React/Vite config files — not touched

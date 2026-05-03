@@ -10,14 +10,14 @@ The **static UMI Kit is the handoff reference** for this phase. The React/Vite a
 - **pages/*** are standalone static HTML prototypes for visual/behavioral reference
 - Pages are **not production-ready app routes** — they contain sample data and prototype interactions only
 - Static pages are designed for developer/designer review and hand-off validation
-- UMI extraction packs (umi-p0/, umi-p1/) contain templated content ready for integration
+- UMI/P0/P1 extraction packs were removed from final handoff scope.
 
 ---
 
 ## B. Directory Overview
 
 ### Root files
-- **static-uikit/INDEX.html** — Launcher page listing all demo pages, UMI packs, and validation commands
+- **static-uikit/INDEX.html** — Launcher page listing all demo pages and validation commands
 
 ### Pages directory
 - **static-uikit/pages/*.html** — Individual standalone prototype pages (see Page Inventory below)
@@ -35,9 +35,6 @@ The **static UMI Kit is the handoff reference** for this phase. The React/Vite a
 - **static-uikit/assets/icons/** — SVG icon sprites
 - **static-uikit/assets/brand/** — Logo and brand assets
 
-### UMI Extraction Packs (reference only)
-- **static-uikit/umi-p0/** — P0 priority extraction/reference pack; do not manually edit
-- **static-uikit/umi-p1/** — P1 priority extraction/reference pack; do not manually edit
 
 ---
 
@@ -375,8 +372,6 @@ The static kit implements the following core UI patterns consistently:
 
 ### ⚠️ File modifications
 - **Do not** edit UIKit framework files (`uikit.min.css`, `uikit.min.js`) or font/icon assets in `assets/fonts/`, `assets/icons/`
-- **Do not** manually edit UMI generated packs (`umi-p0/`, `umi-p1/`) unless approved
-- Do not manually edit UMI extraction/reference packs (`umi-p0/`, `umi-p1/`) unless explicitly requested.
 - static-uikit/pages/ is the primary editable reference; packs are generated/reference only
 ### ⚠️ Static HTML values
 - All page data is **sample / placeholder only**
@@ -418,13 +413,13 @@ Developers/designers should manually verify the following items as part of accep
 ### From repository root
 ```bash
 cd CRM_Design && python -m http.server 8080
-# Access: http://localhost:8080/static-uikit/index.html
+# Access: http://localhost:8080/static-uikit/INDEX.html
 ```
 
 ### From static-uikit folder
 ```bash
 cd CRM_Design/static-uikit && python -m http.server 8080
-# Access: http://localhost:8080/index.html
+# Access: http://localhost:8080/INDEX.html
 ```
 
 ### Validation (optional)
@@ -438,9 +433,6 @@ node static-uikit/tools/validate-static-uikit.mjs
 
 - **LINK_INVENTORY.md** — Detailed inventory of all launcher, sidebar, and key navigation links
 - **docs/HANDOFF_READINESS_AUDIT.md** — Audit checklist for handoff readiness
-- **docs/UMI_P0_IMPLEMENTATION_MATRIX.md** — P0 priority matrix
-- **umi-p0/HANDOFF_CHECKLIST.md** — P0 extraction pack handoff checklist
-- **umi-p1/HANDOFF_CHECKLIST.md** — P1 extraction pack handoff checklist
 
 ---
 
@@ -449,7 +441,6 @@ node static-uikit/tools/validate-static-uikit.mjs
 For questions or clarifications:
 - Refer to the static kit audits in `docs/` for CSS ownership, page patterns, and readiness
 - Check `static-uikit/tools/validate-static-uikit.mjs` for automated checks
-- Review UMI extraction pack READMEs for integration guidance
 - Consult **LINK_INVENTORY.md** for navigation and link reference
 
 ---

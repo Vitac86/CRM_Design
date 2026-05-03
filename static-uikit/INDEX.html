@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CRM Static UI Kit — Review launcher</title>
+  <link rel="stylesheet" href="assets/css/uikit.min.css"/>
+  <link rel="stylesheet" href="assets/css/crm-static.css"/>
+</head>
+<body data-page="static-uikit-index">
+<div class="crm-app">
+  <section class="crm-page crm-launcher-page" data-page="static-uikit-index">
+    <header class="crm-card crm-launcher-hero">
+      <p class="crm-launcher-meta">CRM Static UI Kit</p>
+      <h1>Review launcher</h1>
+      <p>Локальная стартовая панель для standalone demo pages и handoff-валидации без React/Vite runtime.</p>
+      <div class="crm-launcher-badges">
+        <span class="crm-badge info">local-only</span>
+        <span class="crm-badge muted">no CDN</span>
+        <span class="crm-badge muted">no API calls</span>
+      </div>
+      <div class="crm-launcher-meta">
+        <strong>Запуск из корня репозитория:</strong>
+        <code class="crm-launcher-code">cd CRM_Design &amp;&amp; python -m http.server 8080</code>
+        <span>→ <code class="crm-launcher-code">http://localhost:8080/static-uikit/INDEX.html</code></span>
+      </div>
+      <div class="crm-launcher-meta">
+        <strong>Запуск из папки static-uikit:</strong>
+        <code class="crm-launcher-code">cd CRM_Design/static-uikit &amp;&amp; python -m http.server 8080</code>
+        <span>→ <code class="crm-launcher-code">http://localhost:8080/INDEX.html</code></span>
+      </div>
+    </header>
+
+    <div class="crm-launcher-grid">
+      <article class="crm-card crm-launcher-card">
+        <div class="crm-section-head">
+          <h3>Standalone pages</h3>
+          <span class="crm-badge info">demo</span>
+        </div>
+
+        <h4>Core</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/dashboard.html">Dashboard</a></li>
+          <li><a class="crm-launcher-link" href="pages/subjects.html">Subjects</a></li>
+          <li><a class="crm-launcher-link" href="pages/subject-card.html">Subject card</a></li>
+          <li><a class="crm-launcher-link" href="pages/subject-register.html">Subject register</a></li>
+          <li><a class="crm-launcher-link" href="pages/contract-wizard.html">Contract wizard</a></li>
+          <li><a class="crm-launcher-link" href="pages/requests.html">Requests</a></li>
+        </ul>
+
+        <h4>Compliance / Trading</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/compliance.html">Compliance</a></li>
+          <li><a class="crm-launcher-link" href="pages/compliance-card.html">Compliance card</a></li>
+          <li><a class="crm-launcher-link" href="pages/trading.html">Trading</a></li>
+          <li><a class="crm-launcher-link" href="pages/trading-card.html">Trading card</a></li>
+        </ul>
+
+        <h4>Operations</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/brokerage.html">Brokerage</a></li>
+          <li><a class="crm-launcher-link" href="pages/trust-management.html">Trust management</a></li>
+          <li><a class="crm-launcher-link" href="pages/agents.html">Agents</a></li>
+          <li><a class="crm-launcher-link" href="pages/middle-office-clients.html">Middle-office clients</a></li>
+          <li><a class="crm-launcher-link" href="pages/middle-office-reports.html">Middle-office reports</a></li>
+          <li><a class="crm-launcher-link" href="pages/depository.html">Depository</a></li>
+          <li><a class="crm-launcher-link" href="pages/back-office.html">Back office</a></li>
+        </ul>
+
+        <h4>System</h4>
+        <ul class="uk-list crm-launcher-links">
+          <li><a class="crm-launcher-link" href="pages/administration.html">Administration</a></li>
+          <li><a class="crm-launcher-link" href="pages/archive.html">Archive</a></li>
+          <li><a class="crm-launcher-link" href="pages/error.html">Error</a></li>
+          <li><a class="crm-launcher-link" href="pages/login.html">Login</a></li>
+          <li><a class="crm-launcher-link" href="pages/register.html">Register</a></li>
+        </ul>
+      </article>
+
+      <article class="crm-card crm-launcher-card">
+        <div class="crm-section-head">
+          <h3>Local validation</h3>
+          <span class="crm-badge muted">manual run</span>
+        </div>
+        <p class="crm-launcher-meta">Команды запускаются вручную из терминала (это текстовая памятка, не browser automation).</p>
+        <pre><code class="crm-launcher-code">node static-uikit/tools/validate-static-uikit.mjs
+npm run build
+python -m http.server 8080</code></pre>
+        <p class="crm-launcher-meta">URL при запуске сервера из корня: <code class="crm-launcher-code">http://localhost:8080/static-uikit/INDEX.html</code></p>
+      </article>
+    </div>
+  </section>
+</div>
+<script src="assets/js/uikit.min.js"></script>
+<script src="assets/js/uikit-icons.min.js"></script>
+</body>
+</html>
