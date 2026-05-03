@@ -6,9 +6,9 @@ This document inventories all **launcher links**, **sidebar navigation links**, 
 
 ---
 
-## A. Launcher Links (from index.html)
+## A. Launcher Links (from INDEX.html)
 
-The launcher page (`static-uikit/index.html`) links to all demo pages. All targets exist unless noted.
+The launcher page (`static-uikit/INDEX.html`) links to active demo pages and docs. UMI/P0/P1 launcher links were removed in final cleanup.
 
 ### Standalone Pages Section
 | Source | Href | Target File | Target Exists | Notes |
@@ -36,43 +36,7 @@ The launcher page (`static-uikit/index.html`) links to all demo pages. All targe
 | Login | pages/login.html | pages/login.html | ✓ | |
 | Register | pages/register.html | pages/register.html | ✓ | |
 
-### UMI P0 Extraction Pack
-| Source | Href | Target File | Target Exists | Notes |
-|--------|------|-------------|---|---|
-| umi-p0/README.md | umi-p0/README.md | umi-p0/README.md | ✓ | |
-| umi-p0/manifest.json | umi-p0/manifest.json | umi-p0/manifest.json | ✓ | |
-| umi-p0/integration-inventory.json | umi-p0/integration-inventory.json | umi-p0/integration-inventory.json | ✓ | |
-| umi-p0/HANDOFF_CHECKLIST.md | umi-p0/HANDOFF_CHECKLIST.md | umi-p0/HANDOFF_CHECKLIST.md | ✓ | |
-| umi-p0/layout/base.html | umi-p0/layout/base.html | umi-p0/layout/base.html | ✓ | |
-| umi-p0/pages/dashboard.html | umi-p0/pages/dashboard.html | umi-p0/pages/dashboard.html | ✓ | |
-| umi-p0/pages/subjects.html | umi-p0/pages/subjects.html | umi-p0/pages/subjects.html | ✓ | |
-| umi-p0/pages/subject-card.html | umi-p0/pages/subject-card.html | umi-p0/pages/subject-card.html | ✓ | |
-| umi-p0/pages/requests.html | umi-p0/pages/requests.html | umi-p0/pages/requests.html | ✓ | |
-| umi-p0/pages/compliance.html | umi-p0/pages/compliance.html | umi-p0/pages/compliance.html | ✓ | |
-| umi-p0/pages/compliance-card.html | umi-p0/pages/compliance-card.html | umi-p0/pages/compliance-card.html | ✓ | |
-| umi-p0/pages/trading.html | umi-p0/pages/trading.html | umi-p0/pages/trading.html | ✓ | |
-| umi-p0/pages/error.html | umi-p0/pages/error.html | umi-p0/pages/error.html | ✓ | |
-
-### UMI P1 Extraction Pack
-| Source | Href | Target File | Target Exists | Notes |
-|--------|------|-------------|---|---|
-| umi-p1/README.md | umi-p1/README.md | umi-p1/README.md | ✓ | |
-| umi-p1/manifest.json | umi-p1/manifest.json | umi-p1/manifest.json | ✓ | |
-| umi-p1/integration-inventory.json | umi-p1/integration-inventory.json | umi-p1/integration-inventory.json | ✓ | |
-| umi-p1/HANDOFF_CHECKLIST.md | umi-p1/HANDOFF_CHECKLIST.md | umi-p1/HANDOFF_CHECKLIST.md | ✓ | |
-| umi-p1/pages/contract-wizard.html | umi-p1/pages/contract-wizard.html | umi-p1/pages/contract-wizard.html | ✓ | |
-| umi-p1/pages/brokerage.html | umi-p1/pages/brokerage.html | umi-p1/pages/brokerage.html | ✓ | |
-| umi-p1/pages/trust-management.html | umi-p1/pages/trust-management.html | umi-p1/pages/trust-management.html | ✓ | |
-| umi-p1/pages/agents.html | umi-p1/pages/agents.html | umi-p1/pages/agents.html | ✓ | |
-| umi-p1/pages/middle-office-clients.html | umi-p1/pages/middle-office-clients.html | umi-p1/pages/middle-office-clients.html | ✓ | |
-| umi-p1/pages/middle-office-reports.html | umi-p1/pages/middle-office-reports.html | umi-p1/pages/middle-office-reports.html | ✓ | |
-| umi-p1/pages/depository.html | umi-p1/pages/depository.html | umi-p1/pages/depository.html | ✓ | |
-| umi-p1/pages/back-office.html | umi-p1/pages/back-office.html | umi-p1/pages/back-office.html | ✓ | |
-| umi-p1/pages/trading-card.html | umi-p1/pages/trading-card.html | umi-p1/pages/trading-card.html | ✓ | |
-| umi-p1/pages/administration.html | umi-p1/pages/administration.html | umi-p1/pages/administration.html | ✓ | **Placeholder / developer-owned** |
-| umi-p1/pages/archive.html | umi-p1/pages/archive.html | umi-p1/pages/archive.html | ✓ | |
-
-**Launcher Summary**: All 54 launcher links point to existing files.
+**Launcher Summary**: Launcher keeps only active `pages/*.html` links and handoff-safe entries.
 
 ---
 
@@ -197,7 +161,7 @@ Most application pages (except auth pages and placeholder pages) share a similar
 | Source | Href | Target | Target Exists | Notes |
 |--------|------|--------|---|---|
 | Register link | register.html | pages/register.html | ✓ | Auth flow navigation |
-| Logo link | ../index.html | ../index.html (launcher) | ✓ | Home / launcher navigation |
+| Logo link | ../INDEX.html | ../INDEX.html (launcher) | ✓ | Home / launcher navigation |
 
 ### Register (pages/register.html)
 | Source | Href | Target | Target Exists | Notes |
@@ -222,7 +186,7 @@ Note: Not all links on every page were exhaustively inspected.
 ## D. Link Status
 
 ### Launcher links
-- Launcher index.html contains 54 documented links to pages and UMI packs
+- Launcher `INDEX.html` no longer contains UMI/P0/P1 links; it contains only active static pages/doc references
 - No missing targets were identified during documentation review
 
 ### Sidebar navigation
