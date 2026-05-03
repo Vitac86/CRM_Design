@@ -53,14 +53,40 @@
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button
+          class="uk-button uk-button-default"
+          type="button"
+          data-sidebar-toggle
+          aria-label="Открыть меню"
+        >
+          <span uk-icon="menu"></span>
+        </button>
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input
+            class="uk-input crm-input"
+            type="search"
+            name="global-search"
+            placeholder="Глобальный поиск"
+            autocomplete="off"
+          />
+        </div>
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
 
       <section class="crm-page" data-page="trading-card">
         <div class="crm-registry-shell crm-trading-detail-shell crm-trading-card-shell">
-          <div class="crm-breadcrumbs"><a href="trading.html">Трейдинг</a><span uk-icon="chevron-right"></span><span>Карточка клиента</span></div>
+          <div class="crm-breadcrumbs">
+            <a href="trading.html">Трейдинг</a>
+            <span uk-icon="chevron-right"></span>
+            <span>Карточка клиента</span>
+          </div>
 
           <!-- ── Hero card ──────────────────────────────────────────────────── -->
           <article class="crm-card crm-trading-hero crm-detail-hero" data-entity="trading-profile" data-id="INV-1011">
@@ -69,7 +95,9 @@
               <div class="crm-trading-identity crm-subject-hero-text">
                 <h1 class="crm-page-title" data-entity="page-title">АО «Восток Майнинг Системс»</h1>
                 <div class="crm-trading-meta">
-                  <span class="crm-trading-code">INV-1011</span><span class="crm-trading-sep">·</span><a href="contract-edit.html" class="crm-link">BR-2026/00444</a>
+                  <span class="crm-trading-code">INV-1011</span>
+                  <span class="crm-trading-sep">·</span>
+                  <a href="contract-edit.html" class="crm-link">BR-2026/00444</a>
                 </div>
                 <div class="crm-inline-badges" aria-label="Статусы профиля">
                   <span class="crm-badge crm-trading-label success" data-status="qualified">Квалифицированный</span>
@@ -83,8 +111,12 @@
           <!-- ── Tabs bar ──────────────────────────────────────────────────── -->
           <div class="crm-trading-tabs-wrap" data-entity="trading-sections">
             <ul class="crm-tabs crm-detail-tabs crm-trading-tabs" uk-tab="connect: .crm-trading-switcher; animation: uk-animation-fade">
-              <li class="uk-active"><a class="crm-tab" href="#" data-tab-target="params">Торговые параметры</a></li>
-              <li><a class="crm-tab" href="#" data-tab-target="terminals">Терминалы и подключения</a></li>
+              <li class="uk-active">
+                <a class="crm-tab" href="#" data-tab-target="params">Торговые параметры</a>
+              </li>
+              <li>
+                <a class="crm-tab" href="#" data-tab-target="terminals">Терминалы и подключения</a>
+              </li>
             </ul>
           </div>
 
@@ -97,7 +129,9 @@
 
                 <!-- 1. Квалификация и риск -->
                 <article class="crm-card crm-trading-section" data-entity="qual-risk">
-                  <div class="crm-form-section-head"><h3>Квалификация и риск</h3></div>
+                  <div class="crm-form-section-head">
+                    <h3>Квалификация и риск</h3>
+                  </div>
                   <div class="crm-profile-rows crm-profile-rows-3">
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">Признак инвестора</div>
@@ -116,11 +150,15 @@
 
                 <!-- 2. ПОД / ФТ -->
                 <article class="crm-card crm-trading-section" data-entity="aml">
-                  <div class="crm-form-section-head"><h3>ПОД / ФТ</h3></div>
+                  <div class="crm-form-section-head">
+                    <h3>ПОД / ФТ</h3>
+                  </div>
                   <div class="crm-profile-rows crm-profile-rows-2">
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">Статус</div>
-                      <div class="crm-profile-value"><span class="crm-badge success" data-status="checked">Проверен</span></div>
+                      <div class="crm-profile-value">
+                        <span class="crm-badge success" data-status="checked">Проверен</span>
+                      </div>
                     </div>
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">Причина блокировки / заморозки</div>
@@ -131,7 +169,9 @@
 
                 <!-- 3. Контактные данные -->
                 <article class="crm-card crm-trading-section" data-entity="contacts">
-                  <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
+                  <div class="crm-form-section-head">
+                    <h3>Контактные данные</h3>
+                  </div>
                   <div class="crm-profile-rows crm-profile-rows-3">
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">Номера телефонов</div>
@@ -150,7 +190,9 @@
 
                 <!-- 4. Распорядитель счёта -->
                 <article class="crm-card crm-trading-section" data-entity="account-manager">
-                  <div class="crm-form-section-head"><h3>Распорядитель счёта</h3></div>
+                  <div class="crm-form-section-head">
+                    <h3>Распорядитель счёта</h3>
+                  </div>
                   <div class="crm-profile-rows crm-profile-rows-3">
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">ФИО</div>
@@ -174,14 +216,18 @@
                     </div>
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">Статус</div>
-                      <div class="crm-profile-value"><span class="crm-badge success" data-status="active">Действующий</span></div>
+                      <div class="crm-profile-value">
+                        <span class="crm-badge success" data-status="active">Действующий</span>
+                      </div>
                     </div>
                   </div>
                 </article>
 
                 <!-- 5. Кодовое слово -->
                 <article class="crm-card crm-trading-section" data-entity="code-word">
-                  <div class="crm-form-section-head"><h3>Кодовое слово</h3></div>
+                  <div class="crm-form-section-head">
+                    <h3>Кодовое слово</h3>
+                  </div>
                   <div class="crm-profile-rows">
                     <div class="crm-profile-row">
                       <div class="crm-profile-label">Кодовое слово</div>
@@ -192,7 +238,9 @@
 
                 <!-- 6. Способы подачи поручений -->
                 <article class="crm-card crm-trading-section" data-entity="order-methods">
-                  <div class="crm-form-section-head"><h3>Способы подачи поручений</h3></div>
+                  <div class="crm-form-section-head">
+                    <h3>Способы подачи поручений</h3>
+                  </div>
                   <div class="crm-order-methods-grid">
                     <div class="crm-order-method-card">
                       <div class="crm-order-method-name">Торговый терминал QUIK</div>
@@ -223,7 +271,13 @@
                 <article class="crm-card crm-trading-section" data-entity="terminals">
                   <div class="crm-form-section-head crm-section-head-with-action">
                     <h3>Терминалы и подключения</h3>
-                    <button class="uk-button crm-button-primary crm-button crm-section-head-btn" type="button" data-action="issue-terminal">+ Выдать терминал</button>
+                    <button
+                      class="uk-button crm-button-primary crm-button crm-section-head-btn"
+                      type="button"
+                      data-action="issue-terminal"
+                    >
+                      + Выдать терминал
+                    </button>
                   </div>
                   <div class="crm-terminals-list">
 
@@ -278,7 +332,14 @@
                         </div>
                       </dl>
                       <div class="crm-terminal-actions">
-                        <button class="uk-button uk-button-default crm-button" type="button" data-action="reset-terminal-password" data-terminal="quik-mobile">Обновить пароль</button>
+                        <button
+                          class="uk-button uk-button-default crm-button"
+                          type="button"
+                          data-action="reset-terminal-password"
+                          data-terminal="quik-mobile"
+                        >
+                          Обновить пароль
+                        </button>
                       </div>
                     </div>
 
@@ -318,12 +379,31 @@
         <div class="crm-modal" data-role="terminal-password-modal" hidden>
           <div class="crm-modal-backdrop" data-action="close-terminal-password-modal"></div>
           <div class="crm-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="terminal-password-modal-title">
-            <button class="crm-modal-close" type="button" aria-label="Закрыть" data-action="close-terminal-password-modal">×</button>
+            <button
+              class="crm-modal-close"
+              type="button"
+              aria-label="Закрыть"
+              data-action="close-terminal-password-modal"
+            >
+              ×
+            </button>
             <h3 id="terminal-password-modal-title">Обновить пароль</h3>
             <p>Вы собираетесь сбросить пароль для терминала <strong>QUIK Mobile</strong>. Клиенту будет направлен новый временный пароль.</p>
             <div class="crm-modal-actions">
-              <button class="uk-button crm-button-primary crm-button" type="button" data-action="confirm-terminal-password">Подтвердить</button>
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="close-terminal-password-modal">Отмена</button>
+              <button
+                class="uk-button crm-button-primary crm-button"
+                type="button"
+                data-action="confirm-terminal-password"
+              >
+                Подтвердить
+              </button>
+              <button
+                class="uk-button uk-button-default crm-button"
+                type="button"
+                data-action="close-terminal-password-modal"
+              >
+                Отмена
+              </button>
             </div>
           </div>
         </div>

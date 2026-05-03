@@ -1,15 +1,9 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CSS variables
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 1. Shared trading variables / page shell */
 body[data-page="trading"],
 body[data-page="trading-card"] {
   --trading-header-bg: #e8edfb;
   --trading-header-border: #dbe2f0;
 }
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   PART A — trading.html (registry / list)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .crm-page[data-page="trading"] {
   min-width: 0;
@@ -36,6 +30,7 @@ body[data-page="trading-card"] {
   max-width: 100%;
 }
 
+/* 2. Trading registry header and actions */
 .crm-page[data-page="trading"] .crm-trading-header {
   align-items: flex-start;
   gap: 12px;
@@ -69,7 +64,20 @@ body[data-page="trading-card"] {
   line-height: 1.35;
 }
 
-/* ── Filter panel ──────────────────────────────────────────────────────── */
+.crm-page[data-page="trading"] .crm-button-export-light {
+  min-height: 36px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px !important;
+  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
+  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
+  color: var(--crm-umi-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+/* 3. Trading registry filters */
 
 /* (0,5,0) — beats global filters.css (0,4,0) */
 .crm-page[data-page="trading"] .crm-trading-shell .crm-registry-filters.crm-filter-panel {
@@ -85,6 +93,7 @@ body[data-page="trading-card"] {
   overflow: visible;
 }
 
+/* 4. Search input */
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-search-shell {
   position: relative;
   display: block;
@@ -162,20 +171,7 @@ body[data-page="trading-card"] {
   max-width: 100%;
 }
 
-.crm-page[data-page="trading"] .crm-button-export-light {
-  min-height: 36px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px !important;
-  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
-  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
-  color: var(--crm-umi-text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: none;
-}
-
-/* ── Table card ───────────────────────────────────────────────────────── */
+/* 5. Registry table card and wrapper */
 
 .crm-page[data-page="trading"] .crm-trading-registry {
   width: 100%;
@@ -210,6 +206,7 @@ body[data-page="trading-card"] {
   content: none;
 }
 
+/* 6. Registry table structure and scrollbars */
 .crm-page[data-page="trading"] .crm-trading-table .crm-table {
   border: 0;
   border-radius: 0;
@@ -229,6 +226,7 @@ body[data-page="trading-card"] {
   margin-bottom: 0;
 }
 
+/* 7. Registry table header */
 .crm-page[data-page="trading"] .crm-trading-table .uk-table thead,
 .crm-page[data-page="trading"] .crm-trading-table .uk-table thead tr,
 .crm-page[data-page="trading"] .crm-trading-table .uk-table thead th {
@@ -254,6 +252,7 @@ body[data-page="trading-card"] {
   font-size: 11px;
 }
 
+/* 8. Registry table body */
 .crm-page[data-page="trading"] .crm-trading-table .uk-table tbody,
 .crm-page[data-page="trading"] .crm-trading-table .uk-table tbody tr,
 .crm-page[data-page="trading"] .crm-trading-table .uk-table tbody td {
@@ -315,7 +314,7 @@ body[data-page="trading-card"] {
   background-color: #8192ab;
 }
 
-/* ── Footer / pagination ──────────────────────────────────────────────── */
+/* 9. Registry footer and pagination */
 
 .crm-page[data-page="trading"] .crm-trading-table-footer {
   display: flex;
@@ -406,10 +405,7 @@ body[data-page="trading-card"] {
   background: #f3f6fb;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   PART B — trading-card.html (detail / card)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
+/* 10. Trading card/detail shell */
 .crm-page[data-page="trading-card"] .crm-breadcrumbs {
   display: none;
 }
@@ -431,7 +427,7 @@ body[data-page="trading-card"] {
   box-shadow: var(--crm-umi-shadow-sm);
 }
 
-/* ── Hero card ─────────────────────────────────────────────────────────── */
+/* 11. Trading card hero/profile sections */
 
 .crm-page[data-page="trading-card"] .crm-trading-hero {
   display: grid;
@@ -511,7 +507,7 @@ body[data-page="trading-card"] {
   letter-spacing: 0;
 }
 
-/* ── Tabs ──────────────────────────────────────────────────────────────── */
+/* 12. Trading tabs and tab panels */
 
 .crm-page[data-page="trading-card"] .crm-trading-tabs-wrap {
   border: 1px solid var(--crm-umi-border);
@@ -561,7 +557,7 @@ body[data-page="trading-card"] {
   color: var(--crm-umi-surface);
 }
 
-/* ── Tab panels ─────────────────────────────────────────────────────────── */
+/* Tab panels */
 
 .crm-page[data-page="trading-card"] .crm-trading-switcher,
 .crm-page[data-page="trading-card"] .crm-trading-tab-panel {
@@ -574,7 +570,7 @@ body[data-page="trading-card"] {
   gap: 8px;
 }
 
-/* ── Section cards ──────────────────────────────────────────────────────── */
+/* Profile section cards */
 
 .crm-page[data-page="trading-card"] .crm-trading-section {
   padding: 14px 16px;
@@ -598,25 +594,7 @@ body[data-page="trading-card"] {
   color: var(--crm-umi-text);
 }
 
-.crm-page[data-page="trading-card"] .crm-form-section-head.crm-section-head-with-action {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.crm-page[data-page="trading-card"] .crm-section-head-btn {
-  flex-shrink: 0;
-  min-height: 30px;
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 7px;
-  font-size: 12px;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-/* ── Profile data grid ───────────────────────────────────────────────────── */
+/* Profile data grid */
 
 .crm-page[data-page="trading-card"] .crm-profile-rows {
   display: grid;
@@ -659,7 +637,7 @@ body[data-page="trading-card"] {
   color: var(--crm-umi-primary);
 }
 
-/* ── Order methods ───────────────────────────────────────────────────────── */
+/* 13. Terminal cards / terminal fields / order methods */
 
 .crm-page[data-page="trading-card"] .crm-order-methods-grid {
   display: grid;
@@ -684,7 +662,7 @@ body[data-page="trading-card"] {
   color: var(--crm-umi-text);
 }
 
-/* ── Terminal cards ──────────────────────────────────────────────────────── */
+/* Terminal cards */
 
 .crm-page[data-page="trading-card"] .crm-terminals-list {
   display: grid;
@@ -738,13 +716,30 @@ body[data-page="trading-card"] {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* 14. Trading card actions */
+.crm-page[data-page="trading-card"] .crm-form-section-head.crm-section-head-with-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.crm-page[data-page="trading-card"] .crm-section-head-btn {
+  flex-shrink: 0;
+  min-height: 30px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .crm-page[data-page="trading-card"] .crm-terminal-actions {
   margin-top: 12px;
   display: flex;
   gap: 8px;
 }
-
-/* ── Toast ───────────────────────────────────────────────────────────────── */
 
 .crm-trading-toast {
   position: fixed;
@@ -769,8 +764,7 @@ body[data-page="trading-card"] {
   transform: translateY(0);
 }
 
-/* ── Responsive ───────────────────────────────────────────────────────────── */
-
+/* 15. Mobile rules for registry */
 @media (max-width: 1180px) {
   .crm-page[data-page="trading"] .crm-trading-header {
     flex-direction: column;
@@ -781,7 +775,10 @@ body[data-page="trading-card"] {
     margin-left: 0;
     padding-top: 0;
   }
+}
 
+/* 16. Mobile rules for trading-card */
+@media (max-width: 1180px) {
   .crm-page[data-page="trading-card"] .crm-profile-rows-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
