@@ -153,6 +153,7 @@
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
+  scrollbar-gutter: auto;
   border: 0;
   border-radius: 0;
   background: #ffffff;
@@ -238,4 +239,3 @@
     margin-left: 0;
   }
 }
-
