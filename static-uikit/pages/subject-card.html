@@ -1,883 +1,1135 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Карточка субъекта</title>
-  <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
-  <link rel="stylesheet" href="../assets/css/crm-static.css"/>
-  <link rel="stylesheet" href="../assets/css/pages/subject-card.css"/>
-</head>
-<body data-page="subject-card">
-<div class="crm-app">
-  <div class="crm-layout">
-    <aside class="crm-sidebar" data-entity="layout-sidebar">
-      <div class="crm-sidebar-brand">
-        <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
-      </div>
-      <nav class="crm-nav" aria-label="Основная навигация">
-        <div class="crm-nav-group" data-group="front-office">
-          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
-            <span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Фронт-офис</span>
-            <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
-          </button>
-          <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
-            <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use></svg>Дашборд</span></a>
-            <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Субъекты</span></a>
-            <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use></svg>Брок. деятельность</span></a>
-            <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trust"></use></svg>Дов. управление</span></a>
-            <a class="crm-nav-link crm-nav-item" href="agents.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-agents"></use></svg>Агенты</span></a>
-            <a class="crm-nav-link crm-nav-item" href="archive.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Архив</span></a>
-            <a class="crm-nav-link crm-nav-item" href="requests.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-requests"></use></svg>Поручения</span></a>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Карточка субъекта</title>
+    <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
+    <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+    <link rel="stylesheet" href="../assets/css/pages/subject-card.css"/>
+  </head>
+  <body data-page="subject-card">
+    <div class="crm-app">
+      <div class="crm-layout">
+        <aside class="crm-sidebar" data-entity="layout-sidebar">
+          <div class="crm-sidebar-brand">
+            <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
           </div>
-        </div>
-
-        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-compliance"></use></svg>Комплаенс</span></a>
-
-        <div class="crm-nav-group" data-group="middle-office">
-          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
-            <span><span uk-icon="album"></span>Мидл-офис</span>
-            <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
-          </button>
-          <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
-            <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал клиентов</span></a>
-            <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал отправленных отчётов</span></a>
-          </div>
-        </div>
-
-        <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
-        <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
-        <a class="crm-nav-link crm-nav-item" href="depository.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
-        <a class="crm-nav-link crm-nav-item" href="administration.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
-      </nav>
-    </aside>
-
-    <main class="crm-main">
-      <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
-      </header>
-      <section class="crm-page" data-page="subject-card">
-        <div class="crm-registry-shell crm-subject-detail-shell crm-subject-card-shell">
-          <div class="crm-breadcrumbs"><a href="subjects.html">Субъекты</a><span uk-icon="chevron-right"></span><span>Карточка субъекта</span></div>
-
-          <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-011">
-            <div class="crm-subject-hero-main crm-detail-hero-main">
-              <div class="crm-subject-avatar">ВМ</div>
-              <div class="crm-subject-identity crm-subject-hero-text">
-                <h1 class="crm-page-title" data-entity="page-title">АО «Восток Майнинг Системс»</h1>
-                <div class="crm-subject-code">
-                  <span class="crm-subject-code-label">Код клиента</span>
-                  <strong>INV-1011</strong>
-                </div>
-                <div class="crm-subject-badge-groups" aria-label="Статусы клиента">
-                  <div class="crm-inline-badges crm-inline-badges-primary">
-                    <span class="crm-badge crm-subject-label muted" data-status="type">Юр. лицо</span>
-                    <span class="crm-badge crm-subject-label success" data-status="residency">Резидент РФ</span>
-                    <span class="crm-badge crm-subject-label warning" data-status="representative">Представитель</span>
-                    <span class="crm-badge crm-subject-label muted" data-status="qualified">Квалифицированный</span>
-                    <span class="crm-badge crm-subject-label success" data-status="kyc">КОУР</span>
-                  </div>
-                </div>
+          <nav class="crm-nav" aria-label="Основная навигация">
+            <div class="crm-nav-group" data-group="front-office">
+              <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+                <span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Фронт-офис</span>
+                <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+              </button>
+              <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
+                <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use></svg>Дашборд</span></a>
+                <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Субъекты</span></a>
+                <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use></svg>Брок. деятельность</span></a>
+                <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trust"></use></svg>Дов. управление</span></a>
+                <a class="crm-nav-link crm-nav-item" href="agents.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-agents"></use></svg>Агенты</span></a>
+                <a class="crm-nav-link crm-nav-item" href="archive.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Архив</span></a>
+                <a class="crm-nav-link crm-nav-item" href="requests.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-requests"></use></svg>Поручения</span></a>
               </div>
             </div>
-            <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions" aria-label="Действия по клиенту">
-              <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
-              <a href="subject-edit.html" class="uk-button uk-button-default crm-button" data-action="edit-subject">Редактировать</a>
-              <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
+
+            <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-compliance"></use></svg>Комплаенс</span></a>
+
+            <div class="crm-nav-group" data-group="middle-office">
+              <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+                <span><span uk-icon="album"></span>Мидл-офис</span>
+                <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+              </button>
+              <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
+                <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал клиентов</span></a>
+                <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал отправленных отчётов</span></a>
+              </div>
             </div>
-          </article>
 
-          <div class="crm-subject-tabs-wrap" data-entity="subject-sections">
-            <ul class="crm-tabs crm-detail-tabs crm-subject-tabs" uk-tab="connect: .crm-subject-switcher; animation: uk-animation-fade">
-              <li class="uk-active"><a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="profile">Профиль</a></li>
-              <li><a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="bank">Банковские реквизиты</a></li>
-              <li><a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="documents">Документы</a></li>
-              <li><a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="relations">Связи</a></li>
-              <li><a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="contracts">Договоры / Счета</a></li>
-              <li><a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="history">История</a></li>
-            </ul>
-          </div>
+            <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
+            <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
+            <a class="crm-nav-link crm-nav-item" href="depository.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
+            <a class="crm-nav-link crm-nav-item" href="administration.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
+          </nav>
+        </aside>
 
-          <ul class="uk-switcher crm-subject-switcher">
-            <li class="crm-subject-tab-panel" data-tab-panel="profile">
-              <section class="crm-subject-section-layout crm-subject-form-layout">
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="main-data">
-                  <div class="crm-form-section-head"><h3>Основные данные</h3></div>
-                  <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3" data-role="main-data-grid">
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Наименование клиента</div><div class="crm-profile-value">АО «Восток Майнинг Системс»</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Полное наименование</div><div class="crm-profile-value">АО «Восток Майнинг Системс» (полное наименование)</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Английское наименование</div><div class="crm-profile-value">АО Восток Майнинг Системс</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Тип клиента</div><div class="crm-profile-value">Юр. лицо</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Признак резидентства</div><div class="crm-profile-value">Резидент РФ</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">ИНН</div><div class="crm-profile-value">2721123456</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">КПП</div><div class="crm-profile-value">771011001</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">ОГРН</div><div class="crm-profile-value">10277V-10111234</div></div>
-                    <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Квалификация инвестора</div><div class="crm-profile-value">Квалифицированный</div></div>
-                  </div>
-                </article>
+        <main class="crm-main">
+          <header class="crm-topbar">
+            <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню">
+              <span uk-icon="menu"></span>
+            </button>
+            <div class="crm-search">
+              <span class="crm-search-icon" uk-icon="search"></span>
+              <input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/>
+            </div>
+            <div class="crm-user">
+              <div>
+                <div>Иванов И.И.</div>
+                <small>менеджер</small>
+              </div>
+              <div class="crm-avatar">ИИ</div>
+            </div>
+          </header>
+          <section class="crm-page" data-page="subject-card">
+            <div class="crm-registry-shell crm-subject-detail-shell crm-subject-card-shell">
+              <div class="crm-breadcrumbs">
+                <a href="subjects.html">Субъекты</a>
+                <span uk-icon="chevron-right"></span>
+                <span>Карточка субъекта</span>
+              </div>
 
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card subject-section" data-entity="addresses" data-role="addresses-section">
-                  <div class="crm-form-section-head crm-section-head-inline">
-                    <h3>Адреса</h3>
-                  </div>
-                  <div class="crm-address-stack subject-address-stack" data-role="addresses-list">
-                    <div data-role="address-registration">
-                      <article class="crm-address-row crm-address-card">
-                        <h4 class="crm-address-title">Адрес регистрации</h4>
-                        <div class="crm-address-fields">
-                          <div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong>Россия</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong>Хабаровск</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Город</span><strong>Хабаровск</strong></div>
-                          <div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong>ул. Муравьёва-Амурского, д. 25</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong>—</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong>101000</strong></div>
-                        </div>
-                      </article>
+              <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-011">
+                <div class="crm-subject-hero-main crm-detail-hero-main">
+                  <div class="crm-subject-avatar">ВМ</div>
+                  <div class="crm-subject-identity crm-subject-hero-text">
+                    <h1 class="crm-page-title" data-entity="page-title">АО «Восток Майнинг Системс»</h1>
+                    <div class="crm-subject-code">
+                      <span class="crm-subject-code-label">Код клиента</span>
+                      <strong>INV-1011</strong>
                     </div>
-                    <div id="subject-addresses-extra" data-role="addresses-extra" hidden>
-                      <article class="crm-address-row crm-address-card">
-                        <h4 class="crm-address-title">Адрес местонахождения</h4>
-                        <div class="crm-address-fields">
-                          <div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong>Россия</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong>Хабаровск</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Город</span><strong>Хабаровск</strong></div>
-                          <div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong>ул. Муравьёва-Амурского, д. 25</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong>—</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong>101000</strong></div>
-                        </div>
-                      </article>
-                      <article class="crm-address-row crm-address-card">
-                        <h4 class="crm-address-title">Почтовый адрес</h4>
-                        <div class="crm-address-fields">
-                          <div class="crm-address-field"><span class="crm-profile-label">Страна</span><strong>Россия</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Регион</span><strong>Хабаровск</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Город</span><strong>Хабаровск</strong></div>
-                          <div class="crm-address-field crm-address-field-street"><span class="crm-profile-label">Улица</span><strong>ул. Муравьёва-Амурского, д. 25</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Дом</span><strong>—</strong></div>
-                          <div class="crm-address-field"><span class="crm-profile-label">Индекс</span><strong>101000</strong></div>
-                        </div>
-                      </article>
+                    <div class="crm-subject-badge-groups" aria-label="Статусы клиента">
+                      <div class="crm-inline-badges crm-inline-badges-primary">
+                        <span class="crm-badge crm-subject-label muted" data-status="type">Юр. лицо</span>
+                        <span class="crm-badge crm-subject-label success" data-status="residency">Резидент РФ</span>
+                        <span class="crm-badge crm-subject-label warning" data-status="representative">Представитель</span>
+                        <span class="crm-badge crm-subject-label muted" data-status="qualified">Квалифицированный</span>
+                        <span class="crm-badge crm-subject-label success" data-status="kyc">КОУР</span>
+                      </div>
                     </div>
                   </div>
-                  <div class="crm-address-actions">
-                    <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
-                  </div>
-                </article>
+                </div>
+                <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions" aria-label="Действия по клиенту">
+                  <button class="uk-button uk-button-default crm-button" type="button" data-action="move-to-archive">В архив</button>
+                  <a href="subject-edit.html" class="uk-button uk-button-default crm-button" data-action="edit-subject">Редактировать</a>
+                  <a href="contract-wizard.html" class="uk-button crm-button-primary crm-button" data-action="open-contract-wizard" data-href="contract-wizard.html">Оформить договор</a>
+                </div>
+              </article>
 
-                <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="representatives">
-                  <div class="crm-form-section-head crm-section-head-inline">
-                    <h3>Представители</h3>
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="open-representative-modal">+ Добавить представителя</button>
-                  </div>
-                  <div class="crm-representatives-list" data-role="representatives-list">
-                    <div class="crm-representative-row">
-                      <div class="crm-representative-cell"><span class="crm-profile-label">Должность</span><strong>Генеральный директор</strong></div>
-                      <div class="crm-representative-cell"><span class="crm-profile-label">Субъект</span><strong>ЗАО «Вектор Данных»</strong></div>
-                      <div class="crm-representative-cell"><span class="crm-profile-label">Основание полномочий</span><strong>Устав общества</strong></div>
-                      <div class="crm-representative-cell"><span class="crm-profile-label">Срок действия</span><strong>Без срока действия</strong></div>
+              <div class="crm-subject-tabs-wrap" data-entity="subject-sections">
+                <ul class="crm-tabs crm-detail-tabs crm-subject-tabs" uk-tab="connect: .crm-subject-switcher; animation: uk-animation-fade">
+                  <li class="uk-active">
+                    <a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="profile">Профиль</a>
+                  </li>
+                  <li>
+                    <a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="bank">Банковские реквизиты</a>
+                  </li>
+                  <li>
+                    <a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="documents">Документы</a>
+                  </li>
+                  <li>
+                    <a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="relations">Связи</a>
+                  </li>
+                  <li>
+                    <a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="contracts">Договоры / Счета</a>
+                  </li>
+                  <li>
+                    <a class="crm-tab" href="#" data-action="switch-subject-section" data-tab-target="history">История</a>
+                  </li>
+                </ul>
+              </div>
+
+              <ul class="uk-switcher crm-subject-switcher">
+                <li class="crm-subject-tab-panel" data-tab-panel="profile">
+                  <section class="crm-subject-section-layout crm-subject-form-layout">
+                    <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="main-data">
+                      <div class="crm-form-section-head">
+                        <h3>Основные данные</h3>
+                      </div>
+                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3" data-role="main-data-grid">
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">Наименование клиента</div>
+                          <div class="crm-profile-value">АО «Восток Майнинг Системс»</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">Полное наименование</div>
+                          <div class="crm-profile-value">АО «Восток Майнинг Системс» (полное наименование)</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">Английское наименование</div>
+                          <div class="crm-profile-value">АО Восток Майнинг Системс</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">Тип клиента</div>
+                          <div class="crm-profile-value">Юр. лицо</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">Признак резидентства</div>
+                          <div class="crm-profile-value">Резидент РФ</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">ИНН</div>
+                          <div class="crm-profile-value">2721123456</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">КПП</div>
+                          <div class="crm-profile-value">771011001</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">ОГРН</div>
+                          <div class="crm-profile-value">10277V-10111234</div>
+                        </div>
+                        <div class="crm-profile-row crm-data-field">
+                          <div class="crm-profile-label">Квалификация инвестора</div>
+                          <div class="crm-profile-value">Квалифицированный</div>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card subject-section" data-entity="addresses" data-role="addresses-section">
+                      <div class="crm-form-section-head crm-section-head-inline">
+                        <h3>Адреса</h3>
+                      </div>
+                      <div class="crm-address-stack subject-address-stack" data-role="addresses-list">
+                        <div data-role="address-registration">
+                          <article class="crm-address-row crm-address-card">
+                            <h4 class="crm-address-title">Адрес регистрации</h4>
+                            <div class="crm-address-fields">
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Страна</span>
+                                <strong>Россия</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Регион</span>
+                                <strong>Хабаровск</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Город</span>
+                                <strong>Хабаровск</strong>
+                              </div>
+                              <div class="crm-address-field crm-address-field-street">
+                                <span class="crm-profile-label">Улица</span>
+                                <strong>ул. Муравьёва-Амурского, д. 25</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Дом</span>
+                                <strong>—</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Индекс</span>
+                                <strong>101000</strong>
+                              </div>
+                            </div>
+                          </article>
+                        </div>
+                        <div id="subject-addresses-extra" data-role="addresses-extra" hidden>
+                          <article class="crm-address-row crm-address-card">
+                            <h4 class="crm-address-title">Адрес местонахождения</h4>
+                            <div class="crm-address-fields">
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Страна</span>
+                                <strong>Россия</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Регион</span>
+                                <strong>Хабаровск</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Город</span>
+                                <strong>Хабаровск</strong>
+                              </div>
+                              <div class="crm-address-field crm-address-field-street">
+                                <span class="crm-profile-label">Улица</span>
+                                <strong>ул. Муравьёва-Амурского, д. 25</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Дом</span>
+                                <strong>—</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Индекс</span>
+                                <strong>101000</strong>
+                              </div>
+                            </div>
+                          </article>
+                          <article class="crm-address-row crm-address-card">
+                            <h4 class="crm-address-title">Почтовый адрес</h4>
+                            <div class="crm-address-fields">
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Страна</span>
+                                <strong>Россия</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Регион</span>
+                                <strong>Хабаровск</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Город</span>
+                                <strong>Хабаровск</strong>
+                              </div>
+                              <div class="crm-address-field crm-address-field-street">
+                                <span class="crm-profile-label">Улица</span>
+                                <strong>ул. Муравьёва-Амурского, д. 25</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Дом</span>
+                                <strong>—</strong>
+                              </div>
+                              <div class="crm-address-field">
+                                <span class="crm-profile-label">Индекс</span>
+                                <strong>101000</strong>
+                              </div>
+                            </div>
+                          </article>
+                        </div>
+                      </div>
+                      <div class="crm-address-actions">
+                        <button class="uk-button uk-button-default crm-button crm-link-action" type="button" data-action="toggle-addresses" aria-expanded="false" aria-controls="subject-addresses-extra">Показать остальные адреса</button>
+                      </div>
+                    </article>
+
+                    <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section" data-entity="representatives">
+                      <div class="crm-form-section-head crm-section-head-inline">
+                        <h3>Представители</h3>
+                        <button class="uk-button uk-button-default crm-button" type="button" data-action="open-representative-modal">+ Добавить представителя</button>
+                      </div>
+                      <div class="crm-representatives-list" data-role="representatives-list">
+                        <div class="crm-representative-row">
+                          <div class="crm-representative-cell">
+                            <span class="crm-profile-label">Должность</span>
+                            <strong>Генеральный директор</strong>
+                          </div>
+                          <div class="crm-representative-cell">
+                            <span class="crm-profile-label">Субъект</span>
+                            <strong>ЗАО «Вектор Данных»</strong>
+                          </div>
+                          <div class="crm-representative-cell">
+                            <span class="crm-profile-label">Основание полномочий</span>
+                            <strong>Устав общества</strong>
+                          </div>
+                          <div class="crm-representative-cell">
+                            <span class="crm-profile-label">Срок действия</span>
+                            <strong>Без срока действия</strong>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="crm-representative-form-slot" data-role="representative-form-slot" hidden>
+                        <div class="crm-bank-account-form crm-representative-add-form">
+                          <h4 class="crm-bank-account-form-title">Добавить представителя</h4>
+                          <div class="crm-representative-form-grid">
+                            <div class="crm-bank-form-field">
+                              <label class="crm-bank-form-label" for="rep-subject-search">Поиск субъекта</label>
+                              <input id="rep-subject-search" class="uk-input crm-input crm-bank-input" type="search" placeholder="Введите ФИО или организацию"/>
+                            </div>
+                            <div class="crm-bank-form-field">
+                              <label class="crm-bank-form-label" for="rep-subject">Субъект</label>
+                              <select id="rep-subject" class="uk-select crm-input crm-bank-input"><option>Соколова Мария Владимировна</option><option>Крылов Денис Олегович</option><option>Никифоров Артём Игоревич</option></select>
+                            </div>
+                            <div class="crm-bank-form-field">
+                              <label class="crm-bank-form-label" for="rep-role">Роль</label>
+                              <select id="rep-role" class="uk-select crm-input crm-bank-input"><option>Представитель по доверенности</option><option>Генеральный директор</option><option>Главный бухгалтер</option></select>
+                            </div>
+                            <div class="crm-bank-form-field">
+                              <label class="crm-bank-form-label" for="rep-authority">Основание полномочий</label>
+                              <input id="rep-authority" class="uk-input crm-input crm-bank-input" type="text" placeholder="Доверенность / приказ / устав"/>
+                            </div>
+                            <div class="crm-bank-form-field crm-representative-form-field-full">
+                              <label class="crm-bank-form-label" for="rep-expiry">Срок действия полномочий</label>
+                              <div class="crm-date-field">
+                                <input id="rep-expiry" class="uk-input crm-input crm-bank-input crm-date-input" type="date" placeholder="дд.мм.гггг" data-role="representative-expiry" data-date-input/>
+                                <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                              </div>
+                            </div>
+                            <div class="crm-representative-form-field-full">
+                              <label class="crm-representative-expiry-toggle">
+                                <input type="checkbox" data-action="toggle-representative-expiry"/>
+                                Без срока действия
+                              </label>
+                            </div>
+                          </div>
+                          <div class="crm-bank-account-form-actions">
+                            <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="save-representative">Сохранить</button>
+                            <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="close-representative-modal">Закрыть</button>
+                          </div>
+                        </div>
+                      </div>
+                      <table class="crm-representatives-contract-hook" hidden>
+                        <tbody data-role="representatives-table-body">
+                          <tr><td>Генеральный директор</td></tr>
+                        </tbody>
+                      </table>
+                    </article>
+
+                    <section class="crm-flat-group" data-entity="registration-contacts-group">
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="registration-data">
+                        <div class="crm-form-section-head">
+                          <h3>Регистрационные данные</h3>
+                        </div>
+                        <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Дата регистрации</div>
+                            <div class="crm-profile-value">18.01.2021</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Регистрирующий орган</div>
+                            <div class="crm-profile-value">Межрайонная ИФНС России №46 по г. Москве</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Уставный капитал</div>
+                            <div class="crm-profile-value">300 000 000 ₽</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Страна регистрации</div>
+                            <div class="crm-profile-value">Российская Федерация</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Регистрационный номер</div>
+                            <div class="crm-profile-value">1217700011256</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Налоговый статус</div>
+                            <div class="crm-profile-value">Плательщик налога на прибыль (ОСНО)</div>
+                          </div>
+                        </div>
+                      </article>
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="contacts">
+                        <div class="crm-form-section-head">
+                          <h3>Контактные данные</h3>
+                        </div>
+                        <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Телефон</div>
+                            <div class="crm-profile-value">+7 (495) 900-22-11</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Дополнительный телефон</div>
+                            <div class="crm-profile-value">+7 (495) 900-22-18 (приёмная)</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Email</div>
+                            <div class="crm-profile-value">office@vms.ru</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Сайт</div>
+                            <div class="crm-profile-value">www.vostokms.ru</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Контактное лицо</div>
+                            <div class="crm-profile-value">Соколова Мария Владимировна</div>
+                          </div>
+                          <div class="crm-profile-row crm-data-field">
+                            <div class="crm-profile-label">Ответственный представитель</div>
+                            <div class="crm-profile-value">Крылов Денис Олегович</div>
+                          </div>
+                        </div>
+                      </article>
+                    </section>
+
+                    <section class="crm-flat-group" data-entity="compliance-rights-group">
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="compliance">
+                        <div class="crm-form-section-head">
+                          <h3>Комплаенс</h3>
+                        </div>
+                        <div class="crm-compliance-panel">
+                          <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
+                            <div class="crm-profile-row crm-data-field">
+                              <div class="crm-profile-label">Статус комплаенса</div>
+                              <div class="crm-profile-value"><span class="crm-badge success" data-status="passed">Пройден</span></div>
+                            </div>
+                            <div class="crm-profile-row crm-data-field">
+                              <div class="crm-profile-label">Дата прохождения</div>
+                              <div class="crm-profile-value">25.04.2026</div>
+                            </div>
+                            <div class="crm-profile-row crm-profile-row-full">
+                              <div class="crm-profile-label">Комментарий</div>
+                              <div class="crm-profile-value">Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено.</div>
+                            </div>
+                            <div class="crm-profile-row crm-data-field">
+                              <div class="crm-profile-label">Комплаенс офицер</div>
+                              <div class="crm-profile-value">Петрова Елена Сергеевна</div>
+                            </div>
+                            <div class="crm-profile-row crm-data-field">
+                              <div class="crm-profile-label">Последняя проверка</div>
+                              <div class="crm-profile-value">25.04.2026 11:40</div>
+                            </div>
+                            <div class="crm-profile-row crm-data-field">
+                              <div class="crm-profile-label">Риск-профиль</div>
+                              <div class="crm-profile-value">Средний (MR-2)</div>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="usage-rights">
+                        <div class="crm-form-section-head">
+                          <h3>Права использования</h3>
+                        </div>
+                        <div class="crm-usage-rights-grid">
+                          <div class="crm-usage-right-card crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования денежных средств</div><div class="crm-profile-value"><span class="crm-badge success" data-status="allowed">Да</span></div></div>
+                          <div class="crm-usage-right-card crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования ценных бумаг</div><div class="crm-profile-value"><span class="crm-badge info" data-status="restricted">Ограничено</span></div></div>
+                        </div>
+                      </article>
+                    </section>
+
+                    <section class="crm-flat-group" data-entity="manager-report-group">
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="manager-agent">
+                        <div class="crm-form-section-head">
+                          <h3>Менеджер и агент</h3>
+                        </div>
+                        <div class="crm-person-card-grid">
+                          <article class="crm-person-card">
+                            <div class="crm-person-avatar" aria-hidden="true">ИИ</div>
+                            <div class="crm-person-content">
+                              <div class="crm-person-title">Иванов Илья Игоревич</div>
+                              <div class="crm-person-meta">Старший менеджер фронт-офиса</div>
+                              <div class="crm-person-line">+7 (495) 780-15-03 доб. 214</div>
+                              <div class="crm-person-line">i.ivanov@investika.ru</div>
+                            </div>
+                          </article>
+                          <article class="crm-person-card">
+                            <div class="crm-person-avatar" aria-hidden="true">РБ</div>
+                            <div class="crm-person-content">
+                              <div class="crm-person-title">ООО «Регион Брокер Партнер»</div>
+                              <div class="crm-person-meta">Агент · AG-1097</div>
+                              <div class="crm-person-line">+7 (343) 351-88-21</div>
+                              <div class="crm-person-line">partner@rbp-agent.ru</div>
+                            </div>
+                          </article>
+                        </div>
+                      </article>
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="report-delivery">
+                        <div class="crm-form-section-head">
+                          <h3>Способ получения отчётов</h3>
+                        </div>
+                        <div class="crm-report-delivery-grid">
+                          <div class="crm-report-delivery-card">
+                            <div class="crm-report-delivery-head">
+                              <div class="crm-report-delivery-title">Электронная почта</div>
+                              <span class="crm-badge success" data-status="enabled">Включён</span>
+                            </div>
+
+                          </div>
+                          <div class="crm-report-delivery-card">
+                            <div class="crm-report-delivery-head">
+                              <div class="crm-report-delivery-title">Личный кабинет</div>
+                              <span class="crm-badge success" data-status="enabled">Включён</span>
+                            </div>
+
+                          </div>
+                          <div class="crm-report-delivery-card">
+                            <div class="crm-report-delivery-head">
+                              <div class="crm-report-delivery-title">Бумажный отчёт</div>
+                              <span class="crm-badge muted" data-status="disabled">Выключен</span>
+                            </div>
+
+                          </div>
+                        </div>
+                      </article>
+                      <article class="crm-subject-profile-section crm-flat-section" data-entity="manager-comment">
+                        <div class="crm-form-section-head">
+                          <h3>Комментарий менеджера</h3>
+                        </div>
+                        <p class="crm-manager-comment">Пакет KYC/FATCA актуализирован, критичных замечаний по карточке нет.</p>
+                      </article>
+                    </section>
+                  </section>
+                </li>
+
+                <li class="crm-subject-tab-panel" data-tab-panel="bank">
+                  <section class="crm-subject-section-layout crm-bank-accounts-section" data-entity="bank-accounts">
+
+                    <div class="crm-card crm-subject-profile-section crm-bank-accounts-header">
+                      <div class="crm-bank-accounts-header-inner">
+                        <div>
+                          <h2 class="crm-bank-accounts-title">Банковские реквизиты</h2>
+                          <p class="crm-bank-accounts-subtitle">Расчётные и специальные счета клиента</p>
+                        </div>
+                        <button class="uk-button uk-button-default crm-button crm-bank-add-button" type="button" data-action="open-bank-account-form">+ Добавить счёт</button>
+                      </div>
                     </div>
-                  </div>
-                  <div class="crm-representative-form-slot" data-role="representative-form-slot" hidden>
-                    <div class="crm-bank-account-form crm-representative-add-form">
-                      <h4 class="crm-bank-account-form-title">Добавить представителя</h4>
-                      <div class="crm-representative-form-grid">
+
+                    <div class="crm-card crm-bank-account-form" data-entity="bank-account-form" hidden>
+                      <h3 class="crm-bank-account-form-title">Новый счёт</h3>
+                      <div class="crm-bank-account-form-error" data-role="bank-form-error" hidden></div>
+                      <div class="crm-bank-account-form-grid">
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Наименование банка *</span>
+                          <input class="uk-input crm-input crm-bank-input" type="text" name="bankName" autocomplete="off"/>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">БИК *</span>
+                          <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="bik" autocomplete="off"/>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Валюта *</span>
+                          <select class="uk-select crm-input crm-bank-input" name="currency">
+                            <option value="RUB">RUB</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="CNY">CNY</option>
+                          </select>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Расчётный счёт *</span>
+                          <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="accountNumber" autocomplete="off"/>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Корреспондентский счёт *</span>
+                          <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="correspondentAccount" autocomplete="off"/>
+                        </label>
                         <div class="crm-bank-form-field">
-                          <label class="crm-bank-form-label" for="rep-subject-search">Поиск субъекта</label>
-                          <input id="rep-subject-search" class="uk-input crm-input crm-bank-input" type="search" placeholder="Введите ФИО или организацию"/>
-                        </div>
-                        <div class="crm-bank-form-field">
-                          <label class="crm-bank-form-label" for="rep-subject">Субъект</label>
-                          <select id="rep-subject" class="uk-select crm-input crm-bank-input"><option>Соколова Мария Владимировна</option><option>Крылов Денис Олегович</option><option>Никифоров Артём Игоревич</option></select>
-                        </div>
-                        <div class="crm-bank-form-field">
-                          <label class="crm-bank-form-label" for="rep-role">Роль</label>
-                          <select id="rep-role" class="uk-select crm-input crm-bank-input"><option>Представитель по доверенности</option><option>Генеральный директор</option><option>Главный бухгалтер</option></select>
-                        </div>
-                        <div class="crm-bank-form-field">
-                          <label class="crm-bank-form-label" for="rep-authority">Основание полномочий</label>
-                          <input id="rep-authority" class="uk-input crm-input crm-bank-input" type="text" placeholder="Доверенность / приказ / устав"/>
-                        </div>
-                        <div class="crm-bank-form-field crm-representative-form-field-full">
-                          <label class="crm-bank-form-label" for="rep-expiry">Срок действия полномочий</label>
+                          <label class="crm-bank-form-label" for="bank-opened-at">Дата открытия</label>
                           <div class="crm-date-field">
-                            <input id="rep-expiry" class="uk-input crm-input crm-bank-input crm-date-input" type="date" placeholder="дд.мм.гггг" data-role="representative-expiry" data-date-input/>
+                            <input id="bank-opened-at" class="uk-input crm-input crm-bank-input crm-date-input" type="date" name="openedAt" placeholder="дд.мм.гггг" data-date-input/>
                             <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
                           </div>
                         </div>
-                        <div class="crm-representative-form-field-full">
-                          <label class="crm-representative-expiry-toggle"><input type="checkbox" data-action="toggle-representative-expiry"/> Без срока действия</label>
-                        </div>
+                        <label class="crm-bank-form-field crm-bank-form-field-full">
+                          <span class="crm-bank-form-label">Назначение</span>
+                          <input class="uk-input crm-input crm-bank-input" type="text" name="purpose" autocomplete="off"/>
+                        </label>
                       </div>
                       <div class="crm-bank-account-form-actions">
-                        <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="save-representative">Сохранить</button>
-                        <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="close-representative-modal">Закрыть</button>
+                        <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="cancel-bank-account-form">Отмена</button>
+                        <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="submit-bank-account-form">Добавить</button>
                       </div>
                     </div>
-                  </div>
-                  <table class="crm-representatives-contract-hook" hidden>
-                    <tbody data-role="representatives-table-body">
-                    <tr><td>Генеральный директор</td></tr>
-                    </tbody>
-                  </table>
-                </article>
 
-                <section class="crm-flat-group" data-entity="registration-contacts-group">
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="registration-data">
-                    <div class="crm-form-section-head"><h3>Регистрационные данные</h3></div>
-                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дата регистрации</div><div class="crm-profile-value">18.01.2021</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Регистрирующий орган</div><div class="crm-profile-value">Межрайонная ИФНС России №46 по г. Москве</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Уставный капитал</div><div class="crm-profile-value">300 000 000 ₽</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Страна регистрации</div><div class="crm-profile-value">Российская Федерация</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Регистрационный номер</div><div class="crm-profile-value">1217700011256</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Налоговый статус</div><div class="crm-profile-value">Плательщик налога на прибыль (ОСНО)</div></div>
-                    </div>
-                  </article>
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="contacts">
-                    <div class="crm-form-section-head"><h3>Контактные данные</h3></div>
-                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Телефон</div><div class="crm-profile-value">+7 (495) 900-22-11</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дополнительный телефон</div><div class="crm-profile-value">+7 (495) 900-22-18 (приёмная)</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Email</div><div class="crm-profile-value">office@vms.ru</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Сайт</div><div class="crm-profile-value">www.vostokms.ru</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Контактное лицо</div><div class="crm-profile-value">Соколова Мария Владимировна</div></div>
-                      <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Ответственный представитель</div><div class="crm-profile-value">Крылов Денис Олегович</div></div>
-                    </div>
-                  </article>
-                </section>
+                    <div class="crm-bank-account-list" data-entity="bank-account-list">
 
-                <section class="crm-flat-group" data-entity="compliance-rights-group">
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="compliance">
-                    <div class="crm-form-section-head"><h3>Комплаенс</h3></div>
-                    <div class="crm-compliance-panel">
-                      <div class="crm-profile-rows crm-data-grid crm-profile-rows-3">
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Статус комплаенса</div><div class="crm-profile-value"><span class="crm-badge success" data-status="passed">Пройден</span></div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Дата прохождения</div><div class="crm-profile-value">25.04.2026</div></div>
-                        <div class="crm-profile-row crm-profile-row-full"><div class="crm-profile-label">Комментарий</div><div class="crm-profile-value">Пакет KYC обновлён полностью, замечаний по структуре владения и источнику средств не выявлено.</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Комплаенс офицер</div><div class="crm-profile-value">Петрова Елена Сергеевна</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Последняя проверка</div><div class="crm-profile-value">25.04.2026 11:40</div></div>
-                        <div class="crm-profile-row crm-data-field"><div class="crm-profile-label">Риск-профиль</div><div class="crm-profile-value">Средний (MR-2)</div></div>
-                      </div>
-                    </div>
-                  </article>
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="usage-rights">
-                    <div class="crm-form-section-head"><h3>Права использования</h3></div>
-                    <div class="crm-usage-rights-grid">
-                      <div class="crm-usage-right-card crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования денежных средств</div><div class="crm-profile-value"><span class="crm-badge success" data-status="allowed">Да</span></div></div>
-                      <div class="crm-usage-right-card crm-profile-row crm-data-field"><div class="crm-profile-label">Право использования ценных бумаг</div><div class="crm-profile-value"><span class="crm-badge info" data-status="restricted">Ограничено</span></div></div>
-                    </div>
-                  </article>
-                </section>
-
-                <section class="crm-flat-group" data-entity="manager-report-group">
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="manager-agent">
-                    <div class="crm-form-section-head"><h3>Менеджер и агент</h3></div>
-                    <div class="crm-person-card-grid">
-                      <article class="crm-person-card">
-                        <div class="crm-person-avatar" aria-hidden="true">ИИ</div>
-                        <div class="crm-person-content">
-                          <div class="crm-person-title">Иванов Илья Игоревич</div>
-                          <div class="crm-person-meta">Старший менеджер фронт-офиса</div>
-                          <div class="crm-person-line">+7 (495) 780-15-03 доб. 214</div>
-                          <div class="crm-person-line">i.ivanov@investika.ru</div>
+                      <article class="crm-bank-account-card">
+                        <div class="crm-bank-account-head">
+                          <div>
+                            <div class="crm-bank-account-title">ПАО Сбербанк, г. Москва</div>
+                            <div class="crm-bank-account-subtitle">Основной расчётный счёт</div>
+                          </div>
+                          <div class="crm-bank-account-badges">
+                            <span class="crm-badge brand">Основной</span>
+                          </div>
+                        </div>
+                        <dl class="crm-bank-account-grid">
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">БИК</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">044525225</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Валюта</dt>
+                            <dd class="crm-bank-field-value">RUB</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Расчётный счёт</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">40702810938000054210</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Дата открытия</dt>
+                            <dd class="crm-bank-field-value">22.01.2021</dd>
+                          </div>
+                          <div class="crm-bank-account-field crm-bank-account-field-wide">
+                            <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">30101810400000000225</dd>
+                          </div>
+                        </dl>
+                        <div class="crm-bank-account-actions">
+                          <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
                         </div>
                       </article>
-                      <article class="crm-person-card">
-                        <div class="crm-person-avatar" aria-hidden="true">РБ</div>
-                        <div class="crm-person-content">
-                          <div class="crm-person-title">ООО «Регион Брокер Партнер»</div>
-                          <div class="crm-person-meta">Агент · AG-1097</div>
-                          <div class="crm-person-line">+7 (343) 351-88-21</div>
-                          <div class="crm-person-line">partner@rbp-agent.ru</div>
+
+                      <article class="crm-bank-account-card">
+                        <div class="crm-bank-account-head">
+                          <div>
+                            <div class="crm-bank-account-title">АО «Альфа-Банк», г. Москва</div>
+                            <div class="crm-bank-account-subtitle">Валютный операционный</div>
+                          </div>
+                        </div>
+                        <dl class="crm-bank-account-grid">
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">БИК</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">044525593</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Валюта</dt>
+                            <dd class="crm-bank-field-value">USD</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Расчётный счёт</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">40702840102310001557</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Дата открытия</dt>
+                            <dd class="crm-bank-field-value">14.07.2023</dd>
+                          </div>
+                          <div class="crm-bank-account-field crm-bank-account-field-wide">
+                            <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">30101810200000000593</dd>
+                          </div>
+                        </dl>
+                        <div class="crm-bank-account-actions">
+                          <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
                         </div>
                       </article>
-                    </div>
-                  </article>
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="report-delivery">
-                    <div class="crm-form-section-head"><h3>Способ получения отчётов</h3></div>
-                    <div class="crm-report-delivery-grid">
-                      <div class="crm-report-delivery-card">
-                        <div class="crm-report-delivery-head">
-                          <div class="crm-report-delivery-title">Электронная почта</div>
-                          <span class="crm-badge success" data-status="enabled">Включён</span>
+
+                      <article class="crm-bank-account-card">
+                        <div class="crm-bank-account-head">
+                          <div>
+                            <div class="crm-bank-account-title">АО «Газпромбанк», г. Санкт-Петербург</div>
+                            <div class="crm-bank-account-subtitle">Расчёты с азиатскими контрагентами</div>
+                          </div>
                         </div>
-                        
-                      </div>
-                      <div class="crm-report-delivery-card">
-                        <div class="crm-report-delivery-head">
-                          <div class="crm-report-delivery-title">Личный кабинет</div>
-                          <span class="crm-badge success" data-status="enabled">Включён</span>
+                        <dl class="crm-bank-account-grid">
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">БИК</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">044030653</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Валюта</dt>
+                            <dd class="crm-bank-field-value">CNY</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Расчётный счёт</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">40702810055030104412</dd>
+                          </div>
+                          <div class="crm-bank-account-field">
+                            <dt class="crm-bank-field-label">Дата открытия</dt>
+                            <dd class="crm-bank-field-value">11.03.2026</dd>
+                          </div>
+                          <div class="crm-bank-account-field crm-bank-account-field-wide">
+                            <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
+                            <dd class="crm-bank-field-value crm-bank-mono">30101810200000000653</dd>
+                          </div>
+                        </dl>
+                        <div class="crm-bank-account-actions">
+                          <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
                         </div>
-                        
+                      </article>
+
+                    </div>
+                  </section>
+                </li>
+
+                <li class="crm-subject-tab-panel" data-tab-panel="documents">
+                  <section class="crm-subject-section-layout crm-documents-section" data-entity="documents">
+
+                    <div class="crm-documents-actions">
+                      <button class="uk-button uk-button-default crm-button crm-doc-action-btn" type="button" data-action="open-document-wizard">Открыть Document Wizard</button>
+                      <button class="uk-button crm-button-primary crm-button crm-doc-action-btn" type="button" data-action="open-document-form">+ Добавить документ</button>
+                    </div>
+
+                    <div class="crm-document-form" data-entity="document-form" hidden>
+                      <div class="crm-document-form-head">
+                        <h3 class="crm-document-form-title">Новый документ</h3>
+                        <p class="crm-document-form-subtitle">Заполните поля для добавления документа в список субъекта.</p>
                       </div>
-                      <div class="crm-report-delivery-card">
-                        <div class="crm-report-delivery-head">
-                          <div class="crm-report-delivery-title">Бумажный отчёт</div>
-                          <span class="crm-badge muted" data-status="disabled">Выключен</span>
+                      <div class="crm-document-form-grid">
+                        <div class="crm-document-form-field crm-document-form-field-full">
+                          <label class="crm-document-form-label" for="doc-title">Название документа *</label>
+                          <input class="uk-input crm-input" id="doc-title" type="text" name="title" autocomplete="off"/>
                         </div>
-                        
+                        <div class="crm-document-form-field">
+                          <label class="crm-document-form-label" for="doc-type">Вид документа *</label>
+                          <select class="uk-select crm-input" id="doc-type" name="documentType">
+                            <option value="">Выберите вид</option>
+                            <option value="Договор ДУ">Договор ДУ</option>
+                            <option value="Депозитарный">Депозитарный</option>
+                            <option value="Анкета">Анкета</option>
+                            <option value="Паспорт">Паспорт</option>
+                            <option value="Доверенность">Доверенность</option>
+                            <option value="Иной документ">Иной документ</option>
+                          </select>
+                        </div>
+                        <div class="crm-document-form-field">
+                          <label class="crm-document-form-label" for="doc-status">Статус документа *</label>
+                          <select class="uk-select crm-input" id="doc-status" name="status">
+                            <option value="">Выберите статус</option>
+                            <option value="Действующий">Действующий</option>
+                            <option value="На подписи">На подписи</option>
+                            <option value="Архивный">Архивный</option>
+                            <option value="Черновик">Черновик</option>
+                          </select>
+                        </div>
+                        <div class="crm-document-form-field">
+                          <label class="crm-document-form-label" for="doc-date">Дата *</label>
+                          <div class="crm-date-field">
+                            <input class="uk-input crm-input crm-date-input" id="doc-date" type="date" name="date" placeholder="дд.мм.гггг" data-date-input/>
+                            <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                          </div>
+                        </div>
+                      </div>
+                      <p class="crm-document-form-error" data-role="document-form-error" hidden>Заполните все обязательные поля.</p>
+                      <div class="crm-document-form-actions">
+                        <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-document-form">Отмена</button>
+                        <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-document-form">Сохранить</button>
                       </div>
                     </div>
-                  </article>
-                  <article class="crm-subject-profile-section crm-flat-section" data-entity="manager-comment">
-                    <div class="crm-form-section-head"><h3>Комментарий менеджера</h3></div>
-                    <p class="crm-manager-comment">Пакет KYC/FATCA актуализирован, критичных замечаний по карточке нет.</p>
-                  </article>
-                </section>
-              </section>
-            </li>
 
-            <li class="crm-subject-tab-panel" data-tab-panel="bank">
-              <section class="crm-subject-section-layout crm-bank-accounts-section" data-entity="bank-accounts">
-
-                <div class="crm-card crm-subject-profile-section crm-bank-accounts-header">
-                  <div class="crm-bank-accounts-header-inner">
-                    <div>
-                      <h2 class="crm-bank-accounts-title">Банковские реквизиты</h2>
-                      <p class="crm-bank-accounts-subtitle">Расчётные и специальные счета клиента</p>
-                    </div>
-                    <button class="uk-button uk-button-default crm-button crm-bank-add-button" type="button" data-action="open-bank-account-form">+ Добавить счёт</button>
-                  </div>
-                </div>
-
-                <div class="crm-card crm-bank-account-form" data-entity="bank-account-form" hidden>
-                  <h3 class="crm-bank-account-form-title">Новый счёт</h3>
-                  <div class="crm-bank-account-form-error" data-role="bank-form-error" hidden></div>
-                  <div class="crm-bank-account-form-grid">
-                    <label class="crm-bank-form-field">
-                      <span class="crm-bank-form-label">Наименование банка *</span>
-                      <input class="uk-input crm-input crm-bank-input" type="text" name="bankName" autocomplete="off"/>
-                    </label>
-                    <label class="crm-bank-form-field">
-                      <span class="crm-bank-form-label">БИК *</span>
-                      <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="bik" autocomplete="off"/>
-                    </label>
-                    <label class="crm-bank-form-field">
-                      <span class="crm-bank-form-label">Валюта *</span>
-                      <select class="uk-select crm-input crm-bank-input" name="currency">
-                        <option value="RUB">RUB</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="CNY">CNY</option>
-                      </select>
-                    </label>
-                    <label class="crm-bank-form-field">
-                      <span class="crm-bank-form-label">Расчётный счёт *</span>
-                      <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="accountNumber" autocomplete="off"/>
-                    </label>
-                    <label class="crm-bank-form-field">
-                      <span class="crm-bank-form-label">Корреспондентский счёт *</span>
-                      <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="correspondentAccount" autocomplete="off"/>
-                    </label>
-                    <div class="crm-bank-form-field">
-                      <label class="crm-bank-form-label" for="bank-opened-at">Дата открытия</label>
-                      <div class="crm-date-field">
-                        <input id="bank-opened-at" class="uk-input crm-input crm-bank-input crm-date-input" type="date" name="openedAt" placeholder="дд.мм.гггг" data-date-input/>
-                        <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
-                      </div>
-                    </div>
-                    <label class="crm-bank-form-field crm-bank-form-field-full">
-                      <span class="crm-bank-form-label">Назначение</span>
-                      <input class="uk-input crm-input crm-bank-input" type="text" name="purpose" autocomplete="off"/>
-                    </label>
-                  </div>
-                  <div class="crm-bank-account-form-actions">
-                    <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="cancel-bank-account-form">Отмена</button>
-                    <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="submit-bank-account-form">Добавить</button>
-                  </div>
-                </div>
-
-                <div class="crm-bank-account-list" data-entity="bank-account-list">
-
-                  <article class="crm-bank-account-card">
-                    <div class="crm-bank-account-head">
-                      <div>
-                        <div class="crm-bank-account-title">ПАО Сбербанк, г. Москва</div>
-                        <div class="crm-bank-account-subtitle">Основной расчётный счёт</div>
-                      </div>
-                      <div class="crm-bank-account-badges">
-                        <span class="crm-badge brand">Основной</span>
-                      </div>
-                    </div>
-                    <dl class="crm-bank-account-grid">
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">БИК</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">044525225</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Валюта</dt>
-                        <dd class="crm-bank-field-value">RUB</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Расчётный счёт</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">40702810938000054210</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Дата открытия</dt>
-                        <dd class="crm-bank-field-value">22.01.2021</dd>
-                      </div>
-                      <div class="crm-bank-account-field crm-bank-account-field-wide">
-                        <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">30101810400000000225</dd>
-                      </div>
-                    </dl>
-                    <div class="crm-bank-account-actions">
-                      <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
-                    </div>
-                  </article>
-
-                  <article class="crm-bank-account-card">
-                    <div class="crm-bank-account-head">
-                      <div>
-                        <div class="crm-bank-account-title">АО «Альфа-Банк», г. Москва</div>
-                        <div class="crm-bank-account-subtitle">Валютный операционный</div>
-                      </div>
-                    </div>
-                    <dl class="crm-bank-account-grid">
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">БИК</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">044525593</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Валюта</dt>
-                        <dd class="crm-bank-field-value">USD</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Расчётный счёт</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">40702840102310001557</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Дата открытия</dt>
-                        <dd class="crm-bank-field-value">14.07.2023</dd>
-                      </div>
-                      <div class="crm-bank-account-field crm-bank-account-field-wide">
-                        <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">30101810200000000593</dd>
-                      </div>
-                    </dl>
-                    <div class="crm-bank-account-actions">
-                      <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
-                    </div>
-                  </article>
-
-                  <article class="crm-bank-account-card">
-                    <div class="crm-bank-account-head">
-                      <div>
-                        <div class="crm-bank-account-title">АО «Газпромбанк», г. Санкт-Петербург</div>
-                        <div class="crm-bank-account-subtitle">Расчёты с азиатскими контрагентами</div>
-                      </div>
-                    </div>
-                    <dl class="crm-bank-account-grid">
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">БИК</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">044030653</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Валюта</dt>
-                        <dd class="crm-bank-field-value">CNY</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Расчётный счёт</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">40702810055030104412</dd>
-                      </div>
-                      <div class="crm-bank-account-field">
-                        <dt class="crm-bank-field-label">Дата открытия</dt>
-                        <dd class="crm-bank-field-value">11.03.2026</dd>
-                      </div>
-                      <div class="crm-bank-account-field crm-bank-account-field-wide">
-                        <dt class="crm-bank-field-label">Корреспондентский счёт</dt>
-                        <dd class="crm-bank-field-value crm-bank-mono">30101810200000000653</dd>
-                      </div>
-                    </dl>
-                    <div class="crm-bank-account-actions">
-                      <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
-                    </div>
-                  </article>
-
-                </div>
-              </section>
-            </li>
-
-            <li class="crm-subject-tab-panel" data-tab-panel="documents">
-              <section class="crm-subject-section-layout crm-documents-section" data-entity="documents">
-
-                <div class="crm-documents-actions">
-                  <button class="uk-button uk-button-default crm-button crm-doc-action-btn" type="button" data-action="open-document-wizard">Открыть Document Wizard</button>
-                  <button class="uk-button crm-button-primary crm-button crm-doc-action-btn" type="button" data-action="open-document-form">+ Добавить документ</button>
-                </div>
-
-                <div class="crm-document-form" data-entity="document-form" hidden>
-                  <div class="crm-document-form-head">
-                    <h3 class="crm-document-form-title">Новый документ</h3>
-                    <p class="crm-document-form-subtitle">Заполните поля для добавления документа в список субъекта.</p>
-                  </div>
-                  <div class="crm-document-form-grid">
-                    <div class="crm-document-form-field crm-document-form-field-full">
-                      <label class="crm-document-form-label" for="doc-title">Название документа *</label>
-                      <input class="uk-input crm-input" id="doc-title" type="text" name="title" autocomplete="off"/>
-                    </div>
-                    <div class="crm-document-form-field">
-                      <label class="crm-document-form-label" for="doc-type">Вид документа *</label>
-                      <select class="uk-select crm-input" id="doc-type" name="documentType">
-                        <option value="">Выберите вид</option>
-                        <option value="Договор ДУ">Договор ДУ</option>
-                        <option value="Депозитарный">Депозитарный</option>
-                        <option value="Анкета">Анкета</option>
-                        <option value="Паспорт">Паспорт</option>
-                        <option value="Доверенность">Доверенность</option>
-                        <option value="Иной документ">Иной документ</option>
-                      </select>
-                    </div>
-                    <div class="crm-document-form-field">
-                      <label class="crm-document-form-label" for="doc-status">Статус документа *</label>
-                      <select class="uk-select crm-input" id="doc-status" name="status">
-                        <option value="">Выберите статус</option>
-                        <option value="Действующий">Действующий</option>
-                        <option value="На подписи">На подписи</option>
-                        <option value="Архивный">Архивный</option>
-                        <option value="Черновик">Черновик</option>
-                      </select>
-                    </div>
-                    <div class="crm-document-form-field">
-                      <label class="crm-document-form-label" for="doc-date">Дата *</label>
-                      <div class="crm-date-field">
-                        <input class="uk-input crm-input crm-date-input" id="doc-date" type="date" name="date" placeholder="дд.мм.гггг" data-date-input/>
-                        <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
-                      </div>
-                    </div>
-                  </div>
-                  <p class="crm-document-form-error" data-role="document-form-error" hidden>Заполните все обязательные поля.</p>
-                  <div class="crm-document-form-actions">
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-document-form">Отмена</button>
-                    <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-document-form">Сохранить</button>
-                  </div>
-                </div>
-
-                <div class="crm-card crm-subject-profile-section" data-entity="documents-list">
-                  <div class="crm-table-wrapper crm-table-card">
-                    <div class="crm-table">
-                      <table class="uk-table uk-table-divider uk-table-small crm-documents-table">
-                        <thead>
-                          <tr>
-                            <th>Название документа</th>
-                            <th>Вид</th>
-                            <th>Статус</th>
-                            <th>Дата</th>
-                            <th class="crm-documents-th-actions">Действия</th>
-                          </tr>
-                        </thead>
-                        <tbody data-role="documents-tbody">
-                          <tr>
-                            <td class="crm-documents-td-title">Устав</td>
-                            <td>Иной документ</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                            <td>18.01.2021</td>
-                            <td class="crm-documents-td-actions"><div class="crm-documents-row-actions"><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Устав" data-doc-type="Иной документ" data-doc-status="Действующий" data-doc-date="18.01.2021">Скачать</button><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Устав">Распечатать</button></div></td>
-                          </tr>
-                          <tr>
-                            <td class="crm-documents-td-title">Выписка ЕГРЮЛ</td>
-                            <td>Иной документ</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                            <td>02.04.2026</td>
-                            <td class="crm-documents-td-actions"><div class="crm-documents-row-actions"><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Выписка ЕГРЮЛ" data-doc-type="Иной документ" data-doc-status="Действующий" data-doc-date="02.04.2026">Скачать</button><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Выписка ЕГРЮЛ">Распечатать</button></div></td>
-                          </tr>
-                          <tr>
-                            <td class="crm-documents-td-title">Паспорт представителя</td>
-                            <td>Паспорт</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                            <td>15.08.2024</td>
-                            <td class="crm-documents-td-actions"><div class="crm-documents-row-actions"><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Паспорт представителя" data-doc-type="Паспорт" data-doc-status="Действующий" data-doc-date="15.08.2024">Скачать</button><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Паспорт представителя">Распечатать</button></div></td>
-                          </tr>
-                          <tr>
-                            <td class="crm-documents-td-title">Доверенность №44/25</td>
-                            <td>Доверенность</td>
-                            <td><span class="crm-badge warning">На подписи</span></td>
-                            <td>02.02.2025</td>
-                            <td class="crm-documents-td-actions"><div class="crm-documents-row-actions"><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Доверенность №44/25" data-doc-type="Доверенность" data-doc-status="На подписи" data-doc-date="02.02.2025">Скачать</button><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Доверенность №44/25">Распечатать</button></div></td>
-                          </tr>
-                          <tr>
-                            <td class="crm-documents-td-title">Анкета клиента KYC</td>
-                            <td>Анкета</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                            <td>25.04.2026</td>
-                            <td class="crm-documents-td-actions"><div class="crm-documents-row-actions"><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Анкета клиента KYC" data-doc-type="Анкета" data-doc-status="Действующий" data-doc-date="25.04.2026">Скачать</button><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Анкета клиента KYC">Распечатать</button></div></td>
-                          </tr>
-                          <tr>
-                            <td class="crm-documents-td-title">Форма FATCA / CRS</td>
-                            <td>Иной документ</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                            <td>25.04.2026</td>
-                            <td class="crm-documents-td-actions"><div class="crm-documents-row-actions"><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Форма FATCA / CRS" data-doc-type="Иной документ" data-doc-status="Действующий" data-doc-date="25.04.2026">Скачать</button><button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Форма FATCA / CRS">Распечатать</button></div></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
-              </section>
-            </li>
-
-            <li class="crm-subject-tab-panel" data-tab-panel="relations">
-              <section class="crm-subject-section-layout crm-relations-section" data-entity="relations">
-
-                <article class="crm-card crm-subject-profile-section" data-entity="relations-list">
-                  <div class="crm-relations-header">
-                    <h3 class="crm-relations-title">Связи</h3>
-                    <p class="crm-relations-subtitle">Связанные лица и организации субъекта</p>
-                  </div>
-                  <div class="crm-table-wrapper crm-table-card">
-                    <div class="crm-table crm-table-compact">
-                      <table class="uk-table uk-table-divider uk-table-small crm-relations-table">
-                        <thead>
-                          <tr>
-                            <th>Связанное лицо / организация</th>
-                            <th>Тип</th>
-                            <th>Роль</th>
-                            <th>Дата начала</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">ЗАО «Вектор Данных»</a></td>
-                            <td>Юр. лицо</td>
-                            <td>Представитель</td>
-                            <td>15.01.2021</td>
-                          </tr>
-                          <tr>
-                            <td><a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">Крылов Денис Олегович</a></td>
-                            <td>Физ. лицо</td>
-                            <td>Генеральный директор</td>
-                            <td>18.01.2021</td>
-                          </tr>
-                          <tr>
-                            <td><a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">ООО «Регион Брокер Партнер»</a></td>
-                            <td>Агент</td>
-                            <td>Агент</td>
-                            <td>22.01.2021</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </article>
-
-              </section>
-            </li>
-
-            <li class="crm-subject-tab-panel" data-tab-panel="contracts">
-              <section class="crm-subject-section-layout crm-contracts-accounts-section" data-entity="contracts-accounts">
-
-                <article class="crm-card crm-subject-profile-section" data-entity="contracts">
-                  <div class="crm-section-head-inline">
-                    <h3 class="crm-section-head-title">Договоры</h3>
-                    <a href="contract-wizard.html" class="uk-button uk-button-default crm-button">+ Добавить договор</a>
-                  </div>
-                  <div class="crm-table-wrapper crm-table-card">
-                    <div class="crm-table crm-table-compact">
-                      <table class="uk-table uk-table-divider uk-table-small crm-contracts-table">
-                        <thead>
-                          <tr>
-                            <th>Номер договора</th>
-                            <th>Вид договора</th>
-                            <th>Дата открытия</th>
-                            <th>Дата закрытия</th>
-                            <th>Статус</th>
-                          </tr>
-                        </thead>
-                        <tbody data-role="contracts-tbody">
-                          <tr>
-                            <td><a href="contract-edit.html" class="crm-link">IN-2026/00011</a></td>
-                            <td>Иной</td>
-                            <td>18.01.2021</td>
-                            <td>—</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                          </tr>
-                          <tr>
-                            <td><a href="contract-edit.html" class="crm-link">BR-2026/00444</a></td>
-                            <td>Брокерский</td>
-                            <td>22.01.2021</td>
-                            <td>—</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                          </tr>
-                          <tr>
-                            <td><a href="contract-edit.html" class="crm-link">DP-2026/00445</a></td>
-                            <td>Депозитарный</td>
-                            <td>26.04.2026</td>
-                            <td>—</td>
-                            <td><span class="crm-badge success">Действующий</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </article>
-
-                <article class="crm-card crm-subject-profile-section" data-entity="client-accounts">
-                  <div class="crm-section-head-inline">
-                    <h3 class="crm-section-head-title">Счета</h3>
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="open-client-account-form">+ Добавить счёт</button>
-                  </div>
-
-                  <div class="crm-client-account-form" data-entity="client-account-form" hidden>
-                    <p class="crm-client-account-form-error" data-role="client-account-form-error" hidden>Заполните номер счёта и дату открытия.</p>
-                    <div class="crm-client-account-form-grid">
-                      <div class="crm-client-account-form-field">
-                        <label class="crm-client-account-form-label" for="acct-number">Номер счёта</label>
-                        <input class="uk-input crm-input" id="acct-number" type="text" name="accountNumber" autocomplete="off"/>
-                      </div>
-                      <div class="crm-client-account-form-field">
-                        <label class="crm-client-account-form-label" for="acct-type">Вид счёта</label>
-                        <select class="uk-select crm-input" id="acct-type" name="accountType">
-                          <option value="broker">Брокерский</option>
-                          <option value="depository">Депозитарный</option>
-                          <option value="trust">Доверительное управление</option>
-                          <option value="iis">ИИС</option>
-                          <option value="other">Иной</option>
-                        </select>
-                      </div>
-                      <div class="crm-client-account-form-field">
-                        <label class="crm-client-account-form-label" for="acct-open-date">Дата открытия</label>
-                        <div class="crm-date-field">
-                          <input class="uk-input crm-input crm-date-input" id="acct-open-date" type="date" name="accountOpenDate" placeholder="дд.мм.гггг" data-date-input/>
-                          <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                    <div class="crm-card crm-subject-profile-section" data-entity="documents-list">
+                      <div class="crm-table-wrapper crm-table-card">
+                        <div class="crm-table">
+                          <table class="uk-table uk-table-divider uk-table-small crm-documents-table">
+                            <thead>
+                              <tr>
+                                <th>Название документа</th>
+                                <th>Вид</th>
+                                <th>Статус</th>
+                                <th>Дата</th>
+                                <th class="crm-documents-th-actions">Действия</th>
+                              </tr>
+                            </thead>
+                            <tbody data-role="documents-tbody">
+                              <tr>
+                                <td class="crm-documents-td-title">Устав</td>
+                                <td>Иной документ</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                                <td>18.01.2021</td>
+                                <td class="crm-documents-td-actions">
+                                  <div class="crm-documents-row-actions">
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Устав" data-doc-type="Иной документ" data-doc-status="Действующий" data-doc-date="18.01.2021">Скачать</button>
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Устав">Распечатать</button>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="crm-documents-td-title">Выписка ЕГРЮЛ</td>
+                                <td>Иной документ</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                                <td>02.04.2026</td>
+                                <td class="crm-documents-td-actions">
+                                  <div class="crm-documents-row-actions">
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Выписка ЕГРЮЛ" data-doc-type="Иной документ" data-doc-status="Действующий" data-doc-date="02.04.2026">Скачать</button>
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Выписка ЕГРЮЛ">Распечатать</button>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="crm-documents-td-title">Паспорт представителя</td>
+                                <td>Паспорт</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                                <td>15.08.2024</td>
+                                <td class="crm-documents-td-actions">
+                                  <div class="crm-documents-row-actions">
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Паспорт представителя" data-doc-type="Паспорт" data-doc-status="Действующий" data-doc-date="15.08.2024">Скачать</button>
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Паспорт представителя">Распечатать</button>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="crm-documents-td-title">Доверенность №44/25</td>
+                                <td>Доверенность</td>
+                                <td>
+                                  <span class="crm-badge warning">На подписи</span>
+                                </td>
+                                <td>02.02.2025</td>
+                                <td class="crm-documents-td-actions">
+                                  <div class="crm-documents-row-actions">
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Доверенность №44/25" data-doc-type="Доверенность" data-doc-status="На подписи" data-doc-date="02.02.2025">Скачать</button>
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Доверенность №44/25">Распечатать</button>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="crm-documents-td-title">Анкета клиента KYC</td>
+                                <td>Анкета</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                                <td>25.04.2026</td>
+                                <td class="crm-documents-td-actions">
+                                  <div class="crm-documents-row-actions">
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Анкета клиента KYC" data-doc-type="Анкета" data-doc-status="Действующий" data-doc-date="25.04.2026">Скачать</button>
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Анкета клиента KYC">Распечатать</button>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="crm-documents-td-title">Форма FATCA / CRS</td>
+                                <td>Иной документ</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                                <td>25.04.2026</td>
+                                <td class="crm-documents-td-actions">
+                                  <div class="crm-documents-row-actions">
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="download-document" data-doc-title="Форма FATCA / CRS" data-doc-type="Иной документ" data-doc-status="Действующий" data-doc-date="25.04.2026">Скачать</button>
+                                    <button class="uk-button uk-button-default crm-button crm-document-action-button" type="button" data-action="print-document" data-doc-title="Форма FATCA / CRS">Распечатать</button>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                     </div>
-                    <div class="crm-client-account-form-actions">
-                      <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-client-account-form">Отмена</button>
-                      <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-client-account-form">Сохранить</button>
-                    </div>
-                  </div>
 
-                  <div class="crm-table-wrapper crm-table-card">
-                    <div class="crm-table crm-table-compact">
-                      <table class="uk-table uk-table-divider uk-table-small crm-accounts-table">
-                        <thead>
-                          <tr>
-                            <th>Номер счёта</th>
-                            <th>Вид счёта</th>
-                            <th>Дата открытия</th>
-                          </tr>
-                        </thead>
-                        <tbody data-role="client-accounts-tbody">
-                          <tr>
-                            <td>30601-000-4401</td>
-                            <td>Брокерский</td>
-                            <td>22.01.2021</td>
-                          </tr>
-                          <tr>
-                            <td>40701-USD-4401</td>
-                            <td>Иной</td>
-                            <td>14.07.2023</td>
-                          </tr>
-                          <tr>
-                            <td>30-016-00041-DP</td>
-                            <td>Депозитарный</td>
-                            <td>26.04.2026</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </article>
+                  </section>
+                </li>
 
-              </section>
-            </li>
+                <li class="crm-subject-tab-panel" data-tab-panel="relations">
+                  <section class="crm-subject-section-layout crm-relations-section" data-entity="relations">
 
-            <li class="crm-subject-tab-panel" data-tab-panel="history">
-              <section class="crm-subject-section-layout crm-history-section" data-entity="history">
+                    <article class="crm-card crm-subject-profile-section" data-entity="relations-list">
+                      <div class="crm-relations-header">
+                        <h3 class="crm-relations-title">Связи</h3>
+                        <p class="crm-relations-subtitle">Связанные лица и организации субъекта</p>
+                      </div>
+                      <div class="crm-table-wrapper crm-table-card">
+                        <div class="crm-table crm-table-compact">
+                          <table class="uk-table uk-table-divider uk-table-small crm-relations-table">
+                            <thead>
+                              <tr>
+                                <th>Связанное лицо / организация</th>
+                                <th>Тип</th>
+                                <th>Роль</th>
+                                <th>Дата начала</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">ЗАО «Вектор Данных»</a>
+                                </td>
+                                <td>Юр. лицо</td>
+                                <td>Представитель</td>
+                                <td>15.01.2021</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">Крылов Денис Олегович</a>
+                                </td>
+                                <td>Физ. лицо</td>
+                                <td>Генеральный директор</td>
+                                <td>18.01.2021</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <a class="crm-relations-link" href="subject-card.html" data-action="open-related-subject">ООО «Регион Брокер Партнер»</a>
+                                </td>
+                                <td>Агент</td>
+                                <td>Агент</td>
+                                <td>22.01.2021</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </article>
 
-                <article class="crm-card crm-subject-profile-section" data-entity="history-list">
-                  <div class="crm-history-header">
-                    <h3 class="crm-history-title">История изменений</h3>
-                    <p class="crm-history-subtitle">События и изменения по карточке субъекта</p>
-                  </div>
-                  <div class="crm-table-wrapper crm-table-card">
-                    <div class="crm-table crm-table-compact">
-                      <table class="uk-table uk-table-divider uk-table-small crm-history-table">
-                        <thead>
-                          <tr>
-                            <th>Дата и время</th>
-                            <th>Раздел</th>
-                            <th>Поле</th>
-                            <th>Изменение</th>
-                            <th>Пользователь</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td class="crm-history-datetime">25.04.2026 11:40</td>
-                            <td>Комплаенс</td>
-                            <td>Статус комплаенса</td>
-                            <td>
-                              <div class="crm-history-change">
-                                <span class="crm-badge warning">На проверке</span>
-                                <span class="crm-history-arrow">→</span>
-                                <span class="crm-badge success">Пройден</span>
-                              </div>
-                            </td>
-                            <td>Петрова Е.С.</td>
-                          </tr>
-                          <tr>
-                            <td class="crm-history-datetime">24.04.2026 16:20</td>
-                            <td>Профиль</td>
-                            <td>Контактный телефон</td>
-                            <td>
-                              <div class="crm-history-change">
-                                <span class="crm-history-arrow">→</span>
-                                <span class="crm-badge success">+7 (495) 900-22-11</span>
-                              </div>
-                            </td>
-                            <td>Иванов И.И.</td>
-                          </tr>
-                          <tr>
-                            <td class="crm-history-datetime">18.04.2026 09:15</td>
-                            <td>Документы</td>
-                            <td>Анкета клиента KYC</td>
-                            <td>
-                              <div class="crm-history-change">
-                                <span class="crm-badge warning">Черновик</span>
-                                <span class="crm-history-arrow">→</span>
-                                <span class="crm-badge success">Действующий</span>
-                              </div>
-                            </td>
-                            <td>Соколова М.В.</td>
-                          </tr>
-                          <tr>
-                            <td class="crm-history-datetime">02.04.2026 14:05</td>
-                            <td>Документы</td>
-                            <td>Выписка ЕГРЮЛ</td>
-                            <td>
-                              <div class="crm-history-change">
-                                <span class="crm-history-arrow">→</span>
-                                <span class="crm-badge success">Добавлен документ</span>
-                              </div>
-                            </td>
-                            <td>Рябцев Н.О.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </article>
+                  </section>
+                </li>
 
-              </section>
-            </li>
-          </ul>
-        </div>
-      
+                <li class="crm-subject-tab-panel" data-tab-panel="contracts">
+                  <section class="crm-subject-section-layout crm-contracts-accounts-section" data-entity="contracts-accounts">
 
-</section>
-    </main>
-  </div>
-</div>
+                    <article class="crm-card crm-subject-profile-section" data-entity="contracts">
+                      <div class="crm-section-head-inline">
+                        <h3 class="crm-section-head-title">Договоры</h3>
+                        <a href="contract-wizard.html" class="uk-button uk-button-default crm-button">+ Добавить договор</a>
+                      </div>
+                      <div class="crm-table-wrapper crm-table-card">
+                        <div class="crm-table crm-table-compact">
+                          <table class="uk-table uk-table-divider uk-table-small crm-contracts-table">
+                            <thead>
+                              <tr>
+                                <th>Номер договора</th>
+                                <th>Вид договора</th>
+                                <th>Дата открытия</th>
+                                <th>Дата закрытия</th>
+                                <th>Статус</th>
+                              </tr>
+                            </thead>
+                            <tbody data-role="contracts-tbody">
+                              <tr>
+                                <td>
+                                  <a href="contract-edit.html" class="crm-link">IN-2026/00011</a>
+                                </td>
+                                <td>Иной</td>
+                                <td>18.01.2021</td>
+                                <td>—</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <a href="contract-edit.html" class="crm-link">BR-2026/00444</a>
+                                </td>
+                                <td>Брокерский</td>
+                                <td>22.01.2021</td>
+                                <td>—</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <a href="contract-edit.html" class="crm-link">DP-2026/00445</a>
+                                </td>
+                                <td>Депозитарный</td>
+                                <td>26.04.2026</td>
+                                <td>—</td>
+                                <td>
+                                  <span class="crm-badge success">Действующий</span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </article>
 
-<script src="../assets/js/uikit.min.js"></script>
-<script src="../assets/js/uikit-icons.min.js"></script>
-<script src="../assets/js/crm-static.js"></script>
-<script src="../assets/js/pages/subject-card.js"></script>
-</body>
+                    <article class="crm-card crm-subject-profile-section" data-entity="client-accounts">
+                      <div class="crm-section-head-inline">
+                        <h3 class="crm-section-head-title">Счета</h3>
+                        <button class="uk-button uk-button-default crm-button" type="button" data-action="open-client-account-form">+ Добавить счёт</button>
+                      </div>
+
+                      <div class="crm-client-account-form" data-entity="client-account-form" hidden>
+                        <p class="crm-client-account-form-error" data-role="client-account-form-error" hidden>Заполните номер счёта и дату открытия.</p>
+                        <div class="crm-client-account-form-grid">
+                          <div class="crm-client-account-form-field">
+                            <label class="crm-client-account-form-label" for="acct-number">Номер счёта</label>
+                            <input class="uk-input crm-input" id="acct-number" type="text" name="accountNumber" autocomplete="off"/>
+                          </div>
+                          <div class="crm-client-account-form-field">
+                            <label class="crm-client-account-form-label" for="acct-type">Вид счёта</label>
+                            <select class="uk-select crm-input" id="acct-type" name="accountType">
+                              <option value="broker">Брокерский</option>
+                              <option value="depository">Депозитарный</option>
+                              <option value="trust">Доверительное управление</option>
+                              <option value="iis">ИИС</option>
+                              <option value="other">Иной</option>
+                            </select>
+                          </div>
+                          <div class="crm-client-account-form-field">
+                            <label class="crm-client-account-form-label" for="acct-open-date">Дата открытия</label>
+                            <div class="crm-date-field">
+                              <input class="uk-input crm-input crm-date-input" id="acct-open-date" type="date" name="accountOpenDate" placeholder="дд.мм.гггг" data-date-input/>
+                              <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="crm-client-account-form-actions">
+                          <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-client-account-form">Отмена</button>
+                          <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-client-account-form">Сохранить</button>
+                        </div>
+                      </div>
+
+                      <div class="crm-table-wrapper crm-table-card">
+                        <div class="crm-table crm-table-compact">
+                          <table class="uk-table uk-table-divider uk-table-small crm-accounts-table">
+                            <thead>
+                              <tr>
+                                <th>Номер счёта</th>
+                                <th>Вид счёта</th>
+                                <th>Дата открытия</th>
+                              </tr>
+                            </thead>
+                            <tbody data-role="client-accounts-tbody">
+                              <tr>
+                                <td>30601-000-4401</td>
+                                <td>Брокерский</td>
+                                <td>22.01.2021</td>
+                              </tr>
+                              <tr>
+                                <td>40701-USD-4401</td>
+                                <td>Иной</td>
+                                <td>14.07.2023</td>
+                              </tr>
+                              <tr>
+                                <td>30-016-00041-DP</td>
+                                <td>Депозитарный</td>
+                                <td>26.04.2026</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </article>
+
+                  </section>
+                </li>
+
+                <li class="crm-subject-tab-panel" data-tab-panel="history">
+                  <section class="crm-subject-section-layout crm-history-section" data-entity="history">
+
+                    <article class="crm-card crm-subject-profile-section" data-entity="history-list">
+                      <div class="crm-history-header">
+                        <h3 class="crm-history-title">История изменений</h3>
+                        <p class="crm-history-subtitle">События и изменения по карточке субъекта</p>
+                      </div>
+                      <div class="crm-table-wrapper crm-table-card">
+                        <div class="crm-table crm-table-compact">
+                          <table class="uk-table uk-table-divider uk-table-small crm-history-table">
+                            <thead>
+                              <tr>
+                                <th>Дата и время</th>
+                                <th>Раздел</th>
+                                <th>Поле</th>
+                                <th>Изменение</th>
+                                <th>Пользователь</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td class="crm-history-datetime">25.04.2026 11:40</td>
+                                <td>Комплаенс</td>
+                                <td>Статус комплаенса</td>
+                                <td>
+                                  <div class="crm-history-change">
+                                    <span class="crm-badge warning">На проверке</span>
+                                    <span class="crm-history-arrow">→</span>
+                                    <span class="crm-badge success">Пройден</span>
+                                  </div>
+                                </td>
+                                <td>Петрова Е.С.</td>
+                              </tr>
+                              <tr>
+                                <td class="crm-history-datetime">24.04.2026 16:20</td>
+                                <td>Профиль</td>
+                                <td>Контактный телефон</td>
+                                <td>
+                                  <div class="crm-history-change">
+                                    <span class="crm-history-arrow">→</span>
+                                    <span class="crm-badge success">+7 (495) 900-22-11</span>
+                                  </div>
+                                </td>
+                                <td>Иванов И.И.</td>
+                              </tr>
+                              <tr>
+                                <td class="crm-history-datetime">18.04.2026 09:15</td>
+                                <td>Документы</td>
+                                <td>Анкета клиента KYC</td>
+                                <td>
+                                  <div class="crm-history-change">
+                                    <span class="crm-badge warning">Черновик</span>
+                                    <span class="crm-history-arrow">→</span>
+                                    <span class="crm-badge success">Действующий</span>
+                                  </div>
+                                </td>
+                                <td>Соколова М.В.</td>
+                              </tr>
+                              <tr>
+                                <td class="crm-history-datetime">02.04.2026 14:05</td>
+                                <td>Документы</td>
+                                <td>Выписка ЕГРЮЛ</td>
+                                <td>
+                                  <div class="crm-history-change">
+                                    <span class="crm-history-arrow">→</span>
+                                    <span class="crm-badge success">Добавлен документ</span>
+                                  </div>
+                                </td>
+                                <td>Рябцев Н.О.</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </article>
+
+                  </section>
+                </li>
+              </ul>
+            </div>
+
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="../assets/js/uikit.min.js"></script>
+    <script src="../assets/js/uikit-icons.min.js"></script>
+    <script src="../assets/js/crm-static.js"></script>
+    <script src="../assets/js/pages/subject-card.js"></script>
+  </body>
 </html>

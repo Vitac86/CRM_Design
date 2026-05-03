@@ -1,4 +1,4 @@
-/* Subject card page */
+/* 1. Subject card page shell */
 .crm-page[data-page="subject-card"] .crm-breadcrumbs {
   display: none;
 }
@@ -20,6 +20,7 @@
   box-shadow: var(--crm-umi-shadow-sm);
 }
 
+/* 2. Hero/profile header */
 .crm-page[data-page="subject-card"] .crm-subject-hero {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -79,6 +80,7 @@
   letter-spacing: 0;
 }
 
+/* 3. Hero actions */
 .crm-page[data-page="subject-card"] .crm-subject-actions {
   display: flex;
   flex-direction: row;
@@ -108,6 +110,7 @@
   white-space: nowrap;
 }
 
+/* 4. Tabs and switcher */
 .crm-page[data-page="subject-card"] .crm-subject-tabs-wrap {
   border: 1px solid var(--crm-umi-border);
   border-radius: 10px;
@@ -130,7 +133,9 @@
   display: none;
 }
 
-.crm-page[data-page="subject-card"] .crm-subject-tabs > * { padding-left: 0; }
+.crm-page[data-page="subject-card"] .crm-subject-tabs > * {
+  padding-left: 0;
+}
 
 .crm-page[data-page="subject-card"] .crm-subject-tabs > li > a {
   min-height: 32px;
@@ -155,6 +160,7 @@
   padding: 0;
 }
 
+/* 5. Shared section/card styles */
 .crm-page[data-page="subject-card"] .crm-subject-section-layout {
   display: grid;
   gap: 8px;
@@ -164,6 +170,7 @@
   gap: 12px;
 }
 
+/* 6. Profile tab layout */
 .crm-page[data-page="subject-card"] .crm-double-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -235,10 +242,18 @@
   gap: 9px 14px;
 }
 
-.crm-page[data-page="subject-card"] .crm-profile-rows-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.crm-page[data-page="subject-card"] .crm-profile-rows-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.crm-page[data-page="subject-card"] .crm-profile-rows-1 { grid-template-columns: 1fr; }
-.crm-page[data-page="subject-card"] .crm-profile-row-full { grid-column: 1 / -1; }
+.crm-page[data-page="subject-card"] .crm-profile-rows-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.crm-page[data-page="subject-card"] .crm-profile-rows-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.crm-page[data-page="subject-card"] .crm-profile-rows-1 {
+  grid-template-columns: 1fr;
+}
+.crm-page[data-page="subject-card"] .crm-profile-row-full {
+  grid-column: 1 / -1;
+}
 
 .crm-page[data-page="subject-card"] .crm-profile-row {
   min-width: 0;
@@ -318,9 +333,15 @@
 }
 
 @media (max-width: 960px) {
-  .crm-page[data-page="subject-card"] .crm-subject-identity h1 { font-size: 22px; }
-  .crm-page[data-page="subject-card"] .crm-profile-rows-3 { grid-template-columns: 1fr; }
-  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .crm-page[data-page="subject-card"] .crm-subject-identity h1 {
+    font-size: 22px;
+  }
+  .crm-page[data-page="subject-card"] .crm-profile-rows-3 {
+    grid-template-columns: 1fr;
+  }
+  .crm-page[data-page="subject-card"] [data-entity="addresses"] .crm-address-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 959px) {
@@ -331,7 +352,7 @@
 }
 
 
-/* Profile content parity refinements */
+/* 7. Main data / addresses / representatives */
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="main-data"],
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="registration-data"],
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="contacts"],
@@ -478,6 +499,7 @@
   font-weight: 600;
 }
 
+/* 8. Registration / contacts / compliance / usage rights */
 .crm-page[data-page="subject-card"] [data-entity="registration-contacts-group"],
 .crm-page[data-page="subject-card"] [data-entity="compliance-rights-group"] {
   gap: 12px;
@@ -520,6 +542,7 @@
   background: var(--crm-umi-surface-muted);
 }
 
+/* 9. Manager / agent / report delivery */
 .crm-page[data-page="subject-card"] [data-entity="manager-report-group"] {
   gap: 12px;
   padding: 0;
@@ -644,6 +667,7 @@
   line-height: 1.5;
 }
 
+/* Mobile rules: profile and address groups */
 @media (max-width: 960px) {
   .crm-page[data-page="subject-card"] [data-tab-panel="profile"] [data-entity="representatives"] .crm-representative-row,
   .crm-page[data-page="subject-card"] [data-entity="usage-rights"] .crm-usage-rights-grid,
@@ -676,7 +700,7 @@
   }
 }
 
-/* ─── Banking accounts tab ─────────────────────────────────────────────────── */
+/* 10. Bank accounts tab */
 
 .crm-page[data-page="subject-card"] .crm-bank-accounts-section {
   gap: 10px;
@@ -736,7 +760,7 @@
   white-space: nowrap;
 }
 
-/* Add account form card */
+/* 15. Inline forms and form fields */
 .crm-page[data-page="subject-card"] .crm-bank-account-form {
   padding: 16px;
   border: 1px solid var(--crm-umi-border);
@@ -942,7 +966,7 @@
   }
 }
 
-/* ─── Documents tab ─────────────────────────────────────────────────────────── */
+/* 11. Documents tab */
 
 .crm-page[data-page="subject-card"] .crm-documents-section {
   gap: 10px;
@@ -969,7 +993,10 @@
   white-space: nowrap;
 }
 
-/* Documents table */
+/* 16. Date fields */
+/* Date field layout and calendar icon placement come from shared crm-date-field styles. */
+
+/* 17. Tables inside tabs */
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper {
   border: 1px solid var(--crm-umi-border);
   border-radius: 8px;
@@ -1099,7 +1126,49 @@
   gap: 8px;
 }
 
-/* Contracts / Accounts tab */
+/* 12. Relations tab */
+.crm-page[data-page="subject-card"] .crm-relations-section {
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-header {
+  margin-bottom: 12px;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+  margin: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+  line-height: 1.4;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-umi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-link {
+  color: var(--crm-umi-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.crm-page[data-page="subject-card"] .crm-relations-link:hover {
+  text-decoration: underline;
+  color: var(--crm-umi-primary-hover, var(--crm-umi-primary));
+}
+
+/* 13. Contracts/accounts tab */
 .crm-page[data-page="subject-card"] .crm-contracts-accounts-section {
   gap: 10px;
 }
@@ -1212,49 +1281,7 @@
   }
 }
 
-/* Relations tab */
-.crm-page[data-page="subject-card"] .crm-relations-section {
-  gap: 10px;
-}
-
-.crm-page[data-page="subject-card"] .crm-relations-header {
-  margin-bottom: 12px;
-}
-
-.crm-page[data-page="subject-card"] .crm-relations-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--crm-umi-text);
-  margin: 0;
-}
-
-.crm-page[data-page="subject-card"] .crm-relations-subtitle {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--crm-umi-text-secondary);
-  line-height: 1.4;
-}
-
-.crm-page[data-page="subject-card"] .crm-relations-table th {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--crm-umi-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.crm-page[data-page="subject-card"] .crm-relations-link {
-  color: var(--crm-umi-primary);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.crm-page[data-page="subject-card"] .crm-relations-link:hover {
-  text-decoration: underline;
-  color: var(--crm-umi-primary-hover, var(--crm-umi-primary));
-}
-
-/* History tab */
+/* 14. History tab */
 .crm-page[data-page="subject-card"] .crm-history-section {
   gap: 10px;
 }
@@ -1304,7 +1331,7 @@
   flex-shrink: 0;
 }
 
-/* ── Contracts tab: contract number button reset ─────────────────────────── */
+/* 18. Buttons/actions */
 .crm-page[data-page="subject-card"] [data-tab-panel="contracts"] button.crm-link {
   -webkit-appearance: none;
   appearance: none;
@@ -1326,7 +1353,7 @@
   color: var(--crm-umi-primary-hover, var(--crm-umi-primary));
 }
 
-/* Unified compliance-style table framing for subject-card data tabs */
+/* Shared table framing for subject-card data tabs */
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper,
 .crm-page[data-page="subject-card"] [data-tab-panel="relations"] .crm-table-wrapper,
 .crm-page[data-page="subject-card"] [data-tab-panel="contracts"] .crm-table-wrapper,
@@ -1576,9 +1603,18 @@
   padding-bottom: 8px;
 }
 
-.crm-page[data-page="subject-card"] .crm-form-section-head h3 { font-size: 15px; font-weight: 600; }
-.crm-page[data-page="subject-card"] .crm-profile-label { font-size: 11px; margin-bottom: 2px; }
-.crm-page[data-page="subject-card"] .crm-profile-value { font-size: 13px; font-weight: 500; }
+.crm-page[data-page="subject-card"] .crm-form-section-head h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+.crm-page[data-page="subject-card"] .crm-profile-label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.crm-page[data-page="subject-card"] .crm-profile-value {
+  font-size: 13px;
+  font-weight: 500;
+}
 
 .crm-page[data-page="subject-card"] [data-tab-panel="profile"] .crm-table-wrapper {
   border-radius: 10px;
@@ -1598,7 +1634,9 @@
   line-height: 1.2;
 }
 
-/* ── Inline representative add-form ──────────────────────────────────────── */
+/* Representative inline add form */
+
+/* 19. Mobile rules */
 
 @media (max-width: 1180px) {
   .crm-page[data-page="subject-card"] .crm-subject-hero {
