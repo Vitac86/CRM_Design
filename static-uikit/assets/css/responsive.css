@@ -316,3 +316,15 @@
     justify-content: center;
   }
 }
+
+
+/* ── 15. TRADING-CARD — terminal fields grid collapse ────────────────────────
+   trading.css sets .crm-terminal-fields to repeat(2, minmax(0,1fr)) at both
+   ≤1180px and ≤768px but adds no narrower breakpoint.  At 360–390px each
+   column is only ~140–160px — too tight for monospace financial values.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .crm-page[data-page="trading-card"] .crm-terminal-fields {
+    grid-template-columns: 1fr;
+  }
+}
