@@ -1,40 +1,349 @@
-.crm-page[data-page="trust-management"] { min-width: 0; overflow-x: hidden; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell { display:grid; gap:16px; align-content:start; width:100%; max-width:100%; min-width:0; box-sizing:border-box; padding:18px 18px 16px; border-radius:18px; border:1px solid #d7e2f2; background:#f5f8ff; box-shadow:0 1px 2px rgba(15,23,42,.08); }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell > * { min-width:0; max-width:100%; }
-.crm-page[data-page="trust-management"] .crm-trust-management-header { align-items:center; gap:12px; margin:0; padding-bottom:2px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-actions { flex:0 0 auto; gap:10px; padding-top:0; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-registry-filters.crm-filter-panel { padding:14px; gap:12px; border-radius:16px; border-color:#d9e3f1; background:#e9eefb; box-shadow:0 1px 2px rgba(15,23,42,.08); margin:0; min-width:0; max-width:100%; overflow:visible; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-search-shell { position:relative; display:block; width:min(520px,100%); max-width:100%; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#64748b; pointer-events:none; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-registry-filters.crm-filter-panel .crm-filter-search-input { width:100%; min-height:40px; height:40px; border-radius:10px; box-sizing:border-box; padding:0 12px 0 44px; border-color:#dbe2f0; background:#fff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-fields-row { display:flex; flex-wrap:wrap; justify-content:flex-start; gap:10px; align-items:center; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control { flex:0 1 auto; width:clamp(176px,18vw,252px); min-width:176px; max-width:252px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-actions { flex:0 0 auto; margin-left:auto; align-self:flex-end; max-width:100%; }
-.crm-page[data-page="trust-management"] .crm-trust-management-registry { width:100%; max-width:100%; min-width:0; margin-top:8px; overflow:hidden; border-radius:10px; border-color:#d9e3f1; background:#fff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table { display:block; width:100%; max-width:100%; min-width:0; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; scrollbar-gutter:auto; border:0; border-radius:0; background:#fff; border-bottom:0; scrollbar-width:thin; scrollbar-color:#9ba9bf #e9eef8; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table::after { display:none; content:none; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .crm-table { border:0; border-radius:0; overflow:visible; width:100%; min-width:1040px; max-width:none; background:#fff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table { width:100%; min-width:1040px; max-width:none; border-collapse:separate; border-spacing:0; margin-bottom:0; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead, .crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead tr, .crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead th { background:#e8edfb; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead th { border-bottom:1px solid #dbe2f0; padding:14px 12px 12px; font-size:12px; font-weight:600; letter-spacing:.01em; text-transform:none; color:#475569; line-height:1.3; vertical-align:middle; white-space:nowrap; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead th .crm-th-sort { margin-left:5px; opacity:.55; font-size:11px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody, .crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody tr, .crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody td { background:#fff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table.uk-table-hover tbody tr:hover td { background:#f8fbff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody td { padding:12px 12px; font-size:13px; line-height:1.35; vertical-align:middle; border-bottom:1px solid #e2e8f0; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody tr:first-child td { border-top:1px solid #dbe2f0; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody tr:last-child td { border-bottom:0; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar { height:8px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar-track { background:#e9eef8; border-radius:999px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar-thumb { background-color:#9ba9bf; border-radius:999px; border:1px solid #e9eef8; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar-thumb:hover { background-color:#8192ab; }
-.crm-page[data-page="trust-management"] .crm-trust-management-table-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 4px 0; background:transparent; border:0; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-page-size, .crm-page[data-page="trust-management"] .crm-trust-management-footer-nav { display:flex; align-items:center; gap:8px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-caption { font-size:11px; font-weight:600; letter-spacing:.05em; color:#607494; margin-right:2px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip { min-width:36px; height:32px; border:1px solid #c8d4e6; background:#fff; border-radius:10px; font-size:13px; color:#4e6383; cursor:pointer; transition:border-color .18s ease, background-color .18s ease, color .18s ease; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip.is-active { border-color:#8ea5c9; background:#dce8f8; color:#203a61; font-weight:600; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip:hover { border-color:#b8c6de; background:#f8fbff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip:focus-visible, .crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(59,130,246,.2); }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-page { font-size:12px; color:#4f6483; margin-right:2px; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button { width:32px; height:32px; border:1px solid #c8d4e6; border-radius:10px; background:#fff; color:#4f6483; display:inline-flex; align-items:center; justify-content:center; font-size:16px; line-height:1; cursor:pointer; transition:border-color .18s ease, background-color .18s ease; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button:hover:not(:disabled) { border-color:#b8c6de; background:#f8fbff; }
-.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button:disabled { cursor:not-allowed; color:#a0aec0; border-color:#dbe2f0; background:#f3f6fb; }
+/* ============================================================
+   Trust Management page - scoped styles
+   .crm-page[data-page="trust-management"]
+   ============================================================ */
+
+/* Page variables and page shell */
+
+.crm-page[data-page="trust-management"] {
+  --trust-management-header-bg: #e8edfb;
+  --trust-management-header-border: #dbe2f0;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid #d7e2f2;
+  background: #f5f8ff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Header and actions */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-header {
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding-bottom: 2px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-actions {
+  flex: 0 0 auto;
+  gap: 10px;
+  padding-top: 0;
+}
+
+/* Filter panel */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-registry-filters.crm-filter-panel {
+  padding: 14px;
+  gap: 12px;
+  border-radius: 16px;
+  border-color: #d9e3f1;
+  background: #e9eefb;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-fields-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
+  flex: 0 1 auto;
+  width: clamp(176px, 18vw, 252px);
+  min-width: 176px;
+  max-width: 252px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+  align-self: flex-end;
+  max-width: 100%;
+}
+
+/* Search input */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-search-shell {
+  position: relative;
+  display: block;
+  width: min(520px, 100%);
+  max-width: 100%;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
+  width: 100%;
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  padding: 0 12px 0 44px;
+  border-color: #dbe2f0;
+  background: #fff;
+}
+
+/* Table card and wrapper */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-registry {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 10px;
+  border-color: #d9e3f1;
+  background: #fff;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: auto;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  border-bottom: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #9ba9bf #e9eef8;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table::after {
+  display: none;
+  content: none;
+}
+
+/* Table structure and scrollbars */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .crm-table {
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  width: 100%;
+  min-width: 1040px;
+  max-width: none;
+  background: #fff;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table {
+  width: 100%;
+  min-width: 1040px;
+  max-width: none;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar-track {
+  background: #e9eef8;
+  border-radius: 999px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar-thumb {
+  background-color: #9ba9bf;
+  border-radius: 999px;
+  border: 1px solid #e9eef8;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table::-webkit-scrollbar-thumb:hover {
+  background-color: #8192ab;
+}
+
+/* Table header */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead,
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead tr,
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead th {
+  background: var(--trust-management-header-bg);
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead th {
+  border-bottom: 1px solid var(--trust-management-header-border);
+  padding: 14px 12px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: #475569;
+  line-height: 1.3;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table thead th .crm-th-sort {
+  margin-left: 5px;
+  opacity: 0.55;
+  font-size: 11px;
+}
+
+/* Table body */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody,
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody tr,
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody td {
+  background: #fff;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table.uk-table-hover tbody tr:hover td {
+  background: #f8fbff;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody td {
+  padding: 12px 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  vertical-align: middle;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody tr:first-child td {
+  border-top: 1px solid #dbe2f0;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Cell helpers */
+
+/* Row text and badge helpers are inherited from shared table and badge CSS. */
+
+/* Column widths */
+
+/* Column width values remain inline in the colgroup to preserve table geometry. */
+
+/* Footer and pagination */
+
+.crm-page[data-page="trust-management"] .crm-trust-management-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 4px 0;
+  background: transparent;
+  border: 0;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-page-size,
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #607494;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip {
+  min-width: 36px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #4e6383;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip.is-active {
+  border-color: #8ea5c9;
+  background: #dce8f8;
+  color: #203a61;
+  font-weight: 600;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip:hover {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-chip:focus-visible,
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-page {
+  font-size: 12px;
+  color: #4f6483;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  border-radius: 10px;
+  background: #fff;
+  color: #4f6483;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button:hover:not(:disabled) {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="trust-management"] .crm-trust-management-footer-nav-button:disabled {
+  cursor: not-allowed;
+  color: #a0aec0;
+  border-color: #dbe2f0;
+  background: #f3f6fb;
+}
+
+/* Mobile rules */
+
+/* Mobile footer and filter behavior remains handled by shared responsive.css. */

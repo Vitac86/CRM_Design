@@ -60,49 +60,168 @@
       </header>
       <section class="crm-page crm-registry-page" data-page="trust-management">
         <section class="crm-registry-shell crm-trust-management-shell">
-
           <div class="crm-page-header crm-page-header-row crm-registry-header crm-trust-management-header">
-          <div class="crm-registry-title-block"><h1 class="crm-page-title" data-entity="page-title">Доверительное управление</h1><p class="crm-page-subtitle">Реестр договоров ДУ со статусом стратегии, портфеля и текущей проверки.</p></div>
-          <div class="crm-header-actions crm-registry-actions crm-trust-management-actions"><button class="uk-button uk-button-default crm-button" type="button" data-action="export-trust-management">Экспорт</button></div>
-        </div>
-        <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-registry-filters crm-filter-panel" data-filter="trust-management">
-          <div class="crm-filter-search-row crm-filter-search"><label class="crm-filter-search-shell" for="trust-search">
+            <div class="crm-registry-title-block">
+              <h1 class="crm-page-title" data-entity="page-title">Доверительное управление</h1>
+              <p class="crm-page-subtitle">Реестр договоров ДУ со статусом стратегии, портфеля и текущей проверки.</p>
+            </div>
+            <div class="crm-header-actions crm-registry-actions crm-trust-management-actions">
+              <button class="uk-button uk-button-default crm-button" type="button" data-action="export-trust-management">Экспорт</button>
+            </div>
+          </div>
+          <form action="#" method="post" data-form="trust-management-filters" data-action="filter-trust-management" class="crm-registry-filters crm-filter-panel" data-filter="trust-management">
+            <div class="crm-filter-search-row crm-filter-search">
+              <label class="crm-filter-search-shell" for="trust-search">
                 <span class="crm-filter-search-icon" aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 </span>
-<input id="trust-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trust-search" placeholder="Договор, клиент или стратегия"/>
-              </label></div>
-          <div class="crm-filter-fields-row crm-filter-grid">
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="trust-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>На согласовании</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="trust-status" value="all" data-filter="trust-status"/></details></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="trust-strategy"><summary class="crm-filter-trigger" aria-label="Фильтр: Стратегия"><span class="crm-filter-trigger-label">Стратегия:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Стратегия">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Сбалансированная</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Консервативная</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="trust-strategy" value="all" data-filter="trust-strategy"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить всё</button></div>
-          </div>
-        </form>
-        <div class="crm-card crm-table-card crm-registry-table crm-trust-management-registry" data-entity="trust-table">
-          <div class="crm-table-wrapper crm-trust-management-table">
-            <div class="crm-table crm-registry-table-compact">
-          <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
-            <colgroup><col style="min-width:220px"/><col style="min-width:180px"/><col style="width:160px"/><col style="width:170px"/><col style="width:140px"/><col style="width:140px"/></colgroup>
-            <thead><tr><th data-sort-key="agreement" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Договор ДУ</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="client" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Клиент</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="strategy" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Стратегия</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="portfolio" data-sort-type="money" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Стоимость портфеля</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="start-date" data-sort-type="date" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Дата начала</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th></tr></thead>
-            <tbody>
-              <tr data-entity="trust-contract" data-id="DU-1144" data-href="subject-card.html"><td><div class="crm-row-main">DU-1144</div><div class="crm-row-sub">CL-4408 · ДУ</div></td><td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div><div class="crm-row-sub">Нерезидент</div></td><td>Сбалансированная</td><td>41 800 000 ₽</td><td>18.02.2026</td><td><span class="crm-badge info" data-status="pending-approval">На согласовании</span></td></tr>
-              <tr data-entity="trust-contract" data-id="DU-1152" data-href="subject-card.html"><td><div class="crm-row-main">DU-1152</div><div class="crm-row-sub">CL-4401 · ДУ</div></td><td><div class="crm-row-main">АО «Восток Майнинг Системс»</div><div class="crm-row-sub">Резидент РФ</div></td><td>Консервативная</td><td>76 400 000 ₽</td><td>04.03.2026</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
-            </tbody>
-          </table>
+                <input id="trust-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="trust-search" placeholder="Договор, клиент или стратегия"/>
+              </label>
+            </div>
+            <div class="crm-filter-fields-row crm-filter-grid">
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="trust-status">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Статус">
+                    <span class="crm-filter-trigger-label">Статус:</span>
+                    <span class="crm-filter-trigger-value">Все</span>
+                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all">
+                      <span>Все</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1">
+                      <span>Активен</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2">
+                      <span>На согласовании</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                  </div>
+                  <input type="hidden" name="trust-status" value="all" data-filter="trust-status"/>
+                </details>
+              </div>
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="trust-strategy">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Стратегия">
+                    <span class="crm-filter-trigger-label">Стратегия:</span>
+                    <span class="crm-filter-trigger-value">Все</span>
+                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Стратегия">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all">
+                      <span>Все</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1">
+                      <span>Сбалансированная</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2">
+                      <span>Консервативная</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                  </div>
+                  <input type="hidden" name="trust-strategy" value="all" data-filter="trust-strategy"/>
+                </details>
+              </div>
+              <div class="crm-filter-actions">
+                <button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить всё</button>
+              </div>
+            </div>
+          </form>
+          <div class="crm-card crm-table-card crm-registry-table crm-trust-management-registry" data-entity="trust-table">
+            <div class="crm-table-wrapper crm-trust-management-table">
+              <div class="crm-table crm-registry-table-compact">
+                <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
+                  <colgroup>
+                    <col style="min-width:220px"/>
+                    <col style="min-width:180px"/>
+                    <col style="width:160px"/>
+                    <col style="width:170px"/>
+                    <col style="width:140px"/>
+                    <col style="width:140px"/>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th data-sort-key="agreement" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Договор ДУ</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="client" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Клиент</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="strategy" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Стратегия</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="portfolio" data-sort-type="money" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Стоимость портфеля</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="start-date" data-sort-type="date" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Дата начала</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="status" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Статус</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr data-entity="trust-contract" data-id="DU-1144" data-href="subject-card.html">
+                      <td>
+                        <div class="crm-row-main">DU-1144</div>
+                        <div class="crm-row-sub">CL-4408 · ДУ</div>
+                      </td>
+                      <td>
+                        <div class="crm-row-main">АО «Глобал Ресурс Траст»</div>
+                        <div class="crm-row-sub">Нерезидент</div>
+                      </td>
+                      <td>Сбалансированная</td>
+                      <td>41 800 000 ₽</td>
+                      <td>18.02.2026</td>
+                      <td><span class="crm-badge info" data-status="pending-approval">На согласовании</span></td>
+                    </tr>
+                    <tr data-entity="trust-contract" data-id="DU-1152" data-href="subject-card.html">
+                      <td>
+                        <div class="crm-row-main">DU-1152</div>
+                        <div class="crm-row-sub">CL-4401 · ДУ</div>
+                      </td>
+                      <td>
+                        <div class="crm-row-main">АО «Восток Майнинг Системс»</div>
+                        <div class="crm-row-sub">Резидент РФ</div>
+                      </td>
+                      <td>Консервативная</td>
+                      <td>76 400 000 ₽</td>
+                      <td>04.03.2026</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden>
+              <div class="crm-empty-state-title">Нет договоров ДУ</div>
+              <div class="crm-empty-state-text">Уточните статус или стратегию.</div>
             </div>
           </div>
-          <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет договоров ДУ</div><div class="crm-empty-state-text">Уточните статус или стратегию.</div></div>
-        </div>
-
-
           <div class="crm-trust-management-table-footer" aria-label="Навигация по таблице">
             <div class="crm-trust-management-footer-page-size" data-page-size-group>
               <span class="crm-trust-management-footer-caption">СТРОК НА СТРАНИЦЕ</span>
