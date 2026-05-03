@@ -1,32 +1,26 @@
-/* ============================================================
-   Contract edit page — scoped styles
-   body[data-page="contract-edit"]
-   .crm-page[data-page="contract-edit"]
-   ============================================================ */
+/* Contract edit page shell */
 
-/* 4-column client summary (wizard uses 3) */
+/* Header / breadcrumbs / title area */
+
+/* Contract summary / status area */
 body[data-page="contract-edit"] .crm-contract-edit-summary {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-@media (max-width: 1180px) {
-  body[data-page="contract-edit"] .crm-contract-edit-summary {
-    grid-template-columns: 1fr 1fr;
-  }
-}
+/* Form cards and sections */
 
-@media (max-width: 960px) {
-  body[data-page="contract-edit"] .crm-contract-edit-summary {
-    grid-template-columns: 1fr;
-  }
-}
+/* Form grids and fields */
 
-/* Actions bar */
+/* Date fields */
+
+/* Status / badge / alert states */
+
+/* Action buttons / footer actions */
 body[data-page="contract-edit"] .crm-contract-edit-actions {
   margin-top: 2px;
 }
 
-/* Toast */
+/* Dynamic / hidden blocks */
 .crm-contract-edit-toast {
   position: fixed;
   right: 24px;
@@ -41,11 +35,26 @@ body[data-page="contract-edit"] .crm-contract-edit-actions {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
   pointer-events: none;
 }
 
 .crm-contract-edit-toast.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Mobile rules */
+@media (max-width: 1180px) {
+  body[data-page="contract-edit"] .crm-contract-edit-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 960px) {
+  body[data-page="contract-edit"] .crm-contract-edit-summary {
+    grid-template-columns: 1fr;
+  }
 }
