@@ -185,86 +185,594 @@
           <div class="crm-card crm-table-card crm-registry-table crm-subjects-registry" data-entity="subject-table">
             <div class="crm-table-wrapper crm-subjects-table">
               <div class="crm-table">
-            <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
-              <colgroup>
-                <col class="crm-col-name"/>
-                <col class="crm-col-id"/>
-                <col class="crm-col-type"/>
-                <col class="crm-col-status"/>
-                <col class="crm-col-status"/>
-                <col class="crm-col-status"/>
-                <col class="crm-col-compact"/>
-                <col class="crm-col-medium"/>
-              </colgroup>
-              <thead>
-              <tr>
-                <th data-sort-key="client-name" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">Наименование клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="inn" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">ИНН</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="client-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">Тип</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="residency" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">Резидент</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="subject-status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">Статус субъекта</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="compliance-status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">Статус комплаенса</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="documents" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">Полный комплект</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-                <th data-sort-key="accounts" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button" tabindex="0"><span class="crm-th-label">ДС / ЦБ</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr data-entity="subject" data-id="c-011" data-href="subject-card.html" data-status="active-client">
-                <td><div class="crm-row-main">АО «Восток Майнинг Системс»</div></td>
-                <td>7704132901</td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-type">АО</span></td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-residency">Резидент РФ</span></td>
-                <td><span class="crm-badge success" data-status="active-client">Активный клиент</span></td>
-                <td><span class="crm-badge success" data-status="approved">Пройден</span></td>
-                <td><span class="crm-subjects-meta-chip" data-status="yes">Да</span></td>
-                <td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span><span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span></span></td>
-              </tr>
-              <tr data-entity="subject" data-id="c-012" data-href="subject-card.html" data-status="on-compliance">
-                <td><div class="crm-row-main">АО «Глобал Ресурс Траст»</div></td>
-                <td>7705964812</td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-type">АО</span></td>
-                <td><span class="crm-subjects-meta-chip is-muted" data-entity="badge-residency">Нерезидент</span></td>
-                <td><span class="crm-badge info" data-status="on-compliance">На комплаенсе</span></td>
-                <td><span class="crm-badge info" data-status="pending-review">На проверке</span></td>
-                <td><span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span></td>
-                <td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span><span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span></span></td>
-              </tr>
-              <tr data-entity="subject" data-id="c-013" data-href="subject-card.html" data-status="registration">
-                <td><div class="crm-row-main">Громова Алина Сергеевна</div></td>
-                <td>502113742889</td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-type">ФЛ</span></td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-residency">Резидент РФ</span></td>
-                <td><span class="crm-badge" data-status="registration">Регистрация</span></td>
-                <td><span class="crm-badge warning" data-status="rework">На доработке</span></td>
-                <td><span class="crm-subjects-meta-chip is-soft-negative" data-status="no">Нет</span></td>
-                <td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span><span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span></span></td>
-              </tr>
-              <tr data-entity="subject" data-id="c-014" data-href="subject-card.html" data-status="data-filled">
-                <td><div class="crm-row-main">ООО «Север Логистик Капитал»</div></td>
-                <td>7812054881</td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-type">ООО</span></td>
-                <td><span class="crm-subjects-meta-chip" data-entity="badge-residency">Резидент РФ</span></td>
-                <td><span class="crm-badge" data-status="data-filled">Данные заполнены</span></td>
-                <td><span class="crm-badge success" data-status="approved">Пройден</span></td>
-                <td><span class="crm-subjects-meta-chip" data-status="yes">Да</span></td>
-                <td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span><span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span></span></td>
-              </tr>
-              <tr data-entity="subject" data-id="c-015" data-href="subject-card.html" data-status="active-client"><td><div class="crm-row-main">ИП Мартынов Кирилл Андреевич</div></td><td>772608314579</td><td><span class="crm-subjects-meta-chip" data-status="ип">ИП</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge success" data-status="активный-клиент">Активный клиент</span></td><td><span class="crm-badge success" data-status="пройден">Пройден</span></td><td><span class="crm-subjects-meta-chip" data-status="да">Да</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip" data-status="цб-да">ЦБ: Да</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-016" data-href="subject-card.html" data-status="blocked"><td><div class="crm-row-main">ООО «Норд Инвест Партнерс»</div></td><td>6659124408</td><td><span class="crm-subjects-meta-chip" data-status="ооо">ООО</span></td><td><span class="crm-subjects-meta-chip is-muted" data-status="нерезидент">Нерезидент</span></td><td><span class="crm-badge danger" data-status="заблокирован">Заблокирован</span></td><td><span class="crm-badge danger" data-status="заблокирован">Заблокирован</span></td><td><span class="crm-subjects-meta-chip is-soft-negative" data-status="нет">Нет</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="дс-нет">ДС: Нет</span><span class="crm-subjects-meta-chip is-muted" data-status="цб-нет">ЦБ: Нет</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-017" data-href="subject-card.html" data-status="on-compliance"><td><div class="crm-row-main">Романова Дарья Алексеевна</div></td><td>503228776514</td><td><span class="crm-subjects-meta-chip" data-status="фл">ФЛ</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge info" data-status="на-комплаенсе">На комплаенсе</span></td><td><span class="crm-badge info" data-status="на-проверке">На проверке</span></td><td><span class="crm-subjects-meta-chip is-soft-warning" data-status="частично">Частично</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip is-soft-warning" data-status="цб-частично">ЦБ: Частично</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-018" data-href="subject-card.html" data-status="registration"><td><div class="crm-row-main">АО «Евразия Финанс Групп»</div></td><td>5408129930</td><td><span class="crm-subjects-meta-chip" data-status="ао">АО</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge" data-status="регистрация">Регистрация</span></td><td><span class="crm-badge warning" data-status="на-доработке">На доработке</span></td><td><span class="crm-subjects-meta-chip is-soft-warning" data-status="частично">Частично</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="дс-нет">ДС: Нет</span><span class="crm-subjects-meta-chip" data-status="цб-да">ЦБ: Да</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-019" data-href="subject-card.html" data-status="data-filled"><td><div class="crm-row-main">ООО «Прайм Брок Сервис»</div></td><td>7810441206</td><td><span class="crm-subjects-meta-chip" data-status="ооо">ООО</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge" data-status="данные-заполнены">Данные заполнены</span></td><td><span class="crm-badge success" data-status="пройден">Пройден</span></td><td><span class="crm-subjects-meta-chip" data-status="да">Да</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip" data-status="цб-да">ЦБ: Да</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-020" data-href="subject-card.html" data-status="active-client"><td><div class="crm-row-main">Кузнецов Павел Ильич</div></td><td>771298441112</td><td><span class="crm-subjects-meta-chip" data-status="фл">ФЛ</span></td><td><span class="crm-subjects-meta-chip is-muted" data-status="нерезидент">Нерезидент</span></td><td><span class="crm-badge success" data-status="активный-клиент">Активный клиент</span></td><td><span class="crm-badge success" data-status="пройден">Пройден</span></td><td><span class="crm-subjects-meta-chip" data-status="да">Да</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip is-muted" data-status="цб-нет">ЦБ: Нет</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-021" data-href="subject-card.html" data-status="on-compliance"><td><div class="crm-row-main">ИП «Лаврова и Партнёры»</div></td><td>230104885621</td><td><span class="crm-subjects-meta-chip" data-status="ип">ИП</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge info" data-status="на-комплаенсе">На комплаенсе</span></td><td><span class="crm-badge info" data-status="на-проверке">На проверке</span></td><td><span class="crm-subjects-meta-chip is-soft-warning" data-status="частично">Частично</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip is-soft-warning" data-status="цб-частично">ЦБ: Частично</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-022" data-href="subject-card.html" data-status="blocked"><td><div class="crm-row-main">АО «Вектор Капитал Холдинг»</div></td><td>5257077419</td><td><span class="crm-subjects-meta-chip" data-status="ао">АО</span></td><td><span class="crm-subjects-meta-chip is-muted" data-status="нерезидент">Нерезидент</span></td><td><span class="crm-badge danger" data-status="заблокирован">Заблокирован</span></td><td><span class="crm-badge danger" data-status="заблокирован">Заблокирован</span></td><td><span class="crm-subjects-meta-chip is-soft-negative" data-status="нет">Нет</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="дс-нет">ДС: Нет</span><span class="crm-subjects-meta-chip is-muted" data-status="цб-нет">ЦБ: Нет</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-023" data-href="subject-card.html" data-status="registration"><td><div class="crm-row-main">ООО «Регион Девелопмент Консалт»</div></td><td>6167128095</td><td><span class="crm-subjects-meta-chip" data-status="ооо">ООО</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge" data-status="регистрация">Регистрация</span></td><td><span class="crm-badge warning" data-status="на-доработке">На доработке</span></td><td><span class="crm-subjects-meta-chip is-soft-negative" data-status="нет">Нет</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="дс-нет">ДС: Нет</span><span class="crm-subjects-meta-chip is-soft-warning" data-status="цб-частично">ЦБ: Частично</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-024" data-href="subject-card.html" data-status="data-filled"><td><div class="crm-row-main">Сафронов Олег Михайлович</div></td><td>780301556942</td><td><span class="crm-subjects-meta-chip" data-status="фл">ФЛ</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge" data-status="данные-заполнены">Данные заполнены</span></td><td><span class="crm-badge success" data-status="пройден">Пройден</span></td><td><span class="crm-subjects-meta-chip" data-status="да">Да</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip" data-status="цб-да">ЦБ: Да</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-025" data-href="subject-card.html" data-status="active-client"><td><div class="crm-row-main">ООО «Сигма Брокер Плюс»</div></td><td>7702456619</td><td><span class="crm-subjects-meta-chip" data-status="ооо">ООО</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge success" data-status="активный-клиент">Активный клиент</span></td><td><span class="crm-badge success" data-status="пройден">Пройден</span></td><td><span class="crm-subjects-meta-chip" data-status="да">Да</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip is-soft-warning" data-status="цб-частично">ЦБ: Частично</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-026" data-href="subject-card.html" data-status="on-compliance"><td><div class="crm-row-main">АО «Каспий Тех Инвест»</div></td><td>1657088340</td><td><span class="crm-subjects-meta-chip" data-status="ао">АО</span></td><td><span class="crm-subjects-meta-chip is-muted" data-status="нерезидент">Нерезидент</span></td><td><span class="crm-badge info" data-status="на-комплаенсе">На комплаенсе</span></td><td><span class="crm-badge info" data-status="на-проверке">На проверке</span></td><td><span class="crm-subjects-meta-chip is-soft-warning" data-status="частично">Частично</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="дс-нет">ДС: Нет</span><span class="crm-subjects-meta-chip" data-status="цб-да">ЦБ: Да</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-027" data-href="subject-card.html" data-status="data-filled"><td><div class="crm-row-main">ИП Киселева Наталья Аркадьевна</div></td><td>190201883550</td><td><span class="crm-subjects-meta-chip" data-status="ип">ИП</span></td><td><span class="crm-subjects-meta-chip" data-status="резидент-рф">Резидент РФ</span></td><td><span class="crm-badge" data-status="данные-заполнены">Данные заполнены</span></td><td><span class="crm-badge warning" data-status="на-доработке">На доработке</span></td><td><span class="crm-subjects-meta-chip is-soft-warning" data-status="частично">Частично</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip" data-status="дс-да">ДС: Да</span><span class="crm-subjects-meta-chip is-soft-warning" data-status="цб-частично">ЦБ: Частично</span></span></td></tr>
-              <tr data-entity="subject" data-id="c-028" data-href="subject-card.html" data-status="blocked"><td><div class="crm-row-main">ООО «Арктик Маркет Солюшнс»</div></td><td>7801719024</td><td><span class="crm-subjects-meta-chip" data-status="ооо">ООО</span></td><td><span class="crm-subjects-meta-chip is-muted" data-status="нерезидент">Нерезидент</span></td><td><span class="crm-badge danger" data-status="заблокирован">Заблокирован</span></td><td><span class="crm-badge danger" data-status="заблокирован">Заблокирован</span></td><td><span class="crm-subjects-meta-chip is-soft-negative" data-status="нет">Нет</span></td><td><span class="crm-inline-badges"><span class="crm-subjects-meta-chip is-muted" data-status="дс-нет">ДС: Нет</span><span class="crm-subjects-meta-chip is-muted" data-status="цб-нет">ЦБ: Нет</span></span></td></tr>
-              </tbody>
-            </table>
+                <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
+                  <colgroup>
+                    <col class="crm-col-name"/>
+                    <col class="crm-col-id"/>
+                    <col class="crm-col-type"/>
+                    <col class="crm-col-status"/>
+                    <col class="crm-col-status"/>
+                    <col class="crm-col-status"/>
+                    <col class="crm-col-compact"/>
+                    <col class="crm-col-medium"/>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th data-sort-key="client-name" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">Наименование клиента</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="inn" data-sort-type="number" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">ИНН</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="client-type" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">Тип</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="residency" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">Резидент</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="subject-status" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">Статус субъекта</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="compliance-status" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">Статус комплаенса</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="documents" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">Полный комплект</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="accounts" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button" tabindex="0">
+                          <span class="crm-th-label">ДС / ЦБ</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr data-entity="subject" data-id="c-011" data-href="subject-card.html" data-status="active-client">
+                      <td>
+                        <div class="crm-row-main">АО «Восток Майнинг Системс»</div>
+                      </td>
+                      <td>
+                        7704132901
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="joint-stock-company">АО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="active-client">Активный клиент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-012" data-href="subject-card.html" data-status="on-compliance">
+                      <td>
+                        <div class="crm-row-main">АО «Глобал Ресурс Траст»</div>
+                      </td>
+                      <td>
+                        7705964812
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="joint-stock-company">АО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-muted" data-status="non-resident">Нерезидент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="on-compliance">На комплаенсе</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="pending-review">На проверке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-013" data-href="subject-card.html" data-status="registration">
+                      <td>
+                        <div class="crm-row-main">Громова Алина Сергеевна</div>
+                      </td>
+                      <td>
+                        502113742889
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual">ФЛ</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="registration">Регистрация</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge warning" data-status="rework">На доработке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-negative" data-status="no">Нет</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-014" data-href="subject-card.html" data-status="data-filled">
+                      <td>
+                        <div class="crm-row-main">ООО «Север Логистик Капитал»</div>
+                      </td>
+                      <td>
+                        7812054881
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="limited-liability-company">ООО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="data-filled">Данные заполнены</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-015" data-href="subject-card.html" data-status="active-client">
+                      <td>
+                        <div class="crm-row-main">ИП Мартынов Кирилл Андреевич</div>
+                      </td>
+                      <td>
+                        772608314579
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual-entrepreneur">ИП</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="active-client">Активный клиент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-016" data-href="subject-card.html" data-status="blocked">
+                      <td>
+                        <div class="crm-row-main">ООО «Норд Инвест Партнерс»</div>
+                      </td>
+                      <td>
+                        6659124408
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="limited-liability-company">ООО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-muted" data-status="non-resident">Нерезидент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge danger" data-status="blocked">Заблокирован</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge danger" data-status="blocked">Заблокирован</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-negative" data-status="no">Нет</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-017" data-href="subject-card.html" data-status="on-compliance">
+                      <td>
+                        <div class="crm-row-main">Романова Дарья Алексеевна</div>
+                      </td>
+                      <td>
+                        503228776514
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual">ФЛ</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="on-compliance">На комплаенсе</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="pending-review">На проверке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-018" data-href="subject-card.html" data-status="registration">
+                      <td>
+                        <div class="crm-row-main">АО «Евразия Финанс Групп»</div>
+                      </td>
+                      <td>
+                        5408129930
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="joint-stock-company">АО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="registration">Регистрация</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge warning" data-status="rework">На доработке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-019" data-href="subject-card.html" data-status="data-filled">
+                      <td>
+                        <div class="crm-row-main">ООО «Прайм Брок Сервис»</div>
+                      </td>
+                      <td>
+                        7810441206
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="limited-liability-company">ООО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="data-filled">Данные заполнены</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-020" data-href="subject-card.html" data-status="active-client">
+                      <td>
+                        <div class="crm-row-main">Кузнецов Павел Ильич</div>
+                      </td>
+                      <td>
+                        771298441112
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual">ФЛ</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-muted" data-status="non-resident">Нерезидент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="active-client">Активный клиент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-021" data-href="subject-card.html" data-status="on-compliance">
+                      <td>
+                        <div class="crm-row-main">ИП «Лаврова и Партнёры»</div>
+                      </td>
+                      <td>
+                        230104885621
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual-entrepreneur">ИП</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="on-compliance">На комплаенсе</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="pending-review">На проверке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-022" data-href="subject-card.html" data-status="blocked">
+                      <td>
+                        <div class="crm-row-main">АО «Вектор Капитал Холдинг»</div>
+                      </td>
+                      <td>
+                        5257077419
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="joint-stock-company">АО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-muted" data-status="non-resident">Нерезидент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge danger" data-status="blocked">Заблокирован</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge danger" data-status="blocked">Заблокирован</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-negative" data-status="no">Нет</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-023" data-href="subject-card.html" data-status="registration">
+                      <td>
+                        <div class="crm-row-main">ООО «Регион Девелопмент Консалт»</div>
+                      </td>
+                      <td>
+                        6167128095
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="limited-liability-company">ООО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="registration">Регистрация</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge warning" data-status="rework">На доработке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-negative" data-status="no">Нет</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-024" data-href="subject-card.html" data-status="data-filled">
+                      <td>
+                        <div class="crm-row-main">Сафронов Олег Михайлович</div>
+                      </td>
+                      <td>
+                        780301556942
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual">ФЛ</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="data-filled">Данные заполнены</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-025" data-href="subject-card.html" data-status="active-client">
+                      <td>
+                        <div class="crm-row-main">ООО «Сигма Брокер Плюс»</div>
+                      </td>
+                      <td>
+                        7702456619
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="limited-liability-company">ООО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="active-client">Активный клиент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge success" data-status="approved">Пройден</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="yes">Да</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-026" data-href="subject-card.html" data-status="on-compliance">
+                      <td>
+                        <div class="crm-row-main">АО «Каспий Тех Инвест»</div>
+                      </td>
+                      <td>
+                        1657088340
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="joint-stock-company">АО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-muted" data-status="non-resident">Нерезидент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="on-compliance">На комплаенсе</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge info" data-status="pending-review">На проверке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip" data-status="securities-account-yes">ЦБ: Да</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-027" data-href="subject-card.html" data-status="data-filled">
+                      <td>
+                        <div class="crm-row-main">ИП Киселева Наталья Аркадьевна</div>
+                      </td>
+                      <td>
+                        190201883550
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="individual-entrepreneur">ИП</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="resident-rf">Резидент РФ</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge" data-status="data-filled">Данные заполнены</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge warning" data-status="rework">На доработке</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-warning" data-status="partial">Частично</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip" data-status="cash-account-yes">ДС: Да</span>
+                          <span class="crm-subjects-meta-chip is-soft-warning" data-status="securities-account-partial">ЦБ: Частично</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr data-entity="subject" data-id="c-028" data-href="subject-card.html" data-status="blocked">
+                      <td>
+                        <div class="crm-row-main">ООО «Арктик Маркет Солюшнс»</div>
+                      </td>
+                      <td>
+                        7801719024
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip" data-status="limited-liability-company">ООО</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-muted" data-status="non-resident">Нерезидент</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge danger" data-status="blocked">Заблокирован</span>
+                      </td>
+                      <td>
+                        <span class="crm-badge danger" data-status="blocked">Заблокирован</span>
+                      </td>
+                      <td>
+                        <span class="crm-subjects-meta-chip is-soft-negative" data-status="no">Нет</span>
+                      </td>
+                      <td>
+                        <span class="crm-inline-badges">
+                          <span class="crm-subjects-meta-chip is-muted" data-status="cash-account-no">ДС: Нет</span>
+                          <span class="crm-subjects-meta-chip is-muted" data-status="securities-account-no">ЦБ: Нет</span>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             <div class="crm-empty-state" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет записей</div><div class="crm-empty-state-text">Измените фильтры или создайте нового субъекта.</div></div>
