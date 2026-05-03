@@ -262,16 +262,16 @@ body[data-page="subjects"] .crm-subjects-table .uk-table tbody td {
   background: #ffffff;
 }
 
-body[data-page="subjects"] .crm-subjects-table .uk-table.uk-table-hover tbody tr:hover td {
-  background: #f8fbff;
-}
-
 body[data-page="subjects"] .crm-subjects-table .uk-table tbody td {
   padding: 8px 12px;
   border-bottom: 1px solid #e2e8f0;
   font-size: 13px;
   line-height: 1.25;
   vertical-align: middle;
+}
+
+body[data-page="subjects"] .crm-subjects-table .uk-table.uk-table-hover tbody tr:hover td {
+  background: #f8fbff;
 }
 
 body[data-page="subjects"] .crm-subjects-table .uk-table tbody tr:first-child td {
