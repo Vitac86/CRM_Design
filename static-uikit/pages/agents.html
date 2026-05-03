@@ -62,108 +62,369 @@
         <section class="crm-registry-shell crm-agents-shell">
 
           <div class="crm-page-header crm-page-header-row crm-registry-header crm-agents-header">
-          <div class="crm-registry-title-block"><h1 data-entity="page-title">Агенты</h1><p>Реестр агентских подключений с деталями организации, комиссии и закрепления.</p></div>
-          <div class="crm-header-actions crm-registry-actions crm-agents-actions"><button class="uk-button crm-button-primary crm-button" type="button" data-action="add-agent">+ Добавить агента</button></div>
-        </div>
-        <form action="#" method="post" data-form="agents-filters" data-action="filter-agents" class="crm-registry-filters crm-filter-panel" data-filter="agents">
-          <div class="crm-filter-search-row crm-filter-search"><label class="crm-filter-search-shell" for="agents-search">
+            <div class="crm-registry-title-block">
+              <h1 data-entity="page-title">Агенты</h1>
+              <p>Реестр агентских подключений с деталями организации, комиссии и закрепления.</p>
+            </div>
+            <div class="crm-header-actions crm-registry-actions crm-agents-actions">
+              <button
+                class="uk-button crm-button-primary crm-button"
+                type="button"
+                data-action="add-agent"
+              >+ Добавить агента</button>
+            </div>
+          </div>
+
+          <form
+            action="#"
+            method="post"
+            data-form="agents-filters"
+            data-action="filter-agents"
+            class="crm-registry-filters crm-filter-panel"
+            data-filter="agents"
+          >
+            <div class="crm-filter-search-row crm-filter-search">
+              <label class="crm-filter-search-shell" for="agents-search">
                 <span class="crm-filter-search-icon" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
                 </span>
-<input id="agents-search" class="uk-input crm-input crm-filter-search-input" type="search" data-filter="search" name="agents-search" placeholder="Агент, договор, телефон или email"/>
-              </label></div>
+                <input
+                  id="agents-search"
+                  class="uk-input crm-input crm-filter-search-input"
+                  type="search"
+                  data-filter="search"
+                  name="agents-search"
+                  placeholder="Агент, договор, телефон или email"
+                />
+              </label>
+            </div>
 
             <div class="crm-filter-fields-row crm-filter-grid">
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="agent-status"><summary class="crm-filter-trigger" aria-label="Фильтр: Статус"><span class="crm-filter-trigger-label">Статус:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Активен</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>На согласовании</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="agent-status" value="all" data-filter="agent-status"/></details></div>
-          <div class="crm-filter-control crm-filter-field crm-filter-pill-control"><details class="crm-filter-menu" data-filter-menu="agent-assignee"><summary class="crm-filter-trigger" aria-label="Фильтр: Закрепление"><span class="crm-filter-trigger-label">Закрепление:</span><span class="crm-filter-trigger-value">Все</span><span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span></summary><div class="crm-filter-dropdown" role="listbox" aria-label="Закрепление">
-                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-1"><span>Иванов И.И.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="opt-2"><span>Петрова Н.А.</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
-                  </div><input type="hidden" name="agent-assignee" value="all" data-filter="agent-assignee"/></details></div>
-          <div class="crm-filter-actions"><button class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" type="button" data-action="reset-filters">Сбросить всё</button></div>
-          </div>
-</form>
-        <section class="crm-card crm-agents-inline-form" data-agent-form hidden>
-          <div class="crm-agents-inline-form-header">
-            <div>
-              <h2 class="crm-agents-inline-form-title">Добавить агента</h2>
-              <p class="crm-agents-inline-form-subtitle">Заполните данные агентского подключения.</p>
-            </div>
-            <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="close-agent-form">Закрыть</button>
-          </div>
-          <form action="#" method="post" data-form="agent-create">
-            <div class="crm-agents-form-grid">
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-org">Агент / организация</label>
-                <input id="agent-org" class="uk-input crm-input crm-agents-form-input" type="text" name="agent-org" placeholder="Наименование организации" autocomplete="off"/>
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="agent-status">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Статус">
+                    <span class="crm-filter-trigger-label">Статус:</span>
+                    <span class="crm-filter-trigger-value">Все</span>
+                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Статус">
+                    <button
+                      type="button"
+                      class="crm-filter-option is-selected"
+                      role="option"
+                      aria-selected="true"
+                      data-filter-option
+                      data-filter-value="all"
+                    >
+                      <span>Все</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="crm-filter-option"
+                      role="option"
+                      aria-selected="false"
+                      data-filter-option
+                      data-filter-value="opt-1"
+                    >
+                      <span>Активен</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="crm-filter-option"
+                      role="option"
+                      aria-selected="false"
+                      data-filter-option
+                      data-filter-value="opt-2"
+                    >
+                      <span>На согласовании</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                  </div>
+                  <input type="hidden" name="agent-status" value="all" data-filter="agent-status"/>
+                </details>
               </div>
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-contract">Договор</label>
-                <input id="agent-contract" class="uk-input crm-input crm-agents-form-input" type="text" name="agent-contract" placeholder="AG-XXXX" autocomplete="off"/>
+
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="agent-assignee">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Закрепление">
+                    <span class="crm-filter-trigger-label">Закрепление:</span>
+                    <span class="crm-filter-trigger-value">Все</span>
+                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Закрепление">
+                    <button
+                      type="button"
+                      class="crm-filter-option is-selected"
+                      role="option"
+                      aria-selected="true"
+                      data-filter-option
+                      data-filter-value="all"
+                    >
+                      <span>Все</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="crm-filter-option"
+                      role="option"
+                      aria-selected="false"
+                      data-filter-option
+                      data-filter-value="opt-1"
+                    >
+                      <span>Иванов И.И.</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="crm-filter-option"
+                      role="option"
+                      aria-selected="false"
+                      data-filter-option
+                      data-filter-value="opt-2"
+                    >
+                      <span>Петрова Н.А.</span>
+                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                  </div>
+                  <input type="hidden" name="agent-assignee" value="all" data-filter="agent-assignee"/>
+                </details>
               </div>
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-commission">Комиссия</label>
-                <input id="agent-commission" class="uk-input crm-input crm-agents-form-input" type="text" name="agent-commission" placeholder="0.00%" autocomplete="off"/>
+
+              <div class="crm-filter-actions">
+                <button
+                  class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset"
+                  type="button"
+                  data-action="reset-filters"
+                >Сбросить всё</button>
               </div>
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-phone">Телефон</label>
-                <input id="agent-phone" class="uk-input crm-input crm-agents-form-input" type="tel" name="agent-phone" placeholder="+7 (XXX) XXX-XX-XX" autocomplete="off"/>
-              </div>
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-email">Email</label>
-                <input id="agent-email" class="uk-input crm-input crm-agents-form-input" type="email" name="agent-email" placeholder="agent@example.com" autocomplete="off"/>
-              </div>
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-assignee">Закрепление</label>
-                <select id="agent-assignee" class="uk-select crm-input crm-agents-form-input" name="agent-assignee">
-                  <option value="">— Выберите —</option>
-                  <option value="ivanov">Иванов И.И.</option>
-                  <option value="petrova">Петрова Н.А.</option>
-                </select>
-              </div>
-              <div class="crm-agents-form-field">
-                <label class="crm-agents-form-label" for="agent-status-field">Статус</label>
-                <select id="agent-status-field" class="uk-select crm-input crm-agents-form-input" name="agent-status">
-                  <option value="active">Активен</option>
-                  <option value="pending">На согласовании</option>
-                </select>
-              </div>
-            </div>
-            <div class="crm-agents-form-actions">
-              <button type="button" class="uk-button uk-button-default crm-button" data-action="close-agent-form">Отмена</button>
-              <button type="submit" class="uk-button crm-button-primary crm-button">Сохранить</button>
             </div>
           </form>
-        </section>
+          <section class="crm-card crm-agents-inline-form" data-agent-form hidden>
+            <div class="crm-agents-inline-form-header">
+              <div>
+                <h2 class="crm-agents-inline-form-title">Добавить агента</h2>
+                <p class="crm-agents-inline-form-subtitle">Заполните данные агентского подключения.</p>
+              </div>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-button-ghost"
+                data-action="close-agent-form"
+              >Закрыть</button>
+            </div>
+            <form action="#" method="post" data-form="agent-create">
+              <div class="crm-agents-form-grid">
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-org">Агент / организация</label>
+                  <input
+                    id="agent-org"
+                    class="uk-input crm-input crm-agents-form-input"
+                    type="text"
+                    name="agent-org"
+                    placeholder="Наименование организации"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-contract">Договор</label>
+                  <input
+                    id="agent-contract"
+                    class="uk-input crm-input crm-agents-form-input"
+                    type="text"
+                    name="agent-contract"
+                    placeholder="AG-XXXX"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-commission">Комиссия</label>
+                  <input
+                    id="agent-commission"
+                    class="uk-input crm-input crm-agents-form-input"
+                    type="text"
+                    name="agent-commission"
+                    placeholder="0.00%"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-phone">Телефон</label>
+                  <input
+                    id="agent-phone"
+                    class="uk-input crm-input crm-agents-form-input"
+                    type="tel"
+                    name="agent-phone"
+                    placeholder="+7 (XXX) XXX-XX-XX"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-email">Email</label>
+                  <input
+                    id="agent-email"
+                    class="uk-input crm-input crm-agents-form-input"
+                    type="email"
+                    name="agent-email"
+                    placeholder="agent@example.com"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-assignee">Закрепление</label>
+                  <select id="agent-assignee" class="uk-select crm-input crm-agents-form-input" name="agent-assignee">
+                    <option value="">— Выберите —</option>
+                    <option value="ivanov">Иванов И.И.</option>
+                    <option value="petrova">Петрова Н.А.</option>
+                  </select>
+                </div>
+                <div class="crm-agents-form-field">
+                  <label class="crm-agents-form-label" for="agent-status-field">Статус</label>
+                  <select id="agent-status-field" class="uk-select crm-input crm-agents-form-input" name="agent-status">
+                    <option value="active">Активен</option>
+                    <option value="pending">На согласовании</option>
+                  </select>
+                </div>
+              </div>
+              <div class="crm-agents-form-actions">
+                <button
+                  type="button"
+                  class="uk-button uk-button-default crm-button"
+                  data-action="close-agent-form"
+                >Отмена</button>
+                <button type="submit" class="uk-button crm-button-primary crm-button">Сохранить</button>
+              </div>
+            </form>
+          </section>
 
-        <div class="crm-card crm-table-card crm-registry-table crm-agents-registry" data-entity="agent-table"><div class="crm-table-wrapper crm-agents-table"><div class="crm-table crm-registry-table-compact">
-          <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
-            <colgroup><col style="min-width:220px"/><col style="min-width:180px"/><col style="width:160px"/><col style="width:170px"/><col style="width:140px"/><col style="width:140px"/></colgroup>
-            <thead><tr><th data-sort-key="agent" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Агент</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="organization" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Организация</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Договор</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="commission" data-sort-type="percent" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Комиссия</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="assignment" data-sort-type="date" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Закрепление</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th></tr></thead>
-            <tbody>
-              <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html"><td><div class="crm-row-main">ПАО «НеоЭнергоСбыт»</div><div class="crm-row-sub">+7 (900) 100-11-03 · corp@neoenergy.test</div></td><td>ПАО «НеоЭнергоСбыт»</td><td>AG-2041</td><td>1.25%</td><td>Иванов И.И.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
-              <tr data-entity="agent" data-id="AG-1988" data-href="subject-card.html"><td><div class="crm-row-main">АО «Орбита ФинСервис»</div><div class="crm-row-sub">+7 (900) 100-11-05 · support@orbita-fin.test</div></td><td>АО «Орбита ФинСервис»</td><td>AG-1988</td><td>2.00%</td><td>Петрова Н.А.</td><td><span class="crm-badge success" data-status="active">Активен</span></td></tr>
-            </tbody>
-          </table></div></div>
-          <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden><div class="crm-empty-state-title">Нет агентов</div><div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div></div>
-        </div>
-
+          <div class="crm-card crm-table-card crm-registry-table crm-agents-registry" data-entity="agent-table">
+            <div class="crm-table-wrapper crm-agents-table">
+              <div class="crm-table crm-registry-table-compact">
+                <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
+                  <colgroup>
+                    <col style="min-width:220px"/>
+                    <col style="min-width:180px"/>
+                    <col style="width:160px"/>
+                    <col style="width:170px"/>
+                    <col style="width:140px"/>
+                    <col style="width:140px"/>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th data-sort-key="agent" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Агент</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="organization" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Организация</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="agreement" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Договор</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="commission" data-sort-type="percent" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Комиссия</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="assignment" data-sort-type="date" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Закрепление</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="status" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Статус</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr data-entity="agent" data-id="AG-2041" data-href="subject-card.html">
+                      <td>
+                        <div class="crm-row-main">ПАО «НеоЭнергоСбыт»</div>
+                        <div class="crm-row-sub">+7 (900) 100-11-03 · corp@neoenergy.test</div>
+                      </td>
+                      <td>ПАО «НеоЭнергоСбыт»</td>
+                      <td>AG-2041</td>
+                      <td>1.25%</td>
+                      <td>Иванов И.И.</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                    <tr data-entity="agent" data-id="AG-1988" data-href="subject-card.html">
+                      <td>
+                        <div class="crm-row-main">АО «Орбита ФинСервис»</div>
+                        <div class="crm-row-sub">+7 (900) 100-11-05 · support@orbita-fin.test</div>
+                      </td>
+                      <td>АО «Орбита ФинСервис»</td>
+                      <td>AG-1988</td>
+                      <td>2.00%</td>
+                      <td>Петрова Н.А.</td>
+                      <td><span class="crm-badge success" data-status="active">Активен</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden>
+              <div class="crm-empty-state-title">Нет агентов</div>
+              <div class="crm-empty-state-text">Измените фильтры или добавьте нового агента.</div>
+            </div>
+          </div>
 
           <div class="crm-agents-table-footer" aria-label="Навигация по таблице">
             <div class="crm-agents-footer-page-size" data-page-size-group>
               <span class="crm-agents-footer-caption">СТРОК НА СТРАНИЦЕ</span>
-              <button type="button" class="crm-agents-footer-chip crm-footer-chip is-active" data-page-size-value="25" aria-pressed="true">25</button>
-              <button type="button" class="crm-agents-footer-chip crm-footer-chip" data-page-size-value="50" aria-pressed="false">50</button>
-              <button type="button" class="crm-agents-footer-chip crm-footer-chip" data-page-size-value="100" aria-pressed="false">100</button>
+              <button
+                type="button"
+                class="crm-agents-footer-chip crm-footer-chip is-active"
+                data-page-size-value="25"
+                aria-pressed="true"
+              >25</button>
+              <button
+                type="button"
+                class="crm-agents-footer-chip crm-footer-chip"
+                data-page-size-value="50"
+                aria-pressed="false"
+              >50</button>
+              <button
+                type="button"
+                class="crm-agents-footer-chip crm-footer-chip"
+                data-page-size-value="100"
+                aria-pressed="false"
+              >100</button>
             </div>
             <div class="crm-agents-footer-nav">
               <span class="crm-agents-footer-page">1 из 1</span>
-              <button type="button" class="crm-agents-footer-nav-button" aria-label="Предыдущая страница" disabled><span aria-hidden="true">‹</span></button>
-              <button type="button" class="crm-agents-footer-nav-button" aria-label="Следующая страница" disabled><span aria-hidden="true">›</span></button>
+              <button
+                type="button"
+                class="crm-agents-footer-nav-button"
+                aria-label="Предыдущая страница"
+                disabled
+              >
+                <span aria-hidden="true">‹</span>
+              </button>
+              <button
+                type="button"
+                class="crm-agents-footer-nav-button"
+                aria-label="Следующая страница"
+                disabled
+              >
+                <span aria-hidden="true">›</span>
+              </button>
             </div>
           </div>
 
