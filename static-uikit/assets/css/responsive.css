@@ -328,3 +328,111 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ── 16. FILTER PANEL — compact two-column layout on narrow mobile ────────────
+   At ≤480px registry filter panels (subjects, trust-management, brokerage, etc.)
+   have 5–6 pill controls stacked one-per-line; combined with 12px row-gaps and
+   18–20px panel padding the panel can top 350px, leaving almost nothing for the
+   table.
+
+   Selector specificity = (0,5,0), identical to the filters.css
+   .crm-page.crm-registry-page block that controls these elements at desktop.
+   responsive.css loads last (@import position 36 vs 16 in crm-static.css), so
+   it wins the cascade tie at equal specificity.
+
+   The ≤640px block in filters.css already sets flex-direction: column.
+   The ≤480px block below overrides back to row+wrap for a 2-per-row layout,
+   cutting the panel height roughly in half.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* Override flex-direction: column (set at ≤640px in filters.css) → 2-per-row */
+  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-fields-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  /* Two pills per row; min-width: 0 overrides the 170px floor from filters.css */
+  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-control {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Actions group: own full-width row, no auto left margin */
+  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-actions {
+    flex: 0 0 100%;
+    width: 100%;
+    margin-left: 0;
+    align-self: stretch;
+    justify-content: flex-start;
+  }
+
+  /* Reset button spans the full actions bar */
+  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-reset {
+    width: 100%;
+  }
+
+  /* Allow pill label to truncate when the control is ~160px wide */
+  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-trigger-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+
+/* ── 17. MIDDLE-OFFICE REPORTS — force master-detail to single column ─────────
+   body[data-page="middle-office-reports"] .crm-mo-split is set to
+   grid-template-columns: 2fr 1fr at specificity (0,2,1), both at desktop and
+   inside @media (max-width:1024px) in middle-office.css, which overrides the
+   generic .crm-mo-split (0,1,0) ≤768px collapse rule in the same file.
+   Repeating the page-scoped selector here (loaded last) wins the cascade tie.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body[data-page="middle-office-reports"] .crm-mo-split {
+    grid-template-columns: 1fr;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  body[data-page="middle-office-reports"] .crm-mo-details-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
+
+/* ── 18. SUBJECT-REGISTER wizard actions — stack on narrow mobile ─────────────
+   .reg-back has margin-left: auto which pushes it off-screen at 390px when
+   other buttons fill the single flex row.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  body[data-page="subject-register"] .reg-wizard-actions,
+  .crm-page[data-page="subject-register"] .reg-wizard-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body[data-page="subject-register"] .reg-wizard-actions .uk-button,
+  .crm-page[data-page="subject-register"] .reg-wizard-actions .uk-button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  body[data-page="subject-register"] .reg-wizard-actions .reg-back,
+  .crm-page[data-page="subject-register"] .reg-wizard-actions .reg-back {
+    margin-left: 0;
+  }
+}

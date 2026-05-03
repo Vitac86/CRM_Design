@@ -94,7 +94,9 @@
   height: 100%;
 }
 
-.crm-page[data-page="brokerage"] .crm-filter-search-input {
+/* Selector raised to (0,5,0) to beat the filters.css .crm-page.crm-registry-page
+   rule that inadvertently overrides padding to 0 14px, causing icon overlap. */
+.crm-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-search-input {
   width: 100%;
   min-height: 40px;
   height: 40px;
