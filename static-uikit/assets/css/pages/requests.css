@@ -38,6 +38,64 @@
   padding-top: 0;
 }
 
+/* Create Request Panel */
+.crm-page[data-page="requests"] .crm-request-create {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 18px;
+  border-radius: 12px;
+  border-color: #d9e3f1;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15,23,42,.08);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.crm-page[data-page="requests"] .crm-request-create[hidden] {
+  display: none;
+}
+
+.crm-page[data-page="requests"] .crm-request-create-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 14px 16px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.crm-page[data-page="requests"] .crm-request-create-field {
+  min-width: 0;
+}
+
+.crm-page[data-page="requests"] .crm-request-create .uk-form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.crm-page[data-page="requests"] .crm-request-create .crm-input,
+.crm-page[data-page="requests"] .crm-request-create .crm-select {
+  width: 100%;
+  max-width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.crm-page[data-page="requests"] .crm-request-create-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
 /* Filter Panel */
 .crm-page[data-page="requests"] .crm-requests-shell .crm-registry-filters.crm-filter-panel {
   padding: 14px;
@@ -328,3 +386,31 @@
 
 /* Mobile Rules
    Shared responsive rules handle the current requests mobile layout. */
+@media (max-width: 768px) {
+  .crm-page[data-page="requests"] .crm-requests-actions,
+  .crm-page[data-page="requests"] .crm-request-create-actions {
+    width: 100%;
+  }
+
+  .crm-page[data-page="requests"] .crm-requests-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .crm-page[data-page="requests"] .crm-request-create {
+    padding: 14px;
+  }
+
+  .crm-page[data-page="requests"] .crm-request-create-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page[data-page="requests"] .crm-request-create-actions {
+    justify-content: stretch;
+  }
+
+  .crm-page[data-page="requests"] .crm-request-create-actions .crm-button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}

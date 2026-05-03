@@ -267,6 +267,42 @@
     });
   }
 
+  const REQUEST_CREATE_CLOSED_TEXT = 'Создать поручение';
+  const REQUEST_CREATE_OPEN_TEXT = 'Закрыть форму';
+
+  function isRequestsPage() {
+    return !!(document.body && document.body.dataset.page === 'requests');
+  }
+
+  function getRequestCreatePanel() {
+    if (!isRequestsPage()) return null;
+    return document.getElementById('request-create-panel') || document.querySelector('[data-entity="request-create-panel"]');
+  }
+
+  function getRequestCreateToggle() {
+    if (!isRequestsPage()) return null;
+    return document.querySelector('[data-action="toggle-request-create"]');
+  }
+
+  function setRequestCreatePanelOpen(isOpen, shouldFocus) {
+    const panel = getRequestCreatePanel();
+    const toggleButton = getRequestCreateToggle();
+
+    if (panel) {
+      panel.hidden = !isOpen;
+    }
+
+    if (toggleButton) {
+      toggleButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggleButton.textContent = isOpen ? REQUEST_CREATE_OPEN_TEXT : REQUEST_CREATE_CLOSED_TEXT;
+    }
+
+    if (isOpen && shouldFocus && panel) {
+      const firstControl = panel.querySelector('input:not([type="hidden"]), select, textarea');
+      if (firstControl) firstControl.focus();
+    }
+  }
+
   function initFilterMenus() {
     document.querySelectorAll('.crm-filter-menu').forEach(function (filterMenu) {
       syncFilterMenuState(filterMenu);
@@ -410,6 +446,23 @@
       const authForm = authSubmit.closest('[data-auth-form]');
       if (authForm) {
         validateAuthForm(authForm);
+        event.preventDefault();
+        return;
+      }
+    }
+
+    if (isRequestsPage()) {
+      const requestCreateToggle = target.closest('[data-action="toggle-request-create"]');
+      if (requestCreateToggle) {
+        const panel = getRequestCreatePanel();
+        setRequestCreatePanelOpen(!!(panel && panel.hidden), true);
+        event.preventDefault();
+        return;
+      }
+
+      const requestCreateClose = target.closest('[data-action="close-request-create"]');
+      if (requestCreateClose) {
+        setRequestCreatePanelOpen(false, false);
         event.preventDefault();
         return;
       }
@@ -571,6 +624,10 @@
     const form = event.target;
     if (form.matches('[data-form]')) {
       event.preventDefault();
+    }
+
+    if (isRequestsPage() && form.matches('[data-form="request-create"]')) {
+      setRequestCreatePanelOpen(false, false);
     }
   });
 
