@@ -391,64 +391,84 @@
 
 /* Brokerage mobile override: keep filter panel content-driven and compact */
 @media (max-width: 480px) {
-  .crm-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel {
+    display: flex;
+    flex-direction: column;
     min-height: 0;
     height: auto;
     align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 10px;
   }
 
-  .crm-page[data-page="brokerage"] .crm-filter-search-row {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-search-row {
     width: 100%;
     margin: 0;
   }
 
-  .crm-page[data-page="brokerage"] .crm-filter-search-shell {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-search-shell {
     width: 100%;
     max-width: 100%;
   }
 
-  .crm-page[data-page="brokerage"] .crm-filter-search-shell .crm-filter-search-input {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-search-shell .crm-filter-search-input {
     width: 100%;
     max-width: 100%;
-    padding-left: 36px;
+    min-width: 0;
+    padding-left: 44px;
     box-sizing: border-box;
   }
 
-  .crm-page[data-page="brokerage"] .crm-filter-fields-row {
-    display: grid;
-    grid-template-columns: 1fr;
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-fields-row {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
     gap: 8px;
     align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 0;
+    height: auto;
   }
 
-  .crm-page[data-page="brokerage"] .crm-filter-control,
-  .crm-page[data-page="brokerage"] .crm-filter-pill-control {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-field,
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-pill-control {
     min-width: 0;
     width: 100%;
     max-width: 100%;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
+    grid-column: auto;
   }
 
-  .crm-page[data-page="brokerage"] .crm-brokerage-filter-actions,
-  .crm-page[data-page="brokerage"] .crm-filter-actions {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-brokerage-filter-actions,
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-actions {
     min-height: 0;
     height: auto;
     margin: 0;
     padding: 0;
-    grid-column: 1 / -1;
+    width: auto;
+    max-width: 100%;
+    align-self: flex-start;
+    flex: 0 0 auto;
+    grid-column: auto;
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
     gap: 8px;
   }
 
-  .crm-page[data-page="brokerage"] .crm-brokerage-filter-actions .uk-button,
-  .crm-page[data-page="brokerage"] .crm-filter-actions .uk-button {
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-brokerage-filter-actions .uk-button,
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-actions .uk-button,
+  .crm-page.crm-registry-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-reset {
     flex: 0 0 auto;
     width: auto;
     max-width: 100%;
     min-height: 36px;
+    white-space: nowrap;
   }
 }
 
