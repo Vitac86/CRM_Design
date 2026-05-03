@@ -1,3 +1,4 @@
+/* 1. Shared compliance variables / page shell */
 .crm-page[data-page="compliance"] {
   --compliance-header-bg: #e8edfb;
   --compliance-header-border: #dbe2f0;
@@ -26,6 +27,8 @@
   box-sizing: border-box;
 }
 
+
+/* 2. Compliance registry header and actions */
 .crm-page[data-page="compliance"] .crm-compliance-header {
   align-items: center;
   gap: 12px;
@@ -39,6 +42,8 @@
   margin: 0;
 }
 
+
+/* 3. Compliance registry filters */
 .crm-page[data-page="compliance"] .crm-registry-filters.crm-filter-panel {
   padding: 14px;
   gap: 12px;
@@ -49,6 +54,8 @@
 }
 
 
+
+/* 4. Search input */
 .crm-page[data-page="compliance"] .crm-filter-search-row {
   display: block;
   width: 100%;
@@ -174,6 +181,8 @@
   font-size: 13px;
 }
 
+
+/* 5. Registry table card and wrapper */
 .crm-page[data-page="compliance"] .crm-table-card.crm-compliance-registry {
   overflow: hidden;
   border-radius: 10px;
@@ -181,6 +190,8 @@
   background: #ffffff;
 }
 
+
+/* 6. Registry table structure and scrollbars */
 .crm-page[data-page="compliance"] .crm-table-wrapper.crm-compliance-table {
   width: 100%;
   max-width: 100%;
@@ -220,14 +231,9 @@
   margin-bottom: 0;
 }
 
-@media (max-width: 1280px) {
-  .crm-page[data-page="compliance"] .crm-filter-actions {
-    margin-left: 0;
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
 
+
+/* 7. Registry table header */
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table thead,
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table thead tr,
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table thead th {
@@ -272,6 +278,8 @@
   font-size: 11px;
 }
 
+
+/* 8. Registry table body */
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table tbody,
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table tbody tr,
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table tbody td {
@@ -305,7 +313,6 @@
   color: #1b2b46;
 }
 
-/* Compact table chip overrides — compliance registry only */
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge {
   min-height: 20px;
   padding: 2px 7px;
@@ -346,19 +353,12 @@
   border-color: #c8d2e4;
 }
 
-/* ── Noise-reduction overrides — compliance registry ────────────────────────
-   Резидент and Полный комплект are secondary attributes; neutral chips keep
-   color emphasis on the Статус комплаенса column only.
-*/
-
-/* Резидент — always neutral */
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-entity="badge-residency"] {
   background: #eaeff7;
   color: #455572;
   border-color: #c8d2e4;
 }
 
-/* Полный комплект — Да: neutral */
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="yes"],
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="да"] {
   background: #eaeff7;
@@ -366,7 +366,6 @@
   border-color: #c8d2e4;
 }
 
-/* Полный комплект — Частично: mild warm tint */
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="partial"],
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="частично"] {
   background: #fdf7e8;
@@ -374,7 +373,6 @@
   border-color: #e4d09c;
 }
 
-/* Полный комплект — Нет: soft negative */
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="no"],
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-badge[data-status="нет"] {
   background: #fce8ec;
@@ -382,7 +380,106 @@
   border-color: #e8b2ba;
 }
 
-/* Compliance card page styles */
+
+
+/* 9. Registry footer and pagination */
+.crm-page[data-page="compliance"] .crm-compliance-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-page-size,
+.crm-page[data-page="compliance"] .crm-compliance-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #607494;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-chip {
+  min-width: 36px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  background: #ffffff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #4e6383;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-chip.is-active {
+  border-color: #8ea5c9;
+  background: #dce8f8;
+  color: #203a61;
+  font-weight: 600;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-page {
+  font-size: 12px;
+  color: #4f6483;
+  margin-right: 2px;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #4f6483;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-chip,
+.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button {
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-chip:hover {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-chip:focus-visible,
+.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-chip:active {
+  background: #edf2fb;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button:hover:not(:disabled) {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button:disabled {
+  cursor: not-allowed;
+  color: #a0aec0;
+  border-color: #dbe2f0;
+  background: #f3f6fb;
+}
+
+/* 10. Compliance card/detail shell */
 .crm-decision-hero {
   border-left: 4px solid #d3def8;
 }
@@ -399,6 +496,8 @@
   margin-bottom: 2px;
 }
 
+
+/* 11. Compliance profile/details cards */
 .crm-doc-checklist {
   display: grid;
   gap: 8px;
@@ -427,6 +526,8 @@
   color: #5e6f8c;
 }
 
+
+/* 12. Compliance decision panel */
 .crm-decision-panel {
   position: sticky;
   top: calc(var(--crm-topbar-h) + 12px);
@@ -435,6 +536,8 @@
   gap: 12px;
 }
 
+
+/* 13. Compliance card forms/actions */
 .crm-decision-actions {
   display: grid;
   grid-template-columns: 1fr;
@@ -469,19 +572,7 @@
   margin-top: auto;
 }
 
-@media (max-width: 920px) {
-  .crm-decision-panel {
-    position: static;
-  }
-}
 
-/* ====================================================
-   Compliance Card page  (data-page="compliance-card")
-   All rules scoped to this page only — do NOT touch
-   .crm-page[data-page="compliance"] list page.
-   ==================================================== */
-
-/* ── Profile card ───────────────────────────────────── */
 
 .crm-page[data-page="compliance-card"] .crm-compliance-profile-card {
   padding: 20px 24px;
@@ -582,8 +673,6 @@
   line-height: 1.4;
 }
 
-/* ── Two-column detail layout ────────────────────────── */
-
 .crm-page[data-page="compliance-card"] .crm-compliance-detail-layout {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -598,8 +687,6 @@
   flex-direction: column;
   gap: 0;
 }
-
-/* ── Info cards (identification / contacts / kyc) ─────── */
 
 .crm-page[data-page="compliance-card"] .crm-compliance-info-card {
   padding: 20px 22px;
@@ -662,8 +749,6 @@
   color: #1b2b46;
   line-height: 1.4;
 }
-
-/* ── Decision panel ──────────────────────────────────── */
 
 .crm-page[data-page="compliance-card"] .crm-compliance-decision-panel {
   padding: 20px 20px;
@@ -775,7 +860,21 @@
   gap: 8px;
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+/* 14. Mobile rules for registry */
+@media (max-width: 1280px) {
+  .crm-page[data-page="compliance"] .crm-filter-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* 15. Mobile rules for compliance-card */
+@media (max-width: 920px) {
+  .crm-decision-panel {
+    position: static;
+  }
+}
 
 @media (max-width: 1100px) {
   .crm-page[data-page="compliance-card"] .crm-compliance-detail-layout {
@@ -821,100 +920,4 @@
   .crm-page[data-page="compliance-card"] .crm-compliance-info-grid {
     grid-template-columns: 1fr 1fr;
   }
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-table-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 4px 0;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-page-size,
-.crm-page[data-page="compliance"] .crm-compliance-footer-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-caption {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: #607494;
-  margin-right: 2px;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-chip {
-  min-width: 36px;
-  height: 32px;
-  border: 1px solid #c8d4e6;
-  background: #ffffff;
-  border-radius: 10px;
-  font-size: 13px;
-  color: #4e6383;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-chip.is-active {
-  border-color: #8ea5c9;
-  background: #dce8f8;
-  color: #203a61;
-  font-weight: 600;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-page {
-  font-size: 12px;
-  color: #4f6483;
-  margin-right: 2px;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #c8d4e6;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #4f6483;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 1;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-chip,
-.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button {
-  cursor: pointer;
-  transition: border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-chip:hover {
-  border-color: #b8c6de;
-  background: #f8fbff;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-chip:focus-visible,
-.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-chip:active {
-  background: #edf2fb;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button:hover:not(:disabled) {
-  border-color: #b8c6de;
-  background: #f8fbff;
-}
-
-.crm-page[data-page="compliance"] .crm-compliance-footer-nav-button:disabled {
-  cursor: not-allowed;
-  color: #a0aec0;
-  border-color: #dbe2f0;
-  background: #f3f6fb;
 }

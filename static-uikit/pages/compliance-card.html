@@ -10,7 +10,7 @@
 <body data-page="compliance-card">
 <div class="crm-app">
   <div class="crm-layout">
-        <aside class="crm-sidebar" data-entity="layout-sidebar">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
       <div class="crm-sidebar-brand">
         <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
       </div>
@@ -53,13 +53,39 @@
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button
+          class="uk-button uk-button-default"
+          type="button"
+          data-sidebar-toggle
+          aria-label="Открыть меню"
+        >
+          <span uk-icon="menu"></span>
+        </button>
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input
+            class="uk-input crm-input"
+            type="search"
+            name="global-search"
+            placeholder="Глобальный поиск"
+            autocomplete="off"
+          />
+        </div>
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
 
       <section class="crm-page" data-page="compliance-card">
-        <div class="crm-breadcrumbs"><a href="compliance.html">Комплаенс</a><span uk-icon="chevron-right"></span><span>Проверка CL-4408</span></div>
+        <div class="crm-breadcrumbs">
+          <a href="compliance.html">Комплаенс</a>
+          <span uk-icon="chevron-right"></span>
+          <span>Проверка CL-4408</span>
+        </div>
 
         <!-- ── Client profile card ── -->
         <article class="crm-card crm-compliance-profile-card">
@@ -240,11 +266,48 @@
             <!-- Documents table -->
             <article class="crm-card crm-table crm-table-wrapper">
               <table class="uk-table uk-table-divider">
-                <thead><tr><th>Документ</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Документ</th>
+                    <th>Статус</th>
+                    <th>Комментарий</th>
+                    <th>Дата</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr><td><div class="crm-row-main">Устав компании</div><div class="crm-row-sub">DOC-3117</div></td><td><span class="crm-badge success" data-status="approved">Проверен</span></td><td>Актуальная редакция</td><td>24.04.2026</td></tr>
-                  <tr><td><div class="crm-row-main">Анкета KYC</div><div class="crm-row-sub">DOC-3118</div></td><td><span class="crm-badge info" data-status="pending-review">На проверке</span></td><td>Нет обновлённого телефона</td><td>24.04.2026</td></tr>
-                  <tr><td><div class="crm-row-main">Сведения о бенефициарах</div><div class="crm-row-sub">DOC-3120</div></td><td><span class="crm-badge warning" data-status="rework">На доработке</span></td><td>Нужна расшифровка доли участия</td><td>23.04.2026</td></tr>
+                  <tr>
+                    <td>
+                      <div class="crm-row-main">Устав компании</div>
+                      <div class="crm-row-sub">DOC-3117</div>
+                    </td>
+                    <td>
+                      <span class="crm-badge success" data-status="approved">Проверен</span>
+                    </td>
+                    <td>Актуальная редакция</td>
+                    <td>24.04.2026</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="crm-row-main">Анкета KYC</div>
+                      <div class="crm-row-sub">DOC-3118</div>
+                    </td>
+                    <td>
+                      <span class="crm-badge info" data-status="pending-review">На проверке</span>
+                    </td>
+                    <td>Нет обновлённого телефона</td>
+                    <td>24.04.2026</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="crm-row-main">Сведения о бенефициарах</div>
+                      <div class="crm-row-sub">DOC-3120</div>
+                    </td>
+                    <td>
+                      <span class="crm-badge warning" data-status="rework">На доработке</span>
+                    </td>
+                    <td>Нужна расшифровка доли участия</td>
+                    <td>23.04.2026</td>
+                  </tr>
                 </tbody>
               </table>
             </article>
@@ -260,9 +323,30 @@
             </div>
 
             <div class="crm-compliance-panel-actions">
-              <button type="button" class="uk-button crm-button-primary crm-button crm-compliance-panel-btn" data-action="compliance-decision" data-status="approved">Одобрить</button>
-              <button type="button" class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-rework" data-action="compliance-decision" data-status="rework">На доработку</button>
-              <button type="button" class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-block" data-action="compliance-decision" data-status="blocked">Заблокировать</button>
+              <button
+                type="button"
+                class="uk-button crm-button-primary crm-button crm-compliance-panel-btn"
+                data-action="compliance-decision"
+                data-status="approved"
+              >
+                Одобрить
+              </button>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-rework"
+                data-action="compliance-decision"
+                data-status="rework"
+              >
+                На доработку
+              </button>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-block"
+                data-action="compliance-decision"
+                data-status="blocked"
+              >
+                Заблокировать
+              </button>
             </div>
 
             <div class="crm-compliance-panel-divider"></div>
@@ -286,13 +370,32 @@
 
             <div class="crm-compliance-panel-comment">
               <label class="uk-form-label" for="compliance-comment">Комментарий</label>
-              <textarea class="uk-textarea crm-input" id="compliance-comment" name="compliance-comment" rows="4" placeholder="Обоснование решения"></textarea>
+              <textarea
+                class="uk-textarea crm-input"
+                id="compliance-comment"
+                name="compliance-comment"
+                rows="4"
+                placeholder="Обоснование решения"
+              ></textarea>
               <span class="crm-field-note">Обязателен для «На доработку» и «Заблокировать».</span>
             </div>
 
             <div class="crm-compliance-panel-footer">
-              <button type="button" class="uk-button uk-button-default crm-button crm-compliance-panel-btn" data-action="save-draft">Сохранить черновик</button>
-              <button type="submit" class="uk-button crm-button-primary crm-button crm-compliance-panel-btn" data-action="compliance-decision" data-status="approved">Принять финальное решение</button>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-compliance-panel-btn"
+                data-action="save-draft"
+              >
+                Сохранить черновик
+              </button>
+              <button
+                type="submit"
+                class="uk-button crm-button-primary crm-button crm-compliance-panel-btn"
+                data-action="compliance-decision"
+                data-status="approved"
+              >
+                Принять финальное решение
+              </button>
             </div>
 
           </aside><!-- /.crm-compliance-decision-panel -->
