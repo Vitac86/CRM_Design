@@ -3,9 +3,25 @@
 ## Scope
 - `static-uikit/` is the handoff target.
 - `static-uikit/INDEX.html` is the launcher for the standalone prototype pages.
-- `src/` React/Vite files are not the source of truth for this static handoff.
-- UMI/P0/P1 packs were removed from final handoff scope.
+- React/Vite is not the source of truth for this static handoff.
 - `administration.html` is placeholder / developer-owned.
+
+## Final handoff package
+- `INDEX.html`
+- `README.md`
+- `pages/`
+- `assets/`
+
+## Not included in final handoff
+- UMI/P0/P1 packs
+- `partials/`
+- `HANDOFF_MANIFEST.json`
+- stale validation tools
+- React/Vite source files
+- `src/`
+- `public/`
+- `package.json`
+- `vite.config.*`
 
 ## How to open
 From the repo root:
@@ -31,6 +47,10 @@ Open:
 ```text
 http://localhost:8080/INDEX.html
 ```
+
+Open the project via uppercase `INDEX.html`. Do not assume lowercase `index.html` works on case-sensitive servers.
+
+No `npm run build` is required for the static handoff.
 
 ## Folder structure
 - `INDEX.html` - launcher.
