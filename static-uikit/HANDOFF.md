@@ -6,7 +6,7 @@
 
 The **static UMI Kit is the handoff reference** for this phase. The React/Vite app (`src/`) is not the source of truth for this static prototype delivery.
 
-- **static-uikit/index.html** is the launcher and page directory
+- **static-uikit/INDEX.html** is the launcher and page directory
 - **pages/*** are standalone static HTML prototypes for visual/behavioral reference
 - Pages are **not production-ready app routes** — they contain sample data and prototype interactions only
 - Static pages are designed for developer/designer review and hand-off validation
@@ -17,7 +17,7 @@ The **static UMI Kit is the handoff reference** for this phase. The React/Vite a
 ## B. Directory Overview
 
 ### Root files
-- **static-uikit/index.html** — Launcher page listing all demo pages, UMI packs, and validation commands
+- **static-uikit/INDEX.html** — Launcher page listing all demo pages, UMI packs, and validation commands
 
 ### Pages directory
 - **static-uikit/pages/*.html** — Individual standalone prototype pages (see Page Inventory below)
@@ -31,7 +31,9 @@ The **static UMI Kit is the handoff reference** for this phase. The React/Vite a
 - **static-uikit/assets/css/print.css** — Print stylesheet
 - **static-uikit/assets/js/uikit.min.js** — Compiled UIKit JS framework
 - **static-uikit/assets/js/crm-static.js** — CRM static prototype behaviors (see JS Inventory below)
-- **static-uikit/assets/vendor/** — Third-party dependencies (fonts, icons, vendor libraries)
+- **static-uikit/assets/fonts/** — Inter, Inter Tight, Montserrat font files (Cyrillic + Latin)
+- **static-uikit/assets/icons/** — SVG icon sprites
+- **static-uikit/assets/brand/** — Logo and brand assets
 
 ### UMI Extraction Packs (reference only)
 - **static-uikit/umi-p0/** — P0 priority extraction/reference pack; do not manually edit
@@ -267,9 +269,9 @@ The static kit implements the following core UI patterns consistently:
 - **Responsive**: Media queries in `responsive.css`
 
 ### Vendor & Icons
-- Fonts: Inter, Inter Tight, Montserrat (in `assets/vendor/fonts/` and `assets/fonts/`)
+- Fonts: Inter, Inter Tight, Montserrat (in `assets/fonts/`)
 - Icons: SVG sprite in `assets/icons/crm-sidebar-icons.svg`
-- UIKit framework: `assets/vendor/` or embedded in `uikit.min.css/js`
+- UIKit framework: embedded in `uikit.min.css` / `uikit.min.js`
 
 ---
 
@@ -372,7 +374,7 @@ The static kit implements the following core UI patterns consistently:
 - React app may diverge; static kit is frozen for this phase
 
 ### ⚠️ File modifications
-- **Do not** edit vendor files (UIKit, fonts, icons in `assets/vendor/`)
+- **Do not** edit UIKit framework files (`uikit.min.css`, `uikit.min.js`) or font/icon assets in `assets/fonts/`, `assets/icons/`
 - **Do not** manually edit UMI generated packs (`umi-p0/`, `umi-p1/`) unless approved
 - Do not manually edit UMI extraction/reference packs (`umi-p0/`, `umi-p1/`) unless explicitly requested.
 - static-uikit/pages/ is the primary editable reference; packs are generated/reference only
