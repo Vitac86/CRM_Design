@@ -1,4 +1,4 @@
-/* ── Middle Office – shared layout ──────────────────────────────────── */
+/* Middle Office: shared variables and shell */
 body[data-page="middle-office-clients"],
 body[data-page="middle-office-reports"] {
   --mo-shell-border: #d7e2f2;
@@ -17,6 +17,7 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
+/* Middle Office: shared page header and actions */
 .crm-mo-page .crm-page-title {
   font-size: 30px;
   font-weight: 600;
@@ -50,7 +51,7 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   font-weight: 500;
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────────────── */
+/* Middle Office: shared toolbar */
 .crm-mo-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -59,6 +60,7 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   padding: 12px 14px;
 }
 
+/* Middle Office: toolbar search input */
 .crm-mo-toolbar-search {
   flex: 1 1 200px;
   min-width: 0;
@@ -105,6 +107,7 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   box-shadow: none;
 }
 
+/* Middle Office: toolbar filters and selects */
 .crm-mo-toolbar-filters {
   display: flex;
   flex-wrap: wrap;
@@ -130,9 +133,8 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   outline: none;
 }
 
-/* ── Clients table ───────────────────────────────────────────────────── */
-
-/* Contain the wide table inside the shell — prevent page-level horizontal scroll */
+/* Middle Office clients: table card and wrapper */
+/* Keep the wide clients table contained inside its card, not the page. */
 body[data-page="middle-office-clients"] .crm-mo-shell {
   min-width: 0;
   overflow-x: hidden;
@@ -152,7 +154,8 @@ body[data-page="middle-office-clients"] .crm-table-card .crm-table-wrapper {
   scrollbar-gutter: auto;
 }
 
-/* Reset the inner crm-table overflow so the wrapper is the single scroll context */
+/* Middle Office clients: table structure and scrollbars */
+/* The wrapper remains the single horizontal scroll context. */
 body[data-page="middle-office-clients"] .crm-table-card .crm-table {
   overflow: visible;
 }
@@ -165,6 +168,7 @@ body[data-page="middle-office-clients"] .crm-table .uk-table {
   min-width: 1240px;
 }
 
+/* Middle Office clients: table header */
 body[data-page="middle-office-clients"] .crm-table .uk-table thead,
 body[data-page="middle-office-clients"] .crm-table .uk-table thead tr,
 body[data-page="middle-office-clients"] .crm-table .uk-table thead th {
@@ -183,6 +187,7 @@ body[data-page="middle-office-clients"] .crm-table .uk-table th {
   white-space: nowrap;
 }
 
+/* Middle Office clients: table body */
 body[data-page="middle-office-clients"] .crm-table .uk-table td {
   padding: 10px 12px;
   vertical-align: middle;
@@ -201,13 +206,104 @@ body[data-page="middle-office-clients"] .crm-table tbody tr:hover {
   cursor: pointer;
 }
 
+/* Middle Office clients: permissions chips */
 .crm-mo-permissions {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
 }
 
-/* ── Reports split layout ────────────────────────────────────────────── */
+/* Middle Office clients: footer and pagination */
+body[data-page="middle-office-clients"] .crm-mo-clients-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 4px 0;
+  background: transparent;
+  border: 0;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-page-size,
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  color: #607494;
+  margin-right: 2px;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip {
+  min-width: 36px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #4e6383;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip.is-active {
+  border-color: #8ea5c9;
+  background: #dce8f8;
+  color: #203a61;
+  font-weight: 600;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip:hover {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip:focus-visible,
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-page {
+  font-size: 12px;
+  color: #4f6483;
+  margin-right: 2px;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  border-radius: 10px;
+  background: #fff;
+  color: #4f6483;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button:hover:not(:disabled) {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button:disabled {
+  cursor: not-allowed;
+  color: #a0aec0;
+  border-color: #dbe2f0;
+  background: #f3f6fb;
+}
+
+/* Middle Office reports: split layout */
 .crm-mo-split {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -215,8 +311,8 @@ body[data-page="middle-office-clients"] .crm-table tbody tr:hover {
   align-items: start;
 }
 
-/* Reports page: list is primary (65–67%), details panel is secondary (33–35%) */
 body[data-page="middle-office-reports"] .crm-mo-split {
+  /* List is primary; the detail panel stays secondary. */
   grid-template-columns: 2fr 1fr;
 }
 
@@ -226,7 +322,7 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   gap: 10px;
 }
 
-/* ── Report list ─────────────────────────────────────────────────────── */
+/* Middle Office reports: list */
 .crm-mo-report-list-wrap {
   border: 1px solid var(--crm-border);
   border-radius: 10px;
@@ -325,7 +421,7 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   color: #60718c;
 }
 
-/* ── Details panel ───────────────────────────────────────────────────── */
+/* Middle Office reports: details panel */
 .crm-mo-details-card {
   border: 1px solid var(--crm-border);
   border-radius: 10px;
@@ -376,6 +472,7 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   color: var(--crm-danger);
 }
 
+/* Middle Office reports: file card and actions */
 .crm-mo-file-card {
   border: 1px solid var(--crm-border);
   border-radius: 6px;
@@ -420,7 +517,7 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   flex-wrap: wrap;
 }
 
-/* ── Toast ───────────────────────────────────────────────────────────── */
+/* Middle Office: toast */
 .crm-mo-toast {
   position: fixed;
   right: 24px;
@@ -444,7 +541,10 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   pointer-events: auto;
 }
 
-/* ── Responsive ──────────────────────────────────────────────────────── */
+/* Middle Office clients: mobile rules */
+/* Client mobile behavior is handled by shared responsive CSS; no page-specific overrides here. */
+
+/* Middle Office reports: mobile rules */
 @media (max-width: 1024px) {
   body[data-page="middle-office-reports"] .crm-mo-split {
     grid-template-columns: 2fr 1fr;
@@ -464,15 +564,3 @@ body[data-page="middle-office-reports"] .crm-mo-split {
     grid-template-columns: 1fr;
   }
 }
-
-body[data-page="middle-office-clients"] .crm-mo-clients-table-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 4px 0; background:transparent; border:0; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-page-size, body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav { display:flex; align-items:center; gap:8px; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-caption { font-size:11px; font-weight:600; letter-spacing:.05em; color:#607494; margin-right:2px; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip { min-width:36px; height:32px; border:1px solid #c8d4e6; background:#fff; border-radius:10px; font-size:13px; color:#4e6383; cursor:pointer; transition:border-color .18s ease, background-color .18s ease, color .18s ease; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip.is-active { border-color:#8ea5c9; background:#dce8f8; color:#203a61; font-weight:600; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip:hover { border-color:#b8c6de; background:#f8fbff; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-chip:focus-visible, body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(59,130,246,.2); }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-page { font-size:12px; color:#4f6483; margin-right:2px; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button { width:32px; height:32px; border:1px solid #c8d4e6; border-radius:10px; background:#fff; color:#4f6483; display:inline-flex; align-items:center; justify-content:center; font-size:16px; line-height:1; cursor:pointer; transition:border-color .18s ease, background-color .18s ease; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button:hover:not(:disabled) { border-color:#b8c6de; background:#f8fbff; }
-body[data-page="middle-office-clients"] .crm-mo-clients-footer-nav-button:disabled { cursor:not-allowed; color:#a0aec0; border-color:#dbe2f0; background:#f3f6fb; }

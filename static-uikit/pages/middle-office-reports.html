@@ -54,9 +54,31 @@
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button
+          class="uk-button uk-button-default"
+          type="button"
+          data-sidebar-toggle
+          aria-label="Открыть меню"
+        >
+          <span uk-icon="menu"></span>
+        </button>
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input
+            class="uk-input crm-input"
+            type="search"
+            name="global-search"
+            placeholder="Глобальный поиск"
+            autocomplete="off"
+          />
+        </div>
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
 
       <section class="crm-page crm-mo-page" data-page="middle-office-reports">
@@ -69,7 +91,13 @@
               <p class="crm-page-subtitle">Журнал отправленных отчётов</p>
             </div>
             <div class="crm-header-actions">
-              <button type="button" class="uk-button uk-button-default crm-button crm-button-secondary" data-action="export-mo-reports">Экспорт</button>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-button-secondary"
+                data-action="export-mo-reports"
+              >
+                Экспорт
+              </button>
             </div>
           </div>
 
@@ -89,7 +117,14 @@
                         <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                       </svg>
                     </span>
-                    <input id="mo-reports-search" class="uk-input" type="search" data-filter="report-search" placeholder="Поиск по клиенту или отчёту..." autocomplete="off"/>
+                    <input
+                      id="mo-reports-search"
+                      class="uk-input"
+                      type="search"
+                      data-filter="report-search"
+                      placeholder="Поиск по клиенту или отчёту..."
+                      autocomplete="off"
+                    />
                   </label>
                 </div>
                 <div class="crm-mo-toolbar-filters">
@@ -110,7 +145,9 @@
               <div class="crm-mo-report-list-wrap" data-entity="mo-report-list">
 
                 <!-- Report 1 -->
-                <button type="button" class="crm-mo-report-item"
+                <button
+                  type="button"
+                  class="crm-mo-report-item"
                   data-client="ООО «Альфа Инвест»"
                   data-client-code="КЛ-001"
                   data-report-title="Квартальный отчёт по брокерскому счёту"
@@ -129,7 +166,9 @@
                     <span class="crm-mo-report-item-name">ООО «Альфа Инвест»</span>
                     <span class="crm-mo-report-item-date">14.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">Квартальный отчёт по брокерскому счёту</div>
+                  <div class="crm-mo-report-item-title">
+                    Квартальный отчёт по брокерскому счёту
+                  </div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">E-mail</span>
                     <span class="crm-badge muted">Брокерский</span>
@@ -138,7 +177,9 @@
                 </button>
 
                 <!-- Report 2 (active) -->
-                <button type="button" class="crm-mo-report-item is-active"
+                <button
+                  type="button"
+                  class="crm-mo-report-item is-active"
                   data-client="АО «Север Капитал»"
                   data-client-code="КЛ-003"
                   data-report-title="Отчёт об операциях с ЦБ за март 2026"
@@ -157,7 +198,9 @@
                     <span class="crm-mo-report-item-name">АО «Север Капитал»</span>
                     <span class="crm-mo-report-item-date">15.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">Отчёт об операциях с ЦБ за март 2026</div>
+                  <div class="crm-mo-report-item-title">
+                    Отчёт об операциях с ЦБ за март 2026
+                  </div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">E-mail</span>
                     <span class="crm-badge muted">Брокерский</span>
@@ -166,7 +209,9 @@
                 </button>
 
                 <!-- Report 3 -->
-                <button type="button" class="crm-mo-report-item"
+                <button
+                  type="button"
+                  class="crm-mo-report-item"
                   data-client="Смирнов А.И."
                   data-client-code="КЛ-002"
                   data-report-title="Налоговый отчёт 2025"
@@ -185,7 +230,9 @@
                     <span class="crm-mo-report-item-name">Смирнов А.И.</span>
                     <span class="crm-mo-report-item-date">10.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">Налоговый отчёт 2025</div>
+                  <div class="crm-mo-report-item-title">
+                    Налоговый отчёт 2025
+                  </div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">Личный кабинет</span>
                     <span class="crm-badge muted">Налоговый</span>
@@ -194,7 +241,9 @@
                 </button>
 
                 <!-- Report 4 -->
-                <button type="button" class="crm-mo-report-item"
+                <button
+                  type="button"
+                  class="crm-mo-report-item"
                   data-client="Петров К.С."
                   data-client-code="КЛ-004"
                   data-report-title="Брокерский отчёт за Q1 2026"
@@ -213,7 +262,9 @@
                     <span class="crm-mo-report-item-name">Петров К.С.</span>
                     <span class="crm-mo-report-item-date">09.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">Брокерский отчёт за Q1 2026</div>
+                  <div class="crm-mo-report-item-title">
+                    Брокерский отчёт за Q1 2026
+                  </div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">E-mail</span>
                     <span class="crm-badge muted">Брокерский</span>
@@ -222,7 +273,9 @@
                 </button>
 
                 <!-- Report 5 -->
-                <button type="button" class="crm-mo-report-item"
+                <button
+                  type="button"
+                  class="crm-mo-report-item"
                   data-client="ООО «Регион Брокер»"
                   data-client-code="КЛ-007"
                   data-report-title="Сводный отчёт ДУ за март 2026"
@@ -241,7 +294,9 @@
                     <span class="crm-mo-report-item-name">ООО «Регион Брокер»</span>
                     <span class="crm-mo-report-item-date">07.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">Сводный отчёт ДУ за март 2026</div>
+                  <div class="crm-mo-report-item-title">
+                    Сводный отчёт ДУ за март 2026
+                  </div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">Личный кабинет</span>
                     <span class="crm-badge muted">ДУ</span>
@@ -259,48 +314,70 @@
 
             <!-- Right: detail panel (pre-populated with report 2 — АО «Север Капитал») -->
             <div class="crm-mo-details-card">
-              <h2 class="crm-mo-details-title" data-detail="title">Отчёт об операциях с ЦБ за март 2026</h2>
+              <h2 class="crm-mo-details-title" data-detail="title">
+                Отчёт об операциях с ЦБ за март 2026
+              </h2>
 
               <div class="crm-mo-details-grid">
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Клиент</p>
-                  <p class="crm-mo-detail-field-value" data-detail="client">АО «Север Капитал»</p>
+                  <p class="crm-mo-detail-field-value" data-detail="client">
+                    АО «Север Капитал»
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Код клиента</p>
-                  <p class="crm-mo-detail-field-value" data-detail="client-code">КЛ-003</p>
+                  <p class="crm-mo-detail-field-value" data-detail="client-code">
+                    КЛ-003
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Тип отчёта</p>
-                  <p class="crm-mo-detail-field-value" data-detail="report-type">Брокерский</p>
+                  <p class="crm-mo-detail-field-value" data-detail="report-type">
+                    Брокерский
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Период</p>
-                  <p class="crm-mo-detail-field-value" data-detail="period">Март 2026</p>
+                  <p class="crm-mo-detail-field-value" data-detail="period">
+                    Март 2026
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Способ отправки</p>
-                  <p class="crm-mo-detail-field-value" data-detail="channel">E-mail</p>
+                  <p class="crm-mo-detail-field-value" data-detail="channel">
+                    E-mail
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Статус</p>
-                  <p class="crm-mo-detail-field-value crm-mo-status-ok" data-detail="status">Доставлен</p>
+                  <p class="crm-mo-detail-field-value crm-mo-status-ok" data-detail="status">
+                    Доставлен
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Время отправки</p>
-                  <p class="crm-mo-detail-field-value" data-detail="sent-at">15.04.2026 09:12</p>
+                  <p class="crm-mo-detail-field-value" data-detail="sent-at">
+                    15.04.2026 09:12
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Адрес</p>
-                  <p class="crm-mo-detail-field-value" data-detail="address">capital@severcap.ru</p>
+                  <p class="crm-mo-detail-field-value" data-detail="address">
+                    capital@severcap.ru
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Договор</p>
-                  <p class="crm-mo-detail-field-value" data-detail="contract">ДУ-2022-012</p>
+                  <p class="crm-mo-detail-field-value" data-detail="contract">
+                    ДУ-2022-012
+                  </p>
                 </div>
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Сформировал</p>
-                  <p class="crm-mo-detail-field-value" data-detail="created-by">Иванов И.И.</p>
+                  <p class="crm-mo-detail-field-value" data-detail="created-by">
+                    Иванов И.И.
+                  </p>
                 </div>
               </div>
 
@@ -312,14 +389,30 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="crm-mo-file-name" data-detail="file-name">report_sever_capital_2026_03.pdf</p>
-                  <p class="crm-mo-file-size" data-detail="file-size">248 КБ</p>
+                  <p class="crm-mo-file-name" data-detail="file-name">
+                    report_sever_capital_2026_03.pdf
+                  </p>
+                  <p class="crm-mo-file-size" data-detail="file-size">
+                    248 КБ
+                  </p>
                 </div>
               </div>
 
               <div class="crm-mo-details-actions">
-                <button type="button" class="uk-button uk-button-default crm-button" data-action="resend-report">Отправить повторно</button>
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="download-report">Скачать</button>
+                <button
+                  type="button"
+                  class="uk-button uk-button-default crm-button"
+                  data-action="resend-report"
+                >
+                  Отправить повторно
+                </button>
+                <button
+                  type="button"
+                  class="uk-button crm-button-primary crm-button"
+                  data-action="download-report"
+                >
+                  Скачать
+                </button>
               </div>
             </div>
 

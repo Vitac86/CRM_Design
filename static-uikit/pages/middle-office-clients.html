@@ -54,9 +54,31 @@
 
     <main class="crm-main">
       <header class="crm-topbar">
-        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
-        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
-        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+        <button
+          class="uk-button uk-button-default"
+          type="button"
+          data-sidebar-toggle
+          aria-label="Открыть меню"
+        >
+          <span uk-icon="menu"></span>
+        </button>
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input
+            class="uk-input crm-input"
+            type="search"
+            name="global-search"
+            placeholder="Глобальный поиск"
+            autocomplete="off"
+          />
+        </div>
+        <div class="crm-user">
+          <div>
+            <div>Иванов И.И.</div>
+            <small>менеджер</small>
+          </div>
+          <div class="crm-avatar">ИИ</div>
+        </div>
       </header>
 
       <section class="crm-page crm-mo-page" data-page="middle-office-clients">
@@ -69,7 +91,13 @@
               <p class="crm-page-subtitle">Журнал клиентов</p>
             </div>
             <div class="crm-header-actions">
-              <button type="button" class="uk-button uk-button-default crm-button crm-button-secondary" data-action="export-mo-clients">Экспорт</button>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-button-secondary"
+                data-action="export-mo-clients"
+              >
+                Экспорт
+              </button>
             </div>
           </div>
 
@@ -83,7 +111,14 @@
                     <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                   </svg>
                 </span>
-                <input id="mo-clients-search" class="uk-input" type="search" data-filter="search" placeholder="Поиск по коду, клиенту, ИНН или договору..." autocomplete="off"/>
+                <input
+                  id="mo-clients-search"
+                  class="uk-input"
+                  type="search"
+                  data-filter="search"
+                  placeholder="Поиск по коду, клиенту, ИНН или договору..."
+                  autocomplete="off"
+                />
               </label>
             </div>
             <div class="crm-mo-toolbar-filters">
@@ -106,7 +141,13 @@
                 <option value="Открыт">Открыт</option>
                 <option value="Закрыт">Закрыт</option>
               </select>
-              <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost" data-action="reset-mo-clients-filters">Сбросить фильтры</button>
+              <button
+                type="button"
+                class="uk-button uk-button-default crm-button crm-button-ghost"
+                data-action="reset-mo-clients-filters"
+              >
+                Сбросить фильтры
+              </button>
             </div>
           </div>
 
@@ -130,7 +171,72 @@
                   </colgroup>
                   <thead>
                     <tr>
-                      <th data-sort-key="client-code" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Вид договора</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="client-name" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Наименование клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="inn" data-sort-type="number" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">ИНН</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="client-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Тип клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement-number" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Номер договора</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="agreement-date" data-sort-type="date" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Дата договора</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="residency" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус резидентства</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="account-type" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Тип счёта</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="account-status" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус счёта</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th><th data-sort-key="rights" data-sort-type="text" aria-sort="none"><button type="button" class="crm-th-sort-button"><span class="crm-th-label">Права ДС / ЦБ</span><span class="crm-th-sort" aria-hidden="true">▾</span></button></th>
+                      <th data-sort-key="client-code" data-sort-type="number" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Код клиента</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="agreement-type" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Вид договора</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="client-name" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Наименование клиента</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="inn" data-sort-type="number" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">ИНН</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="client-type" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Тип клиента</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="agreement-number" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Номер договора</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="agreement-date" data-sort-type="date" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Дата договора</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="residency" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Статус резидентства</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="account-type" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Тип счёта</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="account-status" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Статус счёта</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th data-sort-key="rights" data-sort-type="text" aria-sort="none">
+                        <button type="button" class="crm-th-sort-button">
+                          <span class="crm-th-label">Права ДС / ЦБ</span>
+                          <span class="crm-th-sort" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody data-role="mo-clients-tbody">
@@ -145,13 +251,24 @@
                       <td>БО</td>
                       <td>ООО «Альфа Инвест»</td>
                       <td>7701234567</td>
-                      <td><span class="crm-badge muted">Юр. лицо</span></td>
+                      <td>
+                        <span class="crm-badge muted">Юр. лицо</span>
+                      </td>
                       <td>БД-2021-001</td>
                       <td>15.01.2021</td>
-                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>
+                        <span class="crm-badge success">Резидент РФ</span>
+                      </td>
                       <td>обычный</td>
-                      <td><span class="crm-badge success">Открыт</span></td>
-                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                      <td>
+                        <span class="crm-badge success">Открыт</span>
+                      </td>
+                      <td>
+                        <div class="crm-mo-permissions">
+                          <span class="crm-badge success">ДС: Да</span>
+                          <span class="crm-badge success">ЦБ: Да</span>
+                        </div>
+                      </td>
                     </tr>
                     <tr
                       data-href="subject-card.html"
@@ -164,13 +281,24 @@
                       <td>ИИС</td>
                       <td>Смирнов Алексей Иванович</td>
                       <td>501234567890</td>
-                      <td><span class="crm-badge info">Физ. лицо</span></td>
+                      <td>
+                        <span class="crm-badge info">Физ. лицо</span>
+                      </td>
                       <td>БД-2021-045</td>
                       <td>20.02.2021</td>
-                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>
+                        <span class="crm-badge success">Резидент РФ</span>
+                      </td>
                       <td>ИИС</td>
-                      <td><span class="crm-badge success">Открыт</span></td>
-                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                      <td>
+                        <span class="crm-badge success">Открыт</span>
+                      </td>
+                      <td>
+                        <div class="crm-mo-permissions">
+                          <span class="crm-badge success">ДС: Да</span>
+                          <span class="crm-badge success">ЦБ: Да</span>
+                        </div>
+                      </td>
                     </tr>
                     <tr
                       data-href="subject-card.html"
@@ -183,13 +311,24 @@
                       <td>ДУ</td>
                       <td>АО «Север Капитал»</td>
                       <td>7712345678</td>
-                      <td><span class="crm-badge muted">Юр. лицо</span></td>
+                      <td>
+                        <span class="crm-badge muted">Юр. лицо</span>
+                      </td>
                       <td>ДУ-2022-012</td>
                       <td>10.05.2022</td>
-                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>
+                        <span class="crm-badge success">Резидент РФ</span>
+                      </td>
                       <td>обычный</td>
-                      <td><span class="crm-badge success">Открыт</span></td>
-                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge muted">ЦБ: Нет</span></div></td>
+                      <td>
+                        <span class="crm-badge success">Открыт</span>
+                      </td>
+                      <td>
+                        <div class="crm-mo-permissions">
+                          <span class="crm-badge success">ДС: Да</span>
+                          <span class="crm-badge muted">ЦБ: Нет</span>
+                        </div>
+                      </td>
                     </tr>
                     <tr
                       data-href="subject-card.html"
@@ -202,13 +341,24 @@
                       <td>Депозитарный</td>
                       <td>Петров Кирилл Сергеевич</td>
                       <td>502345678901</td>
-                      <td><span class="crm-badge info">Физ. лицо</span></td>
+                      <td>
+                        <span class="crm-badge info">Физ. лицо</span>
+                      </td>
                       <td>ДП-2020-088</td>
                       <td>05.11.2020</td>
-                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>
+                        <span class="crm-badge success">Резидент РФ</span>
+                      </td>
                       <td>обычный</td>
-                      <td><span class="crm-badge muted">Закрыт</span></td>
-                      <td><div class="crm-mo-permissions"><span class="crm-badge muted">ДС: Нет</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                      <td>
+                        <span class="crm-badge muted">Закрыт</span>
+                      </td>
+                      <td>
+                        <div class="crm-mo-permissions">
+                          <span class="crm-badge muted">ДС: Нет</span>
+                          <span class="crm-badge success">ЦБ: Да</span>
+                        </div>
+                      </td>
                     </tr>
                     <tr
                       data-href="subject-card.html"
@@ -221,13 +371,24 @@
                       <td>БО</td>
                       <td>ИП Захарова М.А.</td>
                       <td>770112345678</td>
-                      <td><span class="crm-badge warning">ИП</span></td>
+                      <td>
+                        <span class="crm-badge warning">ИП</span>
+                      </td>
                       <td>БД-2023-007</td>
                       <td>18.03.2023</td>
-                      <td><span class="crm-badge success">Резидент РФ</span></td>
+                      <td>
+                        <span class="crm-badge success">Резидент РФ</span>
+                      </td>
                       <td>обычный</td>
-                      <td><span class="crm-badge success">Открыт</span></td>
-                      <td><div class="crm-mo-permissions"><span class="crm-badge success">ДС: Да</span><span class="crm-badge success">ЦБ: Да</span></div></td>
+                      <td>
+                        <span class="crm-badge success">Открыт</span>
+                      </td>
+                      <td>
+                        <div class="crm-mo-permissions">
+                          <span class="crm-badge success">ДС: Да</span>
+                          <span class="crm-badge success">ЦБ: Да</span>
+                        </div>
+                      </td>
                     </tr>
                     <tr
                       data-href="subject-card.html"
@@ -240,31 +401,77 @@
                       <td>Дилерский</td>
                       <td>Новикова Елена Павловна</td>
                       <td>503456789012</td>
-                      <td><span class="crm-badge info">Физ. лицо</span></td>
+                      <td>
+                        <span class="crm-badge info">Физ. лицо</span>
+                      </td>
                       <td>ДЛ-2019-021</td>
                       <td>12.09.2019</td>
-                      <td><span class="crm-badge muted">Нерезидент</span></td>
+                      <td>
+                        <span class="crm-badge muted">Нерезидент</span>
+                      </td>
                       <td>обычный</td>
-                      <td><span class="crm-badge muted">Закрыт</span></td>
-                      <td><div class="crm-mo-permissions"><span class="crm-badge muted">ДС: Нет</span><span class="crm-badge muted">ЦБ: Нет</span></div></td>
+                      <td>
+                        <span class="crm-badge muted">Закрыт</span>
+                      </td>
+                      <td>
+                        <div class="crm-mo-permissions">
+                          <span class="crm-badge muted">ДС: Нет</span>
+                          <span class="crm-badge muted">ЦБ: Нет</span>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
-          <div class="crm-mo-clients-table-footer" aria-label="Навигация по таблице">
-            <div class="crm-mo-clients-footer-page-size" data-page-size-group>
-              <span class="crm-mo-clients-footer-caption">СТРОК НА СТРАНИЦЕ</span>
-              <button type="button" class="crm-mo-clients-footer-chip crm-footer-chip is-active" data-page-size-value="25" aria-pressed="true">25</button>
-              <button type="button" class="crm-mo-clients-footer-chip crm-footer-chip" data-page-size-value="50" aria-pressed="false">50</button>
-              <button type="button" class="crm-mo-clients-footer-chip crm-footer-chip" data-page-size-value="100" aria-pressed="false">100</button>
+            <div class="crm-mo-clients-table-footer" aria-label="Навигация по таблице">
+              <div class="crm-mo-clients-footer-page-size" data-page-size-group>
+                <span class="crm-mo-clients-footer-caption">СТРОК НА СТРАНИЦЕ</span>
+                <button
+                  type="button"
+                  class="crm-mo-clients-footer-chip crm-footer-chip is-active"
+                  data-page-size-value="25"
+                  aria-pressed="true"
+                >
+                  25
+                </button>
+                <button
+                  type="button"
+                  class="crm-mo-clients-footer-chip crm-footer-chip"
+                  data-page-size-value="50"
+                  aria-pressed="false"
+                >
+                  50
+                </button>
+                <button
+                  type="button"
+                  class="crm-mo-clients-footer-chip crm-footer-chip"
+                  data-page-size-value="100"
+                  aria-pressed="false"
+                >
+                  100
+                </button>
+              </div>
+              <div class="crm-mo-clients-footer-nav">
+                <span class="crm-mo-clients-footer-page">1 из 1</span>
+                <button
+                  type="button"
+                  class="crm-mo-clients-footer-nav-button"
+                  aria-label="Предыдущая страница"
+                  disabled
+                >
+                  <span aria-hidden="true">‹</span>
+                </button>
+                <button
+                  type="button"
+                  class="crm-mo-clients-footer-nav-button"
+                  aria-label="Следующая страница"
+                  disabled
+                >
+                  <span aria-hidden="true">›</span>
+                </button>
+              </div>
             </div>
-            <div class="crm-mo-clients-footer-nav">
-              <span class="crm-mo-clients-footer-page">1 из 1</span>
-              <button type="button" class="crm-mo-clients-footer-nav-button" aria-label="Предыдущая страница" disabled><span aria-hidden="true">‹</span></button>
-              <button type="button" class="crm-mo-clients-footer-nav-button" aria-label="Следующая страница" disabled><span aria-hidden="true">›</span></button>
-            </div>
-          </div>
             <div class="crm-empty-state" data-entity="mo-clients-empty" hidden>
               <p class="crm-empty-state-title">Записи не найдены</p>
               <p class="crm-empty-state-text">По заданным фильтрам клиенты не найдены. Измените параметры поиска или сбросьте фильтры.</p>
