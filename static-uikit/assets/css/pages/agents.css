@@ -390,6 +390,71 @@
   margin-top: 16px;
 }
 
+.crm-page[data-page="agents"] .crm-agents-subject-wrap {
+  position: relative;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-lookup {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #fff;
+  border: 1px solid #c8d8f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(15,23,42,.10);
+  overflow: hidden;
+  max-height: 232px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #9ba9bf #e9eef8;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-top: 1px solid #eef2f9;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.3;
+  transition: background-color .1s ease;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-option:first-child {
+  border-top: 0;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-option:hover,
+.crm-page[data-page="agents"] .crm-agents-subject-option:focus-visible {
+  background: #f0f5ff;
+  outline: none;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-option-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-option-meta {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.crm-page[data-page="agents"] .crm-agents-subject-lookup-empty {
+  padding: 14px 12px;
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+}
+
 .crm-page[data-page="agents"] .crm-agents-form-help {
   margin: 2px 0 0;
   font-size: 11px;

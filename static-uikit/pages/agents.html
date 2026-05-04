@@ -220,17 +220,19 @@
               <div class="crm-agents-form-grid">
                 <div class="crm-agents-form-field">
                   <label class="crm-agents-form-label" for="agent-org">Физическое лицо / Организация</label>
-                  <input
-                    id="agent-org"
-                    class="uk-input crm-input crm-agents-form-input"
-                    type="search"
-                    name="agent-subject"
-                    placeholder="ИНН, наименование или ФИО"
-                    autocomplete="off"
-                    data-entity="agent-subject-search"
-                    data-search-scope="subjects"
-                    data-action="search-agent-subject"
-                  />
+                  <div class="crm-agents-subject-wrap">
+                    <input
+                      id="agent-org"
+                      class="uk-input crm-input crm-agents-form-input"
+                      type="search"
+                      name="agent-subject"
+                      placeholder="ИНН, наименование или ФИО"
+                      autocomplete="off"
+                      data-entity="agent-subject-search"
+                      data-search-scope="subjects"
+                      data-action="search-agent-subject"
+                    />
+                  </div>
                   <p class="crm-agents-form-help">Начните вводить ИНН, наименование или ФИО субъекта.</p>
                   <div class="crm-agents-subject-preview" data-entity="agent-subject-result" hidden>
                     <span>Выбран: АО «Восток Майнинг Системс» · ИНН 7704132901</span>
@@ -266,6 +268,7 @@
                   </select>
                 </div>
               </div>
+              <input type="hidden" name="agent-subject-id" data-entity="agent-subject-id" />
               <div class="crm-agents-form-actions">
                 <button
                   type="button"

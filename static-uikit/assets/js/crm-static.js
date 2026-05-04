@@ -1466,4 +1466,163 @@
     toggleButton.setAttribute('aria-pressed', makeVisible ? 'true' : 'false');
   });
 
+  // ── Agent subject static lookup (agents.html only) ───────────────────────
+  // Scoped to body[data-page="agents"] / [data-form="agent-create"].
+  // UMI.CMS will replace this with a real server-side subject autocomplete.
+  (function () {
+    if (!(document.body && document.body.dataset.page === 'agents')) return;
+
+    var form = document.querySelector('[data-form="agent-create"]');
+    if (!form) return;
+
+    var input = form.querySelector('[data-entity="agent-subject-search"]');
+    if (!input) return;
+
+    var wrap = input.closest('.crm-agents-subject-wrap');
+    if (!wrap) return;
+
+    var resultBlock = form.querySelector('[data-entity="agent-subject-result"]');
+
+    var hiddenId = document.createElement('input');
+    hiddenId.type = 'hidden';
+    hiddenId.name = 'agent-subject-id';
+    hiddenId.setAttribute('data-entity', 'agent-subject-id');
+    form.appendChild(hiddenId);
+
+    var lookup = document.createElement('div');
+    lookup.className = 'crm-agents-subject-lookup';
+    lookup.setAttribute('data-entity', 'agent-subject-lookup');
+    lookup.setAttribute('role', 'listbox');
+    lookup.setAttribute('aria-label', 'Результаты поиска субъекта');
+    lookup.hidden = true;
+    wrap.appendChild(lookup);
+
+    var SUBJECTS = [
+      { id: 'S-001', name: 'АО «Восток Майнинг Системс»',      inn: '7704132901',   type: 'Юр. лицо' },
+      { id: 'S-002', name: 'АО «Глобал Ресурс Траст»',          inn: '7705964812',   type: 'Юр. лицо' },
+      { id: 'S-003', name: 'Громова Алина Сергеевна',            inn: '502113742889', type: 'Физ. лицо' },
+      { id: 'S-004', name: 'ООО «Север Логистик Капитал»',       inn: '7812054881',   type: 'Юр. лицо' },
+      { id: 'S-005', name: 'ИП Мартынов Кирилл Андреевич',      inn: '772608314579', type: 'ИП' },
+      { id: 'S-006', name: 'Романова Дарья Алексеевна',          inn: '503228776514', type: 'Физ. лицо' }
+    ];
+
+    var isSelected = false;
+
+    function normalizeSubjectQuery(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/ё/g, 'е');
+    }
+
+    function getSubjectMatches(query) {
+      var q = normalizeSubjectQuery(query);
+      if (!q) return [];
+      var tokens = q.split(' ').filter(Boolean);
+      return SUBJECTS.filter(function (s) {
+        var haystack = normalizeSubjectQuery(s.name + ' ' + s.inn + ' ' + s.type);
+        return tokens.every(function (token) { return haystack.indexOf(token) !== -1; });
+      });
+    }
+
+    function closeLookup() {
+      lookup.hidden = true;
+      lookup.innerHTML = '';
+    }
+
+    function clearSelection() {
+      isSelected = false;
+      hiddenId.value = '';
+      if (resultBlock) resultBlock.hidden = true;
+    }
+
+    function selectSubject(subject) {
+      isSelected = true;
+      input.value = subject.name;
+      hiddenId.value = subject.id;
+      closeLookup();
+      if (resultBlock) {
+        var span = resultBlock.querySelector('span');
+        if (span) span.textContent = 'Выбран: ' + subject.name + ' · ИНН ' + subject.inn;
+        resultBlock.hidden = false;
+      }
+    }
+
+    function openLookup(query) {
+      var matches = getSubjectMatches(query);
+      lookup.innerHTML = '';
+
+      if (!matches.length) {
+        var empty = document.createElement('div');
+        empty.className = 'crm-agents-subject-lookup-empty';
+        empty.textContent = 'Ничего не найдено';
+        lookup.appendChild(empty);
+        lookup.hidden = false;
+        return;
+      }
+
+      matches.forEach(function (subject) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'crm-agents-subject-option';
+        btn.setAttribute('role', 'option');
+        btn.setAttribute('data-action', 'select-agent-subject');
+        btn.setAttribute('data-subject-id', subject.id);
+        btn.setAttribute('data-subject-name', subject.name);
+        btn.setAttribute('data-subject-inn', subject.inn);
+        btn.setAttribute('data-subject-type', subject.type);
+
+        var nameEl = document.createElement('span');
+        nameEl.className = 'crm-agents-subject-option-name';
+        nameEl.textContent = subject.name;
+
+        var metaEl = document.createElement('span');
+        metaEl.className = 'crm-agents-subject-option-meta';
+        metaEl.textContent = 'ИНН ' + subject.inn + ' · ' + subject.type;
+
+        btn.appendChild(nameEl);
+        btn.appendChild(metaEl);
+
+        btn.addEventListener('mousedown', function (event) {
+          event.preventDefault();
+        });
+        btn.addEventListener('click', function () {
+          selectSubject(subject);
+        });
+
+        lookup.appendChild(btn);
+      });
+
+      lookup.hidden = false;
+    }
+
+    input.addEventListener('input', function () {
+      var query = input.value.trim();
+      if (isSelected) clearSelection();
+      if (!query) { closeLookup(); return; }
+      openLookup(query);
+    });
+
+    input.addEventListener('focus', function () {
+      var query = input.value.trim();
+      if (query && !isSelected) openLookup(query);
+    });
+
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeLookup();
+        input.blur();
+      }
+    });
+
+    wrap.addEventListener('focusout', function () {
+      window.setTimeout(function () {
+        if (!wrap.contains(document.activeElement)) closeLookup();
+      }, 160);
+    });
+
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!(target instanceof Element)) return;
+      if (!wrap.contains(target)) closeLookup();
+    });
+  }());
+
 })();
