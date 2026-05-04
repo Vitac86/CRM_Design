@@ -1,19 +1,9 @@
 /* Contract edit page shell */
 
-/* Header / breadcrumbs / title area */
-
 /* Contract summary / status area */
 body[data-page="contract-edit"] .crm-contract-edit-summary {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-
-/* Form cards and sections */
-
-/* Form grids and fields */
-
-/* Date fields */
-
-/* Status / badge / alert states */
 
 /* Action buttons / footer actions */
 body[data-page="contract-edit"] .crm-contract-edit-actions {

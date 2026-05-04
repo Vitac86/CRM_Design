@@ -184,26 +184,6 @@ body[data-page="subject-edit"] .crm-edit-checkboxes .crm-check-row:hover {
   border-color: var(--crm-umi-primary);
 }
 
-/* Date fields */
-
-/* Date field layout is provided by the shared crm-date-field rules. */
-
-/* Sticky/footer actions */
-
-/* No page-specific sticky/footer action rules are required here. */
-
-/* Legal entity page-specific rules */
-
-/* Legal entity edit currently uses the shared rules above. */
-
-/* Individual page-specific rules */
-
-/* Individual edit currently uses the shared rules above. */
-
-/* Validation/error states */
-
-/* No page-specific validation state rules are currently present. */
-
 /* Form comments */
 
 body[data-page="subject-edit"] .crm-edit-textarea {
