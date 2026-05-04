@@ -1121,17 +1121,304 @@
 
     return a.text.localeCompare(b.text, 'ru', { numeric: true, sensitivity: 'base' });
   }
-  // ── Global search navigation ─────────────────────────────────────────────
-  var globalSearchInput = document.querySelector('input[name="global-search"]');
-  if (globalSearchInput) {
-    globalSearchInput.addEventListener('keydown', function (event) {
-      if (event.key !== 'Enter') return;
-      event.preventDefault();
-      var query = globalSearchInput.value.trim();
-      if (!query) return;
-      window.location.href = 'search-results.html?q=' + encodeURIComponent(query);
+  // ── Global search preview and navigation ────────────────────────────────
+  var GLOBAL_SEARCH_MAX_RESULTS = 8;
+  var GLOBAL_SEARCH_DATA = [
+    {
+      code: 'CL-4401',
+      title: 'АО «Восток Майнинг Системс»',
+      category: 'Субъект',
+      meta: 'Юридическое лицо · ИНН 7701234567 · Брокерский договор BR-8821',
+      status: 'Активен',
+      statusClass: 'info',
+      href: 'subject-card.html',
+      search: 'CL-4401 АО Восток Майнинг Системс субъект юридическое лицо ИНН 7701234567 BR-8821 P-24108 ao vostok mining'
+    },
+    {
+      code: 'CL-4412',
+      title: 'Громова Алина Сергеевна',
+      category: 'Субъект',
+      meta: 'Физическое лицо · Договор ДУ-8839 · Доверительное управление',
+      status: 'Активен',
+      statusClass: 'info',
+      href: 'subject-card.html',
+      search: 'CL-4412 Громова Алина Сергеевна физическое лицо ДУ-8839 субъект trust management'
+    },
+    {
+      code: 'BR-8821',
+      title: 'Брокерский договор',
+      category: 'Договор',
+      meta: 'АО «Восток Майнинг Системс» · CL-4401 · Открыт 12.01.2024',
+      status: 'Активен',
+      statusClass: 'info',
+      href: 'contract-edit.html',
+      search: 'BR-8821 брокерский договор АО Восток Майнинг Системс CL-4401 contract ao'
+    },
+    {
+      code: 'P-24108',
+      title: 'Вывод денежных средств',
+      category: 'Поручение',
+      meta: 'АО «Восток Майнинг Системс» · CL-4401 · 24.04.2026',
+      status: 'Ожидает',
+      statusClass: 'warning',
+      href: 'requests.html',
+      search: 'P-24108 поручение вывод ДС АО Восток Майнинг Системс CL-4401 request req'
+    },
+    {
+      code: 'P-24103',
+      title: 'Перевод ценных бумаг',
+      category: 'Поручение',
+      meta: 'Громова А.С. · CL-4412 · 23.04.2026',
+      status: 'Принято',
+      statusClass: 'info',
+      href: 'requests.html',
+      search: 'P-24103 поручение перевод ЦБ Громова CL-4412 request req'
+    },
+    {
+      code: 'KYC-2024-0041',
+      title: 'Проверка KYC',
+      category: 'Комплаенс',
+      meta: 'АО «Восток Майнинг Системс» · CL-4401 · Обновлено 20.04.2026',
+      status: 'На проверке',
+      statusClass: 'warning',
+      href: 'compliance-card.html',
+      search: 'KYC-2024-0041 комплаенс проверка KYC АО Восток Майнинг Системс CL-4401 compliance ao'
+    },
+    {
+      code: 'AML-2024-0018',
+      title: 'Плановая AML-проверка',
+      category: 'Комплаенс',
+      meta: 'Громова А.С. · CL-4412 · Завершено 05.03.2026',
+      status: 'Пройдено',
+      statusClass: 'info',
+      href: 'compliance-card.html',
+      search: 'AML-2024-0018 комплаенс AML Громова CL-4412 compliance'
+    },
+    {
+      code: 'INV-1011',
+      title: 'АО «Восток Майнинг Системс»',
+      category: 'Трейдинг',
+      meta: 'Торговый профиль · BR-2026/00444 · QUIK / WebQUIK',
+      status: 'Квал',
+      statusClass: 'success',
+      href: 'trading-card.html',
+      search: 'INV-1011 АО Восток Майнинг Системс торговый профиль BR-2026/00444 QUIK WebQUIK trading inv ao'
+    },
+    {
+      code: 'INV-1012',
+      title: 'АО «Глобал Ресурс Траст»',
+      category: 'Трейдинг',
+      meta: 'Торговый профиль · BR-2026/00412 · Распорядитель Иванов И.И.',
+      status: 'Активен',
+      statusClass: 'success',
+      href: 'trading-card.html',
+      search: 'INV-1012 АО Глобал Ресурс Траст Иванов И.И. торговый профиль WebQUIK trading inv ao'
+    },
+    {
+      code: 'AR-00182',
+      title: 'Расторжение договора BR-7012',
+      category: 'Архив',
+      meta: 'Клиент CL-4388 · Архивировано 14.02.2026',
+      status: 'Архивировано',
+      statusClass: 'success',
+      href: 'archive.html',
+      search: 'AR-00182 архив договор BR-7012 клиент CL-4388 archive'
+    },
+    {
+      code: 'КЛ-003',
+      title: 'Отчёт об операциях с ЦБ за март 2026',
+      category: 'Отчёт',
+      meta: 'АО «Север Капитал» · ДУ-2022-012 · Создал Иванов И.И.',
+      status: 'Доставлен',
+      statusClass: 'success',
+      href: 'middle-office-reports.html',
+      search: 'КЛ-003 отчет отчёт операции ЦБ АО Север Капитал ДУ-2022-012 Иванов middle office report'
+    },
+    {
+      code: 'DEP-CL-910204',
+      title: 'DEP_daily_CL-910204_2026-04-21_0745.xlsx',
+      category: 'Депозитарий',
+      meta: 'АО «Восток Майнинг Системс» · CL-910204 · Создал Иванов И.И.',
+      status: 'Сформирован',
+      statusClass: 'muted',
+      href: 'depository.html',
+      search: 'DEP_daily_CL-910204_2026-04-21_0745.xlsx депозитарий АО Восток Майнинг Системс Иванов report dep ao'
+    }
+  ];
+
+  function normalizeGlobalSearchValue(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/ё/g, 'е');
+  }
+
+  function getPageHref(pageName, query) {
+    var inPagesDir = /\/pages\/[^/]*$/i.test(window.location.pathname.replace(/\\/g, '/'));
+    var prefix = inPagesDir ? '' : 'pages/';
+    var href = prefix + pageName;
+    if (query) href += '?q=' + encodeURIComponent(query);
+    return href;
+  }
+
+  function getGlobalSearchItemHref(item) {
+    if (!item || !item.href) return '#';
+    if (/^(https?:|#|mailto:|tel:)/i.test(item.href)) return item.href;
+    var inPagesDir = /\/pages\/[^/]*$/i.test(window.location.pathname.replace(/\\/g, '/'));
+    return (inPagesDir ? '' : 'pages/') + item.href;
+  }
+
+  function getGlobalSearchMatches(query) {
+    var normalizedQuery = normalizeGlobalSearchValue(query);
+    if (!normalizedQuery) return GLOBAL_SEARCH_DATA.slice(0, GLOBAL_SEARCH_MAX_RESULTS);
+
+    var tokens = normalizedQuery.split(' ').filter(Boolean);
+    return GLOBAL_SEARCH_DATA.filter(function (item) {
+      var haystack = normalizeGlobalSearchValue([
+        item.code,
+        item.title,
+        item.category,
+        item.meta,
+        item.status,
+        item.search
+      ].join(' '));
+
+      return tokens.every(function (token) {
+        return haystack.indexOf(token) !== -1;
+      });
+    }).slice(0, GLOBAL_SEARCH_MAX_RESULTS);
+  }
+
+  function appendGlobalSearchText(parent, className, text) {
+    var node = document.createElement('span');
+    node.className = className;
+    node.textContent = text;
+    parent.appendChild(node);
+    return node;
+  }
+
+  function renderGlobalSearchPreview(resultsNode, matches, query) {
+    resultsNode.innerHTML = '';
+
+    if (!matches.length) {
+      var empty = document.createElement('div');
+      empty.className = 'crm-search-preview-empty';
+      empty.textContent = query ? 'Ничего не найдено' : 'Начните вводить запрос';
+      resultsNode.appendChild(empty);
+      return;
+    }
+
+    matches.forEach(function (item) {
+      var link = document.createElement('a');
+      link.className = 'crm-search-preview-item';
+      link.href = getGlobalSearchItemHref(item);
+
+      var body = document.createElement('span');
+      body.className = 'crm-search-preview-body';
+
+      appendGlobalSearchText(body, 'crm-search-preview-code', item.code);
+      appendGlobalSearchText(body, 'crm-search-preview-title', item.title);
+
+      var meta = document.createElement('span');
+      meta.className = 'crm-search-preview-meta';
+      meta.textContent = item.category + ' · ' + item.meta;
+      body.appendChild(meta);
+
+      link.appendChild(body);
+
+      if (item.status) {
+        var status = document.createElement('span');
+        status.className = 'crm-badge ' + (item.statusClass || 'muted') + ' crm-search-preview-status';
+        status.textContent = item.status;
+        link.appendChild(status);
+      }
+
+      resultsNode.appendChild(link);
     });
   }
+
+  function initGlobalSearchPreview(input) {
+    if (!(input instanceof HTMLInputElement) || input.dataset.globalSearchReady === 'true') return;
+
+    var shell = input.closest('.crm-search');
+    if (!shell) return;
+
+    input.dataset.globalSearchReady = 'true';
+    input.setAttribute('data-role', 'global-search-input');
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-expanded', 'false');
+    shell.setAttribute('data-entity', 'global-search');
+
+    var previewId = 'global-search-preview-' + Math.random().toString(36).slice(2, 9);
+    var preview = document.createElement('div');
+    preview.className = 'crm-search-preview';
+    preview.hidden = true;
+    preview.id = previewId;
+    preview.setAttribute('data-role', 'global-search-preview');
+
+    var results = document.createElement('div');
+    results.className = 'crm-search-preview-results';
+    results.setAttribute('data-role', 'global-search-results');
+    preview.appendChild(results);
+
+    var footer = document.createElement('a');
+    footer.className = 'crm-search-preview-view-all';
+    footer.setAttribute('data-role', 'global-search-view-all');
+    footer.textContent = 'Показать все результаты';
+    preview.appendChild(footer);
+
+    input.setAttribute('aria-controls', previewId);
+    shell.appendChild(preview);
+
+    function updateFooterHref() {
+      footer.href = getPageHref('search-results.html', input.value.trim());
+    }
+
+    function openPreview() {
+      var query = input.value.trim();
+      renderGlobalSearchPreview(results, getGlobalSearchMatches(query), query);
+      updateFooterHref();
+      preview.hidden = false;
+      shell.classList.add('is-search-preview-open');
+      input.setAttribute('aria-expanded', 'true');
+    }
+
+    function closePreview() {
+      preview.hidden = true;
+      shell.classList.remove('is-search-preview-open');
+      input.setAttribute('aria-expanded', 'false');
+    }
+
+    input.addEventListener('focus', openPreview);
+    input.addEventListener('input', openPreview);
+
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closePreview();
+        input.blur();
+        return;
+      }
+
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      var query = input.value.trim();
+      if (!query) return;
+      window.location.href = getPageHref('search-results.html', query);
+    });
+
+    shell.addEventListener('focusout', function () {
+      window.setTimeout(function () {
+        if (!shell.contains(document.activeElement)) closePreview();
+      }, 160);
+    });
+
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!(target instanceof Element)) return;
+      if (!shell.contains(target)) closePreview();
+    });
+
+    updateFooterHref();
+  }
+
+  document.querySelectorAll('input[name="global-search"]').forEach(initGlobalSearchPreview);
 
   document.addEventListener('click', function (event) {
     var target = event.target;
