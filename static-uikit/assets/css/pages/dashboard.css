@@ -220,6 +220,17 @@
   white-space: nowrap;
 }
 
+.crm-dashboard-subject-changes-table th:first-child,
+.crm-dashboard-subject-changes-table td:first-child {
+  width: 38%;
+}
+
+.crm-dashboard-subject-changes-table th:last-child,
+.crm-dashboard-subject-changes-table td:last-child {
+  white-space: normal;
+  word-break: break-word;
+}
+
 .crm-dashboard-table tbody tr {
   transition: background-color 0.14s ease;
 }
