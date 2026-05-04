@@ -1434,6 +1434,22 @@
   white-space: nowrap;
 }
 
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper {
+  padding: 0;
+  background: #f8fafc;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table-wrapper .crm-table {
+  background: transparent;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  background: #ffffff;
+}
+
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table thead,
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table thead tr,
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table thead th {
@@ -1454,6 +1470,12 @@
   text-transform: none;
   vertical-align: middle;
   white-space: nowrap;
+}
+
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table tbody,
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table tbody tr,
+.crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table tbody td {
+  background: #ffffff;
 }
 
 .crm-page[data-page="subject-card"] [data-tab-panel="documents"] .crm-table .uk-table.crm-documents-table thead th:first-child {
