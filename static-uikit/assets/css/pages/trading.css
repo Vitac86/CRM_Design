@@ -64,19 +64,6 @@ body[data-page="trading-card"] {
   line-height: 1.35;
 }
 
-.crm-page[data-page="trading"] .crm-button-export-light {
-  min-height: 36px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px !important;
-  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
-  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
-  color: var(--crm-umi-text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: none;
-}
-
 /* 3. Trading registry filters */
 
 /* (0,5,0) — beats global filters.css (0,4,0) */
