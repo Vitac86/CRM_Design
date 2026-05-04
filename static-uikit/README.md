@@ -79,6 +79,15 @@ Page-specific scripts (active only when the matching HTML file explicitly links 
 - `subject-register.html` → `assets/js/pages/subject-register.js`
 - `trading-card.html` → `assets/js/pages/trading-card.js`
 
+## Page-specific CSS
+`crm-static.css` already bundles most page CSS via `@import`. The files below are **not** included in `crm-static.css` and are loaded only when their matching page explicitly links them:
+
+- `login.html`, `register.html`, `forgot-password.html` → `assets/css/pages/auth.css`
+- `agents.html` → `assets/css/pages/agents.css`
+- `depository.html` → `assets/css/pages/depository.css`
+
+Some other pages (e.g. `subjects.html`, `compliance.html`, `archive.html`, `subject-card.html`) also carry a direct `<link>` for their page CSS even though `crm-static.css` already imports the same file. These are harmless duplicates; do not remove without a visual check.
+
 ## Page inventory
 Auth:
 
