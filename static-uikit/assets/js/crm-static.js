@@ -122,6 +122,206 @@
     panel.classList.toggle('is-filter-menu-open', hasOpenMenu);
   }
 
+  function normalizeFilterValue(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  function normalizeFilterKey(value) {
+    return normalizeFilterValue(value).replace(/[^a-z0-9_-]+/g, '-');
+  }
+
+  function isEmptyFilterValue(value) {
+    const normalized = normalizeFilterValue(value);
+    return normalized === '' || normalized === 'all' || normalized === '\u0432\u0441\u0435';
+  }
+
+  function getStaticFilterLabel(field, value) {
+    const menu = field ? field.closest('.crm-filter-menu') : null;
+    let option = null;
+    if (menu) {
+      option = menu.querySelector('.crm-filter-option[data-filter-option][data-filter-value="' + escapeCssValue(value) + '"]');
+    }
+
+    if (!option && field instanceof HTMLSelectElement) {
+      option = field.selectedOptions && field.selectedOptions[0];
+    }
+
+    return option ? getFilterOptionText(option) : '';
+  }
+
+  function getStaticFilterFieldKey(field) {
+    if (!field) return '';
+    if (field.hasAttribute('data-filter-search')) return 'search';
+    return field.getAttribute('data-filter') || field.getAttribute('name') || field.getAttribute('id') || '';
+  }
+
+  function getStaticFilterTarget(panel) {
+    if (!panel) return null;
+    const shell = panel.closest('.crm-registry-shell, .crm-registry-page, .crm-page') || panel.parentElement || document;
+    const tables = Array.from(shell.querySelectorAll('.crm-registry-table table, table[data-sortable-table], table'));
+    for (let index = 0; index < tables.length; index += 1) {
+      if ((panel.compareDocumentPosition(tables[index]) & Node.DOCUMENT_POSITION_FOLLOWING) && tables[index].querySelector('tbody tr')) {
+        return { shell: shell, table: tables[index] };
+      }
+    }
+
+    const fallbackTable = shell.querySelector('.crm-registry-table table, table[data-sortable-table], table');
+    return fallbackTable ? { shell: shell, table: fallbackTable } : null;
+  }
+
+  function getStaticFilterRows(table) {
+    if (!table || !table.tBodies || !table.tBodies.length) return [];
+    return Array.from(table.tBodies[0].querySelectorAll(':scope > tr:not([data-sort-ignore])'));
+  }
+
+  function getStaticEmptyState(shell, panel) {
+    if (!shell) return null;
+    const states = Array.from(shell.querySelectorAll('.crm-registry-empty, .crm-empty-state, [data-entity="empty-state"]'));
+    for (let index = 0; index < states.length; index += 1) {
+      if (!panel || !panel.contains(states[index])) return states[index];
+    }
+    return null;
+  }
+
+  function collectStaticFilterCriteria(panel) {
+    const criteria = [];
+    if (!panel) return criteria;
+
+    panel.querySelectorAll('input, select, textarea').forEach(function (field) {
+      if (field.disabled) return;
+
+      const type = (field.type || '').toLowerCase();
+      if (type === 'button' || type === 'submit' || type === 'reset') return;
+      if ((type === 'checkbox' || type === 'radio') && !field.checked) return;
+
+      const key = getStaticFilterFieldKey(field);
+      const rawValue = type === 'checkbox' || type === 'radio' ? field.value : field.value;
+      const value = normalizeFilterValue(rawValue);
+      const isSearch = key === 'search' || type === 'search' || field.hasAttribute('data-filter-search');
+      const isDate = type === 'date' || /(^|-)date($|-)|(^|-)period($|-)/.test(normalizeFilterKey(key));
+
+      if (isSearch) {
+        if (value) criteria.push({ type: 'search', key: key, value: value });
+        return;
+      }
+
+      if (isDate) {
+        if (value && isFieldDirty(field)) {
+          criteria.push({ type: 'date', key: key, value: value });
+        }
+        return;
+      }
+
+      if (isEmptyFilterValue(value)) return;
+
+      criteria.push({
+        type: 'value',
+        key: key,
+        value: value,
+        label: normalizeFilterValue(getStaticFilterLabel(field, rawValue))
+      });
+    });
+
+    return criteria;
+  }
+
+  function rowTokenMatches(sourceValue, expectedValue) {
+    const normalizedSource = normalizeFilterValue(sourceValue);
+    if (!normalizedSource) return false;
+    if (normalizedSource === expectedValue) return true;
+    return normalizedSource.split(/[\s,;|]+/).indexOf(expectedValue) !== -1;
+  }
+
+  function getRowFilterAttributeValues(row, key, criterionType) {
+    const normalizedKey = normalizeFilterKey(key);
+    const suffix = normalizedKey.split('-').filter(Boolean).pop() || normalizedKey;
+    const attributes = [
+      'data-filter-' + normalizedKey,
+      'data-' + normalizedKey,
+      'data-' + suffix
+    ];
+
+    if (criterionType === 'date' || normalizedKey.indexOf('date') !== -1) attributes.push('data-date');
+    if (normalizedKey.indexOf('status') !== -1) attributes.push('data-status');
+    if (normalizedKey.indexOf('type') !== -1) attributes.push('data-type');
+    if (normalizedKey.indexOf('result') !== -1) attributes.push('data-result');
+    if (normalizedKey.indexOf('risk') !== -1) attributes.push('data-risk');
+    if (normalizedKey.indexOf('category') !== -1) attributes.push('data-category');
+    if (normalizedKey.indexOf('manager') !== -1) attributes.push('data-manager');
+    if (normalizedKey.indexOf('assignee') !== -1) attributes.push('data-assignee');
+    if (normalizedKey.indexOf('source') !== -1) attributes.push('data-source');
+    if (normalizedKey.indexOf('channel') !== -1) attributes.push('data-channel');
+
+    const values = [];
+    attributes.forEach(function (attribute) {
+      const value = row.getAttribute(attribute);
+      if (value != null) values.push(value);
+    });
+
+    const descendantSelector = attributes.map(function (attribute) {
+      return '[' + attribute + ']';
+    }).join(',');
+
+    if (descendantSelector) {
+      row.querySelectorAll(descendantSelector).forEach(function (node) {
+        attributes.forEach(function (attribute) {
+          const value = node.getAttribute(attribute);
+          if (value != null) values.push(value);
+        });
+      });
+    }
+
+    return values;
+  }
+
+  function rowMatchesStaticCriterion(row, criterion) {
+    if (criterion.type === 'search') {
+      return normalizeFilterValue(row.textContent).indexOf(criterion.value) !== -1;
+    }
+
+    const rowValues = getRowFilterAttributeValues(row, criterion.key, criterion.type);
+    for (let index = 0; index < rowValues.length; index += 1) {
+      if (rowTokenMatches(rowValues[index], criterion.value)) return true;
+    }
+
+    if (criterion.type === 'date') {
+      return false;
+    }
+
+    if (criterion.value.indexOf('opt-') === 0 && criterion.label) {
+      return normalizeFilterValue(row.textContent).indexOf(criterion.label) !== -1;
+    }
+
+    return false;
+  }
+
+  function applyStaticFilters(scope) {
+    getFilterPanels(scope || document).forEach(function (panel) {
+      if (!panel.matches('.crm-registry-filters')) return;
+
+      const target = getStaticFilterTarget(panel);
+      if (!target) return;
+
+      const rows = getStaticFilterRows(target.table);
+      if (!rows.length) return;
+
+      const criteria = collectStaticFilterCriteria(panel);
+      let visibleCount = 0;
+
+      rows.forEach(function (row) {
+        const isVisible = criteria.every(function (criterion) {
+          return rowMatchesStaticCriterion(row, criterion);
+        });
+        row.hidden = !isVisible;
+        row.classList.toggle('is-filter-hidden', !isVisible);
+        if (isVisible) visibleCount += 1;
+      });
+
+      const emptyState = getStaticEmptyState(target.shell, panel);
+      if (emptyState) emptyState.hidden = visibleCount > 0;
+    });
+  }
+
   function syncFilterMenuState(filterMenu, value) {
     if (!filterMenu) return;
 
@@ -162,6 +362,7 @@
     const panel = getFilterPanelOwner(filterMenu);
     syncFilterPanelMenuState(panel);
     syncResetButtonState(panel || document);
+    applyStaticFilters(panel || document);
   }
 
   function resetFilterMenu(filterMenu) {
@@ -508,6 +709,7 @@
         syncBinaryPills(form);
         syncSelectableControlState(form);
         syncResetButtonState(form);
+        applyStaticFilters(form);
       }
       event.preventDefault();
       return;
@@ -651,14 +853,15 @@
     const panel = target.closest('.crm-filter-panel');
     if (panel) {
       syncResetButtonState(panel);
+      applyStaticFilters(panel);
     }
   });
 
   document.addEventListener('change', function (event) {
     const target = event.target;
-    if (!(target instanceof HTMLInputElement)) return;
+    if (!(target instanceof HTMLElement)) return;
 
-    if (target.matches('[data-auth-form] [data-auth-required][type="checkbox"]') && target.classList.contains('is-invalid') && target.checked) {
+    if (target instanceof HTMLInputElement && target.matches('[data-auth-form] [data-auth-required][type="checkbox"]') && target.classList.contains('is-invalid') && target.checked) {
       setAuthControlValidState(target, true);
       const form = target.closest('[data-auth-form]');
       if (form && !form.querySelector('[data-auth-required].is-invalid')) {
@@ -667,12 +870,12 @@
       }
     }
 
-    if (target.matches('.crm-radio-tile input[type="radio"]')) {
+    if (target instanceof HTMLInputElement && target.matches('.crm-radio-tile input[type="radio"]')) {
       const scope = findControlScope(target);
       syncRadioTileGroup(scope, target.name);
     }
 
-    if (target.matches('.crm-check-row input[type="checkbox"], .crm-check-row input[type="radio"]')) {
+    if (target instanceof HTMLInputElement && target.matches('.crm-check-row input[type="checkbox"], .crm-check-row input[type="radio"]')) {
       const row = target.closest('.crm-check-row');
       if (row) {
         row.classList.toggle('is-active', target.checked);
@@ -692,12 +895,14 @@
     const panel = target.closest('.crm-filter-panel');
     if (panel) {
       syncResetButtonState(panel);
+      applyStaticFilters(panel);
     }
   });
 
   initFilterMenus();
   initFilterPanelDefaults(document);
   syncResetButtonState(document);
+  applyStaticFilters(document);
 
   if (window.UIkit) {
     document.querySelectorAll('ul[uk-tab], .crm-tabs[uk-tab]').forEach(function (tab) {
