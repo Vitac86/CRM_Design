@@ -1267,7 +1267,7 @@
 
   function getGlobalSearchMatches(query) {
     var normalizedQuery = normalizeGlobalSearchValue(query);
-    if (!normalizedQuery) return GLOBAL_SEARCH_DATA.slice(0, GLOBAL_SEARCH_MAX_RESULTS);
+    if (!normalizedQuery) return [];
 
     var tokens = normalizedQuery.split(' ').filter(Boolean);
     return GLOBAL_SEARCH_DATA.filter(function (item) {
@@ -1300,7 +1300,7 @@
     if (!matches.length) {
       var empty = document.createElement('div');
       empty.className = 'crm-search-preview-empty';
-      empty.textContent = query ? 'Ничего не найдено' : 'Начните вводить запрос';
+      empty.textContent = 'Ничего не найдено';
       resultsNode.appendChild(empty);
       return;
     }
@@ -1373,6 +1373,11 @@
 
     function openPreview() {
       var query = input.value.trim();
+      if (!query) {
+        closePreview();
+        return;
+      }
+
       renderGlobalSearchPreview(results, getGlobalSearchMatches(query), query);
       updateFooterHref();
       preview.hidden = false;
@@ -1382,6 +1387,7 @@
 
     function closePreview() {
       preview.hidden = true;
+      results.innerHTML = '';
       shell.classList.remove('is-search-preview-open');
       input.setAttribute('aria-expanded', 'false');
     }
