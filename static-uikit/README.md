@@ -135,8 +135,21 @@ System:
 - UMI.CMS should replace client-side search with server-side search and route to this template.
 
 ## Static filters
-All list-page filters (subjects, compliance, trading, etc.) are client-side demo behavior only.
-UMI.CMS should implement server-side filtering and pagination when integrating these templates.
+All list-page filters (subjects, compliance, trading, etc.) are **client-side demo behavior only**. No server requests are made; JavaScript hides/shows table rows in the browser.
+
+### Markup contract
+
+| Element | Attribute | Purpose |
+|---|---|---|
+| Filter control (input, hidden) | `data-filter="<name>"` | Stable filter key; used to match against row attributes. |
+| Custom dropdown option | `data-filter-option` + `data-filter-value="<value>"` | Selectable option inside a `.crm-filter-menu`. |
+| Table row | `data-filter-<name>="<value>"` | The value the filter key is matched against. |
+| Reset button | `data-action="reset-filters"` | Clears all filter controls and restores full row visibility. |
+
+`data-filter` names and `data-filter-*` row attributes are the stable UI hooks that connect controls to data.
+
+### UMI.CMS integration
+Replace client-side filter logic with server-side filtering and pagination. The `data-filter` attribute names on controls and the `data-filter-*` attributes on rows can be preserved as semantic hints, but the JS row-hiding behavior should be superseded by server-rendered result sets.
 
 ## Known limitations
 - Static sample data only.

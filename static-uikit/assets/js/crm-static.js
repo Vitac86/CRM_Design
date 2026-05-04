@@ -3,6 +3,7 @@
   const toggle = document.querySelector('[data-sidebar-toggle]');
   const sidebar = document.querySelector('.crm-sidebar');
 
+  // ── Selectable controls / radio tiles / check rows ──────────────────────
   function syncOptionGridState(scope) {
     scope.querySelectorAll('.crm-option-grid').forEach(function (group) {
       group.querySelectorAll('.crm-option-card').forEach(function (card) {
@@ -34,6 +35,8 @@
     return document.querySelector('[data-auth-error-for="' + escapeCssValue(control.id) + '"]');
   }
 
+  // ── Auth validation ──────────────────────────────────────────────────────
+  // Hook contract: form[data-auth-form], [data-auth-required], [data-auth-error-for="<id>"], [data-auth-alert]
   function setAuthControlValidState(control, isValid) {
     if (!control) return;
     const errorNode = getAuthErrorNode(control);
@@ -97,6 +100,9 @@
     });
   }
 
+  // ── Filter menus and static table filters ───────────────────────────────
+  // Hook contract: .crm-filter-panel, [data-filter="<key>"], [data-filter-option][data-filter-value],
+  //   tbody tr[data-filter-<key>="<value>"], [data-action="reset-filters"]
   function getFilterOptionText(option) {
     if (!option) return '';
     const selectedTextNode = option.querySelector('span');
@@ -468,6 +474,9 @@
     });
   }
 
+  // ── Requests create panel ────────────────────────────────────────────────
+  // Hook contract: body[data-page="requests"], #request-create-panel or [data-entity="request-create-panel"],
+  //   [data-action="toggle-request-create"], [data-action="close-request-create"]
   const REQUEST_CREATE_CLOSED_TEXT = 'Создать поручение';
   const REQUEST_CREATE_OPEN_TEXT = 'Закрыть форму';
 
@@ -510,6 +519,7 @@
     });
   }
 
+  // ── Sidebar / navigation ─────────────────────────────────────────────────
   const mobileQuery = window.matchMedia('(max-width: 920px)');
 
   function isMobileViewport() {
@@ -550,6 +560,7 @@
     });
   }
 
+  // [data-match] on a nav link is a space-separated list of page filenames that also activate that item.
   const currentPage = (window.location.pathname.split('/').pop() || 'dashboard.html').toLowerCase();
   const navLinks = document.querySelectorAll('.crm-sidebar .crm-nav-link[href]');
 
@@ -669,6 +680,7 @@
       }
     }
 
+    // Date field triggers — [data-date-trigger] / [data-date-picker-trigger] open the native date picker.
     const datePickerTrigger = target.closest('[data-date-trigger], [data-date-picker-trigger]');
     if (datePickerTrigger) {
       const inputId = datePickerTrigger.getAttribute('data-date-picker-trigger');
@@ -717,6 +729,7 @@
 
 
 
+    // Footer chips — [data-page-size-group] manages mutually exclusive .crm-footer-chip selection.
     const pageSizeChip = target.closest('[data-page-size-group] .crm-footer-chip');
     if (pageSizeChip) {
       const chipGroup = pageSizeChip.closest('[data-page-size-group]');
@@ -803,6 +816,7 @@
 
     if (!target.closest('.crm-filter-menu')) closeOpenFilterMenus();
 
+    // Row / card data-href navigation — clicking a [data-href] row navigates unless an interactive element is the target.
     const hrefHost = target.closest('[data-href]');
     if (hrefHost) {
       const directAnchor = target.closest('a[href]');
@@ -822,6 +836,8 @@
     }
   });
 
+  // ── Form submit prevention ───────────────────────────────────────────────
+  // [data-form] prevents default submission; prototype-only behavior.
   document.addEventListener('submit', function (event) {
     const form = event.target;
     if (form.matches('[data-form]')) {
@@ -904,6 +920,7 @@
   syncResetButtonState(document);
   applyStaticFilters(document);
 
+  // ── UIkit tabs / init ────────────────────────────────────────────────────
   if (window.UIkit) {
     document.querySelectorAll('ul[uk-tab], .crm-tabs[uk-tab]').forEach(function (tab) {
       window.UIkit.tab(tab);
