@@ -1483,11 +1483,14 @@
 
     var resultBlock = form.querySelector('[data-entity="agent-subject-result"]');
 
-    var hiddenId = document.createElement('input');
-    hiddenId.type = 'hidden';
-    hiddenId.name = 'agent-subject-id';
-    hiddenId.setAttribute('data-entity', 'agent-subject-id');
-    form.appendChild(hiddenId);
+    var hiddenId = form.querySelector('[data-entity="agent-subject-id"]');
+    if (!hiddenId) {
+      hiddenId = document.createElement('input');
+      hiddenId.type = 'hidden';
+      hiddenId.name = 'agent-subject-id';
+      hiddenId.setAttribute('data-entity', 'agent-subject-id');
+      form.appendChild(hiddenId);
+    }
 
     var lookup = document.createElement('div');
     lookup.className = 'crm-agents-subject-lookup';
@@ -1498,12 +1501,12 @@
     wrap.appendChild(lookup);
 
     var SUBJECTS = [
-      { id: 'S-001', name: 'АО «Восток Майнинг Системс»',      inn: '7704132901',   type: 'Юр. лицо' },
-      { id: 'S-002', name: 'АО «Глобал Ресурс Траст»',          inn: '7705964812',   type: 'Юр. лицо' },
-      { id: 'S-003', name: 'Громова Алина Сергеевна',            inn: '502113742889', type: 'Физ. лицо' },
-      { id: 'S-004', name: 'ООО «Север Логистик Капитал»',       inn: '7812054881',   type: 'Юр. лицо' },
-      { id: 'S-005', name: 'ИП Мартынов Кирилл Андреевич',      inn: '772608314579', type: 'ИП' },
-      { id: 'S-006', name: 'Романова Дарья Алексеевна',          inn: '503228776514', type: 'Физ. лицо' }
+      { id: 'S-001', name: 'АО «Восток Майнинг Системс»',      inn: '7704132901',   type: 'Юр. лицо', alias: 'ao' },
+      { id: 'S-002', name: 'АО «Глобал Ресурс Траст»',          inn: '7705964812',   type: 'Юр. лицо', alias: 'ao' },
+      { id: 'S-003', name: 'Громова Алина Сергеевна',            inn: '502113742889', type: 'Физ. лицо', alias: '' },
+      { id: 'S-004', name: 'ООО «Север Логистик Капитал»',       inn: '7812054881',   type: 'Юр. лицо', alias: 'ooo' },
+      { id: 'S-005', name: 'ИП Мартынов Кирилл Андреевич',      inn: '772608314579', type: 'ИП',        alias: 'ip' },
+      { id: 'S-006', name: 'Романова Дарья Алексеевна',          inn: '503228776514', type: 'Физ. лицо', alias: '' }
     ];
 
     var isSelected = false;
@@ -1517,7 +1520,7 @@
       if (!q) return [];
       var tokens = q.split(' ').filter(Boolean);
       return SUBJECTS.filter(function (s) {
-        var haystack = normalizeSubjectQuery(s.name + ' ' + s.inn + ' ' + s.type);
+        var haystack = normalizeSubjectQuery(s.name + ' ' + s.inn + ' ' + s.type + ' ' + (s.alias || ''));
         return tokens.every(function (token) { return haystack.indexOf(token) !== -1; });
       });
     }
