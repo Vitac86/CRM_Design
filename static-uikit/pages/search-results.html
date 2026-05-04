@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Результаты поиска</title>
+  <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
+  <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/search-results.css"/>
+</head>
+<body data-page="search-results">
+<div class="crm-app">
+  <div class="crm-layout">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
+      <div class="crm-sidebar-brand">
+        <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+      </div>
+      <nav class="crm-nav" aria-label="Основная навигация">
+        <div class="crm-nav-group" data-group="front-office">
+          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+            <span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Фронт-офис</span>
+            <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+          </button>
+          <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
+            <a class="crm-nav-link crm-nav-item" href="dashboard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use></svg>Дашборд</span></a>
+            <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-register.html contract-wizard.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Субъекты</span></a>
+            <a class="crm-nav-link crm-nav-item" href="brokerage.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use></svg>Брок. деятельность</span></a>
+            <a class="crm-nav-link crm-nav-item" href="trust-management.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trust"></use></svg>Дов. управление</span></a>
+            <a class="crm-nav-link crm-nav-item" href="agents.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-agents"></use></svg>Агенты</span></a>
+            <a class="crm-nav-link crm-nav-item" href="archive.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Архив</span></a>
+            <a class="crm-nav-link crm-nav-item" href="requests.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-requests"></use></svg>Поручения</span></a>
+          </div>
+        </div>
+
+        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-compliance"></use></svg>Комплаенс</span></a>
+
+        <div class="crm-nav-group" data-group="middle-office">
+          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+            <span><span uk-icon="album"></span>Мидл-офис</span>
+            <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+          </button>
+          <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
+            <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал клиентов</span></a>
+            <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use></svg>Журнал отправленных отчётов</span></a>
+          </div>
+        </div>
+
+        <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
+        <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
+        <a class="crm-nav-link crm-nav-item" href="depository.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
+        <a class="crm-nav-link crm-nav-item" href="administration.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
+      </nav>
+    </aside>
+
+    <main class="crm-main">
+      <header class="crm-topbar">
+        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+        <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/></div>
+        <div class="crm-user"><div><div>Иванов И.И.</div><small>менеджер</small></div><div class="crm-avatar">ИИ</div></div>
+      </header>
+
+      <section class="crm-page crm-search-results-page" data-page="search-results">
+        <section class="crm-search-results-shell">
+
+          <div class="crm-page-header crm-page-header-row crm-search-results-header">
+            <div class="crm-registry-title-block">
+              <h1 class="crm-page-title" data-entity="page-title">Результаты поиска</h1>
+              <p class="crm-page-subtitle">Единая выдача по клиентам, договорам, поручениям, комплаенсу и операциям.</p>
+            </div>
+          </div>
+
+          <div class="crm-search-results-summary">
+            <span class="crm-search-results-summary-neutral" data-search-no-query>Введите запрос в глобальный поиск.</span>
+            <span class="crm-search-results-summary-active" data-search-has-query hidden>По запросу: <strong class="crm-search-results-query-text" data-search-query-output></strong></span>
+          </div>
+
+          <form
+            action="#"
+            method="get"
+            data-form="search-results-filters"
+            class="crm-registry-filters crm-filter-panel crm-search-results-filters"
+          >
+            <div class="crm-filter-search-row crm-filter-search">
+              <label class="crm-filter-search-shell" for="search-refine">
+                <span class="crm-filter-search-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <input
+                  class="uk-input crm-input crm-filter-search-input"
+                  id="search-refine"
+                  type="search"
+                  name="search-refine"
+                  placeholder="Уточнить запрос"
+                  data-search-query-input
+                  autocomplete="off"
+                />
+              </label>
+            </div>
+            <div class="crm-filter-fields-row crm-filter-grid">
+              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
+                <details class="crm-filter-menu" data-filter-menu="filter-type">
+                  <summary class="crm-filter-trigger" aria-label="Фильтр: Тип">
+                    <span class="crm-filter-trigger-label">Тип:</span>
+                    <span class="crm-filter-trigger-value">Все</span>
+                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="crm-filter-dropdown" role="listbox" aria-label="Тип результатов">
+                    <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all">
+                      <span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="subjects">
+                      <span>Субъекты</span><span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="contracts">
+                      <span>Договоры</span><span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="requests">
+                      <span>Поручения</span><span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="compliance">
+                      <span>Комплаенс</span><span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="reports">
+                      <span>Отчёты</span><span class="crm-filter-option-check" aria-hidden="true">✓</span>
+                    </button>
+                  </div>
+                  <input type="hidden" name="filter-type" value="all" data-filter="filter-type"/>
+                </details>
+              </div>
+              <div class="crm-filter-actions">
+                <button
+                  class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset"
+                  type="button"
+                  data-action="reset-filters"
+                >Сбросить всё</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="crm-search-results-list" data-search-results-list>
+
+            <!-- ── Субъекты ──────────────────────────────────────────────── -->
+            <div class="crm-search-result-group">
+              <div class="crm-search-result-group-header">
+                <h3 class="crm-search-result-group-title">Субъекты</h3>
+                <span class="crm-badge muted">2</span>
+              </div>
+              <div class="crm-search-result-group-items">
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="subject-card.html">АО «Восток Майнинг Системс»</a>
+                      <span class="crm-badge muted">Субъект</span>
+                    </div>
+                    <div class="crm-search-result-meta">CL-4401 · ИНН 7701234567 · Юридическое лицо · Зарегистрирован 10.01.2024</div>
+                    <div class="crm-search-result-snippet">Брокерский договор BR-8821 активен. Последнее поручение P-24108 от 24.04.2026 на вывод ДС.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge info" data-status="active">Активен</span>
+                  </div>
+                </div>
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="subject-card.html">Громова Алина Сергеевна</a>
+                      <span class="crm-badge muted">Субъект</span>
+                    </div>
+                    <div class="crm-search-result-meta">CL-4412 · Физическое лицо · Договор ДУ-8839</div>
+                    <div class="crm-search-result-snippet">Клиент доверительного управления. Стратегия «Сбалансированная». Договор действует с 15.03.2023.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge info" data-status="active">Активен</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── Договоры ──────────────────────────────────────────────── -->
+            <div class="crm-search-result-group">
+              <div class="crm-search-result-group-header">
+                <h3 class="crm-search-result-group-title">Договоры</h3>
+                <span class="crm-badge muted">2</span>
+              </div>
+              <div class="crm-search-result-group-items">
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="contract-edit.html">BR-8821</a>
+                      <span class="crm-badge muted">Договор</span>
+                    </div>
+                    <div class="crm-search-result-meta">Брокерский · АО «Восток Майнинг Системс» · CL-4401 · Открыт 12.01.2024</div>
+                    <div class="crm-search-result-snippet">Брокерское обслуживание. Тариф «Стандарт». Последняя операция 24.04.2026.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge info">Активен</span>
+                  </div>
+                </div>
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="contract-edit.html">ДУ-8839</a>
+                      <span class="crm-badge muted">Договор</span>
+                    </div>
+                    <div class="crm-search-result-meta">Доверительное управление · Громова А.С. · CL-4412 · Заключён 15.03.2023</div>
+                    <div class="crm-search-result-snippet">Стратегия «Сбалансированная». Активы под управлением: 4 200 000 RUB.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge info">Активен</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── Поручения ──────────────────────────────────────────────── -->
+            <div class="crm-search-result-group">
+              <div class="crm-search-result-group-header">
+                <h3 class="crm-search-result-group-title">Поручения</h3>
+                <span class="crm-badge muted">2</span>
+              </div>
+              <div class="crm-search-result-group-items">
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="requests.html">P-24108</a>
+                      <span class="crm-badge muted">Поручение</span>
+                    </div>
+                    <div class="crm-search-result-meta">Вывод ДС · АО «Восток Майнинг Системс» · CL-4401 · 24.04.2026</div>
+                    <div class="crm-search-result-snippet">Поручение на вывод денежных средств. Сумма: 2 450 000 RUB. Источник: Личный кабинет.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge warning" data-status="request-waiting">Ожидает</span>
+                  </div>
+                </div>
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="requests.html">P-24103</a>
+                      <span class="crm-badge muted">Поручение</span>
+                    </div>
+                    <div class="crm-search-result-meta">Перевод ЦБ · Громова А.С. · CL-4412 · 23.04.2026</div>
+                    <div class="crm-search-result-snippet">Поручение на перевод ценных бумаг. Сумма: 340 000 RUB. Источник: Операционист.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge info" data-status="request-accepted">Принято</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── Комплаенс ─────────────────────────────────────────────── -->
+            <div class="crm-search-result-group">
+              <div class="crm-search-result-group-header">
+                <h3 class="crm-search-result-group-title">Комплаенс</h3>
+                <span class="crm-badge muted">2</span>
+              </div>
+              <div class="crm-search-result-group-items">
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="compliance-card.html">KYC-2024-0041</a>
+                      <span class="crm-badge muted">Комплаенс</span>
+                    </div>
+                    <div class="crm-search-result-meta">АО «Восток Майнинг Системс» · CL-4401 · Обновлено 20.04.2026</div>
+                    <div class="crm-search-result-snippet">Проверка KYC. Запрос дополнительных документов. Срок ответа клиента до 30.04.2026.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge warning">На проверке</span>
+                  </div>
+                </div>
+
+                <div class="crm-search-result-item">
+                  <div class="crm-search-result-body">
+                    <div class="crm-search-result-head">
+                      <a class="crm-search-result-title" href="compliance-card.html">AML-2024-0018</a>
+                      <span class="crm-badge muted">Комплаенс</span>
+                    </div>
+                    <div class="crm-search-result-meta">Громова А.С. · CL-4412 · Завершено 05.03.2026</div>
+                    <div class="crm-search-result-snippet">Плановая AML-проверка. Нарушений не выявлено. Следующая проверка — март 2027.</div>
+                  </div>
+                  <div class="crm-search-result-status">
+                    <span class="crm-badge info">Пройдено</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div><!-- /data-search-results-list -->
+
+          <!-- ── Empty / no-query state ──────────────────────────────────── -->
+          <div class="crm-search-results-empty" data-search-empty hidden>
+            <div class="crm-empty-state-title">Ничего не найдено</div>
+            <div class="crm-empty-state-text">Попробуйте изменить запрос или проверить написание.</div>
+          </div>
+
+        </section>
+      </section>
+    </main>
+  </div>
+</div>
+<script src="../assets/js/uikit.min.js"></script>
+<script src="../assets/js/uikit-icons.min.js"></script>
+<script src="../assets/js/crm-static.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var q = (params.get('q') || '').trim();
+
+  var globalInput = document.querySelector('input[name="global-search"]');
+  var localInput  = document.querySelector('[data-search-query-input]');
+  var queryOutput = document.querySelector('[data-search-query-output]');
+  var resultsList = document.querySelector('[data-search-results-list]');
+  var emptyState  = document.querySelector('[data-search-empty]');
+  var noQuery     = document.querySelector('[data-search-no-query]');
+  var hasQuery    = document.querySelector('[data-search-has-query]');
+
+  if (globalInput) globalInput.value = q;
+  if (localInput)  localInput.value  = q;
+
+  if (q) {
+    if (queryOutput) queryOutput.textContent = q;
+    if (resultsList) resultsList.hidden = false;
+    if (emptyState)  emptyState.hidden  = true;
+    if (noQuery)     noQuery.hidden     = true;
+    if (hasQuery)    hasQuery.hidden    = false;
+  } else {
+    if (resultsList) resultsList.hidden = true;
+    if (emptyState)  emptyState.hidden  = false;
+    if (noQuery)     noQuery.hidden     = false;
+    if (hasQuery)    hasQuery.hidden    = true;
+  }
+}());
+</script>
+</body>
+</html>

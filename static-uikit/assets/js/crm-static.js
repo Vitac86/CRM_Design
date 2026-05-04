@@ -916,6 +916,18 @@
 
     return a.text.localeCompare(b.text, 'ru', { numeric: true, sensitivity: 'base' });
   }
+  // ── Global search navigation ─────────────────────────────────────────────
+  var globalSearchInput = document.querySelector('input[name="global-search"]');
+  if (globalSearchInput) {
+    globalSearchInput.addEventListener('keydown', function (event) {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      var query = globalSearchInput.value.trim();
+      if (!query) return;
+      window.location.href = 'search-results.html?q=' + encodeURIComponent(query);
+    });
+  }
+
   document.addEventListener('click', function (event) {
     var target = event.target;
     if (!(target instanceof Element)) return;
