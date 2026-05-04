@@ -219,15 +219,22 @@
             <form action="#" method="post" data-form="agent-create">
               <div class="crm-agents-form-grid">
                 <div class="crm-agents-form-field">
-                  <label class="crm-agents-form-label" for="agent-org">Агент / организация</label>
+                  <label class="crm-agents-form-label" for="agent-org">Физическое лицо / Организация</label>
                   <input
                     id="agent-org"
                     class="uk-input crm-input crm-agents-form-input"
-                    type="text"
-                    name="agent-org"
-                    placeholder="Наименование организации"
+                    type="search"
+                    name="agent-subject"
+                    placeholder="ИНН, наименование или ФИО"
                     autocomplete="off"
+                    data-entity="agent-subject-search"
+                    data-search-scope="subjects"
+                    data-action="search-agent-subject"
                   />
+                  <p class="crm-agents-form-help">Начните вводить ИНН, наименование или ФИО субъекта.</p>
+                  <div class="crm-agents-subject-preview" data-entity="agent-subject-result" hidden>
+                    <span>Выбран: АО «Восток Майнинг Системс» · ИНН 7704132901</span>
+                  </div>
                 </div>
                 <div class="crm-agents-form-field">
                   <label class="crm-agents-form-label" for="agent-contract">Договор</label>
@@ -250,36 +257,6 @@
                     placeholder="0.00%"
                     autocomplete="off"
                   />
-                </div>
-                <div class="crm-agents-form-field">
-                  <label class="crm-agents-form-label" for="agent-phone">Телефон</label>
-                  <input
-                    id="agent-phone"
-                    class="uk-input crm-input crm-agents-form-input"
-                    type="tel"
-                    name="agent-phone"
-                    placeholder="+7 (XXX) XXX-XX-XX"
-                    autocomplete="off"
-                  />
-                </div>
-                <div class="crm-agents-form-field">
-                  <label class="crm-agents-form-label" for="agent-email">Email</label>
-                  <input
-                    id="agent-email"
-                    class="uk-input crm-input crm-agents-form-input"
-                    type="email"
-                    name="agent-email"
-                    placeholder="agent@example.com"
-                    autocomplete="off"
-                  />
-                </div>
-                <div class="crm-agents-form-field">
-                  <label class="crm-agents-form-label" for="agent-assignee">Закрепление</label>
-                  <select id="agent-assignee" class="uk-select crm-input crm-agents-form-input" name="agent-assignee">
-                    <option value="">— Выберите —</option>
-                    <option value="ivanov">Иванов И.И.</option>
-                    <option value="petrova">Петрова Н.А.</option>
-                  </select>
                 </div>
                 <div class="crm-agents-form-field">
                   <label class="crm-agents-form-label" for="agent-status-field">Статус</label>

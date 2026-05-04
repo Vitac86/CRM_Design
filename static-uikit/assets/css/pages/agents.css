@@ -354,7 +354,7 @@
 
 .crm-page[data-page="agents"] .crm-agents-form-grid {
   display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
+  grid-template-columns: repeat(2,minmax(0,1fr));
   gap: 12px;
 }
 
@@ -390,13 +390,25 @@
   margin-top: 16px;
 }
 
-/* Mobile Rules */
-@media (max-width:900px) {
-  .crm-page[data-page="agents"] .crm-agents-form-grid {
-    grid-template-columns: repeat(2,minmax(0,1fr));
-  }
+.crm-page[data-page="agents"] .crm-agents-form-help {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #8298b8;
+  line-height: 1.4;
 }
 
+.crm-page[data-page="agents"] .crm-agents-subject-preview {
+  margin-top: 4px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #f0f5ff;
+  border: 1px solid #d4e0f5;
+  font-size: 12px;
+  color: #3b5a8a;
+  line-height: 1.4;
+}
+
+/* Mobile Rules */
 @media (max-width:600px) {
   .crm-page[data-page="agents"] .crm-agents-form-grid {
     grid-template-columns: minmax(0,1fr);
