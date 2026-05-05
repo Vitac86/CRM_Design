@@ -51,20 +51,6 @@
   line-height: 1.35;
 }
 
-.crm-page[data-page="back-office"] .crm-back-office-actions {
-  flex: 0 0 auto;
-  gap: 10px;
-  margin-left: auto;
-  padding-top: 2px;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-actions .crm-button {
-  min-height: 36px;
-  height: 36px;
-  padding: 0 14px;
-  font-size: 13px;
-}
-
 /* Filter Panel */
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-registry-filters.crm-filter-panel {
   gap: 12px;
@@ -117,6 +103,8 @@
 /* Search Input */
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-search-row {
   display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   min-width: 0;
 }
@@ -124,8 +112,9 @@
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-search-shell {
   position: relative;
   display: block;
-  width: min(520px, 100%);
-  max-width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 520px;
 }
 
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-search-icon {
@@ -161,6 +150,32 @@
 
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-search-input::placeholder {
   color: #8b9eb8;
+}
+
+.crm-page[data-page="back-office"] .crm-back-office-shell [data-action="open-counterparty-inline-add"] {
+  flex: 0 0 auto;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-add-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #8b9eb8;
+  line-height: 1.45;
+  min-height: 18px;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-add-hint[data-hint-state="invalid"],
+.crm-page[data-page="back-office"] .crm-counterparty-add-hint[data-hint-state="duplicate"] {
+  color: #b45309;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-add-hint[data-hint-state="available"] {
+  color: #16a34a;
 }
 
 /* Table Card and Wrapper */
@@ -352,12 +367,6 @@
     flex-direction: column;
   }
 
-  .crm-page[data-page="back-office"] .crm-back-office-actions {
-    justify-content: flex-start;
-    margin-left: 0;
-    padding-top: 0;
-  }
-
   .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row {
     align-items: stretch;
   }
@@ -368,48 +377,46 @@
   }
 }
 
-/* ── Counterparty Add Page ──────────────────────────────────────────────── */
+/* ── Counterparty Inline Add Panel ─────────────────────────────────────────── */
 
-.crm-counterparty-add-page {
-  max-width: 720px;
-}
-
-.crm-counterparty-lookup-card {
+.crm-page[data-page="back-office"] .crm-counterparty-inline-add {
   display: grid;
-  gap: 20px;
-  padding: 20px 24px;
+  gap: 16px;
+  padding: 16px 20px;
 }
 
-.crm-counterparty-inn-label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.crm-counterparty-inn-help {
-  margin: 6px 0 0;
-  font-size: 12px;
-  color: #607494;
-  line-height: 1.45;
-  max-width: 480px;
-}
-
-.crm-counterparty-inn-input {
-  max-width: 320px;
-}
-
-.crm-counterparty-lookup-actions {
+.crm-page[data-page="back-office"] .crm-counterparty-inline-header {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
+  gap: 6px 20px;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-inline-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-inline-inn-row {
+  margin: 0;
+  font-size: 13px;
+  color: #607494;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-inline-inn-row strong {
+  color: #0f172a;
+}
+
+.crm-page[data-page="back-office"] .crm-counterparty-inline-footer {
+  display: flex;
   gap: 10px;
 }
 
 .crm-counterparty-result {
   border-top: 1px solid #d9e3f1;
-  padding-top: 18px;
+  padding-top: 14px;
   display: grid;
   gap: 14px;
 }
@@ -500,12 +507,11 @@
 }
 
 @media (max-width: 600px) {
-  .crm-counterparty-lookup-actions {
-    flex-direction: column;
-    align-items: stretch;
+  .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-search-row {
+    flex-wrap: wrap;
   }
 
-  .crm-counterparty-inn-input {
-    max-width: 100%;
+  .crm-page[data-page="back-office"] .crm-back-office-shell [data-action="open-counterparty-inline-add"] {
+    width: 100%;
   }
 }

@@ -129,8 +129,7 @@ Operations:
 - `middle-office-clients.html`
 - `middle-office-reports.html`
 - `depository.html`
-- `back-office.html` — counterparties registry (Бэк-офис module).
-- `counterparty-add.html` — static INN lookup demo for counterparty creation; enter an INN to resolve counterparty details before adding to the registry.
+- `back-office.html` — counterparties registry (Бэк-офис module); inline INN lookup for adding new counterparties from an external source.
 - `archive.html`
 
 System:

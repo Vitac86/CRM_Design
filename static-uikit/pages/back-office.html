@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        <a class="crm-nav-link crm-nav-item" href="back-office.html" data-match="counterparty-add.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
+        <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
         <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
         <a class="crm-nav-link crm-nav-item" href="depository.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
         <a class="crm-nav-link crm-nav-item" href="administration.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
@@ -86,13 +86,6 @@
               <h1 class="crm-page-title" data-entity="page-title">Контрагенты</h1>
               <p class="crm-page-subtitle">Реестр контрагентов для бэк-офисных операций и документооборота.</p>
             </div>
-            <div class="crm-header-actions crm-registry-actions crm-back-office-actions">
-              <a
-                class="uk-button crm-button-primary crm-button"
-                href="counterparty-add.html"
-                data-action="add-counterparty"
-              >+ Добавить контрагента</a>
-            </div>
           </div>
 
           <form
@@ -120,8 +113,68 @@
                   placeholder="Наименование, ФИО или ИНН"
                 />
               </label>
+              <button
+                class="uk-button crm-button-primary crm-button"
+                type="button"
+                data-action="open-counterparty-inline-add"
+                disabled
+              >+ Добавить контрагента</button>
             </div>
+            <p class="crm-counterparty-add-hint" data-entity="counterparty-add-hint">Введите ИНН. Если контрагент не найден в реестре, его можно добавить из внешнего источника.</p>
           </form>
+
+          <div class="crm-card crm-counterparty-inline-add" data-entity="counterparty-inline-add" hidden>
+            <div class="crm-counterparty-inline-header">
+              <h3 class="crm-counterparty-inline-title">Проверка контрагента по ИНН</h3>
+              <p class="crm-counterparty-inline-inn-row">ИНН: <strong data-entity="counterparty-inline-inn">—</strong></p>
+            </div>
+
+            <div class="crm-counterparty-result" data-entity="counterparty-inline-success" hidden>
+              <div class="crm-counterparty-result-header">
+                <span class="crm-badge success">Найден во внешнем источнике</span>
+              </div>
+              <dl class="crm-counterparty-result-list">
+                <div class="crm-counterparty-result-item">
+                  <dt>Наименование / ФИО</dt>
+                  <dd data-entity="counterparty-inline-name">—</dd>
+                </div>
+                <div class="crm-counterparty-result-item">
+                  <dt>ИНН</dt>
+                  <dd data-entity="counterparty-inline-inn-val">—</dd>
+                </div>
+                <div class="crm-counterparty-result-item">
+                  <dt>Тип</dt>
+                  <dd data-entity="counterparty-inline-type">—</dd>
+                </div>
+              </dl>
+              <p class="crm-counterparty-source-note">Источник: внешний справочник</p>
+              <div class="crm-counterparty-result-actions">
+                <button
+                  class="uk-button crm-button crm-button-primary"
+                  type="button"
+                  data-action="confirm-counterparty-add"
+                >Подтвердить добавление</button>
+                <span class="crm-counterparty-save-confirmation" data-entity="counterparty-inline-confirmation" hidden>
+                  Контрагент подготовлен к добавлению.
+                </span>
+              </div>
+            </div>
+
+            <div class="crm-counterparty-error" data-entity="counterparty-inline-error" hidden>
+              <span class="crm-counterparty-error-icon" aria-hidden="true">⚠</span>
+              <span class="crm-counterparty-error-body">
+                <span data-entity="counterparty-inline-error-text">Ошибка.</span>
+              </span>
+            </div>
+
+            <div class="crm-counterparty-inline-footer">
+              <button
+                class="uk-button crm-button crm-button-secondary"
+                type="button"
+                data-action="close-counterparty-inline-add"
+              >Закрыть</button>
+            </div>
+          </div>
 
           <div
             class="crm-card crm-table-card crm-registry-table crm-back-office-registry"

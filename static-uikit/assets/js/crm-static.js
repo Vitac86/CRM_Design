@@ -1628,122 +1628,172 @@
     });
   }());
 
-  // ── Counterparty INN lookup (counterparty-add.html only) ─────────────────
-  // Scoped to [data-entity="counterparty-add-form"]; no-ops on all other pages.
-  // Simulates an external-source INN resolution flow with three outcomes:
-  //   duplicate  — INN already exists in CRM (blocks adding)
-  //   success    — external source returned data (proceed to add)
-  //   not found  — external source returned no data
+  // ── Back-office inline counterparty add (back-office.html only) ─────────────
+  // Scoped to body[data-page="back-office"].
+  // Simulates inline INN lookup against three outcomes:
+  //   duplicate  — INN already in CRM table (button stays disabled)
+  //   success    — external demo dataset returned data
+  //   not found  — INN valid but not in external demo dataset
   // UMI.CMS will replace this with a real server-side INN resolution API.
   (function () {
-    var form = document.querySelector('[data-entity="counterparty-add-form"]');
-    if (!form) return;
+    if (!(document.body && document.body.dataset.page === 'back-office')) return;
 
-    var innInput = form.querySelector('[data-entity="counterparty-inn-input"]');
-    var resolveBtn = form.querySelector('[data-action="resolve-counterparty-inn"]');
-    var successBlock = form.querySelector('[data-entity="counterparty-lookup-success"]');
-    var errorBlock = form.querySelector('[data-entity="counterparty-lookup-error"]');
-    var errorText = errorBlock ? errorBlock.querySelector('[data-entity="counterparty-lookup-error-text"]') : null;
-    var registryLink = errorBlock ? errorBlock.querySelector('[data-entity="cp-error-registry-link"]') : null;
+    var searchInput = document.getElementById('bo-search');
+    var addBtn = document.querySelector('[data-action="open-counterparty-inline-add"]');
+    var inlinePanel = document.querySelector('[data-entity="counterparty-inline-add"]');
+    var hintEl = document.querySelector('[data-entity="counterparty-add-hint"]');
 
-    if (!innInput || !resolveBtn) return;
+    if (!searchInput || !addBtn || !inlinePanel) return;
 
-    // INNs already present in the CRM registry — triggers duplicate error.
-    var CRM_INN_SET = {
-      '7704132901':  true,
-      '502113742889': true
-    };
+    var innDisplay = inlinePanel.querySelector('[data-entity="counterparty-inline-inn"]');
+    var successBlock = inlinePanel.querySelector('[data-entity="counterparty-inline-success"]');
+    var errorBlock = inlinePanel.querySelector('[data-entity="counterparty-inline-error"]');
+    var errorText = errorBlock ? errorBlock.querySelector('[data-entity="counterparty-inline-error-text"]') : null;
 
-    // INNs that return a successful result from the simulated external source.
+    // External demo dataset — INNs not in the current CRM registry that return success.
     var EXTERNAL_DATASET = {
-      '7708123456':   { name: 'ООО «Альфа Расчёты»',          type: 'Юридическое лицо' },
-      '772608314579': { name: 'ИП Мартынов Кирилл Андреевич', type: 'ИП' },
-      '7812054881':   { name: 'ООО «Север Логистик Капитал»', type: 'Юридическое лицо' },
-      '503228776514': { name: 'Романова Дарья Алексеевна',    type: 'Физическое лицо' }
+      '503228776514': { name: 'Романова Дарья Алексеевна',  type: 'Физическое лицо' },
+      '5408129930':   { name: 'АО «Евразия Финанс Групп»',  type: 'Юридическое лицо' },
+      '6659124408':   { name: 'ООО «Норд Инвест Партнерс»', type: 'Юридическое лицо' }
     };
 
-    function clearResults() {
-      if (successBlock) successBlock.hidden = true;
-      if (errorBlock) errorBlock.hidden = true;
+    function getCrmInns() {
+      var inns = {};
+      document.querySelectorAll('[data-entity="counterparty"]').forEach(function (row) {
+        var inn = row.getAttribute('data-counterparty-inn');
+        if (inn) {
+          inns[inn] = true;
+        } else {
+          var match = row.textContent.match(/\b(\d{10}|\d{12})\b/);
+          if (match) inns[match[1]] = true;
+        }
+      });
+      return inns;
     }
 
-    function showError(message, showLink) {
+    function clearPanel() {
+      if (successBlock) successBlock.hidden = true;
+      if (errorBlock) errorBlock.hidden = true;
+      if (innDisplay) innDisplay.textContent = '—';
+      var confirmation = inlinePanel.querySelector('[data-entity="counterparty-inline-confirmation"]');
+      var confirmBtn = inlinePanel.querySelector('[data-action="confirm-counterparty-add"]');
+      if (confirmation) confirmation.hidden = true;
+      if (confirmBtn) confirmBtn.disabled = false;
+    }
+
+    function showPanelError(message) {
       if (successBlock) successBlock.hidden = true;
       if (errorBlock) {
-        errorBlock.hidden = false;
         if (errorText) errorText.textContent = message;
-        if (registryLink) registryLink.hidden = !showLink;
+        errorBlock.hidden = false;
       }
+      inlinePanel.hidden = false;
     }
 
-    function showSuccess(inn, counterparty) {
+    function showPanelSuccess(inn, counterparty) {
       if (errorBlock) errorBlock.hidden = true;
       if (successBlock) {
-        var nameEl = successBlock.querySelector('[data-entity="cp-result-name"]');
-        var innEl = successBlock.querySelector('[data-entity="cp-result-inn"]');
-        var typeEl = successBlock.querySelector('[data-entity="cp-result-type"]');
-        var saveBtn = successBlock.querySelector('[data-action="save-counterparty"]');
-        var confirmation = successBlock.querySelector('[data-entity="counterparty-save-confirmation"]');
+        var nameEl = successBlock.querySelector('[data-entity="counterparty-inline-name"]');
+        var innValEl = successBlock.querySelector('[data-entity="counterparty-inline-inn-val"]');
+        var typeEl = successBlock.querySelector('[data-entity="counterparty-inline-type"]');
+        var confirmBtn = successBlock.querySelector('[data-action="confirm-counterparty-add"]');
+        var confirmation = successBlock.querySelector('[data-entity="counterparty-inline-confirmation"]');
         if (nameEl) nameEl.textContent = counterparty.name;
-        if (innEl) innEl.textContent = inn;
+        if (innValEl) innValEl.textContent = inn;
         if (typeEl) typeEl.textContent = counterparty.type;
-        if (saveBtn) saveBtn.disabled = false;
+        if (confirmBtn) confirmBtn.disabled = false;
         if (confirmation) confirmation.hidden = true;
         successBlock.hidden = false;
       }
+      inlinePanel.hidden = false;
     }
 
-    function resolveInn() {
-      var raw = innInput.value.trim();
+    function updateButtonAndHint() {
+      var raw = searchInput.value.trim();
+      var digits = raw.replace(/\D/g, '');
+      var allDigits = raw === digits;
+      var validLength = digits.length === 10 || digits.length === 12;
+      var looksLikeInn = allDigits && validLength;
+      var crmInns = looksLikeInn ? getCrmInns() : {};
+      var isDuplicate = looksLikeInn && !!crmInns[digits];
+      var isAvailable = looksLikeInn && !isDuplicate;
+
+      addBtn.disabled = !isAvailable;
+
+      if (!hintEl) return;
+
       if (!raw) {
-        showError('Введите ИНН контрагента.', false);
+        hintEl.textContent = 'Введите ИНН. Если контрагент не найден в реестре, его можно добавить из внешнего источника.';
+        hintEl.dataset.hintState = '';
+      } else if (!allDigits) {
+        hintEl.textContent = '';
+        hintEl.dataset.hintState = '';
+      } else if (!validLength) {
+        hintEl.textContent = 'Введите корректный ИНН: 10 или 12 цифр.';
+        hintEl.dataset.hintState = 'invalid';
+      } else if (isDuplicate) {
+        hintEl.textContent = 'Контрагент с таким ИНН уже есть в реестре.';
+        hintEl.dataset.hintState = 'duplicate';
+      } else {
+        hintEl.textContent = 'Контрагент не найден в реестре. Можно проверить внешний источник.';
+        hintEl.dataset.hintState = 'available';
+      }
+    }
+
+    searchInput.addEventListener('input', function () {
+      updateButtonAndHint();
+      if (!inlinePanel.hidden) {
+        inlinePanel.hidden = true;
+        clearPanel();
+      }
+    });
+
+    addBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      var raw = searchInput.value.trim();
+      clearPanel();
+      if (!raw) {
+        if (innDisplay) innDisplay.textContent = '';
+        showPanelError('Введите ИНН контрагента.');
         return;
       }
       var digits = raw.replace(/\D/g, '');
-      if (digits !== raw || (digits.length !== 10 && digits.length !== 12)) {
-        showError('ИНН должен содержать 10 или 12 цифр.', false);
+      if (raw !== digits || (digits.length !== 10 && digits.length !== 12)) {
+        if (innDisplay) innDisplay.textContent = raw;
+        showPanelError('ИНН должен содержать 10 или 12 цифр.');
         return;
       }
-      if (CRM_INN_SET[digits]) {
-        showError('Контрагент с таким ИНН уже есть в CRM.', true);
-        return;
-      }
+      if (innDisplay) innDisplay.textContent = digits;
       var found = EXTERNAL_DATASET[digits];
       if (found) {
-        showSuccess(digits, found);
+        showPanelSuccess(digits, found);
       } else {
-        showError('Внешние источники не вернули данные по указанному ИНН.', false);
+        showPanelError('Внешние источники не вернули данные по указанному ИНН.');
       }
-    }
-
-    resolveBtn.addEventListener('click', function (event) {
-      resolveInn();
-      event.preventDefault();
-    });
-
-    innInput.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        resolveInn();
-        event.preventDefault();
-      }
-    });
-
-    innInput.addEventListener('input', function () {
-      clearResults();
     });
 
     document.addEventListener('click', function (event) {
       var target = event.target;
       if (!(target instanceof Element)) return;
-      var saveBtn = target.closest('[data-action="save-counterparty"]');
-      if (!saveBtn) return;
-      var confirmation = document.querySelector('[data-entity="counterparty-save-confirmation"]');
-      if (confirmation) {
-        confirmation.hidden = false;
-        saveBtn.disabled = true;
+
+      if (target.closest('[data-action="close-counterparty-inline-add"]')) {
+        inlinePanel.hidden = true;
+        clearPanel();
+        event.preventDefault();
+        return;
       }
-      event.preventDefault();
+
+      var confirmBtn = target.closest('[data-action="confirm-counterparty-add"]');
+      if (confirmBtn && inlinePanel.contains(confirmBtn)) {
+        var confirmation = inlinePanel.querySelector('[data-entity="counterparty-inline-confirmation"]');
+        if (confirmation) confirmation.hidden = false;
+        confirmBtn.disabled = true;
+        event.preventDefault();
+        return;
+      }
     });
+
+    updateButtonAndHint();
   }());
 
 })();
