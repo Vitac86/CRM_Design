@@ -1885,18 +1885,17 @@
     updateButtonAndHint();
   }());
 
-  // ── Statement export – html2pdf browser download ─────────────────────────────
+  // ── Statement export – print-ready HTML / backend PDF handoff ────────────────
   // Scoped to body[data-page="contract-wizard"] and body[data-page="contract-edit"].
-  // Fetches the existing paper HTML template, fills it with form data, generates a PDF
-  // via the local html2pdf.js vendor bundle, and triggers a browser download directly.
+  // Fetches the existing paper HTML template, fills it with form data, and either
+  // sends the filled payload to a backend PDF endpoint or opens the filled HTML.
   // Static demo personal data are placeholders for UMI.CMS/server-side data binding.
-  // UMI.CMS may later replace this with server-side PDF generation for higher-fidelity output.
   (function () {
     var page = document.body && document.body.dataset.page;
     if (page !== 'contract-wizard' && page !== 'contract-edit') return;
 
-    var exportBtn = document.querySelector('[data-action="export-statement"]');
-    if (!exportBtn) return;
+    var exportBtns = document.querySelectorAll('[data-action="export-statement"]');
+    if (!exportBtns.length) return;
 
     var form = document.querySelector('[data-form="contract-wizard"], [data-form="contract-edit"]');
 
@@ -1919,6 +1918,45 @@
              now.getFullYear();
     }
 
+    function getSummaryValue(label) {
+      var summary = document.querySelector('.crm-contract-client-summary');
+      if (!summary) return '';
+
+      var items = summary.querySelectorAll('div');
+      for (var i = 0; i < items.length; i += 1) {
+        var title = items[i].querySelector('span');
+        var value = items[i].querySelector('strong');
+        if (title && value && title.textContent.trim() === label) {
+          return value.textContent.trim();
+        }
+      }
+      return '';
+    }
+
+    function collectFormValues() {
+      var values = {};
+      if (!form) return values;
+
+      form.querySelectorAll('input[name], select[name], textarea[name]').forEach(function (el) {
+        var name = el.name;
+        if (!name) return;
+
+        if (el.type === 'checkbox') {
+          values[name] = el.checked;
+          return;
+        }
+
+        if (el.type === 'radio') {
+          if (el.checked) values[name] = el.value;
+          return;
+        }
+
+        values[name] = el.value;
+      });
+
+      return values;
+    }
+
     function collectData() {
       var reportEmail = '';
       var reportEmailEnabled = false;
@@ -1934,9 +1972,16 @@
       }
 
       var incomeVal = page === 'contract-wizard' ? getSelectValue('income-transfer').toLowerCase() : '';
+      var clientEmail = reportEmail || getSummaryValue('Email');
 
       // Static demo personal data are placeholders for UMI.CMS/server-side data binding.
       return {
+        sourcePage: page,
+        clientName: getSummaryValue('Клиент'),
+        clientCode: getSummaryValue('Код клиента'),
+        inn: getSummaryValue('ИНН'),
+        email: clientEmail,
+        formValues: collectFormValues(),
         fields: {
           'client-full-name':          'Ковалёв Даниил Олегович',
           'passport-series':           '4512',
@@ -1945,7 +1990,7 @@
           'passport-issue-day':        '22',
           'passport-issue-month-year': 'апреля 2026',
           'registration-address':      'г. Москва, ул. Примерная, д. 10, кв. 25',
-          'report-email':              reportEmail,
+          'report-email':              clientEmail,
           'statement-date':            getStatementDate(),
           'signature-name':            'Ковалёв Даниил Олегович'
         },
@@ -1995,101 +2040,111 @@
       });
     }
 
-    exportBtn.addEventListener('click', function (event) {
-      event.preventDefault();
+    function buildFilledHtml(doc) {
+      return '<!doctype html>\n' + doc.documentElement.outerHTML;
+    }
 
-      if (!window.html2pdf) {
-        alert('Не подключена библиотека генерации PDF.');
+    function buildPayload(exportBtn, data, filledHtml) {
+      return {
+        sourcePage: data.sourcePage,
+        templateId: exportBtn.getAttribute('data-document-template') || '',
+        clientName: data.clientName,
+        clientCode: data.clientCode,
+        inn: data.inn,
+        email: data.email,
+        formValues: data.formValues,
+        fields: data.fields,
+        checks: data.checks,
+        html: filledHtml
+      };
+    }
+
+    function downloadBlob(blob, filename) {
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function postToPdfEndpoint(endpoint, payload, filename) {
+      return fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.blob();
+      }).then(function (blob) {
+        downloadBlob(blob, filename);
+      });
+    }
+
+    function openFilledHtml(filledHtml) {
+      var preview = window.open('', '_blank');
+      if (!preview) {
+        alert('Не удалось открыть новую вкладку. Разрешите всплывающие окна для предпросмотра заявления.');
         return;
       }
 
-      var templateUrl = exportBtn.getAttribute('data-template-url');
-      if (!templateUrl) {
-        alert('Не задан путь к шаблону заявления (data-template-url).');
-        return;
-      }
+      preview.document.open();
+      preview.document.write(filledHtml);
+      preview.document.close();
 
-      var filename = exportBtn.getAttribute('data-pdf-filename') || 'zayavlenie-o-prisoedinenii-fl.pdf';
-      var originalText = exportBtn.textContent;
-      exportBtn.disabled = true;
-      exportBtn.textContent = 'Формируем PDF...';
+      console.info('Static fallback opened filled HTML. Use browser Save as PDF. UMI.CMS should provide a backend PDF endpoint for direct download.');
+      alert('Заявление открыто в новой вкладке. Для прямого скачивания PDF нужен серверный endpoint UMI.CMS.');
+    }
 
-      var data = collectData();
-      var container = null;
-      var injectedStyles = [];
+    exportBtns.forEach(function (exportBtn) {
+      exportBtn.addEventListener('click', function (event) {
+        event.preventDefault();
 
-      function cleanup() {
-        if (container && container.parentNode) container.parentNode.removeChild(container);
-        injectedStyles.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
-      }
+        var templateUrl = exportBtn.getAttribute('data-template-url');
+        if (!templateUrl) {
+          alert('Не задан путь к шаблону заявления (data-template-url).');
+          return;
+        }
 
-      fetch(templateUrl)
-        .then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.text();
-        })
-        .then(function (html) {
-          var parser = new DOMParser();
-          var doc = parser.parseFromString(html, 'text/html');
-          fillTemplateDoc(doc, data);
+        var endpoint = (exportBtn.getAttribute('data-pdf-endpoint') || '').trim();
+        var filename = exportBtn.getAttribute('data-pdf-filename') || 'zayavlenie-o-prisoedinenii-fl.pdf';
+        var originalText = exportBtn.textContent;
+        exportBtn.disabled = true;
+        exportBtn.textContent = 'Готовим заявление...';
 
-          // Inject template styles into the current page head so html2canvas picks them up.
-          doc.querySelectorAll('style').forEach(function (s) {
-            var styleEl = document.createElement('style');
-            styleEl.setAttribute('data-pdf-temp', '');
-            styleEl.textContent = s.textContent;
-            document.head.appendChild(styleEl);
-            injectedStyles.push(styleEl);
-          });
+        var data = collectData();
 
-          // Mount the filled document offscreen so html2canvas can render it.
-          container = document.createElement('div');
-          container.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;background:#fff;';
-          document.body.appendChild(container);
+        fetch(templateUrl)
+          .then(function (response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.text();
+          })
+          .then(function (html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            fillTemplateDoc(doc, data);
 
-          var docEl = doc.querySelector('.document');
-          if (docEl) {
-            container.appendChild(document.importNode(docEl, true));
-          } else {
-            container.innerHTML = doc.body.innerHTML;
-          }
+            var filledHtml = buildFilledHtml(doc);
+            var payload = buildPayload(exportBtn, data, filledHtml);
 
-          var renderEl = container.querySelector('.document') || container;
-
-          var options = {
-            margin: [0, 0, 0, 0],
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-              scale: 2,
-              useCORS: true,
-              logging: false,
-              letterRendering: true
-            },
-            jsPDF: {
-              unit: 'mm',
-              format: 'a4',
-              orientation: 'portrait'
-            },
-            pagebreak: {
-              mode: ['css', 'legacy']
+            if (endpoint) {
+              return postToPdfEndpoint(endpoint, payload, filename);
             }
-          };
 
-          return html2pdf().set(options).from(renderEl).save();
-        })
-        .then(function () {
-          cleanup();
-          exportBtn.disabled = false;
-          exportBtn.textContent = originalText;
-        })
-        .catch(function (err) {
-          console.warn('Не удалось сформировать PDF:', err);
-          alert('Не удалось сформировать PDF. Проверьте путь к шаблону заявления.');
-          cleanup();
-          exportBtn.disabled = false;
-          exportBtn.textContent = originalText;
-        });
+            openFilledHtml(filledHtml);
+            return null;
+          })
+          .catch(function (err) {
+            console.warn('Не удалось подготовить заявление:', err);
+            alert('Не удалось подготовить заявление. Проверьте путь к шаблону заявления.');
+          })
+          .finally(function () {
+            exportBtn.disabled = false;
+            exportBtn.textContent = originalText;
+          });
+      });
     });
   }());
 

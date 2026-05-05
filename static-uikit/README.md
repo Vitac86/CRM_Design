@@ -168,9 +168,11 @@ Print-ready HTML templates for client-facing documents live in `assets/document-
 |---|---|
 | `zayavlenie-o-prisoedinenii-fl.html` | Заявление о присоединении (для физических лиц) |
 
-The "Выгрузить заявление" button in `contract-wizard.html` fetches this template, fills it with wizard values via `DOMParser`, opens it in a new window, and triggers `window.print()` so the user can save as PDF.
+The "Выгрузить заявление" button is exposed in both `contract-wizard.html` and `contract-edit.html`.
 
-**UMI.CMS integration:** replace the client-side fetch+print flow with server-side PDF generation (e.g. wkhtmltopdf / Puppeteer on the backend). The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
+In the static handoff, this action fetches the existing HTML template, fills it via `DOMParser`, and opens the filled print-ready document in a new tab for review or browser "Save as PDF". It does not automatically call print and does not download a fake `.pdf` from HTML.
+
+Direct high-quality PDF download should be implemented by UMI.CMS/backend using a server-side renderer such as headless Chrome, Puppeteer, wkhtmltopdf, or an equivalent tool. `html2pdf` / `html2canvas` intentionally is not used for this legal statement because it rasterizes the document, producing heavier PDFs without a reliable selectable text layer. The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
 
 ## Client-side demo pagination
 Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.
