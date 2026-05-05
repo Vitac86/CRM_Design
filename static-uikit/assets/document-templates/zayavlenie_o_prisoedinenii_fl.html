@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Заявление о присоединении (для физических лиц)</title>
+  <style>
+    :root {
+      --text: #111;
+      --line: #111;
+      --muted: #444;
+      --page-width: 210mm;
+      --font-size: 9.1pt;
+      --line-height: 1.06;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: #f1f1f1;
+      font-family: "Times New Roman", Times, serif;
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+    }
+
+    .document {
+      width: var(--page-width);
+      margin: 18px auto;
+      padding: 13mm 16mm;
+      background: #fff;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .doc-topline {
+      margin: 0 0 5px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 9.8pt;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 2px;
+      text-align: center;
+      font-size: 13pt;
+      font-style: italic;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin: 0 0 7px;
+      text-align: center;
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    p { margin: 0 0 4px; }
+
+    .intro { text-align: justify; }
+
+    .clause { margin-top: 5px; }
+    .clause-title {
+      margin: 0 0 2px;
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .check-list { margin: 0; }
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      margin: 1px 0;
+    }
+
+    .checkbox {
+      display: inline-block;
+      flex: 0 0 auto;
+      width: 3.2mm;
+      height: 3.2mm;
+      margin-top: 1.3px;
+      border: 1px solid var(--line);
+      vertical-align: text-top;
+    }
+
+    .subheading {
+      margin: 5px 0 2px;
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .field {
+      display: inline-block;
+      min-width: 38mm;
+      height: 1.05em;
+      border-bottom: 1px solid var(--line);
+      vertical-align: baseline;
+    }
+    .field.short { min-width: 14mm; }
+    .field.medium { min-width: 28mm; }
+    .field.long { min-width: 78mm; }
+    .field.full { min-width: 100%; }
+
+    .market-table {
+      width: 100%;
+      margin: 4px 0 8px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .market-table td {
+      padding: 1px 6px 2px 0;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .market-table tr:last-child td { border-bottom: 1px solid var(--line); }
+    .market-table .market-name { width: 76%; }
+    .market-table .tariff { width: 24%; font-weight: 700; }
+    .market-note { margin: 2px 0 0 18px; text-align: justify; }
+
+    .dash-list { margin: 0 0 0 0; padding: 0; list-style: none; }
+    .dash-list > li { margin: 1px 0; text-align: justify; }
+    .dash-list > li::before { content: "- "; }
+
+    .bullet-list { margin: 1px 0 1px 24px; padding-left: 10px; }
+    .bullet-list li { margin: 1px 0; text-align: justify; }
+
+    .contact-table, .office-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .contact-table { margin-top: 8px; }
+    .contact-table th, .contact-table td,
+    .office-table th, .office-table td {
+      border: 1px solid var(--line);
+      padding: 3px 6px;
+      vertical-align: top;
+    }
+    .contact-table th, .office-table th {
+      font-weight: 700;
+      text-align: left;
+    }
+    .contact-table td { height: 6mm; }
+    .office-table td { height: 7mm; }
+    .office-table .center { text-align: center; }
+    .office-table .spacer td { height: 9mm; }
+
+    .date-line {
+      margin: 8px 0 0;
+      text-align: center;
+    }
+
+    .signature {
+      margin-top: 7px;
+      display: grid;
+      grid-template-columns: 1fr auto 36mm;
+      column-gap: 8px;
+      align-items: end;
+    }
+    .signature .sig-line {
+      grid-column: 2;
+      min-width: 52mm;
+      border-bottom: 1px solid var(--line);
+      height: 1.1em;
+    }
+    .signature .sig-name {
+      grid-column: 3;
+      border-bottom: 1px solid var(--line);
+      height: 1.1em;
+    }
+    .signature .sig-caption {
+      grid-column: 2;
+      text-align: center;
+      font-size: 9.4pt;
+    }
+    .signature .stamp { grid-column: 3; text-align: center; margin-top: 8px; }
+
+    .office-block { margin-top: 16mm; }
+    .office-title {
+      margin: 0 0 4px;
+      font-style: italic;
+    }
+
+    .page-break { page-break-before: always; break-before: page; }
+    .keep { break-inside: avoid; page-break-inside: avoid; }
+
+    @page { size: A4; margin: 13mm 16mm; }
+
+    @media print {
+      body { background: #fff; }
+      .document {
+        width: auto;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="document">
+    <p class="doc-topline">ПРИЛОЖЕНИЕ 1А К РЕГЛАМЕНТУ. ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ.</p>
+    <h1>Заявление о присоединении</h1>
+    <p class="subtitle">(для физических лиц)</p>
+
+    <p class="intro">
+      Настоящим, <span class="field long"></span>, паспорт серии <span class="field short"></span>,
+      № <span class="field medium"></span>, выдан <span class="field long"></span>, дата выдачи
+      «<span class="field short"></span>» <span class="field short"></span> г., проживающий(ая) по адресу
+      (регистрации): <span class="field full"></span>.
+    </p>
+
+    <section class="clause">
+      <p class="clause-title">1. Присоединяется согласно ст. 428 ГК РФ:</p>
+      <div class="check-list">
+        <div class="check-row"><span class="checkbox"></span><span>к Регламенту брокерского обслуживания, утвержденному ООО «Инвестика» (далее — Регламент), и вступает в договорные отношения с ООО «Инвестика» на условиях Регламента (далее – Договор о брокерском обслуживании);</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>к Депозитарному договору (договору о счете депо), утвержденному ООО «Инвестика», и вступает в договорные отношения с ООО «Инвестика» на условиях Депозитарного договора (договора о счете депо), в том числе Условий осуществления депозитарной деятельности (Клиентского регламента) ООО «Инвестика» (далее – Депозитарный договор (договор о счете депо));</span></div>
+      </div>
+    </section>
+
+    <section class="clause">
+      <p class="clause-title">2. Просит депозитарий ООО «Инвестика» открыть счет депо:</p>
+      <div class="check-list">
+        <div class="check-row"><span class="checkbox"></span><span>Владельца</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>Номинального держателя</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>Доверительного управляющего</span></div>
+      </div>
+
+      <p class="subheading">Открыть торговый счет депо:</p>
+      <div class="check-list">
+        <div class="check-row"><span class="checkbox"></span><span>Владельца</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>Номинального держателя</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>Доверительного управляющего</span></div>
+      </div>
+
+      <div class="check-row" style="margin-top: 4px;"><span class="checkbox"></span><span>назначить ООО «Инвестика» оператором счета депо и торгового счета депо, открытых на основании настоящего заявления, предоставив полномочия, установленные Условиями осуществления депозитарной деятельности ООО Инвестика;</span></div>
+    </section>
+
+    <section class="clause">
+      <p class="clause-title">3. Просит ООО «Инвестика» обеспечить получение отчетов следующим способом:</p>
+      <div class="check-list">
+        <div class="check-row"><span class="checkbox"></span><span>В офисе ООО «Инвестика»</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>По почте заказным письмом</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>По электронной почте <span class="field medium"></span> (необходимо указать адрес электронной почты)</span></div>
+        <div class="check-row"><span class="checkbox"></span><span>По системе ЭДО</span></div>
+      </div>
+    </section>
+
+    <section class="clause keep">
+      <p class="clause-title">4. Просит ООО «Инвестика» предоставить брокерское обслуживание и доверяет открыть необходимые портфели для совершения торговых операций на следующих рынках и в соответствии со следующими тарифными планами:</p>
+      <table class="market-table">
+        <tbody>
+          <tr>
+            <td class="market-name"><div class="check-row"><span class="checkbox"></span><strong>Фондовый рынок</strong></div>
+              <p class="market-note">Настоящим Клиент поручает Брокеру совершать Специальные сделки РЕПО и сделки закрытия позиций в случаях и на условиях, изложенных в Поручении на совершение Специальных сделок РЕПО и сделок закрытия позиций;</p>
+            </td>
+            <td class="tariff">Тарифный план:</td>
+          </tr>
+          <tr>
+            <td class="market-name"><div class="check-row"><span class="checkbox"></span><strong>Срочный рынок</strong></div></td>
+            <td class="tariff">Тарифный план:</td>
+          </tr>
+          <tr>
+            <td class="market-name"><div class="check-row"><span class="checkbox"></span><strong>Валютный рынок и рынок драгоценных металлов</strong></div>
+              <p class="market-note">Настоящим Клиент поручает Брокеру совершать сделки переноса открытых позиций и сделки закрытия позиций при совершении операций на валютном рынке и рынке драгоценных металлов в случаях и на условиях, изложенных в Поручении на сделки переноса открытых позиций и сделки закрытия позиций при совершении операций на валютном рынке и рынке драгоценных металлов.</p>
+            </td>
+            <td class="tariff">Тарифный план:</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="clause">
+      <p class="clause-title">5. Присоединяется согласно ст. 428 ГК РФ:</p>
+      <div class="check-row"><span class="checkbox"></span><span>к Соглашению об использовании электронной подписи и обмене электронными документами</span></div>
+      <div class="check-row"><span class="checkbox"></span><span>к Соглашению о предоставлении права использования программы для ЭВМ РМ клиента QUIK MP«Брокер».</span></div>
+    </section>
+
+    <section class="clause">
+      <p><strong>6.</strong> Просит доходы и (или) выплаты по ценным бумагам в рамках Депозитарного договора (договора о счете депо) (за исключением счета депо/торгового счета депо номинального держателя) перечислять (отметить нужное):</p>
+      <div class="check-row"><span class="checkbox"></span><span>на специальный брокерский счет ООО «Инвестика», открытый в кредитной организации, с последующим зачислением денежных средств на брокерский счет Клиента, открытый в системе внутреннего учета в рамках Договора о брокерском обслуживании</span></div>
+      <div class="check-row"><span class="checkbox"></span><span>на банковские реквизиты, указанные в анкете клиента.</span></div>
+    </section>
+
+    <section class="clause">
+      <p><strong>7.</strong> Подписывая настоящее Заявление, обязуется полностью и своевременно выполнять принятые на себя обязательства.</p>
+    </section>
+
+    <section class="clause">
+      <p><strong>8.</strong> Подтверждает, что ознакомлен:</p>
+      <ul class="dash-list">
+        <li>с Ключевой информацией о договоре о брокерском обслуживании ООО «Инвестика», размещенной на официальном сайте Компании по адресу htths://www.investica.ru в разделе «Раскрытие информации»;</li>
+        <li>с Декларацией о рисках, связанных с совершением операций на рынке ценных бумаг, размещенной на официальном сайте Компании по адресу htths://www.investica.ru в разделе «Раскрытие информации»;</li>
+        <li>с Уведомлением о недопустимости манипулирования и об ответственности за манипулирование рынком (Приложение 13 к Регламенту брокерского обслуживания ООО «Инвестика»);</li>
+        <li>с тем, что денежные средства, зачисляемые брокером на специальный брокерский счет (счета), или переданные брокеру, являющемуся кредитной организацией, не подлежат страхованию в соответствии с Федеральным законом от 23 декабря 2003 года N 177-ФЗ "О страховании вкладов в банках Российской Федерации";</li>
+        <li>о праве подать заявление брокеру об отказе от предоставления брокеру права использования в своих интересах денежных средств и (или) ценных бумаг клиента и о последствиях такого отказа, а также о способе и форме направления брокеру такого заявления ((Приложение 9 к Регламенту брокерского обслуживания ООО «Инвестика»);</li>
+        <li>о праве на получение по запросу информации о видах и суммах платежей (порядке определения сумм платежей), которые клиент должен будет уплатить за предоставление ему финансовой услуги, включая информацию о размере вознаграждения (порядке определения размера вознаграждения) брокера и порядке его уплаты;</li>
+        <li>о праве на получение по запросу следующей информации в отношении предлагаемых к приобретению паев паевых инвестиционных фондов:</li>
+      </ul>
+      <ul class="bullet-list">
+        <li>инвестиционную декларацию паевого инвестиционного фонда;</li>
+        <li>источник получения сведений об изменении расчетной стоимости инвестиционного пая за последние шесть месяцев;</li>
+        <li>размер вознаграждения управляющей компании и общий размер вознаграждения специализированного депозитария, лица, осуществляющего ведение реестра владельцев инвестиционных паев, аудиторской организации, а также оценщика, если инвестиционная декларация паевого инвестиционного фонда предусматривает возможность инвестирования в имущество, оценка которого осуществляется оценщиком;</li>
+        <li>порядок и сроки выплаты денежной компенсации в связи с погашением инвестиционных паев;</li>
+      </ul>
+      <ul class="dash-list">
+        <li>о праве на получение по запросу следующей информации о договорах, являющихся производными финансовыми инструментами:</li>
+      </ul>
+      <ul class="bullet-list">
+        <li>спецификацию договора, являющегося производным финансовым инструментом</li>
+        <li>размер суммы денежных средств, которую необходимо уплатить на момент заключения договора, являющегося производным финансовым инструментом;</li>
+        <li>источник получения сведений о колебании цены (значения) базисного актива за последние шесть месяцев, предшествующих дате заключения договора, являющегося производным финансовым инструментом (в случае наличия у брокера информации о таком источнике).</li>
+      </ul>
+    </section>
+
+    <section class="clause">
+      <p><strong>9.</strong> Подписывая настоящее Заявление подтверждает, что ознакомлен с Регламентом брокерского обслуживания/Депозитарным договором (договором о счете депо) (в зависимости от выбранного варианта присоединения) и приложениями к ним (включая Условия осуществления депозитарной деятельности (Клиентский регламент) ООО «Инвестика», а также с Уведомлением о порядке хранения и учета денежных средств клиента), их содержание понятно.</p>
+    </section>
+
+    <section class="clause">
+      <p><strong>10.</strong> Подписывая настоящее Заявление, подтверждает, что Декларация о рисках (Приложение 5 к Регламенту брокерского обслуживания ООО «Инвестика») предоставлена, прочитана и понятна, осознает реальные риски при принятии инвестиционных решений и подтверждает, что принимает описанные в указанной Декларации риски.</p>
+    </section>
+
+    <section class="clause">
+      <p><strong>11.</strong> Подписывая настоящее Заявление, подтверждает, что предупрежден о факте совмещения ООО «Инвестика» следующих видов профессиональной деятельности на рынке ценных бумаг:</p>
+      <ul class="bullet-list">
+        <li>Деятельность по управлению ценными бумагами</li>
+        <li>Дилерская деятельность</li>
+        <li>Депозитарная деятельность</li>
+        <li>Брокерская деятельность</li>
+      </ul>
+    </section>
+
+    <section class="clause">
+      <p><strong>12.</strong> Подписывая настоящее Заявление, подтверждает, что уведомлен о сервисе единой денежной позиции, позволяющей Клиенту использовать одну денежную позицию в Системе, в целях определения достаточности обеспечения при приеме поручений на сделку, а также для урегулирования сделок в нескольких разных торговых системах.</p>
+    </section>
+
+    <section class="clause">
+      <p><strong>13.</strong> Клиенту даны разъяснения о предпринимаемых Брокером мерах в случае отнесении сделок или иных действий Клиента (включая подачу Поручений Клиента), к нестандартным, то есть содержащим признаки сделок (действий), направленных на легализацию отмывание доходов, полученных преступным путем, финансирование терроризма, манипулирование рынком, неправомерное использование инсайдерской информации, либо иные признаки, подлежащие контролю Брокером в соответствии с действующим законодательством, согласно которому Брокер вправе запросить у Клиента разъяснения по указанным сделкам, действиям Клиента, а Клиент обязан предоставить их.</p>
+    </section>
+
+    <section class="clause">
+      <p><strong>14.</strong> После подписания настоящего Заявления Клиент теряет право ссылаться на то, что он не ознакомился с Регламентом и приложениями к нему, Депозитарным договором и приложениями к нему, с Тарифами на услуги, с Правилами ЭДО, и иными документами, размещенными в сети интернет по вышеуказанному адресу, и признает их обязательность в договорных отношениях с Брокером и Депозитарием.</p>
+    </section>
+
+    <section class="clause">
+      <p><strong>15.</strong> Проставление любого символа в графе <span class="checkbox" style="width: 3mm; height: 3mm; margin: 0 3px -1px;"></span> означает согласие на предоставление соответствующей услуги и/или на заключение соответствующего Соглашения.</p>
+    </section>
+
+    <section class="clause keep">
+      <p><strong>16.</strong> В целях оперативного обмена информацией (в том числе в случаях: снижения остатка клиентского счета ниже допустимого минимума; изменения размера гарантийного обеспечения и норматива ликвидности гарантийного обеспечения; изменения списка неденежных активов, принимаемых в качестве гарантийного обеспечения; принудительного закрытия позиций Клиента и т.д., за исключением подачи поручений на совершение сделок) Клиент и Брокер договорились использовать следующие способы связи:</p>
+      <table class="contact-table">
+        <thead>
+          <tr>
+            <th>Для передачи информации Клиенту</th>
+            <th>Для передачи информации Брокеру/Депозитарию</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Телефон:</td>
+            <td>Телефон: +7 (812) 319-95-00</td>
+          </tr>
+          <tr>
+            <td>Электронная почта:</td>
+            <td>Электронная почта: Backoffice@investica.ru</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <p class="date-line">"_____"__________" 20____ г.</p>
+
+    <div class="signature keep">
+      <span></span>
+      <span class="sig-line"></span>
+      <span class="sig-name"></span>
+      <span></span>
+      <span class="sig-caption">Подпись</span>
+      <span class="stamp">М.П.</span>
+    </div>
+
+    <section class="office-block page-break">
+      <p class="office-title">Заполняется ООО «Инвестика»</p>
+      <table class="office-table">
+        <thead>
+          <tr>
+            <th class="center">Наименование</th>
+            <th class="center">Номер</th>
+            <th class="center">Дата</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Регистрационный номер заявления о присоединении</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Договор на брокерское обслуживание</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Депозитарный договор (Договор счета ДЕПО)</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Код клиента в системе внутреннего учета</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <th class="center">Должность</th>
+            <th class="center">ФИО</th>
+            <th class="center">Подпись</th>
+          </tr>
+          <tr class="spacer">
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
