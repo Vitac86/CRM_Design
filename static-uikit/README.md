@@ -172,6 +172,33 @@ The "Выгрузить заявление" button in `contract-wizard.html` fet
 
 **UMI.CMS integration:** replace the client-side fetch+print flow with server-side PDF generation (e.g. wkhtmltopdf / Puppeteer on the backend). The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
 
+## Client-side demo pagination
+Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.
+
+- Page-size chips (25 / 50 / 100) slice visible tbody rows to the selected window.
+- Prev / Next buttons navigate between pages; the page indicator updates to show `N из M`.
+- Filtering and search narrow the row set first; pagination then slices within that filtered result.
+- Sorting reorders all non-filtered rows and resets to page 1.
+
+**This is static preview only.** UMI.CMS integration must replace this with server-side pagination, filtering, and search for real datasets.
+
+Stable HTML hooks used by the pagination engine:
+
+| Element | Hook | Purpose |
+|---|---|---|
+| Page-size container | `data-page-size-group` | Groups the 25 / 50 / 100 chips |
+| Page-size chip | `data-page-size-value="N"` + `.crm-footer-chip` | Chip value and active-state class |
+| Page indicator span | text matching `N из N` | Updated by JS to reflect current/total pages |
+| Prev button | `aria-label` containing "Предыдущая" | Tagged by JS with `data-pagination-nav="prev"` |
+| Next button | `aria-label` containing "Следующая" | Tagged by JS with `data-pagination-nav="next"` |
+
+CSS classes written by JS (safe to style or remove in UMI.CMS):
+
+| Class | Applied to | Meaning |
+|---|---|---|
+| `.is-filter-hidden` | `<tr>` | Row hidden by an active filter/search |
+| `.is-page-hidden` | `<tr>` | Row hidden because it falls outside the current page window |
+
 ## Known limitations
 - Static sample data only.
 - Prototype JavaScript only; not backend or business logic.

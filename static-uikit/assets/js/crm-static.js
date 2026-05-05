@@ -325,7 +325,157 @@
 
       const emptyState = getStaticEmptyState(target.shell, panel);
       if (emptyState) emptyState.hidden = visibleCount > 0;
+
+      refreshPaginationForTable(target.table, true);
     });
+  }
+
+  // ── Client-side demo pagination ──────────────────────────────────────────────
+  // Static-only demo behavior. UMI.CMS will replace with server-side pagination.
+  // Registry tables with a [data-page-size-group] footer get per-page row slicing.
+  // Filter state: .is-filter-hidden. Pagination state: .is-page-hidden. row.hidden = either.
+
+  var paginationInstances = [];
+
+  function getPaginationFilteredRows(table) {
+    if (!table || !table.tBodies || !table.tBodies.length) return [];
+    return Array.from(
+      table.tBodies[0].querySelectorAll(':scope > tr:not([data-sort-ignore])')
+    ).filter(function (row) {
+      return !row.classList.contains('is-filter-hidden');
+    });
+  }
+
+  function applyPagination(instance) {
+    if (!instance || !instance.table) return;
+    var tbody = instance.table.tBodies && instance.table.tBodies[0];
+    if (!tbody) return;
+
+    var allRows = Array.from(tbody.querySelectorAll(':scope > tr:not([data-sort-ignore])'));
+    var filteredRows = allRows.filter(function (row) {
+      return !row.classList.contains('is-filter-hidden');
+    });
+
+    var pageSize = instance.pageSize;
+    var totalPages = filteredRows.length > 0 ? Math.ceil(filteredRows.length / pageSize) : 1;
+
+    if (instance.currentPage > totalPages) instance.currentPage = totalPages;
+    if (instance.currentPage < 1) instance.currentPage = 1;
+    var currentPage = instance.currentPage;
+
+    var startIndex = (currentPage - 1) * pageSize;
+    var endIndex = startIndex + pageSize;
+
+    filteredRows.forEach(function (row, i) {
+      var hide = i < startIndex || i >= endIndex;
+      row.classList.toggle('is-page-hidden', hide);
+      row.hidden = hide;
+    });
+
+    allRows.forEach(function (row) {
+      if (row.classList.contains('is-filter-hidden')) {
+        row.classList.remove('is-page-hidden');
+        row.hidden = true;
+      }
+    });
+
+    if (instance.indicator) {
+      instance.indicator.textContent = filteredRows.length === 0
+        ? '0 из 0'
+        : currentPage + ' из ' + totalPages;
+    }
+
+    var canPrev = currentPage > 1;
+    var canNext = filteredRows.length > 0 && currentPage < totalPages;
+
+    if (instance.prevBtn) {
+      instance.prevBtn.disabled = !canPrev;
+      instance.prevBtn.setAttribute('aria-disabled', canPrev ? 'false' : 'true');
+      instance.prevBtn.classList.toggle('is-disabled', !canPrev);
+    }
+    if (instance.nextBtn) {
+      instance.nextBtn.disabled = !canNext;
+      instance.nextBtn.setAttribute('aria-disabled', canNext ? 'false' : 'true');
+      instance.nextBtn.classList.toggle('is-disabled', !canNext);
+    }
+  }
+
+  function refreshPaginationForTable(table, resetPage) {
+    paginationInstances.forEach(function (instance) {
+      if (instance.table === table) {
+        if (resetPage) instance.currentPage = 1;
+        applyPagination(instance);
+      }
+    });
+  }
+
+  function initPagination() {
+    paginationInstances = [];
+
+    document.querySelectorAll('[data-page-size-group]').forEach(function (pageGroup) {
+      var shell = pageGroup.closest('.crm-registry-shell, .crm-registry-page, .crm-page') || pageGroup.parentElement;
+      if (!shell) return;
+
+      var table = null;
+      var tables = Array.from(shell.querySelectorAll('.crm-registry-table table, table[data-sortable-table], table'));
+      for (var ti = 0; ti < tables.length; ti++) {
+        var tb = tables[ti].tBodies && tables[ti].tBodies[0];
+        if (tb && tb.querySelectorAll(':scope > tr:not([data-sort-ignore])').length > 0) {
+          table = tables[ti];
+          break;
+        }
+      }
+      if (!table) return;
+
+      var footerDiv = pageGroup.parentElement;
+      var indicator = null;
+      if (footerDiv) {
+        var candidates = Array.from(footerDiv.querySelectorAll('span, td'));
+        for (var ci = 0; ci < candidates.length; ci++) {
+          if (/^\d+\s+из\s+\d+$/.test(candidates[ci].textContent.trim())) {
+            indicator = candidates[ci];
+            break;
+          }
+        }
+      }
+
+      var prevBtn = null;
+      var nextBtn = null;
+      if (footerDiv) {
+        Array.from(footerDiv.querySelectorAll('button[aria-label]')).forEach(function (btn) {
+          var label = btn.getAttribute('aria-label') || '';
+          if (!prevBtn && /предыдущ/i.test(label)) prevBtn = btn;
+          if (!nextBtn && /следующ/i.test(label)) nextBtn = btn;
+        });
+      }
+
+      var activeChip = pageGroup.querySelector('.crm-footer-chip.is-active[data-page-size-value]');
+      var pageSize = activeChip ? (parseInt(activeChip.getAttribute('data-page-size-value'), 10) || 25) : 25;
+
+      var instance = {
+        pageGroup: pageGroup,
+        table: table,
+        pageSize: pageSize,
+        currentPage: 1,
+        prevBtn: prevBtn,
+        nextBtn: nextBtn,
+        indicator: indicator
+      };
+
+      paginationInstances.push(instance);
+      pageGroup._paginationInst = instance;
+
+      if (prevBtn) {
+        prevBtn.setAttribute('data-pagination-nav', 'prev');
+        prevBtn._paginationInst = instance;
+      }
+      if (nextBtn) {
+        nextBtn.setAttribute('data-pagination-nav', 'next');
+        nextBtn._paginationInst = instance;
+      }
+    });
+
+    paginationInstances.forEach(applyPagination);
   }
 
   function syncFilterMenuState(filterMenu, value) {
@@ -739,6 +889,33 @@
           chip.classList.toggle('is-active', isActive);
           chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
+        var newPageSize = parseInt(pageSizeChip.getAttribute('data-page-size-value'), 10) || 25;
+        var chipInst = chipGroup._paginationInst;
+        if (chipInst) {
+          chipInst.pageSize = newPageSize;
+          chipInst.currentPage = 1;
+          applyPagination(chipInst);
+        }
+      }
+      event.preventDefault();
+      return;
+    }
+
+    // Pagination prev/next navigation — buttons tagged by initPagination with [data-pagination-nav].
+    var paginationNavBtn = target.closest('[data-pagination-nav]');
+    if (paginationNavBtn) {
+      var navInst = paginationNavBtn._paginationInst;
+      var navDir = paginationNavBtn.getAttribute('data-pagination-nav');
+      if (navInst && navDir) {
+        var navFilteredRows = getPaginationFilteredRows(navInst.table);
+        var navTotalPages = navFilteredRows.length > 0 ? Math.ceil(navFilteredRows.length / navInst.pageSize) : 1;
+        if (navDir === 'prev' && navInst.currentPage > 1) {
+          navInst.currentPage -= 1;
+          applyPagination(navInst);
+        } else if (navDir === 'next' && navInst.currentPage < navTotalPages) {
+          navInst.currentPage += 1;
+          applyPagination(navInst);
+        }
       }
       event.preventDefault();
       return;
@@ -919,6 +1096,7 @@
   initFilterPanelDefaults(document);
   syncResetButtonState(document);
   applyStaticFilters(document);
+  initPagination();
 
   // ── UIkit tabs / init ────────────────────────────────────────────────────
   if (window.UIkit) {
@@ -1056,7 +1234,9 @@
     var tbody = table.querySelector('tbody');
     if (!tbody) return;
 
-    var rows = Array.from(tbody.querySelectorAll('> tr:not([hidden]):not(.is-hidden):not([data-sort-ignore])'.replace('> ', ':scope > ')));
+    var rows = Array.from(tbody.querySelectorAll(':scope > tr:not([data-sort-ignore])')).filter(function (row) {
+      return !row.classList.contains('is-filter-hidden');
+    });
     if (rows.length === 0) return;
 
     // Find the column index
@@ -1080,6 +1260,8 @@
     rows.forEach(function (row) {
       tbody.appendChild(row);
     });
+
+    refreshPaginationForTable(table, true);
   });
 
   function normalizeSortText(value) {
