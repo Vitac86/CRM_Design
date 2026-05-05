@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Бэк-офис</title>
+  <title>Контрагенты — Бэк-офис</title>
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
 </head>
@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        <a class="crm-nav-link crm-nav-item" href="back-office.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
+        <a class="crm-nav-link crm-nav-item" href="back-office.html" data-match="counterparty-add.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Бэк-офис</span></a>
         <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
         <a class="crm-nav-link crm-nav-item" href="depository.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
         <a class="crm-nav-link crm-nav-item" href="administration.html"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
@@ -83,15 +83,15 @@
         <section class="crm-registry-shell crm-back-office-shell">
           <div class="crm-page-header crm-page-header-row crm-registry-header crm-back-office-header">
             <div class="crm-registry-title-block">
-              <h1 class="crm-page-title" data-entity="page-title">Бэк-офис</h1>
-              <p class="crm-page-subtitle">Реестр отправленных отчётов и операционных файлов с контролем доставки.</p>
+              <h1 class="crm-page-title" data-entity="page-title">Контрагенты</h1>
+              <p class="crm-page-subtitle">Реестр контрагентов для бэк-офисных операций и документооборота.</p>
             </div>
             <div class="crm-header-actions crm-registry-actions crm-back-office-actions">
-              <button
-                class="uk-button uk-button-default crm-button crm-button-secondary"
-                type="button"
-                data-action="export-back-office"
-              >Экспорт</button>
+              <a
+                class="uk-button crm-button-primary crm-button"
+                href="counterparty-add.html"
+                data-action="add-counterparty"
+              >+ Добавить контрагента</a>
             </div>
           </div>
 
@@ -117,109 +117,9 @@
                   type="search"
                   data-filter="search"
                   name="search"
-                  placeholder="Файл, клиент, код"
+                  placeholder="Наименование, ФИО или ИНН"
                 />
               </label>
-            </div>
-
-            <div class="crm-filter-fields-row">
-              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <details class="crm-filter-menu" data-filter-menu="report-type">
-                  <summary class="crm-filter-trigger" aria-label="Фильтр: Вид отчёта">
-                    <span class="crm-filter-trigger-label">Вид отчёта:</span>
-                    <span class="crm-filter-trigger-value">Все</span>
-                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
-                  </summary>
-                  <div class="crm-filter-dropdown" role="listbox" aria-label="Вид отчёта">
-                    <button
-                      type="button"
-                      class="crm-filter-option is-selected"
-                      role="option"
-                      aria-selected="true"
-                      data-filter-option
-                      data-filter-value="all"
-                    >
-                      <span>Все</span>
-                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button
-                      type="button"
-                      class="crm-filter-option"
-                      role="option"
-                      aria-selected="false"
-                      data-filter-option
-                      data-filter-value="opt-1"
-                    >
-                      <span>Операционный</span>
-                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button
-                      type="button"
-                      class="crm-filter-option"
-                      role="option"
-                      aria-selected="false"
-                      data-filter-option
-                      data-filter-value="opt-2"
-                    >
-                      <span>Финансовый</span>
-                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
-                    </button>
-                  </div>
-                  <input type="hidden" name="report-type" value="all" data-filter="report-type"/>
-                </details>
-              </div>
-              <div class="crm-filter-control crm-filter-field crm-filter-pill-control">
-                <details class="crm-filter-menu" data-filter-menu="delivery-result">
-                  <summary class="crm-filter-trigger" aria-label="Фильтр: Результат доставки">
-                    <span class="crm-filter-trigger-label">Результат доставки:</span>
-                    <span class="crm-filter-trigger-value">Все</span>
-                    <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
-                  </summary>
-                  <div class="crm-filter-dropdown" role="listbox" aria-label="Результат доставки">
-                    <button
-                      type="button"
-                      class="crm-filter-option is-selected"
-                      role="option"
-                      aria-selected="true"
-                      data-filter-option
-                      data-filter-value="all"
-                    >
-                      <span>Все</span>
-                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button
-                      type="button"
-                      class="crm-filter-option"
-                      role="option"
-                      aria-selected="false"
-                      data-filter-option
-                      data-filter-value="opt-1"
-                    >
-                      <span>Доставлен</span>
-                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button
-                      type="button"
-                      class="crm-filter-option"
-                      role="option"
-                      aria-selected="false"
-                      data-filter-option
-                      data-filter-value="opt-2"
-                    >
-                      <span>Ошибка</span>
-                      <span class="crm-filter-option-check" aria-hidden="true">✓</span>
-                    </button>
-                  </div>
-                  <input type="hidden" name="delivery-result" value="all" data-filter="delivery-result"/>
-                </details>
-              </div>
-              <div class="crm-filter-actions">
-                <button
-                  class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset"
-                  data-action="reset-filters"
-                  type="button"
-                >Сбросить фильтры</button>
-              </div>
             </div>
           </form>
 
@@ -232,41 +132,70 @@
                 <table class="uk-table uk-table-divider uk-table-hover">
                   <thead>
                     <tr>
-                      <th>Файл</th>
-                      <th>Тип</th>
-                      <th>Канал</th>
-                      <th>Отправка</th>
-                      <th>Статус</th>
+                      <th>Наименование / ФИО</th>
+                      <th>ИНН</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr data-entity="back-office-report" data-id="bo-oper-24042026-003" data-filter-report-type="opt-1" data-filter-delivery-result="opt-1">
+                    <tr
+                      data-entity="counterparty"
+                      data-id="cp-001"
+                      data-counterparty-name="ООО «Альфа Расчёты»"
+                      data-counterparty-inn="7708123456"
+                    >
                       <td>
-                        <div class="crm-row-main">bo_oper_24042026_003.xml</div>
-                        <div class="crm-row-sub">CL-4401 · Операционный</div>
+                        <div class="crm-row-main">ООО «Альфа Расчёты»</div>
+                        <div class="crm-row-sub">Юридическое лицо</div>
                       </td>
-                      <td>Операционный</td>
-                      <td>
-                        <span class="crm-badge muted" data-status="delivery-edo">ЭДО</span>
-                      </td>
-                      <td>24.04.2026 11:08</td>
-                      <td>
-                        <span class="crm-badge success" data-status="delivered">Доставлен</span>
-                      </td>
+                      <td>7708123456</td>
                     </tr>
-                    <tr data-entity="back-office-report" data-id="bo-ops-23042026-014" data-filter-report-type="opt-1" data-filter-delivery-result="opt-2">
+                    <tr
+                      data-entity="counterparty"
+                      data-id="cp-002"
+                      data-counterparty-name="АО «Восток Майнинг Системс»"
+                      data-counterparty-inn="7704132901"
+                    >
                       <td>
-                        <div class="crm-row-main">bo_ops_23042026_014.xml</div>
-                        <div class="crm-row-sub">CL-4412 · Операционный</div>
+                        <div class="crm-row-main">АО «Восток Майнинг Системс»</div>
+                        <div class="crm-row-sub">Юридическое лицо</div>
                       </td>
-                      <td>Операционный</td>
+                      <td>7704132901</td>
+                    </tr>
+                    <tr
+                      data-entity="counterparty"
+                      data-id="cp-003"
+                      data-counterparty-name="ИП Мартынов Кирилл Андреевич"
+                      data-counterparty-inn="772608314579"
+                    >
                       <td>
-                        <span class="crm-badge muted" data-status="delivery-sftp">SFTP</span>
+                        <div class="crm-row-main">ИП Мартынов Кирилл Андреевич</div>
+                        <div class="crm-row-sub">ИП</div>
                       </td>
-                      <td>23.04.2026 18:14</td>
+                      <td>772608314579</td>
+                    </tr>
+                    <tr
+                      data-entity="counterparty"
+                      data-id="cp-004"
+                      data-counterparty-name="Громова Алина Сергеевна"
+                      data-counterparty-inn="502113742889"
+                    >
                       <td>
-                        <span class="crm-badge danger" data-status="delivery-error">Ошибка</span>
+                        <div class="crm-row-main">Громова Алина Сергеевна</div>
+                        <div class="crm-row-sub">Физическое лицо</div>
                       </td>
+                      <td>502113742889</td>
+                    </tr>
+                    <tr
+                      data-entity="counterparty"
+                      data-id="cp-005"
+                      data-counterparty-name="ООО «Север Логистик Капитал»"
+                      data-counterparty-inn="7812054881"
+                    >
+                      <td>
+                        <div class="crm-row-main">ООО «Север Логистик Капитал»</div>
+                        <div class="crm-row-sub">Юридическое лицо</div>
+                      </td>
+                      <td>7812054881</td>
                     </tr>
                   </tbody>
                 </table>
@@ -317,8 +246,8 @@
             </div>
 
             <div class="crm-empty-state crm-registry-empty" data-entity="empty-state" hidden>
-              <div class="crm-empty-state-title">Нет отчётов</div>
-              <div class="crm-empty-state-text">Измените период или параметры фильтра.</div>
+              <div class="crm-empty-state-title">Нет контрагентов</div>
+              <div class="crm-empty-state-text">Измените запрос поиска или добавьте нового контрагента.</div>
             </div>
           </div>
         </section>

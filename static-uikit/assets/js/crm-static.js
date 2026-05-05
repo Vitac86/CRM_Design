@@ -1628,4 +1628,96 @@
     });
   }());
 
+  // ── Counterparty INN lookup (counterparty-add.html only) ─────────────────
+  // Scoped to [data-entity="counterparty-add-form"]; no-ops on all other pages.
+  // UMI.CMS will replace this with a real server-side INN resolution API.
+  (function () {
+    var form = document.querySelector('[data-entity="counterparty-add-form"]');
+    if (!form) return;
+
+    var innInput = form.querySelector('[data-entity="counterparty-inn-input"]');
+    var resolveBtn = form.querySelector('[data-action="resolve-counterparty-inn"]');
+    var successBlock = form.querySelector('[data-entity="counterparty-lookup-success"]');
+    var errorBlock = form.querySelector('[data-entity="counterparty-lookup-error"]');
+    var errorText = errorBlock ? errorBlock.querySelector('[data-entity="counterparty-lookup-error-text"]') : null;
+
+    if (!innInput || !resolveBtn) return;
+
+    var COUNTERPARTY_DATASET = {
+      '7708123456':  { name: 'ООО «Альфа Расчёты»',            type: 'Юридическое лицо' },
+      '7704132901':  { name: 'АО «Восток Майнинг Системс»',    type: 'Юридическое лицо' },
+      '772608314579': { name: 'ИП Мартынов Кирилл Андреевич',  type: 'ИП' },
+      '502113742889': { name: 'Громова Алина Сергеевна',        type: 'Физическое лицо' }
+    };
+
+    function showError(message) {
+      if (successBlock) successBlock.hidden = true;
+      if (errorBlock) {
+        errorBlock.hidden = false;
+        if (errorText) errorText.textContent = message;
+      }
+    }
+
+    function showSuccess(inn, counterparty) {
+      if (errorBlock) errorBlock.hidden = true;
+      if (successBlock) {
+        var nameEl = successBlock.querySelector('[data-entity="cp-result-name"]');
+        var innEl = successBlock.querySelector('[data-entity="cp-result-inn"]');
+        var typeEl = successBlock.querySelector('[data-entity="cp-result-type"]');
+        var saveBtn = successBlock.querySelector('[data-action="save-counterparty"]');
+        var confirmation = successBlock.querySelector('[data-entity="counterparty-save-confirmation"]');
+        if (nameEl) nameEl.textContent = counterparty.name;
+        if (innEl) innEl.textContent = inn;
+        if (typeEl) typeEl.textContent = counterparty.type;
+        if (saveBtn) saveBtn.disabled = false;
+        if (confirmation) confirmation.hidden = true;
+        successBlock.hidden = false;
+      }
+    }
+
+    function resolveInn() {
+      var raw = innInput.value.trim();
+      if (!raw) {
+        showError('Введите ИНН контрагента.');
+        return;
+      }
+      var digits = raw.replace(/\D/g, '');
+      if (digits !== raw || (digits.length !== 10 && digits.length !== 12)) {
+        showError('ИНН должен содержать 10 или 12 цифр.');
+        return;
+      }
+      var found = COUNTERPARTY_DATASET[digits];
+      if (found) {
+        showSuccess(digits, found);
+      } else {
+        showError('Контрагент с таким ИНН не найден.');
+      }
+    }
+
+    resolveBtn.addEventListener('click', function (event) {
+      resolveInn();
+      event.preventDefault();
+    });
+
+    innInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        resolveInn();
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!(target instanceof Element)) return;
+      var saveBtn = target.closest('[data-action="save-counterparty"]');
+      if (!saveBtn) return;
+      var confirmation = document.querySelector('[data-entity="counterparty-save-confirmation"]');
+      if (confirmation) {
+        confirmation.hidden = false;
+        saveBtn.disabled = true;
+      }
+      event.preventDefault();
+    });
+  }());
+
 })();

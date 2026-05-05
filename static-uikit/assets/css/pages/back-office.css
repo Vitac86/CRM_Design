@@ -197,7 +197,7 @@
 /* Table Structure and Scrollbars */
 .crm-page[data-page="back-office"] .crm-back-office-table .crm-table {
   width: 100%;
-  min-width: 760px;
+  min-width: 420px;
   max-width: none;
   overflow: visible;
   border: 0;
@@ -207,7 +207,7 @@
 
 .crm-page[data-page="back-office"] .crm-back-office-table .uk-table {
   width: 100%;
-  min-width: 760px;
+  min-width: 420px;
   margin-bottom: 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -365,5 +365,121 @@
   .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions {
     width: 100%;
     margin-left: 0;
+  }
+}
+
+/* ── Counterparty Add Page ──────────────────────────────────────────────── */
+
+.crm-counterparty-add-page {
+  max-width: 720px;
+}
+
+.crm-counterparty-lookup-card {
+  display: grid;
+  gap: 20px;
+  padding: 20px 24px;
+}
+
+.crm-counterparty-inn-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.crm-counterparty-inn-input {
+  max-width: 320px;
+}
+
+.crm-counterparty-lookup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.crm-counterparty-result {
+  border-top: 1px solid #d9e3f1;
+  padding-top: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.crm-counterparty-result-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crm-counterparty-result-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.crm-counterparty-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.crm-counterparty-result-item dt {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  color: #607494;
+  text-transform: uppercase;
+}
+
+.crm-counterparty-result-item dd {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  margin: 0;
+}
+
+.crm-counterparty-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.crm-counterparty-save-confirmation {
+  font-size: 13px;
+  font-weight: 500;
+  color: #16a34a;
+}
+
+.crm-counterparty-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.crm-counterparty-error-icon {
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .crm-counterparty-lookup-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crm-counterparty-inn-input {
+    max-width: 100%;
   }
 }
