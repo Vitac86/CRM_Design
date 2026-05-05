@@ -1885,44 +1885,57 @@
     updateButtonAndHint();
   }());
 
-  // ── Contract wizard – statement export ──────────────────────────────────────
-  // Scoped to body[data-page="contract-wizard"] / [data-action="export-statement"].
-  // Opens a print-ready HTML statement in a new window; user saves as PDF from the print dialog.
-  // UMI.CMS should replace this with server-side PDF generation.
+  // ── Statement export – html2pdf browser download ─────────────────────────────
+  // Scoped to body[data-page="contract-wizard"] and body[data-page="contract-edit"].
+  // Fetches the existing paper HTML template, fills it with form data, generates a PDF
+  // via the local html2pdf.js vendor bundle, and triggers a browser download directly.
+  // Static demo personal data are placeholders for UMI.CMS/server-side data binding.
+  // UMI.CMS may later replace this with server-side PDF generation for higher-fidelity output.
   (function () {
-    if (!(document.body && document.body.dataset.page === 'contract-wizard')) return;
+    var page = document.body && document.body.dataset.page;
+    if (page !== 'contract-wizard' && page !== 'contract-edit') return;
 
     var exportBtn = document.querySelector('[data-action="export-statement"]');
     if (!exportBtn) return;
 
-    var wizardForm = document.querySelector('[data-form="contract-wizard"]');
+    var form = document.querySelector('[data-form="contract-wizard"], [data-form="contract-edit"]');
 
-    function isWizardChecked(name) {
-      var scope = wizardForm || document;
-      var input = scope.querySelector('input[name="' + name + '"]');
-      return !!(input && input.checked);
+    function isChecked(name) {
+      var scope = form || document;
+      var el = scope.querySelector('input[name="' + name + '"]');
+      return !!(el && el.checked);
     }
 
-    function getWizardSelectValue(name) {
-      var scope = wizardForm || document;
-      var sel = scope.querySelector('select[name="' + name + '"]');
-      return sel ? sel.value : '';
+    function getSelectValue(name) {
+      var scope = form || document;
+      var el = scope.querySelector('select[name="' + name + '"]');
+      return el ? el.value : '';
     }
 
     function getStatementDate() {
       var now = new Date();
-      var d = String(now.getDate()).padStart(2, '0');
-      var m = String(now.getMonth() + 1).padStart(2, '0');
-      var y = now.getFullYear();
-      return d + '.' + m + '.' + y;
+      return String(now.getDate()).padStart(2, '0') + '.' +
+             String(now.getMonth() + 1).padStart(2, '0') + '.' +
+             now.getFullYear();
     }
 
     function collectData() {
-      var reportEmailInput = document.getElementById('wizard-mail');
-      var reportEmail = reportEmailInput ? reportEmailInput.value.trim() : '';
-      var incomeTransfer = getWizardSelectValue('income-transfer').toLowerCase();
+      var reportEmail = '';
+      var reportEmailEnabled = false;
 
-      // Static demo values below are placeholders for UMI.CMS/server-side data binding.
+      if (page === 'contract-wizard') {
+        var wizMailEl = document.getElementById('wizard-mail');
+        reportEmail = wizMailEl ? wizMailEl.value.trim() : '';
+        reportEmailEnabled = !!reportEmail;
+      } else {
+        var editMailEl = document.getElementById('edit-report-email');
+        reportEmail = editMailEl ? editMailEl.value.trim() : '';
+        reportEmailEnabled = isChecked('report-email-enabled') && !!reportEmail;
+      }
+
+      var incomeVal = page === 'contract-wizard' ? getSelectValue('income-transfer').toLowerCase() : '';
+
+      // Static demo personal data are placeholders for UMI.CMS/server-side data binding.
       return {
         fields: {
           'client-full-name':          'Ковалёв Даниил Олегович',
@@ -1937,23 +1950,30 @@
           'signature-name':            'Ковалёв Даниил Олегович'
         },
         checks: {
-          'joined-broker':                  isWizardChecked('joined-broker'),
-          'joined-depository':              isWizardChecked('joined-depository'),
-          'depo-owner':                     isWizardChecked('depo-owner'),
-          'depo-nominee':                   isWizardChecked('depo-nominee'),
-          'depo-trust-manager':             isWizardChecked('depo-trust-manager'),
-          'trading-depo-owner':             isWizardChecked('trading-depo-owner'),
-          'trading-depo-nominee':           isWizardChecked('trading-depo-nominee'),
-          'trading-depo-trust-manager':     isWizardChecked('trading-depo-trust-manager'),
-          'depo-operator':                  isWizardChecked('depo-operator'),
-          'market-stock':                   isWizardChecked('market-stock'),
-          'market-futures':                 isWizardChecked('market-futures'),
-          'market-currency':                isWizardChecked('market-currency'),
-          'edo-signature':                  isWizardChecked('edo-signature'),
-          'edo-enable':                     isWizardChecked('edo-enable'),
-          'income-transfer-broker-account': incomeTransfer.indexOf('брокерский') !== -1,
-          'income-transfer-bank-account':   incomeTransfer.indexOf('расчётный') !== -1 || incomeTransfer.indexOf('расчетный') !== -1,
-          'report-email':                   !!reportEmail
+          'joined-broker':                  isChecked('joined-broker'),
+          'joined-depository':              isChecked('joined-depository'),
+          'depo-owner':                     isChecked('depo-owner'),
+          'depo-nominee':                   isChecked('depo-nominee'),
+          'depo-trust-manager':             isChecked('depo-trust-manager'),
+          'trading-depo-owner':             isChecked('trading-depo-owner'),
+          'trading-depo-nominee':           isChecked('trading-depo-nominee'),
+          'trading-depo-trust-manager':     isChecked('trading-depo-trust-manager'),
+          'depo-operator':                  isChecked('depo-operator'),
+          'market-stock':                   isChecked('market-stock'),
+          'market-futures':                 isChecked('market-futures'),
+          'market-currency':                isChecked('market-currency'),
+          'edo-signature':                  isChecked('edo-signature'),
+          'edo-enable':                     isChecked('edo-enable'),
+          'report-office':                  isChecked('report-office'),
+          'report-post':                    isChecked('report-post'),
+          'report-email':                   reportEmailEnabled,
+          'report-edo':                     isChecked('report-edo'),
+          'income-transfer-broker-account': page === 'contract-wizard'
+            ? incomeVal.indexOf('брокерский') !== -1
+            : isChecked('income-special'),
+          'income-transfer-bank-account':   page === 'contract-wizard'
+            ? (incomeVal.indexOf('расчётный') !== -1 || incomeVal.indexOf('расчетный') !== -1)
+            : isChecked('income-bank')
         }
       };
     }
@@ -1965,11 +1985,12 @@
           el.textContent = data.fields[key];
         }
       });
-
       doc.querySelectorAll('[data-doc-check]').forEach(function (el) {
         var key = el.getAttribute('data-doc-check');
         if (data.checks[key]) {
           el.classList.add('is-checked');
+        } else {
+          el.classList.remove('is-checked');
         }
       });
     }
@@ -1977,13 +1998,30 @@
     exportBtn.addEventListener('click', function (event) {
       event.preventDefault();
 
-      var templateUrl = exportBtn.getAttribute('data-template-url');
-      if (!templateUrl) {
-        console.warn('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
+      if (!window.html2pdf) {
+        alert('Не подключена библиотека генерации PDF.');
         return;
       }
 
+      var templateUrl = exportBtn.getAttribute('data-template-url');
+      if (!templateUrl) {
+        alert('Не задан путь к шаблону заявления (data-template-url).');
+        return;
+      }
+
+      var filename = exportBtn.getAttribute('data-pdf-filename') || 'zayavlenie-o-prisoedinenii-fl.pdf';
+      var originalText = exportBtn.textContent;
+      exportBtn.disabled = true;
+      exportBtn.textContent = 'Формируем PDF...';
+
       var data = collectData();
+      var container = null;
+      var injectedStyles = [];
+
+      function cleanup() {
+        if (container && container.parentNode) container.parentNode.removeChild(container);
+        injectedStyles.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+      }
 
       fetch(templateUrl)
         .then(function (response) {
@@ -1995,25 +2033,62 @@
           var doc = parser.parseFromString(html, 'text/html');
           fillTemplateDoc(doc, data);
 
-          var filledHtml = '<!doctype html>\n' + doc.documentElement.outerHTML;
+          // Inject template styles into the current page head so html2canvas picks them up.
+          doc.querySelectorAll('style').forEach(function (s) {
+            var styleEl = document.createElement('style');
+            styleEl.setAttribute('data-pdf-temp', '');
+            styleEl.textContent = s.textContent;
+            document.head.appendChild(styleEl);
+            injectedStyles.push(styleEl);
+          });
 
-          var win = window.open('', '_blank');
-          if (!win) {
-            alert('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
-            return;
+          // Mount the filled document offscreen so html2canvas can render it.
+          container = document.createElement('div');
+          container.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;background:#fff;';
+          document.body.appendChild(container);
+
+          var docEl = doc.querySelector('.document');
+          if (docEl) {
+            container.appendChild(document.importNode(docEl, true));
+          } else {
+            container.innerHTML = doc.body.innerHTML;
           }
 
-          win.document.open();
-          win.document.write(filledHtml);
-          win.document.close();
+          var renderEl = container.querySelector('.document') || container;
 
-          win.setTimeout(function () {
-            win.print();
-          }, 400);
+          var options = {
+            margin: [0, 0, 0, 0],
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              letterRendering: true
+            },
+            jsPDF: {
+              unit: 'mm',
+              format: 'a4',
+              orientation: 'portrait'
+            },
+            pagebreak: {
+              mode: ['css', 'legacy']
+            }
+          };
+
+          return html2pdf().set(options).from(renderEl).save();
         })
-        .catch(function () {
-          console.warn('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
-          alert('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
+        .then(function () {
+          cleanup();
+          exportBtn.disabled = false;
+          exportBtn.textContent = originalText;
+        })
+        .catch(function (err) {
+          console.warn('Не удалось сформировать PDF:', err);
+          alert('Не удалось сформировать PDF. Проверьте путь к шаблону заявления.');
+          cleanup();
+          exportBtn.disabled = false;
+          exportBtn.textContent = originalText;
         });
     });
   }());
