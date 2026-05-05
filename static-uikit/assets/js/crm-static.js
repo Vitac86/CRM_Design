@@ -1628,34 +1628,18 @@
     });
   }());
 
-  // ── Back-office inline counterparty add (back-office.html only) ─────────────
+  // ── Back-office counterparty add (back-office.html only) ─────────────────
   // Scoped to body[data-page="back-office"].
-  // Simulates inline INN lookup against three outcomes:
-  //   duplicate  — INN already in CRM table (button stays disabled)
-  //   success    — external demo dataset returned data
-  //   not found  — INN valid but not in external demo dataset
-  // UMI.CMS will replace this with a real server-side INN resolution API.
+  // Enables the add button when a valid INN is not already in the table.
+  // On click, shows inline confirmation in the hint; no separate panel opens.
   (function () {
     if (!(document.body && document.body.dataset.page === 'back-office')) return;
 
     var searchInput = document.getElementById('bo-search');
     var addBtn = document.querySelector('[data-action="open-counterparty-inline-add"]');
-    var inlinePanel = document.querySelector('[data-entity="counterparty-inline-add"]');
     var hintEl = document.querySelector('[data-entity="counterparty-add-hint"]');
 
-    if (!searchInput || !addBtn || !inlinePanel) return;
-
-    var innDisplay = inlinePanel.querySelector('[data-entity="counterparty-inline-inn"]');
-    var successBlock = inlinePanel.querySelector('[data-entity="counterparty-inline-success"]');
-    var errorBlock = inlinePanel.querySelector('[data-entity="counterparty-inline-error"]');
-    var errorText = errorBlock ? errorBlock.querySelector('[data-entity="counterparty-inline-error-text"]') : null;
-
-    // External demo dataset — INNs not in the current CRM registry that return success.
-    var EXTERNAL_DATASET = {
-      '503228776514': { name: 'Романова Дарья Алексеевна',  type: 'Физическое лицо' },
-      '5408129930':   { name: 'АО «Евразия Финанс Групп»',  type: 'Юридическое лицо' },
-      '6659124408':   { name: 'ООО «Норд Инвест Партнерс»', type: 'Юридическое лицо' }
-    };
+    if (!searchInput || !addBtn) return;
 
     function getCrmInns() {
       var inns = {};
@@ -1669,43 +1653,6 @@
         }
       });
       return inns;
-    }
-
-    function clearPanel() {
-      if (successBlock) successBlock.hidden = true;
-      if (errorBlock) errorBlock.hidden = true;
-      if (innDisplay) innDisplay.textContent = '—';
-      var confirmation = inlinePanel.querySelector('[data-entity="counterparty-inline-confirmation"]');
-      var confirmBtn = inlinePanel.querySelector('[data-action="confirm-counterparty-add"]');
-      if (confirmation) confirmation.hidden = true;
-      if (confirmBtn) confirmBtn.disabled = false;
-    }
-
-    function showPanelError(message) {
-      if (successBlock) successBlock.hidden = true;
-      if (errorBlock) {
-        if (errorText) errorText.textContent = message;
-        errorBlock.hidden = false;
-      }
-      inlinePanel.hidden = false;
-    }
-
-    function showPanelSuccess(inn, counterparty) {
-      if (errorBlock) errorBlock.hidden = true;
-      if (successBlock) {
-        var nameEl = successBlock.querySelector('[data-entity="counterparty-inline-name"]');
-        var innValEl = successBlock.querySelector('[data-entity="counterparty-inline-inn-val"]');
-        var typeEl = successBlock.querySelector('[data-entity="counterparty-inline-type"]');
-        var confirmBtn = successBlock.querySelector('[data-action="confirm-counterparty-add"]');
-        var confirmation = successBlock.querySelector('[data-entity="counterparty-inline-confirmation"]');
-        if (nameEl) nameEl.textContent = counterparty.name;
-        if (innValEl) innValEl.textContent = inn;
-        if (typeEl) typeEl.textContent = counterparty.type;
-        if (confirmBtn) confirmBtn.disabled = false;
-        if (confirmation) confirmation.hidden = true;
-        successBlock.hidden = false;
-      }
-      inlinePanel.hidden = false;
     }
 
     function updateButtonAndHint() {
@@ -1723,7 +1670,7 @@
       if (!hintEl) return;
 
       if (!raw) {
-        hintEl.textContent = 'Введите ИНН. Если контрагент не найден в реестре, его можно добавить из внешнего источника.';
+        hintEl.textContent = 'Введите ИНН. Если контрагент не найден в реестре, его можно добавить.';
         hintEl.dataset.hintState = '';
       } else if (!allDigits) {
         hintEl.textContent = '';
@@ -1735,62 +1682,22 @@
         hintEl.textContent = 'Контрагент с таким ИНН уже есть в реестре.';
         hintEl.dataset.hintState = 'duplicate';
       } else {
-        hintEl.textContent = 'Контрагент не найден в реестре. Можно проверить внешний источник.';
+        hintEl.textContent = 'Контрагент не найден в реестре. Можно добавить.';
         hintEl.dataset.hintState = 'available';
       }
     }
 
     searchInput.addEventListener('input', function () {
       updateButtonAndHint();
-      if (!inlinePanel.hidden) {
-        inlinePanel.hidden = true;
-        clearPanel();
-      }
     });
 
     addBtn.addEventListener('click', function (event) {
       event.preventDefault();
-      var raw = searchInput.value.trim();
-      clearPanel();
-      if (!raw) {
-        if (innDisplay) innDisplay.textContent = '';
-        showPanelError('Введите ИНН контрагента.');
-        return;
+      if (hintEl) {
+        hintEl.textContent = 'Контрагент подготовлен к добавлению.';
+        hintEl.dataset.hintState = 'confirmed';
       }
-      var digits = raw.replace(/\D/g, '');
-      if (raw !== digits || (digits.length !== 10 && digits.length !== 12)) {
-        if (innDisplay) innDisplay.textContent = raw;
-        showPanelError('ИНН должен содержать 10 или 12 цифр.');
-        return;
-      }
-      if (innDisplay) innDisplay.textContent = digits;
-      var found = EXTERNAL_DATASET[digits];
-      if (found) {
-        showPanelSuccess(digits, found);
-      } else {
-        showPanelError('Внешние источники не вернули данные по указанному ИНН.');
-      }
-    });
-
-    document.addEventListener('click', function (event) {
-      var target = event.target;
-      if (!(target instanceof Element)) return;
-
-      if (target.closest('[data-action="close-counterparty-inline-add"]')) {
-        inlinePanel.hidden = true;
-        clearPanel();
-        event.preventDefault();
-        return;
-      }
-
-      var confirmBtn = target.closest('[data-action="confirm-counterparty-add"]');
-      if (confirmBtn && inlinePanel.contains(confirmBtn)) {
-        var confirmation = inlinePanel.querySelector('[data-entity="counterparty-inline-confirmation"]');
-        if (confirmation) confirmation.hidden = false;
-        confirmBtn.disabled = true;
-        event.preventDefault();
-        return;
-      }
+      addBtn.disabled = true;
     });
 
     updateButtonAndHint();
