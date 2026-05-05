@@ -86,7 +86,7 @@ Page-specific scripts (active only when the matching HTML file explicitly links 
 - `agents.html` → `assets/css/pages/agents.css`
 - `depository.html` → `assets/css/pages/depository.css`
 
-Some other pages (e.g. `subjects.html`, `compliance.html`, `archive.html`, `subject-card.html`) also carry a direct `<link>` for their page CSS even though `crm-static.css` already imports the same file. These are harmless duplicates; do not remove without a visual check.
+Avoid adding direct page CSS links when the file is already bundled by `crm-static.css`, unless a visual check confirms a deliberate cascade exception.
 
 ## Page inventory
 Auth:
@@ -164,4 +164,4 @@ Replace client-side filter logic with server-side filtering and pagination. The 
 - Static sample data only.
 - Prototype JavaScript only; not backend or business logic.
 - Tables intentionally use horizontal scroll on mobile.
-- Some pages may have explicit page CSS links in addition to `crm-static.css`; do not remove unless visually checked.
+- No pages carry redundant direct page CSS links; all page-specific CSS is loaded via `crm-static.css` except for the intentional exceptions listed in "Page-specific CSS" above.
