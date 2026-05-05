@@ -160,6 +160,18 @@ All list-page filters (subjects, compliance, trading, etc.) are **client-side de
 ### UMI.CMS integration
 Replace client-side filter logic with server-side filtering and pagination. The `data-filter` attribute names on controls and the `data-filter-*` attributes on rows can be preserved as semantic hints, but the JS row-hiding behavior should be superseded by server-rendered result sets.
 
+## Document templates
+
+Print-ready HTML templates for client-facing documents live in `assets/document-templates/`.
+
+| Template file | Document |
+|---|---|
+| `zayavlenie-o-prisoedinenii-fl.html` | Заявление о присоединении (для физических лиц) |
+
+The "Выгрузить заявление" button in `contract-wizard.html` fetches this template, fills it with wizard values via `DOMParser`, opens it in a new window, and triggers `window.print()` so the user can save as PDF.
+
+**UMI.CMS integration:** replace the client-side fetch+print flow with server-side PDF generation (e.g. wkhtmltopdf / Puppeteer on the backend). The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
+
 ## Known limitations
 - Static sample data only.
 - Prototype JavaScript only; not backend or business logic.

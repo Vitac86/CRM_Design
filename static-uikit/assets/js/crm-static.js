@@ -1703,4 +1703,137 @@
     updateButtonAndHint();
   }());
 
+  // ── Contract wizard – statement export ──────────────────────────────────────
+  // Scoped to body[data-page="contract-wizard"] / [data-action="export-statement"].
+  // Opens a print-ready HTML statement in a new window; user saves as PDF from the print dialog.
+  // UMI.CMS should replace this with server-side PDF generation.
+  (function () {
+    if (!(document.body && document.body.dataset.page === 'contract-wizard')) return;
+
+    var exportBtn = document.querySelector('[data-action="export-statement"]');
+    if (!exportBtn) return;
+
+    var wizardForm = document.querySelector('[data-form="contract-wizard"]');
+
+    function isWizardChecked(name) {
+      var scope = wizardForm || document;
+      var input = scope.querySelector('input[name="' + name + '"]');
+      return !!(input && input.checked);
+    }
+
+    function getWizardSelectValue(name) {
+      var scope = wizardForm || document;
+      var sel = scope.querySelector('select[name="' + name + '"]');
+      return sel ? sel.value : '';
+    }
+
+    function getStatementDate() {
+      var now = new Date();
+      var d = String(now.getDate()).padStart(2, '0');
+      var m = String(now.getMonth() + 1).padStart(2, '0');
+      var y = now.getFullYear();
+      return d + '.' + m + '.' + y;
+    }
+
+    function collectData() {
+      var reportEmailInput = document.getElementById('wizard-mail');
+      var reportEmail = reportEmailInput ? reportEmailInput.value.trim() : '';
+      var incomeTransfer = getWizardSelectValue('income-transfer').toLowerCase();
+
+      // Static demo values below are placeholders for UMI.CMS/server-side data binding.
+      return {
+        fields: {
+          'client-full-name':          'Ковалёв Даниил Олегович',
+          'passport-series':           '4512',
+          'passport-number':           '345678',
+          'passport-issued-by':        'ГУ МВД России по г. Москве',
+          'passport-issue-day':        '22',
+          'passport-issue-month-year': 'апреля 2026',
+          'registration-address':      'г. Москва, ул. Примерная, д. 10, кв. 25',
+          'report-email':              reportEmail,
+          'statement-date':            getStatementDate(),
+          'signature-name':            'Ковалёв Даниил Олегович'
+        },
+        checks: {
+          'joined-broker':                  isWizardChecked('joined-broker'),
+          'joined-depository':              isWizardChecked('joined-depository'),
+          'depo-owner':                     isWizardChecked('depo-owner'),
+          'depo-nominee':                   isWizardChecked('depo-nominee'),
+          'depo-trust-manager':             isWizardChecked('depo-trust-manager'),
+          'trading-depo-owner':             isWizardChecked('trading-depo-owner'),
+          'trading-depo-nominee':           isWizardChecked('trading-depo-nominee'),
+          'trading-depo-trust-manager':     isWizardChecked('trading-depo-trust-manager'),
+          'depo-operator':                  isWizardChecked('depo-operator'),
+          'market-stock':                   isWizardChecked('market-stock'),
+          'market-futures':                 isWizardChecked('market-futures'),
+          'market-currency':                isWizardChecked('market-currency'),
+          'edo-signature':                  isWizardChecked('edo-signature'),
+          'edo-enable':                     isWizardChecked('edo-enable'),
+          'income-transfer-broker-account': incomeTransfer.indexOf('брокерский') !== -1,
+          'income-transfer-bank-account':   incomeTransfer.indexOf('расчётный') !== -1 || incomeTransfer.indexOf('расчетный') !== -1,
+          'report-email':                   !!reportEmail
+        }
+      };
+    }
+
+    function fillTemplateDoc(doc, data) {
+      doc.querySelectorAll('[data-doc-field]').forEach(function (el) {
+        var key = el.getAttribute('data-doc-field');
+        if (Object.prototype.hasOwnProperty.call(data.fields, key)) {
+          el.textContent = data.fields[key];
+        }
+      });
+
+      doc.querySelectorAll('[data-doc-check]').forEach(function (el) {
+        var key = el.getAttribute('data-doc-check');
+        if (data.checks[key]) {
+          el.classList.add('is-checked');
+        }
+      });
+    }
+
+    exportBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+
+      var templateUrl = exportBtn.getAttribute('data-template-url');
+      if (!templateUrl) {
+        console.warn('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
+        return;
+      }
+
+      var data = collectData();
+
+      fetch(templateUrl)
+        .then(function (response) {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.text();
+        })
+        .then(function (html) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+          fillTemplateDoc(doc, data);
+
+          var filledHtml = '<!doctype html>\n' + doc.documentElement.outerHTML;
+
+          var win = window.open('', '_blank');
+          if (!win) {
+            alert('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
+            return;
+          }
+
+          win.document.open();
+          win.document.write(filledHtml);
+          win.document.close();
+
+          win.setTimeout(function () {
+            win.print();
+          }, 400);
+        })
+        .catch(function () {
+          console.warn('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
+          alert('Не удалось открыть шаблон заявления. Проверьте путь к document template.');
+        });
+    });
+  }());
+
 })();

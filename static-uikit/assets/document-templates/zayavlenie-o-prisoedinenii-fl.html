@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <title>Заявление о присоединении (ФЛ)</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 20mm 20mm 25mm;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 10pt;
+      line-height: 1.45;
+      color: #000;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 18mm 20mm 20mm 25mm;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    @media screen {
+      body { background: #d0d0d0; }
+      .page {
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+        margin: 16px auto;
+      }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page { width: 100%; padding: 0; box-shadow: none; min-height: auto; }
+    }
+
+    /* ── Typography ── */
+    h1 {
+      font-size: 12pt;
+      text-align: center;
+      margin: 0 0 3pt;
+      text-transform: uppercase;
+      letter-spacing: 0.8pt;
+      font-weight: bold;
+    }
+    h2 {
+      font-size: 10pt;
+      text-align: center;
+      margin: 0 0 14pt;
+      font-weight: normal;
+      font-style: italic;
+    }
+
+    p { margin: 3pt 0; }
+
+    /* ── Field underlines ── */
+    .field {
+      display: inline-block;
+      min-width: 50mm;
+      border-bottom: 0.5pt solid #000;
+      padding: 0 2pt 1pt;
+      line-height: 1.2;
+      vertical-align: bottom;
+    }
+
+    /* ── Checkbox ── */
+    .checkbox {
+      display: inline-block;
+      width: 3.5mm;
+      height: 3.5mm;
+      border: 0.6pt solid #000;
+      vertical-align: middle;
+      margin-right: 2pt;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .checkbox.is-checked::after {
+      content: "✓";
+      display: block;
+      text-align: center;
+      line-height: 3mm;
+      font-size: 8pt;
+    }
+
+    /* ── Layout blocks ── */
+    .doc-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14pt;
+      font-size: 9.5pt;
+    }
+    .doc-meta-org { font-weight: bold; }
+    .doc-meta-date { text-align: right; white-space: nowrap; }
+
+    .client-block {
+      margin-bottom: 10pt;
+      font-size: 10pt;
+    }
+    .client-block p { margin: 4pt 0; }
+
+    .intro-text {
+      margin: 8pt 0 12pt;
+      font-size: 9.5pt;
+    }
+
+    .section {
+      margin-bottom: 9pt;
+      page-break-inside: avoid;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 9.5pt;
+      margin: 0 0 4pt;
+    }
+    .check-row {
+      display: flex;
+      align-items: baseline;
+      gap: 3pt;
+      margin: 3pt 0;
+      font-size: 10pt;
+    }
+    .check-row-inline {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3pt;
+      margin-right: 14pt;
+      font-size: 10pt;
+    }
+    .check-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 3pt 0;
+    }
+
+    /* ── Signature ── */
+    .signature-block {
+      margin-top: 20pt;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20pt;
+    }
+    .sig-date { font-size: 10pt; }
+    .sig-right { text-align: center; }
+    .sig-line {
+      display: inline-block;
+      width: 70mm;
+      border-bottom: 0.5pt solid #000;
+      margin-bottom: 2pt;
+    }
+    .sig-label { font-size: 8pt; color: #444; }
+    .sig-name { font-size: 9pt; margin-top: 2pt; }
+
+    /* ── Footer note ── */
+    .footer-note {
+      margin-top: 18pt;
+      padding-top: 5pt;
+      border-top: 0.5pt solid #999;
+      font-size: 7.5pt;
+      color: #555;
+      line-height: 1.35;
+    }
+
+    hr.section-rule {
+      border: none;
+      border-top: 0.4pt solid #ccc;
+      margin: 8pt 0;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-meta">
+    <div>
+      <div class="doc-meta-org">ООО «Инвестика»</div>
+      <div>Профессиональный участник рынка ценных бумаг</div>
+    </div>
+    <div class="doc-meta-date">
+      г. Москва,
+      «<span class="field" style="min-width:28mm" data-doc-field="statement-date"></span>»
+    </div>
+  </div>
+
+  <h1>Заявление о присоединении</h1>
+  <h2>(для физических лиц)</h2>
+
+  <div class="client-block">
+    <p>
+      Я,&nbsp;<span class="field" style="min-width:90mm" data-doc-field="client-full-name"></span>,
+    </p>
+    <p>
+      паспорт: серия&nbsp;<span class="field" style="min-width:14mm" data-doc-field="passport-series"></span>&nbsp;
+      №&nbsp;<span class="field" style="min-width:22mm" data-doc-field="passport-number"></span>,
+      выдан&nbsp;<span class="field" style="min-width:80mm" data-doc-field="passport-issued-by"></span>
+    </p>
+    <p>
+      «<span class="field" style="min-width:10mm" data-doc-field="passport-issue-day"></span>»&nbsp;<span class="field" style="min-width:36mm" data-doc-field="passport-issue-month-year"></span>&nbsp;г.,
+    </p>
+    <p>
+      зарегистрирован(-а) по адресу:&nbsp;<span class="field" style="min-width:100mm" data-doc-field="registration-address"></span>,
+    </p>
+  </div>
+
+  <p class="intro-text">
+    настоящим заявляю о своём присоединении к стандартным формам договоров ООО «Инвестика»
+    на условиях, указанных в соответствующих договорах, опубликованных на сайте ООО «Инвестика»,
+    и прошу совершить следующие действия:
+  </p>
+
+  <hr class="section-rule"/>
+
+  <!-- 1. Присоединение к договорам -->
+  <div class="section">
+    <div class="section-title">1. Присоединение к договорам (ст.&nbsp;428 ГК РФ)</div>
+    <div class="check-row">
+      <span class="checkbox" data-doc-check="joined-broker"></span>
+      <span>Договор о брокерском обслуживании</span>
+    </div>
+    <div class="check-row">
+      <span class="checkbox" data-doc-check="joined-depository"></span>
+      <span>Депозитарный договор</span>
+    </div>
+  </div>
+
+  <!-- 2. Счёт депо -->
+  <div class="section">
+    <div class="section-title">2. Открыть счёт депо (тип лица)</div>
+    <div class="check-group">
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="depo-owner"></span>
+        <span>Владельца</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="depo-nominee"></span>
+        <span>Номинального держателя</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="depo-trust-manager"></span>
+        <span>Доверительного управляющего</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- 3. Оператор счёта депо -->
+  <div class="section">
+    <div class="section-title">3. Назначить оператором счёта депо</div>
+    <div class="check-row">
+      <span class="checkbox" data-doc-check="depo-operator"></span>
+      <span>ООО «Инвестика»</span>
+    </div>
+  </div>
+
+  <!-- 4. Торговый счёт депо -->
+  <div class="section">
+    <div class="section-title">4. Открыть торговый счёт депо (тип лица)</div>
+    <div class="check-group">
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="trading-depo-owner"></span>
+        <span>Владельца</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="trading-depo-nominee"></span>
+        <span>Номинального держателя</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="trading-depo-trust-manager"></span>
+        <span>Доверительного управляющего</span>
+      </span>
+    </div>
+  </div>
+
+  <hr class="section-rule"/>
+
+  <!-- 5. Рынки -->
+  <div class="section">
+    <div class="section-title">5. Брокерское обслуживание на рынках</div>
+    <div class="check-group">
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="market-stock"></span>
+        <span>Фондовый рынок</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="market-futures"></span>
+        <span>Срочный рынок</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="market-currency"></span>
+        <span>Валютный рынок и рынок драгоценных металлов</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- 6. ЭДО -->
+  <div class="section">
+    <div class="section-title">6. Электронный документооборот</div>
+    <div class="check-row">
+      <span class="checkbox" data-doc-check="edo-signature"></span>
+      <span>Использование электронной подписи и обмен электронными документами</span>
+    </div>
+    <div class="check-row">
+      <span class="checkbox" data-doc-check="edo-enable"></span>
+      <span>Подключить систему ЭДО</span>
+    </div>
+  </div>
+
+  <!-- 7. Перечисление доходов -->
+  <div class="section">
+    <div class="section-title">7. Перечисление доходов</div>
+    <div class="check-group">
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="income-transfer-broker-account"></span>
+        <span>На специальный брокерский счёт</span>
+      </span>
+      <span class="check-row-inline">
+        <span class="checkbox" data-doc-check="income-transfer-bank-account"></span>
+        <span>На расчётный счёт клиента</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- 8. Отчёты -->
+  <div class="section">
+    <div class="section-title">8. Направление отчётов</div>
+    <div class="check-row">
+      <span class="checkbox" data-doc-check="report-email"></span>
+      <span>По электронной почте:&nbsp;<span class="field" style="min-width:70mm" data-doc-field="report-email"></span></span>
+    </div>
+  </div>
+
+  <hr class="section-rule"/>
+
+  <!-- Signature -->
+  <div class="signature-block">
+    <div class="sig-date">
+      Дата:&nbsp;«<span class="field" style="min-width:28mm" data-doc-field="statement-date"></span>»
+    </div>
+    <div class="sig-right">
+      <div class="sig-line"></div>
+      <div class="sig-name" data-doc-field="signature-name"></div>
+      <div class="sig-label">(подпись / ФИО)</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Настоящее заявление составлено в двух экземплярах, имеющих равную юридическую силу —
+    по одному для каждой из сторон. Заявление является неотъемлемой частью соответствующего договора
+    (договоров), к которому клиент настоящим присоединяется. Клиент подтверждает, что ознакомлен
+    с условиями соответствующих стандартных форм договоров, размещённых на сайте ООО «Инвестика»,
+    и принимает их в полном объёме.
+  </div>
+
+</div>
+</body>
+</html>
