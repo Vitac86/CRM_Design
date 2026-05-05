@@ -1630,6 +1630,10 @@
 
   // ── Counterparty INN lookup (counterparty-add.html only) ─────────────────
   // Scoped to [data-entity="counterparty-add-form"]; no-ops on all other pages.
+  // Simulates an external-source INN resolution flow with three outcomes:
+  //   duplicate  — INN already exists in CRM (blocks adding)
+  //   success    — external source returned data (proceed to add)
+  //   not found  — external source returned no data
   // UMI.CMS will replace this with a real server-side INN resolution API.
   (function () {
     var form = document.querySelector('[data-entity="counterparty-add-form"]');
@@ -1640,21 +1644,35 @@
     var successBlock = form.querySelector('[data-entity="counterparty-lookup-success"]');
     var errorBlock = form.querySelector('[data-entity="counterparty-lookup-error"]');
     var errorText = errorBlock ? errorBlock.querySelector('[data-entity="counterparty-lookup-error-text"]') : null;
+    var registryLink = errorBlock ? errorBlock.querySelector('[data-entity="cp-error-registry-link"]') : null;
 
     if (!innInput || !resolveBtn) return;
 
-    var COUNTERPARTY_DATASET = {
-      '7708123456':  { name: 'ООО «Альфа Расчёты»',            type: 'Юридическое лицо' },
-      '7704132901':  { name: 'АО «Восток Майнинг Системс»',    type: 'Юридическое лицо' },
-      '772608314579': { name: 'ИП Мартынов Кирилл Андреевич',  type: 'ИП' },
-      '502113742889': { name: 'Громова Алина Сергеевна',        type: 'Физическое лицо' }
+    // INNs already present in the CRM registry — triggers duplicate error.
+    var CRM_INN_SET = {
+      '7704132901':  true,
+      '502113742889': true
     };
 
-    function showError(message) {
+    // INNs that return a successful result from the simulated external source.
+    var EXTERNAL_DATASET = {
+      '7708123456':   { name: 'ООО «Альфа Расчёты»',          type: 'Юридическое лицо' },
+      '772608314579': { name: 'ИП Мартынов Кирилл Андреевич', type: 'ИП' },
+      '7812054881':   { name: 'ООО «Север Логистик Капитал»', type: 'Юридическое лицо' },
+      '503228776514': { name: 'Романова Дарья Алексеевна',    type: 'Физическое лицо' }
+    };
+
+    function clearResults() {
+      if (successBlock) successBlock.hidden = true;
+      if (errorBlock) errorBlock.hidden = true;
+    }
+
+    function showError(message, showLink) {
       if (successBlock) successBlock.hidden = true;
       if (errorBlock) {
         errorBlock.hidden = false;
         if (errorText) errorText.textContent = message;
+        if (registryLink) registryLink.hidden = !showLink;
       }
     }
 
@@ -1678,19 +1696,23 @@
     function resolveInn() {
       var raw = innInput.value.trim();
       if (!raw) {
-        showError('Введите ИНН контрагента.');
+        showError('Введите ИНН контрагента.', false);
         return;
       }
       var digits = raw.replace(/\D/g, '');
       if (digits !== raw || (digits.length !== 10 && digits.length !== 12)) {
-        showError('ИНН должен содержать 10 или 12 цифр.');
+        showError('ИНН должен содержать 10 или 12 цифр.', false);
         return;
       }
-      var found = COUNTERPARTY_DATASET[digits];
+      if (CRM_INN_SET[digits]) {
+        showError('Контрагент с таким ИНН уже есть в CRM.', true);
+        return;
+      }
+      var found = EXTERNAL_DATASET[digits];
       if (found) {
         showSuccess(digits, found);
       } else {
-        showError('Контрагент с таким ИНН не найден.');
+        showError('Внешние источники не вернули данные по указанному ИНН.', false);
       }
     }
 
@@ -1704,6 +1726,10 @@
         resolveInn();
         event.preventDefault();
       }
+    });
+
+    innInput.addEventListener('input', function () {
+      clearResults();
     });
 
     document.addEventListener('click', function (event) {

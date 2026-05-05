@@ -93,7 +93,7 @@
           <div class="crm-page-header crm-page-header-row crm-back-office-header">
             <div class="crm-registry-title-block">
               <h1 class="crm-page-title">Добавление контрагента</h1>
-              <p class="crm-page-subtitle">Введите ИНН, чтобы найти данные контрагента.</p>
+              <p class="crm-page-subtitle">Введите ИНН — система проверит внешние источники и подготовит данные для добавления.</p>
             </div>
           </div>
 
@@ -110,6 +110,7 @@
                 data-entity="counterparty-inn-input"
                 autocomplete="off"
               />
+              <p class="crm-counterparty-inn-help">Данные подгружаются из внешних источников по ИНН. CRM проверит, нет ли такого контрагента в реестре.</p>
             </div>
 
             <div class="crm-counterparty-lookup-actions">
@@ -126,7 +127,7 @@
 
             <div class="crm-counterparty-result" data-entity="counterparty-lookup-success" hidden>
               <div class="crm-counterparty-result-header">
-                <span class="crm-badge success">Найден</span>
+                <span class="crm-badge success">Найден во внешнем источнике</span>
               </div>
               <dl class="crm-counterparty-result-list">
                 <div class="crm-counterparty-result-item">
@@ -142,6 +143,7 @@
                   <dd data-entity="cp-result-type">—</dd>
                 </div>
               </dl>
+              <p class="crm-counterparty-source-note">Источник: внешний справочник</p>
               <div class="crm-counterparty-result-actions">
                 <button
                   class="uk-button crm-button crm-button-primary"
@@ -149,14 +151,17 @@
                   data-action="save-counterparty"
                 >Добавить контрагента</button>
                 <span class="crm-counterparty-save-confirmation" data-entity="counterparty-save-confirmation" hidden>
-                  Контрагент добавлен в статический реестр.
+                  Контрагент подготовлен к добавлению.
                 </span>
               </div>
             </div>
 
             <div class="crm-counterparty-error" data-entity="counterparty-lookup-error" hidden>
               <span class="crm-counterparty-error-icon" aria-hidden="true">⚠</span>
-              <span data-entity="counterparty-lookup-error-text">Ошибка.</span>
+              <span class="crm-counterparty-error-body">
+                <span data-entity="counterparty-lookup-error-text">Ошибка.</span>
+                <a class="crm-counterparty-error-link" href="back-office.html" data-entity="cp-error-registry-link" hidden>Перейти к списку контрагентов</a>
+              </span>
             </div>
           </div>
 
