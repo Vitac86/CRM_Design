@@ -71,6 +71,7 @@ Global scripts:
 Page-specific scripts (active only when the matching HTML file explicitly links them):
 
 - `contract-edit.html` → `assets/js/pages/contract-edit.js`
+- `document-wizard.html` → `assets/js/pages/document-wizard.js`
 - `middle-office-clients.html` → `assets/js/pages/middle-office.js`
 - `middle-office-reports.html` → `assets/js/pages/middle-office.js`
 - `subject-card.html` → `assets/js/pages/subject-card.js`
@@ -107,6 +108,7 @@ Subjects / contracts:
 - `subject-register.html`
 - `subject-edit.html`
 - `subject-edit-individual.html`
+- `document-wizard.html`
 - `contract-wizard.html`
 - `contract-edit.html`
 
@@ -167,21 +169,56 @@ Print-ready HTML templates for client-facing documents live in `assets/document-
 | Template file | Document |
 |---|---|
 | `zayavlenie-o-prisoedinenii-fl.html` | Заявление о присоединении (для физических лиц) |
+| `anketa-fl.html` | Анкета ФЛ |
+| `anketa-yul.html` | Анкета ЮЛ |
+| `qualification-request-fl.html` | Заявление о признании ФЛ квалифицированным инвестором |
+| `qualification-request-yul.html` | Заявление о признании ЮЛ квалифицированным инвестором |
+| `qualification-notice.html` | Уведомление о признании лица квалифицированным инвестором |
+| `account-opening-notice.html` | Уведомление об открытии брокерского-депозитарного счета |
+| `code-word-request.html` | Заявление об установлении/замене кодового слова |
 
 Document template styles are intentionally externalized from the HTML files and live in `assets/css/document-templates/`:
 
 | CSS file | Purpose |
 |---|---|
 | `document-template-base.css` | Shared document styles: A4 layout, field/checkbox primitives, page-break helpers, print rules |
+| `document-template-forms.css` | Shared questionnaire/request/notice styles for the Document Wizard templates |
 | `zayavlenie-o-prisoedinenii-fl.css` | Statement-specific styles: header, clauses, market table, signature block |
 
 The document template font stack is `Arial, Helvetica, sans-serif` for cross-platform stability. No proprietary font files are included and no `@font-face` declarations are used. Times New Roman is not used as a primary font. UMI.CMS/backend can pin or replace fonts server-side if exact legal print fidelity requires a specific typeface.
+
+Document template CSS must remain external. Do not add inline `style` attributes to new document templates.
+
+### Contract statement export
 
 The "Выгрузить заявление" button is exposed in both `contract-wizard.html` and `contract-edit.html`.
 
 In the static handoff, this action fetches the existing HTML template, fills it via `DOMParser`, opens the filled print-ready document in a new tab, and automatically invokes the browser print dialog. The user should select **Save as PDF** in the print dialog. External stylesheet `href` values are resolved to absolute URLs before the document is written to the blank window so styles load correctly, and the print dialog is delayed until stylesheets have loaded. It does not use html2pdf, html2canvas, or any rasterization library.
 
 Direct high-quality PDF download should be implemented by UMI.CMS/backend using a server-side renderer such as headless Chrome, Puppeteer, wkhtmltopdf, or an equivalent tool. `html2pdf` / `html2canvas` intentionally is not used for this legal statement because it rasterizes the document, producing heavier PDFs without a reliable selectable text layer. The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
+
+### Document Wizard
+
+`pages/document-wizard.html` is a static demo wizard for additional client documents. The normal entry point is the subject card → Documents tab → "Открыть Document Wizard". The wizard reads `?subject=<id>`, shows the selected demo subject summary, links back to the correct subject card, and filters documents by subject kind:
+
+- company subjects see ЮЛ-only forms plus shared notices/requests;
+- individual subjects see ФЛ-only forms plus shared notices/requests.
+
+The wizard includes:
+
+- Анкета ФЛ
+- Анкета ЮЛ
+- Заявление о признании ФЛ квалифицированным инвестором
+- Заявление о признании ЮЛ квалифицированным инвестором
+- Уведомление о признании лица квалифицированным инвестором
+- Уведомление об открытии брокерского-депозитарного счета
+- Заявление об установлении/замене кодового слова
+
+It explicitly excludes "Заявление о присоединении": that document remains part of the contract flow only (`contract-wizard.html` / `contract-edit.html`) through the existing "Выгрузить заявление" button.
+
+The Document Wizard output is HTML plus the browser print dialog. It does not use html2pdf, jsPDF, html2canvas, or rasterization. `assets/js/pages/document-wizard.js` resolves relative stylesheet URLs in fetched templates to absolute URLs before writing the filled document to a blank tab, waits for stylesheets to load with a timeout fallback, then invokes `print()`.
+
+The wizard uses static demo subject data and client-side field binding only. Future UMI.CMS integration should replace this with backend subject data binding and, if needed, server-side PDF rendering.
 
 ## Client-side demo pagination
 Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.

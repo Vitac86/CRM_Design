@@ -19,57 +19,153 @@
     <h1>Уведомление об открытии брокерского-депозитарного счёта</h1>
 
     <p class="intro doc-body">
-      Настоящим ООО «Инвестика» уведомляет Вас о том, что на основании заявления о присоединении к Регламенту
-      брокерского обслуживания ООО «Инвестика» Вам открыты следующие счета:
+      Общество с ограниченной ответственностью «Инвестика» в лице
+      <span class="field long" data-doc-field="extra-authorized-signer"></span>,
+      действующего на основании <span class="field medium" data-doc-field="extra-authority-basis"></span>,
+      настоящим извещает Клиента о заключении договора о брокерском обслуживании и депозитарного договора
+      (договора счета депо), а также об открытии счетов.
     </p>
 
     <div class="doc-section">
-      <table class="doc-form-table">
-        <thead>
-          <tr>
-            <th>Наименование счёта</th>
-            <th>Номер счёта</th>
-            <th>Дата открытия</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Брокерский счёт (позиция в системе внутреннего учёта)</td>
-            <td><span class="field full" data-doc-field="extra-brokerage-account"></span></td>
-            <td><span class="field medium" data-doc-field="extra-account-opening-date"></span></td>
-          </tr>
-          <tr>
-            <td>Счёт депо</td>
-            <td><span class="field full" data-doc-field="extra-depo-account"></span></td>
-            <td><span class="field medium" data-doc-field="extra-account-opening-date"></span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="doc-section">
-      <p class="doc-section-title">Реквизиты клиента</p>
+      <p class="doc-section-title">1. Информация о клиенте</p>
       <table class="doc-form-table">
         <tbody>
           <tr>
-            <td class="doc-label">Фамилия, имя, отчество / Наименование организации</td>
+            <td class="doc-label">Наименование клиента / ФИО клиента</td>
             <td><span class="field full" data-doc-field="client-full-name"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">ИНН / номер документа, удостоверяющего личность</td>
+            <td><span class="field full" data-doc-field="client-id-or-inn"></span></td>
           </tr>
           <tr>
             <td class="doc-label">Код клиента</td>
             <td><span class="field medium" data-doc-field="client-code"></span></td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">2. Информация о заключенных договорах</p>
+      <table class="doc-form-table">
+        <thead>
           <tr>
-            <td class="doc-label">ИНН</td>
-            <td><span class="field medium" data-doc-field="client-inn"></span></td>
+            <th>Договор</th>
+            <th>Номер договора</th>
+            <th>Дата</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Договор на брокерское обслуживание</td>
+            <td><span class="field full" data-doc-field="extra-brokerage-contract"></span></td>
+            <td><span class="field medium" data-doc-field="extra-brokerage-contract-date"></span></td>
+          </tr>
+          <tr>
+            <td>Депозитарный договор (договор счета депо)</td>
+            <td><span class="field full" data-doc-field="extra-depository-contract"></span></td>
+            <td><span class="field medium" data-doc-field="extra-depository-contract-date"></span></td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <p class="doc-body" style="margin-top: 6px;">
-      Для проведения операций по брокерскому счёту необходимо обращаться в ООО «Инвестика» по телефону
-      +7&nbsp;(812)&nbsp;319-95-00 или по адресу электронной почты: Backoffice@investica.ru.
+    <div class="doc-section">
+      <p class="doc-section-title">3. Счета в системе внутреннего учета ООО «Инвестика»</p>
+      <table class="doc-form-table">
+        <thead>
+          <tr>
+            <th>Наименование</th>
+            <th>Номер счета</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Брокерский счет</td>
+            <td><span class="field full" data-doc-field="extra-brokerage-account"></span></td>
+          </tr>
+          <tr>
+            <td>Фондовый рынок</td>
+            <td><span class="field full" data-doc-field="extra-stock-market-account"></span></td>
+          </tr>
+          <tr>
+            <td>Срочный рынок</td>
+            <td><span class="field full" data-doc-field="extra-futures-market-account"></span></td>
+          </tr>
+          <tr>
+            <td>Валютный рынок и рынок драгоценных металлов</td>
+            <td><span class="field full" data-doc-field="extra-currency-market-account"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">4. Счета депо в депозитарии ООО «Инвестика»</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Счет депо клиента</td>
+            <td><span class="field full" data-doc-field="extra-depo-account"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Дата открытия</td>
+            <td><span class="field medium" data-doc-field="extra-account-opening-date"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">5. Реквизиты для перечисления денежных средств</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Реквизиты получателя, банк, р/с, к/с, БИК</td>
+            <td><span class="field full" data-doc-field="extra-payment-details"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Назначение платежа</td>
+            <td>
+              Код <span data-doc-field="client-code"></span>. Перевод денежных средств по договору на брокерское
+              обслуживание № <span data-doc-field="extra-brokerage-contract"></span> от
+              <span data-doc-field="extra-brokerage-contract-date"></span>.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">6. Реквизиты для перевода ценных бумаг на счет депо клиента</p>
+      <p class="doc-body">
+        Клиенту необходимо самостоятельно подать поручение держателю ценных бумаг на перевод ценных бумаг
+        в номинальное держание НКО АО «НРД» для зачисления на счет депо клиента, открытый в депозитарии
+        ООО «Инвестика».
+      </p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Торговый / неторговый раздел, место хранения, междепозитарный договор</td>
+            <td><span class="field full" data-doc-field="extra-securities-transfer-details"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Основание для перевода</td>
+            <td>
+              Междепозитарный договор ООО «Инвестика» с НКО АО «НРД»; депозитарный договор клиента
+              № <span data-doc-field="extra-depository-contract"></span> от
+              <span data-doc-field="extra-depository-contract-date"></span>.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="doc-confirmation">
+      Клиент вправе подать заявки способами, предусмотренными Регламентом, в том числе по телефону
+      +7&nbsp;(812)&nbsp;319-95-01, назвав уникальный код, соответствующий номеру портфеля Клиента, и пароль,
+      соответствующий установленному кодовому слову.
     </p>
 
     <p class="date-line" data-doc-field="extra-document-date">"_____" __________ 20____ г.</p>
@@ -77,7 +173,7 @@
     <div class="signature keep">
       <span></span>
       <span class="sig-line"></span>
-      <span class="sig-name"></span>
+      <span class="sig-name" data-doc-field="extra-authorized-signer"></span>
       <span></span>
       <span class="sig-caption">Подпись уполномоченного лица ООО «Инвестика»</span>
       <span class="stamp">М.П.</span>

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
     <link rel="stylesheet" href="../assets/css/crm-static.css"/>
   </head>
-  <body data-page="subject-card">
+  <body data-page="subject-card" data-subject-kind="company">
     <div class="crm-app">
       <div class="crm-layout">
         <aside class="crm-sidebar" data-entity="layout-sidebar">
@@ -699,7 +699,7 @@
                   <section class="crm-subject-section-layout crm-documents-section" data-entity="documents">
 
                     <div class="crm-documents-actions">
-                      <button class="uk-button uk-button-default crm-button crm-doc-action-btn" type="button" data-action="open-document-wizard">Открыть Document Wizard</button>
+                      <a class="uk-button uk-button-default crm-button crm-doc-action-btn" href="document-wizard.html?subject=c-011" data-action="open-document-wizard" data-subject-id="c-011" data-subject-kind="company" onclick="event.stopPropagation()">Открыть Document Wizard</a>
                       <button class="uk-button crm-button-primary crm-button crm-doc-action-btn" type="button" data-action="open-document-form">+ Добавить документ</button>
                     </div>
 

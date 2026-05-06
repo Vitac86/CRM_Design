@@ -184,7 +184,7 @@
           <div class="crm-breadcrumbs">
             <a href="subjects.html">Субъекты</a>
             <span uk-icon="chevron-right"></span>
-            <a href="subject-card.html">Карточка субъекта</a>
+            <a id="docwiz-breadcrumb-card-link" href="subjects.html" data-role="docwiz-card-link">Карточка субъекта</a>
             <span uk-icon="chevron-right"></span>
             <span id="docwiz-breadcrumb-subject">Document Wizard</span>
           </div>
@@ -216,6 +216,7 @@
                 <strong id="docwiz-subject-code">—</strong>
               </div>
             </div>
+            <p id="docwiz-subject-warning" class="crm-docwiz-warning" hidden></p>
 
             <!-- Step indicators -->
             <div class="crm-wizard-steps">
@@ -235,7 +236,7 @@
           </div>
 
           <!-- Step 1: document selection grid (rendered by JS) -->
-          <div class="crm-card" style="padding: 14px 16px;">
+          <div class="crm-card crm-docwiz-doc-list-card">
             <div class="crm-section-head">
               <h3>Выберите документ</h3>
             </div>
@@ -273,7 +274,7 @@
 
           <!-- Navigation back to subject card -->
           <div class="crm-sticky-actions crm-wizard-actions">
-            <a href="subject-card.html" class="uk-button uk-button-default crm-button">
+            <a id="docwiz-back-link" href="subjects.html" class="uk-button uk-button-default crm-button" data-role="docwiz-back-link">
               ← К карточке субъекта
             </a>
           </div>

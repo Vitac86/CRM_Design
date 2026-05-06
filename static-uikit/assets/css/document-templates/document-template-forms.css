@@ -36,6 +36,34 @@ p { margin: 0 0 4px; }
 
 .intro { text-align: justify; }
 
+.doc-appendix {
+  margin: 0 0 3px;
+  text-align: right;
+  color: var(--muted);
+  font-size: 8.8pt;
+}
+
+.doc-check-block {
+  margin: 6px 0;
+}
+
+.doc-section-note {
+  margin-bottom: 4px;
+}
+
+.doc-confirmation {
+  margin-top: 6px;
+  text-align: justify;
+}
+
+.doc-fill-space {
+  min-height: 7mm;
+}
+
+.doc-small {
+  font-size: 8.2pt;
+}
+
 /* --- Section headings --- */
 
 .doc-section { margin-top: 7px; }
@@ -79,6 +107,7 @@ p { margin: 0 0 4px; }
 
 .doc-form-table .doc-label-wide   { width: 65%; }
 .doc-form-table .doc-label-narrow { width: 38%; }
+.doc-form-table .doc-index { width: 8mm; text-align: center; }
 
 /* Small note under a field label */
 .doc-note {

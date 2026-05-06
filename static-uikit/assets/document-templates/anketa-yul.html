@@ -9,8 +9,20 @@
 </head>
 <body>
   <main class="document">
+    <p class="doc-appendix">Приложение 17</p>
     <h1>Анкета клиента</h1>
     <p class="subtitle">(юридическое лицо)</p>
+
+    <div class="doc-check-block">
+      <div class="check-list">
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-client"></span><span>Клиент</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-representative"></span><span>Представитель</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-beneficiary"></span><span>Выгодоприобретатель</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-mode-first"></span><span>Заполняется впервые</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-mode-change"></span><span>Изменение анкетных данных</span></div>
+      </div>
+      <p class="doc-small">Анкета представителя и выгодоприобретателя заполняется с 1 по 11 пункт.</p>
+    </div>
 
     <div class="doc-section">
       <p class="doc-section-title">1. Сведения об организации</p>
@@ -23,6 +35,14 @@
           <tr>
             <td class="doc-label">Полное наименование</td>
             <td><span class="field full" data-doc-field="client-full-legal-name"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Наименование на иностранном языке</td>
+            <td><span class="field full" data-doc-field="client-english-name"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Организационно-правовая форма</td>
+            <td><span class="field full" data-doc-field="client-legal-form"></span></td>
           </tr>
           <tr>
             <td class="doc-label">ИНН</td>
@@ -122,12 +142,157 @@
               </div>
             </td>
           </tr>
+          <tr>
+            <td class="doc-label">Стратегическое общество / общество под контролем стратегического общества</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="strategic-company-yes"></span><span>Да</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="strategic-company-no"></span><span>Нет</span></div>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <div class="doc-section">
-      <p class="doc-section-title">6. Данные клиента в системе</p>
+      <p class="doc-section-title">6. Классификаторы, капитал, органы управления и лицензии</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Доменное имя / сайт</td>
+            <td><span class="field full" data-doc-field="client-website"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">ОКПО</td>
+            <td><span class="field full" data-doc-field="extra-okpo"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">ОКВЭД / виды экономической деятельности</td>
+            <td><span class="field full" data-doc-field="extra-okved"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Уставный капитал</td>
+            <td><span class="field full" data-doc-field="client-charter-capital"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Структура и персональный состав органов управления</td>
+            <td><span class="field full" data-doc-field="extra-management-structure"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Акционеры / участники от 5%</td>
+            <td><span class="field full" data-doc-field="extra-shareholders"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Лица, имеющие право давать обязательные указания</td>
+            <td><span class="field full" data-doc-field="extra-controlling-persons"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Лицензируемая деятельность</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="licensed-activity-no"></span><span>Не осуществляется</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="licensed-activity-yes"></span><span>Осуществляется</span></div>
+              </div>
+              <span class="field full" data-doc-field="extra-license-details"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">7. Банковские реквизиты и связанные лица</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Банковские реквизиты</td>
+            <td><span class="field full" data-doc-field="extra-bank-details"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Официальное лицо без доверенности</td>
+            <td>
+              <span class="field full" data-doc-field="client-rep-full-name"></span>
+              <span class="doc-note" data-doc-field="client-rep-position"></span>
+              <span class="doc-note" data-doc-field="client-rep-authority"></span>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Представитель юридического лица</td>
+            <td><span class="field full" data-doc-field="extra-representative-details"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Выгодоприобретатели / бенефициарные владельцы</td>
+            <td><span class="field full" data-doc-field="extra-beneficiaries"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">8. Цели, финансовое положение, репутация и источники средств</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Цель деловых отношений</td>
+            <td><span class="field full" data-doc-field="extra-business-purpose"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Цель финансово-хозяйственной деятельности</td>
+            <td><span class="field full" data-doc-field="extra-financial-goal"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Документы о финансовом положении</td>
+            <td><span class="field full" data-doc-field="extra-financial-docs"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Документы о деловой репутации</td>
+            <td><span class="field full" data-doc-field="extra-reputation-docs"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Источник происхождения денежных средств / имущества</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="funds-own"></span><span>Собственные средства</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="funds-borrowed"></span><span>Заемные средства</span></div>
+              </div>
+              <span class="field full" data-doc-field="extra-source-of-funds"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">9. Иностранные структуры, FATCA-признаки и иные сведения</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Статус доверительного собственника / протектора иностранной структуры без образования ЮЛ</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="foreign-trust-owner-no"></span><span>Статус доверительного собственника отсутствует</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="foreign-trust-protector-no"></span><span>Статус протектора отсутствует</span></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Признаки налогоплательщика США</td>
+            <td class="doc-small">
+              Налоговое резидентство США, адрес / телефон / контролирующие лица / доверенность / платёжные инструкции в США:
+              <span class="field full" data-doc-field="extra-fatca-details"></span>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Иные сведения</td>
+            <td><span class="field full" data-doc-field="extra-other-info"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">10. Данные клиента в системе</p>
       <table class="doc-form-table">
         <tbody>
           <tr>
@@ -138,7 +303,7 @@
       </table>
     </div>
 
-    <p style="margin-top: 6px; text-align: justify;">
+    <p class="doc-confirmation">
       Подтверждаем достоверность и полноту сведений, указанных в настоящей анкете. Обязуемся незамедлительно
       уведомлять ООО «Инвестика» об изменении сведений, содержащихся в анкете.
     </p>

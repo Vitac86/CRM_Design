@@ -9,8 +9,21 @@
 </head>
 <body>
   <main class="document">
+    <p class="doc-appendix">Приложение 16</p>
     <h1>Анкета клиента</h1>
     <p class="subtitle">(физическое лицо)</p>
+
+    <div class="doc-check-block">
+      <div class="check-list">
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-client"></span><span>Клиент</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-representative"></span><span>Представитель</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-beneficiary"></span><span>Выгодоприобретатель</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-role-beneficial-owner"></span><span>Бенефициарный владелец</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-mode-first"></span><span>Заполняется впервые</span></div>
+        <div class="check-row"><span class="checkbox" data-doc-check="anketa-mode-change"></span><span>Изменение анкетных данных</span></div>
+      </div>
+      <p class="doc-small">В случае упрощенной идентификации клиентом заполняются пункты с 1 по 14. Анкета представителя, выгодоприобретателя, бенефициарного владельца заполняется с 1 по 14 пункт.</p>
+    </div>
 
     <div class="doc-section">
       <p class="doc-section-title">1. Общие сведения</p>
@@ -30,7 +43,13 @@
           </tr>
           <tr>
             <td class="doc-label">Гражданство</td>
-            <td><span class="field long" data-doc-field="client-citizenship"></span></td>
+            <td>
+              <span class="field long" data-doc-field="client-citizenship"></span>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="citizenship-rf"></span><span>Российская Федерация</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="citizenship-other"></span><span>Иное государство</span></div>
+              </div>
+            </td>
           </tr>
           <tr>
             <td class="doc-label">ИНН</td>
@@ -125,7 +144,29 @@
     </div>
 
     <div class="doc-section">
-      <p class="doc-section-title">6. Налоговый статус</p>
+      <p class="doc-section-title">6. Публичные должностные лица и связанные лица</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Наличие статуса публичного должностного лица</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="pep-foreign"></span><span>Иностранное публичное должностное лицо</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="pep-international"></span><span>Должностное лицо публичной международной организации</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="pep-russian"></span><span>Лицо, занимающее государственные или приравненные должности РФ</span></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Степень родства либо статус по отношению к публичному должностному лицу</td>
+            <td><span class="field full" data-doc-field="extra-pep-relation"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">7. Налоговый статус</p>
       <table class="doc-form-table">
         <tbody>
           <tr>
@@ -151,7 +192,82 @@
     </div>
 
     <div class="doc-section">
-      <p class="doc-section-title">7. Данные клиента в системе</p>
+      <p class="doc-section-title">8. Банковские реквизиты, представитель, выгодоприобретатель</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Банковские реквизиты</td>
+            <td><span class="field full" data-doc-field="extra-bank-details"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Сведения о представителе</td>
+            <td><span class="field full" data-doc-field="extra-representative-details"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Сведения о выгодоприобретателе / бенефициарном владельце</td>
+            <td><span class="field full" data-doc-field="extra-beneficiary-details"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">9. Цели, финансовое положение и репутация</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Цель установления и предполагаемый характер деловых отношений</td>
+            <td><span class="field full" data-doc-field="extra-business-purpose"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Цель финансово-хозяйственной деятельности в рамках договора</td>
+            <td><span class="field full" data-doc-field="extra-financial-goal"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Сведения о финансовом положении</td>
+            <td>
+              <span class="field full" data-doc-field="extra-financial-position"></span>
+              <div class="check-row"><span class="checkbox" data-doc-check="financial-bankruptcy-no"></span><span>Отсутствуют сведения о банкротстве</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Сведения о деловой репутации</td>
+            <td><span class="field full" data-doc-field="extra-business-reputation"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">10. Иностранные структуры, FATCA-признаки и иные сведения</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Статус доверительного собственника / протектора иностранной структуры без образования ЮЛ</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="foreign-trust-owner-no"></span><span>Статус доверительного собственника отсутствует</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="foreign-trust-protector-no"></span><span>Статус протектора отсутствует</span></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Признаки налогоплательщика США</td>
+            <td class="doc-small">
+              Гражданство США, greencard, место рождения / адрес / телефон / платёжные инструкции / доверенность на лицо с адресом в США:
+              <span class="field full" data-doc-field="extra-fatca-details"></span>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Иные сведения</td>
+            <td><span class="field full" data-doc-field="extra-other-info"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">11. Данные клиента в системе</p>
       <table class="doc-form-table">
         <tbody>
           <tr>
@@ -162,7 +278,7 @@
       </table>
     </div>
 
-    <p style="margin-top: 6px; text-align: justify;">
+    <p class="doc-confirmation">
       Подтверждаю достоверность и полноту сведений, указанных в настоящей анкете. Обязуюсь незамедлительно
       уведомлять ООО «Инвестика» об изменении сведений, содержащихся в анкете.
     </p>

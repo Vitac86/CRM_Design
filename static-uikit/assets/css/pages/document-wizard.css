@@ -44,7 +44,26 @@
   gap: 12px;
 }
 
+.crm-docwiz-warning {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #f0cf8a;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #80540d;
+  font-size: 12px;
+}
+
+.crm-docwiz-error {
+  padding: 24px;
+  color: #c0392b;
+}
+
 /* Step 1: document selection grid */
+
+.crm-docwiz-doc-list-card {
+  padding: 14px 16px;
+}
 
 .crm-docwiz-doc-grid {
   display: grid;
@@ -143,6 +162,10 @@
 .crm-docwiz-field-wrap {
   display: grid;
   gap: 4px;
+}
+
+.crm-docwiz-field-wrap-full {
+  grid-column: 1 / -1;
 }
 
 .crm-docwiz-field-wrap .crm-document-form-label {
