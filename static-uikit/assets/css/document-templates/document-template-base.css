@@ -1,0 +1,81 @@
+:root {
+  --text: #111;
+  --line: #111;
+  --muted: #444;
+  --page-width: 210mm;
+  --font-size: 9.1pt;
+  --line-height: 1.06;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: #f1f1f1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+}
+
+.document {
+  width: var(--page-width);
+  margin: 18px auto;
+  padding: 13mm 16mm;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.field {
+  display: inline-block;
+  min-width: 38mm;
+  height: 1.05em;
+  border-bottom: 1px solid var(--line);
+  vertical-align: baseline;
+}
+.field.short  { min-width: 14mm; }
+.field.medium { min-width: 28mm; }
+.field.long   { min-width: 78mm; }
+.field.full   { min-width: 100%; }
+
+.check-list { margin: 0; }
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 1px 0;
+}
+
+.checkbox {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 3.2mm;
+  height: 3.2mm;
+  margin-top: 1.3px;
+  border: 1px solid var(--line);
+  vertical-align: text-top;
+}
+
+.checkbox.is-checked::after {
+  content: "✓";
+  display: block;
+  text-align: center;
+  line-height: 3mm;
+  font-size: 8pt;
+}
+
+.page-break { page-break-before: always; break-before: page; }
+.keep { break-inside: avoid; page-break-inside: avoid; }
+
+@page { size: A4; margin: 13mm 16mm; }
+
+@media print {
+  body { background: #fff; }
+  .document {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  a { color: inherit; text-decoration: none; }
+}

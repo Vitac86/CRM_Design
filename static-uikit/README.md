@@ -168,9 +168,18 @@ Print-ready HTML templates for client-facing documents live in `assets/document-
 |---|---|
 | `zayavlenie-o-prisoedinenii-fl.html` | Заявление о присоединении (для физических лиц) |
 
+Document template styles are intentionally externalized from the HTML files and live in `assets/css/document-templates/`:
+
+| CSS file | Purpose |
+|---|---|
+| `document-template-base.css` | Shared document styles: A4 layout, field/checkbox primitives, page-break helpers, print rules |
+| `zayavlenie-o-prisoedinenii-fl.css` | Statement-specific styles: header, clauses, market table, signature block |
+
+The document template font stack is `Arial, Helvetica, sans-serif` for cross-platform stability. No proprietary font files are included and no `@font-face` declarations are used. Times New Roman is not used as a primary font. UMI.CMS/backend can pin or replace fonts server-side if exact legal print fidelity requires a specific typeface.
+
 The "Выгрузить заявление" button is exposed in both `contract-wizard.html` and `contract-edit.html`.
 
-In the static handoff, this action fetches the existing HTML template, fills it via `DOMParser`, and opens the filled print-ready document in a new tab for review or browser "Save as PDF". It does not automatically call print and does not download a fake `.pdf` from HTML.
+In the static handoff, this action fetches the existing HTML template, fills it via `DOMParser`, and opens the filled print-ready document in a new tab for review or browser "Save as PDF". External stylesheet `href` values are resolved to absolute URLs before the document is written to the blank window so styles load correctly. It does not automatically call print and does not download a fake `.pdf` from HTML.
 
 Direct high-quality PDF download should be implemented by UMI.CMS/backend using a server-side renderer such as headless Chrome, Puppeteer, wkhtmltopdf, or an equivalent tool. `html2pdf` / `html2canvas` intentionally is not used for this legal statement because it rasterizes the document, producing heavier PDFs without a reliable selectable text layer. The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
 

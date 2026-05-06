@@ -2126,6 +2126,10 @@
             var doc = parser.parseFromString(html, 'text/html');
             fillTemplateDoc(doc, data);
 
+            doc.querySelectorAll('link[rel="stylesheet"][href]').forEach(function (link) {
+              link.setAttribute('href', new URL(link.getAttribute('href'), templateUrl).href);
+            });
+
             var filledHtml = buildFilledHtml(doc);
             var payload = buildPayload(exportBtn, data, filledHtml);
 
