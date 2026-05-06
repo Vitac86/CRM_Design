@@ -577,6 +577,12 @@
                           <span class="crm-bank-form-label">Назначение</span>
                           <input class="uk-input crm-input crm-bank-input" type="text" name="purpose" autocomplete="off"/>
                         </label>
+                        <div class="crm-bank-form-field crm-bank-form-field-full">
+                          <label class="crm-bank-primary-toggle">
+                            <input type="checkbox" name="isPrimary" data-role="bank-primary-input">
+                            <span>Основной счёт</span>
+                          </label>
+                        </div>
                       </div>
                       <div class="crm-bank-account-form-actions">
                         <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="cancel-bank-account-form">Отмена</button>
@@ -595,6 +601,7 @@
                         data-currency="RUB"
                         data-opened-at="2021-01-22"
                         data-purpose="Основной расчётный счёт"
+                        data-is-primary="true"
                       >
                         <div class="crm-bank-account-head">
                           <div>
@@ -641,6 +648,7 @@
                         data-currency="USD"
                         data-opened-at="2023-07-14"
                         data-purpose="Валютный операционный"
+                        data-is-primary="false"
                       >
                         <div class="crm-bank-account-head">
                           <div>
@@ -684,6 +692,7 @@
                         data-currency="CNY"
                         data-opened-at="2026-03-11"
                         data-purpose="Расчёты с азиатскими контрагентами"
+                        data-is-primary="false"
                       >
                         <div class="crm-bank-account-head">
                           <div>

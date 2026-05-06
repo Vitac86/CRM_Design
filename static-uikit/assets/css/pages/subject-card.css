@@ -847,6 +847,15 @@
   white-space: nowrap;
 }
 
+.crm-page[data-page="subject-card"] .crm-bank-primary-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--crm-umi-text-secondary);
+}
+
 /* Account list */
 .crm-page[data-page="subject-card"] .crm-bank-account-list {
   display: grid;

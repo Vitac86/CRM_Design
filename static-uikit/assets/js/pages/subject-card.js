@@ -69,6 +69,10 @@
     setField('currency', card.getAttribute('data-currency') || 'RUB');
     setField('openedAt', card.getAttribute('data-opened-at'));
     setField('purpose', card.getAttribute('data-purpose'));
+    var primaryCheckbox = form.querySelector('[data-role="bank-primary-input"]');
+    if (primaryCheckbox) {
+      primaryCheckbox.checked = card.getAttribute('data-is-primary') === 'true';
+    }
   }
 
   function showBankForm() {
@@ -83,7 +87,11 @@
     var form = getBankForm();
     if (!form) return;
     form.querySelectorAll('input').forEach(function (input) {
-      input.value = '';
+      if (input.type === 'checkbox') {
+        input.checked = false;
+      } else {
+        input.value = '';
+      }
     });
     var currencySelect = form.querySelector('select[name="currency"]');
     if (currencySelect) currencySelect.value = 'RUB';
@@ -131,12 +139,17 @@
     card.setAttribute('data-currency', data.currency || '');
     card.setAttribute('data-opened-at', data.openedAt || '');
     card.setAttribute('data-purpose', data.purpose || '');
+    card.setAttribute('data-is-primary', data.isPrimary ? 'true' : 'false');
+    var badgesHtml = data.isPrimary
+      ? '<div class="crm-bank-account-badges"><span class="crm-badge brand">Основной</span></div>'
+      : '';
     card.innerHTML =
       '<div class="crm-bank-account-head">' +
         '<div>' +
           '<div class="crm-bank-account-title">' + escapeHtml(data.bankName) + '</div>' +
           '<div class="crm-bank-account-subtitle">' + escapeHtml(purpose) + '</div>' +
         '</div>' +
+        badgesHtml +
       '</div>' +
       '<dl class="crm-bank-account-grid">' +
         '<div class="crm-bank-account-field">' +
@@ -182,6 +195,7 @@
     }
 
     var form = getBankForm();
+    var primaryCheckbox = form.querySelector('[data-role="bank-primary-input"]');
     var data = {
       bankName: getBankFieldValue(form, 'bankName'),
       bik: getBankFieldValue(form, 'bik'),
@@ -190,7 +204,19 @@
       correspondentAccount: getBankFieldValue(form, 'correspondentAccount'),
       openedAt: getBankFieldValue(form, 'openedAt'),
       purpose: getBankFieldValue(form, 'purpose'),
+      isPrimary: primaryCheckbox ? primaryCheckbox.checked : false,
     };
+
+    if (data.isPrimary) {
+      subjectCardPage.querySelectorAll('[data-entity="bank-account-card"]').forEach(function (c) {
+        c.setAttribute('data-is-primary', 'false');
+        var badgesDiv = c.querySelector('.crm-bank-account-badges');
+        if (badgesDiv) {
+          var primaryBadge = badgesDiv.querySelector('.crm-badge.brand');
+          if (primaryBadge) primaryBadge.remove();
+        }
+      });
+    }
 
     if (editingBankCard) {
       var newCard = buildAccountCard(data);

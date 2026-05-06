@@ -460,6 +460,12 @@
                           <span class="crm-bank-form-label">Назначение</span>
                           <input class="uk-input crm-input crm-bank-input" type="text" name="purpose" autocomplete="off"/>
                         </label>
+                        <div class="crm-bank-form-field crm-bank-form-field-full">
+                          <label class="crm-bank-primary-toggle">
+                            <input type="checkbox" name="isPrimary" data-role="bank-primary-input">
+                            <span>Основной счёт</span>
+                          </label>
+                        </div>
                       </div>
                       <div class="crm-bank-account-form-actions">
                         <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="cancel-bank-account-form">Отмена</button>
@@ -477,6 +483,7 @@
                         data-currency="RUB"
                         data-opened-at="2026-04-22"
                         data-purpose="Основной банковский счёт физического лица"
+                        data-is-primary="true"
                       >
                         <div class="crm-bank-account-head">
                           <div>
