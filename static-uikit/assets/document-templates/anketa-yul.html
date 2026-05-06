@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Анкета клиента — юридическое лицо</title>
+  <link rel="stylesheet" href="../css/document-templates/document-template-base.css">
+  <link rel="stylesheet" href="../css/document-templates/document-template-forms.css">
+</head>
+<body>
+  <main class="document">
+    <h1>Анкета клиента</h1>
+    <p class="subtitle">(юридическое лицо)</p>
+
+    <div class="doc-section">
+      <p class="doc-section-title">1. Сведения об организации</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Краткое наименование</td>
+            <td><span class="field full" data-doc-field="client-short-name"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Полное наименование</td>
+            <td><span class="field full" data-doc-field="client-full-legal-name"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">ИНН</td>
+            <td><span class="field long" data-doc-field="client-inn"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">КПП</td>
+            <td><span class="field long" data-doc-field="client-kpp"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">ОГРН</td>
+            <td><span class="field long" data-doc-field="client-ogrn"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Дата государственной регистрации</td>
+            <td><span class="field medium" data-doc-field="client-registration-date"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Орган государственной регистрации</td>
+            <td><span class="field full" data-doc-field="client-registration-authority"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">2. Адреса</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Юридический адрес</td>
+            <td><span class="field full" data-doc-field="client-legal-address"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Почтовый адрес</td>
+            <td><span class="field full" data-doc-field="client-postal-address"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">3. Контактные данные</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Телефон</td>
+            <td><span class="field long" data-doc-field="client-phone"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Адрес электронной почты</td>
+            <td><span class="field full" data-doc-field="client-email"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">4. Сведения о представителе</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Должность представителя</td>
+            <td><span class="field full" data-doc-field="client-rep-position"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Фамилия, имя, отчество представителя</td>
+            <td><span class="field full" data-doc-field="client-rep-full-name"></span></td>
+          </tr>
+          <tr>
+            <td class="doc-label">Основание полномочий</td>
+            <td><span class="field full" data-doc-field="client-rep-authority"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">5. Налоговый статус</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Налоговый резидент Российской Федерации</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="tax-resident-rf-yes"></span><span>Да</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="tax-resident-rf-no"></span><span>Нет</span></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="doc-label">Является налогоплательщиком США (FATCA)</td>
+            <td>
+              <div class="check-list">
+                <div class="check-row"><span class="checkbox" data-doc-check="fatca-yes"></span><span>Да</span></div>
+                <div class="check-row"><span class="checkbox" data-doc-check="fatca-no"></span><span>Нет</span></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <p class="doc-section-title">6. Данные клиента в системе</p>
+      <table class="doc-form-table">
+        <tbody>
+          <tr>
+            <td class="doc-label">Код клиента</td>
+            <td><span class="field long" data-doc-field="client-code"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top: 6px; text-align: justify;">
+      Подтверждаем достоверность и полноту сведений, указанных в настоящей анкете. Обязуемся незамедлительно
+      уведомлять ООО «Инвестика» об изменении сведений, содержащихся в анкете.
+    </p>
+
+    <p class="date-line" data-doc-field="extra-document-date">"_____" __________ 20____ г.</p>
+
+    <div class="signature keep">
+      <span></span>
+      <span class="sig-line"></span>
+      <span class="sig-name" data-doc-field="client-rep-full-name"></span>
+      <span></span>
+      <span class="sig-caption">Подпись</span>
+      <span class="stamp">М.П.</span>
+    </div>
+
+    <section class="office-block page-break">
+      <p class="office-title">Заполняется ООО «Инвестика»</p>
+      <table class="office-table">
+        <thead>
+          <tr>
+            <th class="center">Наименование</th>
+            <th class="center">Номер / значение</th>
+            <th class="center">Дата</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Регистрационный номер анкеты</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Код клиента</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <th class="center">Должность</th>
+            <th class="center">ФИО</th>
+            <th class="center">Подпись</th>
+          </tr>
+          <tr class="spacer">
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

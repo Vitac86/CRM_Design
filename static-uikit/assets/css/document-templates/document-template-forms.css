@@ -1,0 +1,207 @@
+/* Shared styles for questionnaire and request document templates.         */
+/* All templates using this file must also link document-template-base.css. */
+
+/* --- Typography --- */
+
+h1 {
+  margin: 0 0 2px;
+  text-align: center;
+  font-size: 12pt;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 5px 0 2px;
+  font-size: 10pt;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+p { margin: 0 0 4px; }
+
+.doc-topline {
+  margin: 0 0 5px;
+  text-align: right;
+  color: var(--muted);
+  font-size: 9.8pt;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0 0 8px;
+  text-align: center;
+  font-style: italic;
+}
+
+.intro { text-align: justify; }
+
+/* --- Section headings --- */
+
+.doc-section { margin-top: 7px; }
+
+.doc-section-title {
+  margin: 0 0 3px;
+  font-weight: 700;
+  font-size: 9.1pt;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1px;
+}
+
+/* --- Form tables (label / value grid) --- */
+
+.doc-form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4px;
+}
+
+.doc-form-table th,
+.doc-form-table td {
+  border: 1px solid var(--line);
+  padding: 2px 5px 3px;
+  vertical-align: top;
+  line-height: 1.3;
+}
+
+.doc-form-table thead th {
+  text-align: center;
+  font-weight: 700;
+  background: #f0f0f0;
+  font-size: 8.5pt;
+}
+
+.doc-form-table .doc-label {
+  width: 52%;
+  font-size: 8.8pt;
+}
+
+.doc-form-table .doc-label-wide   { width: 65%; }
+.doc-form-table .doc-label-narrow { width: 38%; }
+
+/* Small note under a field label */
+.doc-note {
+  display: block;
+  font-size: 7.8pt;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* --- Date line --- */
+
+.date-line {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+/* --- Signature block --- */
+
+.signature {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns: 1fr auto 36mm;
+  column-gap: 8px;
+  align-items: end;
+}
+
+.signature .sig-line {
+  grid-column: 2;
+  min-width: 52mm;
+  border-bottom: 1px solid var(--line);
+  height: 1.1em;
+}
+
+.signature .sig-name {
+  grid-column: 3;
+  border-bottom: 1px solid var(--line);
+  height: 1.1em;
+}
+
+.signature .sig-caption {
+  grid-column: 2;
+  text-align: center;
+  font-size: 9.4pt;
+}
+
+.signature .stamp {
+  grid-column: 3;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* --- Office fill section --- */
+
+.office-block { margin-top: 16mm; }
+
+.office-title {
+  margin: 0 0 4px;
+  font-style: italic;
+}
+
+.office-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.office-table th,
+.office-table td {
+  border: 1px solid var(--line);
+  padding: 3px 6px;
+  vertical-align: top;
+}
+
+.office-table th {
+  font-weight: 700;
+  text-align: left;
+}
+
+.office-table td  { height: 7mm; }
+.office-table .center  { text-align: center; }
+.office-table .spacer td { height: 9mm; }
+
+/* --- Recipient block (for notices / letters) --- */
+
+.doc-recipient {
+  margin: 0 0 14px;
+  text-align: right;
+}
+
+.doc-recipient p { margin: 0; }
+
+/* --- Notice body text --- */
+
+.doc-body   { text-align: justify; }
+.doc-indent { text-indent: 10mm; }
+
+.clause-title {
+  margin: 0 0 2px;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* --- Criteria table for qualification documents --- */
+
+.criteria-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 3px 0 6px;
+}
+
+.criteria-table td {
+  border: 1px solid var(--line);
+  padding: 2px 5px;
+  vertical-align: top;
+}
+
+.criteria-table .crit-box {
+  width: 6mm;
+  text-align: center;
+}
+
+.criteria-table .crit-num {
+  width: 8mm;
+  text-align: center;
+  font-weight: 700;
+}

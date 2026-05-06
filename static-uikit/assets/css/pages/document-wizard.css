@@ -1,0 +1,229 @@
+/* Document Wizard page */
+
+.crm-docwiz-shell {
+  display: grid;
+  gap: 12px;
+}
+
+/* Subject summary card */
+
+.crm-docwiz-subject-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid #d8e1f0;
+  border-radius: 12px;
+  background: #f4f8ff;
+  padding: 10px;
+}
+
+.crm-docwiz-subject-summary span {
+  display: block;
+  font-size: 11px;
+  color: #6f7f99;
+  text-transform: uppercase;
+}
+
+.crm-docwiz-subject-summary strong {
+  font-size: 13px;
+  color: #253656;
+}
+
+/* Header card */
+
+.crm-docwiz-header {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.crm-docwiz-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Step 1: document selection grid */
+
+.crm-docwiz-doc-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-docwiz-doc-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #d6e0ef;
+  border-radius: 12px;
+  background: #fff;
+  cursor: default;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.crm-docwiz-doc-card-selected {
+  border-color: #5f83da;
+  box-shadow: inset 0 0 0 1px rgba(97, 130, 210, 0.3);
+  background: #ecf3ff;
+}
+
+.crm-docwiz-doc-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #e8f0ff;
+  color: #4a72d8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm-docwiz-doc-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.crm-docwiz-doc-title {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #253656;
+}
+
+.crm-docwiz-doc-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #6f7f99;
+}
+
+.crm-docwiz-doc-action {
+  flex: 0 0 auto;
+}
+
+.crm-docwiz-no-results {
+  padding: 20px;
+  text-align: center;
+  color: #6f7f99;
+  font-size: 13px;
+}
+
+/* Step 2: extra fields */
+
+.crm-docwiz-step-card {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #d6e0ef;
+  border-radius: 14px;
+}
+
+.crm-docwiz-step-title {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #253656;
+}
+
+.crm-docwiz-step-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: #6f7f99;
+}
+
+.crm-docwiz-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.crm-docwiz-field-wrap {
+  display: grid;
+  gap: 4px;
+}
+
+.crm-docwiz-field-wrap .crm-document-form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4e6286;
+}
+
+.crm-docwiz-check-group {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 6px;
+}
+
+.crm-docwiz-check-group .crm-document-form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4e6286;
+  margin-bottom: 2px;
+}
+
+.crm-docwiz-no-fields {
+  font-size: 13px;
+  color: #6f7f99;
+  margin: 0;
+}
+
+/* Input error state */
+.crm-input-error {
+  border-color: #c0392b !important;
+}
+
+/* Step 3: generate section */
+
+.crm-docwiz-generate-section {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #d6e0ef;
+  border-radius: 14px;
+}
+
+.crm-docwiz-generate-note {
+  font-size: 12px;
+  color: #6f7f99;
+  margin: 0;
+}
+
+.crm-docwiz-generate-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Mobile */
+
+@media (max-width: 960px) {
+  .crm-docwiz-subject-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .crm-docwiz-fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-docwiz-generate-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .crm-docwiz-doc-card {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .crm-docwiz-subject-summary {
+    grid-template-columns: 1fr;
+  }
+}
