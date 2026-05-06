@@ -1097,6 +1097,7 @@
       wrap.appendChild(label);
 
       var input;
+      var dateField;
       if (field.type === 'select') {
         input = document.createElement('select');
         input.className = 'uk-select crm-input';
@@ -1117,10 +1118,29 @@
         input.rows = field.rows || 3;
         if (field.placeholder) input.placeholder = field.placeholder;
         if (field.defaultValue) input.value = field.defaultValue;
+      } else if (field.type === 'date') {
+        dateField = document.createElement('div');
+        dateField.className = 'crm-date-field crm-docwiz-date-field';
+
+        input = document.createElement('input');
+        input.className = 'uk-input crm-input crm-date-input';
+        input.type = 'date';
+        input.setAttribute('data-date-input', '');
+        if (field.defaultValue) input.value = field.defaultValue;
+
+        var dateTrigger = document.createElement('button');
+        dateTrigger.className = 'crm-date-trigger';
+        dateTrigger.type = 'button';
+        dateTrigger.setAttribute('data-date-trigger', '');
+        dateTrigger.setAttribute('aria-label', 'Открыть календарь');
+        dateTrigger.setAttribute('uk-icon', 'calendar');
+
+        dateField.appendChild(input);
+        dateField.appendChild(dateTrigger);
       } else {
         input = document.createElement('input');
         input.className = 'uk-input crm-input';
-        input.type = field.type === 'date' ? 'date' : 'text';
+        input.type = 'text';
         if (field.placeholder) input.placeholder = field.placeholder;
         if (field.defaultValue) input.value = field.defaultValue;
       }
@@ -1128,7 +1148,7 @@
       input.id = 'docwiz-field-' + field.key;
       input.setAttribute('data-field-key', field.key);
       if (field.required) input.required = true;
-      wrap.appendChild(input);
+      wrap.appendChild(dateField || input);
       grid.appendChild(wrap);
     });
 
