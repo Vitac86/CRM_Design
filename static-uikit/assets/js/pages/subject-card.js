@@ -7,6 +7,12 @@
     return;
   }
 
+  /* ─── In-memory file store ──────────────────────────────────────────────── */
+
+  var docFileStore = {};
+  var docFileIdCounter = 0;
+  var selectedDocFile = null;
+
   /* ─── Representative modal ─────────────────────────────────────────────── */
 
   function setRepresentativeModalState(isOpen) {
@@ -168,6 +174,51 @@
     return form ? form.querySelector('[data-role="document-form-error"]') : null;
   }
 
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' Б';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' КБ';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+  }
+
+  function clearDocumentUpload() {
+    selectedDocFile = null;
+    var form = getDocumentForm();
+    if (!form) return;
+    var dropzone = form.querySelector('[data-role="document-dropzone"]');
+    var preview = form.querySelector('[data-role="document-file-preview"]');
+    var fileInput = form.querySelector('[data-role="document-file-input"]');
+    if (dropzone) {
+      dropzone.hidden = false;
+      dropzone.classList.remove('is-dragover', 'is-error');
+    }
+    if (preview) preview.hidden = true;
+    if (fileInput) fileInput.value = '';
+  }
+
+  function selectDocumentFile(file) {
+    selectedDocFile = file;
+    var form = getDocumentForm();
+    if (!form) return;
+    var dropzone = form.querySelector('[data-role="document-dropzone"]');
+    var preview = form.querySelector('[data-role="document-file-preview"]');
+    var nameEl = form.querySelector('[data-role="document-file-name"]');
+    var metaEl = form.querySelector('[data-role="document-file-meta"]');
+    if (dropzone) {
+      dropzone.hidden = true;
+      dropzone.classList.remove('is-dragover', 'is-error');
+    }
+    if (preview) preview.hidden = false;
+    if (nameEl) nameEl.textContent = file.name;
+    if (metaEl) {
+      var typeStr = file.type || ('.' + file.name.split('.').pop().toLowerCase());
+      metaEl.textContent = formatFileSize(file.size) + ' · ' + typeStr;
+    }
+    var titleInput = form.querySelector('[name="title"]');
+    if (titleInput && !titleInput.value.trim()) {
+      titleInput.value = file.name.replace(/\.[^.]+$/, '');
+    }
+  }
+
   function clearDocumentForm() {
     var form = getDocumentForm();
     if (!form) return;
@@ -177,6 +228,7 @@
     form.querySelectorAll('select').forEach(function (select) {
       select.value = '';
     });
+    clearDocumentUpload();
     var errEl = getDocumentFormError();
     if (errEl) errEl.hidden = true;
   }
@@ -204,11 +256,12 @@
   }
 
   function isDocumentFormValid() {
-    return (
+    return !!(
       getDocFormFieldValue('title') &&
       getDocFormFieldValue('documentType') &&
       getDocFormFieldValue('status') &&
-      getDocFormFieldValue('date')
+      getDocFormFieldValue('date') &&
+      selectedDocFile
     );
   }
 
@@ -222,6 +275,9 @@
 
   function buildDocumentRow(data) {
     var badgeClass = getDocStatusBadgeClass(data.status);
+    var dlFileAttrs = data.docFileId
+      ? ' data-doc-file-id="' + escapeHtml(data.docFileId) + '"'
+      : '';
     var tr = document.createElement('tr');
     tr.innerHTML =
       '<td class="crm-documents-td-title">' + escapeHtml(data.title) + '</td>' +
@@ -235,12 +291,14 @@
             ' data-doc-title="' + escapeHtml(data.title) + '"' +
             ' data-doc-type="' + escapeHtml(data.documentType) + '"' +
             ' data-doc-status="' + escapeHtml(data.status) + '"' +
-            ' data-doc-date="' + escapeHtml(data.date) + '">' +
+            ' data-doc-date="' + escapeHtml(data.date) + '"' +
+            dlFileAttrs + '>' +
             'Скачать' +
           '</button>' +
           '<button class="uk-button uk-button-default crm-button crm-document-action-button" type="button"' +
             ' data-action="print-document"' +
-            ' data-doc-title="' + escapeHtml(data.title) + '">' +
+            ' data-doc-title="' + escapeHtml(data.title) + '"' +
+            dlFileAttrs + '>' +
             'Распечатать' +
           '</button>' +
         '</div>' +
@@ -251,15 +309,28 @@
   function submitDocumentForm() {
     if (!isDocumentFormValid()) {
       var errEl = getDocumentFormError();
-      if (errEl) errEl.hidden = false;
+      if (errEl) {
+        errEl.textContent = 'Заполните обязательные поля и приложите файл документа.';
+        errEl.hidden = false;
+      }
+      var form = getDocumentForm();
+      if (form && !selectedDocFile) {
+        var dz = form.querySelector('[data-role="document-dropzone"]');
+        if (dz && !dz.hidden) dz.classList.add('is-error');
+      }
       return;
     }
+
+    docFileIdCounter += 1;
+    var fileId = 'doc-file-' + docFileIdCounter;
+    docFileStore[fileId] = selectedDocFile;
 
     var data = {
       title: getDocFormFieldValue('title'),
       documentType: getDocFormFieldValue('documentType'),
       status: getDocFormFieldValue('status'),
       date: getDocFormFieldValue('date'),
+      docFileId: fileId,
     };
 
     var tbody = subjectCardPage.querySelector('[data-role="documents-tbody"]');
@@ -268,6 +339,53 @@
     }
 
     cancelDocumentForm();
+  }
+
+  function setupDocumentUpload() {
+    var form = getDocumentForm();
+    if (!form) return;
+    var dropzone = form.querySelector('[data-role="document-dropzone"]');
+    var fileInput = form.querySelector('[data-role="document-file-input"]');
+    if (!dropzone || !fileInput) return;
+
+    dropzone.addEventListener('dragenter', function (e) {
+      e.preventDefault();
+      dropzone.classList.add('is-dragover');
+    }, false);
+
+    dropzone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+      dropzone.classList.add('is-dragover');
+    }, false);
+
+    dropzone.addEventListener('dragleave', function (e) {
+      if (!dropzone.contains(e.relatedTarget)) {
+        dropzone.classList.remove('is-dragover');
+      }
+    }, false);
+
+    dropzone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      dropzone.classList.remove('is-dragover');
+      var files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length > 0) {
+        selectDocumentFile(files[0]);
+      }
+    }, false);
+
+    dropzone.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    fileInput.addEventListener('change', function () {
+      if (fileInput.files && fileInput.files.length > 0) {
+        selectDocumentFile(fileInput.files[0]);
+      }
+    });
   }
 
   /* ─── Client accounts ───────────────────────────────────────────────────── */
@@ -378,6 +496,20 @@
   }
 
   function downloadDocument(btn) {
+    var fileId = btn.getAttribute('data-doc-file-id');
+    if (fileId && docFileStore[fileId]) {
+      var file = docFileStore[fileId];
+      var objectUrl = URL.createObjectURL(file);
+      var anchor = document.createElement('a');
+      anchor.href = objectUrl;
+      anchor.download = file.name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(objectUrl);
+      return;
+    }
+
     var title = btn.getAttribute('data-doc-title') || 'document';
     var type = btn.getAttribute('data-doc-type') || '';
     var status = btn.getAttribute('data-doc-status') || '';
@@ -407,6 +539,17 @@
   }
 
   function printDocument(btn) {
+    var fileId = btn.getAttribute('data-doc-file-id');
+    if (fileId && docFileStore[fileId]) {
+      var file = docFileStore[fileId];
+      var mime = file.type || '';
+      if (mime === 'application/pdf' || mime.indexOf('image/') === 0) {
+        var objectUrl = URL.createObjectURL(file);
+        window.open(objectUrl, '_blank');
+        setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 10000);
+        return;
+      }
+    }
     var title = btn.getAttribute('data-doc-title') || 'документ';
     window.alert('Подготовка документа «' + title + '» к печати');
     window.print();
@@ -496,6 +639,20 @@
       return;
     }
 
+    if (target.closest('[data-action="remove-document-file"]')) {
+      clearDocumentUpload();
+      event.preventDefault();
+      return;
+    }
+
+    var dropzoneEl = target.closest('[data-role="document-dropzone"]');
+    if (dropzoneEl && !dropzoneEl.hidden) {
+      var fileInputEl = dropzoneEl.querySelector('[data-role="document-file-input"]');
+      if (fileInputEl) fileInputEl.click();
+      event.preventDefault();
+      return;
+    }
+
     var downloadBtn = target.closest('[data-action="download-document"]');
     if (downloadBtn) {
       downloadDocument(downloadBtn);
@@ -510,7 +667,11 @@
       return;
     }
 
-    if (target.closest('[data-action="open-document-wizard"]')) {
+    var wizardTrigger = target.closest('[data-action="open-document-wizard"]');
+    if (wizardTrigger) {
+      if (wizardTrigger.tagName === 'A' && wizardTrigger.getAttribute('href')) {
+        return;
+      }
       event.preventDefault();
       return;
     }
@@ -543,4 +704,5 @@
   });
 
   syncRepresentativeExpiry();
+  setupDocumentUpload();
 })();

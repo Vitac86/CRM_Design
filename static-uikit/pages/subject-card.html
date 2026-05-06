@@ -743,6 +743,49 @@
                           </div>
                         </div>
                       </div>
+
+                      <div class="crm-document-upload" data-role="document-upload">
+                        <label class="crm-document-form-label" for="document-upload-file">
+                          Файл документа *
+                        </label>
+                        <div
+                          class="crm-document-dropzone"
+                          data-role="document-dropzone"
+                          tabindex="0"
+                          role="button"
+                          aria-describedby="document-upload-help"
+                        >
+                          <input
+                            id="document-upload-file"
+                            class="crm-document-file-input"
+                            type="file"
+                            name="documentFile"
+                            data-role="document-file-input"
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt"
+                            hidden
+                          >
+                          <div class="crm-document-dropzone-icon" aria-hidden="true" uk-icon="cloud-upload"></div>
+                          <div class="crm-document-dropzone-text">
+                            <strong>Перетащите файл сюда</strong>
+                            <span>или нажмите, чтобы выбрать файл</span>
+                          </div>
+                          <p id="document-upload-help" class="crm-document-dropzone-help">
+                            PDF, DOC/DOCX, XLS/XLSX, JPG/PNG, TXT. Static demo: файл хранится только в текущей вкладке.
+                          </p>
+                        </div>
+                        <div class="crm-document-file-preview" data-role="document-file-preview" hidden>
+                          <div>
+                            <strong data-role="document-file-name">—</strong>
+                            <span data-role="document-file-meta">—</span>
+                          </div>
+                          <button
+                            class="uk-button uk-button-default crm-button crm-document-file-remove"
+                            type="button"
+                            data-action="remove-document-file"
+                          >Удалить файл</button>
+                        </div>
+                      </div>
+
                       <p class="crm-document-form-error" data-role="document-form-error" hidden>Заполните все обязательные поля.</p>
                       <div class="crm-document-form-actions">
                         <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-document-form">Отмена</button>

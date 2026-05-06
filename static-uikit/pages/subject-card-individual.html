@@ -468,6 +468,96 @@
                       <button class="uk-button crm-button-primary crm-button crm-doc-action-btn" type="button" data-action="open-document-form">+ Добавить документ</button>
                     </div>
 
+                    <div class="crm-document-form" data-entity="document-form" hidden>
+                      <div class="crm-document-form-head">
+                        <h3 class="crm-document-form-title">Новый документ</h3>
+                        <p class="crm-document-form-subtitle">Заполните поля для добавления документа в список субъекта.</p>
+                      </div>
+                      <div class="crm-document-form-grid">
+                        <div class="crm-document-form-field crm-document-form-field-full">
+                          <label class="crm-document-form-label" for="doc-title">Название документа *</label>
+                          <input class="uk-input crm-input" id="doc-title" type="text" name="title" autocomplete="off"/>
+                        </div>
+                        <div class="crm-document-form-field">
+                          <label class="crm-document-form-label" for="doc-type">Вид документа *</label>
+                          <select class="uk-select crm-input" id="doc-type" name="documentType">
+                            <option value="">Выберите вид</option>
+                            <option value="Договор ДУ">Договор ДУ</option>
+                            <option value="Депозитарный">Депозитарный</option>
+                            <option value="Анкета">Анкета</option>
+                            <option value="Паспорт">Паспорт</option>
+                            <option value="Доверенность">Доверенность</option>
+                            <option value="Иной документ">Иной документ</option>
+                          </select>
+                        </div>
+                        <div class="crm-document-form-field">
+                          <label class="crm-document-form-label" for="doc-status">Статус документа *</label>
+                          <select class="uk-select crm-input" id="doc-status" name="status">
+                            <option value="">Выберите статус</option>
+                            <option value="Действующий">Действующий</option>
+                            <option value="На подписи">На подписи</option>
+                            <option value="Архивный">Архивный</option>
+                            <option value="Черновик">Черновик</option>
+                          </select>
+                        </div>
+                        <div class="crm-document-form-field">
+                          <label class="crm-document-form-label" for="doc-date">Дата *</label>
+                          <div class="crm-date-field">
+                            <input class="uk-input crm-input crm-date-input" id="doc-date" type="date" name="date" placeholder="дд.мм.гггг" data-date-input/>
+                            <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="crm-document-upload" data-role="document-upload">
+                        <label class="crm-document-form-label" for="document-upload-file">
+                          Файл документа *
+                        </label>
+                        <div
+                          class="crm-document-dropzone"
+                          data-role="document-dropzone"
+                          tabindex="0"
+                          role="button"
+                          aria-describedby="document-upload-help"
+                        >
+                          <input
+                            id="document-upload-file"
+                            class="crm-document-file-input"
+                            type="file"
+                            name="documentFile"
+                            data-role="document-file-input"
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt"
+                            hidden
+                          >
+                          <div class="crm-document-dropzone-icon" aria-hidden="true" uk-icon="cloud-upload"></div>
+                          <div class="crm-document-dropzone-text">
+                            <strong>Перетащите файл сюда</strong>
+                            <span>или нажмите, чтобы выбрать файл</span>
+                          </div>
+                          <p id="document-upload-help" class="crm-document-dropzone-help">
+                            PDF, DOC/DOCX, XLS/XLSX, JPG/PNG, TXT. Static demo: файл хранится только в текущей вкладке.
+                          </p>
+                        </div>
+                        <div class="crm-document-file-preview" data-role="document-file-preview" hidden>
+                          <div>
+                            <strong data-role="document-file-name">—</strong>
+                            <span data-role="document-file-meta">—</span>
+                          </div>
+                          <button
+                            class="uk-button uk-button-default crm-button crm-document-file-remove"
+                            type="button"
+                            data-action="remove-document-file"
+                          >Удалить файл</button>
+                        </div>
+                      </div>
+
+                      <p class="crm-document-form-error" data-role="document-form-error" hidden>Заполните все обязательные поля.</p>
+                      <div class="crm-document-form-actions">
+                        <button class="uk-button uk-button-default crm-button" type="button" data-action="cancel-document-form">Отмена</button>
+                        <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-document-form">Сохранить</button>
+                      </div>
+                    </div>
+
                     <div class="crm-card crm-subject-profile-section" data-entity="documents-list">
                       <div class="crm-table-wrapper crm-table-card">
                         <div class="crm-table">
@@ -700,5 +790,6 @@
     <script src="../assets/js/uikit.min.js"></script>
     <script src="../assets/js/uikit-icons.min.js"></script>
     <script src="../assets/js/crm-static.js"></script>
+    <script src="../assets/js/pages/subject-card.js"></script>
   </body>
 </html>
