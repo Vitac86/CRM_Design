@@ -44,6 +44,33 @@
     return form ? form.querySelector('[data-role="bank-form-error"]') : null;
   }
 
+  var editingBankCard = null;
+
+  function setBankFormLabels(isEdit) {
+    var form = getBankForm();
+    if (!form) return;
+    var titleEl = form.querySelector('.crm-bank-account-form-title');
+    var submitBtn = form.querySelector('[data-action="submit-bank-account-form"]');
+    if (titleEl) titleEl.textContent = isEdit ? 'Редактировать счёт' : 'Новый счёт';
+    if (submitBtn) submitBtn.textContent = isEdit ? 'Сохранить изменения' : 'Добавить';
+  }
+
+  function prefillBankFormFromCard(card) {
+    var form = getBankForm();
+    if (!form || !card) return;
+    function setField(name, value) {
+      var el = form.querySelector('[name="' + name + '"]');
+      if (el) el.value = value || '';
+    }
+    setField('bankName', card.getAttribute('data-bank-name'));
+    setField('bik', card.getAttribute('data-bik'));
+    setField('accountNumber', card.getAttribute('data-account-number'));
+    setField('correspondentAccount', card.getAttribute('data-correspondent-account'));
+    setField('currency', card.getAttribute('data-currency') || 'RUB');
+    setField('openedAt', card.getAttribute('data-opened-at'));
+    setField('purpose', card.getAttribute('data-purpose'));
+  }
+
   function showBankForm() {
     var form = getBankForm();
     if (!form) return;
@@ -63,9 +90,11 @@
   }
 
   function hideBankForm() {
+    editingBankCard = null;
     var form = getBankForm();
     if (!form) return;
     clearBankForm();
+    setBankFormLabels(false);
     var errEl = getBankFormError();
     if (errEl) errEl.hidden = true;
     form.hidden = true;
@@ -94,6 +123,14 @@
     var openedAt = data.openedAt || '—';
     var card = document.createElement('article');
     card.className = 'crm-bank-account-card';
+    card.setAttribute('data-entity', 'bank-account-card');
+    card.setAttribute('data-bank-name', data.bankName || '');
+    card.setAttribute('data-bik', data.bik || '');
+    card.setAttribute('data-account-number', data.accountNumber || '');
+    card.setAttribute('data-correspondent-account', data.correspondentAccount || '');
+    card.setAttribute('data-currency', data.currency || '');
+    card.setAttribute('data-opened-at', data.openedAt || '');
+    card.setAttribute('data-purpose', data.purpose || '');
     card.innerHTML =
       '<div class="crm-bank-account-head">' +
         '<div>' +
@@ -124,7 +161,7 @@
         '</div>' +
       '</dl>' +
       '<div class="crm-bank-account-actions">' +
-        '<button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>' +
+        '<button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="edit-bank-account">Редактировать</button>' +
       '</div>';
     return card;
   }
@@ -155,9 +192,14 @@
       purpose: getBankFieldValue(form, 'purpose'),
     };
 
-    var list = getBankList();
-    if (list) {
-      list.appendChild(buildAccountCard(data));
+    if (editingBankCard) {
+      var newCard = buildAccountCard(data);
+      editingBankCard.parentNode.replaceChild(newCard, editingBankCard);
+    } else {
+      var list = getBankList();
+      if (list) {
+        list.appendChild(buildAccountCard(data));
+      }
     }
 
     hideBankForm();
@@ -560,6 +602,7 @@
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       setRepresentativeModalState(false);
+      hideBankForm();
       cancelDocumentForm();
     }
   });
@@ -604,7 +647,30 @@
     }
 
     if (target.closest('[data-action="open-bank-account-form"]')) {
+      editingBankCard = null;
+      clearBankForm();
+      setBankFormLabels(false);
       showBankForm();
+      event.preventDefault();
+      return;
+    }
+
+    var editBankBtn = target.closest('[data-action="edit-bank-account"]');
+    if (editBankBtn) {
+      var bankCard = editBankBtn.closest('[data-entity="bank-account-card"]');
+      if (bankCard) {
+        editingBankCard = bankCard;
+        clearBankForm();
+        prefillBankFormFromCard(bankCard);
+        setBankFormLabels(true);
+        var bankForm = getBankForm();
+        if (bankForm) {
+          bankForm.hidden = false;
+          bankForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          var firstBankInput = bankForm.querySelector('input[name="bankName"]');
+          if (firstBankInput) firstBankInput.focus();
+        }
+      }
       event.preventDefault();
       return;
     }

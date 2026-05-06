@@ -420,8 +420,64 @@
                       </div>
                     </div>
 
+                    <div class="crm-card crm-bank-account-form" data-entity="bank-account-form" hidden>
+                      <h3 class="crm-bank-account-form-title">Новый счёт</h3>
+                      <div class="crm-bank-account-form-error" data-role="bank-form-error" hidden></div>
+                      <div class="crm-bank-account-form-grid">
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Наименование банка *</span>
+                          <input class="uk-input crm-input crm-bank-input" type="text" name="bankName" autocomplete="off"/>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">БИК *</span>
+                          <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="bik" autocomplete="off"/>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Валюта *</span>
+                          <select class="uk-select crm-input crm-bank-input" name="currency">
+                            <option value="RUB">RUB</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="CNY">CNY</option>
+                          </select>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Расчётный счёт *</span>
+                          <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="accountNumber" autocomplete="off"/>
+                        </label>
+                        <label class="crm-bank-form-field">
+                          <span class="crm-bank-form-label">Корреспондентский счёт *</span>
+                          <input class="uk-input crm-input crm-bank-input crm-bank-input-mono" type="text" name="correspondentAccount" autocomplete="off"/>
+                        </label>
+                        <div class="crm-bank-form-field">
+                          <label class="crm-bank-form-label" for="bank-opened-at">Дата открытия</label>
+                          <div class="crm-date-field">
+                            <input id="bank-opened-at" class="uk-input crm-input crm-bank-input crm-date-input" type="date" name="openedAt" placeholder="дд.мм.гггг" data-date-input/>
+                            <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
+                          </div>
+                        </div>
+                        <label class="crm-bank-form-field crm-bank-form-field-full">
+                          <span class="crm-bank-form-label">Назначение</span>
+                          <input class="uk-input crm-input crm-bank-input" type="text" name="purpose" autocomplete="off"/>
+                        </label>
+                      </div>
+                      <div class="crm-bank-account-form-actions">
+                        <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="cancel-bank-account-form">Отмена</button>
+                        <button class="uk-button crm-button-primary crm-button crm-bank-action-btn" type="button" data-action="submit-bank-account-form">Добавить</button>
+                      </div>
+                    </div>
+
                     <div class="crm-bank-account-list" data-entity="bank-account-list">
-                      <article class="crm-bank-account-card">
+                      <article class="crm-bank-account-card"
+                        data-entity="bank-account-card"
+                        data-bank-name="ПАО Сбербанк, г. Москва"
+                        data-bik="044525225"
+                        data-account-number="40817810038001234567"
+                        data-correspondent-account="30101810400000000225"
+                        data-currency="RUB"
+                        data-opened-at="2026-04-22"
+                        data-purpose="Основной банковский счёт физического лица"
+                      >
                         <div class="crm-bank-account-head">
                           <div>
                             <div class="crm-bank-account-title">ПАО Сбербанк, г. Москва</div>
@@ -454,7 +510,7 @@
                           </div>
                         </dl>
                         <div class="crm-bank-account-actions">
-                          <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button">Редактировать</button>
+                          <button class="uk-button uk-button-default crm-button crm-bank-action-btn" type="button" data-action="edit-bank-account">Редактировать</button>
                         </div>
                       </article>
                     </div>
