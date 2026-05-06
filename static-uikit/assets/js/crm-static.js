@@ -2148,4 +2148,122 @@
     });
   }());
 
+  // ── CSV table export ─────────────────────────────────────────────────────────
+  // [data-action="export-table-csv"] downloads visible table rows as semicolon-delimited CSV.
+  // Static demo behavior only. UMI.CMS should implement server-side CSV export for real datasets.
+  // HTML hooks: data-action="export-table-csv", data-export-filename, data-export-scope, data-export-ignore.
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!(target instanceof Element)) return;
+
+    var exportBtn = target.closest('[data-action="export-table-csv"]');
+    if (!exportBtn) return;
+
+    event.preventDefault();
+
+    var shell = exportBtn.closest('.crm-registry-shell, .crm-registry-page, .crm-page') || document.body;
+    var candidates = Array.from(shell.querySelectorAll('.crm-registry-table table, table[data-sortable-table], table'));
+
+    var table = null;
+    var i;
+    for (i = 0; i < candidates.length; i++) {
+      var c = candidates[i];
+      var isAfterBtn = !!(exportBtn.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING);
+      if (isAfterBtn && c.querySelector('tbody tr')) {
+        table = c;
+        break;
+      }
+    }
+    if (!table) {
+      for (i = 0; i < candidates.length; i++) {
+        if (candidates[i].querySelector('tbody tr')) { table = candidates[i]; break; }
+      }
+    }
+    if (!table) {
+      console.warn('CSV export: no eligible table found in scope.', exportBtn);
+      return;
+    }
+
+    var headerRow = table.tHead && table.tHead.rows[0];
+    var headers = [];
+    var ignoreIndices = [];
+    if (headerRow) {
+      Array.from(headerRow.cells).forEach(function (th, idx) {
+        if (th.hasAttribute('data-export-ignore') || th.classList.contains('crm-export-ignore')) {
+          ignoreIndices.push(idx);
+          return;
+        }
+        var labelEl = th.querySelector('.crm-th-label');
+        var raw = labelEl ? labelEl.textContent : th.textContent;
+        var text = raw.replace(/[▾▲▼▴]/g, '').replace(/\s+/g, ' ').trim();
+        if (!text || text === 'Действия') {
+          ignoreIndices.push(idx);
+          return;
+        }
+        headers.push({ index: idx, text: text });
+      });
+    }
+
+    var tbody = table.tBodies && table.tBodies[0];
+    var allRows = tbody ? Array.from(tbody.querySelectorAll(':scope > tr')) : [];
+    var visibleRows = allRows.filter(function (row) {
+      if (row.hidden) return false;
+      if (row.classList.contains('is-filter-hidden')) return false;
+      if (row.classList.contains('is-page-hidden')) return false;
+      if (row.hasAttribute('data-sort-ignore')) return false;
+      if (row.classList.contains('crm-empty-state')) return false;
+      if (window.getComputedStyle(row).display === 'none') return false;
+      return true;
+    });
+
+    function csvEscape(value) {
+      var s = String(value || '').replace(/\s+/g, ' ').trim();
+      if (s.indexOf(';') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1) {
+        s = '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    var lines = [];
+    if (headers.length > 0) {
+      lines.push(headers.map(function (h) { return csvEscape(h.text); }).join(';'));
+    }
+
+    if (visibleRows.length === 0 && headers.length > 0) {
+      console.info('CSV export contains headers only because no rows are visible.');
+    }
+
+    visibleRows.forEach(function (row) {
+      var values = headers.map(function (h) {
+        var cell = row.cells[h.index];
+        return cell ? cell.textContent.replace(/\s+/g, ' ').trim() : '';
+      });
+      lines.push(values.map(csvEscape).join(';'));
+    });
+
+    var filename = (exportBtn.getAttribute('data-export-filename') || '').trim();
+    if (!filename) {
+      var pageAttr = (document.body.getAttribute('data-page') || '').trim();
+      filename = pageAttr ? pageAttr + '.csv' : 'export.csv';
+    }
+    if (!/\.csv$/i.test(filename)) filename += '.csv';
+
+    exportBtn.disabled = true;
+    exportBtn.setAttribute('aria-busy', 'true');
+
+    var bom = '﻿';
+    var blob = new Blob([bom + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    exportBtn.disabled = false;
+    exportBtn.setAttribute('aria-busy', 'false');
+  });
+
 })();

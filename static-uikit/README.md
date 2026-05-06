@@ -201,6 +201,25 @@ CSS classes written by JS (safe to style or remove in UMI.CMS):
 | `.is-filter-hidden` | `<tr>` | Row hidden by an active filter/search |
 | `.is-page-hidden` | `<tr>` | Row hidden because it falls outside the current page window |
 
+## Client-side CSV export
+
+Registry list pages (subjects, archive, requests, compliance, brokerage, trading, trust-management, agents, middle-office-clients, etc.) include a client-side CSV export triggered by buttons with `data-action="export-table-csv"`.
+
+- Export collects the currently visible rows only — respects active filters, search, and pagination state.
+- Delimiter is `;` (semicolon) for Russian Excel compatibility. File starts with UTF-8 BOM.
+- Columns marked `data-export-ignore` on their `<th>` (e.g. "Действия") are excluded from the output.
+
+**This is static demo behavior only.** UMI.CMS integration must replace this with server-side CSV export for real datasets and full filtered result sets (not just the current page window).
+
+Stable HTML hooks used by the CSV export engine:
+
+| Element | Hook | Purpose |
+|---|---|---|
+| Export button | `data-action="export-table-csv"` | Triggers CSV export for the nearest registry table |
+| Export button | `data-export-filename="name.csv"` | Output filename; falls back to `<body data-page>.csv` |
+| Export button | `data-export-scope="nearest"` | Documents that nearest-scope table detection is used |
+| Column header `<th>` | `data-export-ignore` | Excludes that column (and its cells) from the CSV |
+
 ## Known limitations
 - Static sample data only.
 - Prototype JavaScript only; not backend or business logic.

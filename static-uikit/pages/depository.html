@@ -97,7 +97,9 @@
               <button
                 type="button"
                 class="uk-button uk-button-default crm-button crm-button-secondary"
-                data-action="export-dep-reports"
+                data-action="export-table-csv"
+                data-export-filename="depository.csv"
+                data-export-scope="nearest"
               >
                 Экспорт
               </button>
@@ -618,7 +620,6 @@
 
     if (e.target.closest('[data-action="resend-dep-report"]'))  { showToast('Отчёт отправлен повторно');      return; }
     if (e.target.closest('[data-action="download-dep-report"]')){ showToast('Файл подготовлен к скачиванию'); return; }
-    if (e.target.closest('[data-action="export-dep-reports"]')) { showToast('CSV-экспорт выполнен');          return; }
 
     if (e.target.closest('[data-action="reset-dep-filters"]')) {
       if (searchInput)      searchInput.value      = '';
