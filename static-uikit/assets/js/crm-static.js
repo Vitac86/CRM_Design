@@ -2102,9 +2102,19 @@
       exportBtn.addEventListener('click', function (event) {
         event.preventDefault();
 
-        var templateUrl = exportBtn.getAttribute('data-template-url');
-        if (!templateUrl) {
+        var rawTemplateUrl = (exportBtn.getAttribute('data-template-url') || '').trim();
+        if (!rawTemplateUrl) {
+          console.warn('Statement export: data-template-url is missing or empty.', exportBtn);
           alert('Не задан путь к шаблону заявления (data-template-url).');
+          return;
+        }
+
+        var templateUrl;
+        try {
+          templateUrl = new URL(rawTemplateUrl, window.location.href).href;
+        } catch (urlErr) {
+          console.warn('Statement export: could not resolve template URL:', rawTemplateUrl, urlErr);
+          alert('Не удалось разрешить путь к шаблону заявления.');
           return;
         }
 
@@ -2141,7 +2151,7 @@
             return null;
           })
           .catch(function (err) {
-            console.warn('Не удалось подготовить заявление:', err);
+            console.error('Statement export failed:', err);
             alert('Не удалось подготовить заявление. Проверьте путь к шаблону заявления.');
           })
           .finally(function () {
