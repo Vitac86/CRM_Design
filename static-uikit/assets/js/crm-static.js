@@ -2083,6 +2083,33 @@
       });
     }
 
+    function triggerStatementPrint(printWindow) {
+      if (!printWindow || printWindow.closed) return;
+
+      var doc = printWindow.document;
+      var links = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+
+      function waitForLink(link) {
+        return new Promise(function (resolve) {
+          if (link.sheet) { resolve(); return; }
+          link.addEventListener('load', resolve, { once: true });
+          link.addEventListener('error', resolve, { once: true });
+          setTimeout(resolve, 700);
+        });
+      }
+
+      Promise.all(links.map(waitForLink)).then(function () {
+        setTimeout(function () {
+          try {
+            printWindow.focus();
+            printWindow.print();
+          } catch (err) {
+            console.error('Statement print failed:', err);
+          }
+        }, 150);
+      });
+    }
+
     function openFilledHtml(filledHtml) {
       var preview = window.open('', '_blank');
       if (!preview) {
@@ -2094,8 +2121,8 @@
       preview.document.write(filledHtml);
       preview.document.close();
 
-      console.info('Static fallback opened filled HTML. Use browser Save as PDF. UMI.CMS should provide a backend PDF endpoint for direct download.');
-      alert('Заявление открыто в новой вкладке. Для прямого скачивания PDF нужен серверный endpoint UMI.CMS.');
+      console.info('Static fallback: filled statement opened. Triggering print dialog for Save as PDF. UMI.CMS should provide a backend PDF endpoint for direct download without print dialog.');
+      triggerStatementPrint(preview);
     }
 
     exportBtns.forEach(function (exportBtn) {

@@ -179,7 +179,7 @@ The document template font stack is `Arial, Helvetica, sans-serif` for cross-pla
 
 The "Выгрузить заявление" button is exposed in both `contract-wizard.html` and `contract-edit.html`.
 
-In the static handoff, this action fetches the existing HTML template, fills it via `DOMParser`, and opens the filled print-ready document in a new tab for review or browser "Save as PDF". External stylesheet `href` values are resolved to absolute URLs before the document is written to the blank window so styles load correctly. It does not automatically call print and does not download a fake `.pdf` from HTML.
+In the static handoff, this action fetches the existing HTML template, fills it via `DOMParser`, opens the filled print-ready document in a new tab, and automatically invokes the browser print dialog. The user should select **Save as PDF** in the print dialog. External stylesheet `href` values are resolved to absolute URLs before the document is written to the blank window so styles load correctly, and the print dialog is delayed until stylesheets have loaded. It does not use html2pdf, html2canvas, or any rasterization library.
 
 Direct high-quality PDF download should be implemented by UMI.CMS/backend using a server-side renderer such as headless Chrome, Puppeteer, wkhtmltopdf, or an equivalent tool. `html2pdf` / `html2canvas` intentionally is not used for this legal statement because it rasterizes the document, producing heavier PDFs without a reliable selectable text layer. The `data-doc-field` and `data-doc-check` attributes on the template elements serve as stable data-binding hooks for the backend renderer.
 
