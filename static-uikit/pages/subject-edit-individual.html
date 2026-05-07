@@ -348,70 +348,147 @@
               </div>
             </section>
 
-            <!-- ── Адрес регистрации ──────────────────────────────────────────── -->
-            <section class="crm-address-group crm-form-section" data-address-group="registration" data-entity="edit-address">
+            <!-- ── Адреса ─────────────────────────────────────────────────────────── -->
+            <section class="crm-address-module crm-form-section" data-address-module data-entity="edit-address">
               <div class="crm-form-section-head">
-                <h3>Адрес регистрации</h3>
+                <h3>Адреса</h3>
               </div>
-              <div
-                class="crm-fias-address-widget"
-                data-fias-address-widget
-                data-address-kind="registration"
-                data-address-main="true">
-              </div>
-            </section>
+              <div class="crm-address-rows">
 
-            <!-- ── Адрес проживания / фактический ─────────────────────────────── -->
-            <section class="crm-address-group crm-form-section" data-address-group="actual">
-              <div class="crm-form-section-head">
-                <h3>Адрес проживания / фактический адрес</h3>
-                <label class="crm-address-same-check">
-                  <input
-                    type="checkbox"
-                    name="actualSameAsRegistration"
-                    data-address-same-as="registration"
-                    data-address-target="actual"
-                    checked />
-                  <span>Совпадает с адресом регистрации</span>
-                </label>
-              </div>
-              <div class="crm-address-same-note" data-address-same-note="actual">
-                Адрес совпадает с адресом регистрации
-                <span data-same-preview-text></span>
-              </div>
-              <div
-                class="crm-fias-address-widget"
-                data-fias-address-widget
-                data-address-kind="actual"
-                data-address-copy-source="registration"
-                hidden>
-              </div>
-            </section>
+                <!-- Адрес регистрации -->
+                <div class="crm-address-row" data-address-row="registration">
+                  <div class="crm-address-row-head">
+                    <strong class="crm-address-row-title">Адрес регистрации</strong>
+                    <button type="button" class="crm-btn-fill-address" data-action="open-fias" data-address-target="registration">
+                      Заполнить адрес
+                    </button>
+                  </div>
+                  <div class="crm-address-row-fields">
+                    <textarea
+                      class="uk-textarea crm-input crm-address-output"
+                      name="registrationAddress"
+                      data-address-output="registration"
+                      rows="2"
+                      placeholder="Адрес регистрации"></textarea>
+                    <input
+                      class="uk-input crm-input crm-address-postal-input"
+                      type="text"
+                      name="registrationPostalCode"
+                      data-address-postal="registration"
+                      placeholder="Индекс"
+                      maxlength="6">
+                  </div>
+                  <div class="crm-fias-panel" data-fias-panel="registration" hidden>
+                    <div
+                      class="crm-fias-address-widget"
+                      data-fias-address-widget
+                      data-address-kind="registration"
+                      data-address-main="true"></div>
+                    <div class="crm-fias-panel-footer">
+                      <button type="button" class="uk-button uk-button-default" data-action="fias-cancel" data-address-target="registration">Отмена</button>
+                      <button type="button" class="uk-button uk-button-primary" data-action="fias-accept" data-address-target="registration">Принять</button>
+                    </div>
+                  </div>
+                </div>
 
-            <!-- ── Почтовый адрес / адрес для корреспонденции ─────────────────── -->
-            <section class="crm-address-group crm-form-section" data-address-group="postal">
-              <div class="crm-form-section-head">
-                <h3>Почтовый адрес / адрес для корреспонденции</h3>
-                <label class="crm-address-same-check">
-                  <input
-                    type="checkbox"
-                    name="postalSameAsRegistration"
-                    data-address-same-as="registration"
-                    data-address-target="postal"
-                    checked />
-                  <span>Совпадает с адресом регистрации</span>
-                </label>
-              </div>
-              <div class="crm-address-same-note" data-address-same-note="postal">
-                Адрес совпадает с адресом регистрации
-                <span data-same-preview-text></span>
-              </div>
-              <div
-                class="crm-fias-address-widget"
-                data-fias-address-widget
-                data-address-kind="postal"
-                data-address-copy-source="registration"
-                hidden>
+                <!-- Адрес проживания / фактический -->
+                <div class="crm-address-row" data-address-row="actual">
+                  <div class="crm-address-row-head">
+                    <strong class="crm-address-row-title">Адрес проживания / фактический адрес</strong>
+                    <label class="crm-address-same-check">
+                      <input
+                        type="checkbox"
+                        name="actualSameAsRegistration"
+                        data-address-same-as="registration"
+                        data-address-target="actual"
+                        checked />
+                      <span>Совпадает с адресом регистрации</span>
+                    </label>
+                    <button type="button" class="crm-btn-fill-address" data-action="open-fias" data-address-target="actual" hidden>
+                      Заполнить адрес
+                    </button>
+                  </div>
+                  <div class="crm-address-same-note" data-address-same-note="actual">
+                    Совпадает с адресом регистрации
+                    <span data-same-preview-text></span>
+                  </div>
+                  <div class="crm-address-row-fields" data-address-row-fields="actual" hidden>
+                    <textarea
+                      class="uk-textarea crm-input crm-address-output"
+                      name="actualAddress"
+                      data-address-output="actual"
+                      rows="2"
+                      placeholder="Адрес проживания"></textarea>
+                    <input
+                      class="uk-input crm-input crm-address-postal-input"
+                      type="text"
+                      name="actualPostalCode"
+                      data-address-postal="actual"
+                      placeholder="Индекс"
+                      maxlength="6">
+                  </div>
+                  <div class="crm-fias-panel" data-fias-panel="actual" hidden>
+                    <div
+                      class="crm-fias-address-widget"
+                      data-fias-address-widget
+                      data-address-kind="actual"
+                      data-address-copy-source="registration"></div>
+                    <div class="crm-fias-panel-footer">
+                      <button type="button" class="uk-button uk-button-default" data-action="fias-cancel" data-address-target="actual">Отмена</button>
+                      <button type="button" class="uk-button uk-button-primary" data-action="fias-accept" data-address-target="actual">Принять</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Почтовый адрес / адрес для корреспонденции -->
+                <div class="crm-address-row" data-address-row="postal">
+                  <div class="crm-address-row-head">
+                    <strong class="crm-address-row-title">Почтовый адрес / адрес для корреспонденции</strong>
+                    <label class="crm-address-same-check">
+                      <input
+                        type="checkbox"
+                        name="postalSameAsRegistration"
+                        data-address-same-as="registration"
+                        data-address-target="postal"
+                        checked />
+                      <span>Совпадает с адресом регистрации</span>
+                    </label>
+                    <button type="button" class="crm-btn-fill-address" data-action="open-fias" data-address-target="postal" hidden>
+                      Заполнить адрес
+                    </button>
+                  </div>
+                  <div class="crm-address-same-note" data-address-same-note="postal">
+                    Совпадает с адресом регистрации
+                    <span data-same-preview-text></span>
+                  </div>
+                  <div class="crm-address-row-fields" data-address-row-fields="postal" hidden>
+                    <textarea
+                      class="uk-textarea crm-input crm-address-output"
+                      name="postalAddress"
+                      data-address-output="postal"
+                      rows="2"
+                      placeholder="Почтовый адрес"></textarea>
+                    <input
+                      class="uk-input crm-input crm-address-postal-input"
+                      type="text"
+                      name="postalCode"
+                      data-address-postal="postal"
+                      placeholder="Индекс"
+                      maxlength="6">
+                  </div>
+                  <div class="crm-fias-panel" data-fias-panel="postal" hidden>
+                    <div
+                      class="crm-fias-address-widget"
+                      data-fias-address-widget
+                      data-address-kind="postal"
+                      data-address-copy-source="registration"></div>
+                    <div class="crm-fias-panel-footer">
+                      <button type="button" class="uk-button uk-button-default" data-action="fias-cancel" data-address-target="postal">Отмена</button>
+                      <button type="button" class="uk-button uk-button-primary" data-action="fias-accept" data-address-target="postal">Принять</button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </section>
 

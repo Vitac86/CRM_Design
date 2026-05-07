@@ -238,25 +238,48 @@ body[data-page="subject-register"] .reg-result-id,
 /* Date-field notes */
 /* Date field visuals are inherited from shared CRM field styles on this page. */
 
-/* ── Address groups (3-address structured layout) ──────────────────────────── */
+/* ── Address module (3-row compact block) ───────────────────────────────────── */
 
-body[data-page="subject-register"] .crm-address-group .crm-form-section-head,
-.crm-page[data-page="subject-register"] .crm-address-group .crm-form-section-head {
+body[data-page="subject-register"] .crm-address-module,
+.crm-page[data-page="subject-register"] .crm-address-module {
+  margin-top: 4px;
+}
+
+body[data-page="subject-register"] .crm-address-rows,
+.crm-page[data-page="subject-register"] .crm-address-rows {
+  border: 1px solid #c8d8ee;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f8faff;
+}
+
+body[data-page="subject-register"] .crm-address-row,
+.crm-page[data-page="subject-register"] .crm-address-row {
+  padding: 14px 16px;
+  border-bottom: 1px solid #dde8f5;
+  background: #fff;
+}
+
+body[data-page="subject-register"] .crm-address-row:last-child,
+.crm-page[data-page="subject-register"] .crm-address-row:last-child {
+  border-bottom: 0;
+}
+
+body[data-page="subject-register"] .crm-address-row-head,
+.crm-page[data-page="subject-register"] .crm-address-row-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 8px 14px;
   margin-bottom: 10px;
 }
 
-body[data-page="subject-register"] .crm-address-group .crm-form-section-head h3,
-.crm-page[data-page="subject-register"] .crm-address-group .crm-form-section-head h3 {
-  margin: 0;
-  flex-shrink: 0;
+body[data-page="subject-register"] .crm-address-row-title,
+.crm-page[data-page="subject-register"] .crm-address-row-title {
   font-size: 13px;
   font-weight: 700;
   color: var(--crm-text);
+  flex-shrink: 0;
 }
 
 body[data-page="subject-register"] .crm-address-same-check,
@@ -280,6 +303,54 @@ body[data-page="subject-register"] .crm-address-same-check input[type="checkbox"
   cursor: pointer;
 }
 
+body[data-page="subject-register"] .crm-btn-fill-address,
+.crm-page[data-page="subject-register"] .crm-btn-fill-address {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #3a6abf;
+  border-radius: 6px;
+  background: transparent;
+  color: #3a6abf;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+body[data-page="subject-register"] .crm-btn-fill-address:hover,
+.crm-page[data-page="subject-register"] .crm-btn-fill-address:hover {
+  background: #3a6abf;
+  color: #fff;
+}
+
+body[data-page="subject-register"] .crm-address-row-fields,
+.crm-page[data-page="subject-register"] .crm-address-row-fields {
+  display: grid;
+  grid-template-columns: 1fr 96px;
+  gap: 8px;
+  align-items: start;
+}
+
+body[data-page="subject-register"] .crm-address-output,
+.crm-page[data-page="subject-register"] .crm-address-output {
+  height: auto;
+  min-height: 52px;
+  resize: vertical;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
+body[data-page="subject-register"] .crm-address-postal-input,
+.crm-page[data-page="subject-register"] .crm-address-postal-input {
+  height: 36px;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
 body[data-page="subject-register"] .crm-address-same-note,
 .crm-page[data-page="subject-register"] .crm-address-same-note {
   font-size: 12px;
@@ -289,7 +360,6 @@ body[data-page="subject-register"] .crm-address-same-note,
   border-radius: 7px;
   padding: 7px 12px;
   margin-top: 2px;
-  margin-bottom: 4px;
 }
 
 body[data-page="subject-register"] .crm-address-same-note [data-same-preview-text],
@@ -301,19 +371,28 @@ body[data-page="subject-register"] .crm-address-same-note [data-same-preview-tex
   margin-top: 2px;
 }
 
-body[data-page="subject-register"] .crm-address-group,
-.crm-page[data-page="subject-register"] .crm-address-group {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eef1f7;
+/* ── FIAS panel ─────────────────────────────────────────────────────────────── */
+
+body[data-page="subject-register"] .crm-fias-panel,
+.crm-page[data-page="subject-register"] .crm-fias-panel {
+  margin-top: 12px;
+  border: 1px solid #c8d8ee;
+  border-radius: 10px;
+  background: #f3f7fb;
+  padding: 14px;
 }
 
-body[data-page="subject-register"] .crm-address-group:last-child,
-.crm-page[data-page="subject-register"] .crm-address-group:last-child {
-  border-bottom: 0;
+body[data-page="subject-register"] .crm-fias-panel-footer,
+.crm-page[data-page="subject-register"] .crm-fias-panel-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #dde8f5;
 }
 
-/* ── FIAS address widget ────────────────────────────────────────────────────── */
+/* ── FIAS widget internals ──────────────────────────────────────────────────── */
 
 body[data-page="subject-register"] .crm-fias-inner,
 .crm-page[data-page="subject-register"] .crm-fias-inner {
@@ -378,18 +457,35 @@ body[data-page="subject-register"] .crm-fias-levels,
   gap: 6px;
 }
 
+/* Compact level row: label / [filter + select in one line] / meta */
+
 body[data-page="subject-register"] .crm-fias-level-row,
 .crm-page[data-page="subject-register"] .crm-fias-level-row {
   display: grid;
-  gap: 4px;
+  gap: 3px;
+}
+
+body[data-page="subject-register"] .crm-fias-combo,
+.crm-page[data-page="subject-register"] .crm-fias-combo {
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 
 body[data-page="subject-register"] .crm-fias-filter,
 .crm-page[data-page="subject-register"] .crm-fias-filter {
+  flex: 0 0 150px;
   height: 30px;
   font-size: 12px;
   border-radius: 6px;
-  max-width: 260px;
+}
+
+body[data-page="subject-register"] .crm-fias-select,
+.crm-page[data-page="subject-register"] .crm-fias-select {
+  flex: 1;
+  height: 30px;
+  font-size: 12px;
+  border-radius: 6px;
 }
 
 body[data-page="subject-register"] .crm-fias-meta,
@@ -399,20 +495,32 @@ body[data-page="subject-register"] .crm-fias-meta,
   min-height: 14px;
 }
 
+/* Preview block — highlighted "Итоговый адрес" */
+
 body[data-page="subject-register"] .crm-fias-preview,
 .crm-page[data-page="subject-register"] .crm-fias-preview {
-  background: #f3f7fb;
-  border: 1px solid #dbe3ee;
+  background: #eef4fd;
+  border: 1px solid #c2d5ee;
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   display: grid;
   gap: 2px;
+}
+
+body[data-page="subject-register"] .crm-fias-preview-label,
+.crm-page[data-page="subject-register"] .crm-fias-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5577a8;
+  margin-bottom: 3px;
 }
 
 body[data-page="subject-register"] .crm-fias-preview-addr,
 .crm-page[data-page="subject-register"] .crm-fias-preview-addr {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--crm-text);
   line-height: 1.4;
 }
@@ -429,8 +537,6 @@ body[data-page="subject-register"] .crm-fias-fallback,
   border: 1px solid #f5d98a;
   border-radius: 8px;
   padding: 10px 12px;
-  display: grid;
-  gap: 6px;
 }
 
 body[data-page="subject-register"] .crm-fias-fallback-msg,
@@ -438,11 +544,6 @@ body[data-page="subject-register"] .crm-fias-fallback-msg,
   font-size: 12px;
   color: #7a5000;
   margin: 0;
-}
-
-body[data-page="subject-register"] .crm-fias-postal-manual,
-.crm-page[data-page="subject-register"] .crm-fias-postal-manual {
-  max-width: 140px;
 }
 
 /* FL residency / address-block toggles */

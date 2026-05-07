@@ -1,8 +1,15 @@
 /**
  * fias-address.js
- * Reusable FIAS-assisted structured address widget for individual RF-resident clients.
- * Initialises every [data-fias-address-widget] block found on the page.
- * Each widget has isolated state — safe to use multiple widgets per page.
+ * Compact FIAS-assisted address module for individual RF-resident clients.
+ *
+ * Architecture:
+ *   - 3-row "Адреса" module in HTML (registration / actual / postal)
+ *   - Each row has an editable textarea + postal input + "Заполнить адрес" button
+ *   - Clicking "Заполнить адрес" opens a FIAS panel for that row
+ *   - FIAS panel: compact level selectors + "Итоговый адрес" preview + Отмена/Принять
+ *   - "Принять" writes address + postal into the row textarea/input and closes panel
+ *   - "Отмена" closes panel without modifying the row
+ *   - Same-as-registration logic hides actual/postal independent fields when checked
  *
  * Security note: MASTER_TOKEN is a static demo placeholder.
  * UMI.CMS / backend must provide secure server-side FIAS API integration.
@@ -43,7 +50,7 @@
     return divType === 'municipal' ? 2 : 1;
   }
 
-  /* ── sorting utilities (ported from fias.html prototype) ───────────────────── */
+  /* ── sorting utilities ──────────────────────────────────────────────────────── */
   function isNum(x) {
     if (x == null) return false;
     const s = String(x).trim();
@@ -98,7 +105,7 @@
     return arr;
   }
 
-  /* ── address text construction (ported from fias.html prototype) ───────────── */
+  /* ── address text construction ──────────────────────────────────────────────── */
   const TYPE_MAP = new Map([
     ['г','город'],['город','город'],
     ['ул','улица'],['улица','улица'],
@@ -168,7 +175,7 @@
       .replace(/\s+/g, ' ').trim();
   }
 
-  /* ── postal code extraction (ported from fias.html prototype) ──────────────── */
+  /* ── postal code extraction ─────────────────────────────────────────────────── */
   function extractPostal(addr) {
     if (!addr) return null;
     if (addr.postal_code) return addr.postal_code;
@@ -195,7 +202,7 @@
         ? res.json().catch(() => null)
         : res.text().catch(() => '');
       return pay.then(payload => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${typeof payload === 'string' ? payload : JSON.stringify(payload)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return payload;
       });
     });
@@ -372,6 +379,11 @@
     });
   }
 
+  function setHiddenInEl(el, key, value) {
+    const f = el.querySelector(`[data-fias-field="${key}"]`);
+    if (f) f.value = value || '';
+  }
+
   /* ── address text builder ──────────────────────────────────────────────────── */
   function buildAddressText(state) {
     const parts = [], seen = new Set();
@@ -394,7 +406,6 @@
     setHidden(state, 'region', state.region?.full_name || '');
     setHidden(state, 'addressType', state.divisionType);
 
-    // collect structured fields
     const fields = { district: '', city: '', settlement: '', planningStructure: '', street: '', landPlot: '', house: '', flat: '', room: '', fiasObjectId: '', fiasPath: '' };
     for (const lvl of getOrder(state.divisionType)) {
       const sel = state.selectedByLevel.get(lvl);
@@ -421,14 +432,13 @@
     return text;
   }
 
-  /* ── notify dependent (same-as) widgets when registration changes ──────────── */
+  /* ── notify dependent (same-as) widgets — mirrors hidden FIAS fields ─────────── */
   function notifyDependents(state) {
     if (state.kind !== 'registration') return;
     const srcWidget = state.el.widgetEl;
     if (!srcWidget) return;
-    const scope = srcWidget.closest('form, [data-entity]') || document;
-    const addrText = state.el.addrPreview?.textContent || '—';
-
+    const moduleEl = srcWidget.closest('[data-address-module]') || srcWidget.closest('form, [data-entity]') || document;
+    const scope = moduleEl.querySelector ? moduleEl : document;
     scope.querySelectorAll('[data-address-same-as="registration"]').forEach(cb => {
       if (!cb.checked) return;
       const targetKind = cb.dataset.addressTarget;
@@ -436,22 +446,7 @@
       if (!targetWidget) return;
       mirrorHiddenFields(srcWidget, targetWidget);
       setHiddenInEl(targetWidget, 'isSameAsRegistration', 'true');
-      // update same-note text
-      const note = findSameNote(scope, targetKind);
-      if (note) {
-        const preview = note.querySelector('[data-same-preview-text]');
-        if (preview) preview.textContent = addrText !== '—' ? addrText : '';
-      }
     });
-  }
-
-  function setHiddenInEl(el, key, value) {
-    const f = el.querySelector(`[data-fias-field="${key}"]`);
-    if (f) f.value = value || '';
-  }
-
-  function findSameNote(scope, kind) {
-    return scope.querySelector(`[data-address-same-note="${kind}"]`) || null;
   }
 
   /* ── level cascade loading ─────────────────────────────────────────────────── */
@@ -470,7 +465,7 @@
     const ctrl = new AbortController();
     state.abortBatch = ctrl;
     state.currentPath = String(basePath);
-    setStatus(state.el.midStatus, 'Загружаю уровни…');
+    setStatus(state.el.midStatus, 'Загружаю…');
 
     const jobs = toLoad.map(lvl =>
       apiGetItems(lvl, basePath, state.divisionType, ctrl.signal)
@@ -490,7 +485,7 @@
           hideLevel(state, r.lvl);
         }
       }
-      setStatus(state.el.midStatus, 'Готово.');
+      setStatus(state.el.midStatus, '');
       buildAddressText(state);
     });
   }
@@ -543,7 +538,7 @@
   function loadRegions(state) {
     const sel = state.el.regionSelect;
     if (!sel) return;
-    sel.innerHTML = '<option value="">— загрузка регионов… —</option>';
+    sel.innerHTML = '<option value="">— загрузка… —</option>';
     sel.disabled = true;
     setStatus(state.el.topStatus, 'Загружаю регионы…');
 
@@ -561,8 +556,8 @@
     }).catch(() => {
       sel.innerHTML = '<option value="">— регионы недоступны —</option>';
       sel.disabled = false;
-      setStatus(state.el.topStatus, 'Ошибка загрузки регионов');
-      showFallback(state, 'ФИАС-сервис недоступен или требует токен. Введите адрес вручную.');
+      setStatus(state.el.topStatus, '');
+      showFallback(state, 'ФИАС-сервис недоступен. Введите адрес вручную в поле выше.');
     });
   }
 
@@ -577,7 +572,6 @@
   /* ── widget DOM builder ────────────────────────────────────────────────────── */
   function buildWidgetUI(widgetEl, state) {
     const kind = state.kind;
-    const isMain = widgetEl.dataset.addressMain === 'true';
     const inner = document.createElement('div');
     inner.className = 'crm-fias-inner';
 
@@ -585,7 +579,7 @@
     const divRow = document.createElement('div');
     divRow.className = 'crm-fias-row crm-fias-divtype-row';
     divRow.innerHTML =
-      '<label class="uk-form-label crm-fias-label">Тип деления</label>' +
+      '<label class="crm-fias-label">Тип деления</label>' +
       '<div class="crm-fias-divtype-opts">' +
         `<label class="crm-fias-radio-opt"><input type="radio" name="fias-divtype-${kind}" value="admin" checked> <span>Административное деление</span></label>` +
         `<label class="crm-fias-radio-opt"><input type="radio" name="fias-divtype-${kind}" value="municipal"> <span>Муниципальное деление</span></label>` +
@@ -598,18 +592,40 @@
     inner.appendChild(topStatus);
     state.el.topStatus = topStatus;
 
-    // 3. Region row
+    // 3. Region row — compact: label + combo (filter + select) side by side
     const regionRow = document.createElement('div');
-    regionRow.className = 'crm-fias-row crm-fias-region-row';
+    regionRow.className = 'crm-fias-level-row';
+
     const regionLabel = document.createElement('label');
-    regionLabel.className = 'uk-form-label crm-fias-label';
+    regionLabel.className = 'crm-fias-label';
     regionLabel.textContent = 'Регион';
+
+    const regionCombo = document.createElement('div');
+    regionCombo.className = 'crm-fias-combo';
+
+    const regionFilter = document.createElement('input');
+    regionFilter.className = 'uk-input crm-input crm-fias-filter';
+    regionFilter.type = 'text';
+    regionFilter.placeholder = 'Фильтр…';
+
     const regionSel = document.createElement('select');
-    regionSel.className = 'uk-select crm-select crm-fias-region-select';
-    regionRow.appendChild(regionLabel);
-    regionRow.appendChild(regionSel);
+    regionSel.className = 'uk-select crm-select crm-fias-select';
+
+    regionCombo.append(regionFilter, regionSel);
+    regionRow.append(regionLabel, regionCombo);
     inner.appendChild(regionRow);
     state.el.regionSelect = regionSel;
+    state.el.regionFilter = regionFilter;
+
+    // Region filter
+    regionFilter.addEventListener('input', () => {
+      const q = regionFilter.value.trim().toLowerCase();
+      const cur = regionSel.value;
+      Array.from(regionSel.options).forEach(o => {
+        o.hidden = q ? !o.textContent.toLowerCase().includes(q) : false;
+      });
+      if (cur) regionSel.value = cur;
+    });
 
     // 4. Mid status
     const midStatus = document.createElement('div');
@@ -623,9 +639,12 @@
     inner.appendChild(levelsContainer);
     state.el.levelsContainer = levelsContainer;
 
-    // 6. Address preview
+    // 6. Address preview — labelled "Итоговый адрес"
     const previewWrap = document.createElement('div');
     previewWrap.className = 'crm-fias-preview';
+    const previewLabel = document.createElement('div');
+    previewLabel.className = 'crm-fias-preview-label';
+    previewLabel.textContent = 'Итоговый адрес';
     const addrPreview = document.createElement('div');
     addrPreview.className = 'crm-fias-preview-addr';
     addrPreview.dataset.fiasAddrPreview = '';
@@ -633,8 +652,7 @@
     const postalPreview = document.createElement('div');
     postalPreview.className = 'crm-fias-preview-postal';
     postalPreview.textContent = 'Индекс: —';
-    previewWrap.appendChild(addrPreview);
-    previewWrap.appendChild(postalPreview);
+    previewWrap.append(previewLabel, addrPreview, postalPreview);
     inner.appendChild(previewWrap);
     state.el.addrPreview = addrPreview;
     state.el.postalPreview = postalPreview;
@@ -644,15 +662,7 @@
     fallbackWrap.className = 'crm-fias-fallback';
     fallbackWrap.hidden = true;
     fallbackWrap.innerHTML =
-      '<p class="crm-fias-fallback-msg" data-fias-fallback-msg>ФИАС-сервис недоступен. Введите адрес вручную.</p>' +
-      '<div class="crm-fias-row">' +
-        '<label class="uk-form-label crm-fias-label">Полный адрес (вручную)</label>' +
-        `<input class="uk-input crm-input" type="text" name="address[${kind}][addressFullManual]" placeholder="г. Москва, ул. Пушкина, д. 1"/>` +
-      '</div>' +
-      '<div class="crm-fias-row" style="margin-top:6px">' +
-        '<label class="uk-form-label crm-fias-label">Почтовый индекс</label>' +
-        `<input class="uk-input crm-input crm-fias-postal-manual" type="text" name="address[${kind}][postalCodeManual]" placeholder="123456"/>` +
-      '</div>';
+      '<p class="crm-fias-fallback-msg" data-fias-fallback-msg>ФИАС-сервис недоступен. Введите адрес вручную.</p>';
     inner.appendChild(fallbackWrap);
     state.el.fallbackWrap = fallbackWrap;
 
@@ -678,13 +688,11 @@
     widgetEl._fiasState = state;
     state.el.widgetEl = widgetEl;
 
-    // Build level rows
     installLevelRows(state, levelsContainer);
-
-    // Wire events
     wireWidgetEvents(state, divRow, regionSel);
   }
 
+  /* ── level rows: compact (label / [filter + select] / meta) ────────────────── */
   function installLevelRows(state, container) {
     container.innerHTML = '';
     state.uiByLevel.clear();
@@ -697,8 +705,12 @@
       wrap.hidden = true;
 
       const label = document.createElement('label');
-      label.className = 'uk-form-label crm-fias-label';
+      label.className = 'crm-fias-label';
       label.textContent = def.label;
+
+      // Compact combo: filter + select on one line
+      const combo = document.createElement('div');
+      combo.className = 'crm-fias-combo';
 
       const filter = document.createElement('input');
       filter.className = 'uk-input crm-input crm-fias-filter';
@@ -706,13 +718,14 @@
       filter.placeholder = 'Фильтр…';
 
       const sel = document.createElement('select');
-      sel.className = 'uk-select crm-select';
+      sel.className = 'uk-select crm-select crm-fias-select';
       sel.disabled = true;
 
       const meta = document.createElement('div');
       meta.className = 'crm-fias-meta';
 
-      wrap.append(label, filter, sel, meta);
+      combo.append(filter, sel);
+      wrap.append(label, combo, meta);
       container.appendChild(wrap);
       state.uiByLevel.set(level, { wrap, filter, select: sel, meta });
 
@@ -720,11 +733,12 @@
 
       sel.addEventListener('change', () => {
         const val = sel.value;
+        const order = getOrder(state.divisionType);
+        const idx = order.indexOf(level);
         if (!val) {
-          // clear this level and below
-          const order = getOrder(state.divisionType);
-          const idx = order.indexOf(level);
-          if (idx >= 0) for (let i = idx; i < order.length; i++) hideLevel(state, order[i]);
+          // Deselected: clear this level's selection, hide + clear only levels below
+          state.selectedByLevel.delete(level);
+          if (idx >= 0) for (let i = idx + 1; i < order.length; i++) hideLevel(state, order[i]);
           buildAddressText(state);
           return;
         }
@@ -735,9 +749,7 @@
         state.selectedByLevel.set(level, chosen);
         if (chosen.hierarchy && chosen.path) syncParents(state, chosen);
 
-        // reset lower levels
-        const order = getOrder(state.divisionType);
-        const idx = order.indexOf(level);
+        // Hide + clear all levels below the selected one
         if (idx >= 0) for (let i = idx + 1; i < order.length; i++) hideLevel(state, order[i]);
 
         const nextPath = chosen.path || (state.currentPath ? `${state.currentPath}.${chosen.object_id}` : String(chosen.object_id));
@@ -748,8 +760,9 @@
     }
   }
 
+  /* ── widget event wiring ───────────────────────────────────────────────────── */
   function wireWidgetEvents(state, divRow, regionSel) {
-    // Division type change
+    // Division type change — keep region, reload children for new division type
     divRow.querySelectorAll('input[type="radio"]').forEach(radio => {
       radio.addEventListener('change', () => {
         if (!radio.checked || radio.value === state.divisionType) return;
@@ -759,7 +772,7 @@
         hideAllLevels(state);
         state.selectedByLevel.clear();
         state.optionsFullByLevel.clear();
-        state.region = prevRegion; // keep selected region
+        state.region = prevRegion; // preserved — no reset
         buildAddressText(state);
         if (state.region) {
           const basePath = state.region.path || String(state.region.object_id);
@@ -768,7 +781,7 @@
       });
     });
 
-    // Region change
+    // Region change — clear all lower levels and reload
     regionSel.addEventListener('change', () => {
       if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
       const id = regionSel.value;
@@ -793,44 +806,123 @@
     });
   }
 
-  /* ── "same as" checkbox logic ──────────────────────────────────────────────── */
+  /* ── address module: panel open / close / accept ───────────────────────────── */
+  function initAddressModule() {
+    // "Заполнить адрес" — open FIAS panel for that row
+    document.querySelectorAll('[data-action="open-fias"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.addressTarget;
+        const moduleEl = btn.closest('[data-address-module]');
+        if (!moduleEl) return;
+        // Close other open panels in this module first
+        moduleEl.querySelectorAll('[data-fias-panel]').forEach(p => { p.hidden = true; });
+        const panel = moduleEl.querySelector(`[data-fias-panel="${target}"]`);
+        if (panel) panel.hidden = false;
+      });
+    });
+
+    // "Отмена" — close panel without changes
+    document.querySelectorAll('[data-action="fias-cancel"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = btn.closest('[data-fias-panel]');
+        if (panel) panel.hidden = true;
+      });
+    });
+
+    // "Принять" — write selected address into the row textarea + postal input
+    document.querySelectorAll('[data-action="fias-accept"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.addressTarget;
+        const panel = btn.closest('[data-fias-panel]');
+        if (!panel) return;
+        const moduleEl = panel.closest('[data-address-module]');
+        if (!moduleEl) return;
+
+        const widget = panel.querySelector('[data-fias-address-widget]');
+        if (widget) {
+          const addrField  = widget.querySelector('[data-fias-field="addressFull"]');
+          const postalField = widget.querySelector('[data-fias-field="postalCode"]');
+          const addrText   = (addrField?.value || '').trim();
+          const postalText = (postalField?.value || '').trim();
+
+          const addrOutput   = moduleEl.querySelector(`[data-address-output="${target}"]`);
+          const postalOutput = moduleEl.querySelector(`[data-address-postal="${target}"]`);
+
+          if (addrOutput && addrText) addrOutput.value = addrText;
+          if (postalOutput)           postalOutput.value = postalText;
+
+          // If registration accepted, refresh same-as note previews
+          if (target === 'registration') {
+            updateSameNoteText(moduleEl, addrText);
+          }
+        }
+        panel.hidden = true;
+      });
+    });
+  }
+
+  /* ── same-note preview text helper ─────────────────────────────────────────── */
+  function updateSameNoteText(moduleEl, addrText) {
+    moduleEl.querySelectorAll('[data-address-same-as="registration"]').forEach(cb => {
+      if (!cb.checked) return;
+      const targetKind = cb.dataset.addressTarget;
+      const note = moduleEl.querySelector(`[data-address-same-note="${targetKind}"]`);
+      if (!note) return;
+      const preview = note.querySelector('[data-same-preview-text]');
+      if (preview) preview.textContent = addrText || '';
+    });
+  }
+
+  /* ── same-as checkboxes: show/hide row fields and fill button ───────────────── */
   function initSameAsCheckboxes() {
     document.querySelectorAll('[data-address-same-as]').forEach(cb => {
       const targetKind = cb.dataset.addressTarget;
       const sourceKind = cb.dataset.addressSameAs;
 
-      function sync() {
-        const scope = cb.closest('form, [data-entity], section') || document;
-        const pageScope = document.body;
+      function syncRow() {
+        const moduleEl = cb.closest('[data-address-module]');
+        if (!moduleEl) return;
 
-        const targetWidget = pageScope.querySelector(`[data-fias-address-widget][data-address-kind="${targetKind}"]`);
-        const sourceWidget = pageScope.querySelector(`[data-fias-address-widget][data-address-kind="${sourceKind}"]`);
-        const note = pageScope.querySelector(`[data-address-same-note="${targetKind}"]`);
+        const note       = moduleEl.querySelector(`[data-address-same-note="${targetKind}"]`);
+        const rowFields  = moduleEl.querySelector(`[data-address-row-fields="${targetKind}"]`);
+        const fillBtn    = moduleEl.querySelector(`[data-action="open-fias"][data-address-target="${targetKind}"]`);
+        const panel      = moduleEl.querySelector(`[data-fias-panel="${targetKind}"]`);
+        const tgtWidget  = moduleEl.querySelector(`[data-fias-address-widget][data-address-kind="${targetKind}"]`);
+        const srcWidget  = moduleEl.querySelector(`[data-fias-address-widget][data-address-kind="${sourceKind}"]`);
+        const srcOutput  = moduleEl.querySelector(`[data-address-output="${sourceKind}"]`);
 
-        if (targetWidget) {
-          targetWidget.hidden = cb.checked;
-          setHiddenInEl(targetWidget, 'isSameAsRegistration', cb.checked ? 'true' : 'false');
-        }
-
-        if (note) {
-          note.hidden = !cb.checked;
-          if (cb.checked && sourceWidget) {
-            const srcPreview = sourceWidget.querySelector('[data-fias-addr-preview]');
-            const noteText = note.querySelector('[data-same-preview-text]');
-            if (noteText && srcPreview) {
-              noteText.textContent = srcPreview.textContent !== '—' ? srcPreview.textContent : '';
-            }
+        if (cb.checked) {
+          if (note) {
+            note.hidden = false;
+            const previewEl = note.querySelector('[data-same-preview-text]');
+            if (previewEl) previewEl.textContent = srcOutput?.value || '';
           }
-        }
-
-        if (cb.checked && targetWidget && sourceWidget) {
-          mirrorHiddenFields(sourceWidget, targetWidget);
-          setHiddenInEl(targetWidget, 'isSameAsRegistration', 'true');
+          if (rowFields) rowFields.hidden = true;
+          if (fillBtn)   fillBtn.hidden   = true;
+          if (panel)     panel.hidden     = true;
+          if (tgtWidget) {
+            setHiddenInEl(tgtWidget, 'isSameAsRegistration', 'true');
+            if (srcWidget) mirrorHiddenFields(srcWidget, tgtWidget);
+          }
+        } else {
+          if (note)      note.hidden     = true;
+          if (rowFields) rowFields.hidden = false;
+          if (fillBtn)   fillBtn.hidden   = false;
+          if (tgtWidget) setHiddenInEl(tgtWidget, 'isSameAsRegistration', 'false');
         }
       }
 
-      cb.addEventListener('change', sync);
-      sync();
+      cb.addEventListener('change', syncRow);
+      syncRow();
+    });
+  }
+
+  /* ── registration textarea → mirror same-as note previews on manual edits ─── */
+  function wireRegistrationTextareaInput() {
+    document.querySelectorAll('[data-address-output="registration"]').forEach(textarea => {
+      const moduleEl = textarea.closest('[data-address-module]');
+      if (!moduleEl) return;
+      textarea.addEventListener('input', () => updateSameNoteText(moduleEl, textarea.value));
     });
   }
 
@@ -848,6 +940,8 @@
     });
 
     initSameAsCheckboxes();
+    initAddressModule();
+    wireRegistrationTextareaInput();
   }
 
   if (document.readyState === 'loading') {
