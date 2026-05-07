@@ -133,6 +133,68 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   outline: none;
 }
 
+/* Middle Office reports: richer toolbar */
+body[data-page="middle-office-reports"] .crm-mo-toolbar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-toolbar-search {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-toolbar-search-shell {
+  cursor: text;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-toolbar-filters {
+  width: 100%;
+}
+
+.crm-mo-filter-input {
+  height: 38px;
+  font-size: 13px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--crm-input-border);
+  background: var(--crm-input-bg);
+  color: var(--crm-text);
+  min-width: 110px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.crm-mo-filter-input:focus {
+  border-color: var(--crm-primary);
+  box-shadow: var(--crm-focus-ring);
+  outline: none;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-date-wrap {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 148px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-input {
+  width: 100%;
+  min-width: 0;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger {
+  right: 10px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-toolbar-filters .crm-button {
+  min-height: 38px;
+  height: 38px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
 /* Middle Office clients: table card and wrapper */
 /* Keep the wide clients table contained inside its card, not the page. */
 body[data-page="middle-office-clients"] .crm-mo-shell {
@@ -421,6 +483,94 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   color: #60718c;
 }
 
+/* Middle Office reports: list pagination */
+body[data-page="middle-office-reports"] .crm-mo-report-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-size,
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  color: #607494;
+  margin-right: 2px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-chip {
+  min-width: 36px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #4e6383;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-chip.is-active {
+  border-color: #8ea5c9;
+  background: #dce8f8;
+  color: #203a61;
+  font-weight: 600;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-chip:hover {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-chip:focus-visible,
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-page {
+  font-size: 12px;
+  color: #4f6483;
+  margin-right: 2px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c8d4e6;
+  border-radius: 10px;
+  background: #fff;
+  color: #4f6483;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-button:hover:not(:disabled) {
+  border-color: #b8c6de;
+  background: #f8fbff;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-button:disabled {
+  cursor: not-allowed;
+  color: #a0aec0;
+  border-color: #dbe2f0;
+  background: #f3f6fb;
+}
+
 /* Middle Office reports: details panel */
 .crm-mo-details-card {
   border: 1px solid var(--crm-border);
@@ -462,6 +612,7 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   font-weight: 500;
   color: var(--crm-text);
   margin: 0;
+  word-break: break-word;
 }
 
 .crm-mo-status-ok {
@@ -470,6 +621,18 @@ body[data-page="middle-office-reports"] .crm-mo-split {
 
 .crm-mo-status-error {
   color: var(--crm-danger);
+}
+
+.crm-mo-status-warn {
+  color: #b45309;
+}
+
+.crm-mo-status-info {
+  color: var(--crm-primary);
+}
+
+.crm-mo-status-muted {
+  color: #60718c;
 }
 
 /* Middle Office reports: file card and actions */
@@ -502,6 +665,7 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   font-weight: 500;
   color: var(--crm-text);
   margin: 0;
+  word-break: break-word;
 }
 
 .crm-mo-file-size {

@@ -127,22 +127,90 @@
                       class="uk-input"
                       type="search"
                       data-filter="report-search"
-                      placeholder="Поиск по клиенту или отчёту..."
+                      placeholder="Поиск по клиенту, коду, файлу или отчёту..."
                       autocomplete="off"
                     />
                   </label>
                 </div>
                 <div class="crm-mo-toolbar-filters">
-                  <select class="crm-mo-select" data-filter="report-status" aria-label="Статус">
+                  <input
+                    type="text"
+                    class="crm-mo-filter-input"
+                    data-filter="report-client-code"
+                    placeholder="Код клиента"
+                    aria-label="Код клиента"
+                    autocomplete="off"
+                  />
+                  <div class="crm-mo-date-wrap crm-date-field">
+                    <input
+                      type="date"
+                      class="uk-input crm-input crm-date-input crm-mo-filter-input"
+                      id="mo-report-date-from"
+                      name="report-date-from"
+                      aria-label="Дата с"
+                      placeholder="дд.мм.гггг"
+                      data-filter="report-date-from"
+                      data-date-input
+                    />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"
+                    ></button>
+                  </div>
+                  <div class="crm-mo-date-wrap crm-date-field">
+                    <input
+                      type="date"
+                      class="uk-input crm-input crm-date-input crm-mo-filter-input"
+                      id="mo-report-date-to"
+                      name="report-date-to"
+                      aria-label="Дата по"
+                      placeholder="дд.мм.гггг"
+                      data-filter="report-date-to"
+                      data-date-input
+                    />
+                    <button
+                      class="crm-date-trigger"
+                      type="button"
+                      data-date-trigger
+                      aria-label="Открыть календарь"
+                      uk-icon="calendar"
+                    ></button>
+                  </div>
+                  <select class="crm-mo-filter-input crm-mo-select" data-filter="report-type" aria-label="Вид отчёта">
+                    <option value="all">Вид отчёта</option>
+                    <option value="Брокерский">Брокерский</option>
+                    <option value="ДУ">ДУ</option>
+                    <option value="Налоговый">Налоговый</option>
+                    <option value="Депозитарный">Депозитарный</option>
+                    <option value="Квартальный">Квартальный</option>
+                    <option value="Ежемесячный">Ежемесячный</option>
+                    <option value="Сводный">Сводный</option>
+                  </select>
+                  <select class="crm-mo-filter-input crm-mo-select" data-filter="report-status" aria-label="Статус">
                     <option value="all">Статус</option>
                     <option value="Доставлен">Доставлен</option>
+                    <option value="Не доставлен">Не доставлен</option>
                     <option value="Ошибка">Ошибка</option>
+                    <option value="На проверке">На проверке</option>
+                    <option value="Запланирован">Запланирован</option>
                   </select>
-                  <select class="crm-mo-select" data-filter="report-channel" aria-label="Канал">
+                  <select class="crm-mo-filter-input crm-mo-select" data-filter="report-channel" aria-label="Канал">
                     <option value="all">Канал</option>
                     <option value="E-mail">E-mail</option>
                     <option value="Личный кабинет">Личный кабинет</option>
+                    <option value="ЭДО">ЭДО</option>
+                    <option value="SFTP">SFTP</option>
                   </select>
+                  <button
+                    type="button"
+                    class="uk-button uk-button-default crm-button crm-button-ghost"
+                    data-action="reset-mo-report-filters"
+                  >
+                    Очистить фильтры
+                  </button>
                 </div>
               </div>
 
@@ -160,20 +228,19 @@
                   data-period="Q1 2026"
                   data-channel="E-mail"
                   data-status="Доставлен"
-                  data-sent-at="14.04.2026 10:48"
-                  data-address="alpha@alphainvest.ru"
+                  data-sent-at="16.04.2026 10:48"
+                  data-address="reports+kl001@example.test"
                   data-contract="БД-2021-001"
                   data-created-by="Сидорова А.В."
-                  data-file-name="report_alpha_invest_2026_q1.pdf"
+                  data-file-name="broker_kl001_2026_q1.pdf"
                   data-file-size="184 КБ"
+                  data-date="2026-04-16"
                 >
                   <div class="crm-mo-report-item-head">
                     <span class="crm-mo-report-item-name">ООО «Альфа Инвест»</span>
-                    <span class="crm-mo-report-item-date">14.04.2026</span>
+                    <span class="crm-mo-report-item-date">16.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">
-                    Квартальный отчёт по брокерскому счёту
-                  </div>
+                  <div class="crm-mo-report-item-title">Квартальный отчёт по брокерскому счёту</div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">E-mail</span>
                     <span class="crm-badge muted">Брокерский</span>
@@ -193,19 +260,18 @@
                   data-channel="E-mail"
                   data-status="Доставлен"
                   data-sent-at="15.04.2026 09:12"
-                  data-address="capital@severcap.ru"
+                  data-address="reports+kl003@example.test"
                   data-contract="ДУ-2022-012"
                   data-created-by="Иванов И.И."
-                  data-file-name="report_sever_capital_2026_03.pdf"
+                  data-file-name="broker_kl003_2026_03.pdf"
                   data-file-size="248 КБ"
+                  data-date="2026-04-15"
                 >
                   <div class="crm-mo-report-item-head">
                     <span class="crm-mo-report-item-name">АО «Север Капитал»</span>
                     <span class="crm-mo-report-item-date">15.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">
-                    Отчёт об операциях с ЦБ за март 2026
-                  </div>
+                  <div class="crm-mo-report-item-title">Отчёт об операциях с ЦБ за март 2026</div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">E-mail</span>
                     <span class="crm-badge muted">Брокерский</span>
@@ -224,20 +290,19 @@
                   data-period="2025"
                   data-channel="Личный кабинет"
                   data-status="Ошибка"
-                  data-sent-at="10.04.2026 16:33"
-                  data-address="smirnov_ai@mail.ru"
+                  data-sent-at="14.04.2026 16:33"
+                  data-address="cabinet://client/kl002"
                   data-contract="БД-2021-045"
                   data-created-by="Петрова Е.С."
-                  data-file-name="tax_report_smirnov_2025.pdf"
+                  data-file-name="tax_kl002_2025.pdf"
                   data-file-size="96 КБ"
+                  data-date="2026-04-14"
                 >
                   <div class="crm-mo-report-item-head">
                     <span class="crm-mo-report-item-name">Смирнов А.И.</span>
-                    <span class="crm-mo-report-item-date">10.04.2026</span>
+                    <span class="crm-mo-report-item-date">14.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">
-                    Налоговый отчёт 2025
-                  </div>
+                  <div class="crm-mo-report-item-title">Налоговый отчёт 2025</div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">Личный кабинет</span>
                     <span class="crm-badge muted">Налоговый</span>
@@ -256,20 +321,19 @@
                   data-period="Q1 2026"
                   data-channel="E-mail"
                   data-status="Доставлен"
-                  data-sent-at="09.04.2026 14:05"
-                  data-address="petrov_ks@bk.ru"
+                  data-sent-at="13.04.2026 14:05"
+                  data-address="reports+kl004@example.test"
                   data-contract="ДП-2020-088"
                   data-created-by="Иванов И.И."
-                  data-file-name="report_petrov_2026_q1.pdf"
+                  data-file-name="broker_kl004_2026_q1.pdf"
                   data-file-size="132 КБ"
+                  data-date="2026-04-13"
                 >
                   <div class="crm-mo-report-item-head">
                     <span class="crm-mo-report-item-name">Петров К.С.</span>
-                    <span class="crm-mo-report-item-date">09.04.2026</span>
+                    <span class="crm-mo-report-item-date">13.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">
-                    Брокерский отчёт за Q1 2026
-                  </div>
+                  <div class="crm-mo-report-item-title">Брокерский отчёт за Q1 2026</div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">E-mail</span>
                     <span class="crm-badge muted">Брокерский</span>
@@ -288,20 +352,19 @@
                   data-period="Март 2026"
                   data-channel="Личный кабинет"
                   data-status="Доставлен"
-                  data-sent-at="07.04.2026 11:20"
-                  data-address="broker@region-broker.ru"
+                  data-sent-at="10.04.2026 11:20"
+                  data-address="cabinet://client/kl007"
                   data-contract="ДУ-2021-033"
                   data-created-by="Сидорова А.В."
-                  data-file-name="du_report_region_broker_2026_03.pdf"
+                  data-file-name="du_kl007_2026_03.pdf"
                   data-file-size="312 КБ"
+                  data-date="2026-04-10"
                 >
                   <div class="crm-mo-report-item-head">
                     <span class="crm-mo-report-item-name">ООО «Регион Брокер»</span>
-                    <span class="crm-mo-report-item-date">07.04.2026</span>
+                    <span class="crm-mo-report-item-date">10.04.2026</span>
                   </div>
-                  <div class="crm-mo-report-item-title">
-                    Сводный отчёт ДУ за март 2026
-                  </div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт ДУ за март 2026</div>
                   <div class="crm-mo-report-item-meta">
                     <span class="crm-badge muted">Личный кабинет</span>
                     <span class="crm-badge muted">ДУ</span>
@@ -309,10 +372,269 @@
                   </div>
                 </button>
 
+                <!-- Report 6 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Вектор Финанс»" data-client-code="КЛ-005" data-report-title="Ежемесячный отчёт за апрель 2026" data-report-type="Ежемесячный" data-period="Апрель 2026" data-channel="ЭДО" data-status="На проверке" data-sent-at="09.04.2026 17:10" data-address="edo://vector-finance/reports" data-contract="БД-2024-019" data-created-by="Кузнецова М.А." data-file-name="monthly_kl005_2026_04.pdf" data-file-size="205 КБ" data-date="2026-04-09">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Вектор Финанс»</span><span class="crm-mo-report-item-date">09.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Ежемесячный отчёт за апрель 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Ежемесячный</span><span class="crm-badge info">На проверке</span></div>
+                </button>
+
+                <!-- Report 7 -->
+                <button type="button" class="crm-mo-report-item" data-client="Николаева М.В." data-client-code="КЛ-006" data-report-title="Депозитарный отчёт по движению ЦБ" data-report-type="Депозитарный" data-period="Апрель 2026" data-channel="SFTP" data-status="Не доставлен" data-sent-at="08.04.2026 12:42" data-address="sftp://demo-reports.local/kl006" data-contract="ДП-2022-014" data-created-by="Петрова Е.С." data-file-name="depo_kl006_2026_04.pdf" data-file-size="154 КБ" data-date="2026-04-08">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Николаева М.В.</span><span class="crm-mo-report-item-date">08.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Депозитарный отчёт по движению ЦБ</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Депозитарный</span><span class="crm-badge warning">Не доставлен</span></div>
+                </button>
+
+                <!-- Report 8 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Орион Партнёры»" data-client-code="КЛ-008" data-report-title="Налоговая справка за 2025" data-report-type="Налоговый" data-period="2025" data-channel="E-mail" data-status="Запланирован" data-sent-at="07.04.2026 18:00" data-address="reports+kl008@example.test" data-contract="БД-2020-028" data-created-by="Иванов И.И." data-file-name="tax_kl008_2025.pdf" data-file-size="119 КБ" data-date="2026-04-07">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Орион Партнёры»</span><span class="crm-mo-report-item-date">07.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Налоговая справка за 2025</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Налоговый</span><span class="crm-badge muted">Запланирован</span></div>
+                </button>
+
+                <!-- Report 9 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Горизонт»" data-client-code="КЛ-009" data-report-title="Квартальный отчёт ДУ за Q1 2026" data-report-type="Квартальный" data-period="Q1 2026" data-channel="ЭДО" data-status="Доставлен" data-sent-at="06.04.2026 09:50" data-address="edo://horizon/reports" data-contract="ДУ-2023-071" data-created-by="Сидорова А.В." data-file-name="quarter_kl009_2026_q1.pdf" data-file-size="284 КБ" data-date="2026-04-06">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Горизонт»</span><span class="crm-mo-report-item-date">06.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Квартальный отчёт ДУ за Q1 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Квартальный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 10 -->
+                <button type="button" class="crm-mo-report-item" data-client="Ковалёв Д.П." data-client-code="КЛ-010" data-report-title="Сводный отчёт портфеля за март 2026" data-report-type="Сводный" data-period="Март 2026" data-channel="Личный кабинет" data-status="Ошибка" data-sent-at="03.04.2026 15:36" data-address="cabinet://client/kl010" data-contract="БД-2021-103" data-created-by="Кузнецова М.А." data-file-name="summary_kl010_2026_03.pdf" data-file-size="226 КБ" data-date="2026-04-03">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Ковалёв Д.П.</span><span class="crm-mo-report-item-date">03.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт портфеля за март 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Сводный</span><span class="crm-badge danger">Ошибка</span></div>
+                </button>
+
+                <!-- Report 11 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Ладога Инвест»" data-client-code="КЛ-011" data-report-title="Ежемесячный брокерский отчёт за март 2026" data-report-type="Ежемесячный" data-period="Март 2026" data-channel="E-mail" data-status="Доставлен" data-sent-at="02.04.2026 10:15" data-address="reports+kl011@example.test" data-contract="БД-2022-057" data-created-by="Петрова Е.С." data-file-name="monthly_kl011_2026_03.pdf" data-file-size="178 КБ" data-date="2026-04-02">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Ладога Инвест»</span><span class="crm-mo-report-item-date">02.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Ежемесячный брокерский отчёт за март 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Ежемесячный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 12 -->
+                <button type="button" class="crm-mo-report-item" data-client="Зайцева Е.Н." data-client-code="КЛ-012" data-report-title="Отчёт ДУ по стратегии «Баланс»" data-report-type="ДУ" data-period="Апрель 2026" data-channel="SFTP" data-status="На проверке" data-sent-at="01.04.2026 13:28" data-address="sftp://demo-reports.local/kl012" data-contract="ДУ-2020-042" data-created-by="Иванов И.И." data-file-name="du_balance_kl012_2026_04.pdf" data-file-size="266 КБ" data-date="2026-04-01">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Зайцева Е.Н.</span><span class="crm-mo-report-item-date">01.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Отчёт ДУ по стратегии «Баланс»</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">ДУ</span><span class="crm-badge info">На проверке</span></div>
+                </button>
+
+                <!-- Report 13 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Строй Актив»" data-client-code="КЛ-013" data-report-title="Депозитарный отчёт по корпоративным действиям" data-report-type="Депозитарный" data-period="Март 2026" data-channel="ЭДО" data-status="Доставлен" data-sent-at="31.03.2026 11:05" data-address="edo://stroy-active/reports" data-contract="ДП-2024-005" data-created-by="Сидорова А.В." data-file-name="depo_actions_kl013_2026_03.pdf" data-file-size="141 КБ" data-date="2026-03-31">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Строй Актив»</span><span class="crm-mo-report-item-date">31.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Депозитарный отчёт по корпоративным действиям</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Депозитарный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 14 -->
+                <button type="button" class="crm-mo-report-item" data-client="Беляев Р.О." data-client-code="КЛ-014" data-report-title="Брокерский отчёт по сделкам за апрель" data-report-type="Брокерский" data-period="Апрель 2026" data-channel="Личный кабинет" data-status="Не доставлен" data-sent-at="30.03.2026 16:44" data-address="cabinet://client/kl014" data-contract="БД-2022-016" data-created-by="Кузнецова М.А." data-file-name="broker_kl014_2026_04.pdf" data-file-size="173 КБ" data-date="2026-03-30">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Беляев Р.О.</span><span class="crm-mo-report-item-date">30.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Брокерский отчёт по сделкам за апрель</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Брокерский</span><span class="crm-badge warning">Не доставлен</span></div>
+                </button>
+
+                <!-- Report 15 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Норд Траст»" data-client-code="КЛ-015" data-report-title="Сводный отчёт по всем договорам" data-report-type="Сводный" data-period="Q1 2026" data-channel="E-mail" data-status="Доставлен" data-sent-at="27.03.2026 09:30" data-address="reports+kl015@example.test" data-contract="СВ-2021-009" data-created-by="Петрова Е.С." data-file-name="summary_kl015_2026_q1.pdf" data-file-size="334 КБ" data-date="2026-03-27">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Норд Траст»</span><span class="crm-mo-report-item-date">27.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт по всем договорам</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Сводный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 16 -->
+                <button type="button" class="crm-mo-report-item" data-client="Морозова Л.К." data-client-code="КЛ-016" data-report-title="Налоговый отчёт по купонам 2025" data-report-type="Налоговый" data-period="2025" data-channel="E-mail" data-status="На проверке" data-sent-at="26.03.2026 12:24" data-address="reports+kl016@example.test" data-contract="БД-2023-062" data-created-by="Иванов И.И." data-file-name="tax_coupon_kl016_2025.pdf" data-file-size="112 КБ" data-date="2026-03-26">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Морозова Л.К.</span><span class="crm-mo-report-item-date">26.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Налоговый отчёт по купонам 2025</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Налоговый</span><span class="crm-badge info">На проверке</span></div>
+                </button>
+
+                <!-- Report 17 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Речной Портфель»" data-client-code="КЛ-017" data-report-title="Квартальный отчёт по счёту ИИС" data-report-type="Квартальный" data-period="Q1 2026" data-channel="Личный кабинет" data-status="Доставлен" data-sent-at="25.03.2026 10:58" data-address="cabinet://client/kl017" data-contract="БД-2020-115" data-created-by="Сидорова А.В." data-file-name="quarter_iis_kl017_2026_q1.pdf" data-file-size="194 КБ" data-date="2026-03-25">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Речной Портфель»</span><span class="crm-mo-report-item-date">25.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Квартальный отчёт по счёту ИИС</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Квартальный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 18 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Сфера Управление»" data-client-code="КЛ-018" data-report-title="Отчёт ДУ за март 2026" data-report-type="ДУ" data-period="Март 2026" data-channel="ЭДО" data-status="Ошибка" data-sent-at="24.03.2026 15:02" data-address="edo://sfera-management/reports" data-contract="ДУ-2022-034" data-created-by="Кузнецова М.А." data-file-name="du_kl018_2026_03.pdf" data-file-size="241 КБ" data-date="2026-03-24">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Сфера Управление»</span><span class="crm-mo-report-item-date">24.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Отчёт ДУ за март 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">ДУ</span><span class="crm-badge danger">Ошибка</span></div>
+                </button>
+
+                <!-- Report 19 -->
+                <button type="button" class="crm-mo-report-item" data-client="Григорьев П.А." data-client-code="КЛ-019" data-report-title="Ежемесячный депозитарный отчёт" data-report-type="Ежемесячный" data-period="Март 2026" data-channel="SFTP" data-status="Доставлен" data-sent-at="23.03.2026 08:45" data-address="sftp://demo-reports.local/kl019" data-contract="ДП-2021-077" data-created-by="Петрова Е.С." data-file-name="monthly_depo_kl019_2026_03.pdf" data-file-size="128 КБ" data-date="2026-03-23">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Григорьев П.А.</span><span class="crm-mo-report-item-date">23.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Ежемесячный депозитарный отчёт</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Ежемесячный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 20 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Меридиан Плюс»" data-client-code="КЛ-020" data-report-title="Брокерский отчёт по комиссиям" data-report-type="Брокерский" data-period="Апрель 2026" data-channel="E-mail" data-status="Запланирован" data-sent-at="20.03.2026 18:10" data-address="reports+kl020@example.test" data-contract="БД-2023-041" data-created-by="Иванов И.И." data-file-name="broker_fee_kl020_2026_04.pdf" data-file-size="102 КБ" data-date="2026-03-20">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Меридиан Плюс»</span><span class="crm-mo-report-item-date">20.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Брокерский отчёт по комиссиям</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Брокерский</span><span class="crm-badge muted">Запланирован</span></div>
+                </button>
+
+                <!-- Report 21 -->
+                <button type="button" class="crm-mo-report-item" data-client="Соколова И.В." data-client-code="КЛ-021" data-report-title="Сводный отчёт клиента за Q1 2026" data-report-type="Сводный" data-period="Q1 2026" data-channel="Личный кабинет" data-status="Доставлен" data-sent-at="19.03.2026 14:18" data-address="cabinet://client/kl021" data-contract="СВ-2024-003" data-created-by="Сидорова А.В." data-file-name="summary_kl021_2026_q1.pdf" data-file-size="218 КБ" data-date="2026-03-19">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Соколова И.В.</span><span class="crm-mo-report-item-date">19.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт клиента за Q1 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Сводный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 22 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Атлас Девелопмент»" data-client-code="КЛ-022" data-report-title="Депозитарный отчёт за апрель 2026" data-report-type="Депозитарный" data-period="Апрель 2026" data-channel="ЭДО" data-status="На проверке" data-sent-at="18.03.2026 11:46" data-address="edo://atlas-development/reports" data-contract="ДП-2020-083" data-created-by="Кузнецова М.А." data-file-name="depo_kl022_2026_04.pdf" data-file-size="166 КБ" data-date="2026-03-18">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Атлас Девелопмент»</span><span class="crm-mo-report-item-date">18.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Депозитарный отчёт за апрель 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Депозитарный</span><span class="crm-badge info">На проверке</span></div>
+                </button>
+
+                <!-- Report 23 -->
+                <button type="button" class="crm-mo-report-item" data-client="Федоров Н.С." data-client-code="КЛ-023" data-report-title="Отчёт ДУ по индивидуальному портфелю" data-report-type="ДУ" data-period="Март 2026" data-channel="E-mail" data-status="Не доставлен" data-sent-at="17.03.2026 10:04" data-address="reports+kl023@example.test" data-contract="ДУ-2021-090" data-created-by="Петрова Е.С." data-file-name="du_personal_kl023_2026_03.pdf" data-file-size="237 КБ" data-date="2026-03-17">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Федоров Н.С.</span><span class="crm-mo-report-item-date">17.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Отчёт ДУ по индивидуальному портфелю</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">ДУ</span><span class="crm-badge warning">Не доставлен</span></div>
+                </button>
+
+                <!-- Report 24 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Импульс Капитал»" data-client-code="КЛ-024" data-report-title="Налоговый отчёт по дивидендам 2025" data-report-type="Налоговый" data-period="2025" data-channel="SFTP" data-status="Доставлен" data-sent-at="16.03.2026 09:26" data-address="sftp://demo-reports.local/kl024" data-contract="БД-2022-122" data-created-by="Иванов И.И." data-file-name="tax_dividend_kl024_2025.pdf" data-file-size="145 КБ" data-date="2026-03-16">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Импульс Капитал»</span><span class="crm-mo-report-item-date">16.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Налоговый отчёт по дивидендам 2025</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Налоговый</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 25 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Призма Инвест»" data-client-code="КЛ-025" data-report-title="Квартальный брокерский отчёт Q1 2026" data-report-type="Квартальный" data-period="Q1 2026" data-channel="E-mail" data-status="Ошибка" data-sent-at="13.03.2026 16:11" data-address="reports+kl025@example.test" data-contract="БД-2023-008" data-created-by="Сидорова А.В." data-file-name="quarter_broker_kl025_2026_q1.pdf" data-file-size="251 КБ" data-date="2026-03-13">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Призма Инвест»</span><span class="crm-mo-report-item-date">13.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Квартальный брокерский отчёт Q1 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Квартальный</span><span class="crm-badge danger">Ошибка</span></div>
+                </button>
+
+                <!-- Report 26 -->
+                <button type="button" class="crm-mo-report-item" data-client="Сафонова Т.М." data-client-code="КЛ-026" data-report-title="Ежемесячный отчёт по брокерскому счёту" data-report-type="Ежемесячный" data-period="Апрель 2026" data-channel="Личный кабинет" data-status="Доставлен" data-sent-at="12.03.2026 13:32" data-address="cabinet://client/kl026" data-contract="БД-2021-067" data-created-by="Кузнецова М.А." data-file-name="monthly_broker_kl026_2026_04.pdf" data-file-size="169 КБ" data-date="2026-03-12">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Сафонова Т.М.</span><span class="crm-mo-report-item-date">12.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Ежемесячный отчёт по брокерскому счёту</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Ежемесячный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 27 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Баланс Групп»" data-client-code="КЛ-027" data-report-title="Сводный отчёт по группе договоров" data-report-type="Сводный" data-period="Март 2026" data-channel="ЭДО" data-status="Доставлен" data-sent-at="11.03.2026 12:08" data-address="edo://balance-group/reports" data-contract="СВ-2022-018" data-created-by="Петрова Е.С." data-file-name="summary_group_kl027_2026_03.pdf" data-file-size="306 КБ" data-date="2026-03-11">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Баланс Групп»</span><span class="crm-mo-report-item-date">11.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт по группе договоров</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Сводный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 28 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Каскад Финанс»" data-client-code="КЛ-028" data-report-title="Депозитарный реестр отчётов за март" data-report-type="Депозитарный" data-period="Март 2026" data-channel="SFTP" data-status="Запланирован" data-sent-at="10.03.2026 18:45" data-address="sftp://demo-reports.local/kl028" data-contract="ДП-2023-026" data-created-by="Иванов И.И." data-file-name="depo_registry_kl028_2026_03.pdf" data-file-size="122 КБ" data-date="2026-03-10">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Каскад Финанс»</span><span class="crm-mo-report-item-date">10.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Депозитарный реестр отчётов за март</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Депозитарный</span><span class="crm-badge muted">Запланирован</span></div>
+                </button>
+
+                <!-- Report 29 -->
+                <button type="button" class="crm-mo-report-item" data-client="Тимофеев А.О." data-client-code="КЛ-029" data-report-title="Брокерский отчёт за апрель 2026" data-report-type="Брокерский" data-period="Апрель 2026" data-channel="E-mail" data-status="На проверке" data-sent-at="09.03.2026 10:55" data-address="reports+kl029@example.test" data-contract="БД-2024-033" data-created-by="Сидорова А.В." data-file-name="broker_kl029_2026_04.pdf" data-file-size="187 КБ" data-date="2026-03-09">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Тимофеев А.О.</span><span class="crm-mo-report-item-date">09.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Брокерский отчёт за апрель 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Брокерский</span><span class="crm-badge info">На проверке</span></div>
+                </button>
+
+                <!-- Report 30 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Южный Вектор»" data-client-code="КЛ-030" data-report-title="Отчёт ДУ по результатам квартала" data-report-type="ДУ" data-period="Q1 2026" data-channel="ЭДО" data-status="Доставлен" data-sent-at="06.03.2026 14:40" data-address="edo://south-vector/reports" data-contract="ДУ-2020-051" data-created-by="Кузнецова М.А." data-file-name="du_quarter_kl030_2026_q1.pdf" data-file-size="292 КБ" data-date="2026-03-06">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Южный Вектор»</span><span class="crm-mo-report-item-date">06.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Отчёт ДУ по результатам квартала</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">ДУ</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 31 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Ритм Инвест»" data-client-code="КЛ-031" data-report-title="Налоговый отчёт по операциям 2025" data-report-type="Налоговый" data-period="2025" data-channel="E-mail" data-status="Доставлен" data-sent-at="05.03.2026 09:14" data-address="reports+kl031@example.test" data-contract="БД-2022-091" data-created-by="Петрова Е.С." data-file-name="tax_ops_kl031_2025.pdf" data-file-size="136 КБ" data-date="2026-03-05">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Ритм Инвест»</span><span class="crm-mo-report-item-date">05.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Налоговый отчёт по операциям 2025</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Налоговый</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 32 -->
+                <button type="button" class="crm-mo-report-item" data-client="Васильева О.С." data-client-code="КЛ-032" data-report-title="Квартальный отчёт по портфелю" data-report-type="Квартальный" data-period="Q1 2026" data-channel="Личный кабинет" data-status="Не доставлен" data-sent-at="04.03.2026 16:22" data-address="cabinet://client/kl032" data-contract="БД-2023-044" data-created-by="Иванов И.И." data-file-name="quarter_portfolio_kl032_2026_q1.pdf" data-file-size="211 КБ" data-date="2026-03-04">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Васильева О.С.</span><span class="crm-mo-report-item-date">04.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Квартальный отчёт по портфелю</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Квартальный</span><span class="crm-badge warning">Не доставлен</span></div>
+                </button>
+
+                <!-- Report 33 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Фактор Плюс»" data-client-code="КЛ-033" data-report-title="Ежемесячный отчёт за март 2026" data-report-type="Ежемесячный" data-period="Март 2026" data-channel="SFTP" data-status="Ошибка" data-sent-at="03.03.2026 15:18" data-address="sftp://demo-reports.local/kl033" data-contract="БД-2024-027" data-created-by="Сидорова А.В." data-file-name="monthly_kl033_2026_03.pdf" data-file-size="158 КБ" data-date="2026-03-03">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Фактор Плюс»</span><span class="crm-mo-report-item-date">03.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Ежемесячный отчёт за март 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Ежемесячный</span><span class="crm-badge danger">Ошибка</span></div>
+                </button>
+
+                <!-- Report 34 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Нева Холдинг»" data-client-code="КЛ-034" data-report-title="Сводный отчёт по активам за апрель" data-report-type="Сводный" data-period="Апрель 2026" data-channel="ЭДО" data-status="Доставлен" data-sent-at="02.03.2026 12:39" data-address="edo://neva-holding/reports" data-contract="СВ-2021-021" data-created-by="Кузнецова М.А." data-file-name="assets_summary_kl034_2026_04.pdf" data-file-size="275 КБ" data-date="2026-03-02">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Нева Холдинг»</span><span class="crm-mo-report-item-date">02.03.2026</span></div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт по активам за апрель</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Сводный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 35 -->
+                <button type="button" class="crm-mo-report-item" data-client="Захаров В.Н." data-client-code="КЛ-035" data-report-title="Депозитарный отчёт по остаткам" data-report-type="Депозитарный" data-period="Апрель 2026" data-channel="Личный кабинет" data-status="На проверке" data-sent-at="30.04.2026 09:05" data-address="cabinet://client/kl035" data-contract="ДП-2022-064" data-created-by="Петрова Е.С." data-file-name="depo_balance_kl035_2026_04.pdf" data-file-size="149 КБ" data-date="2026-04-30">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Захаров В.Н.</span><span class="crm-mo-report-item-date">30.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Депозитарный отчёт по остаткам</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">Личный кабинет</span><span class="crm-badge muted">Депозитарный</span><span class="crm-badge info">На проверке</span></div>
+                </button>
+
+                <!-- Report 36 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Прайм Резерв»" data-client-code="КЛ-036" data-report-title="Брокерский отчёт по сделкам РЕПО" data-report-type="Брокерский" data-period="Март 2026" data-channel="SFTP" data-status="Доставлен" data-sent-at="29.04.2026 08:50" data-address="sftp://demo-reports.local/kl036" data-contract="БД-2020-074" data-created-by="Иванов И.И." data-file-name="broker_repo_kl036_2026_03.pdf" data-file-size="196 КБ" data-date="2026-04-29">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Прайм Резерв»</span><span class="crm-mo-report-item-date">29.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Брокерский отчёт по сделкам РЕПО</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Брокерский</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 37 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Курс Север»" data-client-code="КЛ-037" data-report-title="Отчёт ДУ за апрель 2026" data-report-type="ДУ" data-period="Апрель 2026" data-channel="E-mail" data-status="Запланирован" data-sent-at="28.04.2026 18:20" data-address="reports+kl037@example.test" data-contract="ДУ-2023-097" data-created-by="Сидорова А.В." data-file-name="du_kl037_2026_04.pdf" data-file-size="223 КБ" data-date="2026-04-28">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Курс Север»</span><span class="crm-mo-report-item-date">28.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Отчёт ДУ за апрель 2026</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">ДУ</span><span class="crm-badge muted">Запланирован</span></div>
+                </button>
+
+                <!-- Report 38 -->
+                <button type="button" class="crm-mo-report-item" data-client="Лебедева К.А." data-client-code="КЛ-038" data-report-title="Налоговая сводка за 2025" data-report-type="Налоговый" data-period="2025" data-channel="ЭДО" data-status="Ошибка" data-sent-at="27.04.2026 14:12" data-address="edo://client-kl038/reports" data-contract="БД-2021-039" data-created-by="Кузнецова М.А." data-file-name="tax_summary_kl038_2025.pdf" data-file-size="108 КБ" data-date="2026-04-27">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">Лебедева К.А.</span><span class="crm-mo-report-item-date">27.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Налоговая сводка за 2025</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">ЭДО</span><span class="crm-badge muted">Налоговый</span><span class="crm-badge danger">Ошибка</span></div>
+                </button>
+
+                <!-- Report 39 -->
+                <button type="button" class="crm-mo-report-item" data-client="ООО «Вертикаль Инвест»" data-client-code="КЛ-039" data-report-title="Квартальный депозитарный отчёт" data-report-type="Квартальный" data-period="Q1 2026" data-channel="SFTP" data-status="Доставлен" data-sent-at="24.04.2026 11:25" data-address="sftp://demo-reports.local/kl039" data-contract="ДП-2024-016" data-created-by="Петрова Е.С." data-file-name="quarter_depo_kl039_2026_q1.pdf" data-file-size="230 КБ" data-date="2026-04-24">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">ООО «Вертикаль Инвест»</span><span class="crm-mo-report-item-date">24.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Квартальный депозитарный отчёт</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">SFTP</span><span class="crm-badge muted">Квартальный</span><span class="crm-badge success">Доставлен</span></div>
+                </button>
+
+                <!-- Report 40 -->
+                <button type="button" class="crm-mo-report-item" data-client="АО «Полюс Портфель»" data-client-code="КЛ-040" data-report-title="Сводный отчёт за март и апрель" data-report-type="Сводный" data-period="Март-Апрель 2026" data-channel="E-mail" data-status="Не доставлен" data-sent-at="21.04.2026 10:30" data-address="reports+kl040@example.test" data-contract="СВ-2020-058" data-created-by="Иванов И.И." data-file-name="summary_kl040_2026_03_04.pdf" data-file-size="318 КБ" data-date="2026-04-21">
+                  <div class="crm-mo-report-item-head"><span class="crm-mo-report-item-name">АО «Полюс Портфель»</span><span class="crm-mo-report-item-date">21.04.2026</span></div>
+                  <div class="crm-mo-report-item-title">Сводный отчёт за март и апрель</div>
+                  <div class="crm-mo-report-item-meta"><span class="crm-badge muted">E-mail</span><span class="crm-badge muted">Сводный</span><span class="crm-badge warning">Не доставлен</span></div>
+                </button>
+
                 <!-- List empty state (hidden by default) -->
                 <div class="crm-mo-report-list-empty" data-entity="mo-report-list-empty" hidden>
                   <p class="crm-mo-report-list-empty-title">Отчёты не найдены</p>
                   <p class="crm-mo-report-list-empty-text">Измените параметры поиска или фильтры.</p>
+                </div>
+              </div>
+
+              <div class="crm-mo-report-pagination" data-role="mo-report-pagination">
+                <div class="crm-mo-report-pagination-size" data-page-size-group="mo-report-page-size" aria-label="Количество отчётов на странице">
+                  <span class="crm-mo-report-pagination-caption">На странице</span>
+                  <button type="button" class="crm-mo-report-pagination-chip is-active" data-page-size-value="10">10</button>
+                  <button type="button" class="crm-mo-report-pagination-chip" data-page-size-value="25">25</button>
+                  <button type="button" class="crm-mo-report-pagination-chip" data-page-size-value="50">50</button>
+                </div>
+                <div class="crm-mo-report-pagination-nav">
+                  <span class="crm-mo-report-pagination-page" data-pagination-indicator>1 из 1</span>
+                  <button type="button" class="crm-mo-report-pagination-button" data-pagination-nav="prev" aria-label="Предыдущая страница">‹</button>
+                  <button type="button" class="crm-mo-report-pagination-button" data-pagination-nav="next" aria-label="Следующая страница">›</button>
                 </div>
               </div>
             </div>
@@ -369,7 +691,7 @@
                 <div class="crm-mo-detail-field">
                   <p class="crm-mo-detail-field-label">Адрес</p>
                   <p class="crm-mo-detail-field-value" data-detail="address">
-                    capital@severcap.ru
+                    reports+kl003@example.test
                   </p>
                 </div>
                 <div class="crm-mo-detail-field">
@@ -395,7 +717,7 @@
                 </div>
                 <div>
                   <p class="crm-mo-file-name" data-detail="file-name">
-                    report_sever_capital_2026_03.pdf
+                    broker_kl003_2026_03.pdf
                   </p>
                   <p class="crm-mo-file-size" data-detail="file-size">
                     248 КБ
