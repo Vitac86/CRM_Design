@@ -27,6 +27,60 @@
   margin: 0;
 }
 
+.crm-dashboard-intro-text {
+  max-width: 920px;
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #64748b;
+}
+
+.crm-dashboard-section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(164px, 1fr));
+  gap: 10px;
+}
+
+.crm-dashboard-section-card {
+  min-height: 92px;
+  padding: 12px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.crm-dashboard-section-card:hover {
+  border-color: #c3d1e6;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.crm-dashboard-section-card:focus-visible {
+  outline: none;
+  border-color: #9db3df;
+  box-shadow: 0 0 0 3px rgba(50, 94, 212, 0.16), 0 5px 14px rgba(15, 23, 42, 0.08);
+}
+
+.crm-dashboard-section-card h2 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.crm-dashboard-section-card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #64748b;
+}
+
 .crm-dashboard-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

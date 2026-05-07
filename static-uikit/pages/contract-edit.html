@@ -15,7 +15,9 @@
       <div class="crm-layout">
         <aside class="crm-sidebar" data-entity="layout-sidebar">
           <div class="crm-sidebar-brand">
-            <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика" />
+            <a class="crm-sidebar-brand-link" href="dashboard.html" aria-label="На главную страницу CRM">
+              <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+            </a>
           </div>
           <nav class="crm-nav" aria-label="Основная навигация">
             <div class="crm-nav-group" data-group="front-office">
@@ -173,10 +175,7 @@
 
             <div class="crm-nav-group" data-group="middle-office">
               <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
-                <span>
-                  <span uk-icon="album"></span>
-                  Мидл-офис
-                </span>
+                <span><img class="crm-nav-icon crm-nav-icon-img" src="../assets/icons/Building A Fill.svg" alt="" aria-hidden="true"/>Мидл-офис</span>
                 <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
               </button>
               <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
@@ -190,7 +189,7 @@
                       aria-hidden="true"
                       focusable="false"
                     >
-                      <use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use>
+                      <use href="../assets/icons/crm-sidebar-icons.svg#icon-middle-office-clients"></use>
                     </svg>
                     Журнал клиентов
                   </span>
@@ -205,7 +204,7 @@
                       aria-hidden="true"
                       focusable="false"
                     >
-                      <use href="../assets/icons/crm-sidebar-icons.svg#icon-journal"></use>
+                      <use href="../assets/icons/crm-sidebar-icons.svg#icon-middle-office-reports"></use>
                     </svg>
                     Журнал отправленных отчётов
                   </span>
