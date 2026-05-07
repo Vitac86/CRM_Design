@@ -363,21 +363,23 @@
                       Заполнить адрес
                     </button>
                   </div>
-                  <div class="crm-address-row-fields">
+                  <div class="crm-address-display-line" data-address-row-fields="registration">
                     <textarea
                       class="uk-textarea crm-input crm-address-output"
                       name="registrationAddress"
                       data-address-output="registration"
                       rows="2"
+                      readonly
                       placeholder="Адрес регистрации"></textarea>
-                    <input
-                      class="uk-input crm-input crm-address-postal-input"
-                      type="text"
-                      name="registrationPostalCode"
-                      data-address-postal="registration"
-                      placeholder="Индекс"
-                      maxlength="6">
+                    <button
+                      type="button"
+                      class="uk-button uk-button-default crm-button crm-address-edit-btn"
+                      data-action="edit-address-parts"
+                      data-address-target="registration">
+                      Редактировать
+                    </button>
                   </div>
+                  <div class="crm-address-parts-editor" data-address-parts-editor="registration" hidden></div>
                   <div class="crm-fias-panel" data-fias-panel="registration" hidden>
                     <div
                       class="crm-fias-address-widget"
@@ -412,21 +414,23 @@
                     Совпадает с адресом регистрации
                     <span data-same-preview-text></span>
                   </div>
-                  <div class="crm-address-row-fields" data-address-row-fields="actual" hidden>
+                  <div class="crm-address-display-line" data-address-row-fields="actual" hidden>
                     <textarea
                       class="uk-textarea crm-input crm-address-output"
                       name="actualAddress"
                       data-address-output="actual"
                       rows="2"
+                      readonly
                       placeholder="Адрес проживания"></textarea>
-                    <input
-                      class="uk-input crm-input crm-address-postal-input"
-                      type="text"
-                      name="actualPostalCode"
-                      data-address-postal="actual"
-                      placeholder="Индекс"
-                      maxlength="6">
+                    <button
+                      type="button"
+                      class="uk-button uk-button-default crm-button crm-address-edit-btn"
+                      data-action="edit-address-parts"
+                      data-address-target="actual">
+                      Редактировать
+                    </button>
                   </div>
+                  <div class="crm-address-parts-editor" data-address-parts-editor="actual" hidden></div>
                   <div class="crm-fias-panel" data-fias-panel="actual" hidden>
                     <div
                       class="crm-fias-address-widget"
@@ -461,21 +465,23 @@
                     Совпадает с адресом регистрации
                     <span data-same-preview-text></span>
                   </div>
-                  <div class="crm-address-row-fields" data-address-row-fields="postal" hidden>
+                  <div class="crm-address-display-line" data-address-row-fields="postal" hidden>
                     <textarea
                       class="uk-textarea crm-input crm-address-output"
                       name="postalAddress"
                       data-address-output="postal"
                       rows="2"
+                      readonly
                       placeholder="Почтовый адрес"></textarea>
-                    <input
-                      class="uk-input crm-input crm-address-postal-input"
-                      type="text"
-                      name="postalCode"
-                      data-address-postal="postal"
-                      placeholder="Индекс"
-                      maxlength="6">
+                    <button
+                      type="button"
+                      class="uk-button uk-button-default crm-button crm-address-edit-btn"
+                      data-action="edit-address-parts"
+                      data-address-target="postal">
+                      Редактировать
+                    </button>
                   </div>
+                  <div class="crm-address-parts-editor" data-address-parts-editor="postal" hidden></div>
                   <div class="crm-fias-panel" data-fias-panel="postal" hidden>
                     <div
                       class="crm-fias-address-widget"

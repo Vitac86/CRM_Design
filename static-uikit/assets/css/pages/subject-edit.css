@@ -306,25 +306,89 @@ body[data-page="subject-edit"] .crm-btn-fill-address:hover {
   color: #fff;
 }
 
-body[data-page="subject-edit"] .crm-address-row-fields {
+body[data-page="subject-edit"] .crm-address-display-line {
   display: grid;
-  grid-template-columns: 1fr 96px;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
-  align-items: start;
+  align-items: stretch;
+}
+
+body[data-page="subject-edit"] .crm-address-display-line[hidden],
+body[data-page="subject-edit"] .crm-address-parts-editor[hidden] {
+  display: none;
 }
 
 body[data-page="subject-edit"] .crm-address-output {
   height: auto;
   min-height: 52px;
-  resize: vertical;
+  resize: none;
   font-size: 13px;
   border-radius: 7px;
 }
 
-body[data-page="subject-edit"] .crm-address-postal-input {
+body[data-page="subject-edit"] .crm-address-output[readonly] {
+  background: #f8faff;
+  color: var(--crm-umi-text);
+  border-color: #d7e3f2;
+  cursor: text;
+}
+
+body[data-page="subject-edit"] .crm-address-edit-btn {
+  align-self: start;
+  min-width: 122px;
   height: 36px;
   font-size: 13px;
+  white-space: nowrap;
+}
+
+body[data-page="subject-edit"] .crm-address-parts-editor {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #d7e3f2;
+  border-radius: 8px;
+  background: #f8faff;
+}
+
+body[data-page="subject-edit"] .crm-address-parts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+body[data-page="subject-edit"] .crm-address-part-field {
+  display: block;
+  min-width: 0;
+}
+
+body[data-page="subject-edit"] .crm-address-part-field--wide {
+  grid-column: span 3;
+}
+
+body[data-page="subject-edit"] .crm-address-part-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-umi-text-secondary);
+}
+
+body[data-page="subject-edit"] .crm-address-parts-grid .crm-input {
+  height: 34px;
+  font-size: 13px;
   border-radius: 7px;
+}
+
+body[data-page="subject-edit"] .crm-address-parts-grid textarea.crm-input {
+  height: auto;
+  min-height: 58px;
+  resize: vertical;
+}
+
+body[data-page="subject-edit"] .crm-address-parts-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 body[data-page="subject-edit"] .crm-address-same-note {
@@ -565,5 +629,27 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
     height: auto;
     min-height: 36px;
     justify-content: center;
+  }
+
+  body[data-page="subject-edit"] .crm-address-display-line,
+  body[data-page="subject-edit"] .crm-address-parts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="subject-edit"] .crm-address-edit-btn {
+    width: 100%;
+  }
+
+  body[data-page="subject-edit"] .crm-address-part-field--wide {
+    grid-column: span 1;
+  }
+
+  body[data-page="subject-edit"] .crm-address-parts-actions {
+    flex-direction: column-reverse;
+  }
+
+  body[data-page="subject-edit"] .crm-address-parts-actions .uk-button,
+  body[data-page="subject-edit"] .crm-address-parts-actions .crm-button {
+    width: 100%;
   }
 }

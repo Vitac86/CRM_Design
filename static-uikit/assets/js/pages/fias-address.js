@@ -4,10 +4,10 @@
  *
  * Architecture:
  *   - 3-row "Адреса" module in HTML (registration / actual / postal)
- *   - Each row has an editable textarea + postal input + "Заполнить адрес" button
+ *   - Each row has a readonly address display + "Редактировать" + optional "Заполнить адрес"
  *   - Clicking "Заполнить адрес" opens a FIAS panel for that row
  *   - FIAS panel: searchable combobox per level + "Итоговый адрес" preview + Отмена/Принять
- *   - "Принять" writes address + postal into the row textarea/input and closes panel
+ *   - "Принять" writes structured address parts into hidden fields and updates the readonly display
  *   - "Отмена" closes panel without modifying the row
  *   - Same-as-registration logic hides actual/postal independent fields when checked
  *
@@ -37,6 +37,28 @@
 
   const ORDER_ADMIN = [2, 5, 6, 7, 8, 9, 10, 11, 12, 17];
   const ORDER_MUNIC = [3, 5, 6, 7, 8, 9, 10, 11, 12, 17];
+
+  const ADDRESS_PART_KEYS = [
+    'postalCode', 'country', 'region', 'district', 'city', 'settlement',
+    'planningStructure', 'street', 'landPlot', 'house', 'building', 'flat',
+    'room', 'comment', 'fiasObjectId', 'fiasPath', 'addressType',
+    'isSameAsRegistration',
+  ];
+
+  const EDITOR_PART_FIELDS = [
+    { key: 'postalCode', label: 'Индекс', inputMode: 'numeric', maxLength: 6 },
+    { key: 'country', label: 'Страна' },
+    { key: 'region', label: 'Регион' },
+    { key: 'district', label: 'Район / муниципальный округ' },
+    { key: 'city', label: 'Город' },
+    { key: 'settlement', label: 'Населённый пункт' },
+    { key: 'street', label: 'Улица / территория' },
+    { key: 'house', label: 'Дом / строение' },
+    { key: 'building', label: 'Корпус / строение / литера' },
+    { key: 'flat', label: 'Квартира / помещение' },
+    { key: 'room', label: 'Комната' },
+    { key: 'comment', label: 'Комментарий / доп. сведения', textarea: true, wide: true },
+  ];
 
   /* cached regions shared across widgets on same page load */
   let _regionsCache = null;
@@ -173,6 +195,54 @@
       .replace(/ё/g, 'е')
       .replace(/[\s,.;:()№"']/g, ' ')
       .replace(/\s+/g, ' ').trim();
+  }
+
+  function duplicateKey(s) {
+    return canonical(s)
+      .replace(/^(г|город|ул|улица|д|дом|кв|квартира|помещение|комн|комната)\s+/i, '')
+      .trim();
+  }
+
+  function compactPart(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function addUniquePart(list, seen, value) {
+    const part = compactPart(value);
+    if (!part) return;
+    const key = duplicateKey(part);
+    if (key && seen.has(key)) return;
+    list.push(part);
+    if (key) seen.add(key);
+  }
+
+  function prefixedPart(value, prefix, re) {
+    const part = compactPart(value);
+    if (!part) return '';
+    return re.test(part) ? part : `${prefix} ${part}`;
+  }
+
+  function buildAddressFromParts(parts) {
+    const p = parts || {};
+    const list = [];
+    const seen = new Set();
+
+    addUniquePart(list, seen, p.postalCode);
+    addUniquePart(list, seen, p.country);
+    addUniquePart(list, seen, p.region);
+    addUniquePart(list, seen, p.district);
+    addUniquePart(list, seen, p.city);
+    addUniquePart(list, seen, p.settlement);
+    addUniquePart(list, seen, p.planningStructure);
+    addUniquePart(list, seen, p.landPlot);
+    addUniquePart(list, seen, p.street);
+    addUniquePart(list, seen, prefixedPart(p.house, 'д.', /^(д\.?|дом|вл\.?|владение|стр\.?|строение|соор\.?|сооружение)\s+/i));
+    addUniquePart(list, seen, prefixedPart(p.building, 'корп.', /^(корп\.?|корпус|стр\.?|строение|лит\.?|литера)\s+/i));
+    addUniquePart(list, seen, prefixedPart(p.flat, 'кв.', /^(кв\.?|квартира|пом\.?|помещение|оф\.?|офис)\s+/i));
+    addUniquePart(list, seen, prefixedPart(p.room, 'комн.', /^(комн\.?|комната)\s+/i));
+    addUniquePart(list, seen, p.comment);
+
+    return list.join(', ');
   }
 
   /* ── postal code extraction ─────────────────────────────────────────────────── */
@@ -347,6 +417,18 @@
     const text = codes.length ? `Индекс: ${codes.join(', ')}` : 'Индекс: —';
     if (state.el.postalPreview) state.el.postalPreview.textContent = text;
     setHidden(state, 'postalCode', codes.join(', '));
+    refreshWidgetAddressFull(state);
+  }
+
+  function refreshWidgetAddressFull(state) {
+    const widget = state.el.widgetEl;
+    if (!widget) return;
+    const parts = {};
+    ADDRESS_PART_KEYS.forEach(key => { parts[key] = getHiddenInEl(widget, key); });
+    const text = buildAddressFromParts(parts);
+    if (!text) return;
+    setHidden(state, 'addressFull', text);
+    if (state.el.addrPreview) state.el.addrPreview.textContent = text;
   }
 
   function fetchPostal(state, objectId) {
@@ -391,6 +473,37 @@
     if (f) f.value = value || '';
   }
 
+  function getHiddenInEl(el, key) {
+    const f = el?.querySelector(`[data-fias-field="${key}"]`);
+    return f ? f.value || '' : '';
+  }
+
+  function getAddressWidget(moduleEl, kind) {
+    return moduleEl?.querySelector(`[data-fias-address-widget][data-address-kind="${kind}"]`) || null;
+  }
+
+  function getAddressOutput(moduleEl, kind) {
+    return moduleEl?.querySelector(`[data-address-output="${kind}"]`) || null;
+  }
+
+  function readAddressParts(moduleEl, kind) {
+    const widget = getAddressWidget(moduleEl, kind);
+    const parts = {};
+    ADDRESS_PART_KEYS.forEach(key => { parts[key] = getHiddenInEl(widget, key); });
+    if (!parts.country && (parts.region || parts.fiasObjectId || parts.fiasPath)) parts.country = 'Россия';
+    return parts;
+  }
+
+  function writeAddressParts(moduleEl, kind, parts) {
+    const widget = getAddressWidget(moduleEl, kind);
+    if (!widget) return;
+    ADDRESS_PART_KEYS.forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(parts, key)) {
+        setHiddenInEl(widget, key, parts[key]);
+      }
+    });
+  }
+
   /* ── address text builder ──────────────────────────────────────────────────── */
   function buildAddressText(state) {
     const parts = [], seen = new Set();
@@ -407,13 +520,16 @@
       const cs = canonical(seg);
       if (!seen.has(cs)) { parts.push(seg); seen.add(cs); }
     }
-    const text = parts.length ? parts.join(', ') : '—';
-    if (state.el.addrPreview) state.el.addrPreview.textContent = text;
-    setHidden(state, 'addressFull', text !== '—' ? text : '');
+    const previewText = parts.length ? parts.join(', ') : '—';
     setHidden(state, 'region', state.region?.full_name || '');
+    setHidden(state, 'country', state.region ? 'Россия' : '');
     setHidden(state, 'addressType', state.divisionType);
 
-    const fields = { district: '', city: '', settlement: '', planningStructure: '', street: '', landPlot: '', house: '', flat: '', room: '', fiasObjectId: '', fiasPath: '' };
+    const fields = {
+      district: '', city: '', settlement: '', planningStructure: '', street: '',
+      landPlot: '', house: '', building: '', flat: '', room: '', comment: '',
+      fiasObjectId: '', fiasPath: '',
+    };
     for (const lvl of getOrder(state.divisionType)) {
       const sel = state.selectedByLevel.get(lvl);
       if (!sel) continue;
@@ -435,8 +551,26 @@
     for (const [k, v] of Object.entries(fields)) setHidden(state, k, v);
 
     ensurePostal(state);
+    const fullText = buildAddressFromParts({
+      postalCode: getHiddenInEl(state.el.widgetEl, 'postalCode'),
+      country: getHiddenInEl(state.el.widgetEl, 'country'),
+      region: getHiddenInEl(state.el.widgetEl, 'region'),
+      district: fields.district,
+      city: fields.city,
+      settlement: fields.settlement,
+      planningStructure: fields.planningStructure,
+      street: fields.street,
+      landPlot: fields.landPlot,
+      house: fields.house,
+      building: fields.building,
+      flat: fields.flat,
+      room: fields.room,
+      comment: fields.comment,
+    });
+    if (state.el.addrPreview) state.el.addrPreview.textContent = fullText || previewText;
+    setHidden(state, 'addressFull', fullText || (previewText !== '—' ? previewText : ''));
     notifyDependents(state);
-    return text;
+    return fullText || previewText;
   }
 
   /* ── notify dependent (same-as) widgets — mirrors hidden FIAS fields ─────────── */
@@ -588,7 +722,7 @@
       input.disabled = false;
       input.placeholder = 'Регионы недоступны';
       setStatus(state.el.topStatus, '');
-      showFallback(state, 'ФИАС-сервис недоступен. Введите адрес вручную в поле выше.');
+      showFallback(state, 'ФИАС-сервис недоступен. Введите адрес вручную через «Редактировать».');
     });
   }
 
@@ -754,11 +888,7 @@
     state.el.fallbackWrap = fallbackWrap;
 
     // 8. Hidden output fields
-    const hiddenKeys = [
-      'addressFull', 'postalCode', 'region', 'district', 'city', 'settlement',
-      'planningStructure', 'street', 'landPlot', 'house', 'flat', 'room',
-      'fiasObjectId', 'fiasPath', 'addressType', 'isSameAsRegistration',
-    ];
+    const hiddenKeys = ['addressFull', ...ADDRESS_PART_KEYS];
     const hiddenWrap = document.createElement('div');
     hiddenWrap.hidden = true;
     hiddenWrap.setAttribute('aria-hidden', 'true');
@@ -916,6 +1046,198 @@
     });
   }
 
+  /* ── manual parts editor helpers ───────────────────────────────────────────── */
+  function isAddressModuleRfResident(moduleEl) {
+    const editResidency = document.getElementById('ind-residency');
+    if (editResidency) return editResidency.value !== 'nonresident';
+
+    const flResidency = document.querySelector('input[type="radio"][name="fl-residency"]:checked');
+    if (flResidency) return flResidency.value === 'rf';
+
+    return true;
+  }
+
+  function shouldShowFillButton(moduleEl, kind) {
+    if (!isAddressModuleRfResident(moduleEl)) return false;
+    const sameCheck = moduleEl.querySelector(`[data-address-same-as][data-address-target="${kind}"]`);
+    return !sameCheck || !sameCheck.checked;
+  }
+
+  function syncFillButton(moduleEl, kind) {
+    const fillBtn = moduleEl.querySelector(`[data-action="open-fias-address"][data-address-target="${kind}"]`);
+    if (fillBtn) fillBtn.hidden = !shouldShowFillButton(moduleEl, kind);
+  }
+
+  function closeFiasPanels(moduleEl) {
+    moduleEl?.querySelectorAll('[data-fias-panel]').forEach(panel => { panel.hidden = true; });
+  }
+
+  function closePartsEditors(moduleEl, exceptEditor) {
+    moduleEl?.querySelectorAll('[data-address-parts-editor]').forEach(editor => {
+      if (editor !== exceptEditor) editor.hidden = true;
+    });
+  }
+
+  function hasMeaningfulParts(parts) {
+    return [
+      'postalCode', 'region', 'district', 'city', 'settlement',
+      'planningStructure', 'street', 'landPlot', 'house', 'building',
+      'flat', 'room', 'comment',
+    ].some(key => compactPart(parts?.[key]));
+  }
+
+  function fallbackPartsFromDisplay(text) {
+    const parts = {};
+    let rest = compactPart(text);
+    const postalMatch = rest.match(/^(\d{6})(?:\s*,\s*)?/);
+    if (postalMatch) {
+      parts.postalCode = postalMatch[1];
+      rest = rest.slice(postalMatch[0].length).trim();
+    }
+    if (rest) parts.comment = rest;
+    return parts;
+  }
+
+  function getCurrentAddressParts(moduleEl, kind) {
+    const output = getAddressOutput(moduleEl, kind);
+    const parts = readAddressParts(moduleEl, kind);
+
+    if (!hasMeaningfulParts(parts) && output?.value) {
+      Object.assign(parts, fallbackPartsFromDisplay(output.value));
+    } else if (!parts.postalCode && output?.value) {
+      const fallback = fallbackPartsFromDisplay(output.value);
+      if (fallback.postalCode) parts.postalCode = fallback.postalCode;
+    }
+
+    if (!parts.country && hasMeaningfulParts(parts)) {
+      parts.country = isAddressModuleRfResident(moduleEl) ? 'Россия' : '';
+    }
+
+    if (!parts.street) {
+      parts.street = [parts.planningStructure, parts.landPlot].filter(Boolean).join(', ');
+    }
+
+    return parts;
+  }
+
+  function buildPartsEditor(editor) {
+    if (!editor || editor.dataset.addressPartsReady === 'true') return;
+    const grid = document.createElement('div');
+    grid.className = 'crm-address-parts-grid';
+
+    EDITOR_PART_FIELDS.forEach(def => {
+      const label = document.createElement('label');
+      label.className = `crm-address-part-field${def.wide ? ' crm-address-part-field--wide' : ''}`;
+
+      const caption = document.createElement('span');
+      caption.className = 'crm-address-part-label';
+      caption.textContent = def.label;
+
+      const field = def.textarea ? document.createElement('textarea') : document.createElement('input');
+      field.className = def.textarea ? 'uk-textarea crm-input' : 'uk-input crm-input';
+      field.dataset.addressPart = def.key;
+      if (!def.textarea) field.type = 'text';
+      if (def.inputMode) field.inputMode = def.inputMode;
+      if (def.maxLength) field.maxLength = def.maxLength;
+      if (def.textarea) field.rows = 2;
+      field.autocomplete = 'off';
+
+      label.append(caption, field);
+      grid.appendChild(label);
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'crm-address-parts-actions';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'uk-button uk-button-default crm-button';
+    cancelBtn.dataset.action = 'cancel-address-parts';
+    cancelBtn.textContent = 'Отмена';
+
+    const okBtn = document.createElement('button');
+    okBtn.type = 'button';
+    okBtn.className = 'uk-button uk-button-primary crm-button';
+    okBtn.dataset.action = 'apply-address-parts';
+    okBtn.textContent = 'ОК';
+
+    actions.append(cancelBtn, okBtn);
+    editor.append(grid, actions);
+    editor.dataset.addressPartsReady = 'true';
+  }
+
+  function fillPartsEditor(editor, parts) {
+    EDITOR_PART_FIELDS.forEach(def => {
+      const field = editor.querySelector(`[data-address-part="${def.key}"]`);
+      if (field) field.value = parts?.[def.key] || '';
+    });
+  }
+
+  function collectPartsFromEditor(moduleEl, kind, editor) {
+    const parts = readAddressParts(moduleEl, kind);
+    EDITOR_PART_FIELDS.forEach(def => {
+      const field = editor.querySelector(`[data-address-part="${def.key}"]`);
+      if (field) parts[def.key] = compactPart(field.value);
+    });
+    if (!parts.addressType) parts.addressType = parts.fiasObjectId ? 'admin' : 'manual';
+    parts.addressFull = buildAddressFromParts(parts);
+    return parts;
+  }
+
+  function applyAddressParts(moduleEl, kind, parts) {
+    const widget = getAddressWidget(moduleEl, kind);
+    const output = getAddressOutput(moduleEl, kind);
+    const addressText = buildAddressFromParts(parts) || compactPart(parts?.addressFull);
+
+    writeAddressParts(moduleEl, kind, parts);
+    if (widget) setHiddenInEl(widget, 'addressFull', addressText);
+    if (output) output.value = addressText;
+
+    if (kind === 'registration') {
+      updateSameNoteText(moduleEl, addressText);
+    }
+  }
+
+  function initAddressPartsEditors() {
+    document.querySelectorAll('[data-address-parts-editor]').forEach(buildPartsEditor);
+
+    document.querySelectorAll('[data-action="edit-address-parts"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const kind = btn.dataset.addressTarget;
+        const moduleEl = btn.closest('[data-address-module]');
+        if (!moduleEl || !kind) return;
+        const editor = moduleEl.querySelector(`[data-address-parts-editor="${kind}"]`);
+        if (!editor) return;
+
+        buildPartsEditor(editor);
+        closeFiasPanels(moduleEl);
+        closePartsEditors(moduleEl, editor);
+        fillPartsEditor(editor, getCurrentAddressParts(moduleEl, kind));
+        editor.hidden = false;
+      });
+    });
+
+    document.querySelectorAll('[data-action="cancel-address-parts"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const editor = btn.closest('[data-address-parts-editor]');
+        if (editor) editor.hidden = true;
+      });
+    });
+
+    document.querySelectorAll('[data-action="apply-address-parts"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const editor = btn.closest('[data-address-parts-editor]');
+        const moduleEl = btn.closest('[data-address-module]');
+        if (!editor || !moduleEl) return;
+        const kind = editor.dataset.addressPartsEditor;
+        if (!kind) return;
+        const parts = collectPartsFromEditor(moduleEl, kind, editor);
+        applyAddressParts(moduleEl, kind, parts);
+        editor.hidden = true;
+      });
+    });
+  }
+
   /* ── address module: panel open / close / accept ───────────────────────────── */
   function initAddressModule() {
     // "Заполнить адрес" — open FIAS panel for that row
@@ -924,8 +1246,10 @@
         const target = btn.dataset.addressTarget;
         const moduleEl = btn.closest('[data-address-module]');
         if (!moduleEl) return;
+        if (!shouldShowFillButton(moduleEl, target)) return;
         // Close other open panels in this module first
-        moduleEl.querySelectorAll('[data-fias-panel]').forEach(p => { p.hidden = true; });
+        closeFiasPanels(moduleEl);
+        closePartsEditors(moduleEl);
         const panel = moduleEl.querySelector(`[data-fias-panel="${target}"]`);
         if (panel) panel.hidden = false;
       });
@@ -939,7 +1263,7 @@
       });
     });
 
-    // "Принять" — write selected address into the row textarea + postal input
+    // "Принять" — write selected FIAS parts into hidden fields + readonly display
     document.querySelectorAll('[data-action="fias-accept"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.dataset.addressTarget;
@@ -950,20 +1274,10 @@
 
         const widget = panel.querySelector('[data-fias-address-widget]');
         if (widget) {
-          const addrField  = widget.querySelector('[data-fias-field="addressFull"]');
-          const postalField = widget.querySelector('[data-fias-field="postalCode"]');
-          const addrText   = (addrField?.value || '').trim();
-          const postalText = (postalField?.value || '').trim();
-
-          const addrOutput   = moduleEl.querySelector(`[data-address-output="${target}"]`);
-          const postalOutput = moduleEl.querySelector(`[data-address-postal="${target}"]`);
-
-          if (addrOutput && addrText) addrOutput.value = addrText;
-          if (postalOutput)           postalOutput.value = postalText;
-
-          if (target === 'registration') {
-            updateSameNoteText(moduleEl, addrText);
-          }
+          const parts = readAddressParts(moduleEl, target);
+          const addrText = buildAddressFromParts(parts) || getHiddenInEl(widget, 'addressFull');
+          setHiddenInEl(widget, 'addressFull', addrText);
+          applyAddressParts(moduleEl, target, { ...parts, addressFull: addrText });
         }
         panel.hidden = true;
       });
@@ -972,13 +1286,23 @@
 
   /* ── same-note preview text helper ─────────────────────────────────────────── */
   function updateSameNoteText(moduleEl, addrText) {
+    const sourceWidget = getAddressWidget(moduleEl, 'registration');
     moduleEl.querySelectorAll('[data-address-same-as="registration"]').forEach(cb => {
       if (!cb.checked) return;
       const targetKind = cb.dataset.addressTarget;
       const note = moduleEl.querySelector(`[data-address-same-note="${targetKind}"]`);
-      if (!note) return;
-      const preview = note.querySelector('[data-same-preview-text]');
-      if (preview) preview.textContent = addrText || '';
+      const targetOutput = getAddressOutput(moduleEl, targetKind);
+      const targetWidget = getAddressWidget(moduleEl, targetKind);
+
+      if (note) {
+        const preview = note.querySelector('[data-same-preview-text]');
+        if (preview) preview.textContent = addrText || '';
+      }
+      if (targetOutput) targetOutput.value = addrText || '';
+      if (sourceWidget && targetWidget) {
+        mirrorHiddenFields(sourceWidget, targetWidget);
+        setHiddenInEl(targetWidget, 'isSameAsRegistration', 'true');
+      }
     });
   }
 
@@ -996,9 +1320,11 @@
         const rowFields  = moduleEl.querySelector(`[data-address-row-fields="${targetKind}"]`);
         const fillBtn    = moduleEl.querySelector(`[data-action="open-fias-address"][data-address-target="${targetKind}"]`);
         const panel      = moduleEl.querySelector(`[data-fias-panel="${targetKind}"]`);
+        const editor     = moduleEl.querySelector(`[data-address-parts-editor="${targetKind}"]`);
         const tgtWidget  = moduleEl.querySelector(`[data-fias-address-widget][data-address-kind="${targetKind}"]`);
         const srcWidget  = moduleEl.querySelector(`[data-fias-address-widget][data-address-kind="${sourceKind}"]`);
         const srcOutput  = moduleEl.querySelector(`[data-address-output="${sourceKind}"]`);
+        const tgtOutput  = moduleEl.querySelector(`[data-address-output="${targetKind}"]`);
 
         if (cb.checked) {
           if (note) {
@@ -1009,6 +1335,8 @@
           if (rowFields) rowFields.hidden = true;
           if (fillBtn)   fillBtn.hidden   = true;
           if (panel)     panel.hidden     = true;
+          if (editor)    editor.hidden    = true;
+          if (tgtOutput) tgtOutput.value  = srcOutput?.value || '';
           if (tgtWidget) {
             setHiddenInEl(tgtWidget, 'isSameAsRegistration', 'true');
             if (srcWidget) mirrorHiddenFields(srcWidget, tgtWidget);
@@ -1016,7 +1344,7 @@
         } else {
           if (note)      note.hidden     = true;
           if (rowFields) rowFields.hidden = false;
-          if (fillBtn)   fillBtn.hidden   = false;
+          syncFillButton(moduleEl, targetKind);
           if (tgtWidget) setHiddenInEl(tgtWidget, 'isSameAsRegistration', 'false');
         }
       }
@@ -1026,7 +1354,7 @@
     });
   }
 
-  /* ── registration textarea → mirror same-as note previews on manual edits ─── */
+  /* ── registration output → mirror same-as previews if legacy scripts write it ─ */
   function wireRegistrationTextareaInput() {
     document.querySelectorAll('[data-address-output="registration"]').forEach(textarea => {
       const moduleEl = textarea.closest('[data-address-module]');
@@ -1049,6 +1377,7 @@
     });
 
     initSameAsCheckboxes();
+    initAddressPartsEditors();
     initAddressModule();
     wireRegistrationTextareaInput();
   }

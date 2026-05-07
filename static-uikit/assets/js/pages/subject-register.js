@@ -447,16 +447,28 @@
     }
   });
 
-  /* ── FL residency toggle (RF resident → FIAS block; non-resident → manual) ── */
+  /* ── FL residency toggle: RF resident gets FIAS buttons, non-resident edits manually ── */
   (function () {
     var fiasBlock   = document.getElementById('fl-address-fias');
     var manualBlock = document.getElementById('fl-address-manual');
 
     function applyResidency(value) {
-      if (!fiasBlock || !manualBlock) return;
+      if (!fiasBlock) return;
       var isRf = value === 'rf';
-      fiasBlock.hidden   = !isRf;
-      manualBlock.hidden = isRf;
+      fiasBlock.hidden = false;
+      if (manualBlock) manualBlock.hidden = true;
+
+      fiasBlock.querySelectorAll('.crm-btn-fill-address[data-address-target]').forEach(function (btn) {
+        var target = btn.getAttribute('data-address-target');
+        var sameCheck = fiasBlock.querySelector('[data-address-same-as][data-address-target="' + target + '"]');
+        btn.hidden = !isRf || !!(sameCheck && sameCheck.checked);
+      });
+
+      if (!isRf) {
+        fiasBlock.querySelectorAll('[data-fias-panel]').forEach(function (panel) {
+          panel.hidden = true;
+        });
+      }
     }
 
     document.querySelectorAll('input[type="radio"][name="fl-residency"]').forEach(function (radio) {
@@ -465,7 +477,7 @@
       });
     });
 
-    // Apply initial state (default: RF resident — FIAS block visible)
+    // Apply initial state (default: RF resident — FIAS buttons visible)
     var checked = document.querySelector('input[type="radio"][name="fl-residency"]:checked');
     applyResidency(checked ? checked.value : 'rf');
   }());
