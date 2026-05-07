@@ -228,8 +228,16 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 body[data-page="subject-edit"] .crm-address-rows {
   border: 1px solid #c8d8ee;
   border-radius: 10px;
-  overflow: hidden;
   background: #f8faff;
+  /* overflow intentionally omitted — combobox dropdowns must be able to overflow */
+}
+
+body[data-page="subject-edit"] .crm-address-row:first-child {
+  border-radius: 9px 9px 0 0;
+}
+
+body[data-page="subject-edit"] .crm-address-row:last-child {
+  border-radius: 0 0 9px 9px;
 }
 
 body[data-page="subject-edit"] .crm-address-row {
@@ -420,24 +428,52 @@ body[data-page="subject-edit"] .crm-fias-level-row {
   gap: 3px;
 }
 
-body[data-page="subject-edit"] .crm-fias-combo {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+body[data-page="subject-edit"] .crm-fias-combobox {
+  position: relative;
+  width: 100%;
 }
 
-body[data-page="subject-edit"] .crm-fias-filter {
-  flex: 0 0 150px;
+body[data-page="subject-edit"] .crm-fias-combobox-input {
+  width: 100%;
   height: 30px;
   font-size: 12px;
   border-radius: 6px;
 }
 
-body[data-page="subject-edit"] .crm-fias-select {
-  flex: 1;
-  height: 30px;
-  font-size: 12px;
+body[data-page="subject-edit"] .crm-fias-combobox-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 300;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #c8d8ee;
   border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.13);
+}
+
+body[data-page="subject-edit"] .crm-fias-combobox-item {
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  color: var(--crm-umi-text);
+}
+
+body[data-page="subject-edit"] .crm-fias-combobox-item:hover,
+body[data-page="subject-edit"] .crm-fias-combobox-item.is-active {
+  background: #eef4fd;
+}
+
+body[data-page="subject-edit"] .crm-fias-combobox-item--empty {
+  color: var(--crm-umi-text-muted);
+  cursor: default;
+}
+
+body[data-page="subject-edit"] .crm-fias-combobox-item--empty:hover {
+  background: transparent;
 }
 
 body[data-page="subject-edit"] .crm-fias-meta {

@@ -6,7 +6,7 @@
  *   - 3-row "Адреса" module in HTML (registration / actual / postal)
  *   - Each row has an editable textarea + postal input + "Заполнить адрес" button
  *   - Clicking "Заполнить адрес" opens a FIAS panel for that row
- *   - FIAS panel: compact level selectors + "Итоговый адрес" preview + Отмена/Принять
+ *   - FIAS panel: searchable combobox per level + "Итоговый адрес" preview + Отмена/Принять
  *   - "Принять" writes address + postal into the row textarea/input and closes panel
  *   - "Отмена" closes panel without modifying the row
  *   - Same-as-registration logic hides actual/postal independent fields when checked
@@ -260,9 +260,9 @@
     const ui = state.uiByLevel.get(level);
     if (!ui) return;
     ui.wrap.hidden = true;
-    ui.select.disabled = true;
-    ui.select.innerHTML = '';
-    ui.filter.value = '';
+    ui.menu.hidden = true;
+    ui.menu.innerHTML = '';
+    ui.input.value = '';
     ui.meta.textContent = '';
     state.optionsFullByLevel.delete(level);
     state.selectedByLevel.delete(level);
@@ -272,32 +272,39 @@
     for (const lvl of Object.keys(FIELD_DEFS).map(Number)) hideLevel(state, lvl);
   }
 
-  function renderOptions(state, level, displayList, selectedId) {
+  /* Build combobox menu items from a display list */
+  function renderOptions(state, level, displayList) {
     const ui = state.uiByLevel.get(level);
     if (!ui) return;
-    const def = FIELD_DEFS[level];
     const sorted = sortForLevel(level, displayList);
-    ui.select.innerHTML = '';
-    const ph = document.createElement('option');
-    ph.value = '';
-    ph.textContent = `— ${def.hint} —`;
-    ui.select.appendChild(ph);
+    const currentSelected = state.selectedByLevel.get(level);
+
+    ui.menu.innerHTML = '';
     for (const a of sorted) {
-      const opt = document.createElement('option');
-      opt.value = String(a.object_id);
-      opt.textContent = shortName(a);
-      ui.select.appendChild(opt);
+      const item = document.createElement('div');
+      item.className = 'crm-fias-combobox-item';
+      item.dataset.id = String(a.object_id);
+      item.textContent = shortName(a);
+      if (currentSelected && String(a.object_id) === String(currentSelected.object_id)) {
+        item.classList.add('is-active');
+      }
+      ui.menu.appendChild(item);
     }
-    ui.select.disabled = false;
+    if (!sorted.length) {
+      const empty = document.createElement('div');
+      empty.className = 'crm-fias-combobox-item crm-fias-combobox-item--empty';
+      empty.textContent = 'Нет вариантов';
+      ui.menu.appendChild(empty);
+    }
+
     ui.wrap.hidden = false;
     ui.meta.textContent = `вариантов: ${sorted.length}`;
-    if (selectedId != null) ui.select.value = String(selectedId);
   }
 
   function applyFilter(state, level) {
     const ui = state.uiByLevel.get(level);
     if (!ui || ui.wrap.hidden) return;
-    const q = ui.filter.value.trim().toLowerCase();
+    const q = ui.input.value.trim().toLowerCase();
     const full = state.optionsFullByLevel.get(level) || [];
     const selected = state.selectedByLevel.get(level) || null;
     let filtered = q
@@ -306,8 +313,8 @@
     if (selected && !filtered.some(x => String(x.object_id) === String(selected.object_id))) {
       filtered = [selected, ...filtered];
     }
-    renderOptions(state, level, filtered, selected?.object_id ?? null);
-    ui.meta.textContent = q ? `вариантов: ${filtered.length} (фильтр: "${q}")` : `вариантов: ${filtered.length}`;
+    renderOptions(state, level, filtered);
+    ui.meta.textContent = q ? `вариантов: ${filtered.length} (фильтр)` : `вариантов: ${filtered.length}`;
   }
 
   function ensureSelected(state, level, addr) {
@@ -319,7 +326,7 @@
     state.selectedByLevel.set(level, addr);
     applyFilter(state, level);
     const ui = state.uiByLevel.get(level);
-    if (ui) ui.select.value = String(addr.object_id);
+    if (ui) ui.input.value = shortName(addr);
   }
 
   /* ── postal code ───────────────────────────────────────────────────────────── */
@@ -480,7 +487,7 @@
         if (r.items?.length) {
           const sorted = sortForLevel(r.lvl, r.items);
           state.optionsFullByLevel.set(r.lvl, sorted);
-          renderOptions(state, r.lvl, sorted, null);
+          renderOptions(state, r.lvl, sorted);
         } else {
           hideLevel(state, r.lvl);
         }
@@ -534,28 +541,52 @@
     }
   }
 
+  /* ── region combobox filter ────────────────────────────────────────────────── */
+  function applyRegionFilter(state) {
+    const input = state.el.regionInput;
+    const menu = state.el.regionMenu;
+    if (!input || !menu) return;
+    const q = input.value.trim().toLowerCase();
+    const filtered = q
+      ? state.regions.filter(r => (r.full_name || '').toLowerCase().includes(q))
+      : state.regions;
+    menu.innerHTML = '';
+    for (const r of filtered) {
+      const item = document.createElement('div');
+      item.className = 'crm-fias-combobox-item';
+      item.dataset.id = String(r.object_id);
+      item.textContent = r.full_name || `id=${r.object_id}`;
+      if (state.region && String(state.region.object_id) === String(r.object_id)) {
+        item.classList.add('is-active');
+      }
+      menu.appendChild(item);
+    }
+    if (!filtered.length) {
+      const empty = document.createElement('div');
+      empty.className = 'crm-fias-combobox-item crm-fias-combobox-item--empty';
+      empty.textContent = 'Нет вариантов';
+      menu.appendChild(empty);
+    }
+  }
+
   /* ── region loading ────────────────────────────────────────────────────────── */
   function loadRegions(state) {
-    const sel = state.el.regionSelect;
-    if (!sel) return;
-    sel.innerHTML = '<option value="">— загрузка… —</option>';
-    sel.disabled = true;
+    const input = state.el.regionInput;
+    const menu = state.el.regionMenu;
+    if (!input || !menu) return;
+    input.disabled = true;
+    input.placeholder = 'Загрузка…';
     setStatus(state.el.topStatus, 'Загружаю регионы…');
 
     apiGetRegions().then(regions => {
       state.regions = regions;
-      sel.innerHTML = '<option value="">— выберите регион —</option>';
-      for (const r of regions) {
-        const opt = document.createElement('option');
-        opt.value = String(r.object_id);
-        opt.textContent = r.full_name || `id=${r.object_id}`;
-        sel.appendChild(opt);
-      }
-      sel.disabled = false;
+      input.disabled = false;
+      input.placeholder = 'Выберите регион…';
+      applyRegionFilter(state);
       setStatus(state.el.topStatus, `Регионов: ${regions.length}`);
     }).catch(() => {
-      sel.innerHTML = '<option value="">— регионы недоступны —</option>';
-      sel.disabled = false;
+      input.disabled = false;
+      input.placeholder = 'Регионы недоступны';
       setStatus(state.el.topStatus, '');
       showFallback(state, 'ФИАС-сервис недоступен. Введите адрес вручную в поле выше.');
     });
@@ -592,7 +623,7 @@
     inner.appendChild(topStatus);
     state.el.topStatus = topStatus;
 
-    // 3. Region row — compact: label + combo (filter + select) side by side
+    // 3. Region row — searchable combobox
     const regionRow = document.createElement('div');
     regionRow.className = 'crm-fias-level-row';
 
@@ -600,31 +631,87 @@
     regionLabel.className = 'crm-fias-label';
     regionLabel.textContent = 'Регион';
 
-    const regionCombo = document.createElement('div');
-    regionCombo.className = 'crm-fias-combo';
+    const regionCombobox = document.createElement('div');
+    regionCombobox.className = 'crm-fias-combobox';
 
-    const regionFilter = document.createElement('input');
-    regionFilter.className = 'uk-input crm-input crm-fias-filter';
-    regionFilter.type = 'text';
-    regionFilter.placeholder = 'Фильтр…';
+    const regionInput = document.createElement('input');
+    regionInput.className = 'uk-input crm-input crm-fias-combobox-input';
+    regionInput.type = 'text';
+    regionInput.placeholder = 'Выберите регион…';
+    regionInput.autocomplete = 'off';
 
-    const regionSel = document.createElement('select');
-    regionSel.className = 'uk-select crm-select crm-fias-select';
+    const regionMenu = document.createElement('div');
+    regionMenu.className = 'crm-fias-combobox-menu';
+    regionMenu.hidden = true;
 
-    regionCombo.append(regionFilter, regionSel);
-    regionRow.append(regionLabel, regionCombo);
+    regionCombobox.append(regionInput, regionMenu);
+    regionRow.append(regionLabel, regionCombobox);
     inner.appendChild(regionRow);
-    state.el.regionSelect = regionSel;
-    state.el.regionFilter = regionFilter;
+    state.el.regionInput = regionInput;
+    state.el.regionMenu = regionMenu;
 
-    // Region filter
-    regionFilter.addEventListener('input', () => {
-      const q = regionFilter.value.trim().toLowerCase();
-      const cur = regionSel.value;
-      Array.from(regionSel.options).forEach(o => {
-        o.hidden = q ? !o.textContent.toLowerCase().includes(q) : false;
-      });
-      if (cur) regionSel.value = cur;
+    // Region combobox: open on focus
+    regionInput.addEventListener('focus', () => {
+      applyRegionFilter(state);
+      regionMenu.hidden = false;
+    });
+
+    // Region combobox: filter on input
+    regionInput.addEventListener('input', () => {
+      applyRegionFilter(state);
+      regionMenu.hidden = false;
+    });
+
+    // Region combobox: close / deselect / revert on blur
+    regionInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (regionMenu.hidden) return;
+        regionMenu.hidden = true;
+        if (!regionInput.value.trim()) {
+          if (state.region) {
+            if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
+            state.region = null;
+            state.currentPath = null;
+            hideAllLevels(state);
+            state.selectedByLevel.clear();
+            state.optionsFullByLevel.clear();
+            buildAddressText(state);
+          }
+        } else {
+          regionInput.value = state.region ? (state.region.full_name || '') : '';
+        }
+      }, 150);
+    });
+
+    // Region combobox: Escape closes and reverts
+    regionInput.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        regionMenu.hidden = true;
+        regionInput.value = state.region ? (state.region.full_name || '') : '';
+        regionInput.blur();
+      }
+    });
+
+    // Region combobox: item click → select region and load levels
+    regionMenu.addEventListener('click', e => {
+      const item = e.target.closest('.crm-fias-combobox-item');
+      if (!item || item.classList.contains('crm-fias-combobox-item--empty')) return;
+      const id = item.dataset.id;
+      const region = state.regions.find(r => String(r.object_id) === id);
+      if (!region) return;
+      if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
+      state.region = region;
+      regionInput.value = region.full_name || '';
+      regionMenu.hidden = true;
+      regionMenu.querySelectorAll('.crm-fias-combobox-item').forEach(el => el.classList.remove('is-active'));
+      item.classList.add('is-active');
+      hideAllLevels(state);
+      state.selectedByLevel.clear();
+      state.optionsFullByLevel.clear();
+      const basePath = region.path || String(id);
+      state.currentPath = String(basePath);
+      buildAddressText(state);
+      loadNextLevels(state, 'region', basePath);
     });
 
     // 4. Mid status
@@ -689,10 +776,10 @@
     state.el.widgetEl = widgetEl;
 
     installLevelRows(state, levelsContainer);
-    wireWidgetEvents(state, divRow, regionSel);
+    wireWidgetEvents(state, divRow);
   }
 
-  /* ── level rows: compact (label / [filter + select] / meta) ────────────────── */
+  /* ── level rows: searchable combobox (input + dropdown menu) per level ─────── */
   function installLevelRows(state, container) {
     container.innerHTML = '';
     state.uiByLevel.clear();
@@ -708,48 +795,94 @@
       label.className = 'crm-fias-label';
       label.textContent = def.label;
 
-      // Compact combo: filter + select on one line
-      const combo = document.createElement('div');
-      combo.className = 'crm-fias-combo';
+      const combobox = document.createElement('div');
+      combobox.className = 'crm-fias-combobox';
 
-      const filter = document.createElement('input');
-      filter.className = 'uk-input crm-input crm-fias-filter';
-      filter.type = 'text';
-      filter.placeholder = 'Фильтр…';
+      const input = document.createElement('input');
+      input.className = 'uk-input crm-input crm-fias-combobox-input';
+      input.type = 'text';
+      input.placeholder = def.hint;
+      input.autocomplete = 'off';
 
-      const sel = document.createElement('select');
-      sel.className = 'uk-select crm-select crm-fias-select';
-      sel.disabled = true;
+      const menu = document.createElement('div');
+      menu.className = 'crm-fias-combobox-menu';
+      menu.hidden = true;
 
       const meta = document.createElement('div');
       meta.className = 'crm-fias-meta';
 
-      combo.append(filter, sel);
-      wrap.append(label, combo, meta);
+      combobox.append(input, menu);
+      wrap.append(label, combobox, meta);
       container.appendChild(wrap);
-      state.uiByLevel.set(level, { wrap, filter, select: sel, meta });
+      state.uiByLevel.set(level, { wrap, input, menu, meta });
 
-      filter.addEventListener('input', () => { if (!wrap.hidden) applyFilter(state, level); });
-
-      sel.addEventListener('change', () => {
-        const val = sel.value;
-        const order = getOrder(state.divisionType);
-        const idx = order.indexOf(level);
-        if (!val) {
-          // Deselected: clear this level's selection, hide + clear only levels below
-          state.selectedByLevel.delete(level);
-          if (idx >= 0) for (let i = idx + 1; i < order.length; i++) hideLevel(state, order[i]);
-          buildAddressText(state);
-          return;
+      // Open dropdown on focus
+      input.addEventListener('focus', () => {
+        if (!wrap.hidden) {
+          applyFilter(state, level);
+          menu.hidden = false;
         }
+      });
+
+      // Filter on typing
+      input.addEventListener('input', () => {
+        if (!wrap.hidden) {
+          applyFilter(state, level);
+          menu.hidden = false;
+        }
+      });
+
+      // Close / deselect / revert on blur — 150ms so click on menu item fires first
+      input.addEventListener('blur', () => {
+        setTimeout(() => {
+          if (menu.hidden) return; // click handler already closed it
+          menu.hidden = true;
+          const currentSelected = state.selectedByLevel.get(level);
+          if (!input.value.trim()) {
+            if (currentSelected) {
+              state.selectedByLevel.delete(level);
+              const order = getOrder(state.divisionType);
+              const idx = order.indexOf(level);
+              if (idx >= 0) for (let i = idx + 1; i < order.length; i++) hideLevel(state, order[i]);
+              buildAddressText(state);
+            }
+          } else {
+            // Revert to selected display name (or clear if nothing was selected)
+            input.value = currentSelected ? shortName(currentSelected) : '';
+          }
+        }, 150);
+      });
+
+      // Escape: close menu, revert input to current selection
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          menu.hidden = true;
+          const currentSelected = state.selectedByLevel.get(level);
+          input.value = currentSelected ? shortName(currentSelected) : '';
+          input.blur();
+        }
+      });
+
+      // Item click: select and trigger cascade
+      menu.addEventListener('click', e => {
+        const item = e.target.closest('.crm-fias-combobox-item');
+        if (!item || item.classList.contains('crm-fias-combobox-item--empty')) return;
+        const id = item.dataset.id;
         const full = state.optionsFullByLevel.get(level) || [];
-        const chosen = full.find(x => String(x.object_id) === val);
+        const chosen = full.find(x => String(x.object_id) === id);
         if (!chosen) return;
 
         state.selectedByLevel.set(level, chosen);
+        input.value = shortName(chosen);
+        menu.hidden = true;
+        menu.querySelectorAll('.crm-fias-combobox-item').forEach(el => el.classList.remove('is-active'));
+        item.classList.add('is-active');
+
         if (chosen.hierarchy && chosen.path) syncParents(state, chosen);
 
-        // Hide + clear all levels below the selected one
+        // Clear levels below the selected one
+        const order = getOrder(state.divisionType);
+        const idx = order.indexOf(level);
         if (idx >= 0) for (let i = idx + 1; i < order.length; i++) hideLevel(state, order[i]);
 
         const nextPath = chosen.path || (state.currentPath ? `${state.currentPath}.${chosen.object_id}` : String(chosen.object_id));
@@ -760,19 +893,20 @@
     }
   }
 
-  /* ── widget event wiring ───────────────────────────────────────────────────── */
-  function wireWidgetEvents(state, divRow, regionSel) {
-    // Division type change — keep region, reload children for new division type
+  /* ── widget event wiring — division type radio only ───────────────────────── */
+  function wireWidgetEvents(state, divRow) {
     divRow.querySelectorAll('input[type="radio"]').forEach(radio => {
       radio.addEventListener('change', () => {
         if (!radio.checked || radio.value === state.divisionType) return;
         const prevRegion = state.region;
+        const prevRegionName = state.el.regionInput?.value || '';
         state.divisionType = radio.value;
         if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
         hideAllLevels(state);
         state.selectedByLevel.clear();
         state.optionsFullByLevel.clear();
         state.region = prevRegion; // preserved — no reset
+        if (state.el.regionInput) state.el.regionInput.value = prevRegionName;
         buildAddressText(state);
         if (state.region) {
           const basePath = state.region.path || String(state.region.object_id);
@@ -780,36 +914,12 @@
         }
       });
     });
-
-    // Region change — clear all lower levels and reload
-    regionSel.addEventListener('change', () => {
-      if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
-      const id = regionSel.value;
-      if (!id) {
-        state.region = null;
-        state.currentPath = null;
-        hideAllLevels(state);
-        state.selectedByLevel.clear();
-        state.optionsFullByLevel.clear();
-        buildAddressText(state);
-        return;
-      }
-      state.region = state.regions.find(r => String(r.object_id) === id) || null;
-      hideAllLevels(state);
-      state.selectedByLevel.clear();
-      state.optionsFullByLevel.clear();
-      if (!state.region) return;
-      const basePath = state.region.path || String(id);
-      state.currentPath = String(basePath);
-      buildAddressText(state);
-      loadNextLevels(state, 'region', basePath);
-    });
   }
 
   /* ── address module: panel open / close / accept ───────────────────────────── */
   function initAddressModule() {
     // "Заполнить адрес" — open FIAS panel for that row
-    document.querySelectorAll('[data-action="open-fias"]').forEach(btn => {
+    document.querySelectorAll('[data-action="open-fias-address"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.dataset.addressTarget;
         const moduleEl = btn.closest('[data-address-module]');
@@ -851,7 +961,6 @@
           if (addrOutput && addrText) addrOutput.value = addrText;
           if (postalOutput)           postalOutput.value = postalText;
 
-          // If registration accepted, refresh same-as note previews
           if (target === 'registration') {
             updateSameNoteText(moduleEl, addrText);
           }
@@ -885,7 +994,7 @@
 
         const note       = moduleEl.querySelector(`[data-address-same-note="${targetKind}"]`);
         const rowFields  = moduleEl.querySelector(`[data-address-row-fields="${targetKind}"]`);
-        const fillBtn    = moduleEl.querySelector(`[data-action="open-fias"][data-address-target="${targetKind}"]`);
+        const fillBtn    = moduleEl.querySelector(`[data-action="open-fias-address"][data-address-target="${targetKind}"]`);
         const panel      = moduleEl.querySelector(`[data-fias-panel="${targetKind}"]`);
         const tgtWidget  = moduleEl.querySelector(`[data-fias-address-widget][data-address-kind="${targetKind}"]`);
         const srcWidget  = moduleEl.querySelector(`[data-fias-address-widget][data-address-kind="${sourceKind}"]`);

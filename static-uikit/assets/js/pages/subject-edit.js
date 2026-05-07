@@ -34,4 +34,41 @@
       showToast('Черновик сохранён');
     }
   });
+
+  /* ── Residency toggle: hide/show FIAS fill buttons when nonresident ── */
+  (function () {
+    var residencyEl = document.getElementById('ind-residency');
+    if (!residencyEl) return;
+
+    function applyResidency(value) {
+      var isResident = value === 'resident';
+      var moduleEl = document.querySelector('[data-address-module]');
+      if (!moduleEl) return;
+
+      if (isResident) {
+        // Restore fill buttons respecting same-as checkbox state
+        moduleEl.querySelectorAll('.crm-btn-fill-address[data-address-target]').forEach(function (btn) {
+          var target = btn.getAttribute('data-address-target');
+          var sameCheck = moduleEl.querySelector('[data-address-same-as][data-address-target="' + target + '"]');
+          if (!sameCheck || !sameCheck.checked) {
+            btn.hidden = false;
+          }
+        });
+      } else {
+        // Hide all fill buttons and close any open panels
+        moduleEl.querySelectorAll('.crm-btn-fill-address').forEach(function (btn) {
+          btn.hidden = true;
+        });
+        moduleEl.querySelectorAll('[data-fias-panel]').forEach(function (panel) {
+          panel.hidden = true;
+        });
+      }
+    }
+
+    residencyEl.addEventListener('change', function () {
+      applyResidency(residencyEl.value);
+    });
+
+    applyResidency(residencyEl.value);
+  }());
 }());
