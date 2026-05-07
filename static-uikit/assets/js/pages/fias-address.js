@@ -1068,8 +1068,63 @@
     if (fillBtn) fillBtn.hidden = !shouldShowFillButton(moduleEl, kind);
   }
 
+  function hasAddressData(moduleEl, kind) {
+    const output = getAddressOutput(moduleEl, kind);
+    if (compactPart(output?.value)) return true;
+
+    const widget = getAddressWidget(moduleEl, kind);
+    const panel = moduleEl?.querySelector(`[data-fias-panel="${kind}"]`);
+    const snapshot = panel?._addressHiddenSnapshot || null;
+    const hiddenValue = key => snapshot ? snapshot[key] : getHiddenInEl(widget, key);
+
+    if (compactPart(hiddenValue('addressFull'))) return true;
+
+    return [
+      'postalCode', 'country', 'region', 'district', 'city', 'settlement',
+      'planningStructure', 'street', 'landPlot', 'house', 'building', 'flat',
+      'room', 'comment', 'fiasObjectId', 'fiasPath',
+    ].some(key => compactPart(hiddenValue(key)));
+  }
+
+  function syncEditButton(moduleEl, kind) {
+    const btn = moduleEl.querySelector(`[data-action="edit-address-parts"][data-address-target="${kind}"]`);
+    if (!btn) return;
+
+    const sameCheck = moduleEl.querySelector(`[data-address-same-as][data-address-target="${kind}"]`);
+    const isSameAsRegistration = sameCheck && sameCheck.checked;
+    btn.hidden = isSameAsRegistration || !hasAddressData(moduleEl, kind);
+  }
+
+  function syncAllAddressEditButtons(moduleEl) {
+    if (!moduleEl) return;
+    ['registration', 'actual', 'postal'].forEach(kind => syncEditButton(moduleEl, kind));
+  }
+
+  function snapshotPanelHiddenFields(panel) {
+    const widget = panel?.querySelector('[data-fias-address-widget]');
+    if (!widget) return;
+    const keys = ['addressFull', ...ADDRESS_PART_KEYS];
+    panel._addressHiddenSnapshot = keys.reduce((acc, key) => {
+      acc[key] = getHiddenInEl(widget, key);
+      return acc;
+    }, {});
+  }
+
+  function restorePanelHiddenSnapshot(panel) {
+    const widget = panel?.querySelector('[data-fias-address-widget]');
+    const snapshot = panel?._addressHiddenSnapshot;
+    if (!widget || !snapshot) return;
+    Object.entries(snapshot).forEach(([key, value]) => {
+      setHiddenInEl(widget, key, value);
+    });
+    delete panel._addressHiddenSnapshot;
+  }
+
   function closeFiasPanels(moduleEl) {
-    moduleEl?.querySelectorAll('[data-fias-panel]').forEach(panel => { panel.hidden = true; });
+    moduleEl?.querySelectorAll('[data-fias-panel]').forEach(panel => {
+      if (!panel.hidden) restorePanelHiddenSnapshot(panel);
+      panel.hidden = true;
+    });
   }
 
   function closePartsEditors(moduleEl, exceptEditor) {
@@ -1181,6 +1236,12 @@
     });
     if (!parts.addressType) parts.addressType = parts.fiasObjectId ? 'admin' : 'manual';
     parts.addressFull = buildAddressFromParts(parts);
+
+    if (!parts.addressFull) {
+      ADDRESS_PART_KEYS.forEach(key => { parts[key] = ''; });
+      parts.addressFull = '';
+    }
+
     return parts;
   }
 
@@ -1196,6 +1257,7 @@
     if (kind === 'registration') {
       updateSameNoteText(moduleEl, addressText);
     }
+    syncAllAddressEditButtons(moduleEl);
   }
 
   function initAddressPartsEditors() {
@@ -1206,6 +1268,10 @@
         const kind = btn.dataset.addressTarget;
         const moduleEl = btn.closest('[data-address-module]');
         if (!moduleEl || !kind) return;
+        if (!hasAddressData(moduleEl, kind)) {
+          syncEditButton(moduleEl, kind);
+          return;
+        }
         const editor = moduleEl.querySelector(`[data-address-parts-editor="${kind}"]`);
         if (!editor) return;
 
@@ -1233,6 +1299,7 @@
         if (!kind) return;
         const parts = collectPartsFromEditor(moduleEl, kind, editor);
         applyAddressParts(moduleEl, kind, parts);
+        syncAllAddressEditButtons(moduleEl);
         editor.hidden = true;
       });
     });
@@ -1251,7 +1318,10 @@
         closeFiasPanels(moduleEl);
         closePartsEditors(moduleEl);
         const panel = moduleEl.querySelector(`[data-fias-panel="${target}"]`);
-        if (panel) panel.hidden = false;
+        if (panel) {
+          snapshotPanelHiddenFields(panel);
+          panel.hidden = false;
+        }
       });
     });
 
@@ -1259,7 +1329,12 @@
     document.querySelectorAll('[data-action="fias-cancel"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const panel = btn.closest('[data-fias-panel]');
-        if (panel) panel.hidden = true;
+        if (panel) {
+          restorePanelHiddenSnapshot(panel);
+          panel.hidden = true;
+          const moduleEl = panel.closest('[data-address-module]');
+          syncAllAddressEditButtons(moduleEl);
+        }
       });
     });
 
@@ -1278,7 +1353,9 @@
           const addrText = buildAddressFromParts(parts) || getHiddenInEl(widget, 'addressFull');
           setHiddenInEl(widget, 'addressFull', addrText);
           applyAddressParts(moduleEl, target, { ...parts, addressFull: addrText });
+          syncAllAddressEditButtons(moduleEl);
         }
+        delete panel._addressHiddenSnapshot;
         panel.hidden = true;
       });
     });
@@ -1304,6 +1381,7 @@
         setHiddenInEl(targetWidget, 'isSameAsRegistration', 'true');
       }
     });
+    syncAllAddressEditButtons(moduleEl);
   }
 
   /* ── same-as checkboxes: show/hide row fields and fill button ───────────────── */
@@ -1334,7 +1412,10 @@
           }
           if (rowFields) rowFields.hidden = true;
           if (fillBtn)   fillBtn.hidden   = true;
-          if (panel)     panel.hidden     = true;
+          if (panel) {
+            restorePanelHiddenSnapshot(panel);
+            panel.hidden = true;
+          }
           if (editor)    editor.hidden    = true;
           if (tgtOutput) tgtOutput.value  = srcOutput?.value || '';
           if (tgtWidget) {
@@ -1347,6 +1428,7 @@
           syncFillButton(moduleEl, targetKind);
           if (tgtWidget) setHiddenInEl(tgtWidget, 'isSameAsRegistration', 'false');
         }
+        syncAllAddressEditButtons(moduleEl);
       }
 
       cb.addEventListener('change', syncRow);
@@ -1359,7 +1441,10 @@
     document.querySelectorAll('[data-address-output="registration"]').forEach(textarea => {
       const moduleEl = textarea.closest('[data-address-module]');
       if (!moduleEl) return;
-      textarea.addEventListener('input', () => updateSameNoteText(moduleEl, textarea.value));
+      textarea.addEventListener('input', () => {
+        updateSameNoteText(moduleEl, textarea.value);
+        syncAllAddressEditButtons(moduleEl);
+      });
     });
   }
 
@@ -1380,6 +1465,7 @@
     initAddressPartsEditors();
     initAddressModule();
     wireRegistrationTextareaInput();
+    document.querySelectorAll('[data-address-module]').forEach(syncAllAddressEditButtons);
   }
 
   if (document.readyState === 'loading') {
