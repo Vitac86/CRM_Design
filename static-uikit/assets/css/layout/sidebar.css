@@ -103,3 +103,36 @@
 
 .crm-sidebar::-webkit-scrollbar { width: 6px; }
 .crm-sidebar::-webkit-scrollbar-thumb { background: rgba(205, 221, 255, 0.4); }
+
+.crm-sidebar-brand-link {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.crm-sidebar-brand-link:hover {
+  text-decoration: none;
+}
+
+.crm-sidebar-brand-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(176, 202, 255, 0.34);
+}
+
+.crm-sidebar .crm-nav-icon-img {
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+.crm-sidebar .crm-nav-link:hover .crm-nav-icon-img,
+.crm-sidebar .crm-nav-link.active .crm-nav-icon-img,
+.crm-sidebar .crm-nav-link.is-active .crm-nav-icon-img,
+.crm-sidebar .crm-nav-group.active > .crm-nav-group-toggle .crm-nav-icon-img {
+  opacity: 1;
+}
