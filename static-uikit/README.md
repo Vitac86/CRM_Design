@@ -266,6 +266,24 @@ Stable HTML hooks used by the CSV export engine:
 | Export button | `data-export-scope="nearest"` | Documents that nearest-scope table detection is used |
 | Column header `<th>` | `data-export-ignore` | Excludes that column (and its cells) from the CSV |
 
+## FIAS-assisted address input
+
+Pages `subject-edit-individual.html` and `subject-register.html` include FIAS-assisted structured address input for Russian-resident individual clients.
+
+**How it works (static demo):**
+- `assets/js/pages/fias-address.js` — shared module; initialises every `[data-fias-address-widget]` block on the page with isolated per-widget state.
+- `fias.html` — standalone FIAS prototype (reference/demo, kept for handoff context).
+- Three address blocks per form: registration (primary), actual/residential, postal/correspondence.
+- Actual and postal default to "Совпадает с адресом регистрации" (hidden, mirroring registration values). Unchecking reveals an independent FIAS widget.
+- Cascading reset: changing region, division type, or any parent level clears all dependent levels.
+- If FIAS API is unavailable, a non-blocking fallback banner is shown and manual text fields are revealed.
+- Non-resident and UL flows do not use FIAS widgets; non-resident FL shows simple manual address fields.
+
+**Security / integration note:**
+- `MASTER_TOKEN = "pass"` in `fias-address.js` is a static demo placeholder only. Do not use it in production.
+- UMI.CMS / backend must provide secure server-side FIAS API access (token, proxy, or integration). The token should never be embedded in client-side JS in production.
+- Page-specific CSS for FIAS widgets is in `assets/css/pages/subject-edit.css` and `assets/css/pages/subject-register.css`.
+
 ## Known limitations
 - Static sample data only.
 - Prototype JavaScript only; not backend or business logic.

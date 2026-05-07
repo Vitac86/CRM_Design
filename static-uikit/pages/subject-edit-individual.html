@@ -9,6 +9,7 @@
   <link rel="icon" href="../assets/icons/favicon_white.ico" type="image/x-icon" media="(prefers-color-scheme: dark)" />
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/subject-edit.css"/>
 </head>
 <body data-page="subject-edit" data-subject-kind="individual">
 <div class="crm-app">
@@ -347,81 +348,70 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-address">
+            <!-- ── Адрес регистрации ──────────────────────────────────────────── -->
+            <section class="crm-address-group crm-form-section" data-address-group="registration" data-entity="edit-address">
               <div class="crm-form-section-head">
                 <h3>Адрес регистрации</h3>
               </div>
-              <div class="crm-form-grid uk-grid-small" uk-grid>
-                <div class="uk-width-1-4@m">
-                  <label class="uk-form-label" for="ind-addr-country">Страна</label>
+              <div
+                class="crm-fias-address-widget"
+                data-fias-address-widget
+                data-address-kind="registration"
+                data-address-main="true">
+              </div>
+            </section>
+
+            <!-- ── Адрес проживания / фактический ─────────────────────────────── -->
+            <section class="crm-address-group crm-form-section" data-address-group="actual">
+              <div class="crm-form-section-head">
+                <h3>Адрес проживания / фактический адрес</h3>
+                <label class="crm-address-same-check">
                   <input
-                    id="ind-addr-country"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrCountry"
-                    value="Россия"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-4@m">
-                  <label class="uk-form-label" for="ind-addr-region">Регион</label>
+                    type="checkbox"
+                    name="actualSameAsRegistration"
+                    data-address-same-as="registration"
+                    data-address-target="actual"
+                    checked />
+                  <span>Совпадает с адресом регистрации</span>
+                </label>
+              </div>
+              <div class="crm-address-same-note" data-address-same-note="actual">
+                Адрес совпадает с адресом регистрации
+                <span data-same-preview-text></span>
+              </div>
+              <div
+                class="crm-fias-address-widget"
+                data-fias-address-widget
+                data-address-kind="actual"
+                data-address-copy-source="registration"
+                hidden>
+              </div>
+            </section>
+
+            <!-- ── Почтовый адрес / адрес для корреспонденции ─────────────────── -->
+            <section class="crm-address-group crm-form-section" data-address-group="postal">
+              <div class="crm-form-section-head">
+                <h3>Почтовый адрес / адрес для корреспонденции</h3>
+                <label class="crm-address-same-check">
                   <input
-                    id="ind-addr-region"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrRegion"
-                    value="Москва"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-4@m">
-                  <label class="uk-form-label" for="ind-addr-city">Город</label>
-                  <input
-                    id="ind-addr-city"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrCity"
-                    value="Москва"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-2@m">
-                  <label class="uk-form-label" for="ind-addr-street">Улица</label>
-                  <input
-                    id="ind-addr-street"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrStreet"
-                    value="ул. Тверская"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-6@m">
-                  <label class="uk-form-label" for="ind-addr-house">Дом</label>
-                  <input
-                    id="ind-addr-house"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrHouse"
-                    value="14"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-6@m">
-                  <label class="uk-form-label" for="ind-addr-flat">Квартира</label>
-                  <input
-                    id="ind-addr-flat"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrFlat"
-                    value="38"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-6@m">
-                  <label class="uk-form-label" for="ind-addr-index">Индекс</label>
-                  <input
-                    id="ind-addr-index"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="addrIndex"
-                    value="125009"
-                    autocomplete="off" />
-                </div>
+                    type="checkbox"
+                    name="postalSameAsRegistration"
+                    data-address-same-as="registration"
+                    data-address-target="postal"
+                    checked />
+                  <span>Совпадает с адресом регистрации</span>
+                </label>
+              </div>
+              <div class="crm-address-same-note" data-address-same-note="postal">
+                Адрес совпадает с адресом регистрации
+                <span data-same-preview-text></span>
+              </div>
+              <div
+                class="crm-fias-address-widget"
+                data-fias-address-widget
+                data-address-kind="postal"
+                data-address-copy-source="registration"
+                hidden>
               </div>
             </section>
 
@@ -459,16 +449,6 @@
                     type="email"
                     name="email"
                     value="d.kovalev@mail.ru"
-                    autocomplete="off" />
-                </div>
-                <div class="uk-width-1-1">
-                  <label class="uk-form-label" for="ind-correspondence-addr">Адрес для корреспонденции</label>
-                  <input
-                    id="ind-correspondence-addr"
-                    class="uk-input crm-input"
-                    type="text"
-                    name="correspondenceAddr"
-                    value="125009, г. Москва, ул. Тверская, д. 14, кв. 38"
                     autocomplete="off" />
                 </div>
               </div>
@@ -635,6 +615,7 @@
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/fias-address.js"></script>
 <script src="../assets/js/pages/subject-edit.js"></script>
 </body>
 </html>

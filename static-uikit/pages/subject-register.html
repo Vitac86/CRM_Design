@@ -9,6 +9,7 @@
   <link rel="icon" href="../assets/icons/favicon_white.ico" type="image/x-icon" media="(prefers-color-scheme: dark)" />
   <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
   <link rel="stylesheet" href="../assets/css/crm-static.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/subject-register.css"/>
 </head>
 <body data-page="subject-register">
 <div class="crm-app">
@@ -330,26 +331,22 @@
                     <input id="fl-birth-place" class="uk-input crm-input" type="text" name="fl-birth-place" placeholder="г. Москва"/>
                   </div>
                   <div class="uk-width-1-2@m">
-                    <label class="uk-form-label" for="fl-reg-address">Адрес регистрации</label>
-                    <input id="fl-reg-address" class="uk-input crm-input" type="text" name="fl-reg-address" placeholder="г. Москва, ул. Пушкина, д. 1"/>
-                  </div>
-                </div>
-                <div class="crm-form-grid uk-grid-small reg-binary-grid" uk-grid>
-                  <div class="uk-width-1-2@m">
                     <div class="reg-binary-row">
-                      <p>Фактический адрес совпадает с местом регистрации</p>
+                      <p>Резидентство</p>
                       <div class="crm-binary-control">
                         <label>
-                          <input class="uk-radio" type="radio" name="fl-actual-address" value="yes"/>
-                          <span>Да</span>
+                          <input class="uk-radio" type="radio" name="fl-residency" value="rf" checked/>
+                          <span>Резидент РФ</span>
                         </label>
                         <label>
-                          <input class="uk-radio" type="radio" name="fl-actual-address" value="no"/>
-                          <span>Нет</span>
+                          <input class="uk-radio" type="radio" name="fl-residency" value="nonresident"/>
+                          <span>Нерезидент</span>
                         </label>
                       </div>
                     </div>
                   </div>
+                </div>
+                <div class="crm-form-grid uk-grid-small reg-binary-grid" uk-grid>
                   <div class="uk-width-1-2@m">
                     <div class="reg-binary-row">
                       <p>Квалифицированный инвестор</p>
@@ -397,6 +394,103 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Address: FIAS (RF residents) or manual (non-residents) -->
+              <div class="crm-form-section" id="fl-address-section">
+
+                <!-- FIAS 3-address block — visible when Резидент РФ -->
+                <div id="fl-address-fias">
+
+                  <!-- Адрес регистрации -->
+                  <section class="crm-address-group" data-address-group="registration">
+                    <div class="crm-form-section-head">
+                      <h3>Адрес регистрации</h3>
+                    </div>
+                    <div
+                      class="crm-fias-address-widget"
+                      data-fias-address-widget
+                      data-address-kind="registration"
+                      data-address-main="true">
+                    </div>
+                  </section>
+
+                  <!-- Адрес проживания / фактический -->
+                  <section class="crm-address-group" data-address-group="actual">
+                    <div class="crm-form-section-head">
+                      <h3>Адрес проживания / фактический адрес</h3>
+                      <label class="crm-address-same-check">
+                        <input
+                          type="checkbox"
+                          name="fl-actualSameAsRegistration"
+                          data-address-same-as="registration"
+                          data-address-target="actual"
+                          checked />
+                        <span>Совпадает с адресом регистрации</span>
+                      </label>
+                    </div>
+                    <div class="crm-address-same-note" data-address-same-note="actual">
+                      Адрес совпадает с адресом регистрации
+                      <span data-same-preview-text></span>
+                    </div>
+                    <div
+                      class="crm-fias-address-widget"
+                      data-fias-address-widget
+                      data-address-kind="actual"
+                      data-address-copy-source="registration"
+                      hidden>
+                    </div>
+                  </section>
+
+                  <!-- Почтовый адрес / адрес для корреспонденции -->
+                  <section class="crm-address-group" data-address-group="postal">
+                    <div class="crm-form-section-head">
+                      <h3>Почтовый адрес / адрес для корреспонденции</h3>
+                      <label class="crm-address-same-check">
+                        <input
+                          type="checkbox"
+                          name="fl-postalSameAsRegistration"
+                          data-address-same-as="registration"
+                          data-address-target="postal"
+                          checked />
+                        <span>Совпадает с адресом регистрации</span>
+                      </label>
+                    </div>
+                    <div class="crm-address-same-note" data-address-same-note="postal">
+                      Адрес совпадает с адресом регистрации
+                      <span data-same-preview-text></span>
+                    </div>
+                    <div
+                      class="crm-fias-address-widget"
+                      data-fias-address-widget
+                      data-address-kind="postal"
+                      data-address-copy-source="registration"
+                      hidden>
+                    </div>
+                  </section>
+
+                </div>
+                <!-- /fl-address-fias -->
+
+                <!-- Manual address block — visible when Нерезидент -->
+                <div id="fl-address-manual" hidden>
+                  <div class="crm-form-section-head" style="margin-bottom:10px">
+                    <h3>Адрес</h3>
+                  </div>
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-1">
+                      <label class="uk-form-label" for="fl-reg-address">Адрес регистрации</label>
+                      <input id="fl-reg-address" class="uk-input crm-input" type="text" name="fl-reg-address" placeholder="Укажите адрес регистрации"/>
+                    </div>
+                    <div class="uk-width-1-1">
+                      <label class="uk-form-label" for="fl-actual-address-manual">Фактический адрес <span style="font-weight:400;text-transform:none">(если отличается)</span></label>
+                      <input id="fl-actual-address-manual" class="uk-input crm-input" type="text" name="fl-actual-address-manual" placeholder="Укажите фактический адрес"/>
+                    </div>
+                  </div>
+                </div>
+                <!-- /fl-address-manual -->
+
+              </div>
+              <!-- /fl-address-section -->
 
               <!-- Registration data -->
               <div class="crm-form-section">
@@ -978,6 +1072,7 @@
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/fias-address.js"></script>
 <script src="../assets/js/pages/subject-register.js"></script>
 </body>
 </html>

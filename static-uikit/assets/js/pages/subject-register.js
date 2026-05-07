@@ -447,6 +447,29 @@
     }
   });
 
+  /* ── FL residency toggle (RF resident → FIAS block; non-resident → manual) ── */
+  (function () {
+    var fiasBlock   = document.getElementById('fl-address-fias');
+    var manualBlock = document.getElementById('fl-address-manual');
+
+    function applyResidency(value) {
+      if (!fiasBlock || !manualBlock) return;
+      var isRf = value === 'rf';
+      fiasBlock.hidden   = !isRf;
+      manualBlock.hidden = isRf;
+    }
+
+    document.querySelectorAll('input[type="radio"][name="fl-residency"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        if (radio.checked) applyResidency(radio.value);
+      });
+    });
+
+    // Apply initial state (default: RF resident — FIAS block visible)
+    var checked = document.querySelector('input[type="radio"][name="fl-residency"]:checked');
+    applyResidency(checked ? checked.value : 'rf');
+  }());
+
   /* ── init ────────────────────────────────────────────────────────────────── */
   goStep1();
   syncInnCard();

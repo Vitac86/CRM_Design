@@ -1,0 +1,858 @@
+/**
+ * fias-address.js
+ * Reusable FIAS-assisted structured address widget for individual RF-resident clients.
+ * Initialises every [data-fias-address-widget] block found on the page.
+ * Each widget has isolated state — safe to use multiple widgets per page.
+ *
+ * Security note: MASTER_TOKEN is a static demo placeholder.
+ * UMI.CMS / backend must provide secure server-side FIAS API integration.
+ */
+(function () {
+  'use strict';
+
+  /* ── constants ─────────────────────────────────────────────────────────────── */
+  const API_BASE     = 'https://fias-public-service.nalog.ru/api/spas/v2.0';
+  const MASTER_TOKEN = 'pass'; // demo placeholder — real token via backend
+
+  const FIELD_DEFS = {
+    2:  { level: 2,  label: 'Район',                                  hint: 'Выберите район' },
+    3:  { level: 3,  label: 'Муниципальный округ',                    hint: 'Выберите муниципальный округ' },
+    5:  { level: 5,  label: 'Город',                                  hint: 'Выберите город' },
+    6:  { level: 6,  label: 'Населённый пункт / поселение',           hint: 'Выберите населённый пункт' },
+    7:  { level: 7,  label: 'Планировочная структура / территория',   hint: 'Выберите территорию' },
+    8:  { level: 8,  label: 'Улица / УДС',                            hint: 'Выберите улицу' },
+    9:  { level: 9,  label: 'Земельный участок',                      hint: 'Выберите участок' },
+    10: { level: 10, label: 'Дом / строение',                         hint: 'Выберите дом' },
+    11: { level: 11, label: 'Помещение / квартира',                   hint: 'Выберите помещение' },
+    12: { level: 12, label: 'Комната',                                hint: 'Выберите комнату' },
+    17: { level: 17, label: 'Машино-место',                           hint: 'Выберите машино-место' },
+  };
+
+  const ORDER_ADMIN = [2, 5, 6, 7, 8, 9, 10, 11, 12, 17];
+  const ORDER_MUNIC = [3, 5, 6, 7, 8, 9, 10, 11, 12, 17];
+
+  /* cached regions shared across widgets on same page load */
+  let _regionsCache = null;
+
+  /* ── division helpers ──────────────────────────────────────────────────────── */
+  function getOrder(divType) {
+    return divType === 'municipal' ? ORDER_MUNIC : ORDER_ADMIN;
+  }
+
+  function addrType(divType) {
+    return divType === 'municipal' ? 2 : 1;
+  }
+
+  /* ── sorting utilities (ported from fias.html prototype) ───────────────────── */
+  function isNum(x) {
+    if (x == null) return false;
+    const s = String(x).trim();
+    return s !== '' && !isNaN(Number(s));
+  }
+  function cmpStr(a, b) {
+    return String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
+  }
+  function cmpNumOrStr(a, b) {
+    const an = isNum(a), bn = isNum(b);
+    if (an && bn) return Number(a) - Number(b);
+    if (an && !bn) return -1;
+    if (!an && bn) return 1;
+    return cmpStr(a, b);
+  }
+  function lastH(addr) {
+    const h = addr?.hierarchy;
+    return (Array.isArray(h) && h.length) ? h[h.length - 1] : null;
+  }
+  function cmpTypes(a, b) {
+    const A = lastH(a) || {}, B = lastH(b) || {};
+    return cmpStr(A.type_short_name || A.type_name, B.type_short_name || B.type_name);
+  }
+  function cmpNames(a, b) {
+    const A = lastH(a) || {}, B = lastH(b) || {};
+    return cmpStr(A.name, B.name);
+  }
+  function cmpNums(a, b) {
+    const A = lastH(a) || {}, B = lastH(b) || {};
+    return cmpNumOrStr(A.number, B.number);
+  }
+  function cmpHouses(a, b) {
+    const A = lastH(a) || {}, B = lastH(b) || {};
+    let r = cmpTypes(a, b); if (r) return r;
+    r = cmpNumOrStr(A.number, B.number); if (r) return r;
+    r = cmpStr(A.add_type1_short_name, B.add_type1_short_name); if (r) return r;
+    r = cmpNumOrStr(A.add_number1, B.add_number1); if (r) return r;
+    r = cmpStr(A.add_type2_short_name, B.add_type2_short_name); if (r) return r;
+    return cmpNumOrStr(A.add_number2, B.add_number2);
+  }
+  function sortForLevel(level, list) {
+    const arr = [...(list || [])];
+    arr.sort((a, b) => {
+      const la = Number(a?.object_level_id ?? 0);
+      const lb = Number(b?.object_level_id ?? 0);
+      if (la !== lb) return la - lb;
+      if ([9, 17].includes(level)) return cmpNums(a, b);
+      if (level === 10) return cmpHouses(a, b);
+      if ([11, 12].includes(level)) { let r = cmpTypes(a, b); return r || cmpNums(a, b); }
+      let r = cmpTypes(a, b); return r || cmpNames(a, b);
+    });
+    return arr;
+  }
+
+  /* ── address text construction (ported from fias.html prototype) ───────────── */
+  const TYPE_MAP = new Map([
+    ['г','город'],['город','город'],
+    ['ул','улица'],['улица','улица'],
+    ['пр-кт','проспект'],['просп','проспект'],['проспект','проспект'],
+    ['пер','переулок'],['переулок','переулок'],
+    ['ш','шоссе'],['шоссе','шоссе'],
+    ['наб','набережная'],['набережная','набережная'],
+    ['пл','площадь'],['площадь','площадь'],
+    ['б-р','бульвар'],['бульвар','бульвар'],
+    ['мкр','микрорайон'],['микрорайон','микрорайон'],
+    ['р-н','район'],['район','район'],
+    ['пос','посёлок'],['п','посёлок'],['посёлок','посёлок'],
+    ['тер','территория'],['территория','территория'],
+  ]);
+  const ADD_TYPE_MAP = new Map([
+    ['лит','литера'],['литера','литера'],
+    ['корп','корпус'],['корпус','корпус'],
+    ['стр','строение'],['строение','строение'],
+    ['вл','владение'],['владение','владение'],
+    ['соор','сооружение'],['сооружение','сооружение'],
+  ]);
+
+  function normType(h) {
+    const raw = String(h?.type_name || h?.type_short_name || '').trim();
+    return TYPE_MAP.get(raw.toLowerCase()) || raw.toLowerCase();
+  }
+  function normAddType(raw) {
+    const s = String(raw || '').trim().toLowerCase();
+    return ADD_TYPE_MAP.get(s) || s;
+  }
+  function segment(level, h) {
+    if (!h) return null;
+    if (level === 10) {
+      const t = normType(h) || 'дом';
+      const n = String(h.number || '').trim();
+      if (!n) return null;
+      let s = `${t} ${n}`;
+      const at1 = normAddType(h.add_type1_short_name || h.add_type1_name);
+      const an1 = String(h.add_number1 || '').trim();
+      if (at1 && an1) s += ` ${at1} ${an1}`;
+      const at2 = normAddType(h.add_type2_short_name || h.add_type2_name);
+      const an2 = String(h.add_number2 || '').trim();
+      if (at2 && an2) s += ` ${at2} ${an2}`;
+      return s.trim();
+    }
+    if ([9, 11, 12, 17].includes(level)) {
+      const t = normType(h), n = String(h.number || '').trim();
+      if (t && n) return `${t} ${n}`.trim();
+      if (t && h.name) return `${t} ${String(h.name).trim()}`.trim();
+      return h.name ? String(h.name).trim() : null;
+    }
+    const t = normType(h), name = String(h.name || '').trim();
+    if (t && name) return `${t} ${name}`.trim();
+    const fn = String(h.full_name_short || h.full_name || '').trim();
+    if (!fn) return null;
+    return fn.includes(',') ? fn.split(',').pop().trim() : fn;
+  }
+  function shortName(addr) {
+    const h = lastH(addr);
+    if (!h) return addr.full_name || `id=${addr.object_id}`;
+    return segment(addr.object_level_id, h) || addr.full_name || `id=${addr.object_id}`;
+  }
+  function canonical(s) {
+    return String(s || '').toLowerCase()
+      .replace(/ё/g, 'е')
+      .replace(/[\s,.;:()№"']/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+  }
+
+  /* ── postal code extraction (ported from fias.html prototype) ──────────────── */
+  function extractPostal(addr) {
+    if (!addr) return null;
+    if (addr.postal_code) return addr.postal_code;
+    if (addr.address_details?.postal_code) return addr.address_details.postal_code;
+    if (Array.isArray(addr.hierarchy)) {
+      for (const h of addr.hierarchy) { const r = extractPostal(h); if (r) return r; }
+    }
+    return null;
+  }
+
+  /* ── API ───────────────────────────────────────────────────────────────────── */
+  function apiFetch(path, { method = 'GET', body = null, signal } = {}) {
+    const headers = { 'accept': 'application/json' };
+    if (MASTER_TOKEN) headers['master-token'] = MASTER_TOKEN;
+    if (body != null) headers['content-type'] = 'application/json';
+    return fetch(`${API_BASE}${path}`, {
+      method, headers,
+      body: body != null ? JSON.stringify(body) : undefined,
+      mode: 'cors',
+      signal,
+    }).then(res => {
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      const pay = ct.includes('application/json')
+        ? res.json().catch(() => null)
+        : res.text().catch(() => '');
+      return pay.then(payload => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${typeof payload === 'string' ? payload : JSON.stringify(payload)}`);
+        return payload;
+      });
+    });
+  }
+
+  function apiGetRegions(signal) {
+    if (_regionsCache) return Promise.resolve(_regionsCache);
+    return apiFetch('/GetRegions', { method: 'GET', signal }).then(resp => {
+      const regions = Array.isArray(resp?.addresses) ? resp.addresses
+        : (Array.isArray(resp) ? resp : []);
+      regions.sort((a, b) => String(a.full_name || '').localeCompare(String(b.full_name || ''), 'ru'));
+      _regionsCache = regions;
+      return regions;
+    });
+  }
+
+  function apiGetItems(level, path, divType, signal) {
+    const body = { address_levels: [level], address_type: addrType(divType), path: String(path), include_hist: true };
+    return apiFetch('/GetAddressItems', { method: 'POST', body, signal }).then(resp => {
+      const addrs = Array.isArray(resp?.addresses) ? resp.addresses : [];
+      return addrs.filter(a => Number(a?.object_level_id) === Number(level));
+    });
+  }
+
+  function apiGetById(objectId, divType, signal) {
+    const qs = new URLSearchParams({ object_id: String(objectId), address_type: String(addrType(divType)) });
+    return apiFetch(`/GetAddressItemById?${qs}`, { method: 'GET', signal }).then(resp => {
+      const arr = Array.isArray(resp?.addresses) ? resp.addresses : [];
+      return arr[0] || null;
+    });
+  }
+
+  /* ── widget state ──────────────────────────────────────────────────────────── */
+  function createState(kind) {
+    return {
+      kind,
+      regions: [],
+      region: null,
+      divisionType: 'admin',
+      currentPath: null,
+      selectedByLevel: new Map(),
+      optionsFullByLevel: new Map(),
+      uiByLevel: new Map(),
+      abortBatch: null,
+      postalCodeCache: new Map(),
+      fetchingPostalCode: null,
+      el: {},
+    };
+  }
+
+  /* ── DOM helpers ───────────────────────────────────────────────────────────── */
+  function setStatus(el, text) { if (el) el.textContent = text || ''; }
+
+  function hideLevel(state, level) {
+    const ui = state.uiByLevel.get(level);
+    if (!ui) return;
+    ui.wrap.hidden = true;
+    ui.select.disabled = true;
+    ui.select.innerHTML = '';
+    ui.filter.value = '';
+    ui.meta.textContent = '';
+    state.optionsFullByLevel.delete(level);
+    state.selectedByLevel.delete(level);
+  }
+
+  function hideAllLevels(state) {
+    for (const lvl of Object.keys(FIELD_DEFS).map(Number)) hideLevel(state, lvl);
+  }
+
+  function renderOptions(state, level, displayList, selectedId) {
+    const ui = state.uiByLevel.get(level);
+    if (!ui) return;
+    const def = FIELD_DEFS[level];
+    const sorted = sortForLevel(level, displayList);
+    ui.select.innerHTML = '';
+    const ph = document.createElement('option');
+    ph.value = '';
+    ph.textContent = `— ${def.hint} —`;
+    ui.select.appendChild(ph);
+    for (const a of sorted) {
+      const opt = document.createElement('option');
+      opt.value = String(a.object_id);
+      opt.textContent = shortName(a);
+      ui.select.appendChild(opt);
+    }
+    ui.select.disabled = false;
+    ui.wrap.hidden = false;
+    ui.meta.textContent = `вариантов: ${sorted.length}`;
+    if (selectedId != null) ui.select.value = String(selectedId);
+  }
+
+  function applyFilter(state, level) {
+    const ui = state.uiByLevel.get(level);
+    if (!ui || ui.wrap.hidden) return;
+    const q = ui.filter.value.trim().toLowerCase();
+    const full = state.optionsFullByLevel.get(level) || [];
+    const selected = state.selectedByLevel.get(level) || null;
+    let filtered = q
+      ? full.filter(a => shortName(a).toLowerCase().includes(q) || (a.full_name || '').toLowerCase().includes(q))
+      : full;
+    if (selected && !filtered.some(x => String(x.object_id) === String(selected.object_id))) {
+      filtered = [selected, ...filtered];
+    }
+    renderOptions(state, level, filtered, selected?.object_id ?? null);
+    ui.meta.textContent = q ? `вариантов: ${filtered.length} (фильтр: "${q}")` : `вариантов: ${filtered.length}`;
+  }
+
+  function ensureSelected(state, level, addr) {
+    if (!addr?.object_id || addr.is_active === false) return;
+    const full = state.optionsFullByLevel.get(level) || [];
+    if (!full.some(x => String(x.object_id) === String(addr.object_id))) {
+      state.optionsFullByLevel.set(level, [addr, ...full]);
+    }
+    state.selectedByLevel.set(level, addr);
+    applyFilter(state, level);
+    const ui = state.uiByLevel.get(level);
+    if (ui) ui.select.value = String(addr.object_id);
+  }
+
+  /* ── postal code ───────────────────────────────────────────────────────────── */
+  function collectPostalCodes(state) {
+    const codes = new Set();
+    for (const lvl of getOrder(state.divisionType)) {
+      const addr = state.selectedByLevel.get(lvl);
+      if (!addr) continue;
+      const cached = state.postalCodeCache.get(addr.object_id);
+      const code = cached !== undefined ? cached : extractPostal(addr);
+      if (code) codes.add(code);
+    }
+    return [...codes].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }
+
+  function refreshPostalDisplay(state) {
+    const codes = collectPostalCodes(state);
+    const text = codes.length ? `Индекс: ${codes.join(', ')}` : 'Индекс: —';
+    if (state.el.postalPreview) state.el.postalPreview.textContent = text;
+    setHidden(state, 'postalCode', codes.join(', '));
+  }
+
+  function fetchPostal(state, objectId) {
+    if (state.postalCodeCache.has(objectId)) { refreshPostalDisplay(state); return; }
+    if (state.fetchingPostalCode === objectId) return;
+    state.fetchingPostalCode = objectId;
+    apiGetById(objectId, state.divisionType)
+      .then(addr => state.postalCodeCache.set(objectId, extractPostal(addr) || ''))
+      .catch(() => state.postalCodeCache.set(objectId, ''))
+      .finally(() => { state.fetchingPostalCode = null; refreshPostalDisplay(state); });
+  }
+
+  function ensurePostal(state) {
+    for (const lvl of getOrder(state.divisionType)) {
+      const addr = state.selectedByLevel.get(lvl);
+      if (!addr) continue;
+      if (!state.postalCodeCache.has(addr.object_id) && !extractPostal(addr)) {
+        fetchPostal(state, addr.object_id);
+      }
+    }
+    refreshPostalDisplay(state);
+  }
+
+  /* ── hidden field helpers ──────────────────────────────────────────────────── */
+  function setHidden(state, key, value) {
+    const el = state.el.widgetEl?.querySelector(`[data-fias-field="${key}"]`);
+    if (el) el.value = value || '';
+  }
+
+  function mirrorHiddenFields(srcWidget, dstWidget) {
+    if (!srcWidget || !dstWidget) return;
+    srcWidget.querySelectorAll('[data-fias-field]').forEach(sf => {
+      const key = sf.dataset.fiasField;
+      if (key === 'isSameAsRegistration') return;
+      const df = dstWidget.querySelector(`[data-fias-field="${key}"]`);
+      if (df) df.value = sf.value;
+    });
+  }
+
+  /* ── address text builder ──────────────────────────────────────────────────── */
+  function buildAddressText(state) {
+    const parts = [], seen = new Set();
+    if (state.region?.full_name) {
+      const r = state.region.full_name.trim();
+      const cr = canonical(r);
+      if (r && !seen.has(cr)) { parts.push(r); seen.add(cr); }
+    }
+    for (const lvl of getOrder(state.divisionType)) {
+      const sel = state.selectedByLevel.get(lvl);
+      if (!sel) continue;
+      const seg = segment(lvl, lastH(sel));
+      if (!seg) continue;
+      const cs = canonical(seg);
+      if (!seen.has(cs)) { parts.push(seg); seen.add(cs); }
+    }
+    const text = parts.length ? parts.join(', ') : '—';
+    if (state.el.addrPreview) state.el.addrPreview.textContent = text;
+    setHidden(state, 'addressFull', text !== '—' ? text : '');
+    setHidden(state, 'region', state.region?.full_name || '');
+    setHidden(state, 'addressType', state.divisionType);
+
+    // collect structured fields
+    const fields = { district: '', city: '', settlement: '', planningStructure: '', street: '', landPlot: '', house: '', flat: '', room: '', fiasObjectId: '', fiasPath: '' };
+    for (const lvl of getOrder(state.divisionType)) {
+      const sel = state.selectedByLevel.get(lvl);
+      if (!sel) continue;
+      const seg = segment(lvl, lastH(sel));
+      switch (lvl) {
+        case 2: case 3: fields.district = seg || ''; break;
+        case 5: fields.city = seg || ''; break;
+        case 6: fields.settlement = seg || ''; break;
+        case 7: fields.planningStructure = seg || ''; break;
+        case 8: fields.street = seg || ''; break;
+        case 9: fields.landPlot = seg || ''; break;
+        case 10: fields.house = seg || ''; break;
+        case 11: fields.flat = seg || ''; break;
+        case 12: fields.room = seg || ''; break;
+      }
+      fields.fiasObjectId = String(sel.object_id);
+      fields.fiasPath = String(sel.path || '');
+    }
+    for (const [k, v] of Object.entries(fields)) setHidden(state, k, v);
+
+    ensurePostal(state);
+    notifyDependents(state);
+    return text;
+  }
+
+  /* ── notify dependent (same-as) widgets when registration changes ──────────── */
+  function notifyDependents(state) {
+    if (state.kind !== 'registration') return;
+    const srcWidget = state.el.widgetEl;
+    if (!srcWidget) return;
+    const scope = srcWidget.closest('form, [data-entity]') || document;
+    const addrText = state.el.addrPreview?.textContent || '—';
+
+    scope.querySelectorAll('[data-address-same-as="registration"]').forEach(cb => {
+      if (!cb.checked) return;
+      const targetKind = cb.dataset.addressTarget;
+      const targetWidget = scope.querySelector(`[data-fias-address-widget][data-address-kind="${targetKind}"]`);
+      if (!targetWidget) return;
+      mirrorHiddenFields(srcWidget, targetWidget);
+      setHiddenInEl(targetWidget, 'isSameAsRegistration', 'true');
+      // update same-note text
+      const note = findSameNote(scope, targetKind);
+      if (note) {
+        const preview = note.querySelector('[data-same-preview-text]');
+        if (preview) preview.textContent = addrText !== '—' ? addrText : '';
+      }
+    });
+  }
+
+  function setHiddenInEl(el, key, value) {
+    const f = el.querySelector(`[data-fias-field="${key}"]`);
+    if (f) f.value = value || '';
+  }
+
+  function findSameNote(scope, kind) {
+    return scope.querySelector(`[data-address-same-note="${kind}"]`) || null;
+  }
+
+  /* ── level cascade loading ─────────────────────────────────────────────────── */
+  function orderAfter(divType, level) {
+    const order = getOrder(divType);
+    const idx = order.indexOf(level);
+    return idx >= 0 ? order.slice(idx + 1) : order;
+  }
+
+  function loadNextLevels(state, fromLevel, basePath) {
+    if (!basePath) return;
+    const toLoad = orderAfter(state.divisionType, fromLevel);
+    if (!toLoad.length) return;
+
+    if (state.abortBatch) state.abortBatch.abort();
+    const ctrl = new AbortController();
+    state.abortBatch = ctrl;
+    state.currentPath = String(basePath);
+    setStatus(state.el.midStatus, 'Загружаю уровни…');
+
+    const jobs = toLoad.map(lvl =>
+      apiGetItems(lvl, basePath, state.divisionType, ctrl.signal)
+        .then(items => ({ lvl, items, ok: true }))
+        .catch(e => ({ lvl, items: [], ok: false, err: String(e) }))
+    );
+
+    Promise.all(jobs).then(results => {
+      if (ctrl.signal.aborted) return;
+      for (const r of results) {
+        if (!r.ok) { hideLevel(state, r.lvl); continue; }
+        if (r.items?.length) {
+          const sorted = sortForLevel(r.lvl, r.items);
+          state.optionsFullByLevel.set(r.lvl, sorted);
+          renderOptions(state, r.lvl, sorted, null);
+        } else {
+          hideLevel(state, r.lvl);
+        }
+      }
+      setStatus(state.el.midStatus, 'Готово.');
+      buildAddressText(state);
+    });
+  }
+
+  /* ── parent sync by hierarchy ──────────────────────────────────────────────── */
+  function pathForHierarchyPlace(fullPath, hp) {
+    if (!fullPath) return null;
+    const parts = String(fullPath).split('.');
+    const n = Number(hp);
+    if (!n || n < 1 || parts.length < n) return null;
+    return parts.slice(0, n).join('.');
+  }
+
+  function addrFromHierarchyItem(hItem, computedPath) {
+    const full_name = hItem.full_name || hItem.full_name_short
+      || (hItem.name && (hItem.type_short_name || hItem.type_name)
+        ? `${hItem.name} ${hItem.type_short_name || hItem.type_name}` : hItem.name)
+      || null;
+    return {
+      object_id: hItem.object_id,
+      object_level_id: hItem.object_level_id,
+      full_name,
+      path: computedPath || null,
+      is_active: typeof hItem.is_active === 'boolean' ? hItem.is_active : true,
+      hierarchy: [hItem],
+      postal_code: hItem.postal_code,
+    };
+  }
+
+  function syncParents(state, chosen) {
+    if (!chosen || chosen.is_active === false) return;
+    const chosenLevel = Number(chosen.object_level_id || 0);
+    const map = new Map();
+    for (const h of (chosen.hierarchy || [])) {
+      const lvl = Number(h?.object_level_id);
+      if (!lvl || !FIELD_DEFS[lvl]) continue;
+      if (typeof h.is_active === 'boolean' && !h.is_active) continue;
+      const p = pathForHierarchyPlace(chosen.path, h.hierarchy_place) || null;
+      map.set(lvl, addrFromHierarchyItem(h, p));
+    }
+    for (const lvl of getOrder(state.divisionType)) {
+      if (lvl >= chosenLevel) break;
+      const parent = map.get(lvl);
+      if (parent) ensureSelected(state, lvl, parent);
+      else hideLevel(state, lvl);
+    }
+  }
+
+  /* ── region loading ────────────────────────────────────────────────────────── */
+  function loadRegions(state) {
+    const sel = state.el.regionSelect;
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— загрузка регионов… —</option>';
+    sel.disabled = true;
+    setStatus(state.el.topStatus, 'Загружаю регионы…');
+
+    apiGetRegions().then(regions => {
+      state.regions = regions;
+      sel.innerHTML = '<option value="">— выберите регион —</option>';
+      for (const r of regions) {
+        const opt = document.createElement('option');
+        opt.value = String(r.object_id);
+        opt.textContent = r.full_name || `id=${r.object_id}`;
+        sel.appendChild(opt);
+      }
+      sel.disabled = false;
+      setStatus(state.el.topStatus, `Регионов: ${regions.length}`);
+    }).catch(() => {
+      sel.innerHTML = '<option value="">— регионы недоступны —</option>';
+      sel.disabled = false;
+      setStatus(state.el.topStatus, 'Ошибка загрузки регионов');
+      showFallback(state, 'ФИАС-сервис недоступен или требует токен. Введите адрес вручную.');
+    });
+  }
+
+  function showFallback(state, msg) {
+    const fb = state.el.fallbackWrap;
+    if (!fb) return;
+    fb.hidden = false;
+    const msgEl = fb.querySelector('[data-fias-fallback-msg]');
+    if (msgEl && msg) msgEl.textContent = msg;
+  }
+
+  /* ── widget DOM builder ────────────────────────────────────────────────────── */
+  function buildWidgetUI(widgetEl, state) {
+    const kind = state.kind;
+    const isMain = widgetEl.dataset.addressMain === 'true';
+    const inner = document.createElement('div');
+    inner.className = 'crm-fias-inner';
+
+    // 1. Division type selector
+    const divRow = document.createElement('div');
+    divRow.className = 'crm-fias-row crm-fias-divtype-row';
+    divRow.innerHTML =
+      '<label class="uk-form-label crm-fias-label">Тип деления</label>' +
+      '<div class="crm-fias-divtype-opts">' +
+        `<label class="crm-fias-radio-opt"><input type="radio" name="fias-divtype-${kind}" value="admin" checked> <span>Административное деление</span></label>` +
+        `<label class="crm-fias-radio-opt"><input type="radio" name="fias-divtype-${kind}" value="municipal"> <span>Муниципальное деление</span></label>` +
+      '</div>';
+    inner.appendChild(divRow);
+
+    // 2. Top status
+    const topStatus = document.createElement('div');
+    topStatus.className = 'crm-fias-status crm-fias-status--top';
+    inner.appendChild(topStatus);
+    state.el.topStatus = topStatus;
+
+    // 3. Region row
+    const regionRow = document.createElement('div');
+    regionRow.className = 'crm-fias-row crm-fias-region-row';
+    const regionLabel = document.createElement('label');
+    regionLabel.className = 'uk-form-label crm-fias-label';
+    regionLabel.textContent = 'Регион';
+    const regionSel = document.createElement('select');
+    regionSel.className = 'uk-select crm-select crm-fias-region-select';
+    regionRow.appendChild(regionLabel);
+    regionRow.appendChild(regionSel);
+    inner.appendChild(regionRow);
+    state.el.regionSelect = regionSel;
+
+    // 4. Mid status
+    const midStatus = document.createElement('div');
+    midStatus.className = 'crm-fias-status crm-fias-status--mid';
+    inner.appendChild(midStatus);
+    state.el.midStatus = midStatus;
+
+    // 5. Dynamic levels container
+    const levelsContainer = document.createElement('div');
+    levelsContainer.className = 'crm-fias-levels';
+    inner.appendChild(levelsContainer);
+    state.el.levelsContainer = levelsContainer;
+
+    // 6. Address preview
+    const previewWrap = document.createElement('div');
+    previewWrap.className = 'crm-fias-preview';
+    const addrPreview = document.createElement('div');
+    addrPreview.className = 'crm-fias-preview-addr';
+    addrPreview.dataset.fiasAddrPreview = '';
+    addrPreview.textContent = '—';
+    const postalPreview = document.createElement('div');
+    postalPreview.className = 'crm-fias-preview-postal';
+    postalPreview.textContent = 'Индекс: —';
+    previewWrap.appendChild(addrPreview);
+    previewWrap.appendChild(postalPreview);
+    inner.appendChild(previewWrap);
+    state.el.addrPreview = addrPreview;
+    state.el.postalPreview = postalPreview;
+
+    // 7. Manual fallback (shown if API fails)
+    const fallbackWrap = document.createElement('div');
+    fallbackWrap.className = 'crm-fias-fallback';
+    fallbackWrap.hidden = true;
+    fallbackWrap.innerHTML =
+      '<p class="crm-fias-fallback-msg" data-fias-fallback-msg>ФИАС-сервис недоступен. Введите адрес вручную.</p>' +
+      '<div class="crm-fias-row">' +
+        '<label class="uk-form-label crm-fias-label">Полный адрес (вручную)</label>' +
+        `<input class="uk-input crm-input" type="text" name="address[${kind}][addressFullManual]" placeholder="г. Москва, ул. Пушкина, д. 1"/>` +
+      '</div>' +
+      '<div class="crm-fias-row" style="margin-top:6px">' +
+        '<label class="uk-form-label crm-fias-label">Почтовый индекс</label>' +
+        `<input class="uk-input crm-input crm-fias-postal-manual" type="text" name="address[${kind}][postalCodeManual]" placeholder="123456"/>` +
+      '</div>';
+    inner.appendChild(fallbackWrap);
+    state.el.fallbackWrap = fallbackWrap;
+
+    // 8. Hidden output fields
+    const hiddenKeys = [
+      'addressFull', 'postalCode', 'region', 'district', 'city', 'settlement',
+      'planningStructure', 'street', 'landPlot', 'house', 'flat', 'room',
+      'fiasObjectId', 'fiasPath', 'addressType', 'isSameAsRegistration',
+    ];
+    const hiddenWrap = document.createElement('div');
+    hiddenWrap.hidden = true;
+    hiddenWrap.setAttribute('aria-hidden', 'true');
+    for (const key of hiddenKeys) {
+      const inp = document.createElement('input');
+      inp.type = 'hidden';
+      inp.name = `address[${kind}][${key}]`;
+      inp.dataset.fiasField = key;
+      hiddenWrap.appendChild(inp);
+    }
+    inner.appendChild(hiddenWrap);
+
+    widgetEl.appendChild(inner);
+    widgetEl._fiasState = state;
+    state.el.widgetEl = widgetEl;
+
+    // Build level rows
+    installLevelRows(state, levelsContainer);
+
+    // Wire events
+    wireWidgetEvents(state, divRow, regionSel);
+  }
+
+  function installLevelRows(state, container) {
+    container.innerHTML = '';
+    state.uiByLevel.clear();
+
+    const levels = Object.keys(FIELD_DEFS).map(Number).sort((a, b) => a - b);
+    for (const level of levels) {
+      const def = FIELD_DEFS[level];
+      const wrap = document.createElement('div');
+      wrap.className = 'crm-fias-level-row';
+      wrap.hidden = true;
+
+      const label = document.createElement('label');
+      label.className = 'uk-form-label crm-fias-label';
+      label.textContent = def.label;
+
+      const filter = document.createElement('input');
+      filter.className = 'uk-input crm-input crm-fias-filter';
+      filter.type = 'text';
+      filter.placeholder = 'Фильтр…';
+
+      const sel = document.createElement('select');
+      sel.className = 'uk-select crm-select';
+      sel.disabled = true;
+
+      const meta = document.createElement('div');
+      meta.className = 'crm-fias-meta';
+
+      wrap.append(label, filter, sel, meta);
+      container.appendChild(wrap);
+      state.uiByLevel.set(level, { wrap, filter, select: sel, meta });
+
+      filter.addEventListener('input', () => { if (!wrap.hidden) applyFilter(state, level); });
+
+      sel.addEventListener('change', () => {
+        const val = sel.value;
+        if (!val) {
+          // clear this level and below
+          const order = getOrder(state.divisionType);
+          const idx = order.indexOf(level);
+          if (idx >= 0) for (let i = idx; i < order.length; i++) hideLevel(state, order[i]);
+          buildAddressText(state);
+          return;
+        }
+        const full = state.optionsFullByLevel.get(level) || [];
+        const chosen = full.find(x => String(x.object_id) === val);
+        if (!chosen) return;
+
+        state.selectedByLevel.set(level, chosen);
+        if (chosen.hierarchy && chosen.path) syncParents(state, chosen);
+
+        // reset lower levels
+        const order = getOrder(state.divisionType);
+        const idx = order.indexOf(level);
+        if (idx >= 0) for (let i = idx + 1; i < order.length; i++) hideLevel(state, order[i]);
+
+        const nextPath = chosen.path || (state.currentPath ? `${state.currentPath}.${chosen.object_id}` : String(chosen.object_id));
+        state.currentPath = String(nextPath);
+        buildAddressText(state);
+        loadNextLevels(state, level, nextPath);
+      });
+    }
+  }
+
+  function wireWidgetEvents(state, divRow, regionSel) {
+    // Division type change
+    divRow.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (!radio.checked || radio.value === state.divisionType) return;
+        const prevRegion = state.region;
+        state.divisionType = radio.value;
+        if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
+        hideAllLevels(state);
+        state.selectedByLevel.clear();
+        state.optionsFullByLevel.clear();
+        state.region = prevRegion; // keep selected region
+        buildAddressText(state);
+        if (state.region) {
+          const basePath = state.region.path || String(state.region.object_id);
+          loadNextLevels(state, 'region', basePath);
+        }
+      });
+    });
+
+    // Region change
+    regionSel.addEventListener('change', () => {
+      if (state.abortBatch) { state.abortBatch.abort(); state.abortBatch = null; }
+      const id = regionSel.value;
+      if (!id) {
+        state.region = null;
+        state.currentPath = null;
+        hideAllLevels(state);
+        state.selectedByLevel.clear();
+        state.optionsFullByLevel.clear();
+        buildAddressText(state);
+        return;
+      }
+      state.region = state.regions.find(r => String(r.object_id) === id) || null;
+      hideAllLevels(state);
+      state.selectedByLevel.clear();
+      state.optionsFullByLevel.clear();
+      if (!state.region) return;
+      const basePath = state.region.path || String(id);
+      state.currentPath = String(basePath);
+      buildAddressText(state);
+      loadNextLevels(state, 'region', basePath);
+    });
+  }
+
+  /* ── "same as" checkbox logic ──────────────────────────────────────────────── */
+  function initSameAsCheckboxes() {
+    document.querySelectorAll('[data-address-same-as]').forEach(cb => {
+      const targetKind = cb.dataset.addressTarget;
+      const sourceKind = cb.dataset.addressSameAs;
+
+      function sync() {
+        const scope = cb.closest('form, [data-entity], section') || document;
+        const pageScope = document.body;
+
+        const targetWidget = pageScope.querySelector(`[data-fias-address-widget][data-address-kind="${targetKind}"]`);
+        const sourceWidget = pageScope.querySelector(`[data-fias-address-widget][data-address-kind="${sourceKind}"]`);
+        const note = pageScope.querySelector(`[data-address-same-note="${targetKind}"]`);
+
+        if (targetWidget) {
+          targetWidget.hidden = cb.checked;
+          setHiddenInEl(targetWidget, 'isSameAsRegistration', cb.checked ? 'true' : 'false');
+        }
+
+        if (note) {
+          note.hidden = !cb.checked;
+          if (cb.checked && sourceWidget) {
+            const srcPreview = sourceWidget.querySelector('[data-fias-addr-preview]');
+            const noteText = note.querySelector('[data-same-preview-text]');
+            if (noteText && srcPreview) {
+              noteText.textContent = srcPreview.textContent !== '—' ? srcPreview.textContent : '';
+            }
+          }
+        }
+
+        if (cb.checked && targetWidget && sourceWidget) {
+          mirrorHiddenFields(sourceWidget, targetWidget);
+          setHiddenInEl(targetWidget, 'isSameAsRegistration', 'true');
+        }
+      }
+
+      cb.addEventListener('change', sync);
+      sync();
+    });
+  }
+
+  /* ── main init ─────────────────────────────────────────────────────────────── */
+  function initFiasAddress() {
+    const widgets = document.querySelectorAll('[data-fias-address-widget]');
+    if (!widgets.length) return;
+
+    widgets.forEach(widgetEl => {
+      const kind = widgetEl.dataset.addressKind;
+      if (!kind) return;
+      const state = createState(kind);
+      buildWidgetUI(widgetEl, state);
+      loadRegions(state);
+    });
+
+    initSameAsCheckboxes();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFiasAddress);
+  } else {
+    initFiasAddress();
+  }
+})();
