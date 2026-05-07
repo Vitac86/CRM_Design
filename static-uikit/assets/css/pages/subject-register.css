@@ -382,9 +382,9 @@ body[data-page="subject-register"] .crm-address-parts-editor,
 .crm-page[data-page="subject-register"] .crm-address-parts-editor {
   margin-top: 10px;
   padding: 12px;
-  border: 1px solid #d7e3f2;
+  border: 1px solid #c3d3e8;
   border-radius: 8px;
-  background: #f8faff;
+  background: #f1f6fd;
 }
 
 body[data-page="subject-register"] .crm-address-parts-grid,
@@ -419,6 +419,8 @@ body[data-page="subject-register"] .crm-address-parts-grid .crm-input,
   height: 34px;
   font-size: 13px;
   border-radius: 7px;
+  border-color: #cddbeb;
+  background: #fff;
 }
 
 body[data-page="subject-register"] .crm-address-parts-grid textarea.crm-input,
@@ -434,6 +436,8 @@ body[data-page="subject-register"] .crm-address-parts-actions,
   justify-content: flex-end;
   gap: 8px;
   margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #cfdded;
 }
 
 body[data-page="subject-register"] .crm-address-same-note,
@@ -461,9 +465,9 @@ body[data-page="subject-register"] .crm-address-same-note [data-same-preview-tex
 body[data-page="subject-register"] .crm-fias-panel,
 .crm-page[data-page="subject-register"] .crm-fias-panel {
   margin-top: 12px;
-  border: 1px solid #c8d8ee;
+  border: 1px solid #b8cbe4;
   border-radius: 10px;
-  background: #f3f7fb;
+  background: #edf3fb;
   padding: 14px;
 }
 
@@ -474,7 +478,7 @@ body[data-page="subject-register"] .crm-fias-panel-footer,
   justify-content: flex-end;
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid #dde8f5;
+  border-top: 1px solid #c9d8ea;
 }
 
 /* ── FIAS widget internals ──────────────────────────────────────────────────── */
@@ -617,8 +621,8 @@ body[data-page="subject-register"] .crm-fias-meta,
 
 body[data-page="subject-register"] .crm-fias-preview,
 .crm-page[data-page="subject-register"] .crm-fias-preview {
-  background: #eef4fd;
-  border: 1px solid #c2d5ee;
+  background: #e6effb;
+  border: 1px solid #b4c9e4;
   border-radius: 8px;
   padding: 10px 14px;
   display: grid;
