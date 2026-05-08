@@ -534,6 +534,8 @@ Needs more investigation before:
 
 ## Cleanup Status Notes
 
+- 2026-05-08: DONE Task D7 layout chrome cleanup - removed duplicate sidebar brand/nav spacing, submenu link sizing, and mobile sidebar width declarations from `layout/topbar.css` because `layout/sidebar.css` already owns the equivalent sidebar-scoped rules. HTML/JS/classes/hooks/data attributes unchanged; regenerated `crm-static.bundle.css`.
+
 - 2026-05-08: DONE Task A — `components/buttons.css` duplicate cleanup completed.
 - 2026-05-08: DONE Task B — forms/date-picker indicator duplicate cleanup completed.
 - 2026-05-08: DONE Task C — pagination/footer/page-size chip styles consolidated into shared CRM pagination classes.

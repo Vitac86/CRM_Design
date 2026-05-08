@@ -587,16 +587,6 @@ body {
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
-.crm-sidebar-brand {
-  height: var(--crm-topbar-h);
-  padding: 0 18px;
-}
-
-.crm-sidebar nav {
-  gap: 4px;
-  padding: 12px 10px 18px;
-}
-
 .crm-nav-heading {
   padding: 8px 10px 5px;
   font-size: 10px;
@@ -635,13 +625,6 @@ body {
   margin: 2px 0 4px 10px;
   padding-left: 8px;
   border-left: 1px solid rgba(224, 235, 255, 0.22);
-}
-
-.crm-sidebar .crm-nav-submenu .crm-nav-link {
-  min-height: 32px;
-  padding: 6px 10px;
-  border-radius: 7px;
-  font-size: 13px;
 }
 
 .crm-topbar {
@@ -906,10 +889,6 @@ body {
 }
 
 @media (max-width: 920px) {
-  .crm-sidebar {
-    width: var(--crm-sidebar-w);
-  }
-
   .crm-topbar {
     padding: 0 14px;
   }
@@ -10435,7 +10414,7 @@ body[data-page="trading-card"] {
 
    Selector specificity = (0,5,0), identical to the filters.css
    .crm-page.crm-registry-page block that controls these elements at desktop.
-   responsive.css loads last (import position 36 vs 16 in crm-static.css), so
+   responsive.css loads last (@import position 36 vs 16 in crm-static.css), so
    it wins the cascade tie at equal specificity.
 
    The ≤640px block in filters.css already sets flex-direction: column.
