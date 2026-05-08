@@ -21,6 +21,8 @@ Task D11 source CSS readability/header consistency status note (2026-05-08): DON
 
 Task D11b source CSS formatting correction status note (2026-05-08): DONE - `components/address.css`, `components/subject-form.css`, and `components/registry.css` are now readable multi-line source CSS files. No selectors, property values, or CSS behavior were changed. No HTML/JS/classes/hooks/data attributes were changed.
 
+Task D11c source CSS formatting correction status note (2026-05-08): DONE - `components/address.css`, `components/subject-form.css`, and `components/registry.css` were actually reformatted as readable multi-line source CSS files. No selectors, property values, or CSS behavior were changed. No HTML/JS/classes/hooks/data attributes were changed.
+
 ---
 
 ## 1. Executive summary

@@ -1,7 +1,8 @@
 /* Shared CRM registry/list page component */
 
 /* Header and action rows */
-.crm-page.crm-registry-page .crm-registry-header {
+.crm-page.crm-registry-page .crm-registry-header
+{
   align-items: center;
   gap: 12px;
   padding-bottom: 2px;
@@ -10,12 +11,14 @@
 .crm-page[data-page="agents"] .crm-agents-header,
 .crm-page[data-page="requests"] .crm-requests-header,
 .crm-page[data-page="archive"] .crm-archive-header,
-.crm-page[data-page="trust-management"] .crm-trust-management-header {
+.crm-page[data-page="trust-management"] .crm-trust-management-header
+{
   margin: 0;
 }
 
 .crm-page[data-page="back-office"] .crm-back-office-header,
-.crm-page[data-page="trading"] .crm-trading-header {
+.crm-page[data-page="trading"] .crm-trading-header
+{
   align-items: flex-start;
   gap: 12px;
   margin: 0;
@@ -23,12 +26,14 @@
 }
 
 .crm-page[data-page="back-office"] .crm-registry-title-block,
-.crm-page[data-page="trading"] .crm-registry-title-block {
+.crm-page[data-page="trading"] .crm-registry-title-block
+{
   min-width: 0;
 }
 
 .crm-page[data-page="back-office"] .crm-page-title,
-.crm-page[data-page="trading"] .crm-page-title {
+.crm-page[data-page="trading"] .crm-page-title
+{
   margin: 0;
   font-size: 30px;
   font-weight: 600;
@@ -36,7 +41,8 @@
 }
 
 .crm-page[data-page="back-office"] .crm-page-subtitle,
-.crm-page[data-page="trading"] .crm-page-subtitle {
+.crm-page[data-page="trading"] .crm-page-subtitle
+{
   max-width: 720px;
   margin: 4px 0 0;
   color: #69809f;
@@ -49,7 +55,8 @@ body[data-page="subjects"] .crm-registry-actions,
 .crm-page[data-page="requests"] .crm-requests-actions,
 .crm-page[data-page="archive"] .crm-archive-actions,
 .crm-page[data-page="brokerage"] .crm-brokerage-actions,
-.crm-page[data-page="trust-management"] .crm-trust-management-actions {
+.crm-page[data-page="trust-management"] .crm-trust-management-actions
+{
   gap: 10px;
   padding-top: 0;
 }
@@ -58,17 +65,20 @@ body[data-page="subjects"] .crm-registry-actions,
 .crm-page[data-page="requests"] .crm-requests-actions,
 .crm-page[data-page="archive"] .crm-archive-actions,
 .crm-page[data-page="brokerage"] .crm-brokerage-actions,
-.crm-page[data-page="trust-management"] .crm-trust-management-actions {
+.crm-page[data-page="trust-management"] .crm-trust-management-actions
+{
   flex: 0 0 auto;
 }
 
 /* Registry shell and table surfaces */
-.crm-page.crm-registry-page {
+.crm-page.crm-registry-page
+{
   min-width: 0;
   overflow-x: hidden;
 }
 
-.crm-page.crm-registry-page .crm-registry-shell {
+.crm-page.crm-registry-page .crm-registry-shell
+{
   display: grid;
   align-content: start;
   gap: 16px;
@@ -83,12 +93,14 @@ body[data-page="subjects"] .crm-registry-actions,
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
-.crm-page.crm-registry-page .crm-registry-shell > * {
+.crm-page.crm-registry-page .crm-registry-shell > *
+{
   min-width: 0;
   max-width: 100%;
 }
 
-.crm-page.crm-registry-page .crm-registry-shell .crm-registry-filters.crm-filter-panel {
+.crm-page.crm-registry-page .crm-registry-shell .crm-registry-filters.crm-filter-panel
+{
   gap: 12px;
   min-width: 0;
   max-width: 100%;
@@ -100,18 +112,21 @@ body[data-page="subjects"] .crm-registry-actions,
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
-.crm-page.crm-registry-page .crm-registry-shell .crm-filter-search-input {
+.crm-page.crm-registry-page .crm-registry-shell .crm-filter-search-input
+{
   border-color: #dbe2f0;
   background: #fff;
   color: #0f172a;
   line-height: 40px;
 }
 
-.crm-page.crm-registry-page .crm-registry-shell .crm-filter-search-input::placeholder {
+.crm-page.crm-registry-page .crm-registry-shell .crm-filter-search-input::placeholder
+{
   color: #8b9eb8;
 }
 
-.crm-page.crm-registry-page .crm-registry-table {
+.crm-page.crm-registry-page .crm-registry-table
+{
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -121,7 +136,8 @@ body[data-page="subjects"] .crm-registry-actions,
   background: #fff;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper {
+.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper
+{
   display: block;
   width: 100%;
   max-width: 100%;
@@ -138,31 +154,37 @@ body[data-page="subjects"] .crm-registry-actions,
   scrollbar-color: #9ba9bf #e9eef8;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::after {
+.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::after
+{
   display: none;
   content: none;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar {
+.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar
+{
   height: 8px;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar-track {
+.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar-track
+{
   border-radius: 999px;
   background: #e9eef8;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar-thumb {
+.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar-thumb
+{
   border: 1px solid #e9eef8;
   border-radius: 999px;
   background: #9ba9bf;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar-thumb:hover {
+.crm-page.crm-registry-page .crm-registry-table .crm-table-wrapper::-webkit-scrollbar-thumb:hover
+{
   background: #8192ab;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-table {
+.crm-page.crm-registry-page .crm-registry-table .crm-table
+{
   width: 100%;
   max-width: none;
   overflow: visible;
@@ -171,7 +193,8 @@ body[data-page="subjects"] .crm-registry-actions,
   background: #fff;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table {
+.crm-page.crm-registry-page .crm-registry-table .uk-table
+{
   width: 100%;
   max-width: none;
   margin-bottom: 0;
@@ -179,16 +202,19 @@ body[data-page="subjects"] .crm-registry-actions,
   border-spacing: 0;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table thead {
+.crm-page.crm-registry-page .crm-registry-table .uk-table thead
+{
   background: #e8edfb;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table thead tr {
+.crm-page.crm-registry-page .crm-registry-table .uk-table thead tr
+{
   background: #e8edfb;
   border-bottom: 1px solid #dbe2f0;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table th {
+.crm-page.crm-registry-page .crm-registry-table .uk-table th
+{
   padding: 14px 12px 12px;
   color: #475569;
   font-size: 12px;
@@ -202,7 +228,8 @@ body[data-page="subjects"] .crm-registry-actions,
   border-bottom: 1px solid #dbe2f0;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .crm-th-sort {
+.crm-page.crm-registry-page .crm-registry-table .crm-th-sort
+{
   margin-left: 5px;
   opacity: 0.55;
   font-size: 11px;
@@ -210,15 +237,18 @@ body[data-page="subjects"] .crm-registry-actions,
 
 .crm-page.crm-registry-page:not([data-page="back-office"]) .crm-registry-table .uk-table tbody,
 .crm-page.crm-registry-page:not([data-page="back-office"]) .crm-registry-table .uk-table tbody tr,
-.crm-page.crm-registry-page:not([data-page="back-office"]) .crm-registry-table .uk-table tbody td {
+.crm-page.crm-registry-page:not([data-page="back-office"]) .crm-registry-table .uk-table tbody td
+{
   background: #fff;
 }
 
-.crm-page.crm-registry-page:not([data-page="back-office"]) .crm-registry-table .uk-table tbody tr:hover td {
+.crm-page.crm-registry-page:not([data-page="back-office"]) .crm-registry-table .uk-table tbody tr:hover td
+{
   background: #f8fbff;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table td {
+.crm-page.crm-registry-page .crm-registry-table .uk-table td
+{
   padding: 12px;
   border-bottom: 1px solid #e2e8f0;
   font-size: 13px;
@@ -226,11 +256,13 @@ body[data-page="subjects"] .crm-registry-actions,
   vertical-align: middle;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table tbody tr:first-child td {
+.crm-page.crm-registry-page .crm-registry-table .uk-table tbody tr:first-child td
+{
   border-top: 1px solid #dbe2f0;
 }
 
-.crm-page.crm-registry-page .crm-registry-table .uk-table tbody tr:last-child td {
+.crm-page.crm-registry-page .crm-registry-table .uk-table tbody tr:last-child td
+{
   border-bottom: 0;
 }
 
@@ -243,7 +275,8 @@ body[data-page="subjects"] .crm-filter-fields-row,
 .crm-page[data-page="brokerage"] .crm-filter-fields-row,
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-fields-row,
 .crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-fields-row,
-.crm-page[data-page="compliance"] .crm-filter-fields-row {
+.crm-page[data-page="compliance"] .crm-filter-fields-row
+{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -262,7 +295,8 @@ body[data-page="subjects"] .crm-filter-pill-control,
 .crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control,
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control,
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control
+{
   flex: 0 1 auto;
   min-width: 176px;
   max-width: 252px;
@@ -276,14 +310,16 @@ body[data-page="subjects"] .crm-filter-pill-control,
 .crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control,
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control,
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control
+{
   width: clamp(176px, 18vw, 252px);
 }
 
 body[data-page="subjects"] .crm-filter-menu,
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-menu,
 .crm-page[data-page="brokerage"] .crm-filter-menu,
-.crm-page[data-page="compliance"] .crm-filter-menu {
+.crm-page[data-page="compliance"] .crm-filter-menu
+{
   width: 100%;
   max-width: 100%;
 }
@@ -293,14 +329,16 @@ body[data-page="subjects"] .crm-filter-menu,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-actions,
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions,
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-actions,
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-actions {
+.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-actions
+{
   flex: 0 0 auto;
   margin-left: auto;
   align-self: flex-end;
   max-width: 100%;
 }
 
-.crm-page[data-page="subjects"] .crm-filter-actions {
+.crm-page[data-page="subjects"] .crm-filter-actions
+{
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
@@ -313,7 +351,8 @@ body[data-page="subjects"] .crm-filter-menu,
 body[data-page="subjects"] .crm-filter-reset,
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-reset,
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-reset,
-.crm-page[data-page="compliance"] .crm-filter-reset {
+.crm-page[data-page="compliance"] .crm-filter-reset
+{
   min-height: 36px;
   height: 36px;
   padding-inline: 14px;
@@ -325,7 +364,8 @@ body[data-page="subjects"] .crm-filter-reset,
 .crm-page[data-page="agents"] .crm-agents-registry,
 .crm-page[data-page="requests"] .crm-requests-registry,
 .crm-page[data-page="archive"] .crm-archive-registry,
-.crm-page[data-page="trust-management"] .crm-trust-management-registry {
+.crm-page[data-page="trust-management"] .crm-trust-management-registry
+{
   margin-top: 8px;
 }
 
@@ -336,7 +376,8 @@ body[data-page="subjects"] .crm-filter-reset,
 .crm-page[data-page="brokerage"] .crm-brokerage-table .crm-table,
 .crm-page[data-page="brokerage"] .crm-brokerage-table .uk-table,
 .crm-page[data-page="trust-management"] .crm-trust-management-table .crm-table,
-.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table {
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table
+{
   min-width: 1040px;
 }
 
@@ -345,7 +386,8 @@ body[data-page="subjects"] .crm-filter-reset,
 /* Report/list shell and headers */
 body[data-page="middle-office-clients"] .crm-mo-shell,
 body[data-page="middle-office-reports"] .crm-mo-shell,
-.crm-page[data-page="depository"] .crm-dep-shell {
+.crm-page[data-page="depository"] .crm-dep-shell
+{
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -357,7 +399,8 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-page .crm-page-title,
-.crm-page[data-page="depository"] .crm-page-title {
+.crm-page[data-page="depository"] .crm-page-title
+{
   margin: 0;
   color: var(--crm-text);
   font-size: 30px;
@@ -366,19 +409,22 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-page .crm-page-subtitle,
-.crm-page[data-page="depository"] .crm-page-subtitle {
+.crm-page[data-page="depository"] .crm-page-subtitle
+{
   margin: 3px 0 0;
   color: #69809f;
   font-size: 14px;
 }
 
 .crm-mo-page .crm-page-header-row,
-.crm-page[data-page="depository"] .crm-page-header-row {
+.crm-page[data-page="depository"] .crm-page-header-row
+{
   align-items: flex-start;
 }
 
 .crm-mo-page .crm-header-actions,
-.crm-page[data-page="depository"] .crm-header-actions {
+.crm-page[data-page="depository"] .crm-header-actions
+{
   display: flex;
   align-items: center;
   gap: 10px;
@@ -386,7 +432,8 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-page .crm-header-actions .crm-button,
-.crm-page[data-page="depository"] .crm-header-actions .crm-button {
+.crm-page[data-page="depository"] .crm-header-actions .crm-button
+{
   min-height: 40px;
   height: 40px;
   padding: 0 16px;
@@ -396,7 +443,8 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 
 /* Report/list toolbar controls */
 .crm-mo-toolbar-search-shell,
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell {
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell
+{
   display: flex;
   align-items: center;
   gap: 8px;
@@ -409,13 +457,15 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-toolbar-search-shell:focus-within,
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell:focus-within {
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell:focus-within
+{
   border-color: var(--crm-primary);
   box-shadow: var(--crm-focus-ring);
 }
 
 .crm-mo-toolbar-search-icon,
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-icon {
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-icon
+{
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -425,7 +475,8 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-toolbar-search-shell .uk-input,
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input {
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input
+{
   width: 100%;
   height: 36px;
   padding: 0;
@@ -436,13 +487,15 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-toolbar-search-shell .uk-input:focus,
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input:focus {
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input:focus
+{
   outline: none;
   box-shadow: none;
 }
 
 .crm-mo-toolbar-filters,
-.crm-page[data-page="depository"] .crm-dep-toolbar-filters {
+.crm-page[data-page="depository"] .crm-dep-toolbar-filters
+{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -450,7 +503,8 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-filter-input,
-.crm-page[data-page="depository"] .crm-dep-filter-input {
+.crm-page[data-page="depository"] .crm-dep-filter-input
+{
   box-sizing: border-box;
   min-width: 110px;
   height: 38px;
@@ -464,14 +518,16 @@ body[data-page="middle-office-reports"] .crm-mo-shell,
 }
 
 .crm-mo-filter-input:focus,
-.crm-page[data-page="depository"] .crm-dep-filter-input:focus {
+.crm-page[data-page="depository"] .crm-dep-filter-input:focus
+{
   border-color: var(--crm-primary);
   outline: none;
   box-shadow: var(--crm-focus-ring);
 }
 
 body[data-page="middle-office-reports"] .crm-mo-date-wrap,
-.crm-page[data-page="depository"] .crm-dep-date-wrap {
+.crm-page[data-page="depository"] .crm-dep-date-wrap
+{
   position: relative;
   display: block;
   flex: 0 0 auto;
@@ -479,19 +535,22 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap,
 }
 
 body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-input,
-.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-input {
+.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-input
+{
   width: 100%;
   min-width: 0;
 }
 
 body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
-.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-trigger {
+.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-trigger
+{
   right: 10px;
 }
 
 /* Report list and detail surfaces */
 .crm-mo-report-list-wrap,
-.crm-page[data-page="depository"] .crm-dep-report-list-wrap {
+.crm-page[data-page="depository"] .crm-dep-report-list-wrap
+{
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -505,13 +564,15 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-report-list-empty,
-.crm-page[data-page="depository"] .crm-dep-report-list-empty {
+.crm-page[data-page="depository"] .crm-dep-report-list-empty
+{
   padding: 36px 16px;
   text-align: center;
 }
 
 .crm-mo-report-item,
-.crm-page[data-page="depository"] .crm-dep-report-item {
+.crm-page[data-page="depository"] .crm-dep-report-item
+{
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -527,19 +588,22 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-report-item:hover,
-.crm-page[data-page="depository"] .crm-dep-report-item:hover {
+.crm-page[data-page="depository"] .crm-dep-report-item:hover
+{
   border-color: rgba(63, 102, 216, 0.3);
   background: rgba(63, 102, 216, 0.04);
 }
 
 .crm-mo-report-item.is-active,
-.crm-page[data-page="depository"] .crm-dep-report-item.is-active {
+.crm-page[data-page="depository"] .crm-dep-report-item.is-active
+{
   background: rgba(63, 102, 216, 0.08);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
 .crm-mo-report-item-head,
-.crm-page[data-page="depository"] .crm-dep-report-item-head {
+.crm-page[data-page="depository"] .crm-dep-report-item-head
+{
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -547,7 +611,8 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-report-item-name,
-.crm-page[data-page="depository"] .crm-dep-report-item-name {
+.crm-page[data-page="depository"] .crm-dep-report-item-name
+{
   overflow: hidden;
   color: #223250;
   font-size: 13px;
@@ -557,7 +622,8 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-report-item-date,
-.crm-page[data-page="depository"] .crm-dep-report-item-date {
+.crm-page[data-page="depository"] .crm-dep-report-item-date
+{
   flex-shrink: 0;
   padding-top: 2px;
   color: #74839b;
@@ -566,7 +632,8 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-report-item-meta,
-.crm-page[data-page="depository"] .crm-dep-report-item-meta {
+.crm-page[data-page="depository"] .crm-dep-report-item-meta
+{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -575,7 +642,8 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-details-card,
-.crm-page[data-page="depository"] .crm-dep-details-card {
+.crm-page[data-page="depository"] .crm-dep-details-card
+{
   position: sticky;
   top: 16px;
   padding: 20px;
@@ -585,14 +653,16 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-details-grid,
-.crm-page[data-page="depository"] .crm-dep-details-grid {
+.crm-page[data-page="depository"] .crm-dep-details-grid
+{
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
 .crm-mo-detail-field,
-.crm-page[data-page="depository"] .crm-dep-detail-field {
+.crm-page[data-page="depository"] .crm-dep-detail-field
+{
   padding: 8px 10px;
   border: 1px solid var(--crm-border);
   border-radius: 6px;
@@ -600,14 +670,16 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-detail-field-label,
-.crm-page[data-page="depository"] .crm-dep-detail-field-label {
+.crm-page[data-page="depository"] .crm-dep-detail-field-label
+{
   margin: 0 0 3px;
   color: #74839b;
   font-size: 11px;
 }
 
 .crm-mo-detail-field-value,
-.crm-page[data-page="depository"] .crm-dep-detail-field-value {
+.crm-page[data-page="depository"] .crm-dep-detail-field-value
+{
   margin: 0;
   color: var(--crm-text);
   font-size: 13px;
@@ -616,22 +688,26 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-status-ok,
-.crm-page[data-page="depository"] .crm-dep-status-ok {
+.crm-page[data-page="depository"] .crm-dep-status-ok
+{
   color: var(--crm-success);
 }
 
 .crm-mo-status-error,
-.crm-page[data-page="depository"] .crm-dep-status-error {
+.crm-page[data-page="depository"] .crm-dep-status-error
+{
   color: var(--crm-danger);
 }
 
 .crm-mo-status-warn,
-.crm-page[data-page="depository"] .crm-dep-status-warn {
+.crm-page[data-page="depository"] .crm-dep-status-warn
+{
   color: #b45309;
 }
 
 .crm-mo-file-card,
-.crm-page[data-page="depository"] .crm-dep-file-card {
+.crm-page[data-page="depository"] .crm-dep-file-card
+{
   display: flex;
   align-items: center;
   gap: 10px;
@@ -643,7 +719,8 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-file-icon,
-.crm-page[data-page="depository"] .crm-dep-file-icon {
+.crm-page[data-page="depository"] .crm-dep-file-icon
+{
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -657,14 +734,16 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 .crm-mo-file-size,
-.crm-page[data-page="depository"] .crm-dep-file-size {
+.crm-page[data-page="depository"] .crm-dep-file-size
+{
   margin: 2px 0 0;
   color: #74839b;
   font-size: 11px;
 }
 
 .crm-mo-details-actions,
-.crm-page[data-page="depository"] .crm-dep-details-actions {
+.crm-page[data-page="depository"] .crm-dep-details-actions
+{
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -672,11 +751,13 @@ body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
 }
 
 body[data-page="middle-office-reports"] .crm-mo-report-pagination,
-.crm-page[data-page="depository"] .crm-dep-pagination {
+.crm-page[data-page="depository"] .crm-dep-pagination
+{
   padding: 0 4px;
 }
 
 body[data-page="middle-office-reports"] .crm-mo-report-pagination-button,
-.crm-page[data-page="depository"] .crm-dep-pagination-button {
+.crm-page[data-page="depository"] .crm-dep-pagination-button
+{
   font-size: 18px;
 }
