@@ -41,7 +41,8 @@
   padding-right: 34px !important;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator,
+.crm-date-field .crm-date-input::-webkit-calendar-picker-indicator {
   opacity: 0;
 }
 
@@ -61,10 +62,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background-position: initial;
   background-size: initial;
   background-repeat: no-repeat;
-}
-
-.crm-date-field .crm-date-input::-webkit-calendar-picker-indicator {
-  opacity: 0;
 }
 
 .crm-date-trigger {

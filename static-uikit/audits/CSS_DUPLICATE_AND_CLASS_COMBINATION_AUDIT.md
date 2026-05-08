@@ -250,7 +250,7 @@ Manual checks:
 
 Risk level: Low.
 
-### Task B: forms/date fields cleanup
+### Task B: forms/date fields cleanup — date-picker indicator duplicate cleanup **DONE 2026-05-08**
 
 Goal: consolidate exact date-picker indicator hiding and inspect duplicated form-control sizing.
 
