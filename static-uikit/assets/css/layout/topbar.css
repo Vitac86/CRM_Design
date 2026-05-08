@@ -305,21 +305,7 @@
 .crm-button,
 .uk-button.crm-button,
 .uk-button {
-  min-height: 38px;
   border-radius: 10px !important;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.crm-button-primary,
-.uk-button.crm-button-primary {
-  box-shadow: 0 4px 12px rgba(53, 96, 212, 0.2);
-}
-
-.crm-button-ghost {
-  background: #f5f8ff;
-  border-color: #d4dfef;
-  color: #425576;
 }
 
 .crm-decision-action.is-rework {

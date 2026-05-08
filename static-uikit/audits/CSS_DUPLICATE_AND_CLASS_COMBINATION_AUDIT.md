@@ -531,3 +531,4 @@ Needs more investigation before:
 - 2026-05-08: DONE Task C — pagination/footer/page-size chip styles consolidated into shared CRM pagination classes.
 - 2026-05-08: DONE Task D1 — consolidated obvious registry shell, filter/search, table wrapper, header/body, scrollbar, and sizing-support duplicates into shared component CSS; page-specific widths, controls, and layout exceptions remain local. Regenerated `crm-static.bundle.css`.
 - 2026-05-08: corrected / DONE Task D2 — `components/tables.css` housekeeping correction completed and bundle regenerated without `@import`.
+- 2026-05-08: DONE Task D4 — removed safe topbar/button duplicate declarations that were already supplied by `components/buttons.css`; kept the existing topbar radius override and preserved all selectors/classes. Regenerated `crm-static.bundle.css`.
