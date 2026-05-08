@@ -2089,10 +2089,8 @@ input[type="date"]::-webkit-calendar-picker-indicator,
   gap: 12px;
   min-width: 0;
   max-width: 100%;
-  box-sizing: border-box;
   padding: 14px;
   margin: 0;
-  overflow: visible;
   border-color: #d9e3f1;
   border-radius: 16px;
   background: #e9eefb;
@@ -2428,7 +2426,6 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-search-row {
   display: flex;
   justify-content: flex-start;
-  width: 100%;
   min-width: 0;
 }
 
@@ -2501,8 +2498,6 @@ input[type="date"]::-webkit-calendar-picker-indicator,
   flex: 0 0 auto;
   margin-left: auto;
   align-self: flex-end;
-  display: flex;
-  align-items: flex-end;
 }
 
 .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-reset {
@@ -2523,10 +2518,6 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 }
 
 @media (max-width: 900px) {
-  .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-search-row {
-    width: 100%;
-  }
-
   .crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-fields-row {
     gap: 10px;
   }

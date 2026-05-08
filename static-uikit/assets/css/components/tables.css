@@ -316,10 +316,8 @@
   gap: 12px;
   min-width: 0;
   max-width: 100%;
-  box-sizing: border-box;
   padding: 14px;
   margin: 0;
-  overflow: visible;
   border-color: #d9e3f1;
   border-radius: 16px;
   background: #e9eefb;
