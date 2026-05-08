@@ -17,6 +17,8 @@ Forms internal cleanup status note (2026-05-08): checked / SKIPPED - no safe sam
 
 Task D6 address/FIAS status note (2026-05-08): DONE - duplicated subject register/edit address rows, address display/editor controls, FIAS panel, combobox, preview, fallback, and same-address note styles were extracted to `components/address.css`. Page CSS keeps only page-specific address section spacing, register-only FL address blocks, and each page's responsive breakpoint rules. HTML/JS/classes/hooks/data attributes were not changed; `crm-static.css` now imports the address component and the bundle was regenerated with 38 CSS sections.
 
+Task D11 source CSS readability/header consistency status note (2026-05-08): DONE - `components/address.css`, `components/subject-form.css`, and `components/registry.css` were reformatted for source readability without behavior changes. `crm-static.bundle.css` header was normalized to the stable generated bundle format. No HTML/JS/classes/hooks/data attributes were changed.
+
 ---
 
 ## 1. Executive summary

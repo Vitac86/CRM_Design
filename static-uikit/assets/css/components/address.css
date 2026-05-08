@@ -1,5 +1,6 @@
 /* Shared address and FIAS module styles */
 
+/* Address rows */
 body[data-page="subject-register"] .crm-address-rows,
 .crm-page[data-page="subject-register"] .crm-address-rows,
 body[data-page="subject-edit"] .crm-address-rows {
@@ -102,6 +103,7 @@ body[data-page="subject-edit"] .crm-btn-fill-address:hover {
   color: #fff;
 }
 
+/* Address display and manual parts editor */
 body[data-page="subject-register"] .crm-address-display-line,
 .crm-page[data-page="subject-register"] .crm-address-display-line,
 body[data-page="subject-edit"] .crm-address-display-line {
@@ -241,6 +243,7 @@ body[data-page="subject-edit"] .crm-address-same-note [data-same-preview-text] {
   margin-top: 2px;
 }
 
+/* FIAS panel and controls */
 body[data-page="subject-register"] .crm-fias-panel,
 .crm-page[data-page="subject-register"] .crm-fias-panel,
 body[data-page="subject-edit"] .crm-fias-panel {
@@ -340,6 +343,7 @@ body[data-page="subject-edit"] .crm-fias-level-row {
   gap: 3px;
 }
 
+/* FIAS combobox */
 body[data-page="subject-register"] .crm-fias-combobox,
 .crm-page[data-page="subject-register"] .crm-fias-combobox,
 body[data-page="subject-edit"] .crm-fias-combobox {
@@ -412,6 +416,7 @@ body[data-page="subject-edit"] .crm-fias-meta {
   min-height: 14px;
 }
 
+/* FIAS preview and fallback */
 body[data-page="subject-register"] .crm-fias-preview,
 .crm-page[data-page="subject-register"] .crm-fias-preview,
 body[data-page="subject-edit"] .crm-fias-preview {
