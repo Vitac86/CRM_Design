@@ -13,6 +13,8 @@ Form/search cleanup status note (2026-05-08): DONE - registry filter/search over
 
 Filter/table overlap cleanup status note (2026-05-08): DONE - removed redundant registry search-row width, registry filter-actions flex alignment, and registry panel box-sizing/overflow declarations where shared filter primitives already provide the same computed styles. Registry-specific spacing, sizing, colors, and table placement remain unchanged. Bundle regenerated; no HTML/JS/forms/page CSS changed.
 
+Forms internal cleanup status note (2026-05-08): checked / SKIPPED - no safe same-file duplicate was found in `components/forms.css`. The apparent `min-height: 36px` overlap is retained for separate CRM-only and UIkit control contracts. No CSS/bundle regeneration needed; no HTML/JS/filter/table/page CSS changed.
+
 ---
 
 ## 1. Executive summary
