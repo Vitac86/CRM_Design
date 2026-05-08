@@ -5,6 +5,8 @@
 **Audit type:** CSS duplicate and HTML class-combination audit only  
 **Implementation status:** no CSS, HTML, JS, bundle, build, or test changes
 
+Task C status note (2026-05-08): DONE - pagination/footer/page-size chip styles were consolidated into shared CRM pagination classes in `components/tables.css`; page CSS now keeps only compact middle-office/depository overrides.
+
 ---
 
 ## 1. Executive summary
