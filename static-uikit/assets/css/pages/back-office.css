@@ -1,65 +1,6 @@
-/* Header and Actions */
-.crm-page[data-page="back-office"] .crm-back-office-header {
-  align-items: flex-start;
-  gap: 12px;
-  margin: 0;
-  padding-bottom: 2px;
-}
-
-.crm-page[data-page="back-office"] .crm-registry-title-block {
-  min-width: 0;
-}
-
-.crm-page[data-page="back-office"] .crm-page-title {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 1.15;
-}
-
-.crm-page[data-page="back-office"] .crm-page-subtitle {
-  max-width: 720px;
-  margin: 4px 0 0;
-  color: #69809f;
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-/* Filter Panel */
+/* Shared registry header, title, and filter sizing live in components/registry.css. */
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
   min-width: 0;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px, 18vw, 252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-menu {
-  width: 100%;
-  max-width: 100%;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions {
-  flex: 0 0 auto;
-  align-self: flex-end;
-  margin-left: auto;
-  max-width: 100%;
-}
-
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-reset {
-  min-height: 36px;
-  height: 36px;
-  padding-inline: 14px;
-  border-radius: 999px;
-  font-size: 13px;
 }
 
 /* Search Input */

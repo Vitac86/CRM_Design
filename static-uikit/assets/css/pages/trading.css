@@ -5,18 +5,7 @@ body[data-page="trading-card"] {
   --trading-header-border: #dbe2f0;
 }
 
-/* 2. Trading registry header and actions */
-.crm-page[data-page="trading"] .crm-trading-header {
-  align-items: flex-start;
-  gap: 12px;
-  margin: 0;
-  padding-bottom: 2px;
-}
-
-.crm-page[data-page="trading"] .crm-registry-title-block {
-  min-width: 0;
-}
-
+/* 2. Trading registry actions */
 .crm-page[data-page="trading"] .crm-trading-actions {
   flex: 0 0 auto;
   gap: 10px;
@@ -24,55 +13,9 @@ body[data-page="trading-card"] {
   padding-top: 2px;
 }
 
-.crm-page[data-page="trading"] .crm-page-title {
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 1.15;
-  margin: 0;
-}
-
-.crm-page[data-page="trading"] .crm-page-subtitle {
-  max-width: 720px;
-  margin: 4px 0 0;
-  color: #69809f;
-  font-size: 14px;
-  line-height: 1.35;
-}
-
 /* 3. Trading registry filters */
-
-.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-  align-items: center;
-}
-
-.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px, 18vw, 252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-menu {
   width: 100%;
-}
-
-.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-reset {
-  min-height: 36px;
-  height: 36px;
-  border-radius: 999px;
-  padding-inline: 14px;
-  font-size: 13px;
-}
-
-.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-actions {
-  flex: 0 0 auto;
-  margin-left: auto;
-  align-self: flex-end;
-  max-width: 100%;
 }
 
 /* 5. Registry table sizing */

@@ -5,50 +5,10 @@
 }
 
 .crm-page[data-page="depository"] .crm-dep-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 18px 18px 16px;
-  border-radius: 18px;
-  border: 1px solid #d7e2f2;
-  background: #f5f8ff;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
   min-width: 0;
 }
 
-/* Page header and actions */
-.crm-page[data-page="depository"] .crm-page-title {
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 1.15;
-  margin: 0;
-  color: var(--crm-text);
-}
-
-.crm-page[data-page="depository"] .crm-page-subtitle {
-  color: #69809f;
-  margin: 3px 0 0;
-  font-size: 14px;
-}
-
-.crm-page[data-page="depository"] .crm-page-header-row {
-  align-items: flex-start;
-}
-
-.crm-page[data-page="depository"] .crm-header-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding-top: 4px;
-}
-
-.crm-page[data-page="depository"] .crm-header-actions .crm-button {
-  min-height: 40px;
-  height: 40px;
-  padding: 0 16px;
-  font-size: 14px;
-  font-weight: 500;
-}
+/* Shared depository shell/header rules live in components/registry.css. */
 
 /* Filter toolbar */
 .crm-page[data-page="depository"] .crm-dep-toolbar {
@@ -64,89 +24,7 @@
 
 /* Toolbar search input */
 .crm-page[data-page="depository"] .crm-dep-toolbar-search-shell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--crm-input-border);
-  border-radius: 8px;
-  background: var(--crm-input-bg);
-  padding: 0 10px;
-  height: 38px;
-  transition: border-color 0.15s, box-shadow 0.15s;
   cursor: text;
-}
-
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell:focus-within {
-  border-color: var(--crm-primary);
-  box-shadow: var(--crm-focus-ring);
-}
-
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-icon {
-  color: #8fa3bf;
-  flex-shrink: 0;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  align-items: center;
-}
-
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  height: 36px;
-  font-size: 13px;
-  width: 100%;
-  box-shadow: none;
-}
-
-.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-.crm-page[data-page="depository"] .crm-dep-toolbar-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Toolbar filters/selects */
-.crm-page[data-page="depository"] .crm-dep-filter-input {
-  height: 38px;
-  font-size: 13px;
-  padding: 0 10px;
-  border-radius: 8px;
-  border: 1px solid var(--crm-input-border);
-  background: var(--crm-input-bg);
-  color: var(--crm-text);
-  min-width: 110px;
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-.crm-page[data-page="depository"] .crm-dep-filter-input:focus {
-  border-color: var(--crm-primary);
-  box-shadow: var(--crm-focus-ring);
-  outline: none;
-}
-
-/* Date fields */
-.crm-page[data-page="depository"] .crm-dep-date-wrap {
-  position: relative;
-  display: block;
-  flex: 0 0 auto;
-  width: 148px;
-}
-
-.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-input {
-  width: 100%;
-  min-width: 0;
-}
-
-.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-trigger {
-  right: 10px;
 }
 
 /* Master-detail split */
@@ -159,30 +37,12 @@
 }
 
 .crm-page[data-page="depository"] .crm-dep-split-left {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   min-width: 0;
 }
 
 /* Report list */
 .crm-page[data-page="depository"] .crm-dep-report-list-wrap {
-  border: 1px solid var(--crm-border);
-  border-radius: 10px;
-  background: #fff;
-  padding: 8px;
   max-height: 580px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  scrollbar-width: thin;
-  scrollbar-color: #bfcbdf transparent;
-}
-
-.crm-page[data-page="depository"] .crm-dep-report-list-empty {
-  padding: 36px 16px;
-  text-align: center;
 }
 
 .crm-page[data-page="depository"] .crm-dep-report-list-empty-title {
@@ -199,54 +59,9 @@
 }
 
 /* Report list items */
-.crm-page[data-page="depository"] .crm-dep-report-item {
-  width: 100%;
-  display: block;
-  text-align: left;
-  border: 1px solid var(--crm-border);
-  border-radius: 8px;
-  background: #fff;
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  font: inherit;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.crm-page[data-page="depository"] .crm-dep-report-item:hover {
-  border-color: rgba(63, 102, 216, 0.3);
-  background: rgba(63, 102, 216, 0.04);
-}
-
 .crm-page[data-page="depository"] .crm-dep-report-item.is-active {
   border-color: #4f6bdc;
   background: rgba(79, 107, 220, 0.08);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-}
-
-.crm-page[data-page="depository"] .crm-dep-report-item-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.crm-page[data-page="depository"] .crm-dep-report-item-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #223250;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.crm-page[data-page="depository"] .crm-dep-report-item-date {
-  font-size: 11px;
-  color: #74839b;
-  white-space: nowrap;
-  flex-shrink: 0;
-  padding-top: 2px;
 }
 
 .crm-page[data-page="depository"] .crm-dep-report-item-sub {
@@ -264,22 +79,8 @@
   text-overflow: ellipsis;
 }
 
-.crm-page[data-page="depository"] .crm-dep-report-item-meta {
-  margin-top: 6px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-}
-
 /* Details panel */
 .crm-page[data-page="depository"] .crm-dep-details-card {
-  border: 1px solid var(--crm-border);
-  border-radius: 10px;
-  background: #fff;
-  padding: 20px;
-  position: sticky;
-  top: 16px;
   min-width: 0;
 }
 
@@ -292,70 +93,9 @@
   line-height: 1.4;
 }
 
-/* Details grid and fields */
-.crm-page[data-page="depository"] .crm-dep-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.crm-page[data-page="depository"] .crm-dep-detail-field {
-  border: 1px solid var(--crm-border);
-  border-radius: 6px;
-  background: #f5f8ff;
-  padding: 8px 10px;
-}
-
-.crm-page[data-page="depository"] .crm-dep-detail-field-label {
-  font-size: 11px;
-  color: #74839b;
-  margin: 0 0 3px;
-}
-
-.crm-page[data-page="depository"] .crm-dep-detail-field-value {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--crm-text);
-  margin: 0;
-  word-break: break-word;
-}
-
-.crm-page[data-page="depository"] .crm-dep-status-ok {
-  color: var(--crm-success);
-}
-
-.crm-page[data-page="depository"] .crm-dep-status-error {
-  color: var(--crm-danger);
-}
-
-.crm-page[data-page="depository"] .crm-dep-status-warn {
-  color: #b45309;
-}
-
 /* File card */
 .crm-page[data-page="depository"] .crm-dep-file-card {
-  border: 1px solid var(--crm-border);
-  border-radius: 6px;
-  background: #f5f8ff;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
   min-width: 0;
-}
-
-.crm-page[data-page="depository"] .crm-dep-file-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  background: #fff;
-  border: 1px solid var(--crm-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #74839b;
-  flex-shrink: 0;
 }
 
 .crm-page[data-page="depository"] .crm-dep-file-info {
@@ -371,20 +111,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.crm-page[data-page="depository"] .crm-dep-file-size {
-  font-size: 11px;
-  color: #74839b;
-  margin: 2px 0 0;
-}
-
-/* Action buttons */
-.crm-page[data-page="depository"] .crm-dep-details-actions {
-  margin-top: 14px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 
 /* Toast */
@@ -411,17 +137,8 @@
   pointer-events: auto;
 }
 
-/* Pagination */
-.crm-page[data-page="depository"] .crm-dep-pagination {
-  padding: 0 4px;
-}
-
 .crm-page[data-page="depository"] .crm-dep-pagination-page {
   white-space: nowrap;
-}
-
-.crm-page[data-page="depository"] .crm-dep-pagination-button {
-  font-size: 18px;
 }
 
 /* Mobile rules */

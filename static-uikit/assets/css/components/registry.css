@@ -7,13 +7,45 @@
   padding-bottom: 2px;
 }
 
+.crm-page[data-page="agents"] .crm-agents-header,
 .crm-page[data-page="requests"] .crm-requests-header,
 .crm-page[data-page="archive"] .crm-archive-header,
 .crm-page[data-page="trust-management"] .crm-trust-management-header {
   margin: 0;
 }
 
+.crm-page[data-page="back-office"] .crm-back-office-header,
+.crm-page[data-page="trading"] .crm-trading-header {
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding-bottom: 2px;
+}
+
+.crm-page[data-page="back-office"] .crm-registry-title-block,
+.crm-page[data-page="trading"] .crm-registry-title-block {
+  min-width: 0;
+}
+
+.crm-page[data-page="back-office"] .crm-page-title,
+.crm-page[data-page="trading"] .crm-page-title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.crm-page[data-page="back-office"] .crm-page-subtitle,
+.crm-page[data-page="trading"] .crm-page-subtitle {
+  max-width: 720px;
+  margin: 4px 0 0;
+  color: #69809f;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
 body[data-page="subjects"] .crm-registry-actions,
+.crm-page[data-page="agents"] .crm-agents-actions,
 .crm-page[data-page="requests"] .crm-requests-actions,
 .crm-page[data-page="archive"] .crm-archive-actions,
 .crm-page[data-page="brokerage"] .crm-brokerage-actions,
@@ -22,6 +54,7 @@ body[data-page="subjects"] .crm-registry-actions,
   padding-top: 0;
 }
 
+.crm-page[data-page="agents"] .crm-agents-actions,
 .crm-page[data-page="requests"] .crm-requests-actions,
 .crm-page[data-page="archive"] .crm-archive-actions,
 .crm-page[data-page="brokerage"] .crm-brokerage-actions,
@@ -203,9 +236,12 @@ body[data-page="subjects"] .crm-registry-actions,
 
 /* Registry filter row sizing extracted from list pages */
 body[data-page="subjects"] .crm-filter-fields-row,
+.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-fields-row,
 .crm-page[data-page="requests"] .crm-requests-shell .crm-filter-fields-row,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-fields-row,
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row,
 .crm-page[data-page="brokerage"] .crm-filter-fields-row,
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-fields-row,
 .crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-fields-row,
 .crm-page[data-page="compliance"] .crm-filter-fields-row {
   display: flex;
@@ -217,12 +253,15 @@ body[data-page="subjects"] .crm-filter-fields-row,
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
 body[data-page="subjects"] .crm-filter-pill-control,
+.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-pill-control,
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control,
 .crm-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
 .crm-page[data-page="brokerage"] .crm-filter-pill-control,
 .crm-page[data-page="compliance"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
 .crm-page[data-page="compliance"] .crm-filter-pill-control,
 .crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control,
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control,
 .crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
   flex: 0 1 auto;
   min-width: 176px;
@@ -230,23 +269,30 @@ body[data-page="subjects"] .crm-filter-pill-control,
 }
 
 body[data-page="subjects"] .crm-filter-pill-control,
+.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-pill-control,
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control,
 .crm-page[data-page="brokerage"] .crm-filter-pill-control,
 .crm-page[data-page="compliance"] .crm-filter-pill-control,
 .crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control,
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control,
 .crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
   width: clamp(176px, 18vw, 252px);
 }
 
 body[data-page="subjects"] .crm-filter-menu,
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-menu,
 .crm-page[data-page="brokerage"] .crm-filter-menu,
 .crm-page[data-page="compliance"] .crm-filter-menu {
   width: 100%;
   max-width: 100%;
 }
 
+.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-actions,
 .crm-page[data-page="requests"] .crm-requests-shell .crm-filter-actions,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-actions,
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions,
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-actions,
 .crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-actions {
   flex: 0 0 auto;
   margin-left: auto;
@@ -265,6 +311,8 @@ body[data-page="subjects"] .crm-filter-menu,
 }
 
 body[data-page="subjects"] .crm-filter-reset,
+.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-reset,
+.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-reset,
 .crm-page[data-page="compliance"] .crm-filter-reset {
   min-height: 36px;
   height: 36px;
@@ -274,12 +322,15 @@ body[data-page="subjects"] .crm-filter-reset,
 }
 
 /* Repeated registry table placement and sizing */
+.crm-page[data-page="agents"] .crm-agents-registry,
 .crm-page[data-page="requests"] .crm-requests-registry,
 .crm-page[data-page="archive"] .crm-archive-registry,
 .crm-page[data-page="trust-management"] .crm-trust-management-registry {
   margin-top: 8px;
 }
 
+.crm-page[data-page="agents"] .crm-agents-table .crm-table,
+.crm-page[data-page="agents"] .crm-agents-table .uk-table,
 .crm-page[data-page="requests"] .crm-requests-table .crm-table,
 .crm-page[data-page="requests"] .crm-requests-table .uk-table,
 .crm-page[data-page="brokerage"] .crm-brokerage-table .crm-table,
@@ -287,4 +338,341 @@ body[data-page="subjects"] .crm-filter-reset,
 .crm-page[data-page="trust-management"] .crm-trust-management-table .crm-table,
 .crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table {
   min-width: 1040px;
+}
+
+/* Registry-like report/list pages */
+body[data-page="middle-office-clients"] .crm-mo-shell,
+body[data-page="middle-office-reports"] .crm-mo-shell,
+.crm-page[data-page="depository"] .crm-dep-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 18px 16px;
+  border: 1px solid #d7e2f2;
+  border-radius: 18px;
+  background: #f5f8ff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.crm-mo-page .crm-page-title,
+.crm-page[data-page="depository"] .crm-page-title {
+  margin: 0;
+  color: var(--crm-text);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.crm-mo-page .crm-page-subtitle,
+.crm-page[data-page="depository"] .crm-page-subtitle {
+  margin: 3px 0 0;
+  color: #69809f;
+  font-size: 14px;
+}
+
+.crm-mo-page .crm-page-header-row,
+.crm-page[data-page="depository"] .crm-page-header-row {
+  align-items: flex-start;
+}
+
+.crm-mo-page .crm-header-actions,
+.crm-page[data-page="depository"] .crm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.crm-mo-page .crm-header-actions .crm-button,
+.crm-page[data-page="depository"] .crm-header-actions .crm-button {
+  min-height: 40px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.crm-mo-toolbar-search-shell,
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--crm-input-border);
+  border-radius: 8px;
+  background: var(--crm-input-bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.crm-mo-toolbar-search-shell:focus-within,
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell:focus-within {
+  border-color: var(--crm-primary);
+  box-shadow: var(--crm-focus-ring);
+}
+
+.crm-mo-toolbar-search-icon,
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  width: 15px;
+  height: 15px;
+  color: #8fa3bf;
+}
+
+.crm-mo-toolbar-search-shell .uk-input,
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input {
+  width: 100%;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.crm-mo-toolbar-search-shell .uk-input:focus,
+.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell .uk-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.crm-mo-toolbar-filters,
+.crm-page[data-page="depository"] .crm-dep-toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-mo-filter-input,
+.crm-page[data-page="depository"] .crm-dep-filter-input {
+  box-sizing: border-box;
+  min-width: 110px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--crm-input-border);
+  border-radius: 8px;
+  background: var(--crm-input-bg);
+  color: var(--crm-text);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.crm-mo-filter-input:focus,
+.crm-page[data-page="depository"] .crm-dep-filter-input:focus {
+  border-color: var(--crm-primary);
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}
+
+body[data-page="middle-office-reports"] .crm-mo-date-wrap,
+.crm-page[data-page="depository"] .crm-dep-date-wrap {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 148px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-input,
+.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-input {
+  width: 100%;
+  min-width: 0;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger,
+.crm-page[data-page="depository"] .crm-dep-date-wrap .crm-date-trigger {
+  right: 10px;
+}
+
+.crm-mo-report-list-wrap,
+.crm-page[data-page="depository"] .crm-dep-report-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: #bfcbdf transparent;
+}
+
+.crm-mo-report-list-empty,
+.crm-page[data-page="depository"] .crm-dep-report-list-empty {
+  padding: 36px 16px;
+  text-align: center;
+}
+
+.crm-mo-report-item,
+.crm-page[data-page="depository"] .crm-dep-report-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--crm-border);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.crm-mo-report-item:hover,
+.crm-page[data-page="depository"] .crm-dep-report-item:hover {
+  border-color: rgba(63, 102, 216, 0.3);
+  background: rgba(63, 102, 216, 0.04);
+}
+
+.crm-mo-report-item.is-active,
+.crm-page[data-page="depository"] .crm-dep-report-item.is-active {
+  background: rgba(63, 102, 216, 0.08);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.crm-mo-report-item-head,
+.crm-page[data-page="depository"] .crm-dep-report-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.crm-mo-report-item-name,
+.crm-page[data-page="depository"] .crm-dep-report-item-name {
+  overflow: hidden;
+  color: #223250;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.crm-mo-report-item-date,
+.crm-page[data-page="depository"] .crm-dep-report-item-date {
+  flex-shrink: 0;
+  padding-top: 2px;
+  color: #74839b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.crm-mo-report-item-meta,
+.crm-page[data-page="depository"] .crm-dep-report-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.crm-mo-details-card,
+.crm-page[data-page="depository"] .crm-dep-details-card {
+  position: sticky;
+  top: 16px;
+  padding: 20px;
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.crm-mo-details-grid,
+.crm-page[data-page="depository"] .crm-dep-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.crm-mo-detail-field,
+.crm-page[data-page="depository"] .crm-dep-detail-field {
+  padding: 8px 10px;
+  border: 1px solid var(--crm-border);
+  border-radius: 6px;
+  background: #f5f8ff;
+}
+
+.crm-mo-detail-field-label,
+.crm-page[data-page="depository"] .crm-dep-detail-field-label {
+  margin: 0 0 3px;
+  color: #74839b;
+  font-size: 11px;
+}
+
+.crm-mo-detail-field-value,
+.crm-page[data-page="depository"] .crm-dep-detail-field-value {
+  margin: 0;
+  color: var(--crm-text);
+  font-size: 13px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.crm-mo-status-ok,
+.crm-page[data-page="depository"] .crm-dep-status-ok {
+  color: var(--crm-success);
+}
+
+.crm-mo-status-error,
+.crm-page[data-page="depository"] .crm-dep-status-error {
+  color: var(--crm-danger);
+}
+
+.crm-mo-status-warn,
+.crm-page[data-page="depository"] .crm-dep-status-warn {
+  color: #b45309;
+}
+
+.crm-mo-file-card,
+.crm-page[data-page="depository"] .crm-dep-file-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border: 1px solid var(--crm-border);
+  border-radius: 6px;
+  background: #f5f8ff;
+}
+
+.crm-mo-file-icon,
+.crm-page[data-page="depository"] .crm-dep-file-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--crm-border);
+  border-radius: 6px;
+  background: #fff;
+  color: #74839b;
+}
+
+.crm-mo-file-size,
+.crm-page[data-page="depository"] .crm-dep-file-size {
+  margin: 2px 0 0;
+  color: #74839b;
+  font-size: 11px;
+}
+
+.crm-mo-details-actions,
+.crm-page[data-page="depository"] .crm-dep-details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination,
+.crm-page[data-page="depository"] .crm-dep-pagination {
+  padding: 0 4px;
+}
+
+body[data-page="middle-office-reports"] .crm-mo-report-pagination-button,
+.crm-page[data-page="depository"] .crm-dep-pagination-button {
+  font-size: 18px;
 }

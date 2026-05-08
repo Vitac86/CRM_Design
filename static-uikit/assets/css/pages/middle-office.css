@@ -1,55 +1,4 @@
-/* Middle Office: shared variables and shell */
-body[data-page="middle-office-clients"],
-body[data-page="middle-office-reports"] {
-  --mo-shell-border: #d7e2f2;
-  --mo-shell-bg: #f5f8ff;
-}
-
-body[data-page="middle-office-clients"] .crm-mo-shell,
-body[data-page="middle-office-reports"] .crm-mo-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 18px 18px 16px;
-  border-radius: 18px;
-  border: 1px solid var(--mo-shell-border);
-  background: var(--mo-shell-bg);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
-}
-
-/* Middle Office: shared page header and actions */
-.crm-mo-page .crm-page-title {
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 1.15;
-  margin: 0;
-  color: var(--crm-text);
-}
-
-.crm-mo-page .crm-page-subtitle {
-  color: #69809f;
-  margin: 3px 0 0;
-  font-size: 14px;
-}
-
-.crm-mo-page .crm-page-header-row {
-  align-items: flex-start;
-}
-
-.crm-mo-page .crm-header-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding-top: 4px;
-}
-
-.crm-mo-page .crm-header-actions .crm-button {
-  min-height: 40px;
-  height: 40px;
-  padding: 0 16px;
-  font-size: 14px;
-  font-weight: 500;
-}
+/* Shared middle-office shell/header rules live in components/registry.css. */
 
 /* Middle Office: shared toolbar */
 .crm-mo-toolbar {
@@ -66,55 +15,7 @@ body[data-page="middle-office-reports"] .crm-mo-shell {
   min-width: 0;
 }
 
-.crm-mo-toolbar-search-shell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--crm-input-border);
-  border-radius: 8px;
-  background: var(--crm-input-bg);
-  padding: 0 10px;
-  height: 38px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.crm-mo-toolbar-search-shell:focus-within {
-  border-color: var(--crm-primary);
-  box-shadow: var(--crm-focus-ring);
-}
-
-.crm-mo-toolbar-search-icon {
-  color: #8fa3bf;
-  flex-shrink: 0;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  align-items: center;
-}
-
-.crm-mo-toolbar-search-shell .uk-input {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  height: 36px;
-  font-size: 13px;
-  width: 100%;
-  box-shadow: none;
-}
-
-.crm-mo-toolbar-search-shell .uk-input:focus {
-  outline: none;
-  box-shadow: none;
-}
-
 /* Middle Office: toolbar filters and selects */
-.crm-mo-toolbar-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
 .crm-mo-select {
   height: 38px;
   font-size: 13px;
@@ -151,41 +52,6 @@ body[data-page="middle-office-reports"] .crm-mo-toolbar-search-shell {
 
 body[data-page="middle-office-reports"] .crm-mo-toolbar-filters {
   width: 100%;
-}
-
-.crm-mo-filter-input {
-  height: 38px;
-  font-size: 13px;
-  padding: 0 10px;
-  border-radius: 8px;
-  border: 1px solid var(--crm-input-border);
-  background: var(--crm-input-bg);
-  color: var(--crm-text);
-  min-width: 110px;
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-.crm-mo-filter-input:focus {
-  border-color: var(--crm-primary);
-  box-shadow: var(--crm-focus-ring);
-  outline: none;
-}
-
-body[data-page="middle-office-reports"] .crm-mo-date-wrap {
-  position: relative;
-  display: block;
-  flex: 0 0 auto;
-  width: 148px;
-}
-
-body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-input {
-  width: 100%;
-  min-width: 0;
-}
-
-body[data-page="middle-office-reports"] .crm-mo-date-wrap .crm-date-trigger {
-  right: 10px;
 }
 
 body[data-page="middle-office-reports"] .crm-mo-toolbar-filters .crm-button {
@@ -288,75 +154,13 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   grid-template-columns: 2fr 1fr;
 }
 
-.crm-mo-split-left {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 /* Middle Office reports: list */
 .crm-mo-report-list-wrap {
-  border: 1px solid var(--crm-border);
-  border-radius: 10px;
-  background: #fff;
-  padding: 8px;
   max-height: 560px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  scrollbar-width: thin;
-  scrollbar-color: #bfcbdf transparent;
-}
-
-.crm-mo-report-item {
-  width: 100%;
-  display: block;
-  text-align: left;
-  border: 1px solid var(--crm-border);
-  border-radius: 8px;
-  background: #fff;
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  font: inherit;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.crm-mo-report-item:hover {
-  border-color: rgba(63, 102, 216, 0.3);
-  background: rgba(63, 102, 216, 0.04);
 }
 
 .crm-mo-report-item.is-active {
   border-color: rgba(63, 102, 216, 0.35);
-  background: rgba(63, 102, 216, 0.08);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-}
-
-.crm-mo-report-item-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.crm-mo-report-item-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #223250;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.crm-mo-report-item-date {
-  font-size: 11px;
-  color: #74839b;
-  white-space: nowrap;
-  flex-shrink: 0;
-  padding-top: 2px;
 }
 
 .crm-mo-report-item-title {
@@ -366,19 +170,6 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.crm-mo-report-item-meta {
-  margin-top: 6px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-}
-
-.crm-mo-report-list-empty {
-  padding: 36px 16px;
-  text-align: center;
 }
 
 .crm-mo-report-list-empty-title {
@@ -393,69 +184,12 @@ body[data-page="middle-office-reports"] .crm-mo-split {
   color: #60718c;
 }
 
-/* Middle Office reports: list pagination */
-body[data-page="middle-office-reports"] .crm-mo-report-pagination {
-  padding: 0 4px;
-}
-
-body[data-page="middle-office-reports"] .crm-mo-report-pagination-button {
-  font-size: 18px;
-}
-
 /* Middle Office reports: details panel */
-.crm-mo-details-card {
-  border: 1px solid var(--crm-border);
-  border-radius: 10px;
-  background: #fff;
-  padding: 20px;
-  position: sticky;
-  top: 16px;
-}
-
 .crm-mo-details-title {
   font-size: 15px;
   font-weight: 600;
   color: var(--crm-text);
   margin: 0 0 14px;
-}
-
-.crm-mo-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.crm-mo-detail-field {
-  border: 1px solid var(--crm-border);
-  border-radius: 6px;
-  background: #f5f8ff;
-  padding: 8px 10px;
-}
-
-.crm-mo-detail-field-label {
-  font-size: 11px;
-  color: #74839b;
-  margin: 0 0 3px;
-}
-
-.crm-mo-detail-field-value {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--crm-text);
-  margin: 0;
-  word-break: break-word;
-}
-
-.crm-mo-status-ok {
-  color: var(--crm-success);
-}
-
-.crm-mo-status-error {
-  color: var(--crm-danger);
-}
-
-.crm-mo-status-warn {
-  color: #b45309;
 }
 
 .crm-mo-status-info {
@@ -467,49 +201,12 @@ body[data-page="middle-office-reports"] .crm-mo-report-pagination-button {
 }
 
 /* Middle Office reports: file card and actions */
-.crm-mo-file-card {
-  border: 1px solid var(--crm-border);
-  border-radius: 6px;
-  background: #f5f8ff;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.crm-mo-file-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  background: #fff;
-  border: 1px solid var(--crm-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #74839b;
-  flex-shrink: 0;
-}
-
 .crm-mo-file-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--crm-text);
   margin: 0;
   word-break: break-word;
-}
-
-.crm-mo-file-size {
-  font-size: 11px;
-  color: #74839b;
-  margin: 2px 0 0;
-}
-
-.crm-mo-details-actions {
-  margin-top: 14px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 
 /* Middle Office: toast */
