@@ -534,6 +534,8 @@ Needs more investigation before:
 
 ## Cleanup Status Notes
 
+- 2026-05-08: DONE Task D8 subject create/edit shared CSS extraction - moved shared subject title resets, label casing/weight, form action-row flex alignment, and subject panel radius declarations into `components/subject-form.css`. Page CSS keeps wizard-specific grids/states, edit-shell/header details, address/FIAS spacing/responsive rules, and page-specific form controls. HTML/JS/classes/hooks/data attributes unchanged; `crm-static.css` imports the component and `crm-static.bundle.css` was regenerated.
+
 - 2026-05-08: DONE Task D7 layout chrome cleanup - removed duplicate sidebar brand/nav spacing, submenu link sizing, and mobile sidebar width declarations from `layout/topbar.css` because `layout/sidebar.css` already owns the equivalent sidebar-scoped rules. HTML/JS/classes/hooks/data attributes unchanged; regenerated `crm-static.bundle.css`.
 
 - 2026-05-08: DONE Task A — `components/buttons.css` duplicate cleanup completed.

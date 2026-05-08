@@ -25,7 +25,6 @@ body[data-page="subject-register"] .reg-step-header,
 
 body[data-page="subject-register"] .reg-step-header h2,
 .crm-page[data-page="subject-register"] .reg-step-header h2 {
-  margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: var(--crm-text);
@@ -45,9 +44,7 @@ body[data-page="subject-register"] .reg-group:last-child,
 body[data-page="subject-register"] .reg-group-title,
 .crm-page[data-page="subject-register"] .reg-group-title {
   font-size: 13px;
-  font-weight: 600;
   color: var(--crm-text-secondary);
-  text-transform: uppercase;
   letter-spacing: .04em;
   margin: 0 0 10px;
 }
@@ -76,10 +73,6 @@ body[data-page="subject-register"] .reg-binary-grid,
 body[data-page="subject-register"] .reg-wizard-actions,
 .crm-page[data-page="subject-register"] .reg-wizard-actions {
   margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
 }
 
 body[data-page="subject-register"] .reg-wizard-actions .reg-back,
@@ -162,7 +155,6 @@ body[data-page="subject-register"] .reg-bank-delete:hover,
 body[data-page="subject-register"] .reg-bank-add-form,
 .crm-page[data-page="subject-register"] .reg-bank-add-form {
   border: 1px solid #d7e0ef;
-  border-radius: 12px;
   background: #f8faff;
   padding: 12px;
   margin-top: 12px;
