@@ -15,6 +15,8 @@ Filter/table overlap cleanup status note (2026-05-08): DONE - removed redundant 
 
 Forms internal cleanup status note (2026-05-08): checked / SKIPPED - no safe same-file duplicate was found in `components/forms.css`. The apparent `min-height: 36px` overlap is retained for separate CRM-only and UIkit control contracts. No CSS/bundle regeneration needed; no HTML/JS/filter/table/page CSS changed.
 
+Task D6 address/FIAS status note (2026-05-08): DONE - duplicated subject register/edit address rows, address display/editor controls, FIAS panel, combobox, preview, fallback, and same-address note styles were extracted to `components/address.css`. Page CSS keeps only page-specific address section spacing, register-only FL address blocks, and each page's responsive breakpoint rules. HTML/JS/classes/hooks/data attributes were not changed; `crm-static.css` now imports the address component and the bundle was regenerated with 38 CSS sections.
+
 ---
 
 ## 1. Executive summary

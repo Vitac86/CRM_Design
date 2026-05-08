@@ -1,0 +1,468 @@
+/* Shared address and FIAS module styles */
+
+body[data-page="subject-register"] .crm-address-rows,
+.crm-page[data-page="subject-register"] .crm-address-rows,
+body[data-page="subject-edit"] .crm-address-rows {
+  border: 1px solid #c8d8ee;
+  border-radius: 10px;
+  background: #f8faff;
+}
+
+body[data-page="subject-register"] .crm-address-row:first-child,
+.crm-page[data-page="subject-register"] .crm-address-row:first-child,
+body[data-page="subject-edit"] .crm-address-row:first-child {
+  border-radius: 9px 9px 0 0;
+}
+
+body[data-page="subject-register"] .crm-address-row:last-child,
+.crm-page[data-page="subject-register"] .crm-address-row:last-child,
+body[data-page="subject-edit"] .crm-address-row:last-child {
+  border-radius: 0 0 9px 9px;
+}
+
+body[data-page="subject-register"] .crm-address-row,
+.crm-page[data-page="subject-register"] .crm-address-row,
+body[data-page="subject-edit"] .crm-address-row {
+  padding: 14px 16px;
+  border-bottom: 1px solid #dde8f5;
+  background: #fff;
+}
+
+body[data-page="subject-register"] .crm-address-row:last-child,
+.crm-page[data-page="subject-register"] .crm-address-row:last-child,
+body[data-page="subject-edit"] .crm-address-row:last-child {
+  border-bottom: 0;
+}
+
+body[data-page="subject-register"] .crm-address-row-head,
+.crm-page[data-page="subject-register"] .crm-address-row-head,
+body[data-page="subject-edit"] .crm-address-row-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-bottom: 10px;
+}
+
+body[data-page="subject-register"] .crm-address-row-title,
+.crm-page[data-page="subject-register"] .crm-address-row-title,
+body[data-page="subject-edit"] .crm-address-row-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--crm-text);
+  flex-shrink: 0;
+}
+
+body[data-page="subject-register"] .crm-address-same-check,
+.crm-page[data-page="subject-register"] .crm-address-same-check,
+body[data-page="subject-edit"] .crm-address-same-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--crm-text-secondary);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+body[data-page="subject-register"] .crm-address-same-check input[type="checkbox"],
+.crm-page[data-page="subject-register"] .crm-address-same-check input[type="checkbox"],
+body[data-page="subject-edit"] .crm-address-same-check input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+body[data-page="subject-register"] .crm-btn-fill-address,
+.crm-page[data-page="subject-register"] .crm-btn-fill-address,
+body[data-page="subject-edit"] .crm-btn-fill-address {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #3a6abf;
+  border-radius: 6px;
+  background: transparent;
+  color: #3a6abf;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+body[data-page="subject-register"] .crm-btn-fill-address:hover,
+.crm-page[data-page="subject-register"] .crm-btn-fill-address:hover,
+body[data-page="subject-edit"] .crm-btn-fill-address:hover {
+  background: #3a6abf;
+  color: #fff;
+}
+
+body[data-page="subject-register"] .crm-address-display-line,
+.crm-page[data-page="subject-register"] .crm-address-display-line,
+body[data-page="subject-edit"] .crm-address-display-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+body[data-page="subject-register"] .crm-address-display-line[hidden],
+.crm-page[data-page="subject-register"] .crm-address-display-line[hidden],
+body[data-page="subject-register"] .crm-address-parts-editor[hidden],
+.crm-page[data-page="subject-register"] .crm-address-parts-editor[hidden],
+body[data-page="subject-edit"] .crm-address-display-line[hidden],
+body[data-page="subject-edit"] .crm-address-parts-editor[hidden] {
+  display: none;
+}
+
+body[data-page="subject-register"] .crm-address-output,
+.crm-page[data-page="subject-register"] .crm-address-output,
+body[data-page="subject-edit"] .crm-address-output {
+  height: auto;
+  min-height: 52px;
+  resize: none;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
+body[data-page="subject-register"] .crm-address-output[readonly],
+.crm-page[data-page="subject-register"] .crm-address-output[readonly],
+body[data-page="subject-edit"] .crm-address-output[readonly] {
+  background: #f8faff;
+  color: var(--crm-text);
+  border-color: #d7e3f2;
+  cursor: text;
+}
+
+body[data-page="subject-register"] .crm-address-edit-btn,
+.crm-page[data-page="subject-register"] .crm-address-edit-btn,
+body[data-page="subject-edit"] .crm-address-edit-btn {
+  align-self: start;
+  min-width: 122px;
+  height: 36px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+body[data-page="subject-register"] .crm-address-parts-editor,
+.crm-page[data-page="subject-register"] .crm-address-parts-editor,
+body[data-page="subject-edit"] .crm-address-parts-editor {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #c3d3e8;
+  border-radius: 8px;
+  background: #f1f6fd;
+}
+
+body[data-page="subject-register"] .crm-address-parts-grid,
+.crm-page[data-page="subject-register"] .crm-address-parts-grid,
+body[data-page="subject-edit"] .crm-address-parts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+body[data-page="subject-register"] .crm-address-part-field,
+.crm-page[data-page="subject-register"] .crm-address-part-field,
+body[data-page="subject-edit"] .crm-address-part-field {
+  display: block;
+  min-width: 0;
+}
+
+body[data-page="subject-register"] .crm-address-part-field--wide,
+.crm-page[data-page="subject-register"] .crm-address-part-field--wide,
+body[data-page="subject-edit"] .crm-address-part-field--wide {
+  grid-column: span 3;
+}
+
+body[data-page="subject-register"] .crm-address-part-label,
+.crm-page[data-page="subject-register"] .crm-address-part-label,
+body[data-page="subject-edit"] .crm-address-part-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-text-secondary);
+}
+
+body[data-page="subject-register"] .crm-address-parts-grid .crm-input,
+.crm-page[data-page="subject-register"] .crm-address-parts-grid .crm-input,
+body[data-page="subject-edit"] .crm-address-parts-grid .crm-input {
+  height: 34px;
+  font-size: 13px;
+  border-radius: 7px;
+  border-color: #cddbeb;
+  background: #fff;
+}
+
+body[data-page="subject-register"] .crm-address-parts-grid textarea.crm-input,
+.crm-page[data-page="subject-register"] .crm-address-parts-grid textarea.crm-input,
+body[data-page="subject-edit"] .crm-address-parts-grid textarea.crm-input {
+  height: auto;
+  min-height: 58px;
+  resize: vertical;
+}
+
+body[data-page="subject-register"] .crm-address-parts-actions,
+.crm-page[data-page="subject-register"] .crm-address-parts-actions,
+body[data-page="subject-edit"] .crm-address-parts-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #cfdded;
+}
+
+body[data-page="subject-register"] .crm-address-same-note,
+.crm-page[data-page="subject-register"] .crm-address-same-note,
+body[data-page="subject-edit"] .crm-address-same-note {
+  font-size: 12px;
+  color: var(--crm-text-secondary);
+  background: #f3f7fb;
+  border: 1px solid #e3ecf5;
+  border-radius: 7px;
+  padding: 7px 12px;
+  margin-top: 2px;
+}
+
+body[data-page="subject-register"] .crm-address-same-note [data-same-preview-text],
+.crm-page[data-page="subject-register"] .crm-address-same-note [data-same-preview-text],
+body[data-page="subject-edit"] .crm-address-same-note [data-same-preview-text] {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--crm-text);
+  margin-top: 2px;
+}
+
+body[data-page="subject-register"] .crm-fias-panel,
+.crm-page[data-page="subject-register"] .crm-fias-panel,
+body[data-page="subject-edit"] .crm-fias-panel {
+  margin-top: 12px;
+  border: 1px solid #b8cbe4;
+  border-radius: 10px;
+  background: #edf3fb;
+  padding: 14px;
+}
+
+body[data-page="subject-register"] .crm-fias-panel-footer,
+.crm-page[data-page="subject-register"] .crm-fias-panel-footer,
+body[data-page="subject-edit"] .crm-fias-panel-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #c9d8ea;
+}
+
+body[data-page="subject-register"] .crm-fias-inner,
+.crm-page[data-page="subject-register"] .crm-fias-inner,
+body[data-page="subject-edit"] .crm-fias-inner {
+  display: grid;
+  gap: 8px;
+}
+
+body[data-page="subject-register"] .crm-fias-row,
+.crm-page[data-page="subject-register"] .crm-fias-row,
+body[data-page="subject-edit"] .crm-fias-row {
+  display: grid;
+  gap: 4px;
+}
+
+body[data-page="subject-register"] .crm-fias-label,
+.crm-page[data-page="subject-register"] .crm-fias-label,
+body[data-page="subject-edit"] .crm-fias-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--crm-muted);
+  line-height: 1.25;
+  margin-bottom: 0;
+}
+
+body[data-page="subject-register"] .crm-fias-divtype-opts,
+.crm-page[data-page="subject-register"] .crm-fias-divtype-opts,
+body[data-page="subject-edit"] .crm-fias-divtype-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+body[data-page="subject-register"] .crm-fias-radio-opt,
+.crm-page[data-page="subject-register"] .crm-fias-radio-opt,
+body[data-page="subject-edit"] .crm-fias-radio-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--crm-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+body[data-page="subject-register"] .crm-fias-radio-opt input[type="radio"],
+.crm-page[data-page="subject-register"] .crm-fias-radio-opt input[type="radio"],
+body[data-page="subject-edit"] .crm-fias-radio-opt input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+body[data-page="subject-register"] .crm-fias-status,
+.crm-page[data-page="subject-register"] .crm-fias-status,
+body[data-page="subject-edit"] .crm-fias-status {
+  font-size: 11px;
+  color: var(--crm-text-secondary);
+  min-height: 14px;
+}
+
+body[data-page="subject-register"] .crm-fias-levels,
+.crm-page[data-page="subject-register"] .crm-fias-levels,
+body[data-page="subject-edit"] .crm-fias-levels {
+  display: grid;
+  gap: 6px;
+}
+
+body[data-page="subject-register"] .crm-fias-level-row,
+.crm-page[data-page="subject-register"] .crm-fias-level-row,
+body[data-page="subject-edit"] .crm-fias-level-row {
+  display: grid;
+  gap: 3px;
+}
+
+body[data-page="subject-register"] .crm-fias-combobox,
+.crm-page[data-page="subject-register"] .crm-fias-combobox,
+body[data-page="subject-edit"] .crm-fias-combobox {
+  position: relative;
+  width: 100%;
+}
+
+body[data-page="subject-register"] .crm-fias-combobox-input,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-input,
+body[data-page="subject-edit"] .crm-fias-combobox-input {
+  width: 100%;
+  height: 30px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+body[data-page="subject-register"] .crm-fias-combobox-menu,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-menu,
+body[data-page="subject-edit"] .crm-fias-combobox-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 300;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #c8d8ee;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.13);
+}
+
+body[data-page="subject-register"] .crm-fias-combobox-item,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-item,
+body[data-page="subject-edit"] .crm-fias-combobox-item {
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  color: var(--crm-text);
+}
+
+body[data-page="subject-register"] .crm-fias-combobox-item:hover,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-item:hover,
+body[data-page="subject-register"] .crm-fias-combobox-item.is-active,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-item.is-active,
+body[data-page="subject-edit"] .crm-fias-combobox-item:hover,
+body[data-page="subject-edit"] .crm-fias-combobox-item.is-active {
+  background: #eef4fd;
+}
+
+body[data-page="subject-register"] .crm-fias-combobox-item--empty,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-item--empty,
+body[data-page="subject-edit"] .crm-fias-combobox-item--empty {
+  color: var(--crm-muted);
+  cursor: default;
+}
+
+body[data-page="subject-register"] .crm-fias-combobox-item--empty:hover,
+.crm-page[data-page="subject-register"] .crm-fias-combobox-item--empty:hover,
+body[data-page="subject-edit"] .crm-fias-combobox-item--empty:hover {
+  background: transparent;
+}
+
+body[data-page="subject-register"] .crm-fias-meta,
+.crm-page[data-page="subject-register"] .crm-fias-meta,
+body[data-page="subject-edit"] .crm-fias-meta {
+  font-size: 11px;
+  color: var(--crm-muted);
+  min-height: 14px;
+}
+
+body[data-page="subject-register"] .crm-fias-preview,
+.crm-page[data-page="subject-register"] .crm-fias-preview,
+body[data-page="subject-edit"] .crm-fias-preview {
+  background: #e6effb;
+  border: 1px solid #b4c9e4;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="subject-register"] .crm-fias-preview-label,
+.crm-page[data-page="subject-register"] .crm-fias-preview-label,
+body[data-page="subject-edit"] .crm-fias-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5577a8;
+  margin-bottom: 3px;
+}
+
+body[data-page="subject-register"] .crm-fias-preview-addr,
+.crm-page[data-page="subject-register"] .crm-fias-preview-addr,
+body[data-page="subject-edit"] .crm-fias-preview-addr {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-text);
+  line-height: 1.4;
+}
+
+body[data-page="subject-register"] .crm-fias-preview-postal,
+.crm-page[data-page="subject-register"] .crm-fias-preview-postal,
+body[data-page="subject-edit"] .crm-fias-preview-postal {
+  font-size: 11px;
+  color: var(--crm-text-secondary);
+}
+
+body[data-page="subject-register"] .crm-fias-fallback,
+.crm-page[data-page="subject-register"] .crm-fias-fallback,
+body[data-page="subject-edit"] .crm-fias-fallback {
+  background: #fff8ec;
+  border: 1px solid #f5d98a;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+body[data-page="subject-register"] .crm-fias-fallback-msg,
+.crm-page[data-page="subject-register"] .crm-fias-fallback-msg,
+body[data-page="subject-edit"] .crm-fias-fallback-msg {
+  font-size: 12px;
+  color: #7a5000;
+  margin: 0;
+}
