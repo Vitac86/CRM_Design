@@ -58,13 +58,7 @@
   margin: 0;
 }
 
-.crm-table .uk-table th {
-  white-space: nowrap;
-}
 
-.crm-table .uk-table td {
-  vertical-align: middle;
-}
 
 .crm-table tbody tr[data-href] {
   cursor: pointer;
@@ -223,8 +217,13 @@
 }
 
 /* moved from components/cards.css: shared table primitives */
-.crm-table-wrapper { border-radius: 12px; overflow: auto; max-width: 100%; }
-.crm-table-wrapper { scrollbar-width: thin; scrollbar-color: #bfcbdf transparent; }
+.crm-table-wrapper {
+  border-radius: 12px;
+  overflow: auto;
+  max-width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #bfcbdf transparent;
+}
 
 .crm-table {
   border: 1px solid var(--crm-border);
@@ -270,7 +269,10 @@
   border-top-color: #e5ecf7;
 }
 
-.crm-table tbody tr:hover { background: #f5f8ff; cursor: pointer; }
+.crm-table tbody tr:hover {
+  background: #f2f6ff;
+  cursor: pointer;
+}
 
 .crm-table-wrapper {
   scrollbar-gutter: stable both-edges;
@@ -283,10 +285,6 @@
 
 .crm-table .uk-table td:first-child {
   white-space: normal;
-}
-
-.crm-table tbody tr:hover {
-  background: #f2f6ff;
 }
 
 .crm-page.crm-registry-page {
