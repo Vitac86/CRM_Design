@@ -4,15 +4,13 @@
 body[data-page="subject-register"] .reg-step-header h2,
 .crm-page[data-page="subject-register"] .reg-step-header h2,
 body[data-page="subject-edit"] .crm-edit-title,
-body[data-page="subject-edit"] .crm-form-section-head h3
-{
+body[data-page="subject-edit"] .crm-form-section-head h3 {
   margin: 0;
 }
 
 body[data-page="subject-register"] .reg-group-title,
 .crm-page[data-page="subject-register"] .reg-group-title,
-body[data-page="subject-edit"] .uk-form-label
-{
+body[data-page="subject-edit"] .uk-form-label {
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -20,8 +18,7 @@ body[data-page="subject-edit"] .uk-form-label
 /* Actions and form surfaces */
 body[data-page="subject-register"] .reg-wizard-actions,
 .crm-page[data-page="subject-register"] .reg-wizard-actions,
-body[data-page="subject-edit"] .crm-edit-header-actions
-{
+body[data-page="subject-edit"] .crm-edit-header-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -31,7 +28,6 @@ body[data-page="subject-edit"] .crm-edit-header-actions
 body[data-page="subject-register"] .reg-bank-add-form,
 .crm-page[data-page="subject-register"] .reg-bank-add-form,
 body[data-page="subject-edit"] .crm-edit-header,
-body[data-page="subject-edit"] .crm-edit-form-card
-{
+body[data-page="subject-edit"] .crm-edit-form-card {
   border-radius: 12px;
 }
