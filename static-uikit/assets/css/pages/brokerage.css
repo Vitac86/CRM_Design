@@ -12,20 +12,12 @@
 
 /* Header and actions */
 
-.crm-page[data-page="brokerage"] .crm-brokerage-header {
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 2px;
-}
-
 .crm-page[data-page="brokerage"] .crm-registry-title-block {
   min-width: 0;
   max-width: 100%;
 }
 
 .crm-page[data-page="brokerage"] .crm-brokerage-actions {
-  flex: 0 0 auto;
-  gap: 10px;
   margin-left: auto;
   padding-top: 2px;
 }
@@ -41,30 +33,7 @@
 /* Filter panel */
 
 .crm-page[data-page="brokerage"] .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-  align-items: center;
   min-width: 0;
-  max-width: 100%;
-}
-
-.crm-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
-  flex: 0 1 auto;
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="brokerage"] .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px, 18vw, 252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="brokerage"] .crm-filter-menu {
-  width: 100%;
   max-width: 100%;
 }
 
@@ -72,12 +41,6 @@
   margin-bottom: 0;
   min-width: 0;
   max-width: 100%;
-}
-
-/* Table sizing */
-.crm-page[data-page="brokerage"] .crm-brokerage-table .crm-table,
-.crm-page[data-page="brokerage"] .crm-brokerage-table .uk-table {
-  min-width: 1040px;
 }
 
 /* Cell helpers */

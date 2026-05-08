@@ -1,39 +1,8 @@
 /* Header and Actions */
-.crm-page[data-page="archive"] .crm-archive-header {
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  padding-bottom: 2px;
-}
-
-.crm-page[data-page="archive"] .crm-archive-actions {
-  flex: 0 0 auto;
-  gap: 10px;
-  padding-top: 0;
-}
+/* Shared registry header/action rules live in components/registry.css. */
 
 /* Filter Panel */
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-  align-items: center;
-}
-
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px,18vw,252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-actions {
-  flex: 0 0 auto;
-  margin-left: auto;
-  align-self: flex-end;
-  max-width: 100%;
-}
+/* Shared registry filter row sizing lives in components/registry.css. */
 
 /* Date Fields */
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-date-control.crm-date-field {
@@ -45,10 +14,6 @@
 }
 
 /* Table sizing */
-.crm-page[data-page="archive"] .crm-archive-registry {
-  margin-top: 8px;
-}
-
 .crm-page[data-page="archive"] .crm-archive-table .crm-table,
 .crm-page[data-page="archive"] .crm-archive-table .uk-table {
   min-width: 1100px;

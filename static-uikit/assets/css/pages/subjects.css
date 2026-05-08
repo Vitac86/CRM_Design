@@ -5,22 +5,11 @@ body[data-page="subjects"] {
 }
 
 /* Header and actions */
-body[data-page="subjects"] .crm-subjects-header {
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 2px;
-}
-
 body[data-page="subjects"] .crm-page-title {
   margin: 0;
   font-size: 30px;
   font-weight: 600;
   line-height: 1.15;
-}
-
-body[data-page="subjects"] .crm-registry-actions {
-  gap: 10px;
-  padding-top: 0;
 }
 
 body[data-page="subjects"] .crm-registry-actions .crm-button {
@@ -29,30 +18,6 @@ body[data-page="subjects"] .crm-registry-actions .crm-button {
   padding: 0 16px;
   font-size: 14px;
   font-weight: 500;
-}
-
-body[data-page="subjects"] .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-}
-
-body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
-body[data-page="subjects"] .crm-filter-pill-control {
-  flex: 0 1 auto;
-  min-width: 176px;
-  max-width: 252px;
-}
-
-body[data-page="subjects"] .crm-filter-pill-control {
-  width: clamp(176px, 18vw, 252px);
-}
-
-body[data-page="subjects"] .crm-filter-menu {
-  width: 100%;
-  max-width: 100%;
 }
 
 body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"],
@@ -69,24 +34,6 @@ body[data-page="subjects"] .crm-filter-menu[data-filter-menu="qualification"] .c
 
 body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"] .crm-filter-dropdown {
   min-width: 248px;
-}
-
-body[data-page="subjects"] .crm-filter-reset {
-  min-height: 36px;
-  height: 36px;
-  padding-inline: 14px;
-  border-radius: 999px;
-  font-size: 13px;
-}
-
-.crm-page[data-page="subjects"] .crm-filter-actions {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  align-self: flex-end;
-  gap: 8px;
-  max-width: 100%;
-  margin-left: auto;
 }
 
 .crm-page[data-page="subjects"] .crm-button-export-light {

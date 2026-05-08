@@ -1,16 +1,5 @@
 /* Header and Actions */
-.crm-page[data-page="requests"] .crm-requests-header {
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  padding-bottom: 2px;
-}
-
-.crm-page[data-page="requests"] .crm-requests-actions {
-  flex: 0 0 auto;
-  gap: 10px;
-  padding-top: 0;
-}
+/* Shared registry header/action rules live in components/registry.css. */
 
 /* Create Request Panel */
 .crm-page[data-page="requests"] .crm-request-create {
@@ -71,37 +60,10 @@
 }
 
 /* Filter Panel */
-.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-  align-items: center;
-}
-
-.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px,18vw,252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-actions {
-  flex: 0 0 auto;
-  margin-left: auto;
-  align-self: flex-end;
-  max-width: 100%;
-}
+/* Shared registry filter row sizing lives in components/registry.css. */
 
 /* Table sizing */
-.crm-page[data-page="requests"] .crm-requests-registry {
-  margin-top: 8px;
-}
-
-.crm-page[data-page="requests"] .crm-requests-table .crm-table,
-.crm-page[data-page="requests"] .crm-requests-table .uk-table {
-  min-width: 1040px;
-}
+/* Shared 1040px registry table sizing lives in components/registry.css. */
 
 /* Cell Helpers / Row Helpers
    Row helper visuals are shared; no requests-only rules are needed here. */

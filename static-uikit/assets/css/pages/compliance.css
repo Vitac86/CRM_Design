@@ -5,12 +5,6 @@
 }
 
 /* 2. Compliance registry header and actions */
-.crm-page[data-page="compliance"] .crm-compliance-header {
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 2px;
-}
-
 .crm-page[data-page="compliance"] .crm-page-title {
   font-size: 30px;
   font-weight: 600;
@@ -27,30 +21,7 @@
 }
 
 .crm-page[data-page="compliance"] .crm-filter-fields-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-  align-items: center;
   min-width: 0;
-}
-
-.crm-page[data-page="compliance"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
-  flex: 0 1 auto;
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="compliance"] .crm-filter-pill-control {
-  flex: 0 1 auto;
-  width: clamp(176px, 18vw, 252px);
-  min-width: 176px;
-  max-width: 252px;
-}
-
-.crm-page[data-page="compliance"] .crm-filter-menu {
-  width: 100%;
-  max-width: 100%;
 }
 
 .crm-page[data-page="compliance"] .crm-filter-menu[data-filter-menu="compliance-status"] {
@@ -63,11 +34,6 @@
 }
 
 .crm-page[data-page="compliance"] .crm-filter-reset {
-  min-height: 36px;
-  height: 36px;
-  border-radius: 999px;
-  padding-inline: 14px;
-  font-size: 13px;
   color: #475d85;
   background: #f4f7fd;
   border-color: #ccd8ec;
