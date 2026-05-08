@@ -312,6 +312,31 @@
   max-width: 100%;
 }
 
+.crm-page.crm-registry-page .crm-registry-shell .crm-registry-filters.crm-filter-panel {
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  margin: 0;
+  overflow: visible;
+  border-color: #d9e3f1;
+  border-radius: 16px;
+  background: #e9eefb;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.crm-page.crm-registry-page .crm-registry-shell .crm-filter-search-input {
+  border-color: #dbe2f0;
+  background: #fff;
+  color: #0f172a;
+  line-height: 40px;
+}
+
+.crm-page.crm-registry-page .crm-registry-shell .crm-filter-search-input::placeholder {
+  color: #8b9eb8;
+}
+
 .crm-page.crm-registry-page .crm-registry-table {
   width: 100%;
   max-width: 100%;

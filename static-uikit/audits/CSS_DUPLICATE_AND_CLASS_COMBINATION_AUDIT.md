@@ -9,6 +9,8 @@ Task C status note (2026-05-08): DONE - pagination/footer/page-size chip styles 
 
 Task D2 status note (2026-05-08): corrected / DONE - `components/tables.css` internal housekeeping cleanup complete. Removed 2 outdated single-property rules (`.crm-table .uk-table th { white-space: nowrap }` and `.crm-table .uk-table td { vertical-align: middle }`), merged 2 inline `.crm-table-wrapper` blocks into one, consolidated duplicate `.crm-table tbody tr:hover` rules. Bundle regenerated with all 37 CSS sections, zero @import statements. No HTML/JS/page CSS changed.
 
+Form/search cleanup status note (2026-05-08): DONE - registry filter/search overrides were moved out of `components/forms.css` into `components/tables.css`; exact search shell/icon duplicates and duplicate search-input sizing declarations were removed because `components/filters.css` already supplies them. Generic CRM form-control rules were left unchanged. Bundle regenerated; no HTML/JS/page CSS changed.
+
 ---
 
 ## 1. Executive summary
