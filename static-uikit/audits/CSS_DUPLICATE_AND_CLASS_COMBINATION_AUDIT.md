@@ -206,7 +206,7 @@ Depository note: no dedicated `depository.js` exists in the inspected `assets/js
 
 This plan is for a future implementation pass. It does not require HTML or JS changes.
 
-### Task A: buttons.css duplicate cleanup
+### Task A: buttons.css duplicate cleanup — **DONE 2026-05-08**
 
 Goal: remove the smallest exact duplicate in button variant declarations.
 
