@@ -3,11 +3,11 @@
 **Project:** Investika CRM static UI handoff  
 **Scope source of truth:** `static-uikit/` only  
 **Audit type:** CSS duplicate and HTML class-combination audit only  
-**Implementation status:** no CSS, HTML, JS, bundle, build, or test changes
+**Implementation status:** CSS cleanup Tasks A-D2 completed; HTML/JS class-combination simplification remains deferred.
 
 Task C status note (2026-05-08): DONE - pagination/footer/page-size chip styles were consolidated into shared CRM pagination classes in `components/tables.css`; page CSS now keeps only compact middle-office/depository overrides.
 
-Task D2 status note (2026-05-08): DONE - `components/tables.css` internal housekeeping cleanup complete. Removed 2 outdated single-property rules (`.crm-table .uk-table th { white-space: nowrap }` and `.crm-table .uk-table td { vertical-align: middle }`), merged 2 inline `.crm-table-wrapper` blocks into one, consolidated duplicate `.crm-table tbody tr:hover` rules. Bundle regenerated with all 37 CSS sections, zero @import statements. No HTML/JS/page CSS changed.
+Task D2 status note (2026-05-08): corrected / DONE - `components/tables.css` internal housekeeping cleanup complete. Removed 2 outdated single-property rules (`.crm-table .uk-table th { white-space: nowrap }` and `.crm-table .uk-table td { vertical-align: middle }`), merged 2 inline `.crm-table-wrapper` blocks into one, consolidated duplicate `.crm-table tbody tr:hover` rules. Bundle regenerated with all 37 CSS sections, zero @import statements. No HTML/JS/page CSS changed.
 
 ---
 
@@ -526,4 +526,8 @@ Needs more investigation before:
 
 ## Cleanup Status Notes
 
+- 2026-05-08: DONE Task A — `components/buttons.css` duplicate cleanup completed.
+- 2026-05-08: DONE Task B — forms/date-picker indicator duplicate cleanup completed.
+- 2026-05-08: DONE Task C — pagination/footer/page-size chip styles consolidated into shared CRM pagination classes.
 - 2026-05-08: DONE Task D1 — consolidated obvious registry shell, filter/search, table wrapper, header/body, scrollbar, and sizing-support duplicates into shared component CSS; page-specific widths, controls, and layout exceptions remain local. Regenerated `crm-static.bundle.css`.
+- 2026-05-08: corrected / DONE Task D2 — `components/tables.css` housekeeping correction completed and bundle regenerated without `@import`.
