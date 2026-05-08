@@ -519,3 +519,9 @@ Needs more investigation before:
 - topbar/sidebar token cleanup;
 - class-combination reduction;
 - document-template CSS changes.
+
+---
+
+## Cleanup Status Notes
+
+- 2026-05-08: DONE Task D1 — consolidated obvious registry shell, filter/search, table wrapper, header/body, scrollbar, and sizing-support duplicates into shared component CSS; page-specific widths, controls, and layout exceptions remain local. Regenerated `crm-static.bundle.css`.
