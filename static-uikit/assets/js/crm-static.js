@@ -98,6 +98,29 @@
     return target instanceof HTMLInputElement && target.matches('input[data-phone-mask]');
   }
 
+  function isPhoneMaskPunctuation(char) {
+    return char === ' ' || char === '(' || char === ')' || char === '-';
+  }
+
+  function findPreviousDigitIndex(value, fromIndex) {
+    for (let i = Math.min(fromIndex - 1, value.length - 1); i >= 0; i--) {
+      if (/\d/.test(value.charAt(i))) return i;
+    }
+    return -1;
+  }
+
+  function findNextDigitIndex(value, fromIndex) {
+    for (let i = Math.max(fromIndex, 0); i < value.length; i++) {
+      if (/\d/.test(value.charAt(i))) return i;
+    }
+    return -1;
+  }
+
+  function removeCharAt(value, index) {
+    if (index < 0 || index >= value.length) return value;
+    return value.slice(0, index) + value.slice(index + 1);
+  }
+
   function isActiveDomesticRussianPhoneValue(source) {
     return source.raw === '+7' || source.raw.indexOf('+7 ') === 0 || source.raw.indexOf('+7 (') === 0;
   }
@@ -155,6 +178,33 @@
         formatPhoneInput(input);
       }
     });
+  }
+
+  function handlePhoneMaskDelete(event) {
+    const target = event.target;
+    if (!isPhoneMaskInput(target)) return;
+    if (event.inputType !== 'deleteContentBackward' && event.inputType !== 'deleteContentForward') return;
+    if (typeof target.selectionStart !== 'number' || typeof target.selectionEnd !== 'number') return;
+    if (target.selectionStart !== target.selectionEnd) return;
+
+    const value = target.value || '';
+    const caretPosition = target.selectionStart;
+    let digitIndex = -1;
+
+    if (event.inputType === 'deleteContentBackward') {
+      const punctuationIndex = caretPosition - 1;
+      if (!isPhoneMaskPunctuation(value.charAt(punctuationIndex))) return;
+      digitIndex = findPreviousDigitIndex(value, punctuationIndex);
+    } else {
+      if (!isPhoneMaskPunctuation(value.charAt(caretPosition))) return;
+      digitIndex = findNextDigitIndex(value, caretPosition + 1);
+    }
+
+    if (digitIndex === -1) return;
+
+    event.preventDefault();
+    target.value = removeCharAt(value, digitIndex);
+    formatPhoneInput(target);
   }
 
   // ── Auth validation ──────────────────────────────────────────────────────
@@ -1147,6 +1197,8 @@
       setRequestCreatePanelOpen(false, false);
     }
   });
+
+  document.addEventListener('beforeinput', handlePhoneMaskDelete);
 
   document.addEventListener('paste', function (event) {
     const target = event.target;
