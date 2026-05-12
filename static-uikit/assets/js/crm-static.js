@@ -35,6 +35,128 @@
     return document.querySelector('[data-auth-error-for="' + escapeCssValue(control.id) + '"]');
   }
 
+  const PHONE_INTERNATIONAL_MAX_DIGITS = 15;
+  const PHONE_RU_BODY_MAX_DIGITS = 10;
+  const domesticRuPhoneInputs = new WeakSet();
+
+  // Hook contract: input[data-phone-mask], optional data-phone-country="RU".
+  function normalizePhoneMaskSource(value) {
+    const raw = String(value || '').trim();
+    return {
+      raw: raw,
+      hasLeadingPlus: raw.charAt(0) === '+',
+      digits: raw.replace(/\D/g, '')
+    };
+  }
+
+  function compactInternationalPhone(source) {
+    if (!source.digits) return source.hasLeadingPlus ? '+' : '';
+    return '+' + source.digits.slice(0, PHONE_INTERNATIONAL_MAX_DIGITS);
+  }
+
+  function getRussianPhoneBody(source) {
+    const digits = source.digits || '';
+    const firstDigit = digits.charAt(0);
+    if (firstDigit === '7' || firstDigit === '8') {
+      return digits.slice(1, PHONE_RU_BODY_MAX_DIGITS + 1);
+    }
+    return digits.slice(0, PHONE_RU_BODY_MAX_DIGITS);
+  }
+
+  function formatRussianPhoneBody(bodyDigits) {
+    const body = String(bodyDigits || '').slice(0, PHONE_RU_BODY_MAX_DIGITS);
+    if (!body) return '+7';
+
+    let formatted = '+7 (' + body.slice(0, 3);
+    if (body.length < 3) return formatted;
+
+    formatted += ')';
+    if (body.length > 3) {
+      formatted += ' ' + body.slice(3, 6);
+    }
+    if (body.length > 6) {
+      formatted += '-' + body.slice(6, 8);
+    }
+    if (body.length > 8) {
+      formatted += '-' + body.slice(8, 10);
+    }
+    return formatted;
+  }
+
+  function shouldFormatExplicitRussianPhone(source) {
+    if (!source.digits) return false;
+    return !source.hasLeadingPlus || source.digits.charAt(0) === '7';
+  }
+
+  function isDomesticRussianPhoneInput(source) {
+    return !source.hasLeadingPlus
+      && source.digits.charAt(0) === '8'
+      && source.digits.length <= PHONE_RU_BODY_MAX_DIGITS + 1;
+  }
+
+  function isPhoneMaskInput(target) {
+    return target instanceof HTMLInputElement && target.matches('input[data-phone-mask]');
+  }
+
+  function isActiveDomesticRussianPhoneValue(source) {
+    return source.raw === '+7' || source.raw.indexOf('+7 ') === 0 || source.raw.indexOf('+7 (') === 0;
+  }
+
+  function getPhoneMaskValue(input) {
+    const source = normalizePhoneMaskSource(input.value);
+    const isExplicitRu = String(input.getAttribute('data-phone-country') || '').toUpperCase() === 'RU';
+    const wasDomesticRu = domesticRuPhoneInputs.has(input);
+
+    if (!source.digits) {
+      domesticRuPhoneInputs.delete(input);
+      return source.hasLeadingPlus ? '+' : '';
+    }
+
+    if (isExplicitRu && shouldFormatExplicitRussianPhone(source)) {
+      domesticRuPhoneInputs.delete(input);
+      return formatRussianPhoneBody(getRussianPhoneBody(source));
+    }
+
+    if (!isExplicitRu && isDomesticRussianPhoneInput(source)) {
+      if (source.digits.length === 1) {
+        domesticRuPhoneInputs.delete(input);
+        return '8';
+      }
+      domesticRuPhoneInputs.add(input);
+      return formatRussianPhoneBody(getRussianPhoneBody(source));
+    }
+
+    if (!isExplicitRu && wasDomesticRu && source.hasLeadingPlus && source.digits.charAt(0) === '7' && isActiveDomesticRussianPhoneValue(source)) {
+      domesticRuPhoneInputs.add(input);
+      return formatRussianPhoneBody(getRussianPhoneBody(source));
+    }
+
+    domesticRuPhoneInputs.delete(input);
+    return compactInternationalPhone(source);
+  }
+
+  function formatPhoneInput(input) {
+    const formattedValue = getPhoneMaskValue(input);
+    if (input.value !== formattedValue) {
+      input.value = formattedValue;
+    }
+
+    if (document.activeElement === input && typeof input.setSelectionRange === 'function') {
+      const caretPosition = input.value.length;
+      try {
+        input.setSelectionRange(caretPosition, caretPosition);
+      } catch (err) {}
+    }
+  }
+
+  function initPhoneMasks(scope) {
+    (scope || document).querySelectorAll('input[data-phone-mask]').forEach(function (input) {
+      if (input instanceof HTMLInputElement) {
+        formatPhoneInput(input);
+      }
+    });
+  }
+
   // ── Auth validation ──────────────────────────────────────────────────────
   // Hook contract: form[data-auth-form], [data-auth-required], [data-auth-error-for="<id>"], [data-auth-alert]
   function setAuthControlValidState(control, isValid) {
@@ -1026,10 +1148,30 @@
     }
   });
 
+  document.addEventListener('paste', function (event) {
+    const target = event.target;
+    if (!isPhoneMaskInput(target)) return;
+
+    domesticRuPhoneInputs.delete(target);
+    window.setTimeout(function () {
+      formatPhoneInput(target);
+    }, 0);
+  });
+
+  document.addEventListener('blur', function (event) {
+    const target = event.target;
+    if (isPhoneMaskInput(target)) {
+      formatPhoneInput(target);
+    }
+  }, true);
 
   document.addEventListener('input', function (event) {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
+
+    if (isPhoneMaskInput(target)) {
+      formatPhoneInput(target);
+    }
 
     if (target.matches('[data-auth-form] [data-auth-required]:not([type="checkbox"])')) {
       const targetValue = target.value ? target.value.trim() : '';
@@ -1053,6 +1195,10 @@
   document.addEventListener('change', function (event) {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
+
+    if (isPhoneMaskInput(target)) {
+      formatPhoneInput(target);
+    }
 
     if (target instanceof HTMLInputElement && target.matches('[data-auth-form] [data-auth-required][type="checkbox"]') && target.classList.contains('is-invalid') && target.checked) {
       setAuthControlValidState(target, true);
@@ -1092,6 +1238,7 @@
     }
   });
 
+  initPhoneMasks(document);
   initFilterMenus();
   initFilterPanelDefaults(document);
   syncResetButtonState(document);
