@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Remove-Item \"c:\\\\Users\\\\Виталий\\\\Desktop\\\\PythonProjects\\\\CRM_Design\\\\_section_fix.py\")"
-    ]
-  }
-}
