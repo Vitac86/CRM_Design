@@ -35,8 +35,13 @@
     return document.querySelector('[data-auth-error-for="' + escapeCssValue(control.id) + '"]');
   }
 
-  const PHONE_INTERNATIONAL_MAX_DIGITS = 15;
-  const PHONE_RU_BODY_MAX_DIGITS = 10;
+  const PHONE_MIN_DIGITS = 10;
+  const PHONE_MAX_DIGITS = 15;
+  const RU_PHONE_DIGITS = 11;
+  const PHONE_RU_BODY_MAX_DIGITS = RU_PHONE_DIGITS - 1;
+  const PHONE_INCOMPLETE_MESSAGE = 'Введите номер телефона минимум из 10 цифр.';
+  const PHONE_RU_INCOMPLETE_MESSAGE = 'Введите полный номер телефона: 11 цифр, включая код страны.';
+  const PHONE_TOO_LONG_MESSAGE = 'Номер телефона не должен быть длиннее 15 цифр.';
   const domesticRuPhoneInputs = new WeakSet();
 
   // Hook contract: input[data-phone-mask], optional data-phone-country="RU".
@@ -51,7 +56,7 @@
 
   function compactInternationalPhone(source) {
     if (!source.digits) return source.hasLeadingPlus ? '+' : '';
-    return '+' + source.digits.slice(0, PHONE_INTERNATIONAL_MAX_DIGITS);
+    return '+' + source.digits.slice(0, PHONE_MAX_DIGITS);
   }
 
   function getRussianPhoneBody(source) {
@@ -98,6 +103,10 @@
     return target instanceof HTMLInputElement && target.matches('input[data-phone-mask]');
   }
 
+  function isExplicitRussianPhoneInput(input) {
+    return String(input.getAttribute('data-phone-country') || '').toUpperCase() === 'RU';
+  }
+
   function isPhoneMaskPunctuation(char) {
     return char === ' ' || char === '(' || char === ')' || char === '-';
   }
@@ -127,7 +136,7 @@
 
   function getPhoneMaskValue(input) {
     const source = normalizePhoneMaskSource(input.value);
-    const isExplicitRu = String(input.getAttribute('data-phone-country') || '').toUpperCase() === 'RU';
+    const isExplicitRu = isExplicitRussianPhoneInput(input);
     const wasDomesticRu = domesticRuPhoneInputs.has(input);
 
     if (!source.digits) {
@@ -170,6 +179,35 @@
         input.setSelectionRange(caretPosition, caretPosition);
       } catch (err) {}
     }
+  }
+
+  function validatePhoneInput(input) {
+    const source = normalizePhoneMaskSource(input.value);
+    const isEmpty = source.raw.length === 0;
+    const isRussianFormatted = isExplicitRussianPhoneInput(input) || domesticRuPhoneInputs.has(input);
+    let message = '';
+
+    if (!isEmpty) {
+      if (source.digits.length > PHONE_MAX_DIGITS) {
+        message = PHONE_TOO_LONG_MESSAGE;
+      } else if (isRussianFormatted && source.digits.length !== RU_PHONE_DIGITS) {
+        message = PHONE_RU_INCOMPLETE_MESSAGE;
+      } else if (!isRussianFormatted && source.digits.length < PHONE_MIN_DIGITS) {
+        message = PHONE_INCOMPLETE_MESSAGE;
+      }
+    }
+
+    input.setCustomValidity(message);
+    if (message) {
+      input.setAttribute('aria-invalid', 'true');
+    } else {
+      input.removeAttribute('aria-invalid');
+    }
+  }
+
+  function formatAndValidatePhoneInput(input) {
+    formatPhoneInput(input);
+    validatePhoneInput(input);
   }
 
   function initPhoneMasks(scope) {
@@ -1213,7 +1251,7 @@
   document.addEventListener('blur', function (event) {
     const target = event.target;
     if (isPhoneMaskInput(target)) {
-      formatPhoneInput(target);
+      formatAndValidatePhoneInput(target);
     }
   }, true);
 
@@ -1223,6 +1261,9 @@
 
     if (isPhoneMaskInput(target)) {
       formatPhoneInput(target);
+      if (target.getAttribute('aria-invalid') === 'true') {
+        validatePhoneInput(target);
+      }
     }
 
     if (target.matches('[data-auth-form] [data-auth-required]:not([type="checkbox"])')) {
@@ -1249,7 +1290,7 @@
     if (!(target instanceof HTMLElement)) return;
 
     if (isPhoneMaskInput(target)) {
-      formatPhoneInput(target);
+      formatAndValidatePhoneInput(target);
     }
 
     if (target instanceof HTMLInputElement && target.matches('[data-auth-form] [data-auth-required][type="checkbox"]') && target.classList.contains('is-invalid') && target.checked) {
