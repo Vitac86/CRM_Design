@@ -62,7 +62,7 @@
 
 /* Mobile Rules */
 @media (max-width: 760px) {
-  .crm-page[data-page="back-office"] .crm-back-office-header {
+  .crm-page[data-page="back-office"] .crm-page-header-row {
     flex-direction: column;
   }
 

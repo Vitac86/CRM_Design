@@ -1,21 +1,21 @@
 /* Shared CRM registry/list page component */
 
 /* Header and action rows */
-.crm-page.crm-registry-page .crm-registry-header {
+.crm-page.crm-registry-page .crm-page-header-row {
   align-items: center;
   gap: 12px;
   padding-bottom: 2px;
 }
 
-.crm-page[data-page="agents"] .crm-agents-header,
-.crm-page[data-page="requests"] .crm-requests-header,
-.crm-page[data-page="archive"] .crm-archive-header,
-.crm-page[data-page="trust-management"] .crm-trust-management-header {
+.crm-page[data-page="agents"] .crm-page-header-row,
+.crm-page[data-page="requests"] .crm-page-header-row,
+.crm-page[data-page="archive"] .crm-page-header-row,
+.crm-page[data-page="trust-management"] .crm-page-header-row {
   margin: 0;
 }
 
-.crm-page[data-page="back-office"] .crm-back-office-header,
-.crm-page[data-page="trading"] .crm-trading-header {
+.crm-page[data-page="back-office"] .crm-page-header-row,
+.crm-page[data-page="trading"] .crm-page-header-row {
   align-items: flex-start;
   gap: 12px;
   margin: 0;

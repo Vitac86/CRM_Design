@@ -401,7 +401,7 @@ body[data-page="trading-card"] {
 
 /* 15. Mobile rules for registry */
 @media (max-width: 1180px) {
-  .crm-page[data-page="trading"] .crm-trading-header {
+  .crm-page[data-page="trading"] .crm-page-header-row {
     flex-direction: column;
   }
 
