@@ -1614,6 +1614,29 @@ a:focus-visible,
   box-shadow: var(--crm-focus-ring);
 }
 
+.crm-input.uk-form-danger,
+.crm-select.uk-form-danger,
+.crm-textarea.uk-form-danger,
+input.uk-form-danger,
+select.uk-form-danger,
+textarea.uk-form-danger,
+.crm-input.uk-form-danger:focus,
+.crm-select.uk-form-danger:focus,
+.crm-textarea.uk-form-danger:focus,
+input.uk-form-danger:focus,
+select.uk-form-danger:focus,
+textarea.uk-form-danger:focus {
+  border-color: #e53935 !important;
+}
+
+body[data-page="subject-edit"] .crm-edit-toast {
+  left: auto;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 48px));
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
 .uk-form-label {
   color: var(--crm-text-secondary);
   font-size: 12px;

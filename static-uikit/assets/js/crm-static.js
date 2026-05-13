@@ -42,7 +42,12 @@
   const PHONE_INCOMPLETE_MESSAGE = 'Введите номер телефона минимум из 10 цифр.';
   const PHONE_RU_INCOMPLETE_MESSAGE = 'Введите полный номер телефона: 11 цифр, включая код страны.';
   const PHONE_TOO_LONG_MESSAGE = 'Номер телефона не должен быть длиннее 15 цифр.';
+  const CRM_INVALID_CLASS = 'uk-form-danger';
+  const CRM_REQUIRED_SELECTOR = '[data-crm-required="true"]';
+  const CRM_REQUIRED_MESSAGE = 'Заполните обязательное поле.';
+  const CRM_REQUIRED_SUMMARY_MESSAGE = 'Заполните обязательные поля.';
   const domesticRuPhoneInputs = new WeakSet();
+  let crmValidationToastTimer = null;
 
   // Hook contract: input[data-phone-mask], optional data-phone-country="RU".
   function normalizePhoneMaskSource(value) {
@@ -181,13 +186,76 @@
     }
   }
 
+  function getValidationMessage(input) {
+    return input.getAttribute('data-required-validation-error')
+      || input.getAttribute('data-phone-validation-error')
+      || '';
+  }
+
+  function renderControlValidationState(input) {
+    const message = getValidationMessage(input);
+    if (message) {
+      input.setAttribute('data-validation-error', message);
+      input.setAttribute('aria-invalid', 'true');
+      input.classList.add(CRM_INVALID_CLASS);
+    } else {
+      input.removeAttribute('data-validation-error');
+      input.removeAttribute('aria-invalid');
+      input.classList.remove(CRM_INVALID_CLASS);
+    }
+  }
+
+  function setControlValidationError(input, type, message) {
+    const attr = type === 'phone' ? 'data-phone-validation-error' : 'data-required-validation-error';
+    if (message) {
+      input.setAttribute(attr, message);
+    } else {
+      input.removeAttribute(attr);
+    }
+    renderControlValidationState(input);
+  }
+
+  function isControlHiddenFromValidation(input) {
+    return input.disabled
+      || input.type === 'hidden'
+      || input.hidden
+      || !!input.closest('[hidden]');
+  }
+
+  function isCrmRequiredControl(target) {
+    const isSupportedControl = target instanceof HTMLInputElement
+      || target instanceof HTMLSelectElement
+      || target instanceof HTMLTextAreaElement;
+    return isSupportedControl && target.matches(CRM_REQUIRED_SELECTOR);
+  }
+
+  function getRequiredControlValue(input) {
+    if (input instanceof HTMLInputElement && (input.type === 'checkbox' || input.type === 'radio')) {
+      return input.checked ? '1' : '';
+    }
+    return input.value ? String(input.value).trim() : '';
+  }
+
+  function validateRequiredControl(input) {
+    if (!isCrmRequiredControl(input) || isControlHiddenFromValidation(input)) {
+      setControlValidationError(input, 'required', '');
+      return true;
+    }
+
+    const message = getRequiredControlValue(input) ? '' : CRM_REQUIRED_MESSAGE;
+    setControlValidationError(input, 'required', message);
+    return !message;
+  }
+
   function validatePhoneInput(input) {
     const source = normalizePhoneMaskSource(input.value);
     const isEmpty = source.raw.length === 0;
     const isRussianFormatted = isExplicitRussianPhoneInput(input) || domesticRuPhoneInputs.has(input);
     let message = '';
 
-    if (!isEmpty) {
+    if (isControlHiddenFromValidation(input)) {
+      message = '';
+    } else if (!isEmpty) {
       if (source.digits.length > PHONE_MAX_DIGITS) {
         message = PHONE_TOO_LONG_MESSAGE;
       } else if (isRussianFormatted && source.digits.length !== RU_PHONE_DIGITS) {
@@ -198,16 +266,136 @@
     }
 
     input.setCustomValidity(message);
-    if (message) {
-      input.setAttribute('aria-invalid', 'true');
-    } else {
-      input.removeAttribute('aria-invalid');
-    }
+    setControlValidationError(input, 'phone', message);
+    return !message;
   }
 
   function formatAndValidatePhoneInput(input) {
     formatPhoneInput(input);
-    validatePhoneInput(input);
+    return validatePhoneInput(input);
+  }
+
+  function isCrmControlInvalid(input) {
+    return !!input.getAttribute('data-validation-error');
+  }
+
+  function focusInvalidControl(input) {
+    if (typeof input.scrollIntoView === 'function') {
+      try {
+        input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } catch (err) {
+        input.scrollIntoView();
+      }
+    }
+    if (typeof input.focus === 'function') {
+      try {
+        input.focus({ preventScroll: true });
+      } catch (err) {
+        input.focus();
+      }
+    }
+  }
+
+  function validateCrmControlsInScope(scope, shouldFocusFirstInvalid) {
+    const root = scope || document;
+    let firstInvalid = null;
+
+    root.querySelectorAll(CRM_REQUIRED_SELECTOR + ', input[data-phone-mask]').forEach(function (input) {
+      if (!(input instanceof HTMLInputElement) && !(input instanceof HTMLSelectElement) && !(input instanceof HTMLTextAreaElement)) return;
+
+      if (isPhoneMaskInput(input)) {
+        formatAndValidatePhoneInput(input);
+      }
+
+      if (isCrmRequiredControl(input)) {
+        validateRequiredControl(input);
+      }
+
+      if (!firstInvalid && isCrmControlInvalid(input)) {
+        firstInvalid = input;
+      }
+    });
+
+    if (firstInvalid && shouldFocusFirstInvalid) {
+      focusInvalidControl(firstInvalid);
+    }
+
+    return !firstInvalid;
+  }
+
+  function getSubjectEditValidationScope(trigger) {
+    const form = trigger.closest('form');
+    if (form) return form;
+    return trigger.closest('.crm-subject-edit-shell, .crm-page, .crm-app') || document;
+  }
+
+  function getSubjectRegisterValidationScope(trigger) {
+    return trigger.closest('#reg-step-2-fl, #reg-step-2-ul, .crm-wizard-shell, .crm-page') || document;
+  }
+
+  function showSubjectEditValidationToast(message) {
+    const toast = document.querySelector('[data-entity="edit-toast"]');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    window.clearTimeout(crmValidationToastTimer);
+    crmValidationToastTimer = window.setTimeout(function () {
+      toast.classList.remove('is-visible');
+    }, 2400);
+  }
+
+  function clearSubjectEditValidationToast() {
+    window.clearTimeout(crmValidationToastTimer);
+    crmValidationToastTimer = null;
+  }
+
+  function setSubjectRegisterValidationMessage(scope, message) {
+    const id = scope && scope.id === 'reg-step-2-fl' ? 'reg-err-step2fl'
+      : scope && scope.id === 'reg-step-2-ul' ? 'reg-err-step2ul'
+        : '';
+    if (!id) return;
+    const node = document.getElementById(id);
+    if (!node) return;
+    node.textContent = message || '';
+    node.hidden = !message;
+  }
+
+  function handleCrmValidationSaveGuard(event) {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const page = document.body ? document.body.getAttribute('data-page') : '';
+    let trigger = null;
+    let scope = null;
+
+    if (page === 'subject-edit') {
+      trigger = target.closest('[data-action="save-edit"], [data-action="save-draft-edit"]');
+      scope = trigger ? getSubjectEditValidationScope(trigger) : null;
+    } else if (page === 'subject-register') {
+      trigger = target.closest('[data-action="reg-save-fl"], [data-action="reg-save-ul"]');
+      scope = trigger ? getSubjectRegisterValidationScope(trigger) : null;
+    }
+
+    if (!trigger || !scope) return;
+
+    if (!validateCrmControlsInScope(scope, true)) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') {
+        event.stopImmediatePropagation();
+      }
+      if (page === 'subject-edit') {
+        showSubjectEditValidationToast(CRM_REQUIRED_SUMMARY_MESSAGE);
+      } else if (page === 'subject-register') {
+        setSubjectRegisterValidationMessage(scope, CRM_REQUIRED_SUMMARY_MESSAGE);
+      }
+      return;
+    }
+
+    if (page === 'subject-edit') {
+      clearSubjectEditValidationToast();
+    } else if (page === 'subject-register') {
+      setSubjectRegisterValidationMessage(scope, '');
+    }
   }
 
   function initPhoneMasks(scope) {
@@ -1236,6 +1424,8 @@
     }
   });
 
+  document.addEventListener('click', handleCrmValidationSaveGuard, true);
+
   document.addEventListener('beforeinput', handlePhoneMaskDelete);
 
   document.addEventListener('paste', function (event) {
@@ -1253,6 +1443,9 @@
     if (isPhoneMaskInput(target)) {
       formatAndValidatePhoneInput(target);
     }
+    if (isCrmRequiredControl(target)) {
+      validateRequiredControl(target);
+    }
   }, true);
 
   document.addEventListener('input', function (event) {
@@ -1260,10 +1453,15 @@
     if (!(target instanceof HTMLElement)) return;
 
     if (isPhoneMaskInput(target)) {
+      const hadPhoneError = !!target.getAttribute('data-phone-validation-error');
       formatPhoneInput(target);
-      if (target.getAttribute('aria-invalid') === 'true') {
+      if (hadPhoneError) {
         validatePhoneInput(target);
       }
+    }
+
+    if (isCrmRequiredControl(target)) {
+      validateRequiredControl(target);
     }
 
     if (target.matches('[data-auth-form] [data-auth-required]:not([type="checkbox"])')) {
@@ -1291,6 +1489,9 @@
 
     if (isPhoneMaskInput(target)) {
       formatAndValidatePhoneInput(target);
+    }
+    if (isCrmRequiredControl(target)) {
+      validateRequiredControl(target);
     }
 
     if (target instanceof HTMLInputElement && target.matches('[data-auth-form] [data-auth-required][type="checkbox"]') && target.classList.contains('is-invalid') && target.checked) {

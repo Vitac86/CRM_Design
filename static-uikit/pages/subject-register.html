@@ -307,11 +307,11 @@
                 <div class="crm-form-grid uk-grid-small" uk-grid>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-last-name">Фамилия <span class="crm-required">*</span></label>
-                    <input id="fl-last-name" class="uk-input crm-input" type="text" name="fl-last-name" placeholder="Иванов"/>
+                    <input id="fl-last-name" class="uk-input crm-input" type="text" name="fl-last-name" data-crm-required="true" aria-required="true" placeholder="Иванов"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-first-name">Имя <span class="crm-required">*</span></label>
-                    <input id="fl-first-name" class="uk-input crm-input" type="text" name="fl-first-name" placeholder="Иван"/>
+                    <input id="fl-first-name" class="uk-input crm-input" type="text" name="fl-first-name" data-crm-required="true" aria-required="true" placeholder="Иван"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-middle-name">Отчество</label>
@@ -320,7 +320,7 @@
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-birth-date">Дата рождения</label>
                     <div class="crm-date-field">
-                      <input id="fl-birth-date" class="uk-input crm-input crm-date-input" type="date" name="fl-birth-date" placeholder="дд.мм.гггг" data-date-input/>
+                      <input id="fl-birth-date" class="uk-input crm-input crm-date-input" type="date" name="fl-birth-date" data-crm-required="true" aria-required="true" placeholder="дд.мм.гггг" data-date-input/>
                       <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
                     </div>
                   </div>
@@ -579,7 +579,7 @@
                 <div class="crm-form-grid uk-grid-small" uk-grid>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-inn">ИНН</label>
-                    <input id="fl-inn" class="uk-input crm-input" type="text" name="fl-inn" placeholder="123456789012"/>
+                    <input id="fl-inn" class="uk-input crm-input" type="text" name="fl-inn" data-crm-required="true" aria-required="true" placeholder="123456789012"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-snils">СНИЛС</label>
@@ -596,11 +596,11 @@
                 <div class="crm-form-grid uk-grid-small" uk-grid>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-phone">Номера телефонов</label>
-                    <input id="fl-phone" class="uk-input crm-input" type="tel" name="fl-phone" data-phone-mask inputmode="tel" autocomplete="tel" placeholder="+7 (999) 123-45-67"/>
+                    <input id="fl-phone" class="uk-input crm-input" type="tel" name="fl-phone" data-phone-mask data-crm-required="true" aria-required="true" inputmode="tel" autocomplete="tel" placeholder="+7 (999) 123-45-67"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="fl-email">E-mail</label>
-                    <input id="fl-email" class="uk-input crm-input" type="email" name="fl-email" placeholder="ivan@example.ru"/>
+                    <input id="fl-email" class="uk-input crm-input" type="email" name="fl-email" data-crm-required="true" aria-required="true" placeholder="ivan@example.ru"/>
                   </div>
                 </div>
               </div>
@@ -748,11 +748,11 @@
                 <div class="crm-form-grid uk-grid-small" uk-grid>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-client-name">Наименование клиента <span class="crm-required">*</span></label>
-                    <input id="ul-client-name" class="uk-input crm-input" type="text" name="ul-client-name" placeholder='ООО "Компания"'/>
+                    <input id="ul-client-name" class="uk-input crm-input" type="text" name="ul-client-name" data-crm-required="true" aria-required="true" placeholder='ООО "Компания"'/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-full-name">Полное наименование</label>
-                    <input id="ul-full-name" class="uk-input crm-input" type="text" name="ul-full-name" placeholder="Общество с ограниченной ответственностью..."/>
+                    <input id="ul-full-name" class="uk-input crm-input" type="text" name="ul-full-name" data-crm-required="true" aria-required="true" placeholder="Общество с ограниченной ответственностью..."/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-english-name">Английское наименование</label>
@@ -835,15 +835,15 @@
                 <div class="crm-form-grid uk-grid-small" uk-grid>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-inn">ИНН <span class="crm-required">*</span></label>
-                    <input id="ul-inn" class="uk-input crm-input" type="text" name="ul-inn" placeholder="7707083893"/>
+                    <input id="ul-inn" class="uk-input crm-input" type="text" name="ul-inn" data-crm-required="true" aria-required="true" placeholder="7707083893"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-kpp">КПП</label>
-                    <input id="ul-kpp" class="uk-input crm-input" type="text" name="ul-kpp" placeholder="770101001"/>
+                    <input id="ul-kpp" class="uk-input crm-input" type="text" name="ul-kpp" data-crm-required="true" aria-required="true" placeholder="770101001"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-ogrn">ОГРН</label>
-                    <input id="ul-ogrn" class="uk-input crm-input" type="text" name="ul-ogrn" placeholder="1027700132195"/>
+                    <input id="ul-ogrn" class="uk-input crm-input" type="text" name="ul-ogrn" data-crm-required="true" aria-required="true" placeholder="1027700132195"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-reg-date">Дата регистрации</label>
@@ -915,11 +915,11 @@
                 <div class="crm-form-grid uk-grid-small" uk-grid>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-phone">Номера телефонов</label>
-                    <input id="ul-phone" class="uk-input crm-input" type="tel" name="ul-phone" data-phone-mask inputmode="tel" autocomplete="tel" placeholder="+7 (495) 000-00-00"/>
+                    <input id="ul-phone" class="uk-input crm-input" type="tel" name="ul-phone" data-phone-mask data-crm-required="true" aria-required="true" inputmode="tel" autocomplete="tel" placeholder="+7 (495) 000-00-00"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-email">E-mail</label>
-                    <input id="ul-email" class="uk-input crm-input" type="email" name="ul-email" placeholder="info@company.ru"/>
+                    <input id="ul-email" class="uk-input crm-input" type="email" name="ul-email" data-crm-required="true" aria-required="true" placeholder="info@company.ru"/>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-address">Адрес</label>
