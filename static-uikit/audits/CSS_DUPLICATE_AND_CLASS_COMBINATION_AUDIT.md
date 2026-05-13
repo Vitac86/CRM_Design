@@ -3,7 +3,9 @@
 **Project:** Investika CRM static UI handoff  
 **Scope source of truth:** `static-uikit/` only  
 **Audit type:** CSS duplicate and HTML class-combination audit only  
-**Implementation status:** CSS cleanup Tasks A-D2 completed; HTML/JS class-combination simplification remains deferred.
+**Implementation status:** CSS cleanup Tasks A-D2 completed; Batch 2 registry table/card class-combination cleanup completed (2026-05-13).
+
+Batch 2 registry table/card class-combination cleanup status note (2026-05-13): DONE - Registry table wrapper elements across 9 normal list pages reduced to `crm-table-card crm-registry-table`. `crm-card` removed from all registry table wrappers (subjects, agents, archive, back-office, brokerage, compliance, requests, trading, trust-management). Page-specific registry hooks removed: `crm-agents-registry`, `crm-archive-registry`, `crm-requests-registry`, `crm-trust-management-registry`. Their `margin-top: 8px` CSS in `components/registry.css` migrated to scoped `.crm-page[data-page="..."] .crm-registry-table` selectors. `crm-table-card` in `components/tables.css` updated with CSS variable fallback values so surface styling is preserved without `crm-card`. JS-contract classes (`crm-registry-table`, `crm-registry-shell`, `crm-filter-panel`, `crm-registry-filters`, `crm-footer-chip`, `crm-pagination-chip`) and all `data-*` attributes preserved. No JS files changed. Bundle regenerated; zero `@import` directives; font URLs intact.
 
 Task C status note (2026-05-08): DONE - pagination/footer/page-size chip styles were consolidated into shared CRM pagination classes in `components/tables.css`; page CSS now keeps only compact middle-office/depository overrides.
 

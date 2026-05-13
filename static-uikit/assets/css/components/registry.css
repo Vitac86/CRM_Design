@@ -322,10 +322,10 @@ body[data-page="subjects"] .crm-filter-reset,
 }
 
 /* Repeated registry table placement and sizing */
-.crm-page[data-page="agents"] .crm-agents-registry,
-.crm-page[data-page="requests"] .crm-requests-registry,
-.crm-page[data-page="archive"] .crm-archive-registry,
-.crm-page[data-page="trust-management"] .crm-trust-management-registry {
+.crm-page[data-page="agents"] .crm-registry-table,
+.crm-page[data-page="requests"] .crm-registry-table,
+.crm-page[data-page="archive"] .crm-registry-table,
+.crm-page[data-page="trust-management"] .crm-registry-table {
   margin-top: 8px;
 }
 

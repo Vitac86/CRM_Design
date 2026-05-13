@@ -2490,9 +2490,9 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
 
 /* tables */
 .crm-table-card {
-  border: var(--crm-layer-card-border);
-  border-radius: var(--crm-layer-card-radius);
-  box-shadow: var(--crm-layer-card-shadow);
+  border: var(--crm-layer-card-border, 1px solid #d4deee);
+  border-radius: var(--crm-layer-card-radius, 12px);
+  box-shadow: var(--crm-layer-card-shadow, 0 2px 7px rgba(15, 23, 42, 0.05));
   overflow: hidden;
   background: #fff;
 }
@@ -3409,10 +3409,10 @@ body[data-page="subjects"] .crm-filter-reset,
 }
 
 /* Repeated registry table placement and sizing */
-.crm-page[data-page="agents"] .crm-agents-registry,
-.crm-page[data-page="requests"] .crm-requests-registry,
-.crm-page[data-page="archive"] .crm-archive-registry,
-.crm-page[data-page="trust-management"] .crm-trust-management-registry {
+.crm-page[data-page="agents"] .crm-registry-table,
+.crm-page[data-page="requests"] .crm-registry-table,
+.crm-page[data-page="archive"] .crm-registry-table,
+.crm-page[data-page="trust-management"] .crm-registry-table {
   margin-top: 8px;
 }
 
