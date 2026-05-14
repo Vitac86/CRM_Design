@@ -710,6 +710,7 @@ body {
 
   .crm-search {
     max-width: none;
+    width: auto;
   }
 }
 
@@ -1007,49 +1008,6 @@ body {
 }
 
 
-@media (max-width: 920px) {
-  .crm-layout { grid-template-columns: 1fr; }
-
-  .crm-sidebar {
-    position: fixed;
-    left: -100%;
-    width: 272px;
-    z-index: 20;
-    transition: left .2s;
-  }
-
-  .crm-app.sidebar-open .crm-sidebar { left: 0; }
-  .crm-sidebar-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: rgba(12, 23, 46, 0.35);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .2s ease;
-    z-index: 15;
-  }
-  .crm-app.sidebar-open .crm-sidebar-overlay {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  [data-sidebar-toggle] { display: inline-flex !important; align-items: center; justify-content: center; }
-  .crm-topbar { padding: 0 14px; }
-  .crm-search { width: auto; }
-  .crm-page { padding: 16px 14px 24px; }
-}
-
-@media print {
-  .crm-sidebar,
-  .crm-topbar { display: none !important; }
-
-  .crm-layout { grid-template-columns: 1fr; }
-  .crm-page { padding: 0; }
-}
-
 .crm-nav {
   gap: 6px;
 }
@@ -1082,11 +1040,6 @@ body {
 .crm-nav-group.active > .crm-nav-group-toggle {
   background: rgba(120, 162, 255, 0.16);
 }
-
-.crm-sidebar-overlay {
-  display: none;
-}
-
 
 .crm-register-header {
   margin-bottom: 12px;
@@ -9539,6 +9492,13 @@ body[data-page="trading-card"] {
    .sidebar-open on .crm-app to open/close the sidebar.
    The overlay is injected as <button class="crm-sidebar-overlay"> by JS.
    ─────────────────────────────────────────────────────────────────────────── */
+
+/* Base default: overlay hidden at all viewport sizes; shown inside @media
+   below only when .crm-app.sidebar-open is active on mobile. */
+.crm-sidebar-overlay {
+  display: none;
+}
+
 @media (max-width: 920px) {
 
   /* Drop the two-column layout to a single column */
@@ -9942,4 +9902,20 @@ body[data-page="trading-card"] {
 }
 
 /* ===== print.css ===== */
-/* intentionally left blank in this refactor; styles moved incrementally */
+/* ========================================================================== */
+/* print layer — shell layout overrides                                       */
+/* ========================================================================== */
+@media print {
+  .crm-sidebar,
+  .crm-topbar {
+    display: none !important;
+  }
+
+  .crm-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page {
+    padding: 0;
+  }
+}

@@ -76,49 +76,6 @@
 }
 
 
-@media (max-width: 920px) {
-  .crm-layout { grid-template-columns: 1fr; }
-
-  .crm-sidebar {
-    position: fixed;
-    left: -100%;
-    width: 272px;
-    z-index: 20;
-    transition: left .2s;
-  }
-
-  .crm-app.sidebar-open .crm-sidebar { left: 0; }
-  .crm-sidebar-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: rgba(12, 23, 46, 0.35);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .2s ease;
-    z-index: 15;
-  }
-  .crm-app.sidebar-open .crm-sidebar-overlay {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  [data-sidebar-toggle] { display: inline-flex !important; align-items: center; justify-content: center; }
-  .crm-topbar { padding: 0 14px; }
-  .crm-search { width: auto; }
-  .crm-page { padding: 16px 14px 24px; }
-}
-
-@media print {
-  .crm-sidebar,
-  .crm-topbar { display: none !important; }
-
-  .crm-layout { grid-template-columns: 1fr; }
-  .crm-page { padding: 0; }
-}
-
 .crm-nav {
   gap: 6px;
 }
@@ -151,11 +108,6 @@
 .crm-nav-group.active > .crm-nav-group-toggle {
   background: rgba(120, 162, 255, 0.16);
 }
-
-.crm-sidebar-overlay {
-  display: none;
-}
-
 
 .crm-register-header {
   margin-bottom: 12px;

@@ -35,6 +35,13 @@
    .sidebar-open on .crm-app to open/close the sidebar.
    The overlay is injected as <button class="crm-sidebar-overlay"> by JS.
    ─────────────────────────────────────────────────────────────────────────── */
+
+/* Base default: overlay hidden at all viewport sizes; shown inside @media
+   below only when .crm-app.sidebar-open is active on mobile. */
+.crm-sidebar-overlay {
+  display: none;
+}
+
 @media (max-width: 920px) {
 
   /* Drop the two-column layout to a single column */

@@ -234,5 +234,6 @@
 
   .crm-search {
     max-width: none;
+    width: auto;
   }
 }

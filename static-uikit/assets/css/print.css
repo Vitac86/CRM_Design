@@ -1,1 +1,17 @@
-/* intentionally left blank in this refactor; styles moved incrementally */
+/* ========================================================================== */
+/* print layer — shell layout overrides                                       */
+/* ========================================================================== */
+@media print {
+  .crm-sidebar,
+  .crm-topbar {
+    display: none !important;
+  }
+
+  .crm-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-page {
+    padding: 0;
+  }
+}
