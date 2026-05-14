@@ -2313,3 +2313,60 @@ Scope it narrowly:
 |---|---|
 | `npm.cmd run static:uikit:bundle:check` | Exit 0 - bundle is up to date, 40 / 40 sections, 238.9 KB |
 | `npm.cmd run static:uikit:validate` | Exit 0 - validation passed, 29 pages checked, 296 local asset refs checked, 0 errors, 0 warnings |
+
+## Registry Action and Filter Duplicate Cleanup Notes
+
+Date: 2026-05-14
+
+Files changed:
+- `static-uikit/assets/css/components/registry.css`
+- `static-uikit/tools/validate-static-uikit.mjs`
+- `static-uikit/assets/css/crm-static.bundle.css`
+- `static-uikit/audits/css-class-override-audit.md`
+
+Action selectors consolidated:
+- `.crm-page[data-page="agents"] .crm-agents-actions`
+- `.crm-page[data-page="archive"] .crm-archive-actions`
+- `.crm-page[data-page="brokerage"] .crm-brokerage-actions`
+- `.crm-page[data-page="requests"] .crm-requests-actions`
+- `.crm-page[data-page="trust-management"] .crm-trust-management-actions`
+
+Filter pill selectors consolidated:
+- `.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-pill-control`
+- `.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control`
+- `.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control`
+- `.crm-page[data-page="brokerage"] .crm-filter-pill-control`
+- `.crm-page[data-page="compliance"] .crm-filter-pill-control`
+- `.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control`
+- `.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control`
+- `.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control`
+- `body[data-page="subjects"] .crm-filter-pill-control`
+
+Cleanup scope:
+- CSS cleanup was limited to `components/registry.css`.
+- HTML, class names, and `crm-static.css` import order were not changed.
+- `uikit.min.css` was not edited.
+- `crm-static.bundle.css` was regenerated with the bundle script and was not manually patched.
+
+Validator:
+- Enhanced `static-uikit/tools/validate-static-uikit.mjs` with a conservative guard for the exact 14 targeted registry action/filter selectors.
+- The guard strips block comments first, splits selector groups, counts exact duplicate selector definitions by at-rule context, and does not flag base plus responsive pairs or different breakpoint contexts.
+- Existing checks for `cards.css`, `tables.css`, and `subject-card.css` were left intact.
+
+Command results:
+- Bundle regeneration: `npm.cmd run static:uikit:bundle` passed; bundle written with 40 / 40 sections, 238.0 KB.
+- Bundle check: `npm.cmd run static:uikit:bundle:check` passed; bundle up to date with 40 / 40 sections, 238.0 KB.
+- Validation: `npm.cmd run static:uikit:validate` passed; 29 pages checked, 296 local asset refs checked, 0 errors, 0 warnings.
+
+Estimated same-file same-context cleanup candidate reduction:
+- `components/registry.css` targeted action/filter candidates: 14 -> 0.
+- Overall same-file same-context cleanup candidates: 27 -> approximately 13, assuming no unrelated candidates are added.
+
+Remaining deferred items:
+- `.crm-form-card` contract-wizard scoping/modifier seam.
+- `.crm-decision-panel` compliance scoping/modifier seam.
+- `components/address.css` address-row `:last-child` cleanup.
+- `components/tables.css` table-adjacent header/action cleanup.
+- `components/filters.css` `.crm-filter-panel` same-file cleanup.
+- UIkit bridge cleanup.
+- Optional visual regression tooling.

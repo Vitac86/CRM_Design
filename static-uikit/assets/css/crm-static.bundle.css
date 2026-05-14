@@ -2839,12 +2839,7 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   line-height: 1.35;
 }
 
-body[data-page="subjects"] .crm-registry-actions,
-.crm-page[data-page="agents"] .crm-agents-actions,
-.crm-page[data-page="requests"] .crm-requests-actions,
-.crm-page[data-page="archive"] .crm-archive-actions,
-.crm-page[data-page="brokerage"] .crm-brokerage-actions,
-.crm-page[data-page="trust-management"] .crm-trust-management-actions {
+body[data-page="subjects"] .crm-registry-actions {
   gap: 10px;
   padding-top: 0;
 }
@@ -2854,6 +2849,8 @@ body[data-page="subjects"] .crm-registry-actions,
 .crm-page[data-page="archive"] .crm-archive-actions,
 .crm-page[data-page="brokerage"] .crm-brokerage-actions,
 .crm-page[data-page="trust-management"] .crm-trust-management-actions {
+  gap: 10px;
+  padding-top: 0;
   flex: 0 0 auto;
 }
 
@@ -3047,17 +3044,8 @@ body[data-page="subjects"] .crm-filter-fields-row,
 }
 
 body[data-page="subjects"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
-body[data-page="subjects"] .crm-filter-pill-control,
-.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-pill-control,
-.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control,
 .crm-page[data-page="brokerage"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
-.crm-page[data-page="brokerage"] .crm-filter-pill-control,
-.crm-page[data-page="compliance"] .crm-registry-filters.crm-filter-panel .crm-filter-control,
-.crm-page[data-page="compliance"] .crm-filter-pill-control,
-.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control,
-.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control,
-.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control,
-.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
+.crm-page[data-page="compliance"] .crm-registry-filters.crm-filter-panel .crm-filter-control {
   flex: 0 1 auto;
   min-width: 176px;
   max-width: 252px;
@@ -3072,6 +3060,9 @@ body[data-page="subjects"] .crm-filter-pill-control,
 .crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control,
 .crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control,
 .crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control {
+  flex: 0 1 auto;
+  min-width: 176px;
+  max-width: 252px;
   width: clamp(176px, 18vw, 252px);
 }
 

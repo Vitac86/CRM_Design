@@ -41,6 +41,7 @@ const MANIFEST     = resolve(ASSETS_CSS, 'crm-static.css');
 const BUNDLE       = resolve(ASSETS_CSS, 'crm-static.bundle.css');
 const CARDS_CSS    = resolve(ASSETS_CSS, 'components/cards.css');
 const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
+const REGISTRY_CSS = resolve(ASSETS_CSS, 'components/registry.css');
 const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
@@ -78,6 +79,23 @@ const TABLES_DUPLICATE_SELECTOR_CHECKS = [
   '.crm-table .uk-table th',
   '.crm-table .uk-table td',
   '.crm-table .uk-table td:first-child',
+];
+
+const REGISTRY_ACTION_FILTER_DUPLICATE_CHECKS = [
+  '.crm-page[data-page="agents"] .crm-agents-actions',
+  '.crm-page[data-page="archive"] .crm-archive-actions',
+  '.crm-page[data-page="brokerage"] .crm-brokerage-actions',
+  '.crm-page[data-page="requests"] .crm-requests-actions',
+  '.crm-page[data-page="trust-management"] .crm-trust-management-actions',
+  '.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-pill-control',
+  '.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control',
+  '.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control',
+  '.crm-page[data-page="brokerage"] .crm-filter-pill-control',
+  '.crm-page[data-page="compliance"] .crm-filter-pill-control',
+  '.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control',
+  '.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control',
+  '.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control',
+  'body[data-page="subjects"] .crm-filter-pill-control',
 ];
 
 // ── Reporting ─────────────────────────────────────────────────────────────────
@@ -799,6 +817,27 @@ if (!existsSync(TABLES_CSS)) {
 
   if (!hasDuplicateTableSelector) {
     ok('components/tables.css contains no duplicate top-level table selector definitions');
+  }
+}
+
+if (!existsSync(REGISTRY_CSS)) {
+  err(`components/registry.css not found: ${relative(REPO_ROOT, REGISTRY_CSS)}`);
+} else {
+  const registryRelPath = relative(ASSETS_CSS, REGISTRY_CSS).replace(/\\/g, '/');
+  const registrySource  = stripCssBlockComments(readFileSync(REGISTRY_CSS, 'utf8'));
+  const selectorEntries = collectRuleSelectorEntriesByContext(registrySource);
+  const duplicateContexts = findDuplicateSelectorContexts(selectorEntries)
+    .filter(duplicate => REGISTRY_ACTION_FILTER_DUPLICATE_CHECKS.includes(duplicate.selector));
+
+  for (const duplicate of duplicateContexts) {
+    err(
+      `${registryRelPath} contains duplicate targeted action/filter selector "${duplicate.selector}" ` +
+      `in context "${duplicate.context}" at lines ${duplicate.lines.join(', ')}`
+    );
+  }
+
+  if (duplicateContexts.length === 0) {
+    ok('components/registry.css contains no duplicate targeted action/filter selectors in the same at-rule context');
   }
 }
 
