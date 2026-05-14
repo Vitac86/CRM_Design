@@ -43,6 +43,7 @@ const CARDS_CSS    = resolve(ASSETS_CSS, 'components/cards.css');
 const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
 const REGISTRY_CSS = resolve(ASSETS_CSS, 'components/registry.css');
 const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
+const FILTERS_CSS      = resolve(ASSETS_CSS, 'components/filters.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -79,6 +80,10 @@ const TABLES_DUPLICATE_SELECTOR_CHECKS = [
   '.crm-table .uk-table th',
   '.crm-table .uk-table td',
   '.crm-table .uk-table td:first-child',
+];
+
+const FILTERS_DUPLICATE_SELECTOR_CHECKS = [
+  '.crm-filter-panel',
 ];
 
 const REGISTRY_ACTION_FILTER_DUPLICATE_CHECKS = [
@@ -858,6 +863,27 @@ if (!existsSync(SUBJECT_CARD_CSS)) {
 
   if (duplicateContexts.length === 0) {
     ok('pages/subject-card.css contains no duplicate selector definitions in the same at-rule context');
+  }
+}
+
+if (!existsSync(FILTERS_CSS)) {
+  err(`components/filters.css not found: ${relative(REPO_ROOT, FILTERS_CSS)}`);
+} else {
+  const filtersRelPath = relative(ASSETS_CSS, FILTERS_CSS).replace(/\\/g, '/');
+  const filtersSource  = stripCssBlockComments(readFileSync(FILTERS_CSS, 'utf8'));
+  const filtersSelectors = collectTopLevelRuleSelectors(filtersSource);
+  let hasDuplicateFilterSelector = false;
+
+  for (const selector of FILTERS_DUPLICATE_SELECTOR_CHECKS) {
+    const count = filtersSelectors.filter(found => found === selector).length;
+    if (count > 1) {
+      err(`${filtersRelPath} contains ${count} top-level definitions for "${selector}"`);
+      hasDuplicateFilterSelector = true;
+    }
+  }
+
+  if (!hasDuplicateFilterSelector) {
+    ok('components/filters.css contains no duplicate top-level filter-panel selector definitions');
   }
 }
 

@@ -142,16 +142,12 @@
   margin-bottom: 14px;
   display: grid;
   gap: var(--crm-layer-gap-sm);
+  position: relative;
+  overflow: visible;
 }
 
 .crm-toolbar.crm-filter-panel {
   background: #f3f7fe;
-}
-
-.crm-registry-filters.crm-filter-panel,
-.crm-filter-panel {
-  position: relative;
-  overflow: visible;
 }
 
 .crm-registry-filters.crm-filter-panel.is-filter-menu-open,

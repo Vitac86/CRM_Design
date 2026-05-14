@@ -2367,6 +2367,88 @@ Remaining deferred items:
 - `.crm-decision-panel` compliance scoping/modifier seam.
 - `components/address.css` address-row `:last-child` cleanup.
 - `components/tables.css` table-adjacent header/action cleanup.
-- `components/filters.css` `.crm-filter-panel` same-file cleanup.
+- `components/filters.css` `.crm-filter-panel` same-file cleanup. (**Completed — see Filters Panel Same-File Cleanup Notes below.**)
 - UIkit bridge cleanup.
 - Optional visual regression tooling.
+
+---
+
+## Filters Panel Same-File Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — filters.css `.crm-filter-panel` same-file duplicate consolidation.
+**Status:** Complete — `.crm-filter-panel` consolidated into one canonical block, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/components/filters.css` | Merged `position: relative` and `overflow: visible` into the canonical `.crm-filter-panel` block; removed the now-redundant grouped `.crm-registry-filters.crm-filter-panel, .crm-filter-panel` rule |
+| `tools/validate-static-uikit.mjs` | Added conservative duplicate-selector guard for `.crm-filter-panel` in `components/filters.css` |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section and marked the deferred item as completed |
+
+### What was consolidated
+
+The canonical `components/filters.css` `.crm-filter-panel` block previously owned only surface and grid styles. A second grouped rule:
+
+```css
+.crm-registry-filters.crm-filter-panel,
+.crm-filter-panel {
+  position: relative;
+  overflow: visible;
+}
+```
+
+was the only other top-level definition for `.crm-filter-panel` in the same file. The two properties (`position: relative` and `overflow: visible`) were moved into the canonical `.crm-filter-panel` block and the grouped rule was removed.
+
+The final canonical `.crm-filter-panel` block now contains:
+- `border: var(--crm-layer-card-border)`
+- `border-radius: var(--crm-layer-card-radius)`
+- `background: #f6f9ff`
+- `box-shadow: none`
+- `padding: var(--crm-layer-gap-sm)`
+- `margin-bottom: 14px`
+- `display: grid`
+- `gap: var(--crm-layer-gap-sm)`
+- `position: relative`
+- `overflow: visible`
+
+### `.crm-filter-panel` ownership
+
+`components/filters.css` remains the sole canonical owner of the standalone `.crm-filter-panel` selector. No other source file defines it.
+
+### `.crm-registry-filters.crm-filter-panel` behavior
+
+Preserved without a separate rule. Because `.crm-registry-filters.crm-filter-panel` matches `.crm-filter-panel`, it inherits `position: relative` and `overflow: visible` from the canonical block at the same specificity as before. The scoped `.crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel` registry-page layout block was not modified.
+
+### Validator enhancement
+
+**Added.** `tools/validate-static-uikit.mjs` now checks `components/filters.css` for duplicate top-level exact definitions of `.crm-filter-panel`. The check uses the existing `collectTopLevelRuleSelectors` helper (strips block comments, counts exact top-level preludes), so grouped selectors, scoped overrides, and media-query rules are not counted as duplicates.
+
+New validator confirmation line:
+
+```
+G. Component / Page Boundary Checks
+  ...
+  components/filters.css contains no duplicate top-level filter-panel selector definitions
+```
+
+### Validation results
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | Exit 0 — 40/40 sections inlined — 238.0 KB |
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 — bundle up to date — 40/40 sections — 238.0 KB |
+| `npm.cmd run static:uikit:validate` | Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| `components/address.css` address-row `:last-child` cleanup | Deferred |
+| `components/tables.css` table-adjacent header/action cleanup | Deferred |
+| `.crm-form-card` contract-wizard scoping/modifier seam | Deferred |
+| `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
+| UIkit bridge cleanup | Deferred |
+| Optional visual regression tooling | Deferred |
