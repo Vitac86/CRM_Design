@@ -2073,28 +2073,28 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   background: #fff;
 }
 
-.crm-table-head,
-.crm-table-meta,
-.crm-table-actions,
-.crm-list-actions {
+.crm-table-head {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.crm-table-head {
   justify-content: space-between;
   padding: 10px 12px;
   border-bottom: 1px solid #e4ebf6;
 }
 
 .crm-table-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
   color: var(--crm-muted);
 }
 
 .crm-table-actions,
 .crm-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   justify-content: flex-end;
   flex-wrap: wrap;
 }

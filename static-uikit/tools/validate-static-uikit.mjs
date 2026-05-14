@@ -81,6 +81,10 @@ const TABLES_DUPLICATE_SELECTOR_CHECKS = [
   '.crm-table .uk-table th',
   '.crm-table .uk-table td',
   '.crm-table .uk-table td:first-child',
+  '.crm-table-head',
+  '.crm-table-meta',
+  '.crm-table-actions',
+  '.crm-list-actions',
 ];
 
 const FILTERS_DUPLICATE_SELECTOR_CHECKS = [

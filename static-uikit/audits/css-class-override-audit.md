@@ -2555,7 +2555,103 @@ G. Component / Page Boundary Checks
 
 | Item | Status |
 |------|--------|
-| `components/tables.css` table-adjacent header/action cleanup | Deferred |
+| `components/tables.css` table-adjacent header/action cleanup | **Completed — see Tables Adjacent Header and Action Duplicate Cleanup Notes below.** |
+| `.crm-form-card` contract-wizard scoping/modifier seam | Deferred |
+| `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
+| UIkit bridge cleanup | Deferred |
+| Optional visual regression tooling | Deferred |
+
+---
+
+## Tables Adjacent Header and Action Duplicate Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — tables.css table-adjacent header/action duplicate cleanup.
+**Status:** Complete — four table-adjacent selectors consolidated, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/components/tables.css` | Consolidated four table-adjacent header/action selectors from a group+individual-block pattern into single canonical blocks |
+| `tools/validate-static-uikit.mjs` | Added four new selectors to `TABLES_DUPLICATE_SELECTOR_CHECKS` |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section |
+
+### Problem
+
+`components/tables.css` defined the four table-adjacent selectors twice each. The first occurrence was inside a comma-separated group rule (`display: flex; align-items: center; gap: 8px;`) and the second was an individual rule adding the selector-specific properties. The validator's `collectTopLevelRuleSelectors` helper splits comma-separated preludes into individual selectors before counting, so each of the four selectors registered two top-level occurrences.
+
+### Selectors consolidated
+
+| Selector | Properties from group rule absorbed | Properties already in individual rule |
+|----------|-------------------------------------|---------------------------------------|
+| `.crm-table-head` | `display: flex; align-items: center; gap: 8px` | `justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #e4ebf6` |
+| `.crm-table-meta` | `display: flex; align-items: center; gap: 8px` | `font-size: 12px; color: var(--crm-muted)` |
+| `.crm-table-actions` | `display: flex; align-items: center; gap: 8px` | `justify-content: flex-end; flex-wrap: wrap` |
+| `.crm-list-actions` | `display: flex; align-items: center; gap: 8px` | `justify-content: flex-end; flex-wrap: wrap` |
+
+`.crm-table-actions` and `.crm-list-actions` share identical final values and remain grouped in one canonical block. Each selector now appears exactly once in the top-level rule list.
+
+### Main table blocks confirmed untouched
+
+The main table blocks cleaned in the earlier tables duplicate cleanup were not modified:
+- `.crm-table-wrapper`
+- `.crm-table`
+- `.crm-table .uk-table`
+- `.crm-table .uk-table th`
+- `.crm-table .uk-table td`
+- `.crm-table .uk-table td:first-child`
+
+No scoped card-table overrides (`.crm-table-card .crm-table-wrapper`, `.crm-table-card .crm-table`) were changed.
+
+### Visual behavior confirmed preserved
+
+The final computed property values for all four selectors are identical to those produced by the previous two-block cascade. No property values were changed. No HTML, class names, or UIkit overrides were modified.
+
+### Validator enhancement
+
+**Added.** `TABLES_DUPLICATE_SELECTOR_CHECKS` in `tools/validate-static-uikit.mjs` now includes the four table-adjacent selectors:
+
+- `.crm-table-head`
+- `.crm-table-meta`
+- `.crm-table-actions`
+- `.crm-list-actions`
+
+The existing six main-table guards (`.crm-table-wrapper`, `.crm-table`, `.crm-table .uk-table`, `.crm-table .uk-table th`, `.crm-table .uk-table td`, `.crm-table .uk-table td:first-child`) were not weakened.
+
+New validator confirmation:
+
+```
+G. Component / Page Boundary Checks
+  ...
+  components/tables.css contains no duplicate top-level table selector definitions
+```
+
+(This check now covers all ten guarded selectors.)
+
+### Bundle generation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | Exit 0 — 40/40 sections inlined — 237.9 KB |
+
+### Bundle check result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 — bundle up to date — 40/40 sections — 237.9 KB |
+
+### Validation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:validate` | Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
 | `.crm-form-card` contract-wizard scoping/modifier seam | Deferred |
 | `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
 | UIkit bridge cleanup | Deferred |
