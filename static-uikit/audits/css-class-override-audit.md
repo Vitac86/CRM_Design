@@ -2452,3 +2452,111 @@ G. Component / Page Boundary Checks
 | `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
 | UIkit bridge cleanup | Deferred |
 | Optional visual regression tooling | Deferred |
+
+---
+
+## Address Row Last-Child Duplicate Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — address.css address-row `:last-child` duplicate cleanup.
+**Status:** Complete — duplicate `:last-child` selectors consolidated, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/components/address.css` | Merged `border-bottom: 0` from the duplicate `:last-child` block into the canonical `:last-child` block; removed the now-redundant second `:last-child` block |
+| `tools/validate-static-uikit.mjs` | Added conservative duplicate-selector guard for the three exact `:last-child` selectors in `components/address.css` |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section |
+
+### What was consolidated
+
+`components/address.css` previously defined the three `:last-child` selectors twice in the base (top-level) context:
+
+**First block (lines 18–22):**
+```css
+body[data-page="subject-register"] .crm-address-row:last-child,
+.crm-page[data-page="subject-register"] .crm-address-row:last-child,
+body[data-page="subject-edit"] .crm-address-row:last-child {
+  border-radius: 0 0 9px 9px;
+}
+```
+
+**Second block (lines 32–36), after the base `.crm-address-row` rule:**
+```css
+body[data-page="subject-register"] .crm-address-row:last-child,
+.crm-page[data-page="subject-register"] .crm-address-row:last-child,
+body[data-page="subject-edit"] .crm-address-row:last-child {
+  border-bottom: 0;
+}
+```
+
+The `border-bottom: 0` override from the second block was merged into the first (canonical) block, and the second block was removed. The canonical block is now:
+
+```css
+body[data-page="subject-register"] .crm-address-row:last-child,
+.crm-page[data-page="subject-register"] .crm-address-row:last-child,
+body[data-page="subject-edit"] .crm-address-row:last-child {
+  border-radius: 0 0 9px 9px;
+  border-bottom: 0;
+}
+```
+
+### Final effective address-row `:last-child` behavior preserved
+
+The `:last-child` selector group has higher specificity (0,3,1) than the base `.crm-address-row` block (0,2,1). This means `border-bottom: 0` wins over `border-bottom: 1px solid #dde8f5` from the base block regardless of cascade order — placing the canonical `:last-child` block before the base block is safe and correct.
+
+No change to visual design: the last address row continues to render with `border-radius: 0 0 9px 9px` and no bottom border.
+
+### Selectors not touched
+
+- `.crm-address-row:first-child` block — unchanged.
+- Base `.crm-address-row` block (padding, border-bottom, background) — unchanged.
+- All address display, parts editor, and FIAS rules — unchanged.
+
+### Validator enhancement
+
+**Added.** `tools/validate-static-uikit.mjs` now checks `components/address.css` for duplicate top-level exact definitions of the three `:last-child` selectors:
+
+- `body[data-page="subject-register"] .crm-address-row:last-child`
+- `.crm-page[data-page="subject-register"] .crm-address-row:last-child`
+- `body[data-page="subject-edit"] .crm-address-row:last-child`
+
+The check uses `collectTopLevelRuleSelectors` (strips block comments first, splits comma-separated selector lists, counts only top-level exact matches). Responsive contexts inside `@media` blocks are not flagged. The existing checks for `cards.css`, `tables.css`, `registry.css`, `subject-card.css`, and `filters.css` were left intact.
+
+New validator confirmation line:
+
+```
+G. Component / Page Boundary Checks
+  ...
+  components/address.css contains no duplicate top-level address-row :last-child selector definitions
+```
+
+### Bundle generation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | Exit 0 — 40/40 sections inlined — 237.8 KB |
+
+### Bundle check result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 — bundle up to date — 40/40 sections — 237.8 KB |
+
+### Validation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:validate` | Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| `components/tables.css` table-adjacent header/action cleanup | Deferred |
+| `.crm-form-card` contract-wizard scoping/modifier seam | Deferred |
+| `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
+| UIkit bridge cleanup | Deferred |
+| Optional visual regression tooling | Deferred |

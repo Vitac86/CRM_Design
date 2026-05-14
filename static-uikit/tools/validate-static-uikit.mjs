@@ -44,6 +44,7 @@ const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
 const REGISTRY_CSS = resolve(ASSETS_CSS, 'components/registry.css');
 const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
 const FILTERS_CSS      = resolve(ASSETS_CSS, 'components/filters.css');
+const ADDRESS_CSS      = resolve(ASSETS_CSS, 'components/address.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -84,6 +85,12 @@ const TABLES_DUPLICATE_SELECTOR_CHECKS = [
 
 const FILTERS_DUPLICATE_SELECTOR_CHECKS = [
   '.crm-filter-panel',
+];
+
+const ADDRESS_LAST_CHILD_DUPLICATE_CHECKS = [
+  'body[data-page="subject-register"] .crm-address-row:last-child',
+  '.crm-page[data-page="subject-register"] .crm-address-row:last-child',
+  'body[data-page="subject-edit"] .crm-address-row:last-child',
 ];
 
 const REGISTRY_ACTION_FILTER_DUPLICATE_CHECKS = [
@@ -884,6 +891,27 @@ if (!existsSync(FILTERS_CSS)) {
 
   if (!hasDuplicateFilterSelector) {
     ok('components/filters.css contains no duplicate top-level filter-panel selector definitions');
+  }
+}
+
+if (!existsSync(ADDRESS_CSS)) {
+  err(`components/address.css not found: ${relative(REPO_ROOT, ADDRESS_CSS)}`);
+} else {
+  const addressRelPath = relative(ASSETS_CSS, ADDRESS_CSS).replace(/\\/g, '/');
+  const addressSource  = stripCssBlockComments(readFileSync(ADDRESS_CSS, 'utf8'));
+  const addressSelectors = collectTopLevelRuleSelectors(addressSource);
+  let hasDuplicateAddressLastChild = false;
+
+  for (const selector of ADDRESS_LAST_CHILD_DUPLICATE_CHECKS) {
+    const count = addressSelectors.filter(found => found === selector).length;
+    if (count > 1) {
+      err(`${addressRelPath} contains ${count} top-level definitions for "${selector}"`);
+      hasDuplicateAddressLastChild = true;
+    }
+  }
+
+  if (!hasDuplicateAddressLastChild) {
+    ok('components/address.css contains no duplicate top-level address-row :last-child selector definitions');
   }
 }
 

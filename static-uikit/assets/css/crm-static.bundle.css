@@ -1538,6 +1538,7 @@ body[data-page="subject-register"] .crm-address-row:last-child,
 .crm-page[data-page="subject-register"] .crm-address-row:last-child,
 body[data-page="subject-edit"] .crm-address-row:last-child {
   border-radius: 0 0 9px 9px;
+  border-bottom: 0;
 }
 
 body[data-page="subject-register"] .crm-address-row,
@@ -1546,12 +1547,6 @@ body[data-page="subject-edit"] .crm-address-row {
   padding: 14px 16px;
   border-bottom: 1px solid #dde8f5;
   background: #fff;
-}
-
-body[data-page="subject-register"] .crm-address-row:last-child,
-.crm-page[data-page="subject-register"] .crm-address-row:last-child,
-body[data-page="subject-edit"] .crm-address-row:last-child {
-  border-bottom: 0;
 }
 
 body[data-page="subject-register"] .crm-address-row-head,
