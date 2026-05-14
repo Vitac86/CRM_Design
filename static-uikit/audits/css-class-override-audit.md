@@ -2085,3 +2085,231 @@ G. Component / Page Boundary Checks
 | Registry/page-scoped duplicate cleanup outside subject-card | Deferred |
 | UIkit bridge cleanup in subject page CSS | Deferred |
 | Optional visual regression tooling | Deferred |
+
+## Current Override Metrics After Subject Card and Seam Cleanup
+
+**Date:** 2026-05-14
+**Task type:** AUDIT / METRICS REFRESH ONLY - no CSS, HTML, JS, validator, `crm-static.css`, or bundle files were modified.
+**Scope:** `static-uikit/assets/css/crm-static.css` and the 40 CSS files imported by it. Generated `crm-static.bundle.css`, `uikit.min.css`, non-imported `pages/auth.css`, and non-imported document-template CSS are excluded from duplicate counts.
+
+### 1. Why this refresh was needed
+
+The previous `Current Override Metrics After Cleanup` section predated several cleanup commits:
+- `pages/subject-card.css` same-file same-context duplicate consolidation.
+- Subject-card validator guard.
+- Wrong-owner seam cleanup for `.crm-filter-panel`, `.crm-page-header`, and `.crm-nav-group .crm-nav-submenu`.
+- `components/cards.css` duplicate cleanup for `.crm-option-card`, `.crm-option-card.is-selected`, `.crm-binary-control`, and `.crm-binary-control label`.
+- Validator guard for the targeted `components/cards.css` duplicate selectors.
+
+Those changes made the old 80 / 180 / 77 metrics stale.
+
+### 2. Current duplicate selector counts
+
+Counting method: comma-separated selector groups are split and counted as individual selectors. Cross-file duplicates count selectors that appear in more than one imported source file. Same-file repeated selectors count selectors repeated inside one imported file across any at-rule context. Same-file same-context cleanup candidates are the actionable subset where the same selector repeats in the same file and the same at-rule context.
+
+| Metric | Previous count | Current count | Delta | Main reduction source |
+|---|---:|---:|---:|---|
+| Cross-file duplicate selectors | 80 | 77 | -3 | Wrong-owner seam cleanup removed `.crm-filter-panel`, `.crm-page-header`, and `.crm-nav-group .crm-nav-submenu` from cross-file status |
+| Same-file repeated selectors, any context | 180 | 140 | -40 | Subject-card and targeted cards cleanup reduced repeated selectors; the any-context bucket still intentionally counts retained responsive pairs |
+| Same-file same-context cleanup candidates | 77 | 27 | -50 | Subject-card cleanup removed 46 candidates; targeted `cards.css` cleanup removed 4 candidates |
+
+Responsive and print split:
+
+| Bucket | Cross-file duplicate selectors | Same-file repeated selectors, any context | Same-file same-context candidates |
+|---|---:|---:|---:|
+| Base / non-media | 24 | 27 | 25 |
+| Responsive | 48 | 112 | 2 |
+| Print | 5 | 1 | 0 |
+| **Total** | **77** | **140** | **27** |
+
+Notes:
+- The 140 same-file repeated selector count intentionally includes base plus responsive definitions. Most are expected responsive overrides.
+- The actionable same-file cleanup queue is now the 27 same-context duplicate selector blocks.
+- `components/cards.css` has no remaining same-file same-context cleanup candidates for the guarded card/control selectors.
+
+### 3. Resolved duplicate and wrong-owner items
+
+| Selector | Current status |
+|---|---|
+| `.crm-filter-panel` | Resolved as a cross-file wrong-owner seam. It now appears only in `components/filters.css`; it still has one same-file same-context cleanup candidate inside that file. |
+| `.crm-page-header` | Resolved. It now appears only in `layout/page.css`. |
+| `.crm-nav-group .crm-nav-submenu` | Resolved. It now appears only in `layout/sidebar.css`. |
+| `.crm-option-card` | Resolved. One top-level definition remains in `components/cards.css`. |
+| `.crm-option-card.is-selected` | Resolved. One top-level definition remains in `components/cards.css`. |
+| `.crm-binary-control` | Resolved. One top-level definition remains in `components/cards.css`. |
+| `.crm-binary-control label` | Resolved. One top-level definition remains in `components/cards.css`. |
+
+### 4. Current cross-file duplicate inventory
+
+| Selector | Files | Classification | Current effective owner | Recommended next action |
+|---|---|---|---|---|
+| `.crm-decision-panel` | `components/cards.css`; `pages/compliance.css` | Needs cleanup: should become modifier | `components/cards.css` base, `pages/compliance.css` for compliance page and mobile | Scope the compliance-specific version or convert it to a modifier in a narrow task |
+| `.crm-filter-search-input` | `components/filters.css`; `responsive.css` | OK: responsive override | `components/filters.css` base; `responsive.css` mobile | Keep |
+| `.crm-footer-actions` | `layout/page.css`; `responsive.css` | OK: responsive override | `layout/page.css` base; `responsive.css` mobile | Keep |
+| `.crm-form-card` | `components/cards.css`; `pages/contract-wizard.css` | Needs cleanup: should become modifier | `components/cards.css` base; `pages/contract-wizard.css` contract-specific surface | Scope or modifierize the contract-wizard variant |
+| `.crm-layout` | `layout/app.css`; `responsive.css`; `print.css` | OK: print override | `layout/app.css` base; `responsive.css` mobile; `print.css` print | Keep |
+| `.crm-main` | `layout/app.css`; `responsive.css` | OK: responsive override | `layout/app.css` base; `responsive.css` mobile | Keep |
+| `.crm-mo-details-card` | `components/registry.css`; `pages/middle-office.css`; `responsive.css` | OK: responsive override | `components/registry.css` base; page/responsive media refine it | Keep; review only with middle-office extraction |
+| `.crm-mo-details-grid` | `components/registry.css`; `pages/middle-office.css` | OK: responsive override | `components/registry.css` base; `pages/middle-office.css` mobile | Keep |
+| `.crm-mo-report-item.is-active` | `components/registry.css`; `pages/middle-office.css` | OK: page-scoped composition | `pages/middle-office.css` | Keep until middle-office page cleanup |
+| `.crm-mo-report-list-wrap` | `components/registry.css`; `pages/middle-office.css` | OK: page-scoped composition | `pages/middle-office.css` | Keep until middle-office page cleanup |
+| `.crm-page` | `layout/page.css`; `responsive.css`; `print.css` | OK: print override | `layout/page.css` base; `responsive.css` mobile; `print.css` print | Keep |
+| `.crm-page-actions` | `layout/page.css`; `pages/contract-wizard.css` | OK: responsive override | `layout/page.css` base; `pages/contract-wizard.css` mobile | Keep |
+| `.crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel` | `components/filters.css`; `responsive.css` | OK: responsive override | `components/filters.css` base/tablet; `responsive.css` narrow mobile | Keep |
+| `.crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-actions` | `components/filters.css`; `responsive.css` | OK: responsive override | `components/filters.css` base/tablet; `responsive.css` narrow mobile | Keep |
+| `.crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-control` | `components/filters.css`; `responsive.css` | OK: responsive override | `components/filters.css` base; `responsive.css` narrow mobile | Keep |
+| `.crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-fields-row` | `components/filters.css`; `responsive.css` | OK: responsive override | `components/filters.css` base/tablet; `responsive.css` narrow mobile | Keep |
+| `.crm-page.crm-registry-page .crm-registry-filters.crm-filter-panel .crm-filter-reset` | `components/filters.css`; `responsive.css` | OK: responsive override | `components/filters.css` base/tablet; `responsive.css` narrow mobile | Keep |
+| `.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-actions` | `components/registry.css`; `pages/back-office.css` | OK: responsive override | `components/registry.css` base; `pages/back-office.css` mobile | Keep |
+| `.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row` | `components/registry.css`; `pages/back-office.css` | OK: responsive override | `components/registry.css` base; `pages/back-office.css` base/mobile page refinement | Keep; review with registry cleanup |
+| `.crm-page[data-page="back-office"] .crm-page-header-row` | `components/registry.css`; `pages/back-office.css` | OK: responsive override | `components/registry.css` base; `pages/back-office.css` mobile | Keep |
+| `.crm-page[data-page="brokerage"] .crm-brokerage-actions` | `components/registry.css`; `pages/brokerage.css` | OK: page-scoped composition | `pages/brokerage.css` | Review with registry action cleanup |
+| `.crm-page[data-page="brokerage"] .crm-filter-fields-row` | `components/registry.css`; `pages/brokerage.css` | OK: page-scoped composition | `pages/brokerage.css` | Review with registry filter cleanup |
+| `.crm-page[data-page="compliance"] .crm-filter-fields-row` | `components/registry.css`; `pages/compliance.css` | OK: page-scoped composition | `pages/compliance.css` | Review with registry filter cleanup |
+| `.crm-page[data-page="compliance"] .crm-filter-reset` | `components/registry.css`; `pages/compliance.css` | OK: page-scoped composition | `pages/compliance.css` | Review with registry filter cleanup |
+| `.crm-page[data-page="depository"] .crm-dep-details-card` | `components/registry.css`; `pages/depository.css`; `responsive.css` | OK: responsive override | `components/registry.css` base; page/responsive media refine it | Keep |
+| `.crm-page[data-page="depository"] .crm-dep-details-grid` | `components/registry.css`; `pages/depository.css` | OK: responsive override | `components/registry.css` base; `pages/depository.css` mobile | Keep |
+| `.crm-page[data-page="depository"] .crm-dep-file-card` | `components/registry.css`; `pages/depository.css` | OK: page-scoped composition | `pages/depository.css` | Review with depository page cleanup |
+| `.crm-page[data-page="depository"] .crm-dep-report-item.is-active` | `components/registry.css`; `pages/depository.css` | OK: page-scoped composition | `pages/depository.css` | Review with depository page cleanup |
+| `.crm-page[data-page="depository"] .crm-dep-report-list-wrap` | `components/registry.css`; `pages/depository.css` | OK: page-scoped composition | `pages/depository.css` | Review with depository page cleanup |
+| `.crm-page[data-page="depository"] .crm-dep-shell` | `components/registry.css`; `pages/depository.css` | OK: page-scoped composition | `pages/depository.css` | Review with depository page cleanup |
+| `.crm-page[data-page="depository"] .crm-dep-toolbar-search-shell` | `components/registry.css`; `pages/depository.css` | OK: page-scoped composition | `pages/depository.css` | Review with depository page cleanup |
+| `.crm-page[data-page="requests"] .crm-requests-actions` | `components/registry.css`; `pages/requests.css` | OK: responsive override | `components/registry.css` base; `pages/requests.css` mobile | Keep; also appears in a same-media cleanup candidate |
+| `.crm-page[data-page="subject-card"] .crm-representative-form-grid` | `pages/subject-card.css`; `responsive.css` | OK: responsive override | `pages/subject-card.css` base; `responsive.css` mobile | Keep |
+| `.crm-page[data-page="subject-card"] .crm-subject-card-shell` | `pages/subject-card.css`; `responsive.css` | OK: responsive override | `pages/subject-card.css` base/mobile; `responsive.css` mobile | Keep |
+| `.crm-page[data-page="subject-card"] .crm-subject-detail-shell` | `pages/subject-card.css`; `responsive.css` | OK: responsive override | `pages/subject-card.css` base; `responsive.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .crm-address-display-line` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .crm-address-edit-btn` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .crm-address-part-field--wide` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .crm-address-parts-actions` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .crm-address-parts-grid` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .reg-bank-add-form` | `components/subject-form.css`; `pages/subject-register.css` | OK: page-scoped composition | `pages/subject-register.css` | Keep until subject-form ownership cleanup |
+| `.crm-page[data-page="subject-register"] .reg-group-title` | `components/subject-form.css`; `pages/subject-register.css` | OK: page-scoped composition | `pages/subject-register.css` | Keep until subject-form ownership cleanup |
+| `.crm-page[data-page="subject-register"] .reg-step-header h2` | `components/subject-form.css`; `pages/subject-register.css` | OK: page-scoped composition | `pages/subject-register.css` | Keep until subject-form ownership cleanup |
+| `.crm-page[data-page="subject-register"] .reg-wizard-actions` | `components/subject-form.css`; `pages/subject-register.css`; `responsive.css` | OK: responsive override | subject form/page base; `responsive.css` mobile | Keep |
+| `.crm-page[data-page="subject-register"] .reg-wizard-actions .reg-back` | `pages/subject-register.css`; `responsive.css` | OK: responsive override | `pages/subject-register.css` base; `responsive.css` mobile | Keep |
+| `.crm-page[data-page="trading-card"] .crm-terminal-fields` | `pages/trading.css`; `responsive.css` | OK: responsive override | `pages/trading.css` base/tablet; `responsive.css` mobile | Keep |
+| `.crm-page[data-page="trading"] .crm-page-header-row` | `components/registry.css`; `pages/trading.css` | OK: responsive override | `components/registry.css` base; `pages/trading.css` tablet | Keep |
+| `.crm-sidebar` | `layout/sidebar.css`; `responsive.css`; `print.css` | OK: print override | `layout/sidebar.css` base; `responsive.css` mobile; `print.css` print | Keep |
+| `.crm-sticky-actions` | `layout/page.css`; `responsive.css` | OK: print override | `layout/page.css` base/print; `responsive.css` mobile | Keep |
+| `.crm-table-card` | `components/tables.css`; `responsive.css` | OK: responsive override | `components/tables.css` base; `responsive.css` tablet | Keep |
+| `.crm-topbar` | `layout/topbar.css`; `responsive.css`; `print.css` | OK: print override | `layout/topbar.css` base; `responsive.css` mobile; `print.css` print | Keep |
+| `[data-sidebar-toggle]` | `layout/topbar.css`; `responsive.css` | OK: responsive override | `layout/topbar.css` base hidden state; `responsive.css` mobile visible state | Keep |
+| `body` | `base/reset.css`; `responsive.css` | OK: responsive override | `base/reset.css` base; `responsive.css` mobile overflow guard | Keep |
+| `body[data-page="middle-office-clients"] .crm-mo-shell` | `components/registry.css`; `pages/middle-office.css` | OK: page-scoped composition | `pages/middle-office.css` | Review with middle-office page cleanup |
+| `body[data-page="middle-office-reports"] .crm-mo-split` | `pages/middle-office.css`; `responsive.css` | OK: responsive override | `pages/middle-office.css` base; `responsive.css` mobile | Keep |
+| `body[data-page="subject-edit"] .crm-address-display-line` | `components/address.css`; `pages/subject-edit.css` | OK: responsive override | `components/address.css` base; `pages/subject-edit.css` mobile | Keep |
+| `body[data-page="subject-edit"] .crm-address-edit-btn` | `components/address.css`; `pages/subject-edit.css` | OK: responsive override | `components/address.css` base; `pages/subject-edit.css` mobile | Keep |
+| `body[data-page="subject-edit"] .crm-address-part-field--wide` | `components/address.css`; `pages/subject-edit.css` | OK: responsive override | `components/address.css` base; `pages/subject-edit.css` mobile | Keep |
+| `body[data-page="subject-edit"] .crm-address-parts-actions` | `components/address.css`; `pages/subject-edit.css` | OK: responsive override | `components/address.css` base; `pages/subject-edit.css` mobile | Keep |
+| `body[data-page="subject-edit"] .crm-address-parts-grid` | `components/address.css`; `pages/subject-edit.css` | OK: responsive override | `components/address.css` base; `pages/subject-edit.css` mobile | Keep |
+| `body[data-page="subject-edit"] .crm-edit-form-card` | `components/subject-form.css`; `pages/subject-edit.css` | OK: page-scoped composition | `pages/subject-edit.css` | Keep until subject-form ownership cleanup |
+| `body[data-page="subject-edit"] .crm-edit-header` | `components/subject-form.css`; `pages/subject-edit.css` | OK: responsive override | `components/subject-form.css` base; `pages/subject-edit.css` base/mobile | Keep |
+| `body[data-page="subject-edit"] .crm-edit-header-actions` | `components/subject-form.css`; `pages/subject-edit.css` | OK: responsive override | `components/subject-form.css` base; `pages/subject-edit.css` base/mobile | Keep |
+| `body[data-page="subject-edit"] .crm-edit-title` | `components/subject-form.css`; `pages/subject-edit.css` | OK: page-scoped composition | `pages/subject-edit.css` | Keep until subject-form ownership cleanup |
+| `body[data-page="subject-edit"] .crm-edit-toast` | `components/forms.css`; `pages/subject-edit.css` | OK: page-scoped composition | `pages/subject-edit.css` | Keep page placement; consider shared toast primitive later |
+| `body[data-page="subject-edit"] .crm-form-section-head h3` | `components/subject-form.css`; `pages/subject-edit.css` | OK: page-scoped composition | `pages/subject-edit.css` | Keep until subject-form ownership cleanup |
+| `body[data-page="subject-edit"] .uk-form-label` | `components/subject-form.css`; `pages/subject-edit.css` | OK: UIkit bridge | `pages/subject-edit.css` | Defer to UIkit bridge cleanup |
+| `body[data-page="subject-register"] .crm-address-display-line` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `body[data-page="subject-register"] .crm-address-edit-btn` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `body[data-page="subject-register"] .crm-address-part-field--wide` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `body[data-page="subject-register"] .crm-address-parts-actions` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `body[data-page="subject-register"] .crm-address-parts-grid` | `components/address.css`; `pages/subject-register.css` | OK: responsive override | `components/address.css` base; `pages/subject-register.css` mobile | Keep |
+| `body[data-page="subject-register"] .reg-bank-add-form` | `components/subject-form.css`; `pages/subject-register.css` | OK: page-scoped composition | `pages/subject-register.css` | Keep until subject-form ownership cleanup |
+| `body[data-page="subject-register"] .reg-group-title` | `components/subject-form.css`; `pages/subject-register.css` | OK: page-scoped composition | `pages/subject-register.css` | Keep until subject-form ownership cleanup |
+| `body[data-page="subject-register"] .reg-step-header h2` | `components/subject-form.css`; `pages/subject-register.css` | OK: page-scoped composition | `pages/subject-register.css` | Keep until subject-form ownership cleanup |
+| `body[data-page="subject-register"] .reg-wizard-actions` | `components/subject-form.css`; `pages/subject-register.css`; `responsive.css` | OK: responsive override | subject form/page base; `responsive.css` mobile | Keep |
+| `body[data-page="subject-register"] .reg-wizard-actions .reg-back` | `pages/subject-register.css`; `responsive.css` | OK: responsive override | `pages/subject-register.css` base; `responsive.css` mobile | Keep |
+
+Cross-file inventory summary:
+- 48 selectors are responsive overrides.
+- 5 selectors are print-involved overrides.
+- 24 selectors are base/non-media cross-file duplicates, mostly page-scoped composition.
+- No high-confidence wrong-owner seam from the prior target list remains cross-file duplicated.
+- The only current cleanup-oriented cross-file items are `.crm-form-card` and `.crm-decision-panel`, both best treated as small modifier/scoping tasks rather than broad ownership refactors.
+
+### 5. Current same-file same-context duplicate inventory
+
+| File | Selector | Count | Context | Final computed values clear? | Next cleanup target? |
+|---|---|---:|---|---|---|
+| `components/address.css` | `.crm-page[data-page="subject-register"] .crm-address-row:last-child` | 2 | base | Yes - later block adds/removes only `border-bottom` after radius block | Yes, low-risk address-row cleanup |
+| `components/address.css` | `body[data-page="subject-edit"] .crm-address-row:last-child` | 2 | base | Yes - later block adds/removes only `border-bottom` after radius block | Yes, low-risk address-row cleanup |
+| `components/address.css` | `body[data-page="subject-register"] .crm-address-row:last-child` | 2 | base | Yes - later block adds/removes only `border-bottom` after radius block | Yes, low-risk address-row cleanup |
+| `components/filters.css` | `.crm-filter-panel` | 2 | base | Yes - first block owns surface/grid; second block adds positioning/overflow | Yes, small filter-panel same-file cleanup |
+| `components/forms.css` | `.uk-select` | 2 | base | Yes - first block owns input surface; second block owns native select arrow reset | Later, UIkit bridge cleanup |
+| `components/registry.css` | `.crm-page[data-page="agents"] .crm-agents-actions` | 2 | base | Yes - second block adds `flex` | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="agents"] .crm-agents-shell .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="archive"] .crm-archive-actions` | 2 | base | Yes - second block adds `flex` | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="archive"] .crm-archive-shell .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="brokerage"] .crm-brokerage-actions` | 2 | base | Yes - second block adds `flex` | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="brokerage"] .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="compliance"] .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="requests"] .crm-requests-actions` | 2 | base | Yes - second block adds `flex` | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="requests"] .crm-requests-shell .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="trading"] .crm-trading-shell .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="trust-management"] .crm-trust-management-actions` | 2 | base | Yes - second block adds `flex` | Yes, recommended next cleanup target |
+| `components/registry.css` | `.crm-page[data-page="trust-management"] .crm-trust-management-shell .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/registry.css` | `body[data-page="subjects"] .crm-filter-pill-control` | 2 | base | Yes - second block adds `width` clamp | Yes, recommended next cleanup target |
+| `components/tables.css` | `.crm-list-actions` | 2 | base | Yes - second block adds justify/wrap | Yes, table-adjacent cleanup |
+| `components/tables.css` | `.crm-table-actions` | 2 | base | Yes - second block adds justify/wrap | Yes, table-adjacent cleanup |
+| `components/tables.css` | `.crm-table-head` | 2 | base | Yes - second block adds head-specific justify/padding/border | Yes, table-adjacent cleanup |
+| `components/tables.css` | `.crm-table-meta` | 2 | base | Yes - second block adds typography | Yes, table-adjacent cleanup |
+| `pages/requests.css` | `.crm-page[data-page="requests"] .crm-request-create-actions` | 2 | `@media (max-width: 768px)` | Yes - later media block adds justify content | Yes, localized page cleanup |
+| `pages/requests.css` | `.crm-page[data-page="requests"] .crm-requests-actions` | 2 | `@media (max-width: 768px)` | Yes - later media block adds wrap/justify | Yes, localized page cleanup |
+| `pages/subject-edit.css` | `body[data-page="subject-edit"] .uk-textarea.crm-input` | 2 | base | Yes - later block overrides `height` and adds `resize` | Later, UIkit bridge cleanup |
+| `pages/subjects.css` | `body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip` | 2 | base | Yes - later block adds semantic chip colors | Yes, localized page cleanup |
+
+Same-file same-context counts by file:
+
+| File | Count |
+|---|---:|
+| `components/registry.css` | 14 |
+| `components/tables.css` | 4 |
+| `components/address.css` | 3 |
+| `pages/requests.css` | 2 |
+| `components/filters.css` | 1 |
+| `components/forms.css` | 1 |
+| `pages/subject-edit.css` | 1 |
+| `pages/subjects.css` | 1 |
+| `components/cards.css` | 0 |
+| `pages/subject-card.css` | 0 |
+
+Additional same-file notes:
+- `components/cards.css` still has 3 same-file repeated selectors across contexts only: `.crm-detail-header`, `.crm-option-grid`, and `.crm-report-item`. These are base plus responsive pairs, not same-context cleanup candidates.
+- `pages/subject-card.css` has 31 same-file repeated selectors across contexts, all retained base plus responsive pairs after the same-context cleanup.
+- No print-context same-file cleanup candidates remain.
+
+### 6. Top 10 remaining cleanup targets
+
+| Rank | Target | Why it matters | Risk | Recommended implementation scope |
+|---:|---|---|---|---|
+| 1 | `components/registry.css` action/filter duplicate cleanup | Largest remaining same-file same-context cluster: 14 selectors in one component file with clear additive final values | Medium | Consolidate the registry action flex additions and filter-pill width clamp into the existing grouped blocks only |
+| 2 | `.crm-form-card` contract-wizard scoping/modifier seam | Generic card selector is restyled in a page file; this can leak contract-specific styling if reused | Medium | Scope the contract-wizard override or convert it to a page-specific modifier without changing visuals |
+| 3 | `.crm-decision-panel` compliance scoping/modifier seam | Generic decision panel is restyled by compliance page CSS | Medium | Scope the compliance-specific rule or convert it to a compliance modifier |
+| 4 | `components/address.css` address-row `:last-child` cleanup | Three duplicate selectors with simple radius/border split | Low | Merge `border-bottom: 0` into the existing last-child grouped block |
+| 5 | `components/tables.css` table-adjacent header/action cleanup | Four remaining table-adjacent duplicates after the main table cleanup | Low | Merge `.crm-table-head`, `.crm-table-meta`, `.crm-table-actions`, and `.crm-list-actions` additive declarations |
+| 6 | `components/filters.css` `.crm-filter-panel` same-file cleanup | The cross-file seam is resolved, but the canonical file still splits the base selector into two blocks | Low | Merge positioning/overflow into the base `.crm-filter-panel` block |
+| 7 | `pages/requests.css` mobile actions cleanup | Two duplicate selectors in the same `@media (max-width: 768px)` context | Low | Consolidate only the two request action media blocks |
+| 8 | `pages/subjects.css` meta-chip cleanup | One small same-context page duplicate remains | Low | Merge chip color declarations into the base meta-chip block |
+| 9 | `components/forms.css` `.uk-select` bridge cleanup | UIkit select bridge is split across two base blocks | Medium | Consolidate only `.uk-select` base declarations and keep UIkit bridge intent documented |
+| 10 | `pages/subject-edit.css` `.uk-textarea.crm-input` bridge cleanup | One same-context UIkit textarea bridge duplicate remains | Medium | Merge the two textarea bridge blocks without touching broader subject-edit layout |
+
+### 7. Recommended next implementation task
+
+Recommended next task: **`components/registry.css` page-scoped action/filter duplicate cleanup**.
+
+Scope it narrowly:
+- Consolidate the duplicated registry action selectors where the second block only adds `flex: 0 0 auto`.
+- Consolidate the duplicated registry filter pill selectors where the second block only adds `width: clamp(176px, 18vw, 252px)`.
+- Do not perform broad registry/page CSS cleanup.
+- Do not change HTML or class names.
+- Preserve final computed values and import order behavior.
+- Regenerate the bundle only as part of that future implementation task, not during this audit refresh.
+
+### 8. Validation results
+
+| Command | Result |
+|---|---|
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 - bundle is up to date, 40 / 40 sections, 238.9 KB |
+| `npm.cmd run static:uikit:validate` | Exit 0 - validation passed, 29 pages checked, 296 local asset refs checked, 0 errors, 0 warnings |
