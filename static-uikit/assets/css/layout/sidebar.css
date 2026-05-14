@@ -1,8 +1,70 @@
-/* ===== Sidebar parity / refinements (global static-uikit) ===== */
+/* ===== layout/sidebar.css — canonical sidebar + nav owner ===== */
+
+/* ── Sidebar shell ── */
 
 .crm-sidebar {
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(180deg, #0b1a49 0%, #09143a 100%);
+  color: #fff;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
   width: var(--crm-sidebar-w);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(205, 222, 255, 0.35) transparent;
 }
+
+.crm-sidebar::-webkit-scrollbar { width: 6px; }
+.crm-sidebar::-webkit-scrollbar-thumb { background: rgba(205, 221, 255, 0.4); }
+
+/* ── Brand / logo area ── */
+
+.crm-sidebar-brand {
+  height: var(--crm-topbar-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(214, 228, 255, 0.2);
+  margin: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.crm-sidebar-brand img {
+  max-width: 192px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.crm-sidebar-brand-link {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.crm-sidebar-brand-link:hover {
+  text-decoration: none;
+}
+
+.crm-sidebar-brand-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(176, 202, 255, 0.34);
+}
+
+/* ── Nav container ── */
+
+.crm-sidebar nav { display: flex; flex-direction: column; gap: 4px; padding: 12px 10px 16px; }
 
 .crm-sidebar .crm-nav {
   display: flex;
@@ -11,9 +73,83 @@
   padding: 12px 10px 18px;
 }
 
+/* ── Nav sections and headings ── */
+
+.crm-nav-section { margin-bottom: 0; }
+
+.crm-nav-section + .crm-nav-section {
+  margin-top: 2px;
+}
+
+/* Effective values: font-size/letter-spacing/padding from topbar.css override app.css */
+.crm-nav-heading {
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: rgba(203, 219, 255, 0.62);
+  font-weight: 600;
+  padding: 8px 10px 5px;
+}
+
+/* ── Nav groups and toggles ── */
+
 .crm-sidebar .crm-nav-group {
   margin: 0;
 }
+
+.crm-sidebar .crm-nav-group-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.crm-sidebar .crm-nav-group.active > .crm-nav-group-toggle {
+  color: #fff;
+  font-weight: 600;
+}
+
+.crm-sidebar .crm-nav-group-toggle[aria-expanded="true"] .crm-nav-chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Nav items and chevron ── */
+
+.crm-nav-item { width: 100%; }
+
+.crm-nav-chevron {
+  flex: 0 0 auto;
+  transition: transform 0.18s ease;
+  color: rgba(200, 220, 255, 0.7);
+}
+
+/* ── Nav links — base ── */
+
+.crm-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(236, 243, 255, 0.92);
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 8px 11px;
+  min-height: 38px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  transition: background-color .14s ease, color .14s ease;
+}
+
+/* Moved from topbar.css; the scoped .crm-sidebar rule below wins (higher specificity) */
+.crm-nav-link > span:first-child {
+  gap: 11px;
+}
+
+/* ── Nav links — sidebar-scoped refinements ── */
 
 .crm-sidebar .crm-nav-link {
   width: 100%;
@@ -46,6 +182,7 @@
   overflow: visible;
 }
 
+/* color added from topbar.css effective value */
 .crm-sidebar .crm-nav-link [uk-icon] {
   width: 16px;
   height: 16px;
@@ -53,20 +190,50 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: rgba(231, 239, 255, 0.84);
 }
 
-.crm-sidebar .crm-nav-group-toggle {
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
+/* ── Nav link states ── */
 
-.crm-sidebar .crm-nav-group.active > .crm-nav-group-toggle {
+.crm-nav-link:hover { background: var(--crm-sidebar-hover); color: #fff; text-decoration: none; }
+
+/* Effective: background/box-shadow from topbar.css; font-weight preserved from app.css */
+.crm-nav-link.active,
+.crm-nav-link.is-active {
+  background: rgba(120, 162, 255, 0.24);
   color: #fff;
   font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(176, 202, 255, 0.26);
+}
+
+.crm-sidebar .crm-nav-link.active,
+.crm-sidebar .crm-nav-link.is-active {
+  background: rgba(120, 162, 255, 0.24);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(176, 202, 255, 0.26);
+}
+
+/* ── Submenus ── */
+
+.crm-nav-submenu {
+  margin: 2px 0 4px 10px;
+  border-left: 1px solid rgba(224, 235, 255, 0.22);
+  padding-left: 8px;
+}
+
+.crm-nav-submenu[hidden] {
+  display: none !important;
 }
 
 .crm-sidebar .crm-nav-submenu {
+  margin: 2px 0 4px 10px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(224, 235, 255, 0.22);
+}
+
+/* Moved from topbar.css — same effective values as .crm-sidebar .crm-nav-submenu */
+.crm-nav-group .crm-nav-submenu {
   margin: 2px 0 4px 10px;
   padding-left: 8px;
   border-left: 1px solid rgba(224, 235, 255, 0.22);
@@ -80,39 +247,7 @@
   color: rgba(224, 234, 255, 0.82);
 }
 
-.crm-sidebar .crm-nav-link.active,
-.crm-sidebar .crm-nav-link.is-active {
-  background: rgba(120, 162, 255, 0.24);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(176, 202, 255, 0.26);
-}
-
-.crm-sidebar .crm-nav-group-toggle[aria-expanded="true"] .crm-nav-chevron {
-  transform: rotate(180deg);
-}
-
-.crm-sidebar::-webkit-scrollbar { width: 6px; }
-.crm-sidebar::-webkit-scrollbar-thumb { background: rgba(205, 221, 255, 0.4); }
-
-.crm-sidebar-brand-link {
-  width: 100%;
-  height: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: inherit;
-  text-decoration: none;
-  border-radius: 8px;
-}
-
-.crm-sidebar-brand-link:hover {
-  text-decoration: none;
-}
-
-.crm-sidebar-brand-link:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(176, 202, 255, 0.34);
-}
+/* ── Nav icon images ── */
 
 .crm-sidebar .crm-nav-icon-img {
   object-fit: contain;

@@ -1,70 +1,53 @@
-.crm-layout {
-  grid-template-columns: var(--crm-sidebar-w) minmax(0, 1fr);
-}
+/* ===== layout/topbar.css — canonical topbar + search + user owner ===== */
 
-.crm-sidebar {
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
-}
+/* ── Topbar ── */
 
-.crm-nav-heading {
-  padding: 8px 10px 5px;
-  font-size: 10px;
-  letter-spacing: 0.11em;
-}
-
-.crm-nav-section + .crm-nav-section {
-  margin-top: 2px;
-}
-
-.crm-nav-link {
-  min-height: 38px;
-  padding: 8px 11px;
-  border-radius: 8px;
-  line-height: 1.4;
-}
-
-.crm-nav-link > span:first-child {
-  gap: 11px;
-}
-
-.crm-nav-link [uk-icon] {
-  width: 16px;
-  height: 16px;
-  color: rgba(231, 239, 255, 0.84);
-}
-
-.crm-nav-link.active,
-.crm-nav-link.is-active {
-  background: rgba(120, 162, 255, 0.24);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(176, 202, 255, 0.26);
-}
-
-.crm-nav-group .crm-nav-submenu {
-  margin: 2px 0 4px 10px;
-  padding-left: 8px;
-  border-left: 1px solid rgba(224, 235, 255, 0.22);
-}
-
+/* Effective: base props from app.css; gap/background/border-color/z-index from topbar.css win */
 .crm-topbar {
   height: var(--crm-topbar-h);
+  background: color-mix(in srgb, #f1f5fb 26%, #ffffff 74%);
+  border-bottom: 1px solid #dbe4f1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
   padding: 0 24px;
-  border-bottom-color: #dbe4f1;
-  background: color-mix(in srgb, #f1f5fb 26%, #ffffff 74%);
+  position: sticky;
+  top: 0;
   z-index: 120;
+  backdrop-filter: blur(4px);
 }
 
+/* ── Search ── */
+
+/* Effective: base props from app.css + max-width from topbar.css */
 .crm-search {
+  position: relative;
+  width: min(560px, 100%);
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 520px;
 }
 
+/* Effective: padding-left/background from app.css; border-color from topbar.css wins */
 .crm-search .uk-input {
-  height: 40px;
+  padding-left: 38px;
   border-radius: 10px;
   border-color: #d4dfef;
+  background: var(--crm-input-bg);
+  height: 40px;
   font-size: 13px;
 }
+
+.crm-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--crm-muted);
+}
+
+/* ── Search preview ── */
 
 .crm-search-preview {
   position: absolute;
@@ -188,37 +171,61 @@
   outline: none;
 }
 
+/* ── User / Avatar / Toggle ── */
+
+/* Effective: base props from app.css; gap from topbar.css wins */
 .crm-user {
+  display: flex;
+  align-items: center;
   gap: 11px;
+  color: var(--crm-text-secondary);
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
+/* Effective: color/font-weight from app.css; font-size from topbar.css wins */
 .crm-user > div:first-child > div {
+  color: var(--crm-text);
   font-size: 14px;
+  font-weight: 600;
 }
 
+.crm-user small {
+  color: var(--crm-muted);
+  font-size: 11px;
+}
+
+/* Effective: dimensions/font-size/box-shadow from topbar.css win; rest from app.css */
 .crm-avatar {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4e70d1, #3556b8);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 13px;
+  font-weight: 700;
   box-shadow: 0 8px 16px rgba(53, 86, 184, 0.18);
 }
 
+/* Effective: display:none/border-radius/border-color/padding from app.css !important;
+   min-width/width/height 40px from topbar.css wins */
 [data-sidebar-toggle] {
+  display: none !important;
+  border-radius: 8px !important;
+  border-color: var(--crm-input-border) !important;
   min-width: 40px;
   width: 40px;
   height: 40px;
+  padding: 0 !important;
+  font-size: 20px;
+  color: var(--crm-text-secondary);
+  flex: 0 0 auto;
 }
 
-.crm-page {
-  width: min(100%, var(--crm-page-max-w));
-  margin: 0 auto;
-  padding: var(--crm-page-pad-y) var(--crm-page-pad-x) max(30px, env(safe-area-inset-bottom));
-  gap: 16px;
-}
-
-.crm-page-header {
-  margin-bottom: 2px;
-}
+/* ── Deferred: component-layer overrides (cross-concern; cleanup deferred) ── */
 
 .crm-card,
 .crm-section,
@@ -307,6 +314,8 @@
   min-height: 32px;
 }
 
+/* ── Responsive ── */
+
 @media (max-width: 920px) {
   .crm-topbar {
     padding: 0 14px;
@@ -314,9 +323,5 @@
 
   .crm-search {
     max-width: none;
-  }
-
-  .crm-page {
-    padding: 16px 14px max(24px, env(safe-area-inset-bottom));
   }
 }

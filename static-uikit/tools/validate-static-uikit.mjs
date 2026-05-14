@@ -22,7 +22,7 @@
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { resolve, relative, dirname, join, basename } from 'path';
+import { resolve, relative, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { spawnSync } from 'child_process';
 

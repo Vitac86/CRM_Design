@@ -117,11 +117,32 @@
   }
 }
 
-/* Page layout */
+/* ── Page layout ── */
+
+/* Effective: max-width/padding from page.css win; width/margin/gap merged from topbar.css */
 .crm-page {
+  width: min(100%, var(--crm-page-max-w));
+  margin: 0 auto;
   max-width: none;
   padding: 20px 22px 30px;
+  gap: 16px;
 }
+
+.crm-page-header {
+  margin-bottom: 2px;
+}
+
+.crm-page h1 {
+  margin: 0 0 14px;
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-size: 30px;
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #16233a;
+}
+
+.crm-page h2, .crm-page h3, .crm-page h4 { color: #1c2b45; margin-top: 0; }
 
 .crm-page > * {
   width: min(1520px, 100%);
@@ -179,6 +200,12 @@
 @media (max-width: 1200px) {
   .crm-grid-2,
   .crm-split-view { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 920px) {
+  .crm-page {
+    padding: 16px 14px max(24px, env(safe-area-inset-bottom));
+  }
 }
 
 @media print {

@@ -1270,3 +1270,129 @@ npm run static:uikit:validate
 ### Confirmation: no layout refactor performed
 
 No CSS layout files were moved, renamed, or structurally changed in this task. `layout/app.css`, `layout/sidebar.css`, `layout/topbar.css`, and `layout/page.css` are unchanged. No selectors were moved between files. The only CSS-adjacent file changed is `build-css-bundle.mjs` (adding `--check` mode).
+
+---
+
+## Layout Ownership Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — Layout ownership cleanup.
+**Status:** Complete — all files changed, bundle regenerated, all three checks passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `layout/app.css` | Reduced to shell-only (5 rules): `.crm-app`, global scrollbar, `.crm-layout` (minmax fix baked in), `.crm-main` |
+| `layout/sidebar.css` | Became canonical owner of all sidebar + nav rules (sidebar shell, brand, nav container, sections, headings, groups, toggles, items, chevron, links, active/hover states, submenus, scrollbar, icon images) |
+| `layout/topbar.css` | Reduced to topbar-only (sidebar/nav cross-concerns removed, page rule removed; merged effective values for owned selectors) |
+| `layout/page.css` | `.crm-page` consolidated with effective values from topbar.css; `.crm-page h1/h2/h3/h4` moved in from app.css; `.crm-page-header` moved in from topbar.css; mobile `.crm-page` padding moved in from topbar.css @media block |
+| `tools/validate-static-uikit.mjs` | Removed unused `basename` import (Part 6 minor cleanup) |
+
+### `layout/app.css` reduction
+
+Before: 230 lines (sidebar, nav, topbar, page, scrollbar, shell).
+After: 22 lines (shell-only: `.crm-app`, scrollbar, `.crm-layout`, `.crm-main`).
+
+The `grid-template-columns` value in `.crm-layout` was updated from `var(--crm-sidebar-w) 1fr` to `var(--crm-sidebar-w) minmax(0, 1fr)` — this adopts the effective runtime value that `topbar.css` was previously overriding via a separate `.crm-layout` block (now removed from topbar.css).
+
+### Selectors moved from `app.css` to `sidebar.css`
+
+| Selector | Effective value notes |
+|----------|-----------------------|
+| `.crm-sidebar` | Merged: all app.css props + `width: var(--crm-sidebar-w)` from sidebar.css; `box-shadow` topbar.css duplicate eliminated |
+| `.crm-sidebar-brand` | Moved as-is |
+| `.crm-sidebar-brand img` | Moved as-is |
+| `.crm-sidebar nav` | Moved as-is |
+| `.crm-nav-section` | Moved as-is |
+| `.crm-nav-heading` | **Effective merged value**: `font-size: 10px` (topbar.css won), `letter-spacing: 0.11em` (topbar.css won), `padding: 8px 10px 5px` (topbar.css won), remaining props from app.css |
+| `.crm-nav-item` | Moved as-is |
+| `.crm-nav-chevron` | Moved as-is |
+| `.crm-sidebar .crm-nav-group-toggle` | Merged: app.css had the complete rule (`width: 100%`, `text-align: left`, `font: inherit`) missing from sidebar.css |
+| `.crm-nav-link` | Moved as-is (full base rule including `transition`) |
+| `.crm-nav-link:hover` | Moved as-is |
+| `.crm-nav-link.active` | **Effective merged value**: `background: rgba(120,162,255,0.24)` + `box-shadow` from topbar.css; `font-weight: 600` preserved from app.css; extended to include `.is-active` |
+| `.crm-nav-submenu` | Moved as-is |
+| `.crm-nav-submenu[hidden]` | Moved as-is |
+| `.crm-sidebar .crm-nav-submenu .crm-nav-link` | Already in sidebar.css — duplicate removed from app.css |
+
+### Selectors moved from `topbar.css` to `sidebar.css`
+
+| Selector | Effective value notes |
+|----------|-----------------------|
+| `.crm-nav-heading` | Values moved into merged sidebar.css `.crm-nav-heading` (topbar.css values win for font-size, letter-spacing, padding — preserved in sidebar.css) |
+| `.crm-nav-section + .crm-nav-section` | Moved as-is |
+| `.crm-nav-link` (generic refinements) | Merged into sidebar.css base `.crm-nav-link` rule |
+| `.crm-nav-link > span:first-child` | Moved verbatim — scoped `.crm-sidebar .crm-nav-link > span:first-child` (gap: 10px, higher specificity) still wins for sidebar elements, preserving effective value |
+| `.crm-nav-link [uk-icon]` | `color: rgba(231,239,255,0.84)` added to scoped `.crm-sidebar .crm-nav-link [uk-icon]` rule in sidebar.css; topbar.css rule removed |
+| `.crm-nav-link.active, .crm-nav-link.is-active` | Merged into sidebar.css with `font-weight: 600` added (was in app.css, never overridden) |
+| `.crm-nav-group .crm-nav-submenu` | Moved as-is — same values as `.crm-sidebar .crm-nav-submenu` (already in sidebar.css) |
+| `.crm-sidebar { box-shadow }` | Consolidated into merged `.crm-sidebar` in sidebar.css — duplicate eliminated |
+| `.crm-layout` | Rule removed from topbar.css — effective value baked directly into app.css `.crm-layout` |
+
+### Selectors moved from `app.css` to `topbar.css`
+
+| Selector | Effective value notes |
+|----------|-----------------------|
+| `.crm-topbar` | **Effective merged**: `background: color-mix(...)` + `border-bottom: 1px solid #dbe4f1` + `gap: 10px` + `z-index: 120` from topbar.css; `display/align-items/justify-content/position/top/backdrop-filter` from app.css |
+| `.crm-search` | **Effective merged**: base props from app.css + `max-width: 520px` from topbar.css |
+| `.crm-search .uk-input` | **Effective merged**: `padding-left: 38px` + `background: var(--crm-input-bg)` from app.css; `border-color: #d4dfef` from topbar.css wins |
+| `.crm-search-icon` | Moved from app.css as-is |
+| `.crm-user` | **Effective merged**: base props from app.css + `gap: 11px` from topbar.css wins |
+| `.crm-user > div:first-child > div` | **Effective merged**: `color`/`font-weight` from app.css + `font-size: 14px` from topbar.css wins |
+| `.crm-user small` | Moved from app.css as-is |
+| `.crm-avatar` | **Effective merged**: `width: 40px`/`height: 40px`/`font-size: 13px`/`box-shadow` from topbar.css win; `border-radius`/`background`/`color`/`display`/`font-weight` from app.css |
+| `[data-sidebar-toggle]` | **Effective merged**: `display: none !important`/`border-radius`/`border-color`/`padding` `!important` from app.css; `min-width: 40px`/`width: 40px`/`height: 40px` from topbar.css win; `font-size`/`color`/`flex` from app.css |
+
+### Selectors moved from `app.css` to `page.css`
+
+| Selector | Effective value notes |
+|----------|-----------------------|
+| `.crm-page` | **Effective merged**: `max-width: none`/`padding: 20px 22px 30px` from page.css win; `width: min(100%,...)`/`margin: 0 auto`/`gap: 16px` moved in from topbar.css |
+| `.crm-page h1` | Moved from app.css as-is |
+| `.crm-page h2, .crm-page h3, .crm-page h4` | Moved from app.css as-is |
+
+### Selectors moved from `topbar.css` to `page.css`
+
+| Selector | Notes |
+|----------|-------|
+| `.crm-page-header` | Moved as-is |
+| `@media (max-width: 920px) { .crm-page }` | Moved from topbar.css @media block into page.css @media block |
+
+### Remaining intentional cross-file overrides (deferred)
+
+| Item | File | Status |
+|------|------|--------|
+| Deferred component-layer overrides in `topbar.css` | `.crm-card`, `.crm-section`, `.crm-kpi-card`, `.crm-toolbar`, `.crm-table`, `.crm-button`, etc. | Deferred — not part of layout ownership scope |
+| `topbar.css` button `border-radius: 10px !important` | `layout/topbar.css` | Deferred — component-layer concern, still in topbar.css |
+| `components/cards.css` @media layout rules | Cards, responsive | Deferred from previous phase |
+| `:root` blocks in sidebar.css and topbar.css | Already removed in Phase 1.5 | Complete |
+
+### Import order
+
+Import order in `crm-static.css` **was not changed**. Order remains:
+`app.css → sidebar.css → topbar.css → page.css`
+
+### Bundle regeneration
+
+| Command | Result |
+|---------|--------|
+| `npm run static:uikit:bundle` | ✓ Exit 0 — 40/40 sections — 246.1 KB |
+| `npm run static:uikit:bundle:check` | ✓ Bundle is up to date (40/40 sections, 246.1 KB) |
+| `npm run static:uikit:validate` | ✓ Validation passed — 0 errors, 0 warnings |
+
+### Validation details (post-cleanup)
+
+```
+A. CSS Manifest    — crm-static.css exists ✓, @import-only ✓, 40 files exist ✓, no duplicates ✓, layer order correct ✓
+B. Bundle          — exists ✓, no real @import ✓, 40 markers ✓, up to date ✓, 16 font URLs resolved ✓, :root once in tokens.css ✓
+C. HTML refs       — 29 pages, all pass ✓
+D. Partials        — absent, skipped
+E. UMI packs       — absent, skipped
+F. Local assets    — 296 refs across 29 pages, all resolved ✓
+Errors: 0 | Warnings: 0
+```
+
+### Confirmation: no HTML or class changes
+
+No HTML files were modified. No class names were renamed or removed. No visual design was changed. The refactor is a pure structural ownership cleanup — the compiled bundle produces the same effective CSS output for every selector that was in use before the cleanup.
