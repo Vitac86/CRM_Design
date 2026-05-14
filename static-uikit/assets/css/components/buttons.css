@@ -79,3 +79,9 @@
   color: #3554b1;
   text-decoration: none;
 }
+
+.uk-button:focus,
+.uk-button:focus-visible {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}

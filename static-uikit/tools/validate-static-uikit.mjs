@@ -41,10 +41,13 @@ const MANIFEST     = resolve(ASSETS_CSS, 'crm-static.css');
 const BUNDLE       = resolve(ASSETS_CSS, 'crm-static.bundle.css');
 const CARDS_CSS    = resolve(ASSETS_CSS, 'components/cards.css');
 const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
+const FORMS_CSS    = resolve(ASSETS_CSS, 'components/forms.css');
+const BUTTONS_CSS  = resolve(ASSETS_CSS, 'components/buttons.css');
 const REGISTRY_CSS = resolve(ASSETS_CSS, 'components/registry.css');
-const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
-const FILTERS_CSS      = resolve(ASSETS_CSS, 'components/filters.css');
-const ADDRESS_CSS      = resolve(ASSETS_CSS, 'components/address.css');
+const SUBJECT_CARD_CSS  = resolve(ASSETS_CSS, 'pages/subject-card.css');
+const SUBJECT_EDIT_CSS  = resolve(ASSETS_CSS, 'pages/subject-edit.css');
+const FILTERS_CSS       = resolve(ASSETS_CSS, 'components/filters.css');
+const ADDRESS_CSS       = resolve(ASSETS_CSS, 'components/address.css');
 const CONTRACT_WIZARD_CSS = resolve(ASSETS_CSS, 'pages/contract-wizard.css');
 const COMPLIANCE_CSS      = resolve(ASSETS_CSS, 'pages/compliance.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
@@ -57,6 +60,19 @@ const AUTH_PAGES = new Set(['login.html', 'register.html', 'forgot-password.html
 
 // Expected layer order for CSS imports
 const LAYER_ORDER = ['base', 'layout', 'components', 'pages', 'responsive', 'print'];
+
+// Broad UIkit/form/button focus selectors that must NOT appear in cards.css.
+// Card/control-specific focus selectors (.crm-option-card, .crm-binary-control, etc.) are allowed.
+const CARDS_FORBIDDEN_FOCUS_SELECTORS = [
+  '.uk-button:focus',
+  '.uk-button:focus-visible',
+  '.uk-input:focus-visible',
+  '.uk-select:focus-visible',
+  '.uk-textarea:focus-visible',
+  'a:focus-visible',
+  '.crm-nav-link:focus-visible',
+  '.crm-nav-group-toggle:focus-visible',
+];
 
 const CARDS_FORBIDDEN_SHELL_SELECTORS = [
   '.crm-layout',
@@ -971,6 +987,58 @@ if (!existsSync(COMPLIANCE_CSS)) {
 
   if (!hasBareDecisionPanel) {
     ok('pages/compliance.css contains no bare .crm-decision-panel selector');
+  }
+}
+
+// G-extra 1: No duplicate top-level .uk-select in components/forms.css
+if (!existsSync(FORMS_CSS)) {
+  err(`components/forms.css not found: ${relative(REPO_ROOT, FORMS_CSS)}`);
+} else {
+  const formsRelPath  = relative(ASSETS_CSS, FORMS_CSS).replace(/\\/g, '/');
+  const formsSource   = stripCssBlockComments(readFileSync(FORMS_CSS, 'utf8'));
+  const formsSelectors = collectTopLevelRuleSelectors(formsSource);
+  const ukSelectCount  = formsSelectors.filter(s => s === '.uk-select').length;
+  if (ukSelectCount > 1) {
+    err(`${formsRelPath} contains ${ukSelectCount} top-level ".uk-select" definitions — expected exactly 1`);
+  } else {
+    ok('components/forms.css contains no duplicate top-level .uk-select definitions');
+  }
+}
+
+// G-extra 2: No duplicate top-level body[data-page="subject-edit"] .uk-textarea.crm-input in pages/subject-edit.css
+if (!existsSync(SUBJECT_EDIT_CSS)) {
+  err(`pages/subject-edit.css not found: ${relative(REPO_ROOT, SUBJECT_EDIT_CSS)}`);
+} else {
+  const subjectEditRelPath  = relative(ASSETS_CSS, SUBJECT_EDIT_CSS).replace(/\\/g, '/');
+  const subjectEditSource   = stripCssBlockComments(readFileSync(SUBJECT_EDIT_CSS, 'utf8'));
+  const subjectEditSelectors = collectTopLevelRuleSelectors(subjectEditSource);
+  const textareaBridgeCount  = subjectEditSelectors.filter(
+    s => s === 'body[data-page="subject-edit"] .uk-textarea.crm-input'
+  ).length;
+  if (textareaBridgeCount > 1) {
+    err(
+      `${subjectEditRelPath} contains ${textareaBridgeCount} top-level ` +
+      `"body[data-page=\\"subject-edit\\"] .uk-textarea.crm-input" definitions — expected exactly 1`
+    );
+  } else {
+    ok('pages/subject-edit.css contains no duplicate top-level body[data-page="subject-edit"] .uk-textarea.crm-input definitions');
+  }
+}
+
+// G-extra 3: No broad UIkit/form/button focus selectors remaining in components/cards.css
+if (existsSync(CARDS_CSS)) {
+  const cardsRelPath2   = relative(ASSETS_CSS, CARDS_CSS).replace(/\\/g, '/');
+  const cardsSource2    = stripCssBlockComments(readFileSync(CARDS_CSS, 'utf8'));
+  const cardsSelectors2 = collectTopLevelRuleSelectors(cardsSource2);
+  let hasForbiddenFocus = false;
+  for (const selector of CARDS_FORBIDDEN_FOCUS_SELECTORS) {
+    if (cardsSelectors2.includes(selector)) {
+      err(`${cardsRelPath2} contains broad focus selector "${selector}" — should be owned by the correct component/layout file`);
+      hasForbiddenFocus = true;
+    }
+  }
+  if (!hasForbiddenFocus) {
+    ok('components/cards.css contains no broad UIkit/form/button focus selectors');
   }
 }
 

@@ -261,3 +261,9 @@
 .crm-sidebar .crm-nav-group.active > .crm-nav-group-toggle .crm-nav-icon-img {
   opacity: 1;
 }
+
+.crm-nav-link:focus-visible,
+.crm-nav-group-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}

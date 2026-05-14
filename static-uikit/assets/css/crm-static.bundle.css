@@ -182,6 +182,16 @@ body {
   scrollbar-color: #bcc9e4 transparent;
 }
 
+a,
+.uk-link {
+  text-decoration: none;
+}
+
+a:focus-visible {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}
+
 
 /* ===== layout/app.css ===== */
 /* ========================================================================== */
@@ -471,6 +481,12 @@ body {
 .crm-sidebar .crm-nav-link.is-active .crm-nav-icon-img,
 .crm-sidebar .crm-nav-group.active > .crm-nav-group-toggle .crm-nav-icon-img {
   opacity: 1;
+}
+
+.crm-nav-link:focus-visible,
+.crm-nav-group-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
 }
 
 /* ===== layout/topbar.css ===== */
@@ -1108,19 +1124,6 @@ body {
   margin-top: 16px;
 }
 
-a,
-.uk-link {
-  text-decoration: none;
-}
-
-.uk-button:focus,
-.uk-button:focus-visible,
-.uk-input:focus-visible,
-.uk-select:focus-visible,
-.uk-textarea:focus-visible,
-a:focus-visible,
-.crm-nav-link:focus-visible,
-.crm-nav-group-toggle:focus-visible,
 .crm-option-card:focus-visible,
 .crm-option-card:focus-within,
 .crm-binary-control label:focus-within,
@@ -1347,13 +1350,18 @@ a:focus-visible,
   text-decoration: none;
 }
 
+.uk-button:focus,
+.uk-button:focus-visible {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}
+
 /* ===== components/forms.css ===== */
 /* shared form primitives */
 .crm-form-grid { margin-bottom: 2px; }
 .crm-input, .crm-select { min-height: 36px !important; }
 
 .uk-input,
-.uk-select,
 .uk-textarea {
   border-color: var(--crm-input-border);
   border-radius: 8px;
@@ -1363,6 +1371,21 @@ a:focus-visible,
   font-size: 13px;
 }
 
+.uk-select {
+  border-color: var(--crm-input-border);
+  border-radius: 8px;
+  background: var(--crm-input-bg);
+  color: var(--crm-text);
+  min-height: 36px;
+  font-size: 13px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #6d7d98 50%), linear-gradient(135deg, #6d7d98 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 3px), calc(100% - 10px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px !important;
+}
+
 .uk-input::placeholder,
 .uk-textarea::placeholder { color: #96a3b8; }
 
@@ -1370,6 +1393,13 @@ a:focus-visible,
 .uk-select:focus,
 .uk-textarea:focus {
   border-color: var(--crm-primary);
+  box-shadow: var(--crm-focus-ring);
+}
+
+.uk-input:focus-visible,
+.uk-select:focus-visible,
+.uk-textarea:focus-visible {
+  outline: none;
   box-shadow: var(--crm-focus-ring);
 }
 
@@ -1403,15 +1433,6 @@ body[data-page="subject-edit"] .crm-edit-toast {
   text-transform: uppercase;
   letter-spacing: .03em;
   margin-bottom: 5px;
-}
-
-.uk-select {
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #6d7d98 50%), linear-gradient(135deg, #6d7d98 50%, transparent 50%);
-  background-position: calc(100% - 16px) calc(50% - 3px), calc(100% - 10px) calc(50% - 3px);
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  padding-right: 34px !important;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator,
@@ -6496,8 +6517,7 @@ body[data-page="subject-edit"] .uk-form-label {
 }
 
 body[data-page="subject-edit"] .uk-input.crm-input,
-body[data-page="subject-edit"] .uk-select.crm-select,
-body[data-page="subject-edit"] .uk-textarea.crm-input {
+body[data-page="subject-edit"] .uk-select.crm-select {
   height: 36px;
   border-radius: 7px;
   font-size: 13px;
@@ -6505,6 +6525,8 @@ body[data-page="subject-edit"] .uk-textarea.crm-input {
 
 body[data-page="subject-edit"] .uk-textarea.crm-input {
   height: auto;
+  border-radius: 7px;
+  font-size: 13px;
   resize: vertical;
 }
 

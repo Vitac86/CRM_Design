@@ -176,19 +176,6 @@
   margin-top: 16px;
 }
 
-a,
-.uk-link {
-  text-decoration: none;
-}
-
-.uk-button:focus,
-.uk-button:focus-visible,
-.uk-input:focus-visible,
-.uk-select:focus-visible,
-.uk-textarea:focus-visible,
-a:focus-visible,
-.crm-nav-link:focus-visible,
-.crm-nav-group-toggle:focus-visible,
 .crm-option-card:focus-visible,
 .crm-option-card:focus-within,
 .crm-binary-control label:focus-within,

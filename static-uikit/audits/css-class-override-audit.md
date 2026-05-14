@@ -3122,3 +3122,115 @@ G. Component / Page Boundary Checks
 ```
 
 Bundle is not stale. No source CSS was modified in this audit task.
+
+---
+
+## Narrow UIkit Bridge Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — narrow UIkit bridge cleanup.
+**Status:** Complete — all four parts implemented, validator enhanced with three new guards, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/components/forms.css` | Consolidated `.uk-select` into a single canonical block (shared + select-specific rules); added `.uk-input:focus-visible / .uk-select:focus-visible / .uk-textarea:focus-visible` focus-ring block |
+| `assets/css/components/buttons.css` | Added `.uk-button:focus, .uk-button:focus-visible` focus-ring block |
+| `assets/css/components/cards.css` | Removed `a, .uk-link` global reset; shrank focus-ring group to card/control-specific selectors only (`.crm-option-card`, `.crm-binary-control label`, `.crm-radio-tile`, `.crm-check-row`) |
+| `assets/css/layout/sidebar.css` | Added `.crm-nav-link:focus-visible, .crm-nav-group-toggle:focus-visible` focus-ring block (canonical nav owner) |
+| `assets/css/base/reset.css` | Added `a, .uk-link { text-decoration: none }` and `a:focus-visible` focus-ring block (global accessibility reset) |
+| `assets/css/pages/subject-edit.css` | Consolidated `body[data-page="subject-edit"] .uk-textarea.crm-input` into a single canonical block |
+| `tools/validate-static-uikit.mjs` | Added `FORMS_CSS`, `BUTTONS_CSS`, `SUBJECT_EDIT_CSS` path constants; added `CARDS_FORBIDDEN_FOCUS_SELECTORS` list; added three new guards in Section G |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section |
+
+### 1. `.uk-select` consolidation result
+
+**Resolved.** `components/forms.css` previously defined `.uk-select` in two top-level blocks: once as part of `.uk-input, .uk-select, .uk-textarea` (shared surface skin) and once as a standalone block (custom arrow reset). The shared group was changed to `.uk-input, .uk-textarea` and all properties — shared surface and select-specific (appearance, background-image gradient, background-position/size/repeat, padding-right) — were merged into a single canonical `.uk-select` block. The old standalone `.uk-select` block was removed. Final computed values for `.uk-select`, `.uk-input`, and `.uk-textarea` are identical to the original two-block cascade.
+
+Validator guard added: `components/forms.css contains no duplicate top-level .uk-select definitions`.
+
+### 2. Subject-edit `.uk-textarea.crm-input` consolidation result
+
+**Resolved.** `pages/subject-edit.css` previously defined `body[data-page="subject-edit"] .uk-textarea.crm-input` twice: once inside the three-selector group (`height: 36px; border-radius: 7px; font-size: 13px`) and once in a subsequent standalone block (`height: auto; resize: vertical`). The textarea was removed from the group (group reduced to `.uk-input.crm-input` and `.uk-select.crm-select`), and a single canonical block was written with final computed values: `height: auto; border-radius: 7px; font-size: 13px; resize: vertical`. No other subject-edit rules were changed.
+
+Validator guard added: `pages/subject-edit.css contains no duplicate top-level body[data-page="subject-edit"] .uk-textarea.crm-input definitions`.
+
+### 3. Focus-ring block ownership result
+
+**Resolved.** The broad focus-ring block was split across four canonical owners:
+
+| Selectors | New owner | Rationale |
+|-----------|-----------|-----------|
+| `.uk-input:focus-visible`, `.uk-select:focus-visible`, `.uk-textarea:focus-visible` | `components/forms.css` | Form control UIkit bridge |
+| `.uk-button:focus`, `.uk-button:focus-visible` | `components/buttons.css` | Button UIkit bridge |
+| `.crm-nav-link:focus-visible`, `.crm-nav-group-toggle:focus-visible` | `layout/sidebar.css` | Canonical nav/sidebar owner; import position is safe (sidebar.css is earlier, no conflict since no other file sets these focus styles) |
+| `a:focus-visible` | `base/reset.css` | Global accessibility reset |
+| `.crm-option-card:focus-visible`, `.crm-option-card:focus-within`, `.crm-binary-control label:focus-within`, `.crm-radio-tile:focus-within`, `.crm-check-row:focus-within` | `components/cards.css` | Card/control-specific — correct owner; kept in place |
+
+All blocks carry the same `outline: none; box-shadow: var(--crm-focus-ring)` values. No focus-ring values were changed.
+
+Validator guard added: `components/cards.css contains no broad UIkit/form/button focus selectors`.
+
+### 4. `a, .uk-link` decision
+
+**Moved to `base/reset.css`.** `base/reset.css` already contains global element resets (`*`, `body`), making it the correct semantic home for a global link text-decoration reset. `a:focus-visible` was also co-located in `reset.css` as a global accessibility reset. Both rules were removed from `components/cards.css`.
+
+### 5. Validator enhancement result
+
+**Enhanced.** Three new guards added to Section G of `tools/validate-static-uikit.mjs`:
+
+1. **`components/forms.css` no-duplicate `.uk-select` guard** — errors if `.uk-select` appears more than once as a top-level selector.
+2. **`pages/subject-edit.css` no-duplicate `body[data-page="subject-edit"] .uk-textarea.crm-input` guard** — errors if the selector appears more than once at the top level.
+3. **`components/cards.css` no-broad-focus-selector guard** — errors if any of `.uk-button:focus`, `.uk-button:focus-visible`, `.uk-input:focus-visible`, `.uk-select:focus-visible`, `.uk-textarea:focus-visible`, `a:focus-visible`, `.crm-nav-link:focus-visible`, or `.crm-nav-group-toggle:focus-visible` appears as a top-level selector in `cards.css`.
+
+All existing guards were left intact and no existing checks were weakened.
+
+### 6. Bundle generation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | ✓ Exit 0 — 40/40 sections inlined — 238.2 KB |
+
+### 7. Bundle check result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle:check` | ✓ Exit 0 — bundle up to date — 40/40 sections — 238.2 KB |
+
+### 8. Validation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:validate` | ✓ Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+Full Section G output:
+
+```
+G. Component / Page Boundary Checks
+  ✓ components/cards.css contains no shell-level selectors
+  ✓ components/cards.css contains no duplicate top-level card/control selector definitions
+  ✓ components/tables.css contains no duplicate top-level table selector definitions
+  ✓ components/registry.css contains no duplicate targeted action/filter selectors in the same at-rule context
+  ✓ pages/subject-card.css contains no duplicate selector definitions in the same at-rule context
+  ✓ components/filters.css contains no duplicate top-level filter-panel selector definitions
+  ✓ components/address.css contains no duplicate top-level address-row :last-child selector definitions
+  ✓ pages/contract-wizard.css contains no bare top-level .crm-form-card selector
+  ✓ pages/compliance.css contains no bare .crm-decision-panel selector
+  ✓ components/forms.css contains no duplicate top-level .uk-select definitions
+  ✓ pages/subject-edit.css contains no duplicate top-level body[data-page="subject-edit"] .uk-textarea.crm-input definitions
+  ✓ components/cards.css contains no broad UIkit/form/button focus selectors
+```
+
+### 9. Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| `pages/requests.css` responsive duplicate cleanup (2 selectors in `@media (max-width: 768px)`) | Deferred — localized page cleanup |
+| `pages/subjects.css` meta-chip same-context duplicate | Deferred — localized page cleanup |
+| Optional visual regression tooling | Deferred |
+
+### Confirmation: no HTML or class changes
+
+No HTML files were modified. No class names were renamed or removed. No visual design was changed. `uikit.min.css` was not edited. `crm-static.bundle.css` was regenerated from source — not manually patched. `crm-static.css` import order was not changed.

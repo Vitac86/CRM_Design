@@ -16,3 +16,13 @@ body {
   scrollbar-color: #bcc9e4 transparent;
 }
 
+a,
+.uk-link {
+  text-decoration: none;
+}
+
+a:focus-visible {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}
+
