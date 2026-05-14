@@ -2896,3 +2896,229 @@ G. Component / Page Boundary Checks
 |------|--------|
 | UIkit bridge cleanup | Deferred |
 | Optional visual regression tooling | Deferred |
+
+---
+
+## Final Override Metrics After Semantic Seam Cleanup
+
+**Date:** 2026-05-14
+**Task type:** AUDIT / FINAL METRICS REFRESH ONLY — no CSS, HTML, JS, validator, `crm-static.css`, or bundle files were modified.
+**Scope:** `static-uikit/assets/css/crm-static.css` and the 40 CSS files imported by it. Generated `crm-static.bundle.css`, `uikit.min.css`, non-imported `pages/auth.css`, and non-imported `document-templates/` CSS are excluded from all duplicate counts.
+
+### 1. Why this refresh was needed
+
+The previous metrics section (`Current Override Metrics After Subject Card and Seam Cleanup`) predated six additional cleanup commits:
+
+- `components/registry.css` action/filter duplicate cluster cleanup (14 same-context candidates).
+- `components/filters.css` `.crm-filter-panel` same-file consolidation (1 candidate).
+- `components/address.css` address-row `:last-child` duplicate consolidation (3 candidates).
+- `components/tables.css` table-adjacent header/action duplicate consolidation (4 candidates).
+- `pages/contract-wizard.css` `.crm-form-card` scoping seam cleanup (1 cross-file wrong-owner item).
+- `pages/compliance.css` `.crm-decision-panel` dead legacy seam removal (1 cross-file wrong-owner item + 1 same-file responsive pair).
+
+Those changes made the 77 / 140 / 27 metrics stale. This section records the current state.
+
+### 2. Current duplicate selector counts
+
+Counting method: comma-separated selector groups are split and counted as individual selectors. Cross-file duplicates count selectors that appear in more than one imported source file. Same-file repeated selectors count selectors repeated inside one imported file across any at-rule context. Same-file same-context cleanup candidates are the actionable subset where the same selector repeats in the same file and the same at-rule context.
+
+| Metric | Previous count | Current count | Delta | Main reduction source |
+|---|---:|---:|---:|---|
+| Cross-file duplicate selectors | 77 | 75 | -2 | `.crm-form-card` scoped away from bare selector in `contract-wizard.css` (−1); `.crm-decision-panel` base block removed from `compliance.css` (−1) |
+| Same-file repeated selectors, any context | 140 | 117 | -23 | Registry action/filter consolidation (−14); filters.css filter-panel (−1); address.css last-child (−3); tables.css adjacent selectors (−4); compliance.css decision-panel base+responsive pair removed (−1) |
+| Same-file same-context cleanup candidates | 27 | 5 | -22 | Registry action/filter (−14); filters.css filter-panel (−1); address.css last-child (−3); tables.css adjacent selectors (−4) |
+
+Responsive and print bucket breakdown:
+
+| Bucket | Cross-file duplicate selectors | Same-file repeated selectors, any context | Same-file same-context candidates |
+|---|---:|---:|---:|
+| Base / non-media | 22 | 5 | 3 |
+| Responsive | 48 | 111 | 2 |
+| Print | 5 | 1 | 0 |
+| **Total** | **75** | **117** | **5** |
+
+Notes:
+- The 117 same-file repeated count intentionally includes base plus responsive pairs. The vast majority (111) are expected responsive overrides.
+- The actionable cleanup queue is now the 5 same-context candidates — all low-priority (UIkit bridge territory or isolated page selectors).
+- All component-layer and layout-layer same-context duplicates have been eliminated.
+
+### 3. Comparison with previous counts
+
+| Phase | Cross-file | Same-file any context | Same-context candidates | Primary work done |
+|---|---:|---:|---:|---|
+| After subject-card + seam cleanup | 80 | 180 | 77 | Subject-card consolidation; wrong-owner seam removal for filter-panel, page-header, nav-submenu; cards.css option-card/binary-control |
+| After second metrics refresh | 77 | 140 | 27 | Re-baseline (these were the "previous known metrics" entering the current phase) |
+| **Current (this refresh)** | **75** | **117** | **5** | Registry action/filter; filters.css filter-panel; address.css last-child; tables.css adjacent; contract-wizard seam; compliance dead-legacy removal |
+
+### 4. Resolved items from this phase
+
+| Item | Previous classification | Resolution |
+|---|---|---|
+| `components/registry.css` — 14 action/filter selectors | Same-file same-context, base | All 14 consolidated; registry.css validator guard added |
+| `components/filters.css` — `.crm-filter-panel` same-file split | Same-file same-context, base | Merged `position: relative` and `overflow: visible` into canonical block; validator guard added |
+| `components/address.css` — 3 × `:last-child` selectors | Same-file same-context, base | `border-bottom: 0` merged into canonical `:last-child` block for all three page scopes; validator guard added |
+| `components/tables.css` — `.crm-table-head`, `.crm-table-meta`, `.crm-table-actions`, `.crm-list-actions` | Same-file same-context, base | All four consolidated from group+individual pattern into single canonical blocks; validator guard added |
+| `.crm-form-card` — `pages/contract-wizard.css` bare selector | Cross-file, needs cleanup (wrong owner) | Scoped to `.crm-page[data-page="contract-wizard"] .crm-form-card`; no longer matches the bare `cards.css` selector; validator guard added |
+| `.crm-decision-panel` — `pages/compliance.css` base + responsive | Cross-file, needs cleanup (dead legacy) | Confirmed zero HTML usage (`.crm-compliance-decision-panel` is the live class); both CSS blocks removed from compliance.css; validator guard added |
+
+### 5. Current actionable same-context duplicate candidates
+
+Five same-context cleanup candidates remain. None are in the component or layout layer.
+
+| File | Selector | Count | Context | Why it remains | Safe to clean? | Recommended action |
+|---|---|---:|---|---|---|---|
+| `pages/requests.css` | `.crm-page[data-page="requests"] .crm-request-create-actions` | 2 | `@media (max-width: 768px)` | Two responsive blocks for the same selector; deferred as localized page cleanup | Yes — low risk | Merge the two responsive blocks in a narrow page cleanup task |
+| `pages/requests.css` | `.crm-page[data-page="requests"] .crm-requests-actions` | 2 | `@media (max-width: 768px)` | Same — two responsive blocks; later block adds wrap/justify-content | Yes — low risk | Same narrow page cleanup task |
+| `components/forms.css` | `.uk-select` | 2 | base | UIkit select bridge is split across two base blocks; deferred for UIkit bridge cleanup | Yes — low risk | Consolidate during UIkit bridge cleanup |
+| `pages/subject-edit.css` | `body[data-page="subject-edit"] .uk-textarea.crm-input` | 2 | base | UIkit textarea bridge split; later block overrides height and adds resize; deferred for UIkit bridge cleanup | Yes — low risk | Consolidate during UIkit bridge cleanup |
+| `pages/subjects.css` | `body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip` | 2 | base | Later block adds semantic chip colors; small localized page cleanup | Yes — low risk | Merge in a narrow page cleanup task |
+
+**No high-confidence actionable same-context candidates remain in the component or layout layer.** The 5 remaining are all page-isolated or UIkit bridge territory.
+
+### 6. Current cross-file duplicate classification summary
+
+Total cross-file: **75** (down from 77).
+
+| Classification | Count | Examples |
+|---|---:|---|
+| OK: responsive override | 48 | `.crm-layout`, `.crm-sidebar`, `.crm-topbar`, `.crm-page`, `[data-sidebar-toggle]`, `.crm-filter-panel` (registry+responsive), `.crm-page[data-page="subject-card"] .crm-subject-card-shell`, all address/subject responsive pairs |
+| OK: print override | 5 | `.crm-layout`, `.crm-sidebar`, `.crm-topbar`, `.crm-page`, `.crm-sticky-actions` (in print.css) |
+| OK: page-scoped composition | 17 | depository/middle-office/subject-form/subject-edit/subject-register pairs in registry.css and page CSS; `.crm-edit-toast`, `.crm-edit-form-card`, `.crm-mo-report-list-wrap`, etc. |
+| OK: UIkit bridge | 1 | `body[data-page="subject-edit"] .uk-form-label` in `subject-form.css` + `subject-edit.css` |
+| OK: responsive + page-scoped composition | 4 | `.crm-mo-details-card`, `.crm-page[data-page="requests"] .crm-requests-actions`, `.crm-page[data-page="trading"] .crm-page-header-row`, `.crm-page[data-page="back-office"] .crm-page-header-row` |
+| Needs cleanup: wrong owner | 0 | — all resolved |
+| Needs cleanup: accidental duplicate | 0 | — all resolved |
+| Needs manual review | 0 | — none pending |
+
+**Previously flagged items — current status:**
+
+| Selector | Previous status | Current status |
+|---|---|---|
+| `.crm-form-card` | Needs cleanup: wrong owner | ✓ Resolved — `contract-wizard.css` now uses `.crm-page[data-page="contract-wizard"] .crm-form-card` |
+| `.crm-decision-panel` | Needs cleanup: wrong owner | ✓ Resolved — bare selector removed from `compliance.css` (was dead code; `compliance-card.html` uses `.crm-compliance-decision-panel`) |
+| `.crm-filter-panel` | Previously: wrong owner (cards.css) | ✓ Resolved — `cards.css` no longer defines standalone `.crm-filter-panel`; `filters.css` is sole canonical owner |
+| `.crm-page-header` | Needs cleanup: wrong owner | ✓ Resolved — `cards.css` no longer defines `.crm-page-header`; `layout/page.css` is canonical owner |
+| `.crm-nav-group .crm-nav-submenu` | Needs cleanup: wrong owner | ✓ Resolved — removed from `cards.css`; `layout/sidebar.css` is canonical owner |
+| `.crm-option-card` | Same-file duplicate in `cards.css` | ✓ Resolved — one canonical block; validator guard active |
+| `.crm-binary-control` | Same-file duplicate in `cards.css` | ✓ Resolved — one canonical block; validator guard active |
+| Registry action/filter selectors | 14 same-context duplicates in `registry.css` | ✓ Resolved — all 14 consolidated; validator guard active |
+
+### 7. UIkit bridge inventory
+
+All selectors combining a `.uk-*` class with CRM styling across the 40 imported source files:
+
+**Group A — `components/buttons.css` (legitimate shared UIkit bridge)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `.uk-button { border-radius: 10px; min-height: 36px; ... }` | Reset UIkit button sizing to CRM spec | Legitimate shared UIkit bridge | Should remain as-is |
+| `.uk-button:disabled, .uk-button[disabled]` | CRM disabled state for UIkit button | Legitimate shared UIkit bridge | Should remain as-is |
+| `.uk-button-default { background; border; color }` | UIkit default button = CRM secondary style | Legitimate shared UIkit bridge | Should remain as-is |
+| `.uk-button.crm-button-primary`, `.uk-button.crm-button-secondary`, etc. | CRM button variant composition | Legitimate shared UIkit bridge | Should remain as-is |
+
+**Group B — `components/forms.css` (legitimate shared UIkit bridge, with one cleanup candidate)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `.uk-input, .uk-select, .uk-textarea` (first block) | CRM form control surface skin | Legitimate shared UIkit bridge | Should remain as-is |
+| `.uk-select` (second block — **same-context duplicate**) | Native select arrow reset | Legitimate shared UIkit bridge — but split from first block | Consolidate two `.uk-select` blocks during UIkit bridge cleanup |
+| `.uk-form-label` | CRM label typography | Legitimate shared UIkit bridge | Should remain as-is |
+| `.uk-radio`, `.uk-radio:checked` | Radio button reset | Legitimate shared UIkit bridge | Should remain as-is |
+
+**Group C — `components/cards.css` (broadly scoped — review during bridge cleanup)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `a, .uk-link { text-decoration: none }` | Global link reset | Medium risk — very broad; affects all `a` elements site-wide | Document intent; consider moving to `reset.css` if truly global |
+| `.uk-button:focus, .uk-input:focus-visible, .uk-select:focus-visible, .uk-textarea:focus-visible, ...` | Focus ring for UIkit elements | Legitimate shared UIkit bridge — but placed in `cards.css` (wrong owner) | Should move to `buttons.css` or `forms.css` during UIkit bridge cleanup |
+| `.crm-card, .uk-card.crm-card` | UIkit card + CRM card composition | Legitimate shared UIkit bridge | Should remain as-is |
+| `.crm-card.uk-card-body, .uk-card.crm-card.uk-card-body, .crm-section.uk-card-body` | UIkit card body padding | Legitimate shared UIkit bridge | Should remain as-is |
+
+**Group D — `components/tables.css` (legitimate, well-scoped)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `.crm-table .uk-table` | Strip UIkit table margins, fix min-width | Legitimate shared UIkit bridge | Should remain as-is |
+| `.crm-table .uk-table th` | CRM table header density | Legitimate shared UIkit bridge | Should remain as-is |
+| `.crm-table .uk-table td` | CRM table cell density | Legitimate shared UIkit bridge | Should remain as-is |
+| `.crm-table .uk-table td:first-child` | First cell highlight | Legitimate shared UIkit bridge | Should remain as-is |
+| `.crm-table .uk-table-divider > tr ...` | Divider color override | Legitimate shared UIkit bridge | Should remain as-is |
+| `.crm-table-compact .uk-table th, .crm-table-compact .uk-table td` | Compact density variant | Legitimate shared UIkit bridge | Should remain as-is |
+
+**Group E — `components/tabs.css` (legitimate)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `.crm-tabs > .uk-active > a` | UIkit active tab override | Legitimate shared UIkit bridge | Should remain as-is |
+
+**Group F — `components/filters.css` (legitimate, well-scoped)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `.crm-filter-control .uk-input, .crm-filter-control .uk-select` (inside registry panel) | Registry filter input sizing | Page-scoped UIkit bridge (under registry filter scope) | Should remain as-is |
+| `.crm-filter-search.uk-input, .uk-input.crm-filter-search, .crm-filter-search .uk-input` | Filter search input dimensions | Legitimate shared UIkit bridge | Should remain as-is |
+
+**Group G — `components/registry.css` (well-scoped, page-composition)**
+
+| Selector | Purpose | Classification | Next action |
+|---|---|---|---|
+| `.crm-page.crm-registry-page .crm-registry-table .uk-table` | Registry table UIkit override | Page-scoped UIkit bridge | Should remain as-is |
+| `.crm-page.crm-registry-page .crm-registry-table .uk-table th` | Registry table header | Page-scoped UIkit bridge | Should remain as-is |
+| `.crm-page.crm-registry-page .crm-registry-table .uk-table td` | Registry table cell | Page-scoped UIkit bridge | Should remain as-is |
+| `.crm-mo-toolbar-search-shell .uk-input` | Middle-office toolbar search input | Page-scoped UIkit bridge | Should remain as-is |
+
+**Group H — page files (page-scoped UIkit bridges)**
+
+| Selector | File | Purpose | Classification | Next action |
+|---|---|---|---|---|
+| `.crm-detail-actions .uk-button, .crm-page-actions .uk-button` | `pages/contract-wizard.css` (responsive) | Full-width buttons on mobile | Page-scoped UIkit bridge | Should remain as-is |
+| `.crm-risk-grid .uk-form-label` | `pages/compliance.css` | Label spacing in compliance detail | Page-scoped UIkit bridge | Should remain as-is |
+| `body[data-page="subject-edit"] .uk-form-label` | `components/subject-form.css` + `pages/subject-edit.css` | Label override for subject-edit form | Page-scoped UIkit bridge — cross-file (classified OK in cross-file inventory) | Defer to UIkit bridge cleanup |
+| `body[data-page="subject-edit"] .uk-textarea.crm-input` (×2) | `pages/subject-edit.css` | Textarea height + resize — **same-context duplicate** | Page-scoped UIkit bridge with same-context split | Consolidate both blocks during UIkit bridge cleanup |
+| `.crm-page[data-page="subject-card"] .crm-subject-tabs > .uk-active > a` | `pages/subject-card.css` | Active tab override for subject-card page | Page-scoped UIkit bridge | Should remain as-is |
+| `.crm-page[data-page="subject-card"] .crm-subject-actions .uk-button` | `pages/subject-card.css` | Button sizing on subject-card (now one canonical block) | Page-scoped UIkit bridge | Should remain as-is |
+
+**UIkit bridge summary:**
+- **Should remain as-is:** majority of all groups (A, D, E, parts of B, F, G, H)
+- **Cleanup during UIkit bridge task:** `components/forms.css` `.uk-select` consolidation; `components/cards.css` focus-ring block relocation (wrong file); `pages/subject-edit.css` `.uk-textarea.crm-input` consolidation
+- **Document intent:** `cards.css` `a, .uk-link` broad selector (move to `reset.css` consideration)
+- **Potential duplicate / cleanup:** `body[data-page="subject-edit"] .uk-form-label` in both `subject-form.css` and `subject-edit.css` (cross-file, currently classified OK)
+
+### 8. Recommended next task
+
+**Recommended next task: UIkit bridge cleanup.**
+
+Reason: all high-confidence same-context component and layout duplicates are resolved. The validator guards for `cards.css`, `tables.css`, `registry.css`, `subject-card.css`, `filters.css`, `address.css`, `contract-wizard.css`, and `compliance.css` are active. The 5 remaining same-context candidates are all UIkit bridge territory or isolated page selectors. The natural next phase is to consolidate the UIkit bridge selectors into a documented, canonical layer:
+
+Narrow scope for the UIkit bridge task:
+- Consolidate `.uk-select` same-context duplicate in `components/forms.css`.
+- Move the focus-ring block from `components/cards.css` to `components/forms.css` or `components/buttons.css` (wrong owner).
+- Consolidate `.uk-textarea.crm-input` same-context duplicate in `pages/subject-edit.css`.
+- Document (inline comment) the `a, .uk-link` broad selector in `cards.css` or move to `reset.css`.
+- Do not create a new `uikit-overrides.css` file unless the bridge selectors from multiple component files are large enough to warrant it.
+
+Do not recommend visual regression tooling until UIkit bridge cleanup is complete, as that adds a verification step before the remaining bridge selectors are stabilized.
+
+### 9. Validation results
+
+| Command | Result |
+|---|---|
+| `npm.cmd run static:uikit:bundle:check` | ✓ Exit 0 — bundle is up to date, 40 / 40 sections, 237.7 KB |
+| `npm.cmd run static:uikit:validate` | ✓ Exit 0 — validation passed, 29 pages checked, 296 local asset refs checked, 0 errors, 0 warnings |
+
+**Validator Section G confirmation (all guards active):**
+
+```
+G. Component / Page Boundary Checks
+  ✓ components/cards.css contains no shell-level selectors
+  ✓ components/cards.css contains no duplicate top-level card/control selector definitions
+  ✓ components/tables.css contains no duplicate top-level table selector definitions
+  ✓ components/registry.css contains no duplicate targeted action/filter selectors in the same at-rule context
+  ✓ pages/subject-card.css contains no duplicate selector definitions in the same at-rule context
+  ✓ components/filters.css contains no duplicate top-level filter-panel selector definitions
+  ✓ components/address.css contains no duplicate top-level address-row :last-child selector definitions
+  ✓ pages/contract-wizard.css contains no bare top-level .crm-form-card selector
+  ✓ pages/compliance.css contains no bare .crm-decision-panel selector
+```
+
+Bundle is not stale. No source CSS was modified in this audit task.
