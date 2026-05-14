@@ -139,6 +139,7 @@
   background: #f6f9ff;
   box-shadow: none;
   padding: var(--crm-layer-gap-sm);
+  margin-bottom: 14px;
   display: grid;
   gap: var(--crm-layer-gap-sm);
 }

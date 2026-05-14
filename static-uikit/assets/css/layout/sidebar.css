@@ -234,8 +234,8 @@
 
 /* Moved from topbar.css — same effective values as .crm-sidebar .crm-nav-submenu */
 .crm-nav-group .crm-nav-submenu {
-  margin: 2px 0 4px 10px;
-  padding-left: 8px;
+  margin: 2px 0 6px 10px;
+  padding-left: 9px;
   border-left: 1px solid rgba(224, 235, 255, 0.22);
 }
 

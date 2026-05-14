@@ -2002,3 +2002,86 @@ G. Component / Page Boundary Checks
 | Registry/page-scoped duplicate cleanup outside subject-card | Deferred |
 | UIkit bridge cleanup in subject page CSS | Deferred |
 | Optional visual regression tooling | Deferred |
+
+## Wrong-Owner Seam Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION - wrong-owner seam cleanup and targeted `cards.css` duplicate consolidation.
+**Status:** Complete - canonical owners restored, targeted duplicates consolidated, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/components/cards.css` | Removed wrong-owner `.crm-filter-panel`, `.crm-page-header`, and `.crm-nav-group .crm-nav-submenu` definitions; consolidated targeted option-card and binary-control duplicates |
+| `assets/css/components/filters.css` | Made `.crm-filter-panel` the canonical owner for the still-effective `margin-bottom: 14px` contribution |
+| `assets/css/layout/page.css` | Made `.crm-page-header` the canonical owner for the final effective `margin-bottom: 14px` value |
+| `assets/css/layout/sidebar.css` | Made `.crm-nav-group .crm-nav-submenu` the canonical owner for the final effective submenu margin and padding values |
+| `tools/validate-static-uikit.mjs` | Added conservative duplicate-selector guard for targeted top-level `components/cards.css` selectors |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added these wrong-owner seam cleanup notes and validation results |
+
+### Canonical owner results
+
+| Selector | Canonical owner after cleanup | Result |
+|----------|-------------------------------|--------|
+| `.crm-filter-panel` | `components/filters.css` | `cards.css` no longer defines the standalone selector; `filters.css` preserves the effective base panel primitives including `margin-bottom: 14px` |
+| `.crm-page-header` | `layout/page.css` | `cards.css` no longer defines the standalone selector; `page.css` preserves the effective `margin-bottom: 14px` value |
+| `.crm-nav-group .crm-nav-submenu` | `layout/sidebar.css` | `cards.css` no longer defines the selector; `sidebar.css` preserves the effective `margin: 2px 0 6px 10px` and `padding-left: 9px` values |
+
+### `cards.css` duplicate selectors consolidated
+
+Consolidated exact top-level duplicate blocks for:
+- `.crm-option-card`
+- `.crm-option-card.is-selected`
+- `.crm-binary-control`
+- `.crm-binary-control label`
+
+Related selectors were left in place:
+- `.crm-option-card:hover`
+- `.crm-option-card input`
+- `.crm-option-card span`
+- `.crm-option-card small`
+- `.crm-option-card strong`
+- `.crm-binary-control label input`
+- `.crm-binary-control label.is-active`
+- `.crm-binary-control label:has(input:checked)`
+- `.crm-binary-control label span`
+
+### Validator enhancement
+
+Status: **Added**.
+
+`tools/validate-static-uikit.mjs` now checks `components/cards.css` for duplicate top-level definitions of these exact selectors:
+- `.crm-option-card`
+- `.crm-option-card.is-selected`
+- `.crm-binary-control`
+- `.crm-binary-control label`
+
+The check strips block comments through the existing CSS helper, counts exact top-level selector matches only, and does not flag pseudo/state selectors outside the explicit guarded list.
+
+### Validation results
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | Exit 0 - 40/40 sections inlined - 238.9 KB |
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 - bundle up to date - 40/40 sections - 238.9 KB |
+| `npm.cmd run static:uikit:validate` | Exit 0 - validation passed - 29 pages checked - 296 local asset refs checked - 0 errors, 0 warnings |
+
+New validator confirmation:
+
+```
+G. Component / Page Boundary Checks
+  components/cards.css contains no shell-level selectors
+  components/cards.css contains no duplicate top-level card/control selector definitions
+  components/tables.css contains no duplicate top-level table selector definitions
+  pages/subject-card.css contains no duplicate selector definitions in the same at-rule context
+```
+
+### Remaining deferred cleanup items
+
+| Item | Status |
+|------|--------|
+| Registry/page-scoped duplicate cleanup outside subject-card | Deferred |
+| UIkit bridge cleanup in subject page CSS | Deferred |
+| Optional visual regression tooling | Deferred |

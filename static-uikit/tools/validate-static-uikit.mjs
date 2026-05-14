@@ -64,6 +64,13 @@ const CARDS_FORBIDDEN_SHELL_SELECTORS = [
   '.crm-page',
 ];
 
+const CARDS_DUPLICATE_SELECTOR_CHECKS = [
+  '.crm-option-card',
+  '.crm-option-card.is-selected',
+  '.crm-binary-control',
+  '.crm-binary-control label',
+];
+
 const TABLES_DUPLICATE_SELECTOR_CHECKS = [
   '.crm-table-wrapper',
   '.crm-table',
@@ -745,6 +752,7 @@ if (!existsSync(CARDS_CSS)) {
 } else {
   const cardsRelPath = relative(ASSETS_CSS, CARDS_CSS).replace(/\\/g, '/');
   const cardsSource  = stripCssBlockComments(readFileSync(CARDS_CSS, 'utf8'));
+  const cardsSelectors = collectTopLevelRuleSelectors(cardsSource);
   let hasShellSelector = false;
 
   for (const selector of CARDS_FORBIDDEN_SHELL_SELECTORS) {
@@ -756,6 +764,20 @@ if (!existsSync(CARDS_CSS)) {
 
   if (!hasShellSelector) {
     ok('components/cards.css contains no shell-level selectors');
+  }
+
+  let hasDuplicateCardSelector = false;
+
+  for (const selector of CARDS_DUPLICATE_SELECTOR_CHECKS) {
+    const count = cardsSelectors.filter(found => found === selector).length;
+    if (count > 1) {
+      err(`${cardsRelPath} contains ${count} top-level definitions for "${selector}"`);
+      hasDuplicateCardSelector = true;
+    }
+  }
+
+  if (!hasDuplicateCardSelector) {
+    ok('components/cards.css contains no duplicate top-level card/control selector definitions');
   }
 }
 
