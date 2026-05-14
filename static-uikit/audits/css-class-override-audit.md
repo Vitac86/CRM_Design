@@ -981,4 +981,88 @@ The CSS architecture refactor is complete when all of the following are true:
 
 ---
 
-*This audit was produced by static inspection of all source CSS files and HTML pages in `static-uikit/`. No CSS, HTML, JS, bundle files, or UMI files were modified. All findings are based on the state of the repository as of 2026-05-14.*
+## Phase 0 / Phase 1 Implementation Notes
+
+**Date:** 2026-05-14  
+**Status:** Complete — bundle script created, initial bundle regenerated, three safe source cleanups applied, bundle regenerated again from cleaned sources.
+
+### Bundle generation script
+
+| Property | Value |
+|----------|-------|
+| Script path | `static-uikit/tools/build-css-bundle.mjs` |
+| Command | `node static-uikit/tools/build-css-bundle.mjs` |
+| npm script | `npm run static:uikit:bundle` |
+| Runtime | Node.js ≥16, ESM (`"type": "module"` in root `package.json`) |
+
+The script:
+- Reads `static-uikit/assets/css/crm-static.css` (the canonical import manifest)
+- Parses `@import url("...")` statements in order (also handles bare `@import "..."` syntax)
+- Inlines each source file with a `/* ===== base/fonts.css ===== */` section marker
+- Rewrites all relative `url()` references from each source file's directory to the bundle's directory (`assets/css/`) using Node.js `path.resolve` + `path.relative` — no hardcoded string substitution
+- Writes the result to `static-uikit/assets/css/crm-static.bundle.css`
+- Does NOT minify, reorder selectors, or transform CSS in any way
+- Warns if `crm-static.css` contains non-`@import` rules (desired state: import-manifest only)
+- Warns if any imported file is missing from disk
+
+**Font URL rewriting verified:** `base/fonts.css` source uses `../../fonts/inter/...` (relative to `assets/css/base/`); the generated bundle correctly emits `../fonts/inter/...` (relative to `assets/css/`). Both resolve to `static-uikit/assets/fonts/inter/`.
+
+### Bundle generation results
+
+| Run | Trigger | Sections | Output size | Lines |
+|-----|---------|----------|-------------|-------|
+| Initial run (pre-cleanup) | Script first run | 40 | 246.7 KB | 10,099 |
+| Final run (post-cleanup) | After source cleanups | 40 | 246.0 KB | 10,061 |
+
+The previous bundle (manually maintained, pre-Phase 0) was 257,837 bytes / 10,139 lines. The new generated bundle is slightly smaller because extra blank lines and whitespace from the old manual process are not reproduced. CSS semantics are unchanged.
+
+### CSS source cleanups performed
+
+All three cleanups below are **exact-duplicate removals** — no property values were changed except the `border-radius` consolidation in `cards.css` which restores the effective runtime value (block 2 already won at 14px).
+
+| # | File | Change | Lines removed |
+|---|------|--------|---------------|
+| DX-04 | `layout/app.css` | Removed exact duplicate `.crm-sidebar .crm-nav-link > span:first-child` block (canonical copy in `layout/sidebar.css`) | 7 |
+| DX-05 | `layout/app.css` | Removed exact duplicate `.crm-sidebar .crm-nav-link svg.crm-nav-icon, .crm-sidebar .crm-nav-icon` block (canonical copy in `layout/sidebar.css`) | 12 |
+| DX-06 | `layout/app.css` | Removed exact duplicate `.crm-sidebar .crm-nav-link [uk-icon]` block (canonical copy in `layout/sidebar.css`) | 8 |
+| tabs-01 | `components/tabs.css` | Merged the two `.crm-tabs` blocks into one (block 1 had `display/flex-wrap/gap`, block 2 added `margin` — merged with no value change) | 4 |
+| cards-01 | `components/cards.css` | Consolidated two `.crm-filter-panel` blocks into one: first block updated to `border-radius: 14px` (effective value block 2 had overridden to), second block deleted. `margin-bottom: 14px` preserved from first block. No visual change. | 5 |
+
+**`layout/app.css`** reduced from 259 → 231 lines.  
+**`components/tabs.css`**: `.crm-tabs` is now one canonical block.  
+**`components/cards.css`**: `.crm-filter-panel` is now one canonical block.
+
+### Audit items intentionally deferred
+
+| Item | Reason for deferral |
+|------|---------------------|
+| DX-01: `:root` token split across `sidebar.css` and `topbar.css` | Requires moving tokens to `base/tokens.css` and deleting `:root` blocks — higher risk, Phase 2 |
+| DX-02: `.crm-sidebar background` duplicate in `sidebar.css` | Depends on DX-01 resolution |
+| DX-03: `.crm-sidebar-brand` partial duplicate | Depends on DX-01 resolution |
+| DX-07–DX-15: remaining cross-file overrides | All are intentional cascade refinements or require architectural decisions — Phase 3–4 |
+| `cards.css` @media (920px) responsive layout block | `.crm-sidebar-overlay` is unique to this block; sidebar animation approach (left vs transform) differs from `responsive.css` — requires Q8 to be answered before removal |
+| `cards.css` @media print block | Currently the ONLY print rules for `.crm-sidebar`/`.crm-topbar`/`.crm-layout`/`.crm-page`; `print.css` is intentionally blank — cannot remove safely |
+| Same-file duplicates in `tables.css` | Multiple blocks with differing font-sizes and property values; consolidation requires manual analysis to determine effective value for each property — Phase 3 |
+| Undefined `--crm-layer-card-*` variables in `filters.css` / `modals.css` | Requires either defining the variables in `tokens.css` or adding fallback values — Phase 1 continuation |
+
+### Validation commands run
+
+```
+node static-uikit/tools/build-css-bundle.mjs
+  → ✓ Bundle written → static-uikit/assets/css/crm-static.bundle.css
+    Sections inlined: 40
+    Output size: 246.0 KB
+
+node static-uikit/tools/validate-static-uikit.mjs
+  → ERROR: static-uikit/tools/validate-static-uikit.mjs not found (directory did not exist before this task)
+```
+
+No automated HTML validation script exists. Bundle output was manually spot-checked:
+- Section markers present for all 40 imported files
+- Font URLs correctly rewritten to `../fonts/inter/...` and `../fonts/inter-tight/...`
+- First and last sections confirmed (`base/fonts.css` → `print.css`)
+- Bundle contains no `@import` directives (fully inlined)
+
+---
+
+*This audit was produced by static inspection of all source CSS files and HTML pages in `static-uikit/`. Phase 0/1 changes: bundle script created, three exact-duplicate source blocks removed. No visual changes were made. All findings are based on the state of the repository as of 2026-05-14.*

@@ -6,7 +6,6 @@
  * Regenerate the bundle after modular CSS changes.
  */
 
-
 /* ===== base/fonts.css ===== */
 /* ========================================================================== */
 /* fonts                                                                        */
@@ -83,7 +82,6 @@
   font-display: swap;
 }
 
-
 /* ===== base/tokens.css ===== */
 /* ========================================================================== */
 /* variables / tokens                                                          */
@@ -154,7 +152,6 @@
   --crm-sidebar-w: 276px;
 }
 
-
 /* ===== base/reset.css ===== */
 
 /* ========================================================================== */
@@ -173,7 +170,6 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #bcc9e4 transparent;
 }
-
 
 
 /* ===== layout/app.css ===== */
@@ -262,35 +258,6 @@ body {
   transition: background-color .14s ease, color .14s ease;
 }
 .crm-nav-item { width: 100%; }
-.crm-sidebar .crm-nav-link > span:first-child {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1 1 0;
-}
-.crm-sidebar .crm-nav-link svg.crm-nav-icon,
-.crm-sidebar .crm-nav-icon {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  max-width: 24px;
-  min-height: 24px;
-  max-height: 24px;
-  flex: 0 0 24px;
-  display: block;
-  color: currentColor;
-  overflow: visible;
-}
-
-.crm-sidebar .crm-nav-link [uk-icon] {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 .crm-nav-chevron {
   flex: 0 0 auto;
   transition: transform 0.18s ease;
@@ -437,7 +404,6 @@ body {
 .crm-page h2, .crm-page h3, .crm-page h4 { color: #1c2b45; margin-top: 0; }
 
 
-
 /* ===== layout/sidebar.css ===== */
 /* ===== Sidebar parity fix (global static-uikit) ===== */
 :root {
@@ -577,7 +543,6 @@ body {
 .crm-sidebar .crm-nav-group.active > .crm-nav-group-toggle .crm-nav-icon-img {
   opacity: 1;
 }
-
 
 /* ===== layout/topbar.css ===== */
 :root {
@@ -913,7 +878,6 @@ body {
   }
 }
 
-
 /* ===== layout/page.css ===== */
 /* static-uikit launcher */
 .crm-launcher-page {
@@ -1102,7 +1066,6 @@ body {
   .crm-sticky-actions { display: none !important; }
 }
 
-
 /* ===== components/cards.css ===== */
 /* ========================================================================== */
 /* common components: cards / filters / buttons / badges / tables / tabs      */
@@ -1143,7 +1106,7 @@ body {
 
 .crm-filter-panel {
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   margin-bottom: 14px;
 }
 
@@ -1355,12 +1318,6 @@ a:focus-visible,
 }
 
 
-.crm-filter-panel {
-  border-radius: 14px;
-  padding: 12px;
-}
-
-
 .crm-option-card {
   min-height: 108px;
 }
@@ -1515,7 +1472,6 @@ a:focus-visible,
   }
 }
 
-
 /* ===== components/buttons.css ===== */
 /* Base button — UIkit vendor override: CRM sizing and typography */
 .uk-button {
@@ -1598,7 +1554,6 @@ a:focus-visible,
   color: #3554b1;
   text-decoration: none;
 }
-
 
 /* ===== components/forms.css ===== */
 /* shared form primitives */
@@ -1734,7 +1689,6 @@ input[type="date"]::-webkit-calendar-picker-indicator,
   background-color: var(--crm-primary);
 }
 
-
 /* ===== components/subject-form.css ===== */
 /* Shared subject create/edit form UI */
 
@@ -1769,7 +1723,6 @@ body[data-page="subject-edit"] .crm-edit-header,
 body[data-page="subject-edit"] .crm-edit-form-card {
   border-radius: 12px;
 }
-
 
 /* ===== components/address.css ===== */
 /* Shared address and FIAS module styles */
@@ -2246,7 +2199,6 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   margin: 0;
 }
 
-
 /* ===== components/badges.css ===== */
 /* badges */
 .crm-badge {
@@ -2299,7 +2251,6 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   gap: 6px;
   flex-wrap: wrap;
 }
-
 
 /* ===== components/tables.css ===== */
 /* tables / list pages density pass */
@@ -2737,21 +2688,17 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
 }
 
-
 /* ===== components/tabs.css ===== */
 /* subject tabs */
 .crm-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin: 12px 0 14px;
 }
 
 .crm-tab {
   color: var(--crm-text-secondary);
-}
-
-.crm-tabs {
-  margin: 12px 0 14px;
 }
 
 .crm-tabs > li > a {
@@ -2766,7 +2713,6 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   color: var(--crm-primary);
   border-color: transparent;
 }
-
 
 /* ===== components/filters.css ===== */
 /* ===== Registry filter panel layout ===== */
@@ -3082,7 +3028,6 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
 .crm-filter-option.is-selected .crm-filter-option-check {
   opacity: 1;
 }
-
 
 /* ===== components/registry.css ===== */
 /* Shared CRM registry/list page component */
@@ -3768,14 +3713,12 @@ body[data-page="middle-office-reports"] .crm-mo-report-pagination-button,
   font-size: 18px;
 }
 
-
 /* ===== components/modals.css ===== */
 /* modals */
 .crm-modal .crm-modal-dialog {
   border: var(--crm-layer-card-border);
   border-radius: var(--crm-layer-card-radius);
 }
-
 
 
 /* ===== pages/dashboard.css ===== */
@@ -4180,7 +4123,6 @@ body[data-page="dashboard"] .crm-page-subtitle {
   }
 }
 
-
 /* ===== pages/subjects.css ===== */
 /* Page variables */
 body[data-page="subjects"] {
@@ -4342,7 +4284,6 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   background: #f2ebe4;
   color: #7a5632;
 }
-
 
 /* ===== pages/subject-card.css ===== */
 /* 1. Subject card page shell */
@@ -6253,7 +6194,6 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   }
 }
 
-
 /* ===== pages/contract-wizard.css ===== */
 /* Contract wizard page shell */
 
@@ -6470,7 +6410,6 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   }
 }
 
-
 /* ===== pages/contract-edit.css ===== */
 /* Contract edit page shell */
 
@@ -6522,7 +6461,6 @@ body[data-page="contract-edit"] .crm-contract-edit-actions {
     grid-template-columns: 1fr;
   }
 }
-
 
 /* ===== pages/subject-register.css ===== */
 /* Subject register scope and wizard shell overrides */
@@ -6826,7 +6764,6 @@ body[data-page="subject-register"] .fl-address-block-head,
   }
 }
 
-
 /* ===== pages/subject-edit.css ===== */
 /* Shared subject edit page shell */
 
@@ -7108,7 +7045,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   }
 }
 
-
 /* ===== pages/brokerage.css ===== */
 /* ============================================================
    Brokerage page — scoped styles
@@ -7236,7 +7172,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   }
 }
 
-
 /* ===== pages/trust-management.css ===== */
 /* ============================================================
    Trust Management page - scoped styles
@@ -7272,7 +7207,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 /* Mobile rules */
 
 /* Mobile footer and filter behavior remains handled by shared responsive.css. */
-
 
 /* ===== pages/requests.css ===== */
 /* Header and Actions */
@@ -7379,7 +7313,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   }
 }
 
-
 /* ===== pages/back-office.css ===== */
 /* Shared registry header, title, and filter sizing live in components/registry.css. */
 .crm-page[data-page="back-office"] .crm-back-office-shell .crm-filter-fields-row {
@@ -7469,7 +7402,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   }
 }
 
-
 /* ===== pages/archive.css ===== */
 /* Header and Actions */
 /* Shared registry header/action rules live in components/registry.css. */
@@ -7491,7 +7423,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 .crm-page[data-page="archive"] .crm-archive-table .uk-table {
   min-width: 1100px;
 }
-
 
 /* ===== pages/agents.css ===== */
 /* Shared registry header, filter row, and 1040px table sizing live in components/registry.css. */
@@ -7655,7 +7586,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
     grid-template-columns: minmax(0,1fr);
   }
 }
-
 
 /* ===== pages/compliance.css ===== */
 /* 1. Shared compliance variables */
@@ -8246,7 +8176,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   }
 }
 
-
 /* ===== pages/middle-office.css ===== */
 /* Shared middle-office shell/header rules live in components/registry.css. */
 
@@ -8506,7 +8435,6 @@ body[data-page="middle-office-reports"] .crm-mo-split {
     grid-template-columns: 1fr;
   }
 }
-
 
 /* ===== pages/trading.css ===== */
 /* 1. Shared trading variables */
@@ -8949,7 +8877,6 @@ body[data-page="trading-card"] {
   }
 }
 
-
 /* ===== pages/depository.css ===== */
 /* Depository page shell */
 .crm-page[data-page="depository"] {
@@ -9114,7 +9041,6 @@ body[data-page="trading-card"] {
     grid-template-columns: 1fr;
   }
 }
-
 
 /* ===== pages/document-wizard.css ===== */
 /* Document Wizard page */
@@ -9370,7 +9296,6 @@ body[data-page="trading-card"] {
   }
 }
 
-
 /* ===== pages/error.css ===== */
 .crm-error-state {
   max-width: 560px;
@@ -9380,7 +9305,6 @@ body[data-page="trading-card"] {
 .crm-error-card {
   text-align: center;
 }
-
 
 /* ===== pages/search-results.css ===== */
 /* ── Search Results Page ──────────────────────────────────────────────────── */
@@ -9691,7 +9615,6 @@ body[data-page="trading-card"] {
     padding: 32px 16px;
   }
 }
-
 
 /* ===== responsive.css ===== */
 /* ===========================================================================
@@ -10133,7 +10056,5 @@ body[data-page="trading-card"] {
   }
 }
 
-
 /* ===== print.css ===== */
 /* intentionally left blank in this refactor; styles moved incrementally */
-

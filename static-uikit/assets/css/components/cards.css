@@ -37,7 +37,7 @@
 
 .crm-filter-panel {
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   margin-bottom: 14px;
 }
 
@@ -246,12 +246,6 @@ a:focus-visible,
   .crm-option-grid {
     grid-template-columns: 1fr;
   }
-}
-
-
-.crm-filter-panel {
-  border-radius: 14px;
-  padding: 12px;
 }
 
 
