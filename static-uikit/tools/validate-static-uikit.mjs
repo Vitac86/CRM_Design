@@ -11,7 +11,7 @@
  *   D. Partials directory — existence and CSS loading
  *   E. UMI pack directories — CSS reference audit
  *   F. Local asset existence — <link href>, <script src>, <img src>
- *   G. Component boundary checks — cards.css must not own shell selectors
+ *   G. Component boundary checks — cards.css shell selectors, tables.css duplicate selectors
  *   H. Summary and exit code
  *
  * Usage:
@@ -40,6 +40,7 @@ const ASSETS_FONTS = resolve(ASSETS_DIR, 'fonts');
 const MANIFEST     = resolve(ASSETS_CSS, 'crm-static.css');
 const BUNDLE       = resolve(ASSETS_CSS, 'crm-static.bundle.css');
 const CARDS_CSS    = resolve(ASSETS_CSS, 'components/cards.css');
+const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -60,6 +61,15 @@ const CARDS_FORBIDDEN_SHELL_SELECTORS = [
   '.crm-topbar',
   '.crm-search',
   '.crm-page',
+];
+
+const TABLES_DUPLICATE_SELECTOR_CHECKS = [
+  '.crm-table-wrapper',
+  '.crm-table',
+  '.crm-table .uk-table',
+  '.crm-table .uk-table th',
+  '.crm-table .uk-table td',
+  '.crm-table .uk-table td:first-child',
 ];
 
 // ── Reporting ─────────────────────────────────────────────────────────────────
@@ -112,6 +122,54 @@ function makeSelectorBoundaryRegex(selector) {
     return new RegExp(`(^|[^_a-zA-Z0-9-])${escaped}(?![_a-zA-Z0-9-])`);
   }
   return new RegExp(escaped);
+}
+
+function normalizeSelectorPrelude(selector) {
+  return selector.replace(/\s+/g, ' ').trim();
+}
+
+function collectTopLevelRuleSelectors(source) {
+  const selectors = [];
+  let depth = 0;
+  let preludeStart = 0;
+  let inString = null;
+  let escaped = false;
+
+  for (let i = 0; i < source.length; i++) {
+    const char = source[i];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === inString) {
+        inString = null;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      inString = char;
+      continue;
+    }
+
+    if (char === '{') {
+      const prelude = source.slice(preludeStart, i).trim();
+      if (depth === 0 && prelude && !prelude.startsWith('@')) {
+        selectors.push(normalizeSelectorPrelude(prelude));
+      }
+      depth++;
+      continue;
+    }
+
+    if (char === '}') {
+      depth = Math.max(0, depth - 1);
+      if (depth === 0) preludeStart = i + 1;
+    }
+  }
+
+  return selectors;
 }
 
 /** Resolve a path relative to a page HTML file (strips fragment). */
@@ -576,6 +634,27 @@ if (!existsSync(CARDS_CSS)) {
 
   if (!hasShellSelector) {
     ok('components/cards.css contains no shell-level selectors');
+  }
+}
+
+if (!existsSync(TABLES_CSS)) {
+  err(`components/tables.css not found: ${relative(REPO_ROOT, TABLES_CSS)}`);
+} else {
+  const tablesRelPath = relative(ASSETS_CSS, TABLES_CSS).replace(/\\/g, '/');
+  const tablesSource  = stripCssBlockComments(readFileSync(TABLES_CSS, 'utf8'));
+  const selectors     = collectTopLevelRuleSelectors(tablesSource);
+  let hasDuplicateTableSelector = false;
+
+  for (const selector of TABLES_DUPLICATE_SELECTOR_CHECKS) {
+    const count = selectors.filter(found => found === selector).length;
+    if (count > 1) {
+      err(`${tablesRelPath} contains ${count} top-level definitions for "${selector}"`);
+      hasDuplicateTableSelector = true;
+    }
+  }
+
+  if (!hasDuplicateTableSelector) {
+    ok('components/tables.css contains no duplicate top-level table selector definitions');
   }
 }
 

@@ -1567,3 +1567,88 @@ G. Component Boundary Checks
 | Same-file duplicate cleanup in `components/cards.css` | Deferred |
 | Possible future component normalization | Deferred |
 | Optional visual regression tooling | Deferred |
+
+---
+
+## Tables Same-File Duplicate Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION - tables.css same-file duplicate consolidation.
+**Status:** Complete - table duplicate selectors consolidated, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/components/tables.css` | Consolidated same-file duplicate table wrapper, table shell, UIkit table, and table cell selector blocks |
+| `tools/validate-static-uikit.mjs` | Added conservative duplicate selector guard for top-level `components/tables.css` table selectors |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added these tables duplicate cleanup notes and validation results |
+
+### Duplicate selectors consolidated
+
+Consolidated exact same-file duplicate blocks for:
+- `.crm-table-wrapper`
+- `.crm-table`
+- `.crm-table .uk-table`
+- `.crm-table .uk-table th`
+- `.crm-table .uk-table td`
+- `.crm-table .uk-table td:first-child`
+- `.crm-table .uk-table th, .crm-table .uk-table td`
+
+The compact density block remains as a single intentional grouped rule:
+- `.crm-table-compact .uk-table th, .crm-table-compact .uk-table td`
+
+### Final table structure
+
+`components/tables.css` now has one canonical base block for:
+- table wrapper: `position`, final `overflow: auto`, max width, border, radius, background, shadow, scrollbar styling, and stable gutter;
+- table shell: border, radius, final `overflow: auto`, background;
+- inner UIkit table: `margin: 0`, final `min-width: 100%`, and `font-size: 14px`;
+- header cells: final color, typography, uppercase treatment, bottom border, padding, and nowrap;
+- body cells: final vertical alignment, padding, `font-size: 13px`, text color, line height, weight, and nowrap;
+- first body cell: final darker color, medium weight, and normal wrapping.
+
+The scoped card variants remain separate and intentional:
+- `.crm-table-card .crm-table-wrapper`
+- `.crm-table-card .crm-table`
+
+### Media-query and duplicate notes
+
+No table duplicate was intentionally kept among the exact duplicate targets. The old `@media (max-width: 959px) { .crm-table .uk-table { min-width: 840px; } }` rule was removed because it was dead in the previous cascade: the later `.crm-table .uk-table { min-width: 100%; }` block always won. The responsive `.crm-table-wrapper::after` width adjustment remains because it is still effective.
+
+### Validator enhancement
+
+`tools/validate-static-uikit.mjs` now checks `components/tables.css` for duplicate top-level definitions of these exact selectors:
+- `.crm-table-wrapper`
+- `.crm-table`
+- `.crm-table .uk-table`
+- `.crm-table .uk-table th`
+- `.crm-table .uk-table td`
+- `.crm-table .uk-table td:first-child`
+
+The check strips block comments and only counts top-level exact selector blocks, so selector groups, scoped overrides such as `.crm-table-card .crm-table-wrapper`, and media-query rules are not treated as duplicates.
+
+### Validation results
+
+| Command | Result |
+|---------|--------|
+| `npm run static:uikit:bundle` | Exit 0 - 40/40 sections inlined - 243.9 KB |
+| `npm run static:uikit:bundle:check` | Exit 0 - bundle up to date - 40/40 sections - 243.9 KB |
+| `npm run static:uikit:validate` | Exit 0 - validation passed - 0 errors, 0 warnings |
+
+New validator confirmation:
+
+```
+G. Component Boundary Checks
+  components/cards.css contains no shell-level selectors
+  components/tables.css contains no duplicate top-level table selector definitions
+```
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| Same-file duplicate cleanup in `components/cards.css` | Deferred |
+| Possible future component normalization | Deferred |
+| Optional visual regression tooling | Deferred |
