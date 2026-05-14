@@ -2652,7 +2652,126 @@ G. Component / Page Boundary Checks
 
 | Item | Status |
 |------|--------|
-| `.crm-form-card` contract-wizard scoping/modifier seam | Deferred |
+| `.crm-form-card` contract-wizard scoping/modifier seam | **Completed — see Contract Wizard Form Card Scoping Cleanup Notes below.** |
+| `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
+| UIkit bridge cleanup | Deferred |
+| Optional visual regression tooling | Deferred |
+
+---
+
+## Contract Wizard Form Card Scoping Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — .crm-form-card contract-wizard scoping seam cleanup.
+**Status:** Complete — bare `.crm-form-card` selector scoped to `.crm-page[data-page="contract-wizard"] .crm-form-card`, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/pages/contract-wizard.css` | Replaced bare top-level `.crm-form-card` selector with `.crm-page[data-page="contract-wizard"] .crm-form-card` |
+| `tools/validate-static-uikit.mjs` | Added `CONTRACT_WIZARD_CSS` path constant and guard check for bare top-level `.crm-form-card` in `pages/contract-wizard.css` |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section |
+
+`assets/css/components/cards.css` was not modified.
+
+### Previous problem
+
+`pages/contract-wizard.css` contained a bare top-level `.crm-form-card` selector:
+
+```css
+.crm-form-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d6e0ef;
+  background: #fff;
+}
+```
+
+This made contract-wizard-specific styling appear to be a generic component override, creating an ownership seam: `components/cards.css` is the canonical owner of `.crm-form-card`, and the bare selector in a page file leaks page-specific values into the apparent component API.
+
+### Final scoped selector used
+
+`.crm-page[data-page="contract-wizard"] .crm-form-card`
+
+**Scope derivation:** The contract wizard HTML page (`static-uikit/pages/contract-wizard.html`) has `<div class="crm-page" data-page="contract-wizard">` at line 181, making `.crm-page[data-page="contract-wizard"]` a reliable, non-invasive page scope. No new attributes or classes were added to the HTML.
+
+### Declarations preserved exactly
+
+```css
+.crm-page[data-page="contract-wizard"] .crm-form-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d6e0ef;
+  background: #fff;
+}
+```
+
+No property values were changed.
+
+### `components/cards.css` status
+
+Unchanged. The generic `.crm-form-card` in `cards.css` appears only inside a group selector (lines 40–46) that assigns `border-radius: var(--crm-card-radius)`. The contract-wizard declarations (`display`, `gap`, `border`, `background`) do not overlap with this generic definition, so no shared value was missing from the canonical owner.
+
+### HTML and class names
+
+Not changed. No HTML attributes or class names were added, removed, or renamed.
+
+### Import order
+
+Not changed.
+
+### Visual behavior
+
+Preserved. The scoped selector `.crm-page[data-page="contract-wizard"] .crm-form-card` still matches every `.crm-form-card` element within the contract wizard page shell, so rendering is identical.
+
+### Validator enhancement
+
+**Added.** `tools/validate-static-uikit.mjs` now includes:
+- A `CONTRACT_WIZARD_CSS` path constant pointing to `pages/contract-wizard.css`.
+- A guard in Section G that reads `pages/contract-wizard.css`, collects top-level rule selectors (stripping block comments first), splits comma-separated selector lists, and errors if any part equals exactly `.crm-form-card`.
+
+Allowed selectors (not flagged):
+- `.crm-page[data-page="contract-wizard"] .crm-form-card`
+- `.crm-wizard-shell .crm-form-card`
+- Any other clearly page-scoped descendant selector
+
+Forbidden selector (triggers error):
+- `.crm-form-card` as a standalone top-level selector
+
+No existing validator checks were weakened.
+
+New validator confirmation line:
+
+```
+G. Component / Page Boundary Checks
+  ...
+  pages/contract-wizard.css contains no bare top-level .crm-form-card selector
+```
+
+### Bundle generation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | Exit 0 — 40/40 sections inlined — 237.9 KB |
+
+### Bundle check result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 — bundle up to date — 40/40 sections — 237.9 KB |
+
+### Validation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:validate` | Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
 | `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
 | UIkit bridge cleanup | Deferred |
 | Optional visual regression tooling | Deferred |

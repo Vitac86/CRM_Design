@@ -45,6 +45,7 @@ const REGISTRY_CSS = resolve(ASSETS_CSS, 'components/registry.css');
 const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
 const FILTERS_CSS      = resolve(ASSETS_CSS, 'components/filters.css');
 const ADDRESS_CSS      = resolve(ASSETS_CSS, 'components/address.css');
+const CONTRACT_WIZARD_CSS = resolve(ASSETS_CSS, 'pages/contract-wizard.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -916,6 +917,33 @@ if (!existsSync(ADDRESS_CSS)) {
 
   if (!hasDuplicateAddressLastChild) {
     ok('components/address.css contains no duplicate top-level address-row :last-child selector definitions');
+  }
+}
+
+if (!existsSync(CONTRACT_WIZARD_CSS)) {
+  err(`pages/contract-wizard.css not found: ${relative(REPO_ROOT, CONTRACT_WIZARD_CSS)}`);
+} else {
+  const cwRelPath  = relative(ASSETS_CSS, CONTRACT_WIZARD_CSS).replace(/\\/g, '/');
+  const cwSource   = stripCssBlockComments(readFileSync(CONTRACT_WIZARD_CSS, 'utf8'));
+  const cwTopLevel = collectTopLevelRuleSelectors(cwSource);
+  let hasBareFormCard = false;
+
+  for (const prelude of cwTopLevel) {
+    for (const part of splitSelectorList(prelude)) {
+      if (part === '.crm-form-card') {
+        err(
+          `${cwRelPath} contains bare top-level ".crm-form-card" selector — ` +
+          `must be scoped (e.g. .crm-page[data-page="contract-wizard"] .crm-form-card)`
+        );
+        hasBareFormCard = true;
+        break;
+      }
+    }
+    if (hasBareFormCard) break;
+  }
+
+  if (!hasBareFormCard) {
+    ok('pages/contract-wizard.css contains no bare top-level .crm-form-card selector');
   }
 }
 

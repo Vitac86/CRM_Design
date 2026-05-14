@@ -5931,7 +5931,7 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
 
 /* Form cards and sections */
 
-.crm-form-card {
+.crm-page[data-page="contract-wizard"] .crm-form-card {
   display: grid;
   gap: 10px;
   border: 1px solid #d6e0ef;
