@@ -1568,8 +1568,6 @@ G. Component Boundary Checks
 | Possible future component normalization | Deferred |
 | Optional visual regression tooling | Deferred |
 
----
-
 ## Current Override Metrics After Cleanup
 
 **Date:** 2026-05-14
@@ -1937,4 +1935,70 @@ G. Component Boundary Checks
 |------|--------|
 | Same-file duplicate cleanup in `components/cards.css` | Deferred |
 | Possible future component normalization | Deferred |
+| Optional visual regression tooling | Deferred |
+
+---
+
+## Subject Card Page-Scoped Duplicate Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION - subject-card.css page-scoped duplicate consolidation, followed by documentation/validator completion.
+**Status:** Complete - subject-card duplicate selectors consolidated, bundle regenerated, bundle check and validation passed.
+
+### Files changed in previous implementation
+
+The previous subject-card implementation changed only:
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/pages/subject-card.css` | Consolidated same-file same-context duplicate selector blocks while preserving the final effective cascade values |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+
+No HTML was changed, no class names were renamed, and selectors remained page-scoped under `.crm-page[data-page="subject-card"]`.
+
+### Duplicate selector result
+
+`pages/subject-card.css` same-file same-context duplicate selector count moved from **46 to 0**.
+
+The cleanup preserved legitimate base + responsive pairs: base rules stayed in the base context, `@media (max-width: 1180px)` behavior stayed in that media context, and different breakpoints were not merged together.
+
+Many early-block values changed only because later effective values from the existing cascade were merged upward into the canonical selector blocks. Older overridden values were not kept unless they still contributed a property that was not set later.
+
+### Bundle and validation results
+
+| Check | Result |
+|------|--------|
+| Bundle regeneration | `npm.cmd run static:uikit:bundle` exit 0 - 40/40 sections inlined - 239.4 KB |
+| Bundle freshness | `npm.cmd run static:uikit:bundle:check` exit 0 - bundle up to date - 40/40 sections - 239.4 KB |
+| Static UI validation | `npm.cmd run static:uikit:validate` exit 0 - validation passed - 29 pages checked - 296 local asset refs checked - 0 errors, 0 warnings |
+| Custom selector/context duplicate check | `subject-card same-file same-context duplicate selectors: 0` |
+
+### Validator enhancement
+
+Status: **Added**.
+
+`tools/validate-static-uikit.mjs` now includes a conservative `pages/subject-card.css` duplicate guard that:
+- detects exact duplicate selectors in the same at-rule context;
+- distinguishes the base context from media query contexts;
+- does not flag base + responsive pairs;
+- does not flag different breakpoints as duplicates;
+- strips block comments before scanning;
+- splits selector groups only on top-level commas, avoiding false positives from grouped selectors and selector functions.
+
+New validator confirmation:
+
+```
+G. Component / Page Boundary Checks
+  components/cards.css contains no shell-level selectors
+  components/tables.css contains no duplicate top-level table selector definitions
+  pages/subject-card.css contains no duplicate selector definitions in the same at-rule context
+```
+
+### Remaining deferred cleanup items
+
+| Item | Status |
+|------|--------|
+| Same-file duplicate cleanup in `components/cards.css` | Deferred |
+| Registry/page-scoped duplicate cleanup outside subject-card | Deferred |
+| UIkit bridge cleanup in subject page CSS | Deferred |
 | Optional visual regression tooling | Deferred |

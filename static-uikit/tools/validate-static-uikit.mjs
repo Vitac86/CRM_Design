@@ -41,6 +41,7 @@ const MANIFEST     = resolve(ASSETS_CSS, 'crm-static.css');
 const BUNDLE       = resolve(ASSETS_CSS, 'crm-static.bundle.css');
 const CARDS_CSS    = resolve(ASSETS_CSS, 'components/cards.css');
 const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
+const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -109,7 +110,10 @@ function classifyImport(importPath) {
 }
 
 function stripCssBlockComments(source) {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '');
+  return source.replace(/\/\*[\s\S]*?\*\//g, match => {
+    const newlineCount = (match.match(/\n/g) || []).length;
+    return '\n'.repeat(newlineCount);
+  });
 }
 
 function escapeRegExp(value) {
@@ -170,6 +174,124 @@ function collectTopLevelRuleSelectors(source) {
   }
 
   return selectors;
+}
+
+function splitSelectorList(selectorPrelude) {
+  const selectors = [];
+  let start = 0;
+  let parenDepth = 0;
+  let bracketDepth = 0;
+  let inString = null;
+  let escaped = false;
+
+  for (let i = 0; i < selectorPrelude.length; i++) {
+    const char = selectorPrelude[i];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === inString) {
+        inString = null;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      inString = char;
+      continue;
+    }
+
+    if (char === '(') parenDepth++;
+    if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
+    if (char === '[') bracketDepth++;
+    if (char === ']') bracketDepth = Math.max(0, bracketDepth - 1);
+
+    if (char === ',' && parenDepth === 0 && bracketDepth === 0) {
+      selectors.push(normalizeSelectorPrelude(selectorPrelude.slice(start, i)));
+      start = i + 1;
+    }
+  }
+
+  selectors.push(normalizeSelectorPrelude(selectorPrelude.slice(start)));
+  return selectors.filter(Boolean);
+}
+
+function lineNumberAt(source, index) {
+  return source.slice(0, index).split('\n').length;
+}
+
+function collectRuleSelectorEntriesByContext(source) {
+  const entries = [];
+  const contextStack = [];
+  const blockStack = [];
+  let preludeStart = 0;
+  let inString = null;
+  let escaped = false;
+
+  for (let i = 0; i < source.length; i++) {
+    const char = source[i];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === inString) {
+        inString = null;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      inString = char;
+      continue;
+    }
+
+    if (char === '{') {
+      const prelude = source.slice(preludeStart, i).trim();
+      if (prelude.startsWith('@')) {
+        contextStack.push(normalizeSelectorPrelude(prelude));
+        blockStack.push({ type: 'atrule' });
+      } else if (prelude) {
+        const context = contextStack.length ? contextStack.join(' / ') : 'base';
+        const line = lineNumberAt(source, preludeStart);
+        for (const selector of splitSelectorList(prelude)) {
+          entries.push({ context, selector, line });
+        }
+        blockStack.push({ type: 'rule' });
+      } else {
+        blockStack.push({ type: 'block' });
+      }
+      preludeStart = i + 1;
+      continue;
+    }
+
+    if (char === '}') {
+      const block = blockStack.pop();
+      if (block?.type === 'atrule') contextStack.pop();
+      preludeStart = i + 1;
+    }
+  }
+
+  return entries;
+}
+
+function findDuplicateSelectorContexts(entries) {
+  const byKey = new Map();
+  for (const entry of entries) {
+    const key = `${entry.context}\u0000${entry.selector}`;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(entry.line);
+  }
+
+  return [...byKey.entries()]
+    .filter(([, lines]) => lines.length > 1)
+    .map(([key, lines]) => {
+      const [context, selector] = key.split('\u0000');
+      return { context, selector, lines };
+    });
 }
 
 /** Resolve a path relative to a page HTML file (strips fragment). */
@@ -616,7 +738,7 @@ if (existsSync(PAGES_DIR)) {
 
 // ── Section G: Component Boundary Checks ─────────────────────────────────────
 
-section('G. Component Boundary Checks');
+section('G. Component / Page Boundary Checks');
 
 if (!existsSync(CARDS_CSS)) {
   err(`components/cards.css not found: ${relative(REPO_ROOT, CARDS_CSS)}`);
@@ -655,6 +777,26 @@ if (!existsSync(TABLES_CSS)) {
 
   if (!hasDuplicateTableSelector) {
     ok('components/tables.css contains no duplicate top-level table selector definitions');
+  }
+}
+
+if (!existsSync(SUBJECT_CARD_CSS)) {
+  err(`pages/subject-card.css not found: ${relative(REPO_ROOT, SUBJECT_CARD_CSS)}`);
+} else {
+  const subjectCardRelPath = relative(ASSETS_CSS, SUBJECT_CARD_CSS).replace(/\\/g, '/');
+  const subjectCardSource  = stripCssBlockComments(readFileSync(SUBJECT_CARD_CSS, 'utf8'));
+  const selectorEntries    = collectRuleSelectorEntriesByContext(subjectCardSource);
+  const duplicateContexts  = findDuplicateSelectorContexts(selectorEntries);
+
+  for (const duplicate of duplicateContexts) {
+    err(
+      `${subjectCardRelPath} contains duplicate selector "${duplicate.selector}" ` +
+      `in context "${duplicate.context}" at lines ${duplicate.lines.join(', ')}`
+    );
+  }
+
+  if (duplicateContexts.length === 0) {
+    ok('pages/subject-card.css contains no duplicate selector definitions in the same at-rule context');
   }
 }
 
