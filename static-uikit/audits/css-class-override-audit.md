@@ -2772,6 +2772,127 @@ G. Component / Page Boundary Checks
 
 | Item | Status |
 |------|--------|
-| `.crm-decision-panel` compliance scoping/modifier seam | Deferred |
+| `.crm-decision-panel` compliance scoping/modifier seam | **Completed — see Compliance Decision Panel Scoping Cleanup Notes below.** |
+| UIkit bridge cleanup | Deferred |
+| Optional visual regression tooling | Deferred |
+
+---
+
+## Compliance Decision Panel Scoping Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — .crm-decision-panel compliance scoping seam cleanup.
+**Status:** Complete — bare `.crm-decision-panel` rules confirmed unused in HTML and removed from `pages/compliance.css` as dead legacy code; validator enhanced; bundle regenerated; bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/pages/compliance.css` | Removed bare top-level `.crm-decision-panel` block (comment `/* 12. */` + rule); removed `@media (max-width: 920px)` block containing only the bare `.crm-decision-panel { position: static; }` rule and its `/* 15. */` comment header |
+| `tools/validate-static-uikit.mjs` | Added `COMPLIANCE_CSS` path constant and guard check for bare `.crm-decision-panel` in `pages/compliance.css` (both top-level and inside `@media` contexts) |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section |
+
+`assets/css/components/cards.css` was not modified.
+
+### Was `.crm-decision-panel` used in HTML?
+
+**No.** A full grep search across all `static-uikit/pages/*.html` and `static-uikit/**/*.html` files found zero occurrences of the class `crm-decision-panel`. The compliance-card page (`static-uikit/pages/compliance-card.html`) uses `.crm-compliance-decision-panel` exclusively, not `.crm-decision-panel`.
+
+The bare `.crm-decision-panel` rules in `pages/compliance.css` were therefore confirmed dead legacy code with no active HTML targets.
+
+### Removed rules
+
+**Block 1 — bare top-level selector (formerly under comment `/* 12. Compliance decision panel */`):**
+
+```css
+.crm-decision-panel {
+  position: sticky;
+  top: calc(var(--crm-topbar-h) + 12px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+```
+
+**Block 2 — bare selector inside responsive media block (formerly under `/* 15. Mobile rules for compliance-card */`):**
+
+```css
+@media (max-width: 920px) {
+  .crm-decision-panel {
+    position: static;
+  }
+}
+```
+
+The `/* 15. Mobile rules for compliance-card */` comment was kept as the lead-in for the remaining `@media (max-width: 1100px)` block that follows it, which is still live.
+
+### Final action taken
+
+Removed as unused legacy compliance rule — both the base sticky-positioning block and the responsive static-positioning block.
+
+### `.crm-compliance-decision-panel` behavior
+
+Preserved without modification. The `pages/compliance.css` rules for `.crm-compliance-decision-panel` remain scoped under `.crm-page[data-page="compliance-card"] .crm-compliance-decision-panel` exactly as before. The responsive `@media (max-width: 960px)` block that sets `position: static` on `.crm-page[data-page="compliance-card"] .crm-compliance-decision-panel` was also left intact.
+
+### `components/cards.css` status
+
+Unchanged. The generic `.crm-decision-panel` definition in `cards.css` (lines 273–277: `display: grid; gap: 10px; align-content: start`) remains the sole canonical owner. No missing generic values were discovered.
+
+### HTML and class names
+
+Not changed. No HTML attributes or class names were added, removed, or renamed.
+
+### Import order
+
+Not changed. `crm-static.css` import order was not modified.
+
+### Validator enhancement
+
+**Added.** `tools/validate-static-uikit.mjs` now includes:
+- A `COMPLIANCE_CSS` path constant pointing to `pages/compliance.css`.
+- A guard in Section G that reads `pages/compliance.css`, collects all rule selector entries by context (using the existing `collectRuleSelectorEntriesByContext` helper), splits comma-separated selector lists via `splitSelectorList`, and errors if any individual selector part equals exactly `.crm-decision-panel` — regardless of whether it is in the base context or inside an `@media` block.
+
+Allowed selectors (not flagged):
+- `.crm-page[data-page="compliance-card"] .crm-decision-panel`
+- `.crm-page[data-page="compliance"] .crm-decision-panel`
+- `.crm-compliance-decision-panel`
+- Any other clearly page-scoped descendant selector
+
+Forbidden selector (triggers error):
+- `.crm-decision-panel` as a standalone selector at any context level in `pages/compliance.css`
+
+No existing validator checks were weakened.
+
+New validator confirmation line:
+
+```
+G. Component / Page Boundary Checks
+  ...
+  pages/compliance.css contains no bare .crm-decision-panel selector
+```
+
+### Bundle generation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | Exit 0 — 40/40 sections inlined — 237.7 KB |
+
+### Bundle check result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle:check` | Exit 0 — bundle up to date — 40/40 sections — 237.7 KB |
+
+### Validation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:validate` | Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
 | UIkit bridge cleanup | Deferred |
 | Optional visual regression tooling | Deferred |

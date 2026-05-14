@@ -46,6 +46,7 @@ const SUBJECT_CARD_CSS = resolve(ASSETS_CSS, 'pages/subject-card.css');
 const FILTERS_CSS      = resolve(ASSETS_CSS, 'components/filters.css');
 const ADDRESS_CSS      = resolve(ASSETS_CSS, 'components/address.css');
 const CONTRACT_WIZARD_CSS = resolve(ASSETS_CSS, 'pages/contract-wizard.css');
+const COMPLIANCE_CSS      = resolve(ASSETS_CSS, 'pages/compliance.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -944,6 +945,32 @@ if (!existsSync(CONTRACT_WIZARD_CSS)) {
 
   if (!hasBareFormCard) {
     ok('pages/contract-wizard.css contains no bare top-level .crm-form-card selector');
+  }
+}
+
+if (!existsSync(COMPLIANCE_CSS)) {
+  err(`pages/compliance.css not found: ${relative(REPO_ROOT, COMPLIANCE_CSS)}`);
+} else {
+  const complianceRelPath = relative(ASSETS_CSS, COMPLIANCE_CSS).replace(/\\/g, '/');
+  const complianceSource  = stripCssBlockComments(readFileSync(COMPLIANCE_CSS, 'utf8'));
+  const complianceEntries = collectRuleSelectorEntriesByContext(complianceSource);
+  let hasBareDecisionPanel = false;
+
+  for (const entry of complianceEntries) {
+    for (const part of splitSelectorList(entry.selector)) {
+      if (part === '.crm-decision-panel') {
+        err(
+          `${complianceRelPath} contains bare ".crm-decision-panel" selector ` +
+          `(context: "${entry.context}", line ${entry.line}) — ` +
+          `must be scoped, e.g. .crm-page[data-page="compliance-card"] .crm-decision-panel`
+        );
+        hasBareDecisionPanel = true;
+      }
+    }
+  }
+
+  if (!hasBareDecisionPanel) {
+    ok('pages/compliance.css contains no bare .crm-decision-panel selector');
   }
 }
 
