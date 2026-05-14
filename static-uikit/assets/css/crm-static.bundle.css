@@ -3966,8 +3966,7 @@ body[data-page="subjects"] .crm-subjects-table .crm-row-main {
 }
 
 /* Subjects chips and badges */
-body[data-page="subjects"] .crm-subjects-table .crm-badge,
-body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip {
+body[data-page="subjects"] .crm-subjects-table .crm-badge {
   display: inline-flex;
   align-items: center;
   min-height: 20px;
@@ -3991,6 +3990,17 @@ body[data-page="subjects"] .crm-subjects-table .crm-inline-badges {
 
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip,
 body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip.is-muted {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.6667;
+  white-space: nowrap;
   border-color: #cbd3de;
   background: #eff3f8;
   color: #64748b;

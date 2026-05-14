@@ -3266,5 +3266,99 @@ No HTML files were modified. No class names were renamed or removed. No visual d
 **Validation:** `npm run static:uikit:validate` — ✓ Validation passed (0 errors, 0 warnings)
 
 **Remaining deferred items:**
-- `pages/subjects.css` meta-chip same-context duplicate
+- `pages/subjects.css` meta-chip same-context duplicate — **Completed — see Subjects Meta-Chip Duplicate Cleanup Notes below.**
 - Optional visual regression tooling
+
+---
+
+## Subjects Meta-Chip Duplicate Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — subjects.css meta-chip same-context duplicate cleanup.
+**Status:** Complete — duplicate `.crm-subjects-meta-chip` selector consolidated into one canonical block, validator enhanced, bundle regenerated, bundle check and validation passed.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `assets/css/pages/subjects.css` | Removed `.crm-subjects-meta-chip` from the shared badge/chip group selector; expanded the meta-chip color block into the canonical block carrying all structural and color declarations |
+| `tools/validate-static-uikit.mjs` | Added `SUBJECTS_CSS` path constant and `G-extra 0b` guard for the target meta-chip selector |
+| `assets/css/crm-static.bundle.css` | Regenerated from source CSS via the existing bundle script |
+| `audits/css-class-override-audit.md` | Added this section |
+
+### Selector consolidated
+
+`body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip`
+
+Previously the selector appeared twice in the base (top-level) context of `pages/subjects.css`:
+
+- **First occurrence** (grouped with `.crm-badge`) — contributed structural layout declarations: `display: inline-flex`, `align-items: center`, `min-height: 20px`, `padding: 2px 8px`, `border: 1px solid`, `border-radius: 6px`, `font-size: 12px`, `font-weight: 500`, `letter-spacing: 0`, `line-height: 1.6667`, `white-space: nowrap`.
+- **Second occurrence** (grouped with `.crm-subjects-meta-chip.is-muted`) — contributed semantic color declarations: `border-color: #cbd3de`, `background: #eff3f8`, `color: #64748b`.
+
+### Consolidation approach
+
+The grouped badge block was changed to `.crm-badge`-only (removing `.crm-subjects-meta-chip`). The `is-muted` color block was expanded into the canonical meta-chip block containing all structural declarations plus the color declarations. `.crm-subjects-meta-chip` now appears exactly once in the base context.
+
+**Final canonical block:**
+
+```css
+body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip,
+body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip.is-muted {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.6667;
+  white-space: nowrap;
+  border-color: #cbd3de;
+  background: #eff3f8;
+  color: #64748b;
+}
+```
+
+### Visual behavior preserved
+
+All effective declarations from the prior cascade are present in the canonical block with identical values. `.crm-badge` retains all structural declarations from its own block unchanged. No property values were changed, no HTML was modified, and no class names were renamed.
+
+### Validator enhancement
+
+**Added.** `tools/validate-static-uikit.mjs` now includes:
+- A `SUBJECTS_CSS` path constant pointing to `pages/subjects.css`.
+- A `G-extra 0b` guard that reads `pages/subjects.css`, collects all rule selector entries by context, and fails if `body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip` appears more than once in the same at-rule context.
+
+New validator confirmation line:
+
+```
+G. Component / Page Boundary Checks
+  ...
+  ✓ pages/subjects.css contains no duplicate meta-chip selector definitions in the same at-rule context
+```
+
+### Bundle regeneration result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle` | ✓ Exit 0 — 40/40 sections inlined — 238.2 KB |
+
+### Bundle check result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:bundle:check` | ✓ Exit 0 — bundle up to date — 40/40 sections — 238.2 KB |
+
+### Validation result
+
+| Command | Result |
+|---------|--------|
+| `npm.cmd run static:uikit:validate` | ✓ Exit 0 — validation passed — 29 pages checked — 296 local asset refs checked — 0 errors, 0 warnings |
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| Optional visual regression tooling | Deferred |

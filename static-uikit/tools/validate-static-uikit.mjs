@@ -51,6 +51,7 @@ const ADDRESS_CSS       = resolve(ASSETS_CSS, 'components/address.css');
 const CONTRACT_WIZARD_CSS = resolve(ASSETS_CSS, 'pages/contract-wizard.css');
 const COMPLIANCE_CSS      = resolve(ASSETS_CSS, 'pages/compliance.css');
 const REQUESTS_CSS        = resolve(ASSETS_CSS, 'pages/requests.css');
+const SUBJECTS_CSS        = resolve(ASSETS_CSS, 'pages/subjects.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -1015,6 +1016,32 @@ if (!existsSync(REQUESTS_CSS)) {
 
   if (duplicateContexts.length === 0) {
     ok('pages/requests.css contains no duplicate responsive selector definitions in the same at-rule context');
+  }
+}
+
+// G-extra 0b: No same-context base duplicate for meta-chip in pages/subjects.css
+const SUBJECTS_META_CHIP_DUPLICATE_CHECKS = [
+  'body[data-page="subjects"] .crm-subjects-table .crm-subjects-meta-chip',
+];
+
+if (!existsSync(SUBJECTS_CSS)) {
+  err(`pages/subjects.css not found: ${relative(REPO_ROOT, SUBJECTS_CSS)}`);
+} else {
+  const subjectsRelPath = relative(ASSETS_CSS, SUBJECTS_CSS).replace(/\\/g, '/');
+  const subjectsSource  = stripCssBlockComments(readFileSync(SUBJECTS_CSS, 'utf8'));
+  const subjectsEntries = collectRuleSelectorEntriesByContext(subjectsSource);
+  const duplicateContexts = findDuplicateSelectorContexts(subjectsEntries)
+    .filter(d => SUBJECTS_META_CHIP_DUPLICATE_CHECKS.includes(d.selector));
+
+  for (const duplicate of duplicateContexts) {
+    err(
+      `${subjectsRelPath} contains duplicate selector "${duplicate.selector}" ` +
+      `in context "${duplicate.context}" at lines ${duplicate.lines.join(', ')}`
+    );
+  }
+
+  if (duplicateContexts.length === 0) {
+    ok('pages/subjects.css contains no duplicate meta-chip selector definitions in the same at-rule context');
   }
 }
 
