@@ -1182,3 +1182,91 @@ They are now defined in `base/tokens.css`:
 | `cards.css` @media print block | Deferred per Phase 0/1 notes (only print rules for layout shell) |
 | Same-file duplicates in `tables.css` | Phase 3 |
 | `validate-static-uikit.mjs` creation | Prerequisite for automated validation — still missing |
+
+---
+
+## Validation Foundation Notes
+
+**Date:** 2026-05-14  
+**Status:** Complete — bundle check mode added, validator created, all scripts passing.
+
+### Bundle `--check` mode
+
+`static-uikit/tools/build-css-bundle.mjs` now accepts a `--check` flag:
+- Generates bundle content in memory using the same logic as normal mode.
+- Compares with the current `crm-static.bundle.css` byte-for-byte.
+- Prints `✓ Bundle is up to date (40 / 40 sections, 246.2 KB)` and exits 0 if identical.
+- Prints `ERROR: bundle is stale` and exits 1 if different.
+- Does **not** write the bundle in check mode.
+- All existing guards (missing imports → error+exit, section count mismatch → error+exit) still apply in check mode.
+
+### Validation script
+
+| Property | Value |
+|----------|-------|
+| Script path | `static-uikit/tools/validate-static-uikit.mjs` |
+| Runtime | Node.js ≥16, ESM, zero npm dependencies |
+| Exit code | 0 = no errors, 1 = one or more errors |
+
+### npm scripts added
+
+| Script | Command |
+|--------|---------|
+| `static:uikit:bundle:check` | `node static-uikit/tools/build-css-bundle.mjs --check` |
+| `static:uikit:validate` | `node static-uikit/tools/validate-static-uikit.mjs` |
+
+### Validator checks implemented
+
+| Check | Description |
+|-------|-------------|
+| A. CSS manifest | File exists; contains only @import + blanks + comments; all imported files exist; no duplicate imports; import count (40); layer order (base → layout → components → pages → responsive → print) |
+| B. Bundle | File exists; no real @import directives; section marker count matches manifest; bundle freshness (via --check); all 16 font URLs resolve to existing files; exactly one :root block in base/tokens.css section |
+| C. HTML stylesheet refs | 29 pages: uikit.min.css required; crm-static.bundle.css required; crm-static.css forbidden; modular source CSS forbidden; no duplicate CSS loads; auth.css allowed only on auth pages |
+| D. Partials | static-uikit/partials/ does not exist — reported, not an error |
+| E. UMI packs | static-uikit/umi-p0/ and umi-p1/ do not exist — reported, not an error |
+| F. Local assets | 296 local `<link href>`, `<script src>`, `<img src>` references across 29 pages — all resolve to existing files |
+| G. Summary | Totals printed; exit code driven by error count |
+
+### Validation results
+
+```
+npm run static:uikit:bundle
+  → ✓ Bundle written → static-uikit/assets/css/crm-static.bundle.css
+    Sections inlined : 40 / 40
+    Output size      : 246.2 KB
+
+npm run static:uikit:bundle:check
+  → ✓ Bundle is up to date (40 / 40 sections, 246.2 KB)
+
+npm run static:uikit:validate
+  → A. CSS Manifest    — 6 checks, all ✓
+  → B. Bundle          — 6 checks, all ✓
+  → C. HTML Stylesheet — 29 pages, all ✓
+  → D. Partials        — directory absent, skipped
+  → E. UMI Packs       — umi-p0 and umi-p1 absent, skipped
+  → F. Local Assets    — 296 refs across 29 pages, all ✓
+  → Errors: 0 | Warnings: 0
+  → ✓ Validation passed.
+```
+
+### Warnings/errors found
+
+**None.** All 29 pages, 40 CSS imports, 296 local asset references, and the bundle passed without errors or warnings.
+
+### Notes on absent directories
+
+- `static-uikit/partials/` — does not exist. Validator skips section D gracefully and reports it as informational.
+- `static-uikit/umi-p0/` and `umi-p1/` — do not exist. Validator skips section E gracefully. When these directories are created for UMI integration, the validator will automatically check them for modular-source-CSS references and missing file references.
+
+### Deferred validation improvements
+
+| Item | Priority |
+|------|----------|
+| Create `static-uikit/tools/validate-static-uikit.mjs` | ✓ Done |
+| Add CSS property validation (e.g. confirm no undefined custom properties remain) | Future |
+| Add HTML structural checks (e.g. confirm `<body data-page="...">` attribute is set) | Future |
+| Add visual regression tooling | Future (separate concern) |
+
+### Confirmation: no layout refactor performed
+
+No CSS layout files were moved, renamed, or structurally changed in this task. `layout/app.css`, `layout/sidebar.css`, `layout/topbar.css`, and `layout/page.css` are unchanged. No selectors were moved between files. The only CSS-adjacent file changed is `build-css-bundle.mjs` (adding `--check` mode).

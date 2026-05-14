@@ -13,15 +13,19 @@
  * - Does NOT minify, reorder, or transform any CSS.
  *
  * Usage:
- *   node static-uikit/tools/build-css-bundle.mjs
+ *   node static-uikit/tools/build-css-bundle.mjs          # build
+ *   node static-uikit/tools/build-css-bundle.mjs --check  # verify bundle is current
  *
  * Or via npm:
  *   npm run static:uikit:bundle
+ *   npm run static:uikit:bundle:check
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
+
+const CHECK_MODE = process.argv.includes('--check');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = dirname(__filename);
@@ -146,9 +150,28 @@ if (sectionCount !== expectedSections) {
   process.exit(1);
 }
 
-writeFileSync(BUNDLE_OUT, chunks.join(''), 'utf8');
-
+const bundleContent  = chunks.join('');
 const bundleRelative = relative(process.cwd(), BUNDLE_OUT).replace(/\\/g, '/');
+const sizeKB         = (Buffer.byteLength(bundleContent, 'utf8') / 1024).toFixed(1);
+
+if (CHECK_MODE) {
+  if (!existsSync(BUNDLE_OUT)) {
+    console.error('ERROR (--check): bundle file does not exist.');
+    console.error(`  Run: npm run static:uikit:bundle`);
+    process.exit(1);
+  }
+  const currentContent = readFileSync(BUNDLE_OUT, 'utf8');
+  if (bundleContent === currentContent) {
+    console.log(`✓ Bundle is up to date (${sectionCount} / ${expectedSections} sections, ${sizeKB} KB)`);
+    process.exit(0);
+  } else {
+    console.error('ERROR: bundle is stale — source CSS has changed since last bundle generation.');
+    console.error(`  Run: npm run static:uikit:bundle`);
+    process.exit(1);
+  }
+}
+
+writeFileSync(BUNDLE_OUT, bundleContent, 'utf8');
 console.log(`✓ Bundle written → ${bundleRelative}`);
 console.log(`  Sections inlined : ${sectionCount} / ${expectedSections}`);
-console.log(`  Output size      : ${(Buffer.byteLength(chunks.join(''), 'utf8') / 1024).toFixed(1)} KB`);
+console.log(`  Output size      : ${sizeKB} KB`);

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
     "preview": "vite preview",
-    "static:uikit:bundle": "node static-uikit/tools/build-css-bundle.mjs"
+    "static:uikit:bundle": "node static-uikit/tools/build-css-bundle.mjs",
+    "static:uikit:bundle:check": "node static-uikit/tools/build-css-bundle.mjs --check",
+    "static:uikit:validate": "node static-uikit/tools/validate-static-uikit.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
