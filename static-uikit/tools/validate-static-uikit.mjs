@@ -50,6 +50,7 @@ const FILTERS_CSS       = resolve(ASSETS_CSS, 'components/filters.css');
 const ADDRESS_CSS       = resolve(ASSETS_CSS, 'components/address.css');
 const CONTRACT_WIZARD_CSS = resolve(ASSETS_CSS, 'pages/contract-wizard.css');
 const COMPLIANCE_CSS      = resolve(ASSETS_CSS, 'pages/compliance.css');
+const REQUESTS_CSS        = resolve(ASSETS_CSS, 'pages/requests.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -987,6 +988,33 @@ if (!existsSync(COMPLIANCE_CSS)) {
 
   if (!hasBareDecisionPanel) {
     ok('pages/compliance.css contains no bare .crm-decision-panel selector');
+  }
+}
+
+// G-extra 0: No same-context responsive duplicates in pages/requests.css
+const REQUESTS_RESPONSIVE_DUPLICATE_CHECKS = [
+  '.crm-page[data-page="requests"] .crm-request-create-actions',
+  '.crm-page[data-page="requests"] .crm-requests-actions',
+];
+
+if (!existsSync(REQUESTS_CSS)) {
+  err(`pages/requests.css not found: ${relative(REPO_ROOT, REQUESTS_CSS)}`);
+} else {
+  const requestsRelPath = relative(ASSETS_CSS, REQUESTS_CSS).replace(/\\/g, '/');
+  const requestsSource  = stripCssBlockComments(readFileSync(REQUESTS_CSS, 'utf8'));
+  const requestsEntries = collectRuleSelectorEntriesByContext(requestsSource);
+  const duplicateContexts = findDuplicateSelectorContexts(requestsEntries)
+    .filter(d => REQUESTS_RESPONSIVE_DUPLICATE_CHECKS.includes(d.selector));
+
+  for (const duplicate of duplicateContexts) {
+    err(
+      `${requestsRelPath} contains duplicate selector "${duplicate.selector}" ` +
+      `in context "${duplicate.context}" at lines ${duplicate.lines.join(', ')}`
+    );
+  }
+
+  if (duplicateContexts.length === 0) {
+    ok('pages/requests.css contains no duplicate responsive selector definitions in the same at-rule context');
   }
 }
 

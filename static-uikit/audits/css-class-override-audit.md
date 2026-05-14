@@ -3234,3 +3234,37 @@ G. Component / Page Boundary Checks
 ### Confirmation: no HTML or class changes
 
 No HTML files were modified. No class names were renamed or removed. No visual design was changed. `uikit.min.css` was not edited. `crm-static.bundle.css` was regenerated from source — not manually patched. `crm-static.css` import order was not changed.
+
+---
+
+## Requests Responsive Duplicate Cleanup Notes
+
+**Date:** 2026-05-14
+
+**Files changed:**
+- `static-uikit/assets/css/pages/requests.css` — responsive block consolidated
+- `static-uikit/tools/validate-static-uikit.mjs` — new guard added (G-extra 0)
+- `static-uikit/assets/css/crm-static.bundle.css` — regenerated from source
+
+**Selectors consolidated (both inside `@media (max-width: 768px)`):**
+
+| Selector | Was | Now |
+|---|---|---|
+| `.crm-page[data-page="requests"] .crm-requests-actions` | Two occurrences: (1) group selector giving `width: 100%`; (2) standalone giving `flex-wrap: wrap; justify-content: flex-start` | Single block: `width: 100%; flex-wrap: wrap; justify-content: flex-start` |
+| `.crm-page[data-page="requests"] .crm-request-create-actions` | Two occurrences: (1) group selector giving `width: 100%`; (2) standalone giving `justify-content: stretch` | Single block: `width: 100%; justify-content: stretch` |
+
+**Only `@media (max-width: 768px)` duplicates were touched.** No base rules were modified. No declarations were moved outside the media query. No values were changed.
+
+**Responsive behavior preserved:** All effective declarations from the prior cascade are present in the merged blocks with identical values.
+
+**Validator enhanced:** `validate-static-uikit.mjs` — G-extra 0 guard added. Fails if either target selector appears more than once in the same at-rule context in `pages/requests.css`. Does not flag base + responsive pairs (checks context-keyed duplicates only). Existing guards were not weakened.
+
+**Bundle regeneration:** `npm run static:uikit:bundle` — ✓ passed (40/40 sections, 238.1 KB)
+
+**Bundle check:** `npm run static:uikit:bundle:check` — ✓ bundle is up to date
+
+**Validation:** `npm run static:uikit:validate` — ✓ Validation passed (0 errors, 0 warnings)
+
+**Remaining deferred items:**
+- `pages/subjects.css` meta-chip same-context duplicate
+- Optional visual regression tooling

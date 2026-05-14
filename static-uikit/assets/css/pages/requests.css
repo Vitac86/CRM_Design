@@ -74,12 +74,8 @@
 /* Mobile Rules
    Shared responsive rules handle the current requests mobile layout. */
 @media (max-width: 768px) {
-  .crm-page[data-page="requests"] .crm-requests-actions,
-  .crm-page[data-page="requests"] .crm-request-create-actions {
-    width: 100%;
-  }
-
   .crm-page[data-page="requests"] .crm-requests-actions {
+    width: 100%;
     flex-wrap: wrap;
     justify-content: flex-start;
   }
@@ -93,6 +89,7 @@
   }
 
   .crm-page[data-page="requests"] .crm-request-create-actions {
+    width: 100%;
     justify-content: stretch;
   }
 
