@@ -1507,3 +1507,63 @@ Errors: 0 | Warnings: 0
 ### Confirmation: no HTML or class changes
 
 No HTML files were modified. No class names were renamed or removed. No visual design was changed. The compiled bundle produces the same effective CSS output for every selector. `uikit.min.css` was not edited. `crm-static.bundle.css` was regenerated from source — not manually patched.
+
+---
+
+## Responsive Shell Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION - Finish responsive shell cleanup.
+**Status:** Complete - validator guard added, bundle regenerated, bundle check and validation passed.
+
+### Files changed in this finishing pass
+
+| File | Nature of change |
+|------|-----------------|
+| `tools/validate-static-uikit.mjs` | Added component boundary check for forbidden shell-level selectors in `components/cards.css` |
+| `audits/css-class-override-audit.md` | Added these responsive shell cleanup notes and validation results |
+
+Bundle handling: `assets/css/crm-static.bundle.css` was regenerated via the existing bundle script and remained content-equivalent to the checked-in bundle.
+
+### Current CSS ownership confirmation
+
+The earlier responsive shell cleanup commit already moved or removed:
+- mobile shell rules from `components/cards.css`;
+- print shell rules from `components/cards.css`;
+- base `.crm-sidebar-overlay { display: none; }` from `components/cards.css`.
+
+Final ownership:
+- Mobile shell/sidebar/overlay behavior: `responsive.css`
+- Print shell behavior: `print.css`
+- Mobile topbar search width: `layout/topbar.css`
+
+`components/cards.css` is clean from the shell-level selector boundary list:
+`.crm-layout`, `.crm-sidebar`, `.crm-app.sidebar-open`, `.crm-sidebar-overlay`, `[data-sidebar-toggle]`, `.crm-topbar`, `.crm-search`, `.crm-page`.
+
+### Validator guard added
+
+`tools/validate-static-uikit.mjs` now includes a `G. Component Boundary Checks` section. It scans only `assets/css/components/cards.css`, strips block comments before scanning, and fails validation if any shell-level selector from the boundary list is present. The check does not forbid those selectors globally.
+
+### Validation results
+
+| Command | Result |
+|---------|--------|
+| `npm run static:uikit:bundle` | Exit 0 - 40/40 sections inlined - 244.6 KB |
+| `npm run static:uikit:bundle:check` | Exit 0 - bundle up to date - 40/40 sections - 244.6 KB |
+| `npm run static:uikit:validate` | Exit 0 - validation passed - 0 errors, 0 warnings |
+
+New validator confirmation:
+
+```
+G. Component Boundary Checks
+  components/cards.css contains no shell-level selectors
+```
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| Same-file duplicate cleanup in `components/tables.css` | Deferred |
+| Same-file duplicate cleanup in `components/cards.css` | Deferred |
+| Possible future component normalization | Deferred |
+| Optional visual regression tooling | Deferred |

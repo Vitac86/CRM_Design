@@ -11,7 +11,8 @@
  *   D. Partials directory — existence and CSS loading
  *   E. UMI pack directories — CSS reference audit
  *   F. Local asset existence — <link href>, <script src>, <img src>
- *   G. Summary and exit code
+ *   G. Component boundary checks — cards.css must not own shell selectors
+ *   H. Summary and exit code
  *
  * Usage:
  *   node static-uikit/tools/validate-static-uikit.mjs
@@ -38,6 +39,7 @@ const ASSETS_CSS   = resolve(ASSETS_DIR, 'css');
 const ASSETS_FONTS = resolve(ASSETS_DIR, 'fonts');
 const MANIFEST     = resolve(ASSETS_CSS, 'crm-static.css');
 const BUNDLE       = resolve(ASSETS_CSS, 'crm-static.bundle.css');
+const CARDS_CSS    = resolve(ASSETS_CSS, 'components/cards.css');
 const PAGES_DIR    = resolve(STATIC_ROOT, 'pages');
 const PARTIALS_DIR = resolve(STATIC_ROOT, 'partials');
 const UMI_P0_DIR   = resolve(STATIC_ROOT, 'umi-p0');
@@ -48,6 +50,17 @@ const AUTH_PAGES = new Set(['login.html', 'register.html', 'forgot-password.html
 
 // Expected layer order for CSS imports
 const LAYER_ORDER = ['base', 'layout', 'components', 'pages', 'responsive', 'print'];
+
+const CARDS_FORBIDDEN_SHELL_SELECTORS = [
+  '.crm-layout',
+  '.crm-sidebar',
+  '.crm-app.sidebar-open',
+  '.crm-sidebar-overlay',
+  '[data-sidebar-toggle]',
+  '.crm-topbar',
+  '.crm-search',
+  '.crm-page',
+];
 
 // ── Reporting ─────────────────────────────────────────────────────────────────
 
@@ -83,6 +96,22 @@ function classifyImport(importPath) {
   if (p === 'responsive.css')      return 'responsive';
   if (p === 'print.css')           return 'print';
   return 'unknown';
+}
+
+function stripCssBlockComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function makeSelectorBoundaryRegex(selector) {
+  const escaped = escapeRegExp(selector);
+  if (selector.startsWith('.')) {
+    return new RegExp(`(^|[^_a-zA-Z0-9-])${escaped}(?![_a-zA-Z0-9-])`);
+  }
+  return new RegExp(escaped);
 }
 
 /** Resolve a path relative to a page HTML file (strips fragment). */
@@ -527,9 +556,32 @@ if (existsSync(PAGES_DIR)) {
   }
 }
 
-// ── Section G: Summary ────────────────────────────────────────────────────────
+// ── Section G: Component Boundary Checks ─────────────────────────────────────
 
-section('G. Summary');
+section('G. Component Boundary Checks');
+
+if (!existsSync(CARDS_CSS)) {
+  err(`components/cards.css not found: ${relative(REPO_ROOT, CARDS_CSS)}`);
+} else {
+  const cardsRelPath = relative(ASSETS_CSS, CARDS_CSS).replace(/\\/g, '/');
+  const cardsSource  = stripCssBlockComments(readFileSync(CARDS_CSS, 'utf8'));
+  let hasShellSelector = false;
+
+  for (const selector of CARDS_FORBIDDEN_SHELL_SELECTORS) {
+    if (makeSelectorBoundaryRegex(selector).test(cardsSource)) {
+      err(`${cardsRelPath} contains shell-level selector "${selector}"`);
+      hasShellSelector = true;
+    }
+  }
+
+  if (!hasShellSelector) {
+    ok('components/cards.css contains no shell-level selectors');
+  }
+}
+
+// ── Section H: Summary ───────────────────────────────────────────────────────
+
+section('H. Summary');
 
 console.log(`  Pages checked           : ${htmlPageCount}`);
 console.log(`  CSS imports in manifest : ${manifestImports.length}`);
