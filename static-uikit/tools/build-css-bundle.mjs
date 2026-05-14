@@ -20,7 +20,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { resolve, relative, dirname, join } from 'path';
+import { resolve, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -84,6 +84,12 @@ if (!existsSync(MANIFEST)) {
 const manifestSource = readFileSync(MANIFEST, 'utf8');
 const manifestLines  = manifestSource.split('\n');
 
+// Count the total number of @import statements in the manifest.
+// Used to verify no imports were silently skipped.
+const expectedSections = manifestLines.filter(
+  line => IMPORT_URL_RE.test(line) || IMPORT_PLAIN_RE.test(line)
+).length;
+
 const chunks = [BUNDLE_HEADER];
 let sectionCount = 0;
 let warnNonImport = false;
@@ -98,8 +104,9 @@ for (const line of manifestLines) {
     const sourceDir  = dirname(sourcePath);
 
     if (!existsSync(sourcePath)) {
-      console.warn(`WARNING: imported file not found — skipping: ${importPath}`);
-      continue;
+      console.error(`ERROR: imported file not found: ${importPath}`);
+      console.error('Build aborted — fix missing import before regenerating the bundle.');
+      process.exit(1);
     }
 
     let content = readFileSync(sourcePath, 'utf8');
@@ -131,9 +138,17 @@ if (warnNonImport) {
   );
 }
 
+if (sectionCount !== expectedSections) {
+  console.error(
+    `ERROR: section count mismatch — expected ${expectedSections} imports, inlined ${sectionCount}.`
+  );
+  console.error('Build aborted — bundle was not written.');
+  process.exit(1);
+}
+
 writeFileSync(BUNDLE_OUT, chunks.join(''), 'utf8');
 
 const bundleRelative = relative(process.cwd(), BUNDLE_OUT).replace(/\\/g, '/');
 console.log(`✓ Bundle written → ${bundleRelative}`);
-console.log(`  Sections inlined : ${sectionCount}`);
+console.log(`  Sections inlined : ${sectionCount} / ${expectedSections}`);
 console.log(`  Output size      : ${(Buffer.byteLength(chunks.join(''), 'utf8') / 1024).toFixed(1)} KB`);

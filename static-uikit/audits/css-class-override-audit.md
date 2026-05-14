@@ -100,7 +100,7 @@ static-uikit/assets/css/
 
 ## 3. CSS Import Order from crm-static.css
 
-`static-uikit/assets/css/crm-static.css` is a clean 45-line @import manifest. All 44 imported files listed below:
+`static-uikit/assets/css/crm-static.css` is a clean 45-line @import manifest. All 40 imported files listed below:
 
 ```css
 @import "./base/fonts.css";
@@ -1066,3 +1066,119 @@ No automated HTML validation script exists. Bundle output was manually spot-chec
 ---
 
 *This audit was produced by static inspection of all source CSS files and HTML pages in `static-uikit/`. Phase 0/1 changes: bundle script created, three exact-duplicate source blocks removed. No visual changes were made. All findings are based on the state of the repository as of 2026-05-14.*
+
+---
+
+## Phase 1.5 / Phase 2 Preparation Notes
+
+**Date:** 2026-05-14  
+**Status:** Complete — token layer consolidated, undefined tokens defined, bundle regenerated and validated.
+
+### Bundle script hardening (`static-uikit/tools/build-css-bundle.mjs`)
+
+| Change | Detail |
+|--------|--------|
+| Removed unused import | `join` was imported from `'path'` but never used — removed |
+| Missing imports are now build errors | Previously: `console.warn` + `continue` (silently produced an incomplete bundle). Now: `console.error` + `process.exit(1)` — build aborts with a clear error message |
+| Section count check added | Script counts expected `@import` statements before processing; after writing the bundle, if `sectionCount !== expectedSections` the build fails with a mismatch error and does not write the bundle |
+| Output line updated | `Sections inlined : 40 / 40` — shows both inlined and expected counts |
+
+### Corrected import / section count
+
+The audit previously stated "All 44 imported files" in §3. The actual count is **40** `@import` statements in `crm-static.css`, matching the 40 sections the build script reports. Corrected to 40.
+
+### Tokens moved to `base/tokens.css` (Part 3)
+
+All `:root` custom property declarations are now consolidated in `base/tokens.css` as the single canonical source. Values set to current effective runtime values (the values previously winning from the cascade tail).
+
+| Token | Old value in `tokens.css` | Effective runtime value (before) | New value in `tokens.css` |
+|-------|--------------------------|----------------------------------|---------------------------|
+| `--crm-topbar-h` | `62px` (stale) | `64px` (topbar.css won) | **`64px`** |
+| `--crm-sidebar-w` | `276px` (stale) | `270px` (topbar.css won) | **`270px`** |
+| `--crm-page-max-w` | not defined | `1440px` (topbar.css only) | **`1440px`** |
+| `--crm-page-pad-x` | not defined | `24px` (topbar.css only) | **`24px`** |
+| `--crm-page-pad-y` | not defined | `22px` (topbar.css only) | **`22px`** |
+| `--crm-card-radius` | not defined | `14px` (topbar.css only) | **`14px`** |
+| `--crm-panel-radius` | not defined | `14px` (topbar.css only) | **`14px`** |
+
+### `:root` blocks removed from layout files
+
+| File | Change |
+|------|--------|
+| `layout/sidebar.css` | `:root { --crm-sidebar-w: 270px; --crm-topbar-h: 64px; }` block removed |
+| `layout/topbar.css` | `:root { --crm-topbar-h: 64px; --crm-sidebar-w: 270px; --crm-page-max-w: 1440px; --crm-page-pad-x: 24px; --crm-page-pad-y: 22px; --crm-card-radius: 14px; --crm-panel-radius: 14px; }` block removed |
+
+Both files verified: no `:root` block remains. The single `:root` block in the bundle is now exclusively in the `base/tokens.css` section.
+
+### Missing layer tokens defined (Part 4) — intentional visual bug fix
+
+The following tokens were previously **undefined** everywhere. Their usage in `filters.css` and `modals.css` was silently resolving to CSS initial values, causing:
+- `.crm-filter-panel` (base selector, not inside `.crm-registry-page`): no border, no border-radius, no padding, no gap
+- `.crm-modal .crm-modal-dialog`: no border, no border-radius (confirmed latent rendering bug from §1, item 4)
+
+They are now defined in `base/tokens.css`:
+
+```css
+--crm-layer-card-border: 1px solid var(--crm-border);   /* resolves to: 1px solid #d7e0ef */
+--crm-layer-card-radius: var(--crm-radius-lg);           /* resolves to: 14px */
+--crm-layer-gap-sm: 12px;
+```
+
+**This is an intentional visual bug fix.** Elements using the base `.crm-filter-panel` selector (outside registry pages) and `.crm-modal .crm-modal-dialog` will now render with the correct border and border-radius that were previously missing.
+
+### Duplicate declarations removed (Part 5)
+
+| File | Selector | Property removed | Reason |
+|------|----------|-----------------|--------|
+| `layout/sidebar.css` | `.crm-sidebar` | `background: linear-gradient(...)` | Exact duplicate of `layout/app.css` — identical value |
+| `layout/sidebar.css` | `.crm-sidebar-brand` | entire block (`height`, `padding`) | Both properties are exact duplicates of `layout/app.css` |
+
+**Deferred (not removed — require further analysis or selector restructuring):**
+- `layout/topbar.css` `.crm-toolbar, .crm-filter-panel, .crm-toolbar.crm-filter-panel` — `border-radius` and `padding` for `.crm-filter-panel` are now overridden by `filters.css` with the newly-defined tokens (same effective values), but the selector is grouped with `.crm-toolbar` which still needs it. Splitting the grouped selector is deferred to Phase 3.
+
+### Source files changed
+
+| File | Change summary |
+|------|---------------|
+| `static-uikit/tools/build-css-bundle.mjs` | Hardened: missing import → error+exit, section count check, removed unused `join` import |
+| `static-uikit/assets/css/base/tokens.css` | Updated 2 stale values; added 7 layout/component tokens; defined 3 previously-undefined layer tokens |
+| `static-uikit/assets/css/layout/sidebar.css` | Removed `:root` block; removed duplicate `background` from `.crm-sidebar`; removed duplicate `.crm-sidebar-brand` block |
+| `static-uikit/assets/css/layout/topbar.css` | Removed `:root` block (all 7 properties) |
+| `static-uikit/audits/css-class-override-audit.md` | Corrected import count "44" → "40" |
+
+### Bundle regeneration result
+
+| Property | Value |
+|----------|-------|
+| Command | `node static-uikit/tools/build-css-bundle.mjs` |
+| Exit code | 0 |
+| Sections inlined | 40 / 40 |
+| Output size | 246.2 KB |
+
+### Validation results
+
+| Check | Result |
+|-------|--------|
+| `npm run static:uikit:bundle` | ✓ Exit 0 — 40/40 sections |
+| `node static-uikit/tools/validate-static-uikit.mjs` | Script does not exist (still missing — deferred) |
+| Real `@import` directives in bundle | 0 ✓ |
+| Build-generated section markers (files) | 40 ✓ |
+| Font URL paths (`../fonts/`) | 16 URLs, 0 bad paths ✓ |
+| `:root` blocks in bundle | 1 (only in `base/tokens.css` section) ✓ |
+| `sidebar.css` section has `:root` | No ✓ |
+| `topbar.css` section has `:root` | No ✓ |
+| New tokens present in bundle | All 10 confirmed via text search ✓ |
+
+**Note on validation script:** `static-uikit/tools/validate-static-uikit.mjs` still does not exist. Creating it remains an open prerequisite for automated HTML/CSS validation.
+
+### Deferred items
+
+| Item | Reason for deferral |
+|------|---------------------|
+| `layout/topbar.css` grouped selector `.crm-toolbar, .crm-filter-panel` — split to remove dead `.crm-filter-panel` declarations | Requires selector restructuring; deferred to Phase 3 |
+| DX-02: `.crm-sidebar` `background` in `topbar.css` | `topbar.css` `.crm-sidebar { box-shadow }` is also a duplicate of `app.css` — not in Part 5 scope, deferred |
+| DX-07–DX-15: remaining cross-file overrides | Still intentional cascade refinements or require architectural decisions — Phase 3–4 |
+| `cards.css` @media (920px) responsive layout block | Deferred per Phase 0/1 notes (sidebar animation approach conflict with responsive.css) |
+| `cards.css` @media print block | Deferred per Phase 0/1 notes (only print rules for layout shell) |
+| Same-file duplicates in `tables.css` | Phase 3 |
+| `validate-static-uikit.mjs` creation | Prerequisite for automated validation — still missing |

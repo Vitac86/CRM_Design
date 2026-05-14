@@ -1,13 +1,3 @@
-:root {
-  --crm-topbar-h: 64px;
-  --crm-sidebar-w: 270px;
-  --crm-page-max-w: 1440px;
-  --crm-page-pad-x: 24px;
-  --crm-page-pad-y: 22px;
-  --crm-card-radius: 14px;
-  --crm-panel-radius: 14px;
-}
-
 .crm-layout {
   grid-template-columns: var(--crm-sidebar-w) minmax(0, 1fr);
 }

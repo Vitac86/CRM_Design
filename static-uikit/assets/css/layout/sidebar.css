@@ -1,17 +1,7 @@
-/* ===== Sidebar parity fix (global static-uikit) ===== */
-:root {
-  --crm-sidebar-w: 270px;
-  --crm-topbar-h: 64px;
-}
+/* ===== Sidebar parity / refinements (global static-uikit) ===== */
 
 .crm-sidebar {
   width: var(--crm-sidebar-w);
-  background: linear-gradient(180deg, #0b1a49 0%, #09143a 100%);
-}
-
-.crm-sidebar-brand {
-  height: var(--crm-topbar-h);
-  padding: 0 18px;
 }
 
 .crm-sidebar .crm-nav {

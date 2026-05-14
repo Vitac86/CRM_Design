@@ -63,6 +63,17 @@
   --crm-c24-status-warning: var(--crm-umi-status-warning);
   --crm-c24-status-danger: var(--crm-umi-status-danger);
   --crm-c24-status-info: var(--crm-umi-status-info);
-  --crm-topbar-h: 62px;
-  --crm-sidebar-w: 276px;
+  --crm-topbar-h: 64px;
+  --crm-sidebar-w: 270px;
+  /* Layout / page-shell dimensions — moved from layout/topbar.css :root block */
+  --crm-page-max-w: 1440px;
+  --crm-page-pad-x: 24px;
+  --crm-page-pad-y: 22px;
+  /* Component radius tokens — moved from layout/topbar.css :root block */
+  --crm-card-radius: 14px;
+  --crm-panel-radius: 14px;
+  /* Layer-composition tokens — previously undefined; fixes silent visual bugs in filters.css and modals.css */
+  --crm-layer-card-border: 1px solid var(--crm-border);
+  --crm-layer-card-radius: var(--crm-radius-lg);
+  --crm-layer-gap-sm: 12px;
 }
