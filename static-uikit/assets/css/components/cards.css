@@ -10,7 +10,8 @@
 }
 
 .crm-card.uk-card-body,
-.uk-card.crm-card.uk-card-body { padding: 16px 18px; }
+.uk-card.crm-card.uk-card-body,
+.crm-section.uk-card-body { padding: 16px 18px; }
 
 .crm-toolbar {
   background: var(--crm-surface-muted);
@@ -44,6 +45,14 @@
 
 .crm-section {
   border-radius: 12px;
+}
+
+.crm-kpi-card,
+.crm-form-card,
+.crm-create-panel,
+.crm-journal-table,
+.crm-compliance-queue {
+  border-radius: var(--crm-card-radius);
 }
 
 .crm-section h3 {
@@ -266,6 +275,7 @@ a:focus-visible,
 .crm-binary-control label {
   display: inline-flex;
   align-items: center;
+  min-height: 32px;
   border: 1px solid #cdd8ec;
   border-radius: 999px;
   padding: 6px 14px;

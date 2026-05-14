@@ -701,95 +701,6 @@ body {
   flex: 0 0 auto;
 }
 
-/* ── Deferred: component-layer overrides (cross-concern; cleanup deferred) ── */
-
-.crm-card,
-.crm-section,
-.crm-kpi-card,
-.crm-form-card,
-.crm-create-panel,
-.crm-journal-table,
-.crm-compliance-queue,
-.crm-table-wrapper {
-  border-radius: var(--crm-card-radius);
-}
-
-.crm-card,
-.uk-card.crm-card,
-.crm-table-wrapper {
-  border-color: #d7e1ef;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
-}
-
-.crm-card.uk-card-body,
-.uk-card.crm-card.uk-card-body,
-.crm-section.uk-card-body {
-  padding: 16px 18px;
-}
-
-.crm-toolbar,
-.crm-filter-panel,
-.crm-toolbar.crm-filter-panel {
-  border-radius: var(--crm-panel-radius);
-  padding: 12px;
-  border-color: #d7e1ef;
-}
-
-.crm-toolbar.crm-filter-panel {
-  background: #f3f7fe;
-}
-
-.crm-table .uk-table th {
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  color: #64758f;
-  padding: 11px 12px;
-  background: #eef3fb;
-}
-
-.crm-table .uk-table td {
-  padding: 11px 12px;
-  font-size: 13px;
-}
-
-.crm-table-compact .uk-table th,
-.crm-table-compact .uk-table td {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.crm-button,
-.uk-button.crm-button,
-.uk-button {
-  border-radius: 10px !important;
-}
-
-.crm-decision-action.is-rework {
-  border-color: #efcf99;
-  background: #fff5e3;
-  color: #83521b;
-}
-
-.crm-decision-action.is-block {
-  border-color: #efc0c0;
-  background: #feeeee;
-  color: #9c3d3d;
-}
-
-
-.crm-option-card {
-  border-radius: 12px;
-}
-
-.crm-option-card.is-selected {
-  border-color: #6a8bdd;
-  background: #eaf1ff;
-}
-
-.crm-binary-control label {
-  min-height: 32px;
-}
-
 /* ── Responsive ── */
 
 @media (max-width: 920px) {
@@ -1030,7 +941,8 @@ body {
 }
 
 .crm-card.uk-card-body,
-.uk-card.crm-card.uk-card-body { padding: 16px 18px; }
+.uk-card.crm-card.uk-card-body,
+.crm-section.uk-card-body { padding: 16px 18px; }
 
 .crm-toolbar {
   background: var(--crm-surface-muted);
@@ -1064,6 +976,14 @@ body {
 
 .crm-section {
   border-radius: 12px;
+}
+
+.crm-kpi-card,
+.crm-form-card,
+.crm-create-panel,
+.crm-journal-table,
+.crm-compliance-queue {
+  border-radius: var(--crm-card-radius);
 }
 
 .crm-section h3 {
@@ -1286,6 +1206,7 @@ a:focus-visible,
 .crm-binary-control label {
   display: inline-flex;
   align-items: center;
+  min-height: 32px;
   border: 1px solid #cdd8ec;
   border-radius: 999px;
   padding: 6px 14px;
@@ -1426,7 +1347,7 @@ a:focus-visible,
 /* ===== components/buttons.css ===== */
 /* Base button — UIkit vendor override: CRM sizing and typography */
 .uk-button {
-  border-radius: 8px;
+  border-radius: 10px;
   min-height: 36px;
   padding: 0 14px;
   font-size: 13px;
@@ -1437,7 +1358,7 @@ a:focus-visible,
 /* CRM button base — standalone fallback when .uk-button is absent */
 .crm-button {
   min-height: 36px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
 }
@@ -2212,6 +2133,7 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   border: 1px solid var(--crm-border);
   border-radius: 12px;
   background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 .crm-table-wrapper::after {
@@ -2459,6 +2381,7 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
 .crm-table .uk-table td {
   vertical-align: middle;
   padding: 12px 12px;
+  font-size: 13px;
   color: var(--crm-text-secondary);
   line-height: 1.35;
   font-weight: 400;
@@ -2491,6 +2414,13 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
 
 .crm-table .uk-table td:first-child {
   white-space: normal;
+}
+
+/* compact density — moved from layout/topbar.css deferred block */
+.crm-table-compact .uk-table th,
+.crm-table-compact .uk-table td {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 [data-sortable-table] .crm-th-sort-button {
@@ -2809,6 +2739,10 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   padding: var(--crm-layer-gap-sm);
   display: grid;
   gap: var(--crm-layer-gap-sm);
+}
+
+.crm-toolbar.crm-filter-panel {
+  background: #f3f7fe;
 }
 
 .crm-registry-filters.crm-filter-panel,

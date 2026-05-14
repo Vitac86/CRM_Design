@@ -143,6 +143,10 @@
   gap: var(--crm-layer-gap-sm);
 }
 
+.crm-toolbar.crm-filter-panel {
+  background: #f3f7fe;
+}
+
 .crm-registry-filters.crm-filter-panel,
 .crm-filter-panel {
   position: relative;

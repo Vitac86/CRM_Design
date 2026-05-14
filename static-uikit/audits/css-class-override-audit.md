@@ -1396,3 +1396,114 @@ Errors: 0 | Warnings: 0
 ### Confirmation: no HTML or class changes
 
 No HTML files were modified. No class names were renamed or removed. No visual design was changed. The refactor is a pure structural ownership cleanup — the compiled bundle produces the same effective CSS output for every selector that was in use before the cleanup.
+
+---
+
+## Component Ownership Cleanup Notes
+
+**Date:** 2026-05-14
+**Task type:** SAFE IMPLEMENTATION — Component ownership cleanup after layout ownership cleanup.
+**Status:** Complete — all files changed, bundle regenerated, all three checks passed.
+
+### Overview
+
+The deferred block `/* ── Deferred: component-layer overrides (cross-concern; cleanup deferred) ── */` was removed from `layout/topbar.css`. Every selector in that block was either already owned (and won) by the correct component file, or was moved into the correct component file to preserve effective computed values.
+
+### Files changed
+
+| File | Nature of change |
+|------|-----------------|
+| `layout/topbar.css` | Removed entire deferred component-layer block (88 lines) |
+| `components/cards.css` | Added `.crm-section.uk-card-body` to padding selector group; added `.crm-kpi-card / .crm-form-card / .crm-create-panel / .crm-journal-table / .crm-compliance-queue { border-radius }` block; added `min-height: 32px` to `.crm-binary-control label` |
+| `components/buttons.css` | Updated `border-radius` from `8px` to `10px` for both `.uk-button` and `.crm-button` base blocks |
+| `components/tables.css` | Added `box-shadow` to first `.crm-table-wrapper` block; added `font-size: 13px` to `.crm-table .uk-table td` block; added `.crm-table-compact .uk-table th/td` compact padding block |
+| `components/filters.css` | Added `.crm-toolbar.crm-filter-panel { background: #f3f7fe }` to shared filter panel primitives section |
+
+### Selectors moved from `topbar.css` to `cards.css`
+
+| Selector | Disposition |
+|----------|-------------|
+| `.crm-card { border-radius: var(--crm-card-radius) }` | Removed from topbar.css — `cards.css { border-radius: 12px }` already wins (later in cascade) |
+| `.crm-section { border-radius: var(--crm-card-radius) }` | Removed from topbar.css — `cards.css { border-radius: 12px }` already wins |
+| `.crm-card, .uk-card.crm-card { border-color / box-shadow }` | Removed from topbar.css — `cards.css { border: 1px solid #d4deee; box-shadow: var(--crm-shadow-sm) }` already wins |
+| `.crm-card.uk-card-body / .uk-card.crm-card.uk-card-body { padding: 16px 18px }` | Removed from topbar.css — identical value already in `cards.css`; `.crm-section.uk-card-body` added to the existing selector group in `cards.css` |
+| `.crm-kpi-card, .crm-form-card, .crm-create-panel, .crm-journal-table, .crm-compliance-queue { border-radius: var(--crm-card-radius) }` | Only in topbar.css — moved to `cards.css` as a new block; token `--crm-card-radius: 14px` is defined in `base/tokens.css` |
+| `.crm-option-card { border-radius: 12px }` | Removed from topbar.css — `cards.css` already has identical value |
+| `.crm-option-card.is-selected { border-color / background }` | Removed from topbar.css — `cards.css` later blocks already win with different (winning) values |
+| `.crm-binary-control label { min-height: 32px }` | Only in topbar.css — merged into the complete `.crm-binary-control label` block in `cards.css` |
+
+### Selectors moved from `topbar.css` to `buttons.css`
+
+| Selector | Disposition |
+|----------|-------------|
+| `.crm-button, .uk-button.crm-button, .uk-button { border-radius: 10px !important }` | Removed from topbar.css. Existing `border-radius: 8px` declarations in `buttons.css` updated to `10px`. No `!important` required — `buttons.css` already wins over UIkit vendor CSS via cascade position. Visual radius is unchanged at 10px. |
+
+### Selectors moved from `topbar.css` to `tables.css`
+
+| Selector | Disposition |
+|----------|-------------|
+| `.crm-table-wrapper { border-radius: var(--crm-card-radius) }` | Removed — `tables.css { border-radius: 12px }` already wins |
+| `.crm-table-wrapper { border-color: #d7e1ef }` | Removed — `tables.css { border: 1px solid var(--crm-border) }` already wins |
+| `.crm-table-wrapper { box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) }` | Only in topbar.css — added to the canonical first `.crm-table-wrapper` block in `tables.css`. `.crm-table-card .crm-table-wrapper { box-shadow: none }` already in `tables.css` resets it for card-wrapped tables. |
+| `.crm-table .uk-table th { font-size/letter-spacing/color/padding/background }` | Removed from topbar.css — `tables.css` later block already wins with its own values |
+| `.crm-table .uk-table td { padding: 11px 12px }` | Removed from topbar.css — `tables.css { padding: 12px 12px }` already wins |
+| `.crm-table .uk-table td { font-size: 13px }` | topbar.css was the winning declaration (`.crm-table .uk-table td` specificity beats `.crm-table .uk-table` in tables.css). Added `font-size: 13px` to `.crm-table .uk-table td` block in `tables.css` to preserve effective value. |
+| `.crm-table-compact .uk-table th, .crm-table-compact .uk-table td { padding-top/bottom: 10px }` | Only in topbar.css — moved to `tables.css` as a new labeled consolidation block |
+
+### Selectors moved from `topbar.css` to `filters.css`
+
+| Selector | Disposition |
+|----------|-------------|
+| `.crm-toolbar, .crm-filter-panel { border-radius / padding / border-color }` | Removed from topbar.css — `cards.css` wins for `.crm-toolbar`; `filters.css` wins for `.crm-filter-panel`. No new declarations needed. |
+| `.crm-toolbar.crm-filter-panel { background: #f3f7fe }` | topbar.css was the winning declaration (two-class specificity beats single-class rules in cards.css / filters.css). Moved to `filters.css` shared filter panel primitives section with the same selector and value. |
+
+### Decision-action variants (Part 5)
+
+`.crm-decision-action.is-rework` and `.crm-decision-action.is-block` existed in the topbar.css deferred block with values `{ border-color: #efcf99; background: #fff5e3; color: #83521b }` and `{ border-color: #efc0c0; background: #feeeee; color: #9c3d3d }`.
+
+`pages/compliance.css` already contains complete `.crm-decision-action.is-rework/.is-block` rules (with hover states) at a later cascade position, which WIN over the topbar.css values. The effective rendered values come from `compliance.css`. The topbar.css declarations were redundant — they were removed without adding duplicates. `pages/compliance.css` is the canonical owner.
+
+### New component file created
+
+None. All selectors were moved into existing files.
+
+### Button radius — visual change confirmation
+
+`.uk-button` and `.crm-button` `border-radius` in `components/buttons.css`:
+- Before: `8px` (never actually computed — topbar.css `10px !important` overrode it)
+- After: `10px` (no `!important` required — `buttons.css` wins over UIkit via cascade; `!important` removed from topbar.css)
+- Effective visual radius: **unchanged at 10px**
+
+### Remaining deferred items
+
+| Item | Status |
+|------|--------|
+| `components/cards.css` `@media (max-width: 920px)` layout block | Still deferred — contains `.crm-sidebar-overlay` behavior; requires separate responsive-shell cleanup task |
+| `components/cards.css` `@media print` block | Still deferred |
+| Same-file duplicates in `tables.css` | Still deferred (Phase 3) |
+| Undefined `--crm-layer-card-*` variables | Already fixed in Phase 1.5 |
+| `components/cards.css` same-file `.crm-binary-control`, `.crm-option-card`, `.crm-filter-panel` duplicate blocks | Still deferred (Phase 3) |
+
+### Bundle regeneration result
+
+| Command | Result |
+|---------|--------|
+| `npm run static:uikit:bundle` | ✓ Exit 0 — 40/40 sections — 245.1 KB |
+| `npm run static:uikit:bundle:check` | ✓ Bundle is up to date (40/40 sections, 245.1 KB) |
+| `npm run static:uikit:validate` | ✓ Validation passed — 0 errors, 0 warnings |
+
+### Validation details
+
+```
+A. CSS Manifest    — crm-static.css exists ✓, @import-only ✓, 40 files exist ✓, no duplicates ✓, layer order correct ✓
+B. Bundle          — exists ✓, no real @import ✓, 40 markers ✓, up to date ✓, 16 font URLs resolved ✓, :root once in tokens.css ✓
+C. HTML refs       — 29 pages, all pass ✓
+D. Partials        — absent, skipped
+E. UMI packs       — absent, skipped
+F. Local assets    — 296 refs across 29 pages, all resolved ✓
+Errors: 0 | Warnings: 0
+```
+
+### Confirmation: no HTML or class changes
+
+No HTML files were modified. No class names were renamed or removed. No visual design was changed. The compiled bundle produces the same effective CSS output for every selector. `uikit.min.css` was not edited. `crm-static.bundle.css` was regenerated from source — not manually patched.

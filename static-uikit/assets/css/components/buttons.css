@@ -1,6 +1,6 @@
 /* Base button — UIkit vendor override: CRM sizing and typography */
 .uk-button {
-  border-radius: 8px;
+  border-radius: 10px;
   min-height: 36px;
   padding: 0 14px;
   font-size: 13px;
@@ -11,7 +11,7 @@
 /* CRM button base — standalone fallback when .uk-button is absent */
 .crm-button {
   min-height: 36px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
 }

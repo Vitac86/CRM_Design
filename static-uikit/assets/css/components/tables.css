@@ -6,6 +6,7 @@
   border: 1px solid var(--crm-border);
   border-radius: 12px;
   background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 .crm-table-wrapper::after {
@@ -253,6 +254,7 @@
 .crm-table .uk-table td {
   vertical-align: middle;
   padding: 12px 12px;
+  font-size: 13px;
   color: var(--crm-text-secondary);
   line-height: 1.35;
   font-weight: 400;
@@ -285,6 +287,13 @@
 
 .crm-table .uk-table td:first-child {
   white-space: normal;
+}
+
+/* compact density — moved from layout/topbar.css deferred block */
+.crm-table-compact .uk-table th,
+.crm-table-compact .uk-table td {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 [data-sortable-table] .crm-th-sort-button {
