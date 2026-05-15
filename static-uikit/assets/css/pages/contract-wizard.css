@@ -212,3 +212,117 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Application type tab switcher ─────────────────────────────────────────── */
+
+.crm-contract-application-switch {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid #d6e0ef;
+  border-radius: 12px;
+  background: #f4f8ff;
+  margin-bottom: 2px;
+}
+
+.crm-contract-application-tab {
+  flex: 1;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #4e6286;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.crm-contract-application-tab:hover {
+  background: #e8effe;
+  color: #253656;
+}
+
+.crm-contract-application-tab.is-active {
+  background: #fff;
+  color: #2d4e94;
+  border-color: #9db6e8;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(42, 74, 148, 0.10);
+}
+
+.crm-contract-application-tab:focus-visible {
+  outline: 2px solid var(--crm-primary, #4e7be0);
+  outline-offset: 2px;
+}
+
+/* ── Type IN panels ─────────────────────────────────────────────────────────── */
+
+.crm-type-in-note {
+  font-size: 12px;
+  color: #6f7f99;
+  margin-top: 6px;
+  padding: 5px 9px;
+  border-left: 3px solid #c3d1eb;
+  border-radius: 0 4px 4px 0;
+  background: #f8faff;
+}
+
+.crm-legal-text-preview {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6f7f99;
+}
+
+.crm-legal-text-preview summary {
+  cursor: pointer;
+  color: #4a6ca3;
+  font-weight: 500;
+  user-select: none;
+}
+
+.crm-legal-text-list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.crm-legal-text-list li {
+  margin-bottom: 4px;
+}
+
+/* Back-office collapsible section */
+.crm-type-in-backoffice > summary {
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 2px;
+}
+
+.crm-type-in-backoffice > summary::-webkit-details-marker {
+  display: none;
+}
+
+.crm-type-in-backoffice > summary .crm-form-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crm-type-in-backoffice > summary .crm-form-section-head::after {
+  content: "▾";
+  font-size: 11px;
+  color: #8fa3c6;
+  margin-left: 4px;
+}
+
+.crm-type-in-backoffice[open] > summary .crm-form-section-head::after {
+  content: "▴";
+}
+
+/* Mobile overrides */
+@media (max-width: 960px) {
+  .crm-contract-application-switch {
+    flex-direction: column;
+  }
+}

@@ -213,20 +213,14 @@
           </div>
 
           <form action="#" method="post" data-form="contract-wizard" data-action="submit-contract-wizard" class="crm-register-card crm-contract-wizard-form">
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Присоединение по ст. 428 ГК РФ</h3>
-              </div>
 
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="joined-broker" checked/><span>Договор о брокерском обслуживании</span>
-              </label>
+            <!-- Application type tab switcher -->
+            <div class="crm-contract-application-switch" role="tablist" aria-label="Тип заявления">
+              <button type="button" class="crm-contract-application-tab is-active" role="tab" id="app-tab-standard" aria-selected="true" aria-controls="app-panel-standard" data-contract-application-tab data-contract-application-type="standard">Заявление о присоединении</button>
+              <button type="button" class="crm-contract-application-tab" role="tab" id="app-tab-type-in" aria-selected="false" aria-controls="app-panel-type-in" data-contract-application-tab data-contract-application-type="type-in">Заявление о присоединении Тип ИН</button>
+            </div>
 
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="joined-depository" checked/><span>Депозитарный договор</span>
-              </label>
-            </section>
-
+            <!-- SHARED: Person type selector (common to both application types) -->
             <section class="crm-form-section">
               <div class="crm-form-section-head">
                 <h3>Тип лица</h3>
@@ -247,125 +241,621 @@
               </div>
             </section>
 
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Открыть счёт депо</h3>
-              </div>
+            <!-- STANDARD PANEL -->
+            <div id="app-panel-standard" role="tabpanel" aria-labelledby="app-tab-standard" data-contract-application-panel="standard">
 
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="depo-owner" checked/><span>Владельца</span>
-              </label>
-
-              <label class="crm-check-row">
-                <input type="checkbox" name="depo-nominee"/><span>Номинального держателя</span>
-              </label>
-
-              <label class="crm-check-row">
-                <input type="checkbox" name="depo-trust-manager"/><span>Доверительного управляющего</span>
-              </label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Оператор счёта депо</h3>
-              </div>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="depo-operator" checked/><span>ООО «Инвестика» оператором счёта депо</span>
-              </label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Открыть торговый счёт депо</h3>
-              </div>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="trading-depo-owner" checked/><span>Владельца</span>
-              </label>
-
-              <label class="crm-check-row">
-                <input type="checkbox" name="trading-depo-nominee"/><span>Номинального держателя</span>
-              </label>
-
-              <label class="crm-check-row">
-                <input type="checkbox" name="trading-depo-trust-manager"/><span>Доверительного управляющего</span>
-              </label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Оператор торгового счёта депо</h3>
-              </div>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="trading-depo-operator" checked/><span>ООО «Инвестика» оператор торгового счёта депо</span>
-              </label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Брокерское обслуживание на рынках</h3>
-              </div>
-
-              <div class="crm-form-grid uk-grid-small" uk-grid>
-                <div class="uk-width-1-2@m">
-                  <label class="uk-form-label" for="wizard-tariff">Тариф для всех счетов</label>
-                  <select id="wizard-tariff" class="uk-select crm-select" name="tariff">
-                    <option>Универсальный</option>
-                    <option>Инвестор</option>
-                    <option>Премиум</option>
-                  </select>
-                </div>
-              </div>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="market-stock" checked/><span>Фондовый рынок</span>
-              </label>
-
-              <label class="crm-check-row">
-                <input type="checkbox" name="market-futures"/><span>Срочный рынок</span>
-              </label>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="market-currency" checked/><span>Валютный рынок и рынок драгоценных металлов</span>
-              </label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Электронный документооборот</h3>
-              </div>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="edo-signature" checked/><span>Использование электронной подписи и обмен электронными документами</span>
-              </label>
-
-              <label class="crm-check-row is-active">
-                <input type="checkbox" name="edo-enable" checked/><span>Подключить систему ЭДО</span>
-              </label>
-            </section>
-
-            <section class="crm-form-section">
-              <div class="crm-form-section-head">
-                <h3>Перечисление доходов</h3>
-              </div>
-
-              <div class="crm-form-grid uk-grid-small" uk-grid>
-                <div class="uk-width-1-2@m">
-                  <label class="uk-form-label" for="wizard-delivery">Способ перечисления</label>
-                  <select class="uk-select crm-select" id="wizard-delivery" name="income-transfer">
-                    <option>Специальный брокерский счёт</option>
-                    <option>Расчётный счёт клиента</option>
-                  </select>
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Присоединение по ст. 428 ГК РФ</h3>
                 </div>
 
-                <div class="uk-width-1-2@m">
-                  <label class="uk-form-label" for="wizard-mail">Email для отчётов</label>
-                  <input class="uk-input crm-input" id="wizard-mail" name="report-email" value="office@vms.ru"/>
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="joined-broker" checked/><span>Договор о брокерском обслуживании</span>
+                </label>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="joined-depository" checked/><span>Депозитарный договор</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Открыть счёт депо</h3>
                 </div>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="depo-owner" checked/><span>Владельца</span>
+                </label>
+
+                <label class="crm-check-row">
+                  <input type="checkbox" name="depo-nominee"/><span>Номинального держателя</span>
+                </label>
+
+                <label class="crm-check-row">
+                  <input type="checkbox" name="depo-trust-manager"/><span>Доверительного управляющего</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Оператор счёта депо</h3>
+                </div>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="depo-operator" checked/><span>ООО «Инвестика» оператором счёта депо</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Открыть торговый счёт депо</h3>
+                </div>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="trading-depo-owner" checked/><span>Владельца</span>
+                </label>
+
+                <label class="crm-check-row">
+                  <input type="checkbox" name="trading-depo-nominee"/><span>Номинального держателя</span>
+                </label>
+
+                <label class="crm-check-row">
+                  <input type="checkbox" name="trading-depo-trust-manager"/><span>Доверительного управляющего</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Оператор торгового счёта депо</h3>
+                </div>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="trading-depo-operator" checked/><span>ООО «Инвестика» оператор торгового счёта депо</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Брокерское обслуживание на рынках</h3>
+                </div>
+
+                <div class="crm-form-grid uk-grid-small" uk-grid>
+                  <div class="uk-width-1-2@m">
+                    <label class="uk-form-label" for="wizard-tariff">Тариф для всех счетов</label>
+                    <select id="wizard-tariff" class="uk-select crm-select" name="tariff">
+                      <option>Универсальный</option>
+                      <option>Инвестор</option>
+                      <option>Премиум</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="market-stock" checked/><span>Фондовый рынок</span>
+                </label>
+
+                <label class="crm-check-row">
+                  <input type="checkbox" name="market-futures"/><span>Срочный рынок</span>
+                </label>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="market-currency" checked/><span>Валютный рынок и рынок драгоценных металлов</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Электронный документооборот</h3>
+                </div>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="edo-signature" checked/><span>Использование электронной подписи и обмен электронными документами</span>
+                </label>
+
+                <label class="crm-check-row is-active">
+                  <input type="checkbox" name="edo-enable" checked/><span>Подключить систему ЭДО</span>
+                </label>
+              </section>
+
+              <section class="crm-form-section">
+                <div class="crm-form-section-head">
+                  <h3>Перечисление доходов</h3>
+                </div>
+
+                <div class="crm-form-grid uk-grid-small" uk-grid>
+                  <div class="uk-width-1-2@m">
+                    <label class="uk-form-label" for="wizard-delivery">Способ перечисления</label>
+                    <select class="uk-select crm-select" id="wizard-delivery" name="income-transfer">
+                      <option>Специальный брокерский счёт</option>
+                      <option>Расчётный счёт клиента</option>
+                    </select>
+                  </div>
+
+                  <div class="uk-width-1-2@m">
+                    <label class="uk-form-label" for="wizard-mail">Email для отчётов</label>
+                    <input class="uk-input crm-input" id="wizard-mail" name="report-email" value="office@vms.ru"/>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+            <!-- /STANDARD PANEL -->
+
+            <!-- TYPE IN PANEL -->
+            <div id="app-panel-type-in" role="tabpanel" aria-labelledby="app-tab-type-in" data-contract-application-panel="type-in" hidden>
+
+              <!-- INDIVIDUAL sub-panel (Физическое лицо / ИП) -->
+              <div data-type-in-person-panel="individual" hidden>
+
+                <p class="crm-type-in-note" id="tin-entrepreneur-note" hidden>Для ИП используется вариант заявления для физических лиц.</p>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Сведения о Заявителе</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-full-name">Фамилия, имя, отчество полностью</label>
+                      <input class="uk-input crm-input" id="tin-fl-full-name" name="tin-fl-full-name" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-doc-type">Документ, удостоверяющий личность</label>
+                      <input class="uk-input crm-input" id="tin-fl-doc-type" name="tin-fl-doc-type" type="text" value="Паспорт гражданина РФ"/>
+                    </div>
+                    <div class="uk-width-1-4@m">
+                      <label class="uk-form-label" for="tin-fl-doc-series">Серия</label>
+                      <input class="uk-input crm-input" id="tin-fl-doc-series" name="tin-fl-doc-series" type="text"/>
+                    </div>
+                    <div class="uk-width-1-4@m">
+                      <label class="uk-form-label" for="tin-fl-doc-number">Номер</label>
+                      <input class="uk-input crm-input" id="tin-fl-doc-number" name="tin-fl-doc-number" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-doc-issued-by">Кем выдан</label>
+                      <input class="uk-input crm-input" id="tin-fl-doc-issued-by" name="tin-fl-doc-issued-by" type="text"/>
+                    </div>
+                    <div class="uk-width-1-4@m">
+                      <label class="uk-form-label" for="tin-fl-doc-date">Дата выдачи</label>
+                      <input class="uk-input crm-input" id="tin-fl-doc-date" name="tin-fl-doc-date" type="date"/>
+                    </div>
+                    <div class="uk-width-1-4@m">
+                      <label class="uk-form-label" for="tin-fl-citizenship">Гражданство</label>
+                      <input class="uk-input crm-input" id="tin-fl-citizenship" name="tin-fl-citizenship" type="text"/>
+                    </div>
+                    <div class="uk-width-1-4@m">
+                      <label class="uk-form-label" for="tin-fl-birth-date">Дата рождения</label>
+                      <input class="uk-input crm-input" id="tin-fl-birth-date" name="tin-fl-birth-date" type="date"/>
+                    </div>
+                    <div class="uk-width-3-4@m">
+                      <label class="uk-form-label" for="tin-fl-address">Адрес регистрации</label>
+                      <input class="uk-input crm-input" id="tin-fl-address" name="tin-fl-address" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-representative">Представитель, ФИО</label>
+                      <input class="uk-input crm-input" id="tin-fl-representative" name="tin-fl-representative" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-rep-doc">Документ-основание полномочий представителя</label>
+                      <input class="uk-input crm-input" id="tin-fl-rep-doc" name="tin-fl-rep-doc" type="text"/>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Присоединение по ст. 428 ГК РФ</h3>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-joined-broker-depository" checked/>
+                    <span>к Регламенту осуществления брокерской и депозитарной деятельности ООО «Инвестика» при обслуживании иностранных инвесторов</span>
+                  </label>
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-joined-depository" checked/>
+                    <span>к Депозитарному договору</span>
+                  </label>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Счёт депо Тип ИН</h3>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-depo-in-owner" checked/>
+                    <span>Счёт депо владельца типа «Ин»</span>
+                  </label>
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-depo-operator" checked/>
+                    <span>Назначить ООО «Инвестика» оператором счёта депо типа «Ин»</span>
+                  </label>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Получение отчётов</h3>
+                  </div>
+
+                  <label class="crm-check-row"><input type="checkbox" name="tin-report-office"/><span>В офисе ООО «Инвестика»</span></label>
+                  <label class="crm-check-row"><input type="checkbox" name="tin-report-post"/><span>По почте заказным письмом</span></label>
+                  <label class="crm-check-row"><input type="checkbox" name="tin-report-email"/><span>По электронной почте</span></label>
+                  <label class="crm-check-row"><input type="checkbox" name="tin-report-edo"/><span>По системе ЭДО</span></label>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Брокерское обслуживание на рынках</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-tariff-stock">Тарифный план — Фондовый рынок</label>
+                      <select id="tin-fl-tariff-stock" class="uk-select crm-select" name="tin-fl-tariff-stock">
+                        <option>Универсальный</option>
+                        <option>Инвестор</option>
+                        <option>Премиум</option>
+                      </select>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-tariff-futures">Тарифный план — Срочный рынок</label>
+                      <select id="tin-fl-tariff-futures" class="uk-select crm-select" name="tin-fl-tariff-futures">
+                        <option>Универсальный</option>
+                        <option>Инвестор</option>
+                        <option>Премиум</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-market-stock" checked/>
+                    <span>Фондовый рынок ПАО Московская Биржа</span>
+                  </label>
+                  <label class="crm-check-row">
+                    <input type="checkbox" name="tin-market-futures"/>
+                    <span>Срочный рынок ПАО Московская Биржа</span>
+                  </label>
+                  <p class="crm-type-in-note">Примечание: оказание услуг на срочном рынке в настоящее время не осуществляется до момента явного предложения таких услуг ООО «Инвестика» в соответствии с правилами ПАО Московская Биржа и НКЦ.</p>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Банковский счёт типа «Ин»</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-bank-name">Наименование кредитной организации</label>
+                      <input class="uk-input crm-input" id="tin-fl-bank-name" name="tin-fl-bank-name" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-bank-bic">БИК / SWIFT кредитной организации</label>
+                      <input class="uk-input crm-input" id="tin-fl-bank-bic" name="tin-fl-bank-bic" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-bank-account">Номер банковского счёта типа «Ин»</label>
+                      <input class="uk-input crm-input" id="tin-fl-bank-account" name="tin-fl-bank-account" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-bank-currency">Валюта счёта</label>
+                      <input class="uk-input crm-input" id="tin-fl-bank-currency" name="tin-fl-bank-currency" type="text" value="USD"/>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Подтверждения</h3>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-lang-confirm" checked/>
+                    <span>Подтверждаю знание русского языка и понимание настоящего заявления и всех присоединяемых документов на русском языке.</span>
+                  </label>
+
+                  <details class="crm-legal-text-preview">
+                    <summary>Иные подтверждения (развернуть)</summary>
+                    <ul class="crm-legal-text-list">
+                      <li>Подтверждаю, что ознакомлен с условиями Регламента осуществления брокерской и депозитарной деятельности ООО «Инвестика» при обслуживании иностранных инвесторов и Депозитарного договора, их содержание понятно.</li>
+                      <li>Подтверждаю ознакомление с Декларацией о рисках и принимаю описанные в ней риски.</li>
+                      <li>Подтверждаю, что предупреждён о факте совмещения ООО «Инвестика» видов профессиональной деятельности на рынке ценных бумаг.</li>
+                      <li>Обязуюсь полностью и своевременно выполнять принятые на себя обязательства.</li>
+                    </ul>
+                  </details>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Контактные данные Заявителя</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-phone">Телефон Заявителя</label>
+                      <input class="uk-input crm-input" id="tin-fl-phone" name="tin-fl-phone" type="tel" data-phone-mask/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-fl-email">Электронная почта Заявителя</label>
+                      <input class="uk-input crm-input" id="tin-fl-email" name="tin-fl-email" type="email"/>
+                    </div>
+                  </div>
+                </section>
+
+                <details class="crm-form-section crm-type-in-backoffice">
+                  <summary>
+                    <div class="crm-form-section-head">
+                      <h3>Бэк-офис (заполняется ООО «Инвестика»)</h3>
+                    </div>
+                  </summary>
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Регистрационный номер заявления</label>
+                      <input class="uk-input crm-input" name="tin-fl-reg-number" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Договор о брокерском обслуживании</label>
+                      <input class="uk-input crm-input" name="tin-fl-broker-contract" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Депозитарный договор</label>
+                      <input class="uk-input crm-input" name="tin-fl-depo-contract" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Код клиента</label>
+                      <input class="uk-input crm-input" name="tin-fl-client-code" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Номер открытого счёта депо типа «Ин»</label>
+                      <input class="uk-input crm-input" name="tin-fl-depo-account" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Уполномоченный сотрудник ООО «Инвестика»</label>
+                      <input class="uk-input crm-input" name="tin-fl-officer" type="text" readonly/>
+                    </div>
+                  </div>
+                </details>
+
               </div>
-            </section>
+              <!-- /INDIVIDUAL sub-panel -->
+
+              <!-- LEGAL sub-panel (Юридическое лицо / иностранная структура) -->
+              <div data-type-in-person-panel="legal">
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Сведения о Заявителе</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-1">
+                      <label class="uk-form-label" for="tin-ul-full-name">Полное наименование юридического лица / иностранной структуры без образования юридического лица</label>
+                      <input class="uk-input crm-input" id="tin-ul-full-name" name="tin-ul-full-name" type="text"/>
+                    </div>
+                    <div class="uk-width-1-1">
+                      <label class="uk-form-label" for="tin-ul-foreign-name">Полное или сокращённое наименование на иностранном языке</label>
+                      <input class="uk-input crm-input" id="tin-ul-foreign-name" name="tin-ul-foreign-name" type="text"/>
+                    </div>
+                    <div class="uk-width-1-3@m">
+                      <label class="uk-form-label" for="tin-ul-country">Страна регистрации / учреждения</label>
+                      <input class="uk-input crm-input" id="tin-ul-country" name="tin-ul-country" type="text"/>
+                    </div>
+                    <div class="uk-width-1-3@m">
+                      <label class="uk-form-label" for="tin-ul-reg-number">Регистрационный номер по месту учреждения</label>
+                      <input class="uk-input crm-input" id="tin-ul-reg-number" name="tin-ul-reg-number" type="text"/>
+                    </div>
+                    <div class="uk-width-1-3@m">
+                      <label class="uk-form-label" for="tin-ul-reg-date">Дата регистрации</label>
+                      <input class="uk-input crm-input" id="tin-ul-reg-date" name="tin-ul-reg-date" type="date"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-reg-authority">Орган регистрации</label>
+                      <input class="uk-input crm-input" id="tin-ul-reg-authority" name="tin-ul-reg-authority" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-inn">Идентификационный номер налогоплательщика (при наличии)</label>
+                      <input class="uk-input crm-input" id="tin-ul-inn" name="tin-ul-inn" type="text"/>
+                    </div>
+                    <div class="uk-width-1-1">
+                      <label class="uk-form-label" for="tin-ul-address">Адрес места нахождения</label>
+                      <input class="uk-input crm-input" id="tin-ul-address" name="tin-ul-address" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-signatory-name">ФИО подписанта</label>
+                      <input class="uk-input crm-input" id="tin-ul-signatory-name" name="tin-ul-signatory-name" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-signatory-position">Должность подписанта</label>
+                      <input class="uk-input crm-input" id="tin-ul-signatory-position" name="tin-ul-signatory-position" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-authority-doc">Документ, подтверждающий полномочия подписанта</label>
+                      <input class="uk-input crm-input" id="tin-ul-authority-doc" name="tin-ul-authority-doc" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-representative">Реквизиты доверенности / представитель (при наличии)</label>
+                      <input class="uk-input crm-input" id="tin-ul-representative" name="tin-ul-representative" type="text"/>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Присоединение по ст. 428 ГК РФ</h3>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-ul-joined-broker-depository" checked/>
+                    <span>к Регламенту осуществления брокерской и депозитарной деятельности ООО «Инвестика» при обслуживании иностранных инвесторов</span>
+                  </label>
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-ul-joined-depository" checked/>
+                    <span>к Депозитарному договору</span>
+                  </label>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Счёт депо Тип ИН</h3>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-ul-depo-in-owner" checked/>
+                    <span>Счёт депо владельца типа «Ин»</span>
+                  </label>
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-ul-depo-operator" checked/>
+                    <span>Назначить ООО «Инвестика» оператором счёта депо типа «Ин»</span>
+                  </label>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Получение отчётов</h3>
+                  </div>
+
+                  <label class="crm-check-row"><input type="checkbox" name="tin-ul-report-office"/><span>В офисе ООО «Инвестика»</span></label>
+                  <label class="crm-check-row"><input type="checkbox" name="tin-ul-report-post"/><span>По почте заказным письмом</span></label>
+                  <label class="crm-check-row"><input type="checkbox" name="tin-ul-report-email"/><span>По электронной почте</span></label>
+                  <label class="crm-check-row"><input type="checkbox" name="tin-ul-report-edo"/><span>По системе ЭДО</span></label>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Брокерское обслуживание на рынках</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-tariff-stock">Тарифный план — Фондовый рынок</label>
+                      <select id="tin-ul-tariff-stock" class="uk-select crm-select" name="tin-ul-tariff-stock">
+                        <option>Универсальный</option>
+                        <option>Инвестор</option>
+                        <option>Премиум</option>
+                      </select>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-tariff-futures">Тарифный план — Срочный рынок</label>
+                      <select id="tin-ul-tariff-futures" class="uk-select crm-select" name="tin-ul-tariff-futures">
+                        <option>Универсальный</option>
+                        <option>Инвестор</option>
+                        <option>Премиум</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-ul-market-stock" checked/>
+                    <span>Фондовый рынок ПАО Московская Биржа</span>
+                  </label>
+                  <label class="crm-check-row">
+                    <input type="checkbox" name="tin-ul-market-futures"/>
+                    <span>Срочный рынок ПАО Московская Биржа</span>
+                  </label>
+                  <p class="crm-type-in-note">Примечание: оказание услуг на срочном рынке в настоящее время не осуществляется до момента явного предложения таких услуг ООО «Инвестика» в соответствии с правилами ПАО Московская Биржа и НКЦ.</p>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Банковский счёт типа «Ин»</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-bank-name">Наименование кредитной организации</label>
+                      <input class="uk-input crm-input" id="tin-ul-bank-name" name="tin-ul-bank-name" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-bank-bic">БИК / SWIFT кредитной организации</label>
+                      <input class="uk-input crm-input" id="tin-ul-bank-bic" name="tin-ul-bank-bic" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-bank-account">Номер банковского счёта типа «Ин»</label>
+                      <input class="uk-input crm-input" id="tin-ul-bank-account" name="tin-ul-bank-account" type="text"/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-bank-currency">Валюта счёта</label>
+                      <input class="uk-input crm-input" id="tin-ul-bank-currency" name="tin-ul-bank-currency" type="text" value="USD"/>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Подтверждения</h3>
+                  </div>
+
+                  <label class="crm-check-row is-active">
+                    <input type="checkbox" name="tin-ul-lang-confirm" checked/>
+                    <span>Уполномоченный представитель подтверждает знание русского языка и понимание настоящего заявления и всех присоединяемых документов на русском языке.</span>
+                  </label>
+
+                  <details class="crm-legal-text-preview">
+                    <summary>Иные подтверждения (развернуть)</summary>
+                    <ul class="crm-legal-text-list">
+                      <li>Подтверждаем, что ознакомлены с условиями Регламента осуществления брокерской и депозитарной деятельности ООО «Инвестика» при обслуживании иностранных инвесторов и Депозитарного договора, их содержание понятно.</li>
+                      <li>Подтверждаем ознакомление с Декларацией о рисках и принимаем описанные в ней риски.</li>
+                      <li>Подтверждаем, что предупреждены о факте совмещения ООО «Инвестика» видов профессиональной деятельности на рынке ценных бумаг.</li>
+                      <li>Обязуемся полностью и своевременно выполнять принятые на себя обязательства.</li>
+                    </ul>
+                  </details>
+                </section>
+
+                <section class="crm-form-section">
+                  <div class="crm-form-section-head">
+                    <h3>Контактные данные Заявителя</h3>
+                  </div>
+
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-phone">Телефон Заявителя</label>
+                      <input class="uk-input crm-input" id="tin-ul-phone" name="tin-ul-phone" type="tel" data-phone-mask/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label" for="tin-ul-email">Электронная почта Заявителя</label>
+                      <input class="uk-input crm-input" id="tin-ul-email" name="tin-ul-email" type="email"/>
+                    </div>
+                  </div>
+                </section>
+
+                <details class="crm-form-section crm-type-in-backoffice">
+                  <summary>
+                    <div class="crm-form-section-head">
+                      <h3>Бэк-офис (заполняется ООО «Инвестика»)</h3>
+                    </div>
+                  </summary>
+                  <div class="crm-form-grid uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Регистрационный номер заявления</label>
+                      <input class="uk-input crm-input" name="tin-ul-reg-number-bo" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Договор о брокерском обслуживании</label>
+                      <input class="uk-input crm-input" name="tin-ul-broker-contract" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Депозитарный договор</label>
+                      <input class="uk-input crm-input" name="tin-ul-depo-contract" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Код клиента</label>
+                      <input class="uk-input crm-input" name="tin-ul-client-code" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Номер открытого счёта депо типа «Ин»</label>
+                      <input class="uk-input crm-input" name="tin-ul-depo-account" type="text" readonly/>
+                    </div>
+                    <div class="uk-width-1-2@m">
+                      <label class="uk-form-label">Уполномоченный сотрудник ООО «Инвестика»</label>
+                      <input class="uk-input crm-input" name="tin-ul-officer" type="text" readonly/>
+                    </div>
+                  </div>
+                </details>
+
+              </div>
+              <!-- /LEGAL sub-panel -->
+
+            </div>
+            <!-- /TYPE IN PANEL -->
 
             <div class="crm-sticky-actions crm-wizard-actions">
               <a href="subject-card.html" class="uk-button uk-button-default crm-button" data-action="wizard-back">Назад к договорам</a>

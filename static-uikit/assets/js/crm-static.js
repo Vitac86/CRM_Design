@@ -2433,7 +2433,55 @@
           'registration-address':      'г. Москва, ул. Примерная, д. 10, кв. 25',
           'report-email':              clientEmail,
           'statement-date':            getStatementDate(),
-          'signature-name':            'Ковалёв Даниил Олегович'
+          'signature-name':            'Ковалёв Даниил Олегович',
+          // Type IN FL (individual) demo fields
+          'tin-full-name':             'Ковалёв Даниил Олегович',
+          'tin-doc-type':              'Паспорт гражданина РФ',
+          'tin-doc-series':            '4512',
+          'tin-doc-number':            '345678',
+          'tin-doc-issued-by':         'ГУ МВД России по г. Москве',
+          'tin-doc-issue-day':         '22',
+          'tin-doc-issue-month-year':  'апреля 2026',
+          'tin-citizenship':           'Российская Федерация',
+          'tin-birth-date':            '01.01.1985',
+          'tin-registration-address':  'г. Москва, ул. Примерная, д. 10, кв. 25',
+          'tin-representative':        '',
+          'tin-representative-doc':    '',
+          'tin-tariff-stock':          'Универсальный',
+          'tin-tariff-futures':        'Универсальный',
+          'tin-bank-name':             '',
+          'tin-bank-bic':              '',
+          'tin-bank-account':          '',
+          'tin-bank-currency':         'USD',
+          'tin-report-email-addr':     clientEmail,
+          'tin-phone':                 '',
+          'tin-email':                 clientEmail,
+          'tin-statement-date':        getStatementDate(),
+          'tin-signature-name':        'Ковалёв Даниил Олегович',
+          // Type IN UL (legal entity) demo fields
+          'tin-ul-full-name':                 getSummaryValue('Клиент') || 'АО «Восток Майнинг Системс»',
+          'tin-ul-foreign-name':              '',
+          'tin-ul-country':                   '',
+          'tin-ul-reg-number':                '',
+          'tin-ul-reg-date-authority':        '',
+          'tin-ul-inn':                       getSummaryValue('ИНН') || '',
+          'tin-ul-address':                   '',
+          'tin-ul-signatory-name':            '',
+          'tin-ul-signatory-position':        '',
+          'tin-ul-authority-doc':             '',
+          'tin-ul-representative':            '',
+          'tin-ul-tariff-stock':              'Универсальный',
+          'tin-ul-tariff-futures':            'Универсальный',
+          'tin-ul-bank-name':                 '',
+          'tin-ul-bank-bic':                  '',
+          'tin-ul-bank-account':              '',
+          'tin-ul-bank-currency':             'USD',
+          'tin-ul-report-email-addr':         clientEmail,
+          'tin-ul-phone':                     '',
+          'tin-ul-email':                     clientEmail,
+          'tin-ul-statement-date':            getStatementDate(),
+          'tin-ul-signature-name':            '',
+          'tin-ul-signatory-position-line':   ''
         },
         checks: {
           'joined-broker':                  isChecked('joined-broker'),
@@ -2459,7 +2507,31 @@
             : isChecked('income-special'),
           'income-transfer-bank-account':   page === 'contract-wizard'
             ? (incomeVal.indexOf('расчётный') !== -1 || incomeVal.indexOf('расчетный') !== -1)
-            : isChecked('income-bank')
+            : isChecked('income-bank'),
+          // Type IN FL checks
+          'tin-joined-broker-depository': isChecked('tin-joined-broker-depository'),
+          'tin-joined-depository':        isChecked('tin-joined-depository'),
+          'tin-depo-in-owner':            isChecked('tin-depo-in-owner'),
+          'tin-depo-operator':            isChecked('tin-depo-operator'),
+          'tin-report-office':            isChecked('tin-report-office'),
+          'tin-report-post':              isChecked('tin-report-post'),
+          'tin-report-email':             isChecked('tin-report-email'),
+          'tin-report-edo':               isChecked('tin-report-edo'),
+          'tin-market-stock':             isChecked('tin-market-stock'),
+          'tin-market-futures':           isChecked('tin-market-futures'),
+          'tin-lang-confirm':             isChecked('tin-lang-confirm'),
+          // Type IN UL checks
+          'tin-ul-joined-broker-depository': isChecked('tin-ul-joined-broker-depository'),
+          'tin-ul-joined-depository':        isChecked('tin-ul-joined-depository'),
+          'tin-ul-depo-in-owner':            isChecked('tin-ul-depo-in-owner'),
+          'tin-ul-depo-operator':            isChecked('tin-ul-depo-operator'),
+          'tin-ul-report-office':            isChecked('tin-ul-report-office'),
+          'tin-ul-report-post':              isChecked('tin-ul-report-post'),
+          'tin-ul-report-email':             isChecked('tin-ul-report-email'),
+          'tin-ul-report-edo':               isChecked('tin-ul-report-edo'),
+          'tin-ul-market-stock':             isChecked('tin-ul-market-stock'),
+          'tin-ul-market-futures':           isChecked('tin-ul-market-futures'),
+          'tin-ul-lang-confirm':             isChecked('tin-ul-lang-confirm')
         }
       };
     }
@@ -2749,3 +2821,127 @@
   });
 
 })();
+
+  // ── Contract wizard application type tabs ────────────────────────────────────
+  // Scoped to body[data-page="contract-wizard"] only.
+  // Manages tab switching between standard and Type IN panels, keeps aria-selected
+  // and hidden attributes in sync, and updates the export button data-attributes
+  // whenever the active application type or person type changes.
+  (function () {
+    if (!document.body || document.body.dataset.page !== 'contract-wizard') return;
+
+    var wizForm = document.querySelector('[data-form="contract-wizard"]');
+    if (!wizForm) return;
+
+    var EXPORT_CONFIG = {
+      standard: {
+        template: 'zayavlenie-o-prisoedinenii-fl',
+        url: '../assets/document-templates/zayavlenie-o-prisoedinenii-fl.html',
+        filename: 'zayavlenie-o-prisoedinenii-fl.pdf',
+        label: 'Выгрузить заявление'
+      },
+      'type-in-individual': {
+        template: 'zayavlenie-tip-in-fl',
+        url: '../assets/document-templates/zayavlenie-tip-in-fl.html',
+        filename: 'zayavlenie-tip-in-fl.pdf',
+        label: 'Выгрузить заявление Тип ИН'
+      },
+      'type-in-legal': {
+        template: 'zayavlenie-tip-in-ul',
+        url: '../assets/document-templates/zayavlenie-tip-in-ul.html',
+        filename: 'zayavlenie-tip-in-ul.pdf',
+        label: 'Выгрузить заявление Тип ИН'
+      }
+    };
+
+    function getActiveApplicationType() {
+      var activeTab = wizForm.querySelector('[data-contract-application-tab][aria-selected="true"]');
+      return activeTab ? (activeTab.getAttribute('data-contract-application-type') || 'standard') : 'standard';
+    }
+
+    function getActivePersonType() {
+      var radio = wizForm.querySelector('input[name="personType"]:checked');
+      return radio ? radio.value : 'legal';
+    }
+
+    function getExportConfigKey() {
+      if (getActiveApplicationType() === 'type-in') {
+        return getActivePersonType() === 'legal' ? 'type-in-legal' : 'type-in-individual';
+      }
+      return 'standard';
+    }
+
+    function syncExportButton() {
+      var exportBtn = document.querySelector('[data-action="export-statement"]');
+      if (!exportBtn) return;
+
+      var config = EXPORT_CONFIG[getExportConfigKey()];
+      if (!config) return;
+
+      exportBtn.setAttribute('data-document-template', config.template);
+      exportBtn.setAttribute('data-template-url', config.url);
+      exportBtn.setAttribute('data-pdf-filename', config.filename);
+      if (!exportBtn.disabled) {
+        exportBtn.textContent = config.label;
+      }
+    }
+
+    function syncTypeInPersonPanels(personType) {
+      var typeInPanel = wizForm.querySelector('[data-contract-application-panel="type-in"]');
+      if (!typeInPanel) return;
+
+      var showIndividual = personType === 'individual' || personType === 'entrepreneur';
+
+      typeInPanel.querySelectorAll('[data-type-in-person-panel]').forEach(function (panel) {
+        var panelType = panel.getAttribute('data-type-in-person-panel');
+        panel.hidden = panelType === 'individual' ? !showIndividual : showIndividual;
+      });
+
+      var entrepreneurNote = document.getElementById('tin-entrepreneur-note');
+      if (entrepreneurNote) {
+        entrepreneurNote.hidden = personType !== 'entrepreneur';
+      }
+    }
+
+    function switchApplicationType(newType) {
+      wizForm.querySelectorAll('[data-contract-application-tab]').forEach(function (tab) {
+        var isActive = tab.getAttribute('data-contract-application-type') === newType;
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        tab.classList.toggle('is-active', isActive);
+      });
+
+      wizForm.querySelectorAll('[data-contract-application-panel]').forEach(function (panel) {
+        panel.hidden = panel.getAttribute('data-contract-application-panel') !== newType;
+      });
+
+      if (newType === 'type-in') {
+        syncTypeInPersonPanels(getActivePersonType());
+      }
+
+      syncExportButton();
+    }
+
+    wizForm.addEventListener('click', function (event) {
+      var tab = event.target.closest('[data-contract-application-tab]');
+      if (tab) {
+        var tabType = tab.getAttribute('data-contract-application-type');
+        if (tabType) {
+          switchApplicationType(tabType);
+          event.preventDefault();
+        }
+      }
+    });
+
+    wizForm.addEventListener('change', function (event) {
+      var target = event.target;
+      if (target instanceof HTMLInputElement && target.name === 'personType') {
+        if (getActiveApplicationType() === 'type-in') {
+          syncTypeInPersonPanels(target.value);
+        }
+        syncExportButton();
+      }
+    });
+
+    // Initialize export button and ensure correct panel states on load.
+    syncExportButton();
+  }());
