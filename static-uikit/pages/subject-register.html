@@ -271,10 +271,12 @@
 
               <p id="reg-err-step1" class="reg-error-msg" hidden></p>
 
-              <div class="crm-footer-actions crm-register-actions">
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-next-step1">
-                  Далее
-                </button>
+              <div class="crm-sticky-actions crm-wizard-actions reg-sticky-actions">
+                <div class="crm-page-actions crm-actions reg-sticky-actions-main">
+                  <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-next-step1">
+                    Далее
+                  </button>
+                </div>
               </div>
             </div>
             <!-- /Step 1 -->
@@ -295,13 +297,15 @@
 
               <p id="reg-err-step2inn" class="reg-error-msg" hidden></p>
 
-              <div class="reg-wizard-actions">
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-resolve-inn">
-                  Далее
-                </button>
-                <button type="button" class="uk-button uk-button-default crm-button reg-back" data-action="reg-back-step2">
+              <div class="crm-sticky-actions crm-wizard-actions reg-sticky-actions">
+                <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-back-step2">
                   Назад
                 </button>
+                <div class="crm-page-actions crm-actions reg-sticky-actions-main">
+                  <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-resolve-inn">
+                    Далее
+                  </button>
+                </div>
               </div>
             </div>
             <!-- /Step 2 INN -->
@@ -923,17 +927,19 @@
 
               <p id="reg-err-step2fl" class="reg-error-msg" hidden></p>
 
-              <div class="reg-wizard-actions">
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-save-fl">
-                  Сохранить
-                </button>
-                <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-save-draft">
-                  Сохранить как черновик
-                </button>
-                <a href="subjects.html" class="uk-button uk-button-default crm-button">Отмена</a>
-                <button type="button" class="uk-button uk-button-default crm-button reg-back" data-action="reg-back-step2">
+              <div class="crm-sticky-actions crm-wizard-actions reg-sticky-actions">
+                <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-back-step2">
                   Назад
                 </button>
+                <div class="crm-page-actions crm-actions reg-sticky-actions-main">
+                  <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-save-draft">
+                    Сохранить как черновик
+                  </button>
+                  <a href="subjects.html" class="uk-button uk-button-default crm-button">Отмена</a>
+                  <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-save-fl">
+                    Сохранить
+                  </button>
+                </div>
               </div>
             </div>
             <!-- /Step 2 FL -->
@@ -1338,17 +1344,19 @@
 
               <p id="reg-err-step2ul" class="reg-error-msg" hidden></p>
 
-              <div class="reg-wizard-actions">
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-save-ul">
-                  Сохранить
-                </button>
-                <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-save-draft">
-                  Сохранить как черновик
-                </button>
-                <a href="subjects.html" class="uk-button uk-button-default crm-button">Отмена</a>
-                <button type="button" class="uk-button uk-button-default crm-button reg-back" data-action="reg-back-step2">
+              <div class="crm-sticky-actions crm-wizard-actions reg-sticky-actions">
+                <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-back-step2">
                   Назад
                 </button>
+                <div class="crm-page-actions crm-actions reg-sticky-actions-main">
+                  <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-save-draft">
+                    Сохранить как черновик
+                  </button>
+                  <a href="subjects.html" class="uk-button uk-button-default crm-button">Отмена</a>
+                  <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-save-ul">
+                    Сохранить
+                  </button>
+                </div>
               </div>
             </div>
             <!-- /Step 2 UL -->
@@ -1384,13 +1392,15 @@
                 </dl>
               </div>
 
-              <div class="reg-wizard-actions">
-                <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-finish">
-                  Завершить
-                </button>
-                <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-open-card">
-                  Открыть карточку
-                </button>
+              <div class="crm-sticky-actions crm-wizard-actions reg-sticky-actions">
+                <div class="crm-page-actions crm-actions reg-sticky-actions-main">
+                  <button type="button" class="uk-button uk-button-default crm-button" data-action="reg-open-card">
+                    Открыть карточку
+                  </button>
+                  <button type="button" class="uk-button crm-button-primary crm-button" data-action="reg-finish">
+                    Завершить
+                  </button>
+                </div>
               </div>
 
               <p id="result-id" class="reg-result-id"></p>

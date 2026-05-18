@@ -6343,15 +6343,23 @@ body[data-page="subject-register"] .reg-binary-grid,
   margin-top: 12px;
 }
 
-/* Wizard action bar */
-body[data-page="subject-register"] .reg-wizard-actions,
-.crm-page[data-page="subject-register"] .reg-wizard-actions {
-  margin-top: 18px;
+/* Sticky action bar — right-align when no back button is present */
+body[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child,
+.crm-page[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child {
+  margin-left: auto;
 }
 
-body[data-page="subject-register"] .reg-wizard-actions .reg-back,
-.crm-page[data-page="subject-register"] .reg-wizard-actions .reg-back {
-  margin-left: auto;
+@media (max-width: 640px) {
+  body[data-page="subject-register"] .reg-sticky-actions,
+  .crm-page[data-page="subject-register"] .reg-sticky-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  body[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child,
+  .crm-page[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child {
+    margin-left: 0;
+  }
 }
 
 /* Validation and error messages */
