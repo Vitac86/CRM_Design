@@ -197,6 +197,21 @@
   justify-content: flex-end;
 }
 
+.crm-sticky-actions > .crm-page-actions:only-child {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .crm-sticky-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .crm-sticky-actions > .crm-page-actions:only-child {
+    margin-left: 0;
+  }
+}
+
 @media (max-width: 1200px) {
   .crm-grid-2,
   .crm-split-view { grid-template-columns: 1fr; }

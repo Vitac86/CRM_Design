@@ -169,7 +169,9 @@
   padding: 14px;
 }
 
-/* Action buttons / footer actions */
+/* Action buttons / footer actions
+   Shared by wizard pages: contract-wizard, contract-edit, document-wizard.
+   Must NOT be used on non-wizard pages (e.g. subject-register uses crm-sticky-actions alone). */
 
 .crm-wizard-actions {
   margin-top: 2px;

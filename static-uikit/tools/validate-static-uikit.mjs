@@ -44,8 +44,9 @@ const TABLES_CSS   = resolve(ASSETS_CSS, 'components/tables.css');
 const FORMS_CSS    = resolve(ASSETS_CSS, 'components/forms.css');
 const BUTTONS_CSS  = resolve(ASSETS_CSS, 'components/buttons.css');
 const REGISTRY_CSS = resolve(ASSETS_CSS, 'components/registry.css');
-const SUBJECT_CARD_CSS  = resolve(ASSETS_CSS, 'pages/subject-card.css');
-const SUBJECT_EDIT_CSS  = resolve(ASSETS_CSS, 'pages/subject-edit.css');
+const SUBJECT_CARD_CSS     = resolve(ASSETS_CSS, 'pages/subject-card.css');
+const SUBJECT_EDIT_CSS     = resolve(ASSETS_CSS, 'pages/subject-edit.css');
+const SUBJECT_REGISTER_CSS = resolve(ASSETS_CSS, 'pages/subject-register.css');
 const FILTERS_CSS       = resolve(ASSETS_CSS, 'components/filters.css');
 const ADDRESS_CSS       = resolve(ASSETS_CSS, 'components/address.css');
 const CONTRACT_WIZARD_CSS = resolve(ASSETS_CSS, 'pages/contract-wizard.css');
@@ -1094,6 +1095,42 @@ if (existsSync(CARDS_CSS)) {
   }
   if (!hasForbiddenFocus) {
     ok('components/cards.css contains no broad UIkit/form/button focus selectors');
+  }
+}
+
+// G-extra 4: subject-register sticky action class ownership
+// Fails if subject-register.html still uses removed page-specific wrapper classes.
+// Warns if subject-register.html uses crm-wizard-actions (wrong owner: contract-wizard.css).
+{
+  const subjectRegisterHtml = resolve(PAGES_DIR, 'subject-register.html');
+  if (existsSync(subjectRegisterHtml)) {
+    const srHtml = readFileSync(subjectRegisterHtml, 'utf8');
+    if (/\breg-sticky-actions\b/.test(srHtml)) {
+      err('pages/subject-register.html contains removed class "reg-sticky-actions" — use "crm-sticky-actions" instead');
+    } else {
+      ok('pages/subject-register.html does not contain removed class "reg-sticky-actions"');
+    }
+    if (/\breg-sticky-actions-main\b/.test(srHtml)) {
+      err('pages/subject-register.html contains removed class "reg-sticky-actions-main" — use "crm-page-actions crm-actions" instead');
+    } else {
+      ok('pages/subject-register.html does not contain removed class "reg-sticky-actions-main"');
+    }
+    if (/\bcrm-wizard-actions\b/.test(srHtml)) {
+      warn('pages/subject-register.html contains "crm-wizard-actions" whose CSS owner is pages/contract-wizard.css — remove it from subject-register');
+    }
+  } else {
+    warn('pages/subject-register.html not found — skipping sticky action class ownership check');
+  }
+
+  if (existsSync(SUBJECT_REGISTER_CSS)) {
+    const srCss = stripCssBlockComments(readFileSync(SUBJECT_REGISTER_CSS, 'utf8'));
+    if (/\.reg-sticky-actions\b/.test(srCss)) {
+      err('pages/subject-register.css contains ".reg-sticky-actions" selectors — these are now owned by layout/page.css via crm-sticky-actions');
+    } else {
+      ok('pages/subject-register.css contains no ".reg-sticky-actions" selectors');
+    }
+  } else {
+    warn('pages/subject-register.css not found — skipping CSS selector check');
   }
 }
 

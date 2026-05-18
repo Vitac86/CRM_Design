@@ -930,6 +930,21 @@ a:focus-visible {
   justify-content: flex-end;
 }
 
+.crm-sticky-actions > .crm-page-actions:only-child {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .crm-sticky-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .crm-sticky-actions > .crm-page-actions:only-child {
+    margin-left: 0;
+  }
+}
+
 @media (max-width: 1200px) {
   .crm-grid-2,
   .crm-split-view { grid-template-columns: 1fr; }
@@ -6056,7 +6071,9 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   padding: 14px;
 }
 
-/* Action buttons / footer actions */
+/* Action buttons / footer actions
+   Shared by wizard pages: contract-wizard, contract-edit, document-wizard.
+   Must NOT be used on non-wizard pages (e.g. subject-register uses crm-sticky-actions alone). */
 
 .crm-wizard-actions {
   margin-top: 2px;
@@ -6341,25 +6358,6 @@ body[data-page="subject-register"] .reg-binary-row > p,
 body[data-page="subject-register"] .reg-binary-grid,
 .crm-page[data-page="subject-register"] .reg-binary-grid {
   margin-top: 12px;
-}
-
-/* Sticky action bar — right-align when no back button is present */
-body[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child,
-.crm-page[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child {
-  margin-left: auto;
-}
-
-@media (max-width: 640px) {
-  body[data-page="subject-register"] .reg-sticky-actions,
-  .crm-page[data-page="subject-register"] .reg-sticky-actions {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  body[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child,
-  .crm-page[data-page="subject-register"] .reg-sticky-actions > .reg-sticky-actions-main:only-child {
-    margin-left: 0;
-  }
 }
 
 /* Validation and error messages */
