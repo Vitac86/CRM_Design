@@ -1111,7 +1111,7 @@ if (existsSync(CARDS_CSS)) {
       ok('pages/subject-register.html does not contain removed class "reg-sticky-actions"');
     }
     if (/\breg-sticky-actions-main\b/.test(srHtml)) {
-      err('pages/subject-register.html contains removed class "reg-sticky-actions-main" — use "crm-page-actions crm-actions" instead');
+      err('pages/subject-register.html contains removed class "reg-sticky-actions-main" — use "crm-page-actions" instead');
     } else {
       ok('pages/subject-register.html does not contain removed class "reg-sticky-actions-main"');
     }
@@ -1162,6 +1162,26 @@ if (existsSync(CONTRACT_WIZARD_CSS)) {
 
   if (!hasWizardInfra) {
     ok('pages/contract-wizard.css contains no unscoped shared wizard infrastructure selectors');
+  }
+}
+
+// G-extra 6: crm-actions is an orphan class with no CSS definition.
+// HTML must use crm-page-actions directly.
+if (existsSync(PAGES_DIR)) {
+  const pageFiles = readdirSync(PAGES_DIR).filter(f => f.endsWith('.html')).sort();
+  let foundCrmActions = false;
+  for (const pageFile of pageFiles) {
+    const pageHtml = readFileSync(join(PAGES_DIR, pageFile), 'utf8');
+    if (/\bcrm-actions\b/.test(pageHtml)) {
+      err(
+        `pages/${pageFile} contains orphan class "crm-actions" which has no CSS definition — ` +
+        `remove it; use "crm-page-actions" directly`
+      );
+      foundCrmActions = true;
+    }
+  }
+  if (!foundCrmActions) {
+    ok('no HTML page contains orphan class "crm-actions"');
   }
 }
 
