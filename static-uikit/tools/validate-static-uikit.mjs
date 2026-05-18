@@ -1328,6 +1328,51 @@ if (existsSync(COMPLIANCE_CSS)) {
   }
 }
 
+// G-extra 12: Subject card class naming and orphan cleanup guards.
+// Fails if any subject-card page contains bare class token "subject-section",
+// "crm-profile-section", or "crm-subject-form-layout".
+// Fails if subject-card.css contains ".subject-section" (bare, unrenamed selector).
+// Passes if subject-card.css contains ".crm-subject-section".
+{
+  const SUBJECT_CARD_PAGES = ['subject-card.html', 'subject-card-individual.html'];
+  const SUBJECT_CARD_ORPHAN_CLASSES = [
+    { token: 'subject-section',        message: 'bare class "subject-section" must be renamed to "crm-subject-section"' },
+    { token: 'crm-profile-section',    message: 'orphan class "crm-profile-section" has no CSS definition — remove it' },
+    { token: 'crm-subject-form-layout', message: 'orphan class "crm-subject-form-layout" has no CSS definition — remove it' },
+  ];
+
+  for (const pageFile of SUBJECT_CARD_PAGES) {
+    const pageHtmlPath = resolve(PAGES_DIR, pageFile);
+    if (!existsSync(pageHtmlPath)) {
+      warn(`${pageFile} not found — skipping subject-card class naming check`);
+      continue;
+    }
+    const pageHtml = readFileSync(pageHtmlPath, 'utf8');
+    for (const { token, message } of SUBJECT_CARD_ORPHAN_CLASSES) {
+      if (new RegExp(`(?:^|[\\s"'])${token}(?=[\\s"']|$)`, 'm').test(pageHtml)) {
+        err(`pages/${pageFile} contains ${message}`);
+      }
+    }
+  }
+
+  const scCssPath = resolve(ASSETS_CSS, 'pages', 'subject-card.css');
+  if (existsSync(scCssPath)) {
+    const scCssSource = stripCssBlockComments(readFileSync(scCssPath, 'utf8'));
+    if (/\.subject-section\b/.test(scCssSource)) {
+      err('pages/subject-card.css contains ".subject-section" — rename to ".crm-subject-section"');
+    } else {
+      ok('pages/subject-card.css contains no bare ".subject-section" selector');
+    }
+    if (/\.crm-subject-section\b/.test(scCssSource)) {
+      ok('pages/subject-card.css contains ".crm-subject-section" (renamed selector present)');
+    } else {
+      err('pages/subject-card.css does not contain ".crm-subject-section" — rename from ".subject-section"');
+    }
+  } else {
+    warn('pages/subject-card.css not found — skipping subject-section rename check');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');

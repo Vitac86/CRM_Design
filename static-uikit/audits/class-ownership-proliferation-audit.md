@@ -1028,3 +1028,75 @@ New validator check: **G-extra 11** — fails if `pages/compliance.css` contains
 | 1 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
 | 2 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
 | 3 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
+
+---
+
+## Subject Card Class Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/pages/subject-card.html` | Renamed `subject-section` → `crm-subject-section` (1 element); removed `crm-profile-section` (3 elements); removed `crm-subject-form-layout` (1 element) |
+| `static-uikit/pages/subject-card-individual.html` | Renamed `subject-section` → `crm-subject-section` (1 element); removed `crm-profile-section` (2 elements); removed `crm-subject-form-layout` (1 element) |
+| `static-uikit/assets/css/pages/subject-card.css` | Renamed selector `.subject-section .crm-form-section-head` → `.crm-subject-section .crm-form-section-head` |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 12 guard |
+
+### `subject-section` rename result
+
+**Renamed** `subject-section` → `crm-subject-section` in both HTML pages and `subject-card.css`.
+
+- `subject-card.html` (addresses article): `subject-section` → `crm-subject-section`
+- `subject-card-individual.html` (addresses article): `subject-section` → `crm-subject-section`
+- `subject-card.css`: `.subject-section .crm-form-section-head` → `.crm-subject-section .crm-form-section-head`
+
+All CSS declarations preserved exactly. No other subject-card classes touched.
+
+### `crm-profile-section` removal result
+
+**Removed** from 5 HTML elements (3 in `subject-card.html`, 2 in `subject-card-individual.html`).
+
+Class had no CSS definition in any source file and no JS dependency. Elements retain all live classes: `crm-card`, `crm-form-card`, `crm-section`, `crm-subject-profile-section`. No visual change.
+
+### `crm-subject-form-layout` removal result
+
+**Removed** from 2 HTML elements (1 in each page). Class had no CSS definition and no JS dependency. Elements retain `crm-subject-section-layout`. No visual change.
+
+### JS unchanged
+
+Zero JS files were changed. Grep across all 9 JS files under `static-uikit/assets/js/` confirmed zero matches for `subject-section`, `crm-profile-section`, and `crm-subject-form-layout`.
+
+### Visual behavior preservation
+
+- `crm-subject-section` is defined in `subject-card.css` (renamed selector) — styling preserved exactly.
+- `crm-profile-section` and `crm-subject-form-layout` had no CSS definitions — removal is visually inert.
+- All other classes on affected elements (`crm-card`, `crm-form-card`, `crm-section`, `crm-subject-profile-section`) are unchanged.
+
+### Validator enhancement
+
+**Implemented** — G-extra 12 added to `validate-static-uikit.mjs`:
+- Fails if `subject-card.html` or `subject-card-individual.html` contains class token `subject-section`.
+- Fails if either page contains class token `crm-profile-section`.
+- Fails if either page contains class token `crm-subject-form-layout`.
+- Fails if `subject-card.css` contains `.subject-section` (bare unrenamed selector).
+- Passes if `subject-card.css` contains `.crm-subject-section`.
+
+### Bundle generation result
+
+`npm run static:uikit:bundle` — ✓ Bundle written — 42/42 sections, 243.1 KB
+
+### Bundle check result
+
+`npm run static:uikit:bundle:check` — ✓ Bundle is up to date (42/42 sections, 243.1 KB)
+
+### Validation result
+
+`npm run static:uikit:validate` — ✓ Errors: 0, Warnings: 0
+
+New validator check: **G-extra 12** — guards subject-card class naming and orphan removal.
+
+### Remaining class ownership candidates
+
+None from the subject-card class cleanup scope. The class ownership / proliferation audit for this scope is complete. Optional remaining work: visual regression testing of subject-card pages, and a final global audit pass.

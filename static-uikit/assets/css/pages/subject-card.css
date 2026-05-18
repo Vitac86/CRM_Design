@@ -240,7 +240,7 @@
   border-bottom: 1px solid var(--crm-umi-border);
 }
 
-.crm-page[data-page="subject-card"] .subject-section .crm-form-section-head {
+.crm-page[data-page="subject-card"] .crm-subject-section .crm-form-section-head {
   margin-bottom: 8px;
   padding-bottom: 7px;
   border-bottom: 1px solid var(--crm-umi-border);
