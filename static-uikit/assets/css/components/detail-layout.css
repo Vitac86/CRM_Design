@@ -1,0 +1,65 @@
+/* Shared detail page layout — hero header, meta, actions, tabs.
+   Used by: subject-card, subject-card-individual, trading-card, contract-wizard. */
+
+.crm-detail-layout {
+  align-items: start;
+}
+
+.crm-detail-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid #d5dfef;
+  background: linear-gradient(145deg, #ffffff 0%, #f4f8ff 100%);
+}
+
+.crm-detail-hero-main {
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.crm-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 13px;
+  color: #4e6286;
+}
+
+.crm-detail-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.crm-detail-tabs {
+  margin-top: 0;
+  border-radius: 12px;
+  overflow-x: auto;
+  border: 1px solid #d6e0ef;
+  background: #fff;
+  padding: 4px 8px 0;
+}
+
+@media (max-width: 1200px) {
+  .crm-detail-actions {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 960px) {
+  .crm-detail-hero {
+    flex-direction: column;
+  }
+
+  .crm-detail-actions {
+    width: 100%;
+  }
+
+  .crm-detail-actions .uk-button {
+    width: 100%;
+  }
+}

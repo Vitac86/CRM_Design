@@ -1185,6 +1185,39 @@ if (existsSync(PAGES_DIR)) {
   }
 }
 
+// G-extra 7: Detail layout classes must not be defined in pages/contract-wizard.css.
+// These classes are shared across multiple pages and must live in components/detail-layout.css.
+const DETAIL_LAYOUT_CLASSES = [
+  '.crm-detail-layout',
+  '.crm-detail-hero',
+  '.crm-detail-hero-main',
+  '.crm-detail-meta',
+  '.crm-detail-actions',
+  '.crm-detail-tabs',
+];
+
+if (existsSync(CONTRACT_WIZARD_CSS)) {
+  const cwDlSource  = stripCssBlockComments(readFileSync(CONTRACT_WIZARD_CSS, 'utf8'));
+  const cwDlEntries = collectRuleSelectorEntriesByContext(cwDlSource);
+  let hasDetailLayout = false;
+
+  for (const entry of cwDlEntries) {
+    for (const part of splitSelectorList(entry.selector)) {
+      if (DETAIL_LAYOUT_CLASSES.includes(part)) {
+        err(
+          `pages/contract-wizard.css contains unscoped detail-layout selector "${part}" ` +
+          `(context: "${entry.context}") — shared detail-layout infrastructure must be in components/detail-layout.css`
+        );
+        hasDetailLayout = true;
+      }
+    }
+  }
+
+  if (!hasDetailLayout) {
+    ok('pages/contract-wizard.css contains no unscoped shared detail-layout selectors');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');

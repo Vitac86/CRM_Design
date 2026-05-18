@@ -566,14 +566,13 @@ New validator check added: **G-extra 5** — fails if `pages/contract-wizard.css
 | Rank | Task |
 |------|------|
 | 1 | **Extract shared detail-layout classes** (`.crm-detail-hero`, `.crm-detail-hero-main`, `.crm-detail-meta`, `.crm-detail-actions`, `.crm-detail-tabs`) from `pages/contract-wizard.css` to a new `components/detail-layout.css` — 4 pages affected |
-| 2 | **Extract shared detail-layout classes** (`.crm-detail-hero`, `.crm-detail-hero-main`, `.crm-detail-meta`, `.crm-detail-actions`, `.crm-detail-tabs`) from `pages/contract-wizard.css` to a new `components/detail-layout.css` — 4 pages affected |
-| 3 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
-| 4 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
-| 5 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
-| 6 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
-| 7 | **`subject-section` rename** — rename bare class to `crm-subject-section` in subject-card.html, subject-card-individual.html, subject-card.css |
-| 8 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
-| 9 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+| 2 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
+| 3 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 4 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 5 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
+| 6 | **`subject-section` rename** — rename bare class to `crm-subject-section` in subject-card.html, subject-card-individual.html, subject-card.css |
+| 7 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
+| 8 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
 
 ---
 
@@ -632,11 +631,93 @@ New validator check: **G-extra 6** — fails if any HTML page under `static-uiki
 
 | Rank | Task |
 |------|------|
-| 1 | **Extract shared detail-layout classes** (`crm-detail-*`) from `pages/contract-wizard.css` to `components/detail-layout.css` — 4 pages affected |
-| 2 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
-| 3 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
-| 4 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
-| 5 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
-| 6 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
-| 7 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
-| 8 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+| 1 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
+| 2 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 3 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 4 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
+| 5 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
+| 6 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
+| 7 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+
+---
+
+## Detail Layout Ownership Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/assets/css/components/detail-layout.css` | Created (new file) |
+| `static-uikit/assets/css/pages/contract-wizard.css` | Removed shared detail-layout classes and responsive rules |
+| `static-uikit/assets/css/crm-static.css` | Added `./components/detail-layout.css` import (42 total) |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 7 guard |
+| `static-uikit/audits/class-ownership-proliferation-audit.md` | Fixed duplicate row in wizard notes table; updated remaining candidates in orphan-actions notes |
+
+### Classes moved to `components/detail-layout.css`
+
+- `.crm-detail-layout`
+- `.crm-detail-hero`
+- `.crm-detail-hero-main`
+- `.crm-detail-meta`
+- `.crm-detail-actions`
+- `.crm-detail-tabs`
+
+### Responsive rules moved / split
+
+| Rule | Action |
+|------|--------|
+| `@media (max-width: 1200px) { .crm-detail-actions { align-items: flex-start; } }` | Moved in full to `components/detail-layout.css` |
+| `@media (max-width: 960px) { .crm-detail-hero { flex-direction: column; } }` | Moved to `components/detail-layout.css` |
+| `@media (max-width: 960px) { .crm-detail-actions { width: 100%; } }` | Split from combined `.crm-detail-actions, .crm-page-actions` selector; detail part moved to `components/detail-layout.css` |
+| `@media (max-width: 960px) { .crm-detail-actions .uk-button { width: 100%; } }` | Split from combined selector; detail part moved to `components/detail-layout.css` |
+| `@media (max-width: 960px) { .crm-page-actions { width: 100%; } }` | Kept in `pages/contract-wizard.css` (unrelated selector, not a detail-layout class) |
+| `@media (max-width: 960px) { .crm-page-actions .uk-button { width: 100%; } }` | Kept in `pages/contract-wizard.css` |
+
+### HTML / JS class names
+
+No HTML class names were changed. No JS class names were changed. All four pages (subject-card.html, subject-card-individual.html, trading-card.html, contract-wizard.html) continue to receive detail-layout styles via `components/detail-layout.css`, which loads before page CSS in the cascade.
+
+### Cascade preservation
+
+`components/detail-layout.css` loads before all `pages/*.css` imports. Page-specific overrides in `pages/subject-card.css` (`.crm-page[data-page="subject-card"] .crm-subject-hero`, `.crm-subject-actions`, etc.) and `pages/trading.css` (`.crm-page[data-page="trading-card"] .crm-trading-hero`, etc.) continue to win over base component definitions. The `crm-trading-hero crm-detail-hero` dual-class pattern on `trading-card.html` continues to work correctly.
+
+### `.crm-subject-summary` decision
+
+Not moved. Used only in `contract-wizard.html` (confirmed by grep — zero matches in other pages). Correctly stays in `pages/contract-wizard.css`.
+
+### `.crm-radio-grid` decision
+
+Not moved. Used only in the contract wizard context and remains in `pages/contract-wizard.css`.
+
+### Manifest import update
+
+- Before: 41 imports
+- After: 42 imports (added `./components/detail-layout.css` after `./components/wizard.css`)
+
+### Validator enhancement
+
+**Implemented** — G-extra 7 added to `validate-static-uikit.mjs`:
+- Checks `pages/contract-wizard.css` for unscoped definitions of `.crm-detail-layout`, `.crm-detail-hero`, `.crm-detail-hero-main`, `.crm-detail-meta`, `.crm-detail-actions`, `.crm-detail-tabs`.
+- Fails if any are found; passes if they live in `components/detail-layout.css`.
+
+### Build and validation results
+
+| Check | Result |
+|-------|--------|
+| `npm run static:uikit:bundle` | ✓ Bundle written — 42/42 sections, 243.3 KB |
+| `npm run static:uikit:bundle:check` | ✓ Bundle is up to date (42/42 sections, 243.3 KB) |
+| `npm run static:uikit:validate` | ✓ Errors: 0, Warnings: 0 |
+
+### Remaining class ownership candidates
+
+| Rank | Task |
+|------|------|
+| 1 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
+| 2 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 3 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 4 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
+| 5 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
+| 6 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
+| 7 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |

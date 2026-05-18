@@ -19,6 +19,7 @@
 @import url("./components/registry.css");
 @import url("./components/modals.css");
 @import url("./components/wizard.css");
+@import url("./components/detail-layout.css");
 
 @import url("./pages/dashboard.css");
 @import url("./pages/subjects.css");
