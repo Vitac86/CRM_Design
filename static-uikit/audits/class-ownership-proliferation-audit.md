@@ -802,3 +802,79 @@ No HTML class names were changed. No JS files were touched. All three pages (sub
 | 4 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
 | 5 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
 | 6 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+
+---
+
+## Cards Dead CSS Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/assets/css/components/cards.css` | Removed confirmed dead class definitions |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 9 guard |
+
+### Classes verified as unused
+
+All five candidate classes were confirmed unused by grepping all HTML pages under `static-uikit/pages/`, all JS files under `static-uikit/assets/js/`, and all source CSS files (excluding `crm-static.bundle.css`, `uikit.min.css`). Zero matches found outside `components/cards.css` and the generated bundle.
+
+| Class | HTML matches | JS matches | Source CSS matches (excl. cards.css) |
+|-------|-------------|-----------|--------------------------------------|
+| `.crm-decision-panel` | 0 | 0 | 0 |
+| `.crm-kpi-card` | 0 | 0 | 0 |
+| `.crm-journal-table` | 0 | 0 | 0 |
+| `.crm-compliance-queue` | 0 | 0 | 0 |
+| `.crm-register-actions` | 0 | 0 | 0 |
+
+### Classes removed
+
+| Class | Location in cards.css | Removal type |
+|-------|----------------------|--------------|
+| `.crm-kpi-card` | Grouped selector with `.crm-form-card`, `.crm-create-panel`, `.crm-journal-table`, `.crm-compliance-queue` | Removed from group; group kept for live selectors |
+| `.crm-journal-table` | Same grouped selector | Removed from group |
+| `.crm-compliance-queue` | Same grouped selector | Removed from group |
+| `.crm-register-actions` | Standalone rule | Entire rule removed |
+| `.crm-decision-panel` | Standalone rule | Entire rule removed |
+
+Live selectors preserved in the grouped border-radius rule: `.crm-form-card`, `.crm-create-panel`.
+
+### Classes intentionally kept
+
+None — all five candidates were confirmed dead and removed.
+
+### Verification method
+
+- `Grep` across `static-uikit/pages/*.html` — 0 matches for all five classes.
+- `Grep` across `static-uikit/assets/js/` — 0 matches for all five classes.
+- `Grep` across `static-uikit/assets/css/*.css` (all source files) — matches only in `components/cards.css` (source) and `crm-static.bundle.css` (generated; excluded from scope).
+
+### Validator enhancement
+
+**Implemented** — G-extra 9 added to `validate-static-uikit.mjs`:
+- Reads `components/cards.css` and checks for any of the five dead class tokens using `makeSelectorBoundaryRegex`.
+- Fails with an error if any dead class definition is found.
+- Check label: `components/cards.css contains no confirmed dead class definitions`.
+
+### Bundle generation result
+
+`npm run static:uikit:bundle` — ✓ Bundle written — 42/42 sections, 242.9 KB
+
+### Bundle check result
+
+`npm run static:uikit:bundle:check` — ✓ Bundle is up to date (42/42 sections, 242.9 KB)
+
+### Validation result
+
+`npm run static:uikit:validate` — ✓ Errors: 0, Warnings: 0
+
+### Remaining class ownership candidates
+
+| Rank | Task |
+|------|------|
+| 1 | **subject-edit toast ownership cleanup** — move `body[data-page="subject-edit"] .crm-edit-toast` from `components/forms.css` to `pages/subject-edit.css` |
+| 2 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in `compliance.css` |
+| 3 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
+| 4 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
+| 5 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |

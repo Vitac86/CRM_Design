@@ -1248,6 +1248,30 @@ if (existsSync(BUTTONS_CSS)) {
   }
 }
 
+// G-extra 9: Confirmed dead classes must not exist in components/cards.css.
+// These were verified unused in all HTML and JS and removed in the cards dead CSS cleanup.
+const CARDS_DEAD_CLASSES = [
+  '.crm-decision-panel',
+  '.crm-kpi-card',
+  '.crm-journal-table',
+  '.crm-compliance-queue',
+  '.crm-register-actions',
+];
+
+if (existsSync(CARDS_CSS)) {
+  const cardsDeadSource = stripCssBlockComments(readFileSync(CARDS_CSS, 'utf8'));
+  let hasDeadCardClass = false;
+  for (const cls of CARDS_DEAD_CLASSES) {
+    if (makeSelectorBoundaryRegex(cls).test(cardsDeadSource)) {
+      err(`components/cards.css still contains confirmed dead class "${cls}" — remove this selector`);
+      hasDeadCardClass = true;
+    }
+  }
+  if (!hasDeadCardClass) {
+    ok('components/cards.css contains no confirmed dead class definitions');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');

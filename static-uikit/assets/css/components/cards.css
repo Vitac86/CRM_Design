@@ -37,11 +37,8 @@
   border-radius: 12px;
 }
 
-.crm-kpi-card,
 .crm-form-card,
-.crm-create-panel,
-.crm-journal-table,
-.crm-compliance-queue {
+.crm-create-panel {
   border-radius: var(--crm-card-radius);
 }
 
@@ -171,11 +168,6 @@
   position: relative;
 }
 
-.crm-register-actions {
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
 .crm-option-card:focus-visible,
 .crm-option-card:focus-within,
 .crm-binary-control label:focus-within,
@@ -255,12 +247,6 @@
 .crm-detail-header h1 {
   margin-bottom: 4px;
   font-size: 28px;
-}
-
-.crm-decision-panel {
-  display: grid;
-  gap: 10px;
-  align-content: start;
 }
 
 .crm-action-row {
