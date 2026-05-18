@@ -18,6 +18,7 @@
 @import url("./components/filters.css");
 @import url("./components/registry.css");
 @import url("./components/modals.css");
+@import url("./components/wizard.css");
 
 @import url("./pages/dashboard.css");
 @import url("./pages/subjects.css");

@@ -503,3 +503,71 @@ This document (`static-uikit/audits/class-ownership-proliferation-audit.md`) is 
 | Recommended next task | Extract wizard classes to components/wizard.css |
 | Bundle check | ✓ Up to date (40/40, 243.0 KB) |
 | Validation | ✓ Errors: 0, Warnings: 0 |
+
+---
+
+## Wizard Infrastructure Ownership Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/assets/css/components/wizard.css` | Created (new file) |
+| `static-uikit/assets/css/pages/contract-wizard.css` | Removed shared wizard classes |
+| `static-uikit/assets/css/crm-static.css` | Added `./components/wizard.css` import (41 total) |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 5 guard |
+
+### Classes moved to `components/wizard.css`
+
+- `.crm-wizard-shell`
+- `.crm-wizard-steps`
+- `.crm-wizard-step`
+- `.crm-wizard-step strong`
+- `.crm-wizard-step-active`
+- `.crm-wizard-step-active strong`
+- `.crm-wizard-actions` — moved; used by contract-wizard, contract-edit, document-wizard (3 pages); declarations are generic wizard action tweaks (`margin-top: 2px; bottom: 12px`)
+- `@media (max-width: 960px) { .crm-wizard-steps }` — responsive rule split out; `.crm-contract-client-summary` and `.crm-radio-grid` remain in contract-wizard.css responsive block
+
+### `.crm-wizard-actions` decision
+
+**Moved** to `components/wizard.css`. The class is shared by exactly the three wizard pages (contract-wizard, contract-edit, document-wizard) and its declarations are a generic wizard footer helper, not contract-wizard-specific. The existing comment guard in contract-wizard.css documented this intent; formalising it in components/wizard.css is the correct resolution.
+
+### `.crm-wizard-step-done` decision
+
+**Not moved.** Currently defined only in `pages/subject-register.css`, scoped to `body[data-page="subject-register"]`. The `document-wizard.js` does not toggle `crm-wizard-step-done` (confirmed by JS read — it only uses `crm-wizard-step-active`). No global definition needed at this time.
+
+### HTML / JS class names
+
+No HTML class names were changed. No JS class names were changed. All four pages (contract-wizard.html, contract-edit.html, document-wizard.html, subject-register.html) continue to receive wizard infrastructure styles via `components/wizard.css`, which loads before page CSS in the cascade.
+
+### Cascade preservation
+
+`components/wizard.css` loads before all `pages/*.css` imports. Page-specific overrides in `subject-register.css` (`.crm-wizard-step-done`) continue to win over base component definitions.
+
+### Manifest import update
+
+- Before: 40 imports
+- After: 41 imports (added `./components/wizard.css` after `./components/modals.css`)
+
+### Build and validation results
+
+| Check | Result |
+|-------|--------|
+| `npm run static:uikit:bundle` | ✓ Bundle written — 41/41 sections, 243.1 KB |
+| `npm run static:uikit:bundle:check` | ✓ Bundle is up to date (41/41 sections, 243.1 KB) |
+| `npm run static:uikit:validate` | ✓ Errors: 0, Warnings: 0 |
+
+New validator check added: **G-extra 5** — fails if `pages/contract-wizard.css` contains unscoped definitions for `.crm-wizard-shell`, `.crm-wizard-steps`, `.crm-wizard-step`, or `.crm-wizard-step-active`.
+
+### Remaining class ownership candidates
+
+| Rank | Task |
+|------|------|
+| 1 | **Extract shared detail-layout classes** (`.crm-detail-hero`, `.crm-detail-hero-main`, `.crm-detail-meta`, `.crm-detail-actions`, `.crm-detail-tabs`) from `pages/contract-wizard.css` to a new `components/detail-layout.css` — 4 pages affected |
+| 2 | **Remove `crm-actions` orphan class** from 7 HTML elements across subject-register, contract-wizard, contract-edit — pure HTML change, no CSS/JS impact |
+| 3 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
+| 4 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 5 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 6 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |

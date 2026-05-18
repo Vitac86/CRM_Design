@@ -1134,6 +1134,37 @@ if (existsSync(CARDS_CSS)) {
   }
 }
 
+// G-extra 5: Wizard infrastructure classes must not be defined in pages/contract-wizard.css
+// These classes are shared across multiple wizard pages and must live in components/wizard.css.
+const WIZARD_INFRA_CLASSES = [
+  '.crm-wizard-shell',
+  '.crm-wizard-steps',
+  '.crm-wizard-step',
+  '.crm-wizard-step-active',
+];
+
+if (existsSync(CONTRACT_WIZARD_CSS)) {
+  const cwInfraSource  = stripCssBlockComments(readFileSync(CONTRACT_WIZARD_CSS, 'utf8'));
+  const cwInfraEntries = collectRuleSelectorEntriesByContext(cwInfraSource);
+  let hasWizardInfra   = false;
+
+  for (const entry of cwInfraEntries) {
+    for (const part of splitSelectorList(entry.selector)) {
+      if (WIZARD_INFRA_CLASSES.includes(part)) {
+        err(
+          `pages/contract-wizard.css contains unscoped wizard infrastructure selector "${part}" ` +
+          `(context: "${entry.context}") — shared wizard infrastructure must be in components/wizard.css`
+        );
+        hasWizardInfra = true;
+      }
+    }
+  }
+
+  if (!hasWizardInfra) {
+    ok('pages/contract-wizard.css contains no unscoped shared wizard infrastructure selectors');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');
