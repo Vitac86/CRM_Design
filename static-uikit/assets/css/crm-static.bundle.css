@@ -1433,14 +1433,6 @@ textarea.uk-form-danger:focus {
   border-color: #e53935 !important;
 }
 
-body[data-page="subject-edit"] .crm-edit-toast {
-  left: auto;
-  width: max-content;
-  max-width: min(360px, calc(100vw - 48px));
-  box-sizing: border-box;
-  line-height: 1.4;
-}
-
 .uk-form-label {
   color: var(--crm-text-secondary);
   font-size: 12px;
@@ -6794,6 +6786,14 @@ body[data-page="subject-edit"] .crm-edit-toast.is-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+body[data-page="subject-edit"] .crm-edit-toast {
+  left: auto;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 48px));
+  box-sizing: border-box;
+  line-height: 1.4;
 }
 
 /* Address module page-specific spacing */

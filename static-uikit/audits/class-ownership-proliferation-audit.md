@@ -873,8 +873,89 @@ None — all five candidates were confirmed dead and removed.
 
 | Rank | Task |
 |------|------|
-| 1 | **subject-edit toast ownership cleanup** — move `body[data-page="subject-edit"] .crm-edit-toast` from `components/forms.css` to `pages/subject-edit.css` |
-| 2 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in `compliance.css` |
-| 3 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
-| 4 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
-| 5 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
+| 1 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in `compliance.css` |
+| 2 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
+| 3 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
+| 4 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
+
+---
+
+## Subject Edit Toast Ownership Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/assets/css/components/forms.css` | Removed `body[data-page="subject-edit"] .crm-edit-toast` rule |
+| `static-uikit/assets/css/pages/subject-edit.css` | Added moved `body[data-page="subject-edit"] .crm-edit-toast` rule (sizing/layout supplement) |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 10 guard |
+
+### CSS rule moved
+
+```css
+/* Removed from: components/forms.css */
+/* Added to:     pages/subject-edit.css */
+
+body[data-page="subject-edit"] .crm-edit-toast {
+  left: auto;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 48px));
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+```
+
+### Previous owner
+
+`components/forms.css` — a shared component file that should contain only unscoped form primitives. The rule was page-scoped and had no business in this file.
+
+### Final owner
+
+`pages/subject-edit.css` — the rule is added as a separate block after the existing `.crm-edit-toast.is-visible` rule, within the "Save feedback" section of the file.
+
+### Usage verification
+
+| Location | Class usage | Details |
+|----------|-------------|---------|
+| `pages/subject-edit.html` line 619 | `class="crm-edit-toast"` | On `body[data-page="subject-edit"]` — covered |
+| `pages/subject-edit-individual.html` line 719 | `class="crm-edit-toast"` | Also on `body[data-page="subject-edit"]` (`data-subject-kind="individual"`) — covered |
+| `assets/js/pages/subject-edit.js` | No direct class reference | JS uses `[data-entity="edit-toast"]` to find the element; toggles only `is-visible` |
+| All other HTML pages | 0 matches | `crm-edit-toast` is not used on any other page |
+
+### Cascade preservation
+
+`pages/subject-edit.css` loads **after** `components/forms.css` in the cascade (pages load after components). Moving the rule to `subject-edit.css` does not weaken it — cascade order is unchanged or improved. The properties in the moved rule (`left`, `width`, `max-width`, `box-sizing`, `line-height`) have zero overlap with the existing base toast rule already in `subject-edit.css` (`position`, `right`, `bottom`, `z-index`, `background`, `color`, `font-size`, `padding`, `border-radius`, `box-shadow`, `opacity`, `transform`, `transition`, `pointer-events`), so both rules apply additively with no conflicts.
+
+### HTML / JS unchanged
+
+No HTML files were changed. No JS files were changed.
+
+### Validator enhancement
+
+**Implemented** — G-extra 10 added to `validate-static-uikit.mjs`:
+- Fails if `components/forms.css` contains `body[data-page="subject-edit"] .crm-edit-toast`.
+- Fails if `pages/subject-edit.css` does not contain `.crm-edit-toast`.
+- Check labels: `components/forms.css contains no body[data-page="subject-edit"] .crm-edit-toast rule` and `pages/subject-edit.css contains .crm-edit-toast definition`.
+
+### Bundle generation result
+
+`npm run static:uikit:bundle` — ✓ Bundle written — 42/42 sections, 242.9 KB
+
+### Bundle check result
+
+`npm run static:uikit:bundle:check` — ✓ Bundle is up to date (42/42 sections, 242.9 KB)
+
+### Validation result
+
+`npm run static:uikit:validate` — ✓ Errors: 0, Warnings: 0
+
+### Remaining class ownership candidates
+
+| Rank | Task |
+|------|------|
+| 1 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in `compliance.css` |
+| 2 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
+| 3 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
+| 4 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |

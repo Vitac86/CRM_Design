@@ -1272,6 +1272,33 @@ if (existsSync(CARDS_CSS)) {
   }
 }
 
+// G-extra 10: Subject-edit toast rule must live in pages/subject-edit.css, not components/forms.css.
+// Fails if components/forms.css contains body[data-page="subject-edit"] .crm-edit-toast.
+// Fails if pages/subject-edit.css does not contain .crm-edit-toast.
+if (existsSync(FORMS_CSS)) {
+  const formsToastSource = stripCssBlockComments(readFileSync(FORMS_CSS, 'utf8'));
+  if (/body\[data-page="subject-edit"\]\s+\.crm-edit-toast/.test(formsToastSource)) {
+    err(
+      'components/forms.css contains body[data-page="subject-edit"] .crm-edit-toast — ' +
+      'this page-scoped rule belongs in pages/subject-edit.css; remove it from forms.css'
+    );
+  } else {
+    ok('components/forms.css contains no body[data-page="subject-edit"] .crm-edit-toast rule');
+  }
+}
+
+if (existsSync(SUBJECT_EDIT_CSS)) {
+  const seToastSource = stripCssBlockComments(readFileSync(SUBJECT_EDIT_CSS, 'utf8'));
+  if (!/\.crm-edit-toast\b/.test(seToastSource)) {
+    err(
+      'pages/subject-edit.css does not contain .crm-edit-toast — ' +
+      'the toast rule must be defined here'
+    );
+  } else {
+    ok('pages/subject-edit.css contains .crm-edit-toast definition');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');

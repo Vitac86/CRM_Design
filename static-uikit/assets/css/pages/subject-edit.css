@@ -210,6 +210,14 @@ body[data-page="subject-edit"] .crm-edit-toast.is-visible {
   pointer-events: auto;
 }
 
+body[data-page="subject-edit"] .crm-edit-toast {
+  left: auto;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 48px));
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
 /* Address module page-specific spacing */
 
 body[data-page="subject-edit"] .crm-address-module.crm-form-section {
