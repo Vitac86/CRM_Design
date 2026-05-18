@@ -1299,6 +1299,35 @@ if (existsSync(SUBJECT_EDIT_CSS)) {
   }
 }
 
+// G-extra 11: .crm-doc-checklist* must be scoped to .crm-page[data-page="compliance-card"] in compliance.css.
+// These classes are used only on compliance-card.html; unscoped definitions appear dead and are incorrect.
+const CHECKLIST_UNSCOPED_CLASSES = [
+  '.crm-doc-checklist',
+  '.crm-doc-checklist-item',
+];
+
+if (existsSync(COMPLIANCE_CSS)) {
+  const compChecklistSrc     = stripCssBlockComments(readFileSync(COMPLIANCE_CSS, 'utf8'));
+  const compChecklistEntries = collectRuleSelectorEntriesByContext(compChecklistSrc);
+  let hasUnscopedChecklist   = false;
+
+  for (const entry of compChecklistEntries) {
+    for (const part of splitSelectorList(entry.selector)) {
+      if (CHECKLIST_UNSCOPED_CLASSES.includes(part)) {
+        err(
+          `pages/compliance.css contains unscoped checklist selector "${part}" ` +
+          `(context: "${entry.context}") — scope it to .crm-page[data-page="compliance-card"] ${part}`
+        );
+        hasUnscopedChecklist = true;
+      }
+    }
+  }
+
+  if (!hasUnscopedChecklist) {
+    ok('pages/compliance.css .crm-doc-checklist* selectors are scoped to .crm-page[data-page="compliance-card"]');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');

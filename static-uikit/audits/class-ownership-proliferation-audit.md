@@ -873,10 +873,9 @@ None — all five candidates were confirmed dead and removed.
 
 | Rank | Task |
 |------|------|
-| 1 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in `compliance.css` |
-| 2 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
-| 3 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
-| 4 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
+| 1 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
+| 2 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
+| 3 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
 
 ---
 
@@ -955,7 +954,77 @@ No HTML files were changed. No JS files were changed.
 
 | Rank | Task |
 |------|------|
-| 1 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in `compliance.css` |
-| 2 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
-| 3 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
-| 4 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
+| 1 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
+| 2 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
+| 3 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |
+
+---
+
+## Compliance Checklist Scoping Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/assets/css/pages/compliance.css` | Scoped `.crm-doc-checklist*` selectors to `.crm-page[data-page="compliance-card"]` |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 11 guard |
+
+### Checklist selectors scoped
+
+| Before | After |
+|--------|-------|
+| `.crm-doc-checklist` | `.crm-page[data-page="compliance-card"] .crm-doc-checklist` |
+| `.crm-doc-checklist-item` | `.crm-page[data-page="compliance-card"] .crm-doc-checklist-item` |
+| `.crm-doc-checklist-item strong` | `.crm-page[data-page="compliance-card"] .crm-doc-checklist-item strong` |
+| `.crm-doc-checklist-item p` | `.crm-page[data-page="compliance-card"] .crm-doc-checklist-item p` |
+
+All declarations preserved exactly — no values changed.
+
+### Usage verification
+
+| Location | Finding |
+|----------|---------|
+| `pages/compliance-card.html` | 4 elements use `crm-doc-checklist` / `crm-doc-checklist-item` (lines 240–262) |
+| `pages/compliance.html` | 0 matches — class absent |
+| All other HTML pages | 0 matches |
+| All 9 JS files | 0 matches — no JS dependency |
+| CSS definition (before) | `pages/compliance.css` — unscoped, no `[data-page]` guard |
+
+### HTML / JS unchanged
+
+No HTML files were changed. No JS files were changed.
+
+### Visual behavior preservation
+
+The compliance-card checklist layout is unchanged. All four rules preserve their exact declarations. The compliance registry page (`data-page="compliance"`) has no checklist elements and is unaffected. No unrelated compliance-card selectors were touched.
+
+### Validator enhancement
+
+**Implemented** — G-extra 11 added to `validate-static-uikit.mjs`:
+- Uses `collectRuleSelectorEntriesByContext` to scan `pages/compliance.css` for entries where any selector-list part exactly equals `.crm-doc-checklist` or `.crm-doc-checklist-item` (i.e., an unscoped bare definition).
+- Fails with an error if any such unscoped entry is found.
+- Check label: `pages/compliance.css .crm-doc-checklist* selectors are scoped to .crm-page[data-page="compliance-card"]`.
+
+### Bundle generation result
+
+`npm run static:uikit:bundle` — ✓ Bundle written — 42/42 sections, 243.1 KB
+
+### Bundle check result
+
+`npm run static:uikit:bundle:check` — ✓ Bundle is up to date (42/42 sections, 243.1 KB)
+
+### Validation result
+
+`npm run static:uikit:validate` — ✓ Errors: 0, Warnings: 0
+
+New validator check: **G-extra 11** — fails if `pages/compliance.css` contains unscoped bare definitions for `.crm-doc-checklist` or `.crm-doc-checklist-item`.
+
+### Remaining class ownership candidates
+
+| Rank | Task |
+|------|------|
+| 1 | **`subject-section` rename** — rename bare class to `crm-subject-section` in `subject-card.html`, `subject-card-individual.html`, `subject-card.css` |
+| 2 | **Remove orphan `crm-profile-section`** from 5 elements in `subject-card.html` / `subject-card-individual.html` |
+| 3 | **Remove orphan `crm-subject-form-layout`** from 2 elements in `subject-card.html` / `subject-card-individual.html` |

@@ -7565,12 +7565,12 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 }
 
 /* 11. Compliance profile/details cards */
-.crm-doc-checklist {
+.crm-page[data-page="compliance-card"] .crm-doc-checklist {
   display: grid;
   gap: 8px;
 }
 
-.crm-doc-checklist-item {
+.crm-page[data-page="compliance-card"] .crm-doc-checklist-item {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -7581,13 +7581,13 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   padding: 10px 12px;
 }
 
-.crm-doc-checklist-item strong {
+.crm-page[data-page="compliance-card"] .crm-doc-checklist-item strong {
   display: block;
   margin-bottom: 2px;
   color: #1d2d49;
 }
 
-.crm-doc-checklist-item p {
+.crm-page[data-page="compliance-card"] .crm-doc-checklist-item p {
   margin: 0;
   font-size: 13px;
   color: #5e6f8c;
