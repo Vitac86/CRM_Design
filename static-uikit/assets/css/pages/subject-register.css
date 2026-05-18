@@ -12,7 +12,12 @@ body[data-page="subject-register"] .reg-type-grid,
 
 body[data-page="subject-register"] .reg-method-grid,
 .crm-page[data-page="subject-register"] .reg-method-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body[data-page="subject-register"] .reg-citizenship-grid,
+.crm-page[data-page="subject-register"] .reg-citizenship-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* Step headers and groups */
@@ -260,7 +265,9 @@ body[data-page="subject-register"] .fl-address-block-head,
   body[data-page="subject-register"] .reg-type-grid,
   .crm-page[data-page="subject-register"] .reg-type-grid,
   body[data-page="subject-register"] .reg-method-grid,
-  .crm-page[data-page="subject-register"] .reg-method-grid {
+  .crm-page[data-page="subject-register"] .reg-method-grid,
+  body[data-page="subject-register"] .reg-citizenship-grid,
+  .crm-page[data-page="subject-register"] .reg-citizenship-grid {
     grid-template-columns: 1fr;
   }
 

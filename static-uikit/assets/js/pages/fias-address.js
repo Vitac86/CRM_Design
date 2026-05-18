@@ -1051,8 +1051,9 @@
     const editResidency = document.getElementById('ind-residency');
     if (editResidency) return editResidency.value !== 'nonresident';
 
-    const flResidency = document.querySelector('input[type="radio"][name="fl-residency"]:checked');
-    if (flResidency) return flResidency.value === 'rf';
+    /* Address mode is controlled by citizenship, not tax residency */
+    const flCitizenship = document.querySelector('input[type="radio"][name="fl-citizenship-status"]:checked');
+    if (flCitizenship) return flCitizenship.value === 'rf';
 
     return true;
   }

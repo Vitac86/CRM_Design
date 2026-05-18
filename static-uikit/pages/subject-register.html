@@ -231,6 +231,25 @@
                 </div>
               </div>
 
+              <!-- Citizenship selection (FL only) -->
+              <div class="reg-group reg-citizenship-group" id="reg-citizenship-group" hidden>
+                <div class="reg-step-header">
+                  <h2>Гражданство</h2>
+                </div>
+                <div class="crm-option-grid reg-citizenship-grid" role="radiogroup" aria-label="Гражданство">
+                  <label class="crm-option-card" data-value="rf">
+                    <input type="radio" name="fl-citizenship-status" value="rf" checked/>
+                    <span>Гражданин РФ</span>
+                    <small>Адрес заполняется через ФИАС. Страна по умолчанию — Российская Федерация.</small>
+                  </label>
+                  <label class="crm-option-card" data-value="foreign">
+                    <input type="radio" name="fl-citizenship-status" value="foreign"/>
+                    <span>Иностранный гражданин / не гражданин РФ</span>
+                    <small>Адрес заполняется вручную по структурированным полям со страной.</small>
+                  </label>
+                </div>
+              </div>
+
               <!-- Method selection -->
               <div class="reg-group">
                 <div class="reg-step-header">
@@ -241,11 +260,6 @@
                     <input type="radio" name="reg-method" value="manual"/>
                     <span>Ручной ввод</span>
                     <small>Основной сценарий заполнения данных клиента.</small>
-                  </label>
-                  <label class="crm-option-card" data-value="cabinet">
-                    <input type="radio" name="reg-method" value="cabinet"/>
-                    <span>Загрузить из ЛК</span>
-                    <small>Скоро будет доступно.</small>
                   </label>
                   <label class="crm-option-card" data-value="inn">
                     <input type="radio" name="reg-method" value="inn"/>
@@ -331,15 +345,15 @@
                   </div>
                   <div class="uk-width-1-2@m">
                     <div class="reg-binary-row">
-                      <p>Резидентство</p>
+                      <p>Налоговое резидентство</p>
                       <div class="crm-binary-control">
                         <label>
                           <input class="uk-radio" type="radio" name="fl-residency" value="rf" checked/>
-                          <span>Резидент РФ</span>
+                          <span>Налоговый резидент РФ</span>
                         </label>
                         <label>
                           <input class="uk-radio" type="radio" name="fl-residency" value="nonresident"/>
-                          <span>Нерезидент</span>
+                          <span>Налоговый нерезидент РФ</span>
                         </label>
                       </div>
                     </div>
@@ -569,6 +583,212 @@
                 </div>
                 <!-- /fl-address-manual -->
 
+                <!-- FL foreign (non-RF citizen) structured address -->
+                <div id="fl-address-foreign" hidden>
+                  <p class="crm-address-mode-note">Заполните адрес по частям. Страна обязательна для каждого адреса.</p>
+                  <div class="crm-address-rows">
+
+                    <!-- Адрес регистрации -->
+                    <div class="crm-address-row" data-manual-row="fl-registration">
+                      <div class="crm-address-row-head">
+                        <strong class="crm-address-row-title">Адрес регистрации</strong>
+                      </div>
+                      <div class="crm-address-manual-fields">
+                        <div class="crm-address-parts-grid" data-manual-kind="fl-registration">
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Страна <span class="crm-required">*</span></span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-country" data-manual-part="country" data-crm-required="true" aria-required="true" placeholder="Германия"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Индекс</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-postal" data-manual-part="postalCode" inputmode="numeric" maxlength="10" placeholder="10115"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Регион / область</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-region" data-manual-part="region" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Район</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-district" data-manual-part="district" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Город</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-city" data-manual-part="city" placeholder="Berlin"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Населённый пункт</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-settlement" data-manual-part="settlement" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Улица</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-street" data-manual-part="street" placeholder="Unter den Linden"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Дом / строение</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-house" data-manual-part="house" placeholder="1"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Корпус / литера</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-building" data-manual-part="building" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Квартира / помещение</span>
+                            <input class="uk-input crm-input" type="text" name="fl-foreign-reg-flat" data-manual-part="flat" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field crm-address-part-field--wide">
+                            <span class="crm-address-part-label">Комментарий / доп. сведения</span>
+                            <textarea class="uk-textarea crm-input" name="fl-foreign-reg-comment" data-manual-part="comment" rows="2" autocomplete="off" placeholder=""></textarea>
+                          </label>
+                        </div>
+                        <div class="crm-address-full-preview">
+                          <span class="crm-address-part-label">Итоговый адрес</span>
+                          <textarea class="uk-textarea crm-input crm-address-output" name="fl-registrationAddress" data-manual-output="fl-registration" rows="2" readonly placeholder="Итоговый адрес"></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Адрес проживания / фактический адрес -->
+                    <div class="crm-address-row" data-manual-row="fl-actual">
+                      <div class="crm-address-row-head">
+                        <strong class="crm-address-row-title">Адрес проживания / фактический адрес</strong>
+                        <label class="crm-address-same-check">
+                          <input type="checkbox" name="fl-foreign-actualSameAsReg" data-manual-same-as="fl-registration" data-manual-target="fl-actual" checked/>
+                          <span>Совпадает с адресом регистрации</span>
+                        </label>
+                      </div>
+                      <div class="crm-address-same-note" data-manual-same-note="fl-actual">
+                        Совпадает с адресом регистрации
+                        <span data-manual-same-preview="fl-actual"></span>
+                      </div>
+                      <div data-manual-fields-wrap="fl-actual" hidden>
+                        <div class="crm-address-manual-fields">
+                          <div class="crm-address-parts-grid" data-manual-kind="fl-actual">
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Страна <span class="crm-required">*</span></span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-country" data-manual-part="country" data-crm-required="true" aria-required="true" placeholder="Германия"/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Индекс</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-postal" data-manual-part="postalCode" inputmode="numeric" maxlength="10" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Регион / область</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-region" data-manual-part="region" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Район</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-district" data-manual-part="district" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Город</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-city" data-manual-part="city" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Населённый пункт</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-settlement" data-manual-part="settlement" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Улица</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-street" data-manual-part="street" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Дом / строение</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-house" data-manual-part="house" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Корпус / литера</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-building" data-manual-part="building" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Квартира / помещение</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-actual-flat" data-manual-part="flat" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field crm-address-part-field--wide">
+                              <span class="crm-address-part-label">Комментарий / доп. сведения</span>
+                              <textarea class="uk-textarea crm-input" name="fl-foreign-actual-comment" data-manual-part="comment" rows="2" autocomplete="off" placeholder=""></textarea>
+                            </label>
+                          </div>
+                          <div class="crm-address-full-preview">
+                            <span class="crm-address-part-label">Итоговый адрес</span>
+                            <textarea class="uk-textarea crm-input crm-address-output" name="fl-actualAddress" data-manual-output="fl-actual" rows="2" readonly placeholder="Итоговый адрес"></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Почтовый адрес / адрес для корреспонденции -->
+                    <div class="crm-address-row" data-manual-row="fl-postal">
+                      <div class="crm-address-row-head">
+                        <strong class="crm-address-row-title">Почтовый адрес / адрес для корреспонденции</strong>
+                        <label class="crm-address-same-check">
+                          <input type="checkbox" name="fl-foreign-postalSameAsReg" data-manual-same-as="fl-registration" data-manual-target="fl-postal" checked/>
+                          <span>Совпадает с адресом регистрации</span>
+                        </label>
+                      </div>
+                      <div class="crm-address-same-note" data-manual-same-note="fl-postal">
+                        Совпадает с адресом регистрации
+                        <span data-manual-same-preview="fl-postal"></span>
+                      </div>
+                      <div data-manual-fields-wrap="fl-postal" hidden>
+                        <div class="crm-address-manual-fields">
+                          <div class="crm-address-parts-grid" data-manual-kind="fl-postal">
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Страна <span class="crm-required">*</span></span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-country" data-manual-part="country" data-crm-required="true" aria-required="true" placeholder="Германия"/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Индекс</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-postal" data-manual-part="postalCode" inputmode="numeric" maxlength="10" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Регион / область</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-region" data-manual-part="region" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Район</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-district" data-manual-part="district" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Город</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-city" data-manual-part="city" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Населённый пункт</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-settlement" data-manual-part="settlement" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Улица</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-street" data-manual-part="street" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Дом / строение</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-house" data-manual-part="house" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Корпус / литера</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-building" data-manual-part="building" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field">
+                              <span class="crm-address-part-label">Квартира / помещение</span>
+                              <input class="uk-input crm-input" type="text" name="fl-foreign-postal-flat" data-manual-part="flat" placeholder=""/>
+                            </label>
+                            <label class="crm-address-part-field crm-address-part-field--wide">
+                              <span class="crm-address-part-label">Комментарий / доп. сведения</span>
+                              <textarea class="uk-textarea crm-input" name="fl-foreign-postal-comment" data-manual-part="comment" rows="2" autocomplete="off" placeholder=""></textarea>
+                            </label>
+                          </div>
+                          <div class="crm-address-full-preview">
+                            <span class="crm-address-part-label">Итоговый адрес</span>
+                            <textarea class="uk-textarea crm-input crm-address-output" name="fl-postalAddress" data-manual-output="fl-postal" rows="2" readonly placeholder="Итоговый адрес"></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                <!-- /fl-address-foreign -->
+
               </div>
               <!-- /fl-address-section -->
 
@@ -679,21 +899,6 @@
                   </div>
                 </div>
                 <div class="crm-form-grid uk-grid-small reg-binary-grid" uk-grid>
-                  <div class="uk-width-1-2@m">
-                    <div class="reg-binary-row">
-                      <p>Налоговый резидент</p>
-                      <div class="crm-binary-control">
-                        <label>
-                          <input class="uk-radio" type="radio" name="fl-tax-resident" value="yes"/>
-                          <span>Да</span>
-                        </label>
-                        <label>
-                          <input class="uk-radio" type="radio" name="fl-tax-resident" value="no"/>
-                          <span>Нет</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
                   <div class="uk-width-1-2@m">
                     <div class="reg-binary-row">
                       <p>Дееспособность</p>
@@ -922,9 +1127,62 @@
                     <label class="uk-form-label" for="ul-email">E-mail</label>
                     <input id="ul-email" class="uk-input crm-input" type="email" name="ul-email" data-crm-required="true" aria-required="true" placeholder="info@company.ru"/>
                   </div>
-                  <div class="uk-width-1-2@m">
-                    <label class="uk-form-label" for="ul-address">Адрес</label>
-                    <input id="ul-address" class="uk-input crm-input" type="text" name="ul-address" placeholder="г. Москва, ул. Летниковская, д. 10"/>
+                  <div class="uk-width-1-1">
+                    <fieldset class="crm-address-manual-block" id="ul-address-block">
+                      <legend class="uk-form-label">Адрес места нахождения</legend>
+                      <div class="crm-address-manual-fields">
+                        <div class="crm-address-parts-grid" data-manual-kind="ul-address">
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Страна <span class="crm-required">*</span></span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-country" name="ul-address-country" data-manual-part="country" data-crm-required="true" aria-required="true" placeholder="Россия"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Индекс</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-postal-code" name="ul-address-postal-code" data-manual-part="postalCode" inputmode="numeric" maxlength="10" placeholder="115114"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Регион / область</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-region" name="ul-address-region" data-manual-part="region" placeholder="г. Москва"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Район</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-district" name="ul-address-district" data-manual-part="district" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Город</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-city" name="ul-address-city" data-manual-part="city" placeholder="Москва"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Населённый пункт</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-settlement" name="ul-address-settlement" data-manual-part="settlement" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Улица</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-street" name="ul-address-street" data-manual-part="street" placeholder="ул. Летниковская"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Дом / строение</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-house" name="ul-address-house" data-manual-part="house" placeholder="10"/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Корпус / литера</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-building" name="ul-address-building" data-manual-part="building" placeholder=""/>
+                          </label>
+                          <label class="crm-address-part-field">
+                            <span class="crm-address-part-label">Офис / помещение</span>
+                            <input class="uk-input crm-input" type="text" id="ul-address-office" name="ul-address-office" data-manual-part="flat" placeholder="офис 301"/>
+                          </label>
+                          <label class="crm-address-part-field crm-address-part-field--wide">
+                            <span class="crm-address-part-label">Комментарий / доп. сведения</span>
+                            <textarea class="uk-textarea crm-input" id="ul-address-comment" name="ul-address-comment" data-manual-part="comment" rows="2" autocomplete="off" placeholder=""></textarea>
+                          </label>
+                        </div>
+                        <div class="crm-address-full-preview">
+                          <span class="crm-address-part-label">Итоговый адрес</span>
+                          <textarea class="uk-textarea crm-input crm-address-output" id="ul-address-full" name="ul-address" data-manual-output="ul-address" rows="2" readonly placeholder="Итоговый адрес"></textarea>
+                        </div>
+                      </div>
+                    </fieldset>
                   </div>
                   <div class="uk-width-1-2@m">
                     <label class="uk-form-label" for="ul-beneficiary">Выгодоприобретатель</label>

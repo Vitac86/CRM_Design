@@ -466,3 +466,61 @@ body[data-page="subject-edit"] .crm-fias-fallback-msg {
   color: #7a5000;
   margin: 0;
 }
+
+/* Address mode note (foreign citizen / manual mode hint) */
+body[data-page="subject-register"] .crm-address-mode-note,
+.crm-page[data-page="subject-register"] .crm-address-mode-note {
+  font-size: 12px;
+  color: var(--crm-text-secondary);
+  background: #f3f7fb;
+  border: 1px solid #e3ecf5;
+  border-radius: 7px;
+  padding: 7px 12px;
+  margin: 0 0 12px;
+}
+
+/* Structured manual address block (always-open parts editor) */
+body[data-page="subject-register"] .crm-address-manual-fields,
+.crm-page[data-page="subject-register"] .crm-address-manual-fields,
+body[data-page="subject-register"] fieldset.crm-address-manual-block .crm-address-manual-fields,
+.crm-page[data-page="subject-register"] fieldset.crm-address-manual-block .crm-address-manual-fields {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #c3d3e8;
+  border-radius: 8px;
+  background: #f1f6fd;
+}
+
+/* UL fieldset wrapper */
+body[data-page="subject-register"] fieldset.crm-address-manual-block,
+.crm-page[data-page="subject-register"] fieldset.crm-address-manual-block {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+body[data-page="subject-register"] fieldset.crm-address-manual-block legend,
+.crm-page[data-page="subject-register"] fieldset.crm-address-manual-block legend {
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+/* Full address preview row inside manual block */
+body[data-page="subject-register"] .crm-address-full-preview,
+.crm-page[data-page="subject-register"] .crm-address-full-preview {
+  margin-top: 10px;
+}
+
+body[data-page="subject-register"] .crm-address-full-preview .crm-address-part-label,
+.crm-page[data-page="subject-register"] .crm-address-full-preview .crm-address-part-label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+body[data-page="subject-register"] .crm-address-full-preview .crm-address-output,
+.crm-page[data-page="subject-register"] .crm-address-full-preview .crm-address-output {
+  width: 100%;
+  resize: none;
+  background: #f8faff;
+  border-color: #d7e3f2;
+}

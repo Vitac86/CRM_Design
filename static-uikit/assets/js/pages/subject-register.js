@@ -11,10 +11,11 @@
   if (!pageScope) return;
 
   /* ── state ───────────────────────────────────────────────────────────────── */
-  var currentStep = 1;
-  var subjectType = null;  // 'fl' | 'ul'
-  var regMethod   = null;  // 'manual' | 'cabinet' | 'inn'
-  var innResolved = false;
+  var currentStep  = 1;
+  var subjectType  = null;   // 'fl' | 'ul'
+  var regMethod    = null;   // 'manual' | 'inn'
+  var innResolved  = false;
+  var flCitizenship = 'rf'; // 'rf' | 'foreign'
 
   /* ── element refs ────────────────────────────────────────────────────────── */
   var panels = {
@@ -25,12 +26,15 @@
     step3:    document.getElementById('reg-step-3'),
   };
 
-  var stepNote       = document.querySelector('[data-reg-step-note]');
-  var stepIndicators = Array.prototype.slice.call(document.querySelectorAll('.crm-wizard-step'));
-  var typeGrid       = document.querySelector('.reg-type-grid');
-  var methodGrid     = document.querySelector('.reg-method-grid');
-  var innCard        = methodGrid ? methodGrid.querySelector('[data-value="inn"]') : null;
-  var innCardSmall   = innCard ? innCard.querySelector('small') : null;
+  var stepNote         = document.querySelector('[data-reg-step-note]');
+  var stepIndicators   = Array.prototype.slice.call(document.querySelectorAll('.crm-wizard-step'));
+  var typeGrid         = document.querySelector('.reg-type-grid');
+  var methodGrid       = document.querySelector('.reg-method-grid');
+  var citizenshipGroup = document.getElementById('reg-citizenship-group');
+  var flAddressFias    = document.getElementById('fl-address-fias');
+  var flAddressForeign = document.getElementById('fl-address-foreign');
+  var innCard          = methodGrid ? methodGrid.querySelector('[data-value="inn"]') : null;
+  var innCardSmall     = innCard ? innCard.querySelector('small') : null;
 
   /* ── panel helpers ───────────────────────────────────────────────────────── */
   function showPanel(key) {
@@ -89,6 +93,139 @@
     }
   }
 
+  /* ── citizenship group visibility ───────────────────────────────────────── */
+  function syncCitizenshipGroup() {
+    if (!citizenshipGroup || !typeGrid) return;
+    var selRadio = typeGrid.querySelector('.crm-option-card.is-selected input[type="radio"]');
+    var isFL     = selRadio && selRadio.value === 'fl';
+    citizenshipGroup.hidden = !isFL;
+  }
+
+  /* ── FL address mode (citizenship-driven) ────────────────────────────────── */
+  function applyFlCitizenship(value) {
+    flCitizenship = value;
+    if (!flAddressFias || !flAddressForeign) return;
+
+    var isRf = value === 'rf';
+    flAddressFias.hidden    = !isRf;
+    flAddressForeign.hidden = isRf;
+
+    if (!isRf) {
+      flAddressFias.querySelectorAll('[data-fias-panel]').forEach(function (panel) {
+        panel.hidden = true;
+      });
+    } else {
+      /* restore fill button visibility for RF citizen based on same-as state */
+      flAddressFias.querySelectorAll('.crm-btn-fill-address[data-address-target]').forEach(function (btn) {
+        var target    = btn.getAttribute('data-address-target');
+        var sameCheck = flAddressFias.querySelector('[data-address-same-as][data-address-target="' + target + '"]');
+        btn.hidden = !!(sameCheck && sameCheck.checked);
+      });
+    }
+  }
+
+  /* ── manual address assembly ─────────────────────────────────────────────── */
+  var MANUAL_PART_ORDER = [
+    'postalCode', 'country', 'region', 'district', 'city',
+    'settlement', 'street', 'house', 'building', 'flat', 'comment',
+  ];
+
+  function buildManualAddressFull(parts) {
+    var list = [];
+    var seen = {};
+    MANUAL_PART_ORDER.forEach(function (key) {
+      var s = String(parts[key] || '').replace(/\s+/g, ' ').trim();
+      if (!s) return;
+      var k = s.toLowerCase();
+      if (!seen[k]) { seen[k] = true; list.push(s); }
+    });
+    return list.join(', ');
+  }
+
+  function collectManualParts(grid) {
+    var parts = {};
+    grid.querySelectorAll('[data-manual-part]').forEach(function (field) {
+      var key = field.getAttribute('data-manual-part');
+      parts[key] = String(field.value || '').replace(/\s+/g, ' ').trim();
+    });
+    return parts;
+  }
+
+  function rebuildManualAddress(kind) {
+    var grid   = document.querySelector('[data-manual-kind="' + kind + '"]');
+    var output = document.querySelector('[data-manual-output="' + kind + '"]');
+    if (!grid || !output) return '';
+    var parts = collectManualParts(grid);
+    var full  = buildManualAddressFull(parts);
+    output.value = full;
+    return full;
+  }
+
+  function mirrorManualParts(sourceKind, targetKind) {
+    var sourceGrid = document.querySelector('[data-manual-kind="' + sourceKind + '"]');
+    var targetGrid = document.querySelector('[data-manual-kind="' + targetKind + '"]');
+    if (!sourceGrid || !targetGrid) return;
+    sourceGrid.querySelectorAll('[data-manual-part]').forEach(function (field) {
+      var key   = field.getAttribute('data-manual-part');
+      var tgt   = targetGrid.querySelector('[data-manual-part="' + key + '"]');
+      if (tgt) tgt.value = field.value;
+    });
+  }
+
+  function updateManualSameAs(sourceKind, fullText) {
+    document.querySelectorAll('[data-manual-same-as="' + sourceKind + '"]').forEach(function (cb) {
+      if (!cb.checked) return;
+      var targetKind   = cb.getAttribute('data-manual-target');
+      var preview      = document.querySelector('[data-manual-same-preview="' + targetKind + '"]');
+      var targetOutput = document.querySelector('[data-manual-output="' + targetKind + '"]');
+      if (preview)      preview.textContent = fullText || '';
+      if (targetOutput) targetOutput.value  = fullText || '';
+      mirrorManualParts(sourceKind, targetKind);
+    });
+  }
+
+  function initManualAddressListeners() {
+    document.querySelectorAll('[data-manual-kind]').forEach(function (grid) {
+      var kind = grid.getAttribute('data-manual-kind');
+      grid.addEventListener('input', function () {
+        var full = rebuildManualAddress(kind);
+        updateManualSameAs(kind, full);
+      });
+    });
+  }
+
+  function initManualSameAsCheckboxes() {
+    document.querySelectorAll('[data-manual-same-as]').forEach(function (cb) {
+      var sourceKind = cb.getAttribute('data-manual-same-as');
+      var targetKind = cb.getAttribute('data-manual-target');
+
+      function syncRow() {
+        var fieldsWrap = document.querySelector('[data-manual-fields-wrap="' + targetKind + '"]');
+        var sameNote   = document.querySelector('[data-manual-same-note="' + targetKind + '"]');
+
+        if (cb.checked) {
+          if (fieldsWrap) fieldsWrap.hidden = true;
+          if (sameNote)   sameNote.hidden   = false;
+
+          var sourceOutput = document.querySelector('[data-manual-output="' + sourceKind + '"]');
+          var fullText     = sourceOutput ? sourceOutput.value : '';
+          var preview      = document.querySelector('[data-manual-same-preview="' + targetKind + '"]');
+          var targetOutput = document.querySelector('[data-manual-output="' + targetKind + '"]');
+          if (preview)      preview.textContent = fullText || '';
+          if (targetOutput) targetOutput.value  = fullText || '';
+          mirrorManualParts(sourceKind, targetKind);
+        } else {
+          if (fieldsWrap) fieldsWrap.hidden = false;
+          if (sameNote)   sameNote.hidden   = true;
+          rebuildManualAddress(targetKind);
+        }
+      }
+
+      cb.addEventListener('change', syncRow);
+      syncRow();
+    });
+  }
+
   /* ── INN demo prefill data ───────────────────────────────────────────────── */
   var INN_FIELDS = {
     'ul-client-name':           'ООО "ТехноИмпульс"',
@@ -107,7 +244,12 @@
     'ul-pfr-number':            '087-001-123456',
     'ul-phone':                 '+7 (495) 123-45-67',
     'ul-email':                 'info@technoimpulse.demo',
-    'ul-address':               'г. Москва, ул. Летниковская, д. 10, стр. 4',
+    /* structured address parts */
+    'ul-address-country':       'Россия',
+    'ul-address-region':        'г. Москва',
+    'ul-address-street':        'ул. Летниковская',
+    'ul-address-house':         'д. 10',
+    'ul-address-building':      'стр. 4',
     'ul-beneficiary':           'Иванов Игорь Сергеевич',
     'ul-auth-persons':          'Генеральный директор Петров Пётр Петрович',
     'ul-okato':                 '45286585000',
@@ -142,10 +284,8 @@
     });
 
     Object.keys(INN_RADIOS).forEach(function (name) {
-      var val = INN_RADIOS[name];
-      var radios = document.querySelectorAll(
-        'input[type="radio"][name="' + name + '"]'
-      );
+      var val    = INN_RADIOS[name];
+      var radios = document.querySelectorAll('input[type="radio"][name="' + name + '"]');
       radios.forEach(function (radio) {
         radio.checked = radio.value === val;
         var lbl = radio.closest('label');
@@ -154,6 +294,9 @@
         }
       });
     });
+
+    /* assemble full UL address from filled parts */
+    rebuildManualAddress('ul-address');
   }
 
   function clearUlForm() {
@@ -163,6 +306,7 @@
     p.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
     p.querySelectorAll('.crm-binary-control label').forEach(function (l) { l.classList.remove('is-active'); });
     p.querySelectorAll('select').forEach(function (s) { s.selectedIndex = 0; });
+    p.querySelectorAll('textarea').forEach(function (t) { t.value = ''; });
   }
 
   /* ── result panel update ─────────────────────────────────────────────────── */
@@ -223,6 +367,7 @@
     } else if (subjectType === 'fl') {
       showPanel('step2fl');
       setStepNote('Шаг 2 из 3 · Данные клиента — Физическое лицо');
+      applyFlCitizenship(flCitizenship);
     } else {
       showPanel('step2ul');
       setStepNote(note || 'Шаг 2 из 3 · Данные клиента — Юридическое лицо');
@@ -275,8 +420,8 @@
     clearError(errId);
     bankCounter++;
 
-    var currency = curEl ? curEl.value : 'RUB';
-    var isPrimary = bankCounter === 1; // first added account is primary
+    var currency  = curEl ? curEl.value : 'RUB';
+    var isPrimary = bankCounter === 1;
 
     var listEl  = document.getElementById('bank-list-'  + suffix);
     var emptyEl = document.getElementById('bank-empty-' + suffix);
@@ -331,14 +476,23 @@
     });
   }
 
+  /* ── citizenship radio listeners ─────────────────────────────────────────── */
+  document.querySelectorAll('input[type="radio"][name="fl-citizenship-status"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) applyFlCitizenship(radio.value);
+    });
+  });
+
   /* ── click delegation ────────────────────────────────────────────────────── */
   document.addEventListener('click', function (event) {
     var target = event.target;
     if (!target || !target.closest) return;
 
-    /* sync INN card disabled state after any click inside the type grid */
     if (typeGrid && typeGrid.contains(target)) {
-      requestAnimationFrame(syncInnCard);
+      requestAnimationFrame(function () {
+        syncInnCard();
+        syncCitizenshipGroup();
+      });
     }
 
     /* ── step 1: Далее ─────────────────────────────────────────────────────── */
@@ -359,6 +513,12 @@
       subjectType = selType.value;
       regMethod   = selMethod.value;
       innResolved = false;
+
+      /* read citizenship selection for FL */
+      if (subjectType === 'fl') {
+        var checkedCit = document.querySelector('input[type="radio"][name="fl-citizenship-status"]:checked');
+        flCitizenship  = checkedCit ? checkedCit.value : 'rf';
+      }
 
       if (subjectType === 'ul') clearUlForm();
       goStep2();
@@ -447,42 +607,16 @@
     }
   });
 
-  /* ── FL residency toggle: RF resident gets FIAS buttons, non-resident edits manually ── */
-  (function () {
-    var fiasBlock   = document.getElementById('fl-address-fias');
-    var manualBlock = document.getElementById('fl-address-manual');
-
-    function applyResidency(value) {
-      if (!fiasBlock) return;
-      var isRf = value === 'rf';
-      fiasBlock.hidden = false;
-      if (manualBlock) manualBlock.hidden = true;
-
-      fiasBlock.querySelectorAll('.crm-btn-fill-address[data-address-target]').forEach(function (btn) {
-        var target = btn.getAttribute('data-address-target');
-        var sameCheck = fiasBlock.querySelector('[data-address-same-as][data-address-target="' + target + '"]');
-        btn.hidden = !isRf || !!(sameCheck && sameCheck.checked);
-      });
-
-      if (!isRf) {
-        fiasBlock.querySelectorAll('[data-fias-panel]').forEach(function (panel) {
-          panel.hidden = true;
-        });
-      }
-    }
-
-    document.querySelectorAll('input[type="radio"][name="fl-residency"]').forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        if (radio.checked) applyResidency(radio.value);
-      });
-    });
-
-    // Apply initial state (default: RF resident — FIAS buttons visible)
-    var checked = document.querySelector('input[type="radio"][name="fl-residency"]:checked');
-    applyResidency(checked ? checked.value : 'rf');
-  }());
-
   /* ── init ────────────────────────────────────────────────────────────────── */
+  /* Apply initial citizenship state (default: RF citizen — FIAS visible) */
+  var checkedCit = document.querySelector('input[type="radio"][name="fl-citizenship-status"]:checked');
+  applyFlCitizenship(checkedCit ? checkedCit.value : 'rf');
+
+  /* Wire manual structured address inputs */
+  initManualAddressListeners();
+  initManualSameAsCheckboxes();
+
   goStep1();
   syncInnCard();
+  syncCitizenshipGroup();
 })();
