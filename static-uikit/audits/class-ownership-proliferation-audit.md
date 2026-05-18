@@ -631,13 +631,12 @@ New validator check: **G-extra 6** — fails if any HTML page under `static-uiki
 
 | Rank | Task |
 |------|------|
-| 1 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
-| 2 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
-| 3 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
-| 4 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
-| 5 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
-| 6 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
-| 7 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+| 1 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 2 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 3 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
+| 4 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
+| 5 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
+| 6 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
 
 ---
 
@@ -714,10 +713,92 @@ Not moved. Used only in the contract wizard context and remains in `pages/contra
 
 | Rank | Task |
 |------|------|
-| 1 | **Consolidate `.crm-button-export-light`** to `components/buttons.css` — removes cross-page duplicate between subjects.css and compliance.css; fixes brokerage.html implicit dependency |
-| 2 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
-| 3 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
-| 4 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
-| 5 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
-| 6 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
-| 7 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+| 1 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 2 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 3 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
+| 4 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
+| 5 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
+| 6 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |
+
+---
+
+## Export Light Button Ownership Cleanup Notes
+
+**Date:** 2026-05-18
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `static-uikit/assets/css/components/buttons.css` | Added canonical `.crm-button-export-light` definition |
+| `static-uikit/assets/css/pages/subjects.css` | Removed page-scoped `.crm-button-export-light` block |
+| `static-uikit/assets/css/pages/compliance.css` | Removed page-scoped `.crm-button-export-light` block |
+| `static-uikit/tools/validate-static-uikit.mjs` | Added G-extra 8 guard |
+
+### Pages where `.crm-button-export-light` is used
+
+- `pages/subjects.html`
+- `pages/compliance.html`
+- `pages/brokerage.html`
+
+All three use the class on the same button pattern: `uk-button uk-button-default crm-button crm-button-secondary crm-button-export-light` (export CSV action in registry header actions).
+
+### CSS files where it was previously defined
+
+| File | Selector | Font-size |
+|------|----------|-----------|
+| `pages/subjects.css` | `.crm-page[data-page="subjects"] .crm-button-export-light` | `12px` |
+| `pages/compliance.css` | `.crm-page[data-page="compliance"] .crm-button-export-light` | `13px` |
+
+### Final canonical owner
+
+`components/buttons.css` — unscoped `.crm-button-export-light`.
+
+Canonical properties (subjects.css definition taken as authoritative):
+- `min-height: 36px; height: 36px;`
+- `padding: 0 14px;`
+- `border-radius: 999px;`
+- `border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);`
+- `background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);`
+- `color: var(--crm-umi-text-secondary);`
+- `font-size: 12px;`
+- `font-weight: 500;`
+- `box-shadow: none;`
+
+### Font-size decision (compliance override)
+
+`compliance.css` had `font-size: 13px`. No explicit visual requirement was documented for this value. The subjects.css value (`12px`) was chosen as the canonical value. No page-specific compliance override was kept.
+
+### Page-specific override retained
+
+None. Both page-scoped definitions were removed in full.
+
+### HTML / JS unchanged
+
+No HTML class names were changed. No JS files were touched. All three pages (subjects.html, compliance.html, brokerage.html) receive the export-light styles via `components/buttons.css`, which loads before page CSS in the cascade. `brokerage.html` now has an explicit component owner for this class for the first time.
+
+### Validator enhancement
+
+**Implemented** — G-extra 8 added to `validate-static-uikit.mjs`:
+- Fails if `pages/subjects.css` contains `.crm-button-export-light`.
+- Fails if `pages/compliance.css` contains `.crm-button-export-light`.
+- Fails if `components/buttons.css` does not contain `.crm-button-export-light`.
+
+### Build and validation results
+
+| Check | Result |
+|-------|--------|
+| `npm run static:uikit:bundle` | ✓ Bundle written — 42/42 sections, 243.1 KB |
+| `npm run static:uikit:bundle:check` | ✓ Bundle is up to date (42/42 sections, 243.1 KB) |
+| `npm run static:uikit:validate` | ✓ Errors: 0, Warnings: 0 |
+
+### Remaining class ownership candidates
+
+| Rank | Task |
+|------|------|
+| 1 | **Dead CSS cleanup in `components/cards.css`** — remove `.crm-decision-panel`, `.crm-kpi-card`, `.crm-journal-table`, `.crm-compliance-queue`, `.crm-register-actions` |
+| 2 | **Move `body[data-page="subject-edit"] .crm-edit-toast`** from `components/forms.css` to `pages/subject-edit.css` — restores component boundary |
+| 3 | **Compliance checklist scoping** — scope `.crm-doc-checklist`, `.crm-doc-checklist-item` to `[data-page="compliance-card"]` in compliance.css |
+| 4 | **`subject-section` rename** — rename bare class to `crm-subject-section` in HTML and CSS |
+| 5 | **Remove orphan `crm-profile-section`** from 5 elements in subject-card.html / subject-card-individual.html |
+| 6 | **Remove orphan `crm-subject-form-layout`** from 2 elements in subject-card.html / subject-card-individual.html |

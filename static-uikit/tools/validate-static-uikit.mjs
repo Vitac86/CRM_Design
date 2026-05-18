@@ -1218,6 +1218,36 @@ if (existsSync(CONTRACT_WIZARD_CSS)) {
   }
 }
 
+// G-extra 8: .crm-button-export-light must be in components/buttons.css only.
+// Fails if pages/subjects.css or pages/compliance.css still define it.
+// Fails if components/buttons.css does not define it.
+if (existsSync(SUBJECTS_CSS)) {
+  const subjExportSource = stripCssBlockComments(readFileSync(SUBJECTS_CSS, 'utf8'));
+  if (/\.crm-button-export-light\b/.test(subjExportSource)) {
+    err('pages/subjects.css contains .crm-button-export-light — this class is now owned by components/buttons.css; remove the page-scoped definition');
+  } else {
+    ok('pages/subjects.css contains no .crm-button-export-light definition');
+  }
+}
+
+if (existsSync(COMPLIANCE_CSS)) {
+  const compExportSource = stripCssBlockComments(readFileSync(COMPLIANCE_CSS, 'utf8'));
+  if (/\.crm-button-export-light\b/.test(compExportSource)) {
+    err('pages/compliance.css contains .crm-button-export-light — this class is now owned by components/buttons.css; remove the page-scoped definition');
+  } else {
+    ok('pages/compliance.css contains no .crm-button-export-light definition');
+  }
+}
+
+if (existsSync(BUTTONS_CSS)) {
+  const btnsExportSource = stripCssBlockComments(readFileSync(BUTTONS_CSS, 'utf8'));
+  if (!/\.crm-button-export-light\b/.test(btnsExportSource)) {
+    err('components/buttons.css does not contain .crm-button-export-light — the canonical shared definition is missing');
+  } else {
+    ok('components/buttons.css contains canonical .crm-button-export-light definition');
+  }
+}
+
 // ── Section H: Summary ───────────────────────────────────────────────────────
 
 section('H. Summary');

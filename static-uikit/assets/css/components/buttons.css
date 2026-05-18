@@ -59,6 +59,20 @@
   border-color: #c5d3ea;
 }
 
+/* Export-light variant */
+.crm-button-export-light {
+  min-height: 36px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
+  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
+  color: var(--crm-umi-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
 /* Disabled state */
 .uk-button:disabled,
 .uk-button[disabled] {

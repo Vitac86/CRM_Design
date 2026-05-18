@@ -56,14 +56,6 @@
   max-width: 100%;
 }
 
-.crm-page[data-page="compliance"] .crm-button-export-light {
-  min-height: 36px;
-  height: 36px;
-  border-radius: 999px;
-  padding-inline: 14px;
-  font-size: 13px;
-}
-
 /* 4. Registry table sizing */
 .crm-page.crm-registry-page[data-page="compliance"] .crm-compliance-table .crm-table {
   width: max-content;

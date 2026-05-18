@@ -1344,6 +1344,20 @@ a:focus-visible {
   border-color: #c5d3ea;
 }
 
+/* Export-light variant */
+.crm-button-export-light {
+  min-height: 36px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
+  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
+  color: var(--crm-umi-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
 /* Disabled state */
 .uk-button:disabled,
 .uk-button[disabled] {
@@ -4130,19 +4144,6 @@ body[data-page="subjects"] .crm-filter-menu[data-filter-menu="qualification"] .c
 
 body[data-page="subjects"] .crm-filter-menu[data-filter-menu="subject-status"] .crm-filter-dropdown {
   min-width: 248px;
-}
-
-.crm-page[data-page="subjects"] .crm-button-export-light {
-  min-height: 36px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border-color: color-mix(in srgb, var(--crm-umi-border) 88%, transparent);
-  background: color-mix(in srgb, var(--crm-umi-surface) 85%, var(--crm-primary-soft) 15%);
-  color: var(--crm-umi-text-secondary);
-  font-size: 12px;
-  font-weight: 500;
-  box-shadow: none;
 }
 
 /* Table sizing */
@@ -7474,14 +7475,6 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   justify-content: flex-end;
   min-width: 0;
   max-width: 100%;
-}
-
-.crm-page[data-page="compliance"] .crm-button-export-light {
-  min-height: 36px;
-  height: 36px;
-  border-radius: 999px;
-  padding-inline: 14px;
-  font-size: 13px;
 }
 
 /* 4. Registry table sizing */
