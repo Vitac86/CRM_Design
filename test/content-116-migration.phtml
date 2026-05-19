@@ -1,0 +1,707 @@
+<?php
+/** @var umiTemplaterPHP $this */
+/** @var array $variables */
+// Список комплаенс — MIGRATION v2 (новый CRM-дизайн поверх старой логики)
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/halkoteka/initialize.php";
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/loger/logUser.php";
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/simpleParam.php";
+
+// -------------------- Dual logger --------------------
+$__LOG_BASE_CTX = [
+    'script'  => 'content-116',
+    'page_id' => 116,
+];
+
+function normForLog($v): string
+{
+    if ($v === null)    return '';
+    if (is_bool($v))   return $v ? '1' : '0';
+    if (is_scalar($v)) return (string) $v;
+    return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function trackUmiSet($object, array &$fieldsLog, string $field, $newValue, string $source = 'front_compliance'): bool
+{
+    $oldValue = $object->getValue($field);
+    $oldNorm  = normForLog($oldValue);
+    $newNorm  = normForLog($newValue);
+    $changed  = ($oldNorm !== $newNorm);
+
+    if (!$changed) {
+        $fieldsLog[] = ['field' => $field, 'value' => $newNorm, 'source' => $source, 'changed' => false, 'meta' => ['op' => 'set', 'prev' => $oldNorm]];
+        return false;
+    }
+    try {
+        $object->setValue($field, $newValue);
+        $fieldsLog[] = ['field' => $field, 'value' => $newNorm, 'source' => $source, 'changed' => true, 'meta' => ['op' => 'set', 'prev' => $oldNorm]];
+        return true;
+    } catch (Throwable $e) {
+        $fieldsLog[] = ['field' => $field, 'value' => $newNorm, 'source' => $source, 'changed' => false, 'meta' => ['op' => 'set', 'prev' => $oldNorm, 'error' => $e->getMessage()]];
+        return false;
+    }
+}
+
+// ==================== СТАРЫЕ ФУНКЦИИ ЗАПРОСОВ (сохранены без изменений) ====================
+
+function getUserIdByStatus($status_klienta_input)
+{
+    $client = new selector('objects');
+    $client->types('object-type')->id(TmpltId::$ClientPhys);
+    $client->where('status_klienta')->equals($status_klienta_input);
+    return $client;
+}
+
+function getFirmsIdByStatus($status_klienta_input)
+{
+    $client = new selector('objects');
+    $client->types('object-type')->id(TmpltId::$ClientFirm);
+    $client->where('status_klienta')->equals($status_klienta_input);
+    return $client;
+}
+
+// ==================== ФУНКЦИИ МАППИНГА (миграционный слой) ====================
+
+/**
+ * Форматирует num_investika как INVXXXXX.
+ * Если поле уже содержит префикс INV — сохраняет как есть (upper).
+ */
+function formatInvestikaCode($num): string
+{
+    if (!$num) return '—';
+    $s = trim((string) $num);
+    if ($s === '') return '—';
+    if (mb_strtoupper(mb_substr($s, 0, 3)) === 'INV') return mb_strtoupper($s);
+    return 'INV' . $s;
+}
+
+/**
+ * Разбирает юридический подтип из наименования.
+ * org_type в UMI не существует — парсинг из basicname/origname.
+ */
+function parseLegalSubtype($basicname, $origname = ''): string
+{
+    $name = (string) $basicname . ' ' . (string) $origname;
+    if (mb_strpos($name, 'ПАО') !== false) return 'ПАО';
+    if (mb_strpos($name, 'АО')  !== false) return 'АО';
+    if (mb_strpos($name, 'ООО') !== false) return 'ООО';
+    return 'ЮЛ';
+}
+
+/** Метка статуса комплаенса из status_klienta. */
+function mapStatusLabel($code): string
+{
+    $map = ['5' => 'Пройден', '3' => 'На проверке', '4' => 'На доработке', '-1' => 'Заблокирован'];
+    return $map[(string) $code] ?? '—';
+}
+
+/** CSS-модификатор бейджа статуса. */
+function mapStatusBadgeClass($code): string
+{
+    $map = ['5' => 'success', '3' => 'info', '4' => 'warning', '-1' => 'danger'];
+    return $map[(string) $code] ?? 'muted';
+}
+
+/** data-filter-compliance-status значение. */
+function mapStatusFilterValue($code): string
+{
+    $map = ['5' => 'approved', '3' => 'pending-review', '4' => 'rework', '-1' => 'blocked'];
+    return $map[(string) $code] ?? 'unknown';
+}
+
+/**
+ * Метка резидентства из isrezident.
+ * ФЛ: isrezident=true → «Гражданин РФ», false → «Иностранный гражданин».
+ * ЮЛ: isrezident=true → «Российское ЮЛ», false → «Иностранное ЮЛ».
+ */
+function mapResidencyLabel($isrezident, string $entityType): string
+{
+    if ($entityType === 'firm') {
+        return $isrezident ? 'Российское ЮЛ' : 'Иностранное ЮЛ';
+    }
+    return $isrezident ? 'Гражданин РФ' : 'Иностранный гражданин';
+}
+
+/** CSS-модификатор бейджа резидентства. */
+function mapResidencyBadgeClass($isrezident): string
+{
+    return $isrezident ? 'success' : 'warning';
+}
+
+/** data-filter-residency значение. */
+function mapResidencyFilterValue($isrezident): string
+{
+    return $isrezident ? 'resident' : 'non-resident';
+}
+
+/**
+ * data-filter-client-type значение.
+ * ИП: TODO — нет подтверждённого источника ОГРНИП / отдельного шаблона в UMI.
+ */
+function mapClientTypeFilterValue(string $entityType, string $subtype): string
+{
+    if ($entityType === 'phys') return 'person';
+    $subtypeMap = ['ООО' => 'legal llc', 'АО' => 'legal ao', 'ПАО' => 'legal pao'];
+    return $subtypeMap[$subtype] ?? 'legal';
+}
+
+/** Метка типа клиента для отображения. */
+function mapClientTypeLabel(string $entityType, string $subtype): string
+{
+    if ($entityType === 'phys') return 'Физ. лицо';
+    if ($subtype === 'ЮЛ') return 'Юр. лицо';
+    return $subtype;
+}
+
+/**
+ * Маппинг risklevel (guide ID 145).
+ * initial → КНУР, low → КОУР, medium → КСУР, high → КПУР.
+ */
+function mapRiskLevelLabel($value): string
+{
+    $map = [
+        'initial' => 'КНУР',
+        'low'     => 'КОУР',
+        'medium'  => 'КСУР',
+        'high'    => 'КПУР',
+    ];
+    return $map[(string) $value] ?? '—';
+}
+
+// ==================== СЕССИЯ ====================
+
+$objectsCollection = umiObjectsCollection::getInstance();
+$typesCollection   = umiObjectTypesCollection::getInstance();
+
+$user = $variables['user'] ?? [];
+if (($user['@status'] ?? '') !== 'auth') {
+    $user = [];
+}
+$userLogin = $user['@login'] ?? '';
+
+// ==================== ОБРАБОТКА POST: отмена с замечаниями ====================
+// СОХРАНЕНО БЕЗ ИЗМЕНЕНИЙ — оригинальная логика content-116.phtml
+
+if (isset($_POST["typesend"])) {
+    if ("firm" == $_POST["typesend"]) {
+        foreach ($_POST as $k => $v) {
+            if ("typesend" == $k) continue;
+            $k      = trim($k);
+            $client = new selector('objects');
+            $client->types('object-type')->id(TmpltId::$ClientFirm);
+            $client->where('hash')->equals($k);
+            if ($client && $client->length() > 0) {
+                foreach ($client as $vl) {
+                    $hystory    = $vl->getValue('komplajns_zamechaniya') . "_|||_|" . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $v;
+                    $fieldsLog  = [];
+                    $actions    = [];
+                    trackUmiSet($vl, $fieldsLog, 'status_klienta', 4, 'front_compliance');
+                    trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $hystory, 'front_compliance');
+                    $vl->commit();
+                    $actions[]  = ['action' => 'compliance_reject', 'result' => 'success', 'message' => 'Отмена с замечаниями (firm)'];
+                    $__hash     = (string) $vl->getValue('hash');
+                    $__dctx     = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_REJECT', 'entity' => 'firm']), $userLogin)->setHash($__hash);
+                    $__env      = $__dctx->env();
+                    $__env->kv('entity', 'firm');
+                    $__env->kv('event', 'COMPLIANCE_REJECT');
+                    $__env->kv('comment_len', mb_strlen($v));
+                    $__env->kv('received_keys', array_keys($_POST));
+                    $__env->in('data.received', $_POST);
+                    foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                    foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                    $__env->status('success');
+                    $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReject_done', 'COMPLIANCE_REJECT');
+                }
+            }
+        }
+        header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+        exit;
+    } else {
+        foreach ($_POST as $k => $v) {
+            if ("typesend" == $k) continue;
+            $client = new selector('objects');
+            $client->types('object-type')->id(TmpltId::$ClientPhys);
+            $client->where('hash')->equals($k);
+            if ($client && $client->length() > 0) {
+                foreach ($client as $vl) {
+                    $hystory   = $vl->getValue('komplajns_zamechaniya') . "_|||_|" . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $v;
+                    $fieldsLog = [];
+                    $actions   = [];
+                    trackUmiSet($vl, $fieldsLog, 'status_klienta', 4, 'front_compliance');
+                    trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $hystory, 'front_compliance');
+                    $vl->commit();
+                    $actions[] = ['action' => 'compliance_reject', 'result' => 'success', 'message' => 'Отмена с замечаниями (phys)'];
+                    $__hash    = (string) $vl->getValue('hash');
+                    $__dctx    = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_REJECT', 'entity' => 'phys']), $userLogin)->setHash($__hash);
+                    $__env     = $__dctx->env();
+                    $__env->kv('entity', 'phys'); $__env->kv('event', 'COMPLIANCE_REJECT'); $__env->kv('comment_len', mb_strlen($v)); $__env->kv('received_keys', array_keys($_POST)); $__env->in('data.received', $_POST);
+                    foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                    foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                    $__env->status('success');
+                    $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReject_done', 'COMPLIANCE_REJECT');
+                }
+            }
+        }
+        header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+        exit;
+    }
+}
+
+// ==================== ОБРАБОТКА POST: блокировка физика ====================
+
+if (isset($_POST["ban_phys_comment"])) {
+    $hash    = (string) ($_POST["hash"]    ?? '');
+    $comment = (string) ($_POST["comment"] ?? '');
+    if ($hash && $comment) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientPhys);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions   = [];
+                $current   = (string) $vl->getValue('komplajns_zamechaniya');
+                $newEntry  = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+                $history   = $current ? $current . $newEntry : $newEntry;
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "-1", 'front_compliance');
+                trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance');
+                $vl->commit();
+                $actions[] = ['action' => 'compliance_ban', 'result' => 'success', 'message' => 'Физик заблокирован с комментарием'];
+                $__hash    = (string) $vl->getValue('hash');
+                $__dctx    = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_BAN', 'entity' => 'phys']), $userLogin)->setHash($__hash);
+                $__env     = $__dctx->env();
+                $__env->kv('entity', 'phys'); $__env->kv('event', 'COMPLIANCE_BAN'); $__env->kv('comment_len', mb_strlen($comment)); $__env->kv('received_keys', array_keys($_POST)); $__env->in('data.received', $_POST);
+                foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceBan_done', 'COMPLIANCE_BAN');
+            }
+        }
+    }
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// ==================== ОБРАБОТКА POST: блокировка юрика ====================
+
+if (isset($_POST["ban_firm_comment"])) {
+    $hash    = (string) ($_POST["hash"]    ?? '');
+    $comment = (string) ($_POST["comment"] ?? '');
+    if ($hash && $comment) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientFirm);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions   = [];
+                $current   = (string) $vl->getValue('komplajns_zamechaniya');
+                $newEntry  = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+                $history   = $current ? $current . $newEntry : $newEntry;
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "-1", 'front_compliance');
+                trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance');
+                $vl->commit();
+                $actions[] = ['action' => 'compliance_ban', 'result' => 'success', 'message' => 'Юрик заблокирован с комментарием'];
+                $__hash    = (string) $vl->getValue('hash');
+                $__dctx    = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_BAN', 'entity' => 'firm']), $userLogin)->setHash($__hash);
+                $__env     = $__dctx->env();
+                $__env->kv('entity', 'firm'); $__env->kv('event', 'COMPLIANCE_BAN'); $__env->kv('comment_len', mb_strlen($comment)); $__env->kv('received_keys', array_keys($_POST)); $__env->in('data.received', $_POST);
+                foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceBan_done', 'COMPLIANCE_BAN');
+            }
+        }
+    }
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// ==================== ОБРАБОТКА GET: подтверждение физика ====================
+
+if (isset($_GET["checked_phys"])) {
+    $hash = (string) ($_GET["checked_phys"] ?? '');
+    if ($hash) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientPhys);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions   = [];
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "5", 'front_compliance');
+                $vl->commit();
+                $actions[] = ['action' => 'compliance_approve', 'result' => 'success', 'message' => 'Подтверждён физик'];
+                $__hash    = (string) $vl->getValue('hash');
+                $__dctx    = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_APPROVE', 'entity' => 'phys']), $userLogin)->setHash($__hash);
+                $__env     = $__dctx->env();
+                $__env->kv('entity', 'phys'); $__env->kv('event', 'COMPLIANCE_APPROVE'); $__env->kv('received_keys', array_keys($_GET)); $__env->in('data.received', $_GET);
+                foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceApprove_done', 'COMPLIANCE_APPROVE');
+            }
+        }
+    }
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// ==================== ОБРАБОТКА GET: физик на исправление ====================
+
+if (isset($_GET["redact_phys"])) {
+    $hash = (string) ($_GET["redact_phys"] ?? '');
+    $bd   = (string) ($_GET["bd"] ?? '');
+    if ($hash) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientPhys);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                if ($bd && $vl->getValue("birthday") != $bd) continue;
+                $fieldsLog = [];
+                $actions   = [];
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "4", 'front_compliance');
+                $vl->commit();
+                $actions[] = ['action' => 'compliance_return_to_fix', 'result' => 'success', 'message' => 'Физик отправлен на исправление (status_klienta=4)'];
+                $__hash    = (string) $vl->getValue('hash');
+                $__dctx    = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_RETURN_TO_FIX', 'entity' => 'phys']), $userLogin)->setHash($__hash);
+                $__env     = $__dctx->env();
+                $__env->kv('entity', 'phys'); $__env->kv('event', 'COMPLIANCE_RETURN_TO_FIX'); $__env->kv('received_keys', array_keys($_GET)); $__env->in('data.received', $_GET);
+                foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReturnToFix_done', 'COMPLIANCE_RETURN_TO_FIX');
+            }
+        }
+    }
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// ==================== ОБРАБОТКА GET: подтверждение юрика ====================
+
+if (isset($_GET["checked"])) {
+    $hash = (string) ($_GET["checked"] ?? '');
+    if ($hash) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientFirm);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions   = [];
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "5", 'front_compliance');
+                $vl->commit();
+                $actions[] = ['action' => 'compliance_approve', 'result' => 'success', 'message' => 'Юрик подтверждён (status_klienta=5)'];
+                $__hash    = (string) $vl->getValue('hash');
+                $__dctx    = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_APPROVE', 'entity' => 'firm']), $userLogin)->setHash($__hash);
+                $__env     = $__dctx->env();
+                $__env->kv('entity', 'firm'); $__env->kv('event', 'COMPLIANCE_APPROVE'); $__env->kv('received_keys', array_keys($_GET)); $__env->in('data.received', $_GET);
+                foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+                foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), (array)($__a['meta'] ?? [])); }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceApprove_done', 'COMPLIANCE_APPROVE');
+            }
+        }
+    }
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// ==================== СБОР ДАННЫХ ДЛЯ ВЫВОДА ====================
+// TODO: заменить на $this->getData('getComplianceList', $params) когда будет реализован classes/modules/content/class.php
+
+// Все статусы комплаенса: 3=На проверке, 4=На доработке, 5=Пройден, -1=Заблокирован
+$allStatuses = ['3', '4', '5', '-1'];
+$items       = [];
+
+foreach ($allStatuses as $statusCode) {
+    $firms = getFirmsIdByStatus($statusCode);
+    if ($firms && $firms->length() > 0) {
+        foreach ($firms as $obj) {
+            $basicname  = $obj->getValue('basicname');
+            $origname   = $obj->getValue('origname');
+            $subtype    = parseLegalSubtype($basicname, $origname);
+            $isrezident = (bool) $obj->getValue('isrezident');
+            $numInv     = $obj->getValue('num_investika');
+            $items[] = [
+                'type'                => 'firm',
+                'hash'                => (string) $obj->getValue('hash'),
+                'code'                => formatInvestikaCode($numInv),
+                'name'                => $basicname ?: $origname ?: '—',
+                'inn'                 => (string) $obj->getValue('inn'),
+                'subtype'             => $subtype,
+                'type_label'          => mapClientTypeLabel('firm', $subtype),
+                'type_filter'         => mapClientTypeFilterValue('firm', $subtype),
+                'residency_label'     => mapResidencyLabel($isrezident, 'firm'),
+                'residency_badge'     => mapResidencyBadgeClass($isrezident),
+                'residency_filter'    => mapResidencyFilterValue($isrezident),
+                'status_raw'          => $statusCode,
+                'status_label'        => mapStatusLabel($statusCode),
+                'status_badge'        => mapStatusBadgeClass($statusCode),
+                'status_filter'       => mapStatusFilterValue($statusCode),
+                // TODO: «Полный комплект документов» — нет подтверждённого поля в UMI.
+                //       Выводится как disabled-заглушка.
+                'docs_complete_todo'  => true,
+            ];
+        }
+    }
+}
+
+foreach ($allStatuses as $statusCode) {
+    $phys = getUserIdByStatus($statusCode);
+    if ($phys && $phys->length() > 0) {
+        foreach ($phys as $obj) {
+            $surname    = $obj->getValue('surname');
+            $namecl     = $obj->getValue('namecl');
+            $patronymic = $obj->getValue('patronymic');
+            $fullName   = trim("$surname $namecl $patronymic") ?: '—';
+            $isrezident = (bool) $obj->getValue('isrezident');
+            $numInv     = $obj->getValue('num_investika');
+            $items[] = [
+                'type'                => 'phys',
+                'hash'                => (string) $obj->getValue('hash'),
+                'code'                => formatInvestikaCode($numInv),
+                'name'                => $fullName,
+                'inn'                 => (string) $obj->getValue('inn'),
+                'subtype'             => '',
+                'type_label'          => 'Физ. лицо',
+                'type_filter'         => 'person',
+                // ФЛ: isrezident = гражданство РФ, не налоговое резидентство
+                'residency_label'     => mapResidencyLabel($isrezident, 'phys'),
+                'residency_badge'     => mapResidencyBadgeClass($isrezident),
+                'residency_filter'    => mapResidencyFilterValue($isrezident),
+                'status_raw'          => $statusCode,
+                'status_label'        => mapStatusLabel($statusCode),
+                'status_badge'        => mapStatusBadgeClass($statusCode),
+                'status_filter'       => mapStatusFilterValue($statusCode),
+                // TODO: «Полный комплект документов» — нет подтверждённого поля в UMI.
+                'docs_complete_todo'  => true,
+            ];
+        }
+    }
+}
+
+// TODO: URL страницы карточки — уточнить у владельца проекта (UmiCMS routing).
+//       Предполагаемый вид: /compliance/card/?hash=XXXX
+//       Пока используется заглушка с data-href на data-hash.
+$cardBaseUrl = '/compliance/card/';
+
+?>
+
+<div class="crm-page crm-registry-page" data-page="compliance">
+  <div class="crm-registry-shell crm-compliance-shell">
+
+    <div class="crm-page-header crm-page-header-row">
+      <div class="crm-registry-title-block">
+        <h1 class="crm-page-title" data-entity="page-title">Комплаенс</h1>
+      </div>
+      <div class="crm-header-actions crm-registry-actions">
+        <?php /* TODO: кнопка «Экспорт» — реализовать exportComplianceCSV() в content_custom. Пока UI-only. */ ?>
+        <button
+          class="uk-button uk-button-default crm-button crm-button-secondary crm-button-export-light"
+          type="button"
+          data-action="export-table-csv"
+          data-export-filename="compliance.csv"
+          data-export-scope="nearest"
+          disabled
+          title="TODO: требуется метод exportComplianceCSV() в content_custom"
+        >Экспорт</button>
+      </div>
+    </div>
+
+    <form
+      action="#"
+      method="post"
+      data-form="compliance-filters"
+      data-action="filter-compliance"
+      class="crm-registry-filters crm-filter-panel"
+      data-filter="compliance"
+    >
+      <div class="crm-filter-search-row crm-filter-search">
+        <label class="crm-filter-search-shell" for="compliance-search">
+          <span class="crm-filter-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" role="img" aria-hidden="true" focusable="false">
+              <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"></circle>
+              <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </span>
+          <input
+            id="compliance-search"
+            class="uk-input crm-input crm-filter-search-input"
+            type="search"
+            name="compliance-search"
+            placeholder="Поиск по клиенту, коду, ИНН или статусу"
+            autocomplete="off"
+            data-filter-search
+          />
+        </label>
+      </div>
+      <div class="crm-filter-fields-row crm-filter-grid">
+
+        <div class="crm-filter-control crm-filter-pill-control">
+          <details class="crm-filter-menu" data-filter-menu="client-type">
+            <summary class="crm-filter-trigger" aria-label="Фильтр: Тип клиента">
+              <span class="crm-filter-trigger-label">Тип клиента:</span>
+              <span class="crm-filter-trigger-value">Все</span>
+              <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="crm-filter-dropdown" role="listbox" aria-label="Тип клиента">
+              <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true" data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="legal"><span>Юр. лицо</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="person"><span>Физ. лицо</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <?php /* TODO: ИП — требуется подтверждение источника ОГРНИП / отдельного шаблона UMI. Пока UI-опция недоступна. */ ?>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="llc"><span>ООО</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="ao"><span>АО</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="pao"><span>ПАО</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+            </div>
+            <input type="hidden" name="client-type" value="all" data-filter="client-type"/>
+          </details>
+        </div>
+
+        <div class="crm-filter-control crm-filter-pill-control">
+          <details class="crm-filter-menu" data-filter-menu="residency">
+            <summary class="crm-filter-trigger" aria-label="Фильтр: Резидентство">
+              <span class="crm-filter-trigger-label">Резидентство:</span>
+              <span class="crm-filter-trigger-value">Все</span>
+              <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="crm-filter-dropdown" role="listbox" aria-label="Резидентство">
+              <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true"  data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="resident"><span>Резидент РФ</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="non-resident"><span>Нерезидент</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+            </div>
+            <input type="hidden" name="residency" value="all" data-filter="residency"/>
+          </details>
+        </div>
+
+        <div class="crm-filter-control crm-filter-pill-control">
+          <details class="crm-filter-menu" data-filter-menu="compliance-status">
+            <summary class="crm-filter-trigger" aria-label="Фильтр: Статус комплаенса">
+              <span class="crm-filter-trigger-label">Статус комплаенса:</span>
+              <span class="crm-filter-trigger-value">Все</span>
+              <span class="crm-filter-trigger-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="crm-filter-dropdown" role="listbox" aria-label="Статус комплаенса">
+              <button type="button" class="crm-filter-option is-selected" role="option" aria-selected="true"  data-filter-option data-filter-value="all"><span>Все</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="approved"><span>Пройден</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="pending-review"><span>На проверке</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="rework"><span>На доработке</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+              <button type="button" class="crm-filter-option" role="option" aria-selected="false" data-filter-option data-filter-value="blocked"><span>Заблокирован</span><span class="crm-filter-option-check" aria-hidden="true">✓</span></button>
+            </div>
+            <input type="hidden" name="compliance-status" value="all" data-filter="compliance-status"/>
+          </details>
+        </div>
+
+        <div class="crm-filter-actions">
+          <button type="button" class="uk-button uk-button-default crm-button crm-button-ghost crm-filter-reset" data-action="reset-filters">
+            Очистить фильтры
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+    <div class="crm-table-card crm-registry-table" data-entity="compliance-table">
+      <div class="crm-table-wrapper crm-compliance-table">
+        <div class="crm-table">
+          <table class="uk-table uk-table-divider uk-table-hover" data-sortable-table>
+            <colgroup>
+              <col class="crm-col-id"/>
+              <col class="crm-col-name"/>
+              <col class="crm-col-id"/>
+              <col class="crm-col-type"/>
+              <col class="crm-col-status"/>
+              <col class="crm-col-status"/>
+              <col class="crm-col-compact"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th data-sort-key="client-code" data-sort-type="number" aria-sort="none">
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">Код клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+                <th data-sort-key="client-name" data-sort-type="text" aria-sort="none">
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">Наименование клиента</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+                <th data-sort-key="inn" data-sort-type="number" aria-sort="none">
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">ИНН</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+                <th data-sort-key="client-type" data-sort-type="text" aria-sort="none">
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">Тип</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+                <th data-sort-key="residency" data-sort-type="text" aria-sort="none">
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">Резидент</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+                <th data-sort-key="compliance-status" data-sort-type="text" aria-sort="none">
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">Статус комплаенса</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+                <th data-sort-key="documents" data-sort-type="text" aria-sort="none">
+                  <?php /* TODO: «Полный комплект» — нет подтверждённого поля.
+                               Колонка оставлена как UI-заглушка.
+                               Убрать или активировать после подтверждения источника данных. */ ?>
+                  <button type="button" class="crm-th-sort-button"><span class="crm-th-label">Полный комплект</span><span class="crm-th-sort" aria-hidden="true">▾</span></button>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($items)) : ?>
+                <?php foreach ($items as $item) : ?>
+                  <tr
+                    data-entity="compliance"
+                    data-id="<?= htmlspecialchars($item['hash'], ENT_QUOTES, 'UTF-8') ?>"
+                    data-href="<?= htmlspecialchars($cardBaseUrl . '?hash=' . urlencode($item['hash']), ENT_QUOTES, 'UTF-8') ?>"
+                    data-filter-client-type="<?= htmlspecialchars($item['type_filter'], ENT_QUOTES, 'UTF-8') ?>"
+                    data-filter-residency="<?= htmlspecialchars($item['residency_filter'], ENT_QUOTES, 'UTF-8') ?>"
+                    data-filter-compliance-status="<?= htmlspecialchars($item['status_filter'], ENT_QUOTES, 'UTF-8') ?>"
+                  >
+                    <td><?= htmlspecialchars($item['code'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td>
+                      <div class="crm-row-main"><?= htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                    </td>
+                    <td><?= htmlspecialchars($item['inn'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
+                    <td>
+                      <span class="crm-badge muted" data-entity="badge-type"><?= htmlspecialchars($item['type_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </td>
+                    <td>
+                      <span class="crm-badge <?= htmlspecialchars($item['residency_badge'], ENT_QUOTES, 'UTF-8') ?>" data-entity="badge-residency"><?= htmlspecialchars($item['residency_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </td>
+                    <td>
+                      <span class="crm-badge <?= htmlspecialchars($item['status_badge'], ENT_QUOTES, 'UTF-8') ?>" data-status="<?= htmlspecialchars($item['status_filter'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($item['status_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </td>
+                    <td>
+                      <?php /* TODO: «Полный комплект документов» — источник не подтверждён.
+                                   Выводится disabled-заглушка. Не создавать новые UMI-поля. */ ?>
+                      <span class="crm-badge muted" data-status="docs-unknown" title="TODO: источник данных не подтверждён">—</span>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="crm-compliance-table-footer crm-pagination crm-registry-table-footer" aria-label="Навигация по таблице">
+        <div class="crm-compliance-footer-page-size crm-pagination-size" data-page-size-group>
+          <span class="crm-compliance-footer-caption crm-pagination-caption">СТРОК НА СТРАНИЦЕ</span>
+          <button type="button" class="crm-footer-chip crm-pagination-chip is-active" data-page-size-value="25" aria-pressed="true">25</button>
+          <button type="button" class="crm-footer-chip crm-pagination-chip" data-page-size-value="50" aria-pressed="false">50</button>
+          <button type="button" class="crm-footer-chip crm-pagination-chip" data-page-size-value="100" aria-pressed="false">100</button>
+        </div>
+        <div class="crm-compliance-footer-nav crm-pagination-nav">
+          <span class="crm-compliance-footer-page crm-pagination-indicator" data-pagination-indicator>
+            1 из 1
+          </span>
+          <button type="button" class="crm-compliance-footer-nav-button crm-pagination-button" aria-label="Предыдущая страница" disabled><span aria-hidden="true">‹</span></button>
+          <button type="button" class="crm-compliance-footer-nav-button crm-pagination-button" aria-label="Следующая страница" disabled><span aria-hidden="true">›</span></button>
+        </div>
+      </div>
+
+      <div class="crm-empty-state" data-entity="empty-state" <?= empty($items) ? '' : 'hidden' ?>>
+        <div class="crm-empty-state-title">Нет записей комплаенса</div>
+        <div class="crm-empty-state-text">Скорректируйте фильтры или дождитесь поступления клиентов на проверку.</div>
+      </div>
+    </div>
+
+  </div>
+</div>

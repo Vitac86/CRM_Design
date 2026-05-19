@@ -1,0 +1,835 @@
+<?php
+/** @var umiTemplaterPHP $this */
+/** @var array $variables */
+// Карточка комплаенс-проверки клиента — MIGRATION v2 (новый CRM-дизайн)
+// TODO: Назначить номер страницы UmiCMS. Предполагаемый путь: content-151.phtml
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/halkoteka/initialize.php";
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/loger/logUser.php";
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/simpleParam.php";
+
+// -------------------- Dual logger --------------------
+$__LOG_BASE_CTX = [
+    'script'  => 'content-compliance-card',
+    'page_id' => 0, // TODO: задать реальный page_id после создания страницы в UMI
+];
+
+function normForLogCard($v): string
+{
+    if ($v === null)    return '';
+    if (is_bool($v))   return $v ? '1' : '0';
+    if (is_scalar($v)) return (string) $v;
+    return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function trackUmiSetCard($object, array &$fieldsLog, string $field, $newValue, string $source = 'front_compliance_card'): bool
+{
+    $oldValue = $object->getValue($field);
+    $oldNorm  = normForLogCard($oldValue);
+    $newNorm  = normForLogCard($newValue);
+    $changed  = ($oldNorm !== $newNorm);
+    if (!$changed) {
+        $fieldsLog[] = ['field' => $field, 'value' => $newNorm, 'source' => $source, 'changed' => false, 'meta' => ['op' => 'set', 'prev' => $oldNorm]];
+        return false;
+    }
+    try {
+        $object->setValue($field, $newValue);
+        $fieldsLog[] = ['field' => $field, 'value' => $newNorm, 'source' => $source, 'changed' => true, 'meta' => ['op' => 'set', 'prev' => $oldNorm]];
+        return true;
+    } catch (Throwable $e) {
+        $fieldsLog[] = ['field' => $field, 'value' => $newNorm, 'source' => $source, 'changed' => false, 'meta' => ['op' => 'set', 'prev' => $oldNorm, 'error' => $e->getMessage()]];
+        return false;
+    }
+}
+
+// ==================== ФУНКЦИИ МАППИНГА ====================
+
+function cardFormatInvestikaCode($num): string
+{
+    if (!$num) return '—';
+    $s = trim((string) $num);
+    if ($s === '') return '—';
+    if (mb_strtoupper(mb_substr($s, 0, 3)) === 'INV') return mb_strtoupper($s);
+    return 'INV' . $s;
+}
+
+/**
+ * Парсинг юридического подтипа из наименования.
+ * org_type в UMI не существует — парсинг из basicname/origname.
+ */
+function cardParseLegalSubtype($basicname, $origname = ''): string
+{
+    $name = (string) $basicname . ' ' . (string) $origname;
+    if (mb_strpos($name, 'ПАО') !== false) return 'ПАО';
+    if (mb_strpos($name, 'АО')  !== false) return 'АО';
+    if (mb_strpos($name, 'ООО') !== false) return 'ООО';
+    return 'ЮЛ';
+}
+
+function cardMapStatusLabel($code): string
+{
+    $map = ['5' => 'Пройден', '3' => 'На проверке', '4' => 'На доработке', '-1' => 'Заблокирован'];
+    return $map[(string) $code] ?? '—';
+}
+
+function cardMapStatusBadgeClass($code): string
+{
+    $map = ['5' => 'success', '3' => 'info', '4' => 'warning', '-1' => 'danger'];
+    return $map[(string) $code] ?? 'muted';
+}
+
+function cardMapStatusDataAttr($code): string
+{
+    $map = ['5' => 'approved', '3' => 'pending-review', '4' => 'rework', '-1' => 'blocked'];
+    return $map[(string) $code] ?? 'unknown';
+}
+
+/**
+ * Маппинг резидентства.
+ * ФЛ: isrezident = гражданство РФ (НЕ налоговое резидентство).
+ * ЮЛ: isrezident = российское юридическое лицо.
+ */
+function cardMapResidencyLabel($isrezident, string $entityType): string
+{
+    if ($entityType === 'firm') {
+        return $isrezident ? 'Российское юридическое лицо' : 'Иностранное юридическое лицо';
+    }
+    return $isrezident ? 'Гражданин РФ' : 'Иностранный гражданин / не гражданин РФ';
+}
+
+/**
+ * Налоговое резидентство — только для ФЛ, поле is_rf_taxpayer.
+ * Не путать с isrezident (гражданство).
+ */
+function cardMapTaxResidencyLabel($isRfTaxpayer): string
+{
+    return $isRfTaxpayer ? 'Налоговый резидент РФ' : 'Налоговый нерезидент РФ';
+}
+
+/**
+ * Уровень риска — guide ID 145.
+ * initial → КНУР, low → КОУР, medium → КСУР, high → КПУР.
+ */
+function cardMapRiskLevelLabel($value): string
+{
+    $map = [
+        'initial' => 'КНУР (Клиент с начальным уровнем риска)',
+        'low'     => 'КОУР (Клиент с особым уровнем риска)',
+        'medium'  => 'КСУР (Клиент со стандартным уровнем риска)',
+        'high'    => 'КПУР (Клиент с повышенным уровнем риска)',
+    ];
+    return $map[(string) $value] ?? '—';
+}
+
+function cardMapRiskBadgeClass($value): string
+{
+    $map = ['initial' => 'muted', 'low' => 'success', 'medium' => 'warning', 'high' => 'danger'];
+    return $map[(string) $value] ?? 'muted';
+}
+
+/** Форматирует историю komplajns_zamechaniya (pipe-delimited) в массив записей. */
+function cardParseRemarksHistory($raw): array
+{
+    if (!$raw) return [];
+    $entries = explode('_|||_', trim((string) $raw));
+    $result  = [];
+    foreach ($entries as $entry) {
+        $entry = ltrim($entry, '|');
+        if ($entry === '') continue;
+        $parts = explode('|', $entry, 4);
+        $result[] = [
+            'date'    => isset($parts[0]) ? htmlspecialchars(trim($parts[0]), ENT_QUOTES, 'UTF-8') : '',
+            'user'    => isset($parts[1]) ? htmlspecialchars(trim($parts[1]), ENT_QUOTES, 'UTF-8') : '',
+            'comment' => isset($parts[2]) ? htmlspecialchars(trim($parts[2]), ENT_QUOTES, 'UTF-8') : '',
+        ];
+    }
+    return array_filter($result, fn($r) => $r['comment'] !== '');
+}
+
+/** Строит адресную строку из полей объекта. */
+function cardBuildAddress($obj): string
+{
+    $parts = [];
+    $index = trim((string) $obj->getValue('index'));
+    if ($index) $parts[] = $index;
+    $country = trim((string) $obj->getValue('country'));
+    if ($country) $parts[] = $country;
+    $region = trim((string) $obj->getValue('region'));
+    if ($region) $parts[] = $region;
+    $city = trim((string) $obj->getValue('city'));
+    if ($city) $parts[] = $city;
+    $settlement = trim((string) $obj->getValue('settlement'));
+    if ($settlement) $parts[] = $settlement;
+    $street = trim((string) $obj->getValue('street'));
+    if ($street) $parts[] = $street;
+    $house = trim((string) $obj->getValue('house'));
+    if ($house) $parts[] = 'д. ' . $house;
+    $corps = trim((string) $obj->getValue('corps'));
+    if ($corps) $parts[] = 'корп. ' . $corps;
+    $flat = trim((string) $obj->getValue('flat'));
+    if ($flat) $parts[] = 'кв./оф. ' . $flat;
+    return implode(', ', $parts) ?: '—';
+}
+
+// ==================== СЕССИЯ ====================
+
+$user      = $variables['user'] ?? [];
+if (($user['@status'] ?? '') !== 'auth') $user = [];
+$userLogin = $user['@login'] ?? '';
+
+// TODO: отображать полное имя офицера если доступно (сейчас только login).
+$officerDisplay = $userLogin ?: '—';
+
+// URL возврата к списку — TODO: уточнить реальный URL страницы комплаенс-списка.
+$listPageUrl = '/compliance/';
+
+// ==================== ПОЛУЧЕНИЕ ОБЪЕКТА ПО HASH ====================
+
+$hashRaw    = isset($_GET['hash']) ? trim((string) $_GET['hash']) : '';
+$clientObj  = null;
+$entityType = null; // 'firm' | 'phys'
+
+if ($hashRaw === '') {
+    // Нет hash — редирект на список
+    header("Location: " . $listPageUrl);
+    exit;
+}
+
+// Попытка найти юрика
+$firmSel = new selector('objects');
+$firmSel->types('object-type')->id(TmpltId::$ClientFirm);
+$firmSel->where('hash')->equals($hashRaw);
+if ($firmSel && $firmSel->length() > 0) {
+    foreach ($firmSel as $obj) {
+        $clientObj  = $obj;
+        $entityType = 'firm';
+        break;
+    }
+}
+
+// Если не нашли — ищем физика
+if (!$clientObj) {
+    $physSel = new selector('objects');
+    $physSel->types('object-type')->id(TmpltId::$ClientPhys);
+    $physSel->where('hash')->equals($hashRaw);
+    if ($physSel && $physSel->length() > 0) {
+        foreach ($physSel as $obj) {
+            $clientObj  = $obj;
+            $entityType = 'phys';
+            break;
+        }
+    }
+}
+
+if (!$clientObj) {
+    // Объект не найден — показываем заглушку
+    echo '<div class="crm-page"><div class="crm-empty-state"><div class="crm-empty-state-title">Клиент не найден</div><div class="crm-empty-state-text">Проверьте ссылку или вернитесь к <a href="' . htmlspecialchars($listPageUrl, ENT_QUOTES, 'UTF-8') . '">списку комплаенса</a>.</div></div></div>';
+    return;
+}
+
+// ==================== ОБРАБОТКА ДЕЙСТВИЙ КАРТОЧКИ ====================
+// Дублированы из content-116 для нового UX (решение принимается из карточки).
+
+$cardSelf = strtok($_SERVER['REQUEST_URI'], '?') . '?hash=' . urlencode($hashRaw);
+
+// POST: «На доработку» с комментарием (firm)
+if (isset($_POST['compliance_action']) && $_POST['compliance_action'] === 'rework' && $entityType === 'firm') {
+    $comment = trim((string) ($_POST['compliance_comment'] ?? ''));
+    if ($comment !== '') {
+        $fieldsLog = [];
+        $actions   = [];
+        $current   = (string) $clientObj->getValue('komplajns_zamechaniya');
+        $newEntry  = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+        $history   = $current ? $current . $newEntry : $newEntry;
+        trackUmiSetCard($clientObj, $fieldsLog, 'status_klienta', 4, 'front_compliance_card');
+        trackUmiSetCard($clientObj, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance_card');
+        $clientObj->commit();
+        $actions[] = ['action' => 'compliance_rework', 'result' => 'success', 'message' => 'Юрик — на доработку (card)'];
+        $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_RETURN_TO_FIX', 'entity' => 'firm']), $userLogin)->setHash($hashRaw);
+        $__env  = $__dctx->env();
+        $__env->kv('entity', 'firm'); $__env->kv('event', 'COMPLIANCE_RETURN_TO_FIX'); $__env->kv('comment_len', mb_strlen($comment));
+        foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance_card'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+        foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), []); }
+        $__env->status('success');
+        $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReturnToFix_done', 'COMPLIANCE_RETURN_TO_FIX');
+    }
+    header("Location: " . $cardSelf);
+    exit;
+}
+
+// POST: «На доработку» с комментарием (phys)
+if (isset($_POST['compliance_action']) && $_POST['compliance_action'] === 'rework' && $entityType === 'phys') {
+    $comment = trim((string) ($_POST['compliance_comment'] ?? ''));
+    $bd      = (string) $clientObj->getValue('birthday');
+    if ($comment !== '') {
+        $fieldsLog = [];
+        $actions   = [];
+        $current   = (string) $clientObj->getValue('komplajns_zamechaniya');
+        $newEntry  = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+        $history   = $current ? $current . $newEntry : $newEntry;
+        trackUmiSetCard($clientObj, $fieldsLog, 'status_klienta', "4", 'front_compliance_card');
+        trackUmiSetCard($clientObj, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance_card');
+        $clientObj->commit();
+        $actions[] = ['action' => 'compliance_rework', 'result' => 'success', 'message' => 'Физик — на доработку (card)'];
+        $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_RETURN_TO_FIX', 'entity' => 'phys']), $userLogin)->setHash($hashRaw);
+        $__env  = $__dctx->env();
+        $__env->kv('entity', 'phys'); $__env->kv('event', 'COMPLIANCE_RETURN_TO_FIX'); $__env->kv('comment_len', mb_strlen($comment));
+        foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance_card'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+        foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), []); }
+        $__env->status('success');
+        $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReturnToFix_done', 'COMPLIANCE_RETURN_TO_FIX');
+    }
+    header("Location: " . $cardSelf);
+    exit;
+}
+
+// POST: «Заблокировать» с комментарием
+if (isset($_POST['compliance_action']) && $_POST['compliance_action'] === 'blocked') {
+    $comment    = trim((string) ($_POST['compliance_comment'] ?? ''));
+    $typeIdField = $entityType === 'firm' ? 'ban_firm_comment' : 'ban_phys_comment';
+    if ($comment !== '') {
+        $fieldsLog = [];
+        $actions   = [];
+        $current   = (string) $clientObj->getValue('komplajns_zamechaniya');
+        $newEntry  = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+        $history   = $current ? $current . $newEntry : $newEntry;
+        trackUmiSetCard($clientObj, $fieldsLog, 'status_klienta', "-1", 'front_compliance_card');
+        trackUmiSetCard($clientObj, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance_card');
+        $clientObj->commit();
+        $actions[] = ['action' => 'compliance_ban', 'result' => 'success', 'message' => 'Клиент заблокирован (card)'];
+        $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_BAN', 'entity' => $entityType]), $userLogin)->setHash($hashRaw);
+        $__env  = $__dctx->env();
+        $__env->kv('entity', $entityType); $__env->kv('event', 'COMPLIANCE_BAN'); $__env->kv('comment_len', mb_strlen($comment));
+        foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance_card'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+        foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), []); }
+        $__env->status('success');
+        $__dctx->save('fiksaciya-komplajnsom', 'ComplianceBan_done', 'COMPLIANCE_BAN');
+    }
+    header("Location: " . $cardSelf);
+    exit;
+}
+
+// GET: «Одобрить» — firm
+if (isset($_GET['compliance_action']) && $_GET['compliance_action'] === 'approved' && $entityType === 'firm') {
+    $fieldsLog = [];
+    $actions   = [];
+    trackUmiSetCard($clientObj, $fieldsLog, 'status_klienta', "5", 'front_compliance_card');
+    $clientObj->commit();
+    $actions[] = ['action' => 'compliance_approve', 'result' => 'success', 'message' => 'Юрик одобрен (card)'];
+    $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_APPROVE', 'entity' => 'firm']), $userLogin)->setHash($hashRaw);
+    $__env  = $__dctx->env();
+    $__env->kv('entity', 'firm'); $__env->kv('event', 'COMPLIANCE_APPROVE');
+    foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance_card'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+    foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), []); }
+    $__env->status('success');
+    $__dctx->save('fiksaciya-komplajnsom', 'ComplianceApprove_done', 'COMPLIANCE_APPROVE');
+    header("Location: " . $cardSelf);
+    exit;
+}
+
+// GET: «Одобрить» — phys
+if (isset($_GET['compliance_action']) && $_GET['compliance_action'] === 'approved' && $entityType === 'phys') {
+    $fieldsLog = [];
+    $actions   = [];
+    trackUmiSetCard($clientObj, $fieldsLog, 'status_klienta', "5", 'front_compliance_card');
+    $clientObj->commit();
+    $actions[] = ['action' => 'compliance_approve', 'result' => 'success', 'message' => 'Физик одобрен (card)'];
+    $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, ['operation' => 'COMPLIANCE_APPROVE', 'entity' => 'phys']), $userLogin)->setHash($hashRaw);
+    $__env  = $__dctx->env();
+    $__env->kv('entity', 'phys'); $__env->kv('event', 'COMPLIANCE_APPROVE');
+    foreach ($fieldsLog as $__f) { if (!is_array($__f) || !isset($__f['field'])) continue; $__env->field((string)$__f['field'], $__f['value'] ?? null, (string)($__f['source'] ?? 'front_compliance_card'), (bool)($__f['changed'] ?? true), (array)($__f['meta'] ?? ['op' => 'set'])); }
+    foreach ($actions  as $__a) { if (!is_array($__a) || !isset($__a['action'])) continue; $__env->action((string)$__a['action'], (string)($__a['result'] ?? 'processing'), (string)($__a['message'] ?? ''), []); }
+    $__env->status('success');
+    $__dctx->save('fiksaciya-komplajnsom', 'ComplianceApprove_done', 'COMPLIANCE_APPROVE');
+    header("Location: " . $cardSelf);
+    exit;
+}
+
+// ==================== ПОДГОТОВКА ДАННЫХ ДЛЯ ВЫВОДА ====================
+
+$statusRaw  = (string) $clientObj->getValue('status_klienta');
+$riskRaw    = (string) $clientObj->getValue('risklevel');
+$isrezident = (bool)   $clientObj->getValue('isrezident');
+$numInv     = $clientObj->getValue('num_investika');
+$clientCode = cardFormatInvestikaCode($numInv);
+$statusLabel      = cardMapStatusLabel($statusRaw);
+$statusBadge      = cardMapStatusBadgeClass($statusRaw);
+$statusDataAttr   = cardMapStatusDataAttr($statusRaw);
+$riskLabel        = cardMapRiskLevelLabel($riskRaw);
+$riskBadge        = cardMapRiskBadgeClass($riskRaw);
+$residencyLabel   = cardMapResidencyLabel($isrezident, $entityType);
+$remarksHistory   = cardParseRemarksHistory($clientObj->getValue('komplajns_zamechaniya'));
+$isqualified      = (bool) $clientObj->getValue('isqualified');
+
+// Данные в зависимости от типа
+if ($entityType === 'firm') {
+    $basicname      = (string) $clientObj->getValue('basicname');
+    $origname       = (string) $clientObj->getValue('origname');
+    $subtype        = cardParseLegalSubtype($basicname, $origname);
+    $displayName    = $basicname ?: $origname ?: '—';
+    $typeLabel      = 'Юридическое лицо';
+    $subtypeLabel   = $subtype;
+
+    $inn            = (string) $clientObj->getValue('inn');
+    $kpp            = (string) $clientObj->getValue('kpp');
+    $ogrn           = (string) $clientObj->getValue('ogrn');
+    $engname        = (string) $clientObj->getValue('engname');
+    $engshortname   = (string) $clientObj->getValue('engshortname');
+    $dataReg        = (string) $clientObj->getValue('data_registracii');
+    $parentCompany  = (string) $clientObj->getValue('eto_roditelskaya_kompaniya');
+    $phones         = (string) $clientObj->getValue('phones');
+    $contactEmail   = (string) $clientObj->getValue('contact_email');
+    $address        = cardBuildAddress($clientObj);
+    $city           = (string) $clientObj->getValue('city');
+    $country        = (string) $clientObj->getValue('country');
+    $vygodopriob    = (string) $clientObj->getValue('vygodopriobretatel');
+
+    // Аватар-инициалы из basicname
+    $avatarWords = preg_split('/[\s«»""\']+/', $basicname, -1, PREG_SPLIT_NO_EMPTY);
+    $avatarText  = mb_strtoupper(mb_substr($avatarWords[0] ?? 'КЛ', 0, 1) . mb_substr($avatarWords[1] ?? '', 0, 1));
+
+} else {
+    $surname        = (string) $clientObj->getValue('surname');
+    $namecl         = (string) $clientObj->getValue('namecl');
+    $patronymic     = (string) $clientObj->getValue('patronymic');
+    $displayName    = trim("$surname $namecl $patronymic") ?: '—';
+    $typeLabel      = 'Физическое лицо';
+    $subtypeLabel   = 'ФЛ';
+    $subtype        = 'ФЛ';
+
+    $inn            = (string) $clientObj->getValue('inn');
+    $snils          = (string) $clientObj->getValue('snils');
+    $birthday       = (string) $clientObj->getValue('birthday');
+    $birthPlace     = (string) $clientObj->getValue('birth_place');
+    $isRfTaxpayer   = (bool)   $clientObj->getValue('is_rf_taxpayer');
+    $taxResLabel    = cardMapTaxResidencyLabel($isRfTaxpayer);
+    $passSeries     = (string) $clientObj->getValue('pass_series');
+    $passNumber     = (string) $clientObj->getValue('pass_number');
+    $passIssuer     = (string) $clientObj->getValue('pass_issuer');
+    $passIssuerCode = (string) $clientObj->getValue('pass_issuer_code');
+    $passIssueDate  = (string) $clientObj->getValue('pass_issue_date');
+    $legalCapacity  = (string) $clientObj->getValue('legal_capacity');
+    $mainPhone      = (string) $clientObj->getValue('main_phone');
+    $contactEmail   = (string) $clientObj->getValue('contact_email');
+    $address        = cardBuildAddress($clientObj);
+    $city           = (string) $clientObj->getValue('city');
+    $country        = (string) $clientObj->getValue('country');
+
+    $nameParts = preg_split('/\s+/', trim($surname . ' ' . $namecl), 2, PREG_SPLIT_NO_EMPTY);
+    $avatarText = mb_strtoupper(mb_substr($nameParts[0] ?? 'КЛ', 0, 1) . mb_substr($nameParts[1] ?? '', 0, 1));
+}
+
+// Решение требуется, если статус не 5 (одобрен) и не -1 (заблокирован)
+$needsDecision    = !in_array($statusRaw, ['5', '-1'], true);
+$decisionPanelBadge = $needsDecision
+    ? '<span class="crm-badge warning">Требует решения</span>'
+    : '<span class="crm-badge ' . htmlspecialchars($statusBadge, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') . '</span>';
+
+?>
+
+<div class="crm-page" data-page="compliance-card">
+
+  <div class="crm-breadcrumbs">
+    <a href="<?= htmlspecialchars($listPageUrl, ENT_QUOTES, 'UTF-8') ?>">Комплаенс</a>
+    <span uk-icon="chevron-right"></span>
+    <span>Проверка <?= htmlspecialchars($clientCode, ENT_QUOTES, 'UTF-8') ?></span>
+  </div>
+
+  <!-- ── Профиль клиента ── -->
+  <article class="crm-card crm-compliance-profile-card">
+    <div class="crm-compliance-profile-main">
+      <div class="crm-compliance-avatar"><?= htmlspecialchars($avatarText, ENT_QUOTES, 'UTF-8') ?></div>
+      <div class="crm-compliance-profile-content">
+        <div class="crm-compliance-code"><?= htmlspecialchars($clientCode, ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="crm-compliance-title-row">
+          <h1 data-entity="page-title"><?= htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8') ?></h1>
+        </div>
+        <div class="crm-inline-badges crm-compliance-profile-badges">
+          <?php if ($riskRaw && $riskRaw !== '') : ?>
+            <span class="crm-badge <?= htmlspecialchars($riskBadge, ENT_QUOTES, 'UTF-8') ?>" data-status="risk-<?= htmlspecialchars($riskRaw, ENT_QUOTES, 'UTF-8') ?>">Риск: <?= htmlspecialchars(cardMapRiskLevelLabel($riskRaw), ENT_QUOTES, 'UTF-8') ?></span>
+          <?php else : ?>
+            <span class="crm-badge muted" data-status="risk-unknown">Риск: —</span>
+          <?php endif; ?>
+          <span class="crm-badge <?= htmlspecialchars($statusBadge, ENT_QUOTES, 'UTF-8') ?>" data-status="<?= htmlspecialchars($statusDataAttr, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') ?></span>
+          <span class="crm-badge muted"><?= htmlspecialchars($subtypeLabel, ENT_QUOTES, 'UTF-8') ?></span>
+          <span class="crm-badge <?= $isrezident ? 'success' : 'warning' ?>"><?= htmlspecialchars($residencyLabel, ENT_QUOTES, 'UTF-8') ?></span>
+          <?php /* TODO: «Документы: частично/полностью» — нет подтверждённого источника. Disabled-заглушка. */ ?>
+          <span class="crm-badge muted" data-status="docs-unknown" title="TODO: источник данных не подтверждён">Документы: —</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crm-compliance-profile-divider"></div>
+
+    <div class="crm-compliance-profile-meta">
+      <div>
+        <span class="crm-compliance-meta-label">Офицер</span>
+        <?php /* TODO: офицер — используется userLogin из сессии. Если нужно полное ФИО — уточнить источник. */ ?>
+        <strong><?= htmlspecialchars($officerDisplay, ENT_QUOTES, 'UTF-8') ?></strong>
+      </div>
+      <div>
+        <span class="crm-compliance-meta-label">Статус комплаенса</span>
+        <strong><?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+      </div>
+      <div>
+        <span class="crm-compliance-meta-label">Тип клиента</span>
+        <strong><?= htmlspecialchars($typeLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+      </div>
+    </div>
+  </article>
+
+  <!-- ── Двухколоночный макет ── -->
+  <div class="crm-compliance-detail-layout">
+
+    <!-- Левая колонка с данными -->
+    <div class="crm-compliance-detail-main">
+
+      <!-- Идентификация -->
+      <article class="crm-card crm-compliance-info-card">
+        <div class="crm-compliance-info-head">
+          <h2>Идентификация клиента</h2>
+        </div>
+        <div class="crm-compliance-info-grid">
+
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label">Код клиента</span>
+            <strong><?= htmlspecialchars($clientCode, ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label">Тип клиента</span>
+            <strong><?= htmlspecialchars($typeLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label">ИНН</span>
+            <strong><?= htmlspecialchars($inn ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+
+          <?php if ($entityType === 'firm') : ?>
+
+            <div class="crm-compliance-info-item span-full">
+              <span class="crm-compliance-info-label">Краткое наименование</span>
+              <strong><?= htmlspecialchars($basicname ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item span-full">
+              <span class="crm-compliance-info-label">Полное наименование</span>
+              <strong><?= htmlspecialchars($origname ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <?php if ($engname || $engshortname) : ?>
+              <div class="crm-compliance-info-item span-full">
+                <span class="crm-compliance-info-label">Английское наименование</span>
+                <strong><?= htmlspecialchars($engshortname ?: $engname, ENT_QUOTES, 'UTF-8') ?></strong>
+              </div>
+              <div class="crm-compliance-info-item span-full">
+                <span class="crm-compliance-info-label">Полное английское наименование</span>
+                <strong><?= htmlspecialchars($engname ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+              </div>
+            <?php endif; ?>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">КПП</span>
+              <strong><?= htmlspecialchars($kpp ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">ОГРН</span>
+              <strong><?= htmlspecialchars($ogrn ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Дата регистрации</span>
+              <strong><?= htmlspecialchars($dataReg ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <?php /* ЮЛ: isrezident = Российское/Иностранное юридическое лицо. */ ?>
+              <span class="crm-compliance-info-label">Резидентство</span>
+              <strong><?= htmlspecialchars($residencyLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Квалифицированный инвестор</span>
+              <strong><?= $isqualified ? 'Да' : 'Нет' ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <?php /* TODO: «Полный комплект документов» — источник не подтверждён. Disabled. */ ?>
+              <span class="crm-compliance-info-label">Полный комплект документов</span>
+              <strong><span class="crm-badge muted" title="TODO: источник не подтверждён">—</span></strong>
+            </div>
+            <?php if ($parentCompany) : ?>
+              <div class="crm-compliance-info-item span-full">
+                <span class="crm-compliance-info-label">Родительская компания</span>
+                <strong><?= htmlspecialchars($parentCompany, ENT_QUOTES, 'UTF-8') ?></strong>
+              </div>
+            <?php endif; ?>
+            <?php if ($vygodopriob) : ?>
+              <div class="crm-compliance-info-item span-full">
+                <span class="crm-compliance-info-label">Выгодоприобретатель</span>
+                <strong><?= htmlspecialchars($vygodopriob, ENT_QUOTES, 'UTF-8') ?></strong>
+              </div>
+            <?php endif; ?>
+
+          <?php else : // phys ?>
+
+            <div class="crm-compliance-info-item span-full">
+              <span class="crm-compliance-info-label">Фамилия</span>
+              <strong><?= htmlspecialchars($surname ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Имя</span>
+              <strong><?= htmlspecialchars($namecl ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Отчество</span>
+              <strong><?= htmlspecialchars($patronymic ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Дата рождения</span>
+              <strong><?= htmlspecialchars($birthday ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Место рождения</span>
+              <strong><?= htmlspecialchars($birthPlace ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">СНИЛС</span>
+              <strong><?= htmlspecialchars($snils ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Паспорт (серия / номер)</span>
+              <strong><?= htmlspecialchars(($passSeries ?: '—') . ' / ' . ($passNumber ?: '—'), ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item span-full">
+              <span class="crm-compliance-info-label">Кем выдан / код подразделения</span>
+              <strong><?= htmlspecialchars(($passIssuer ?: '—') . ' (' . ($passIssuerCode ?: '—') . ')', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Дата выдачи паспорта</span>
+              <strong><?= htmlspecialchars($passIssueDate ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <?php /* ФЛ: isrezident = гражданство РФ. Не налоговое резидентство. */ ?>
+              <span class="crm-compliance-info-label">Гражданство / резидентство</span>
+              <strong><?= htmlspecialchars($residencyLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <?php /* ФЛ: is_rf_taxpayer = налоговое резидентство (отдельное поле). */ ?>
+              <span class="crm-compliance-info-label">Налоговое резидентство</span>
+              <strong><?= htmlspecialchars($taxResLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Дееспособность</span>
+              <strong><?= htmlspecialchars($legalCapacity ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <span class="crm-compliance-info-label">Квалифицированный инвестор</span>
+              <strong><?= $isqualified ? 'Да' : 'Нет' ?></strong>
+            </div>
+            <div class="crm-compliance-info-item">
+              <?php /* TODO: «Полный комплект документов» — источник не подтверждён. Disabled. */ ?>
+              <span class="crm-compliance-info-label">Полный комплект документов</span>
+              <strong><span class="crm-badge muted" title="TODO: источник не подтверждён">—</span></strong>
+            </div>
+
+          <?php endif; ?>
+
+        </div>
+      </article>
+
+      <!-- Контактные данные -->
+      <article class="crm-card crm-compliance-info-card">
+        <div class="crm-compliance-info-head">
+          <h2>Контактные данные</h2>
+        </div>
+        <div class="crm-compliance-info-grid">
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label"><?= $entityType === 'firm' ? 'Номера телефонов' : 'Основной телефон' ?></span>
+            <strong><?= htmlspecialchars(($entityType === 'firm' ? $phones : $mainPhone) ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label">E-mail</span>
+            <strong><?= htmlspecialchars($contactEmail ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label">Страна</span>
+            <strong><?= htmlspecialchars($country ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+          <div class="crm-compliance-info-item">
+            <span class="crm-compliance-info-label">Город</span>
+            <strong><?= htmlspecialchars($city ?: '—', ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+          <div class="crm-compliance-info-item span-full">
+            <span class="crm-compliance-info-label">Адрес (из ФИАС)</span>
+            <strong><?= htmlspecialchars($address, ENT_QUOTES, 'UTF-8') ?></strong>
+          </div>
+        </div>
+      </article>
+
+      <!-- KYC / AML / Риск-факторы — DISABLED, источник не подтверждён -->
+      <article class="crm-card crm-compliance-info-card" aria-disabled="true">
+        <div class="crm-compliance-info-head crm-compliance-info-head--flex">
+          <h2>KYC / AML / Риск-факторы</h2>
+          <span class="crm-step-note">
+            <?php /* TODO: KYC/AML — нет подтверждённых полей в UMI. Блок отключён.
+                           Требуется: подтвердить, хранятся ли документы как поля объекта
+                           или как связанные UMI-объекты. */ ?>
+            <span class="crm-badge muted">TODO: источник не подтверждён</span>
+          </span>
+        </div>
+        <div class="crm-doc-checklist" style="opacity:0.4;pointer-events:none;">
+          <div class="crm-doc-checklist-item">
+            <div><strong>KYC анкета</strong><p>Требует подтверждения источника данных.</p></div>
+            <span class="crm-badge muted">—</span>
+          </div>
+          <div class="crm-doc-checklist-item">
+            <div><strong>Проверка бенефициаров</strong><p>Требует подтверждения источника данных.</p></div>
+            <span class="crm-badge muted">—</span>
+          </div>
+          <div class="crm-doc-checklist-item">
+            <div><strong>AML мониторинг</strong><p>Требует подтверждения источника данных.</p></div>
+            <span class="crm-badge muted">—</span>
+          </div>
+          <div class="crm-doc-checklist-item">
+            <div><strong>Санкционные списки</strong><p>Требует подтверждения источника данных.</p></div>
+            <span class="crm-badge muted">—</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Документы — DISABLED, источник не подтверждён -->
+      <article class="crm-card crm-table crm-table-wrapper" aria-disabled="true" style="opacity:0.4;">
+        <?php /* TODO: Документы — нет подтверждённых полей в UMI. Таблица отключена.
+                       Требуется: выяснить, хранятся ли документы как object fields
+                       или как linked UMI objects. */ ?>
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <tr>
+              <th>Документ</th>
+              <th>Статус</th>
+              <th>Комментарий</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="4" style="text-align:center;color:var(--crm-text-muted);">
+                TODO: источник документов не подтверждён. Не отображать данные до подтверждения.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <!-- История замечаний / комплаенс-переписка -->
+      <?php if (!empty($remarksHistory)) : ?>
+        <article class="crm-card crm-compliance-info-card">
+          <div class="crm-compliance-info-head">
+            <h2>История замечаний</h2>
+          </div>
+          <div class="crm-doc-checklist">
+            <?php foreach ($remarksHistory as $remark) : ?>
+              <div class="crm-doc-checklist-item">
+                <div>
+                  <strong><?= $remark['user'] ?></strong>
+                  <p><?= $remark['comment'] ?></p>
+                </div>
+                <span class="crm-compliance-meta-label"><?= $remark['date'] ?></span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </article>
+      <?php endif; ?>
+
+    </div><!-- /.crm-compliance-detail-main -->
+
+    <!-- ── Панель принятия решения ── -->
+    <aside class="crm-card crm-compliance-decision-panel">
+
+      <div class="crm-compliance-panel-head">
+        <h3>Панель принятия решения</h3>
+        <?= $decisionPanelBadge ?>
+      </div>
+
+      <div class="crm-compliance-panel-actions">
+        <?php /* «Одобрить» — GET-запрос с compliance_action=approved */ ?>
+        <a
+          href="<?= htmlspecialchars($cardSelf . '&compliance_action=approved', ENT_QUOTES, 'UTF-8') ?>"
+          class="uk-button crm-button-primary crm-button crm-compliance-panel-btn"
+          data-action="compliance-decision"
+          data-status="approved"
+          onclick="return confirm('Подтвердить одобрение клиента?');"
+        >Одобрить</a>
+
+        <?php /* «На доработку» и «Заблокировать» — POST с комментарием (форма ниже) */ ?>
+        <button
+          type="button"
+          class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-rework"
+          data-action="compliance-decision"
+          data-status="rework"
+          onclick="document.getElementById('compliance-action-field').value='rework'; document.getElementById('compliance-decision-form').submit();"
+        >На доработку</button>
+        <button
+          type="button"
+          class="uk-button uk-button-default crm-button crm-compliance-panel-btn crm-compliance-act-block"
+          data-action="compliance-decision"
+          data-status="blocked"
+          onclick="document.getElementById('compliance-action-field').value='blocked'; document.getElementById('compliance-decision-form').submit();"
+        >Заблокировать</button>
+      </div>
+
+      <div class="crm-compliance-panel-divider"></div>
+
+      <div class="crm-compliance-panel-summary">
+        <div class="crm-compliance-panel-summary-row">
+          <span class="crm-compliance-meta-label">Текущее решение</span>
+          <span class="crm-badge <?= htmlspecialchars($statusBadge, ENT_QUOTES, 'UTF-8') ?>" data-status="<?= htmlspecialchars($statusDataAttr, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') ?></span>
+        </div>
+        <div class="crm-compliance-panel-summary-row">
+          <span class="crm-compliance-meta-label">Офицер</span>
+          <?php /* TODO: Офицер — отображается userLogin из сессии. Уточнить, нужно ли полное ФИО. */ ?>
+          <span class="crm-compliance-panel-summary-val"><?= htmlspecialchars($officerDisplay, ENT_QUOTES, 'UTF-8') ?></span>
+        </div>
+        <?php if ($riskRaw) : ?>
+          <div class="crm-compliance-panel-summary-row">
+            <span class="crm-compliance-meta-label">Уровень риска</span>
+            <span class="crm-badge <?= htmlspecialchars($riskBadge, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($riskLabel, ENT_QUOTES, 'UTF-8') ?></span>
+          </div>
+        <?php endif; ?>
+      </div>
+
+      <div class="crm-compliance-panel-divider"></div>
+
+      <form
+        id="compliance-decision-form"
+        method="POST"
+        action="<?= htmlspecialchars($cardSelf, ENT_QUOTES, 'UTF-8') ?>"
+        class="crm-compliance-panel-comment"
+        autocomplete="off"
+      >
+        <input type="hidden" name="compliance_action" id="compliance-action-field" value="" />
+        <label class="uk-form-label" for="compliance-comment">Комментарий</label>
+        <textarea
+          class="uk-textarea crm-input"
+          id="compliance-comment"
+          name="compliance_comment"
+          rows="4"
+          placeholder="Обоснование решения"
+        ></textarea>
+        <span class="crm-field-note">Обязателен для «На доработку» и «Заблокировать».</span>
+      </form>
+
+      <div class="crm-compliance-panel-footer">
+        <?php /* «Сохранить черновик» — DISABLED по бизнес-правилам. Черновик решения не реализуется. */ ?>
+        <button
+          type="button"
+          class="uk-button uk-button-default crm-button crm-compliance-panel-btn"
+          data-action="save-draft"
+          disabled
+          title="TODO: черновик решения не реализован"
+        >Сохранить черновик</button>
+        <button
+          type="button"
+          class="uk-button crm-button-primary crm-button crm-compliance-panel-btn"
+          data-action="compliance-decision"
+          data-status="approved"
+          onclick="document.getElementById('compliance-action-field').value='approved_final'; document.getElementById('compliance-decision-form').submit();"
+        >Принять финальное решение</button>
+      </div>
+
+    </aside><!-- /.crm-compliance-decision-panel -->
+
+  </div><!-- /.crm-compliance-detail-layout -->
+</div>
