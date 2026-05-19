@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Аудит миграции — Compliance</title>
+<style>
+  :root {
+    --c-bg: #f4f6fa;
+    --c-surface: #ffffff;
+    --c-border: #e2e8f0;
+    --c-text: #1e293b;
+    --c-muted: #64748b;
+    --c-accent: #3b6fd4;
+    --c-accent-light: #eff4ff;
+    --c-success: #16a34a;
+    --c-success-bg: #dcfce7;
+    --c-warn: #b45309;
+    --c-warn-bg: #fef3c7;
+    --c-danger: #dc2626;
+    --c-danger-bg: #fee2e2;
+    --c-info: #0369a1;
+    --c-info-bg: #e0f2fe;
+    --c-muted-bg: #f1f5f9;
+    --c-navy: #1e3a5f;
+    --nav-w: 240px;
+    --radius: 8px;
+    --shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-size: 14px;
+    line-height: 1.65;
+    display: flex;
+  }
+
+  /* ── NAV ── */
+  nav {
+    width: var(--nav-w);
+    min-width: var(--nav-w);
+    background: var(--c-navy);
+    color: #cbd5e1;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 0 40px;
+    flex-shrink: 0;
+  }
+  nav .nav-logo {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 0 16px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    margin-bottom: 12px;
+  }
+  nav a {
+    display: block;
+    padding: 5px 16px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 12.5px;
+    line-height: 1.4;
+    border-left: 2px solid transparent;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  nav a:hover { color: #fff; background: rgba(255,255,255,.05); border-left-color: var(--c-accent); }
+  nav a.sec { font-weight: 600; color: #e2e8f0; font-size: 12px; margin-top: 8px; }
+  nav a.sub { padding-left: 28px; }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    min-width: 0;
+    padding: 40px 48px 80px;
+    max-width: 1100px;
+  }
+
+  /* ── HEADER ── */
+  .doc-header {
+    background: var(--c-navy);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    margin-bottom: 32px;
+  }
+  .doc-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .doc-header .sub { color: #94a3b8; font-size: 13px; }
+  .doc-header .meta { display: flex; gap: 24px; margin-top: 18px; }
+  .doc-header .meta-item { font-size: 12px; }
+  .doc-header .meta-item strong { display: block; color: #e2e8f0; font-size: 13px; }
+  .doc-header .meta-item span { color: #64748b; }
+
+  /* ── SECTION ── */
+  .section {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .section-head {
+    background: var(--c-muted-bg);
+    border-bottom: 1px solid var(--c-border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-head h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--c-navy);
+    letter-spacing: .01em;
+  }
+  .section-num {
+    background: var(--c-navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+  }
+  .section-body { padding: 20px 24px; }
+
+  /* ── SUMMARY BOX ── */
+  .summary-box {
+    background: var(--c-accent-light);
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .summary-box p + p { margin-top: 10px; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    border-left: 3px solid;
+  }
+  .callout.info { background: var(--c-info-bg); border-color: var(--c-info); color: var(--c-info); }
+  .callout.warn { background: var(--c-warn-bg); border-color: var(--c-warn); color: var(--c-warn); }
+  .callout.danger { background: var(--c-danger-bg); border-color: var(--c-danger); color: var(--c-danger); }
+  .callout.success { background: var(--c-success-bg); border-color: var(--c-success); color: var(--c-success); }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 7px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+  .badge.success  { background: var(--c-success-bg); color: var(--c-success); }
+  .badge.warn     { background: var(--c-warn-bg); color: var(--c-warn); }
+  .badge.danger   { background: var(--c-danger-bg); color: var(--c-danger); }
+  .badge.info     { background: var(--c-info-bg); color: var(--c-info); }
+  .badge.muted    { background: var(--c-muted-bg); color: var(--c-muted); }
+  .badge.navy     { background: #dbeafe; color: #1e3a5f; }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; margin: 0 -24px; padding: 0 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--c-border);
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    white-space: nowrap;
+  }
+  tbody td {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 7px 10px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #fafcff; }
+  .td-mono { font-family: "SFMono-Regular", Consolas, monospace; font-size: 11.5px; color: #475569; }
+  .td-muted { color: var(--c-muted); font-style: italic; }
+
+  /* ── ICONS ── */
+  .ic-yes  { color: var(--c-success); font-style: normal; }
+  .ic-no   { color: #cbd5e1; font-style: normal; }
+  .ic-warn { color: var(--c-warn); font-style: normal; }
+
+  /* confidence */
+  .conf-high   { color: var(--c-success); font-weight: 600; }
+  .conf-med    { color: var(--c-warn); font-weight: 600; }
+  .conf-low    { color: #ea580c; font-weight: 600; }
+  .conf-none   { color: #94a3b8; font-weight: 600; }
+
+  /* ── KV GRID ── */
+  .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+  .kv-item { }
+  .kv-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--c-muted); margin-bottom: 2px; }
+  .kv-val { font-size: 13px; color: var(--c-text); }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon { flex-shrink: 0; margin-top: 2px; font-style: normal; }
+
+  /* ── METHOD BLOCK ── */
+  .method {
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+  .method-head {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--c-border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .method-name {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--c-navy);
+  }
+  .method-body { padding: 14px 16px; }
+  .method-body p { margin: 6px 0; font-size: 13px; }
+  .method-body strong { color: var(--c-navy); }
+  pre {
+    background: #f8fafc;
+    border: 1px solid var(--c-border);
+    border-radius: 5px;
+    padding: 12px 14px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    color: #334155;
+    margin: 8px 0;
+  }
+
+  /* ── RISK LIST ── */
+  .risk-list { list-style: none; }
+  .risk-list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    align-items: start;
+  }
+  .risk-list li:last-child { border-bottom: none; }
+  .risk-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* ── STEP LIST ── */
+  .step-list { list-style: none; counter-reset: step; }
+  .step-list li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+    align-items: start;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(step);
+    background: var(--c-navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .step-list .step-title { font-weight: 600; font-size: 13px; color: var(--c-navy); }
+  .step-list .step-desc  { font-size: 12.5px; color: var(--c-muted); margin-top: 2px; }
+
+  /* ── MISC ── */
+  h3 { font-size: 13px; font-weight: 700; color: var(--c-navy); margin: 18px 0 8px; }
+  p  { font-size: 13px; margin: 8px 0; }
+  strong { font-weight: 600; }
+  code {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 11.5px;
+    background: #f1f5f9;
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: #475569;
+  }
+  .new-field {
+    background: #fef9c3;
+    border: 1px solid #fde047;
+    color: #713f12;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+  }
+  hr { border: none; border-top: 1px solid var(--c-border); margin: 16px 0; }
+
+  /* ── SCROLLBAR ── */
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav>
+  <div class="nav-logo">Аудит миграции</div>
+  <a href="#s1" class="sec">1. Резюме</a>
+  <a href="#s2" class="sec">2. Файлы</a>
+  <a href="#s3" class="sec">3. content-116.phtml</a>
+  <a href="#s3-fn" class="sub">Функции</a>
+  <a href="#s3-h" class="sub">Обработчики</a>
+  <a href="#s4" class="sec">4. compliance.html</a>
+  <a href="#s5" class="sec">5. compliance-card.html</a>
+  <a href="#s6" class="sec">6. Соответствие UI → код</a>
+  <a href="#s7" class="sec">7. Маппинг: список</a>
+  <a href="#s8" class="sec">8. Маппинг: карточка</a>
+  <a href="#s9" class="sec">9. Статусы</a>
+  <a href="#s10" class="sec">10. Инвентарь обработчиков</a>
+  <a href="#s11" class="sec">11. Бизнес-логика</a>
+  <a href="#s12" class="sec">12. Методы content_custom</a>
+  <a href="#s12-list" class="sub">getComplianceList</a>
+  <a href="#s12-card" class="sub">getComplianceCard</a>
+  <a href="#s12-dec" class="sub">submitDecision</a>
+  <a href="#s12-draft" class="sub">saveDraft</a>
+  <a href="#s12-csv" class="sub">exportCSV</a>
+  <a href="#s13" class="sec">13. Перенос в UmiCMS</a>
+  <a href="#s14" class="sec">14. Не найдено</a>
+  <a href="#s15" class="sec">15. Риски и вопросы</a>
+  <a href="#s16" class="sec">16. Следующий шаг</a>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main>
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="sub">АУДИТ МИГРАЦИИ</div>
+    <h1>Compliance — Список и Карточка</h1>
+    <div class="sub">UmiCMS → Новый статический CRM-дизайн &nbsp;·&nbsp; Только анализ, без реализации</div>
+    <div class="meta">
+      <div class="meta-item"><span>Дата</span><strong>2026-05-19</strong></div>
+      <div class="meta-item"><span>Файлов проанализировано</span><strong>4</strong></div>
+      <div class="meta-item"><span>Статус</span><strong>АУДИТ ЗАВЕРШЁН</strong></div>
+    </div>
+  </div>
+
+  <!-- ─── 1. РЕЗЮМЕ ─── -->
+  <div class="section" id="s1">
+    <div class="section-head">
+      <span class="section-num">1</span>
+      <h2>Краткое резюме</h2>
+    </div>
+    <div class="section-body">
+      <div class="summary-box">
+        <p><strong>content-116.phtml — это страница списка комплаенса.</strong> Он совмещает: вывод клиентов со статусом 3 («На проверке»), все бизнес-действия (одобрить / на доработку / заблокировать) и inline-просмотр данных через модальные окна UIKit. Отдельной «карточки» клиента в старом коде <strong>не существует</strong>.</p>
+        <p>Новый дизайн разделяет функциональность на <strong>две страницы</strong>: реестр (<code>compliance.html</code>) и карточку проверки (<code>compliance-card.html</code>). Это архитектурное изменение — главный вызов миграции: вся бизнес-логика из phtml переходит в <code>content_custom</code>, inline-модалки заменяются переходом на отдельную страницу.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="callout success">
+          <strong>✅ Подтверждено из старого кода</strong>
+          status_klienta (3/4/5/−1), hash, basicname, inn, num_investika, surname/namecl/patronymic, komplajns_zamechaniya, все 7 обработчиков действий, DualLog
+        </div>
+        <div class="callout warn">
+          <strong>❌ Не найдено в старом коде</strong>
+          Резидентство, подтип ЮЛ, ИП-тип, KYC/AML статусы, документы, риск-уровень, контакты, офицер, дата обновления, черновик, экспорт CSV
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2. ФАЙЛЫ ─── -->
+  <div class="section" id="s2">
+    <div class="section-head">
+      <span class="section-num">2</span>
+      <h2>Какие файлы проанализированы</h2>
+    </div>
+    <div class="section-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Файл</th><th>Роль</th><th>Строки</th></tr></thead>
+          <tbody>
+            <tr><td class="td-mono">test/content-116.phtml</td><td>Старый UmiCMS-шаблон — страница списка + все обработчики</td><td>760</td></tr>
+            <tr><td class="td-mono">test/compliance.html</td><td>Новый дизайн — реестр Комплаенс</td><td>667</td></tr>
+            <tr><td class="td-mono">test/compliance-card.html</td><td>Новый дизайн — карточка проверки</td><td>420</td></tr>
+            <tr><td class="td-mono">test/prompt_simple.txt</td><td>Предыдущий промпт (кодировка Windows-1251, нечитаем в UTF-8)</td><td>178</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="td-muted" style="margin-top:10px">Внешних JS-файлов в content-116.phtml нет. UiKit и crm-static.js подключены только в статических HTML-файлах.</p>
+    </div>
+  </div>
+
+  <!-- ─── 3. CONTENT-116 ─── -->
+  <div class="section" id="s3">
+    <div class="section-head">
+      <span class="section-num">3</span>
+      <h2>Что делает старый content-116.phtml</h2>
+    </div>
+    <div class="section-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div class="callout success"><strong>Страница списка?</strong>Да. Заголовок «Клиенты для проверки». Две вкладки: ЮЛ / ФЛ.</div>
+        <div class="callout danger"><strong>Страница карточки?</strong>Нет. Детали клиента — только через inline UIKit-модалки.</div>
+        <div class="callout warn"><strong>Бизнес-логика?</strong>Да. Изменение status_klienta, komplajns_zamechaniya, DualLog. Не просто шаблон.</div>
+      </div>
+
+      <h3 id="s3-fn">Вспомогательные функции (строки 15–131)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Функция</th><th>Назначение</th><th>Строки</th></tr></thead>
+          <tbody>
+            <tr><td class="td-mono">normForLog($v)</td><td>Нормализация значения для лога</td><td>15–24</td></tr>
+            <tr><td class="td-mono">trackUmiSet($object, &amp;$fieldsLog, $field, $newValue)</td><td><code>setValue</code> с записью diff в лог перед/после</td><td>26–64</td></tr>
+            <tr><td class="td-mono">getUserIdByStatus($status)</td><td><code>selector('objects')</code>, тип <code>ClientPhys</code>, фильтр по <code>status_klienta</code></td><td>67–73</td></tr>
+            <tr><td class="td-mono">getFirmsIdByStatus($status)</td><td><code>selector('objects')</code>, тип <code>ClientFirm</code>, фильтр по <code>status_klienta</code></td><td>75–81</td></tr>
+            <tr><td class="td-mono">addChatLines($date)</td><td>Рендеринг истории комментариев из массива строк (UIKit panel)</td><td>83–108</td></tr>
+            <tr><td class="td-mono">safeValue($val)</td><td><code>htmlspecialchars</code> для любого типа: null / scalar / array / object</td><td>113–130</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s3-h">Обработчики POST/GET (строки 144–506)</h3>
+      <div class="callout info" style="margin-bottom:12px">Все 7 обработчиков выполняются до HTML-вывода и завершаются <code>header("Location:") + exit</code>. HTML начинается со строки 511.</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Обработчик</th><th>Тип</th><th>Строки</th><th>Входные параметры</th><th>Изменяемые поля</th></tr></thead>
+          <tbody>
+            <tr><td class="td-mono">typesend = "firm"</td><td><span class="badge warn">POST</span></td><td>145–193</td><td><code>POST[typesend]="firm"</code>, <code>POST[{hash}]={comment}</code></td><td><code>status_klienta</code> → 4; <code>komplajns_zamechaniya</code> ← append</td></tr>
+            <tr><td class="td-mono">typesend = "phys"</td><td><span class="badge warn">POST</span></td><td>194–241</td><td><code>POST[typesend]="phys"</code>, <code>POST[{hash}]={comment}</code></td><td><code>status_klienta</code> → 4; <code>komplajns_zamechaniya</code> ← append</td></tr>
+            <tr><td class="td-mono">ban_phys_comment</td><td><span class="badge danger">POST</span></td><td>244–298</td><td><code>POST[ban_phys_comment]=1</code>, <code>POST[hash]</code>, <code>POST[comment]</code></td><td><code>status_klienta</code> → "-1"; <code>komplajns_zamechaniya</code> ← append</td></tr>
+            <tr><td class="td-mono">ban_firm_comment</td><td><span class="badge danger">POST</span></td><td>300–354</td><td><code>POST[ban_firm_comment]=1</code>, <code>POST[hash]</code>, <code>POST[comment]</code></td><td><code>status_klienta</code> → "-1"; <code>komplajns_zamechaniya</code> ← append</td></tr>
+            <tr><td class="td-mono">checked_phys</td><td><span class="badge info">GET</span></td><td>356–403</td><td><code>GET[checked_phys]={hash}</code></td><td><code>status_klienta</code> → "5"</td></tr>
+            <tr><td class="td-mono">redact_phys</td><td><span class="badge info">GET</span></td><td>405–456</td><td><code>GET[redact_phys]={hash}</code>, <code>GET[bd]={birthday}</code> (опц.)</td><td><code>status_klienta</code> → "4"</td></tr>
+            <tr><td class="td-mono">checked</td><td><span class="badge info">GET</span></td><td>458–505</td><td><code>GET[checked]={hash}</code></td><td><code>status_klienta</code> → "5"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 4. СПИСОК ─── -->
+  <div class="section" id="s4">
+    <div class="section-head">
+      <span class="section-num">4</span>
+      <h2>Чек-лист функциональности compliance.html</h2>
+    </div>
+    <div class="section-body">
+      <p style="margin-bottom:12px">Область: <code>&lt;div class="crm-page crm-registry-page" data-page="compliance"&gt;</code> (строки 88–657)</p>
+
+      <div class="callout warn" style="margin-bottom:14px">
+        <strong>Ключевые отличия от старого кода</strong>
+        Старый — только статус 3; новый — все статусы. Старый — две вкладки ЮЛ/ФЛ; новый — единая таблица с фильтром. Старый — действия через модалки прямо в списке; новый — навигация на отдельную карточку.
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Элемент</th><th>Есть</th><th>Бэкенд</th><th>UI-only</th><th>Нет в old</th><th>Реализация</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Заголовок «Комплаенс»</td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge muted">Нет</span></td></tr>
+            <tr><td>2</td><td>Кнопка «Экспорт» CSV (стр. 95–101)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>3</td><td>Поиск по клиенту / коду / ИНН / статусу (стр. 121–130)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>4</td><td>Фильтр «Тип клиента» (Все / ЮЛ / ФЛ / ИП / ООО / АО / ПАО, стр. 133–226)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Расширить</span></td></tr>
+            <tr><td>5</td><td>Фильтр «Резидентство» (стр. 228–277)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>6</td><td>Фильтр «Статус комплаенса» (стр. 279–350)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Маппинг</span></td></tr>
+            <tr><td>7</td><td>Кнопка «Очистить фильтры»</td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge muted">Нет</span></td></tr>
+            <tr><td>8</td><td>Колонка «Код клиента»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>9</td><td>Колонка «Наименование клиента»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>10</td><td>Колонка «ИНН»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>11</td><td>Колонка «Тип» (badge ООО/АО/ПАО/ФЛ/ИП)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Уточнить</span></td></tr>
+            <tr><td>12</td><td>Колонка «Резидент» (badge)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>13</td><td>Колонка «Статус комплаенса» (badge)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>14</td><td>Колонка «Полный комплект» (badge)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>15</td><td>Сортировка колонок</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>16</td><td>Клик по строке → карточка (<code>data-href</code>)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>17</td><td>Пагинация 25/50/100 + prev/next (стр. 603–650)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>18</td><td>Пустое состояние (стр. 651–654)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Маппинг</span></td></tr>
+            <tr><td>19</td><td>Глобальный поиск в topbar</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><i class="ic-yes">✅</i></td><td><span class="badge muted">UI-only пока</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5. КАРТОЧКА ─── -->
+  <div class="section" id="s5">
+    <div class="section-head">
+      <span class="section-num">5</span>
+      <h2>Чек-лист функциональности compliance-card.html</h2>
+    </div>
+    <div class="section-body">
+      <p style="margin-bottom:12px">Область: <code>&lt;div class="crm-page" data-page="compliance-card"&gt;</code> (строки 89–410)</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Элемент</th><th>Есть</th><th>Бэкенд</th><th>Нет в old</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td colspan="6" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#64748b">Профиль клиента</td></tr>
+            <tr><td>1</td><td>Хлебные крошки (Комплаенс › Проверка CL-XXXX)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>2</td><td>Аватар с инициалами</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Новая</span></td></tr>
+            <tr><td>3</td><td>Код клиента в профиле (CL-4408)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge warn">Уточнить формат</span></td></tr>
+            <tr><td>4</td><td>Наименование (h1)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>5</td><td>Бейдж «Риск: Средний»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>6</td><td>Бейдж статуса комплаенса</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>7</td><td>Бейдж ЮЛ / ФЛ / ИП</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Частично</span></td></tr>
+            <tr><td>8</td><td>Бейдж «Нерезидент» / «Резидент»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>9</td><td>Бейдж «Документы: частично»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>10</td><td>Мета: Представитель</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>11</td><td>Мета: Статус комплаенса</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>12</td><td>Мета: Последнее обновление</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td colspan="6" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#64748b">Идентификация</td></tr>
+            <tr><td>13</td><td>Код клиента</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>14</td><td>Тип клиента</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Частично</span></td></tr>
+            <tr><td>15</td><td>ИНН</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>16</td><td>Наименование клиента</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>17</td><td>Полное наименование</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>18</td><td>Английское наименование</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>19</td><td>Полное английское наименование</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>20</td><td>КПП</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>21</td><td>ОГРН</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>22</td><td>Дата регистрации</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>23</td><td>Резидентство</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>24</td><td>Признак инвестора</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>25</td><td>Полный комплект документов</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>26</td><td>Родительская компания</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td colspan="6" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#64748b">Контакты</td></tr>
+            <tr><td>27</td><td>Телефоны</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>28</td><td>E-mail</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>29–31</td><td>Страна / Город / Адрес</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td colspan="6" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#64748b">KYC / AML</td></tr>
+            <tr><td>32</td><td>KYC анкета (статус + комментарий)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>33</td><td>Проверка бенефициаров</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>34</td><td>AML мониторинг</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td>35</td><td>Санкционные списки</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td colspan="6" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#64748b">Документы</td></tr>
+            <tr><td>36</td><td>Таблица документов (Документ / Статус / Комментарий / Дата)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВОЕ ПОЛЕ</span></td></tr>
+            <tr><td colspan="6" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#64748b">Панель решения</td></tr>
+            <tr><td>37</td><td>Кнопка «Одобрить»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг → новый метод</span></td></tr>
+            <tr><td>38</td><td>Кнопка «На доработку»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг → новый метод</span></td></tr>
+            <tr><td>39</td><td>Кнопка «Заблокировать»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг → новый метод</span></td></tr>
+            <tr><td>40</td><td>Текущее решение (badge)</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>41</td><td>Офицер комплаенса</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-warn">⚠️</i></td><td><span class="badge warn">Нужен источник</span></td></tr>
+            <tr><td>42</td><td>Дата обновления</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="badge danger">Нужен источник</span></td></tr>
+            <tr><td>43</td><td>Textarea комментария</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг</span></td></tr>
+            <tr><td>44</td><td>Примечание «Обязателен для доработки/блокировки»</td><td><i class="ic-yes">✅</i></td><td>—</td><td>—</td><td><span class="badge muted">UI</span></td></tr>
+            <tr><td>45</td><td>Кнопка «Сохранить черновик»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td><span class="new-field">НОВАЯ ФУНКЦИЯ</span></td></tr>
+            <tr><td>46</td><td>Кнопка «Принять финальное решение»</td><td><i class="ic-yes">✅</i></td><td><i class="ic-yes">✅</i></td><td>—</td><td><span class="badge success">Маппинг → новый метод</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 9. СТАТУСЫ ─── -->
+  <div class="section" id="s9">
+    <div class="section-head">
+      <span class="section-num">9</span>
+      <h2>Маппинг статусов</h2>
+    </div>
+    <div class="section-body">
+      <div class="callout warn" style="margin-bottom:14px">Тип данных: <code>4</code> устанавливается как int (стр. 159), <code>"5"</code> и <code>"-1"</code> — как string. Необходимо унифицировать до int перед миграцией.</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Старое значение</th><th>Старый смысл</th><th>Строки old</th><th>Новый label</th><th>Новый badge</th><th>Подтверждение</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge info">3</span></td>
+              <td>На проверке — ожидает решения</td>
+              <td class="td-mono">537, 644</td>
+              <td>На проверке</td>
+              <td><span class="badge info">info / pending-review</span></td>
+              <td><span class="conf-high">✅ Подтверждено</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge warn">4</span></td>
+              <td>На доработке / Отмена с замечаниями</td>
+              <td class="td-mono">159, 206, 421</td>
+              <td>На доработке</td>
+              <td><span class="badge warn">warning / rework</span></td>
+              <td><span class="conf-high">✅ Подтверждено</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge success">5</span></td>
+              <td>Пройден / Одобрен</td>
+              <td class="td-mono">368, 470</td>
+              <td>Пройден</td>
+              <td><span class="badge success">success / approved</span></td>
+              <td><span class="conf-high">✅ Подтверждено</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge danger">-1</span></td>
+              <td>Заблокирован</td>
+              <td class="td-mono">262, 318</td>
+              <td>Заблокирован</td>
+              <td><span class="badge danger">danger / blocked</span></td>
+              <td><span class="conf-high">✅ Подтверждено</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge muted">Прочие</span></td>
+              <td>Не встречаются в content-116</td>
+              <td>—</td>
+              <td>Неизвестно</td>
+              <td><span class="badge muted">muted</span></td>
+              <td><span class="conf-none">❌ Не подтверждено</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 10. ОБРАБОТЧИКИ ─── -->
+  <div class="section" id="s10">
+    <div class="section-head">
+      <span class="section-num">10</span>
+      <h2>Инвентаризация старых обработчиков / действий</h2>
+    </div>
+    <div class="section-body">
+      <div class="callout danger" style="margin-bottom:14px">
+        <strong>⚠️ Обработчики нельзя удалять или переименовывать досрочно.</strong>
+        Approve реализован через GET-ссылки (<code>?checked=HASH</code>). Формат <code>komplajns_zamechaniya</code>: <code>{existing}_|||_|{date}|{login}|{comment}</code> — менять нельзя.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Обработчик</th><th>Тип</th><th>Строки</th><th>Поля UMI</th><th>Побочные эффекты</th><th>Новый эквивалент</th><th>Миграция</th></tr></thead>
+          <tbody>
+            <tr><td class="td-mono">typesend = "firm"</td><td><span class="badge warn">POST</span></td><td>145–193</td><td><code>status_klienta→4</code>, <code>komplajns_zamechaniya</code></td><td>DualLog COMPLIANCE_REJECT; redirect</td><td>Кнопка «На доработку» в карточке</td><td><code>submitComplianceDecision(['action'=>'rework', ...])</code></td></tr>
+            <tr><td class="td-mono">typesend = "phys"</td><td><span class="badge warn">POST</span></td><td>194–241</td><td><code>status_klienta→4</code>, <code>komplajns_zamechaniya</code></td><td>DualLog COMPLIANCE_REJECT; redirect</td><td>Кнопка «На доработку» в карточке</td><td>То же, <code>object_type=phys</code></td></tr>
+            <tr><td class="td-mono">ban_phys_comment</td><td><span class="badge danger">POST</span></td><td>244–298</td><td><code>status_klienta→"-1"</code>, <code>komplajns_zamechaniya</code></td><td>DualLog COMPLIANCE_BAN; redirect</td><td>Кнопка «Заблокировать» в карточке</td><td><code>submitComplianceDecision(['action'=>'block', ...])</code></td></tr>
+            <tr><td class="td-mono">ban_firm_comment</td><td><span class="badge danger">POST</span></td><td>300–354</td><td><code>status_klienta→"-1"</code>, <code>komplajns_zamechaniya</code></td><td>DualLog COMPLIANCE_BAN; redirect</td><td>Кнопка «Заблокировать» в карточке</td><td>То же, <code>object_type=firm</code></td></tr>
+            <tr><td class="td-mono">checked_phys</td><td><span class="badge info">GET</span></td><td>356–403</td><td><code>status_klienta→"5"</code></td><td>DualLog COMPLIANCE_APPROVE; redirect</td><td>Кнопка «Одобрить» в карточке</td><td><code>submitComplianceDecision(['action'=>'approve', ...])</code>; старый GET сохранить</td></tr>
+            <tr><td class="td-mono">redact_phys</td><td><span class="badge info">GET</span></td><td>405–456</td><td><code>status_klienta→"4"</code></td><td>DualLog COMPLIANCE_RETURN_TO_FIX; redirect</td><td>Кнопка «На доработку» в карточке</td><td>Параметр <code>bd</code> сохранить; старый GET сохранить</td></tr>
+            <tr><td class="td-mono">checked</td><td><span class="badge info">GET</span></td><td>458–505</td><td><code>status_klienta→"5"</code></td><td>DualLog COMPLIANCE_APPROVE; redirect</td><td>Кнопка «Одобрить» в карточке</td><td><code>submitComplianceDecision(['action'=>'approve', ...])</code>; старый GET сохранить</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 12. МЕТОДЫ ─── -->
+  <div class="section" id="s12">
+    <div class="section-head">
+      <span class="section-num">12</span>
+      <h2>Предлагаемые методы content_custom — без реализации</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="method" id="s12-list">
+        <div class="method-head">
+          <span class="badge navy">LIST</span>
+          <span class="method-name">public function getComplianceList($params = [])</span>
+        </div>
+        <div class="method-body">
+          <p><strong>Назначение:</strong> Возвращает список клиентов для реестра со всеми статусами.</p>
+          <p><strong>Источник:</strong> <code>getFirmsIdByStatus()</code> / <code>getUserIdByStatus()</code> (стр. 67–82) + HTML-секция списка (536–748).</p>
+          <p><strong>Риск:</strong> UmiCMS selector работает с одним типом. Два запроса (firm + phys) + PHP-merge. Глобальная сортировка и точный offset нетривиальны.</p>
+          <pre>$params = [
+  'status'        => int|string|null,
+  'client_type'   => 'firm'|'phys'|'ip'|null,
+  'residency'     => 'resident'|'non-resident'|null,
+  'search'        => string|null,
+  'docs_complete' => null|'yes'|'partial'|'no',
+  'limit'         => int,    // default 25
+  'offset'        => int,    // default 0
+  'order_by'      => string,
+  'order_dir'     => 'asc'|'desc',
+]
+
+// Return shape:
+[
+  'items' => [[
+    'id', 'hash', 'object_type', 'client_type', 'client_subtype',
+    'code', 'name', 'inn', 'residency', 'residency_label',
+    'status', 'status_label', 'status_badge', 'documents_complete', 'updated_at'
+  ]],
+  'total', 'page', 'per_page',
+  'pagination' => ['total_pages', 'current_page', 'has_prev', 'has_next']
+]</pre>
+        </div>
+      </div>
+
+      <div class="method" id="s12-card">
+        <div class="method-head">
+          <span class="badge navy">CARD</span>
+          <span class="method-name">public function getComplianceCard($hash)</span>
+        </div>
+        <div class="method-body">
+          <p><strong>Назначение:</strong> Полные данные клиента для карточки проверки.</p>
+          <p><strong>Источник:</strong> Поиск по hash через selector (стр. 152, 199, 252, 305, 360, 409, 460); <code>komplajns_zamechaniya</code> → history.</p>
+          <p><strong>Риск:</strong> ~60% полей карточки отсутствуют в content-116. Требуется инвентаризация UMI-схемы перед реализацией.</p>
+          <pre>// Return shape:
+[
+  'client'    => [ 'id', 'hash', 'object_type', 'client_type', 'client_subtype',
+                   'code', 'name', 'full_name', 'name_en*', 'full_name_en*', 'inn',
+                   'kpp', 'ogrn', 'registration_date', 'residency', 'investor_type',
+                   'docs_complete', 'parent_company*', 'risk_level*' ],
+  'contacts'  => [ 'phones', 'email', 'country', 'city', 'address' ],
+  'checks'    => [[ 'name', 'status', 'comment' ]],  // KYC, AML, Бенефициары, Санкции
+  'documents' => [[ 'name', 'doc_id', 'status', 'comment', 'date' ]],
+  'decision'  => [ 'status', 'status_label', 'officer', 'updated_at' ],
+  'history'   => [[ 'date', 'user', 'comment' ]],
+]
+// * — новые поля, требуют подтверждения</pre>
+        </div>
+      </div>
+
+      <div class="method" id="s12-dec">
+        <div class="method-head">
+          <span class="badge success">ACTION</span>
+          <span class="method-name">public function submitComplianceDecision($params = [])</span>
+        </div>
+        <div class="method-body">
+          <p><strong>Назначение:</strong> Единая точка для всех действий. Объединяет 7 старых обработчиков.</p>
+          <p><strong>Риск:</strong> Переход с GET на POST. Старые GET-URL сохранить до полного переключения.</p>
+          <pre>$params = [
+  'hash'        => string,                       // обязательно
+  'object_type' => 'firm'|'phys',                // обязательно
+  'action'      => 'approve'|'rework'|'block',   // обязательно
+  'comment'     => string,                        // обязателен для rework и block
+  'birthday'    => string|null,                   // опц., phys, из redact_phys
+]</pre>
+        </div>
+      </div>
+
+      <div class="method" id="s12-draft">
+        <div class="method-head">
+          <span class="badge muted">DRAFT</span>
+          <span class="method-name">public function saveComplianceDraft($params = [])</span>
+        </div>
+        <div class="method-body">
+          <p><strong>Назначение:</strong> Сохраняет промежуточный комментарий без изменения <code>status_klienta</code>.</p>
+          <p><strong>Источник:</strong> Отсутствует в old code. <strong>Новая функция.</strong></p>
+          <p><strong>Риск:</strong> Нужно определить хранилище черновика — новое UMI-поле <code>komplajns_draft</code> или иное.</p>
+          <pre>$params = [ 'hash' => string, 'comment' => string ]</pre>
+        </div>
+      </div>
+
+      <div class="method" id="s12-csv">
+        <div class="method-head">
+          <span class="badge muted">EXPORT</span>
+          <span class="method-name">public function exportComplianceCSV($params = [])</span>
+        </div>
+        <div class="method-body">
+          <p><strong>Назначение:</strong> Формирует CSV-файл с применёнными фильтрами.</p>
+          <p><strong>Источник:</strong> Отсутствует в old code. <strong>Новая функция.</strong></p>
+          <p><strong>Риск:</strong> Большой объём → риск timeout. Рекомендовать серверную генерацию с прямой отдачей файла.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 13. ПЕРЕНОС ─── -->
+  <div class="section" id="s13">
+    <div class="section-head">
+      <span class="section-num">13</span>
+      <h2>Что переносить в UmiCMS-шаблон</h2>
+    </div>
+    <div class="section-body">
+      <h3>Список — предлагаемый путь: <code>\php\content\content-116.phtml</code></h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Блок</th><th>Статус</th><th>Примечание</th></tr></thead>
+          <tbody>
+            <tr><td><code>&lt;div class="crm-page crm-registry-page" data-page="compliance"&gt;</code></td><td><span class="badge success">Как есть</span></td><td>Корневой div шаблона</td></tr>
+            <tr><td>Заголовок, кнопка Экспорт</td><td><span class="badge success">Как есть</span></td><td>Кнопка статична до реализации CSV</td></tr>
+            <tr><td><code>&lt;form data-form="compliance-filters"&gt;</code></td><td><span class="badge success">Как есть</span></td><td>Фильтры — UI-only на первом этапе</td></tr>
+            <tr><td><code>&lt;thead&gt;</code></td><td><span class="badge success">Как есть</span></td><td>Сохранить <code>data-sort-key</code></td></tr>
+            <tr><td><code>&lt;tbody&gt;</code></td><td><span class="badge danger">PHP-цикл</span></td><td><code>foreach($items as $row)</code></td></tr>
+            <tr><td><code>&lt;tr data-entity="compliance" data-id="{code}" data-href="...?hash={hash}" ...&gt;</code></td><td><span class="badge danger">Шаблон строки</span></td><td>Все <code>data-*</code> обязательны для <code>crm-static.js</code></td></tr>
+            <tr><td>Badges в строках</td><td><span class="badge danger">Динамические</span></td><td>Из <code>status_badge</code> / <code>residency</code> / <code>client_subtype</code></td></tr>
+            <tr><td>Пагинация</td><td><span class="badge danger">Динамическая</span></td><td>Из <code>$pagination</code>; сохранить <code>data-page-size-value</code>, ARIA</td></tr>
+            <tr><td>Empty state</td><td><span class="badge warn">Условный</span></td><td><code>if (empty($items))</code> — убрать <code>hidden</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:20px">Карточка — предлагаемый путь: <code>\php\content\content-151.phtml</code> (новый)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Блок</th><th>Статус</th><th>Примечание</th></tr></thead>
+          <tbody>
+            <tr><td>Хлебные крошки</td><td><span class="badge danger">Динамически</span></td><td><code>Проверка {$card['client']['code']}</code></td></tr>
+            <tr><td>Аватар с инициалами</td><td><span class="badge danger">Генерировать</span></td><td><code>substr</code> из имени на PHP</td></tr>
+            <tr><td>Код + имя + бейджи профиля</td><td><span class="badge danger">Динамически</span></td><td>Из <code>$card['client']</code>; сохранить <code>data-status</code></td></tr>
+            <tr><td>Мета (представитель / статус / дата)</td><td><span class="badge danger">Динамически</span></td><td>Из <code>$card['decision']</code></td></tr>
+            <tr><td>Блок «Идентификация»</td><td><span class="badge danger">Динамически</span></td><td>Из <code>$card['client']</code>; сохранить <code>span-full</code></td></tr>
+            <tr><td>Блок «Контакты»</td><td><span class="badge danger">Динамически</span></td><td>Из <code>$card['contacts']</code></td></tr>
+            <tr><td>Checklist KYC/AML</td><td><span class="badge danger">foreach</span></td><td><code>foreach($card['checks'] as $check)</code>; сохранить <code>crm-doc-checklist-item</code></td></tr>
+            <tr><td>Таблица документов</td><td><span class="badge danger">foreach</span></td><td><code>foreach($card['documents'] as $doc)</code></td></tr>
+            <tr><td>Кнопки панели решения</td><td><span class="badge success">Статичные</span></td><td>Сохранить <code>data-action</code>, <code>data-status</code></td></tr>
+            <tr><td>Summary (решение / офицер / дата)</td><td><span class="badge danger">Динамически</span></td><td>Из <code>$card['decision']</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout info" style="margin-top:12px">Не переносить: <code>&lt;aside class="crm-sidebar"&gt;</code>, <code>&lt;header class="crm-topbar"&gt;</code>, <code>&lt;head&gt;</code> / <code>&lt;body&gt;</code> — предоставляет UmiCMS.</div>
+    </div>
+  </div>
+
+  <!-- ─── 14. НЕ НАЙДЕНО ─── -->
+  <div class="section" id="s14">
+    <div class="section-head">
+      <span class="section-num">14</span>
+      <h2>Что не найдено / требует решения</h2>
+    </div>
+    <div class="section-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Новое UI поле</th><th>Почему не найдено</th><th>Возможный источник</th><th>Рекомендация</th></tr></thead>
+          <tbody>
+            <tr><td>Резидентство</td><td>Не отображается в content-116</td><td>Поле <code>residency</code> в ClientFirm/ClientPhys</td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Полный комплект документов</td><td>Отсутствует</td><td>Вычисляемое или поле <code>docs_complete</code></td><td><span class="badge warn">Подтвердить; пока «—»</span></td></tr>
+            <tr><td>Подтип ЮЛ (ООО/АО/ПАО)</td><td>Отсутствует</td><td>Поле <code>org_type</code> в ClientFirm</td><td><span class="badge warn">Подтвердить значения</span></td></tr>
+            <tr><td>ИП как отдельный тип</td><td>Отсутствует</td><td>Отдельный <code>TmpltId</code> или поле <code>is_ip</code></td><td><span class="new-field">ТРЕБУЕТ ПОДТВЕРЖДЕНИЯ</span></td></tr>
+            <tr><td>Полное наименование ЮЛ</td><td>Отсутствует</td><td><code>fullname</code> или <code>company_full</code></td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Английское наименование</td><td>Отсутствует</td><td>—</td><td><span class="new-field">НОВОЕ ПОЛЕ / ТРЕБУЕТ ПОДТВЕРЖДЕНИЯ</span></td></tr>
+            <tr><td>КПП</td><td>Отсутствует в content-116</td><td><code>kpp</code> в ClientFirm</td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>ОГРН</td><td>Отсутствует в content-116</td><td><code>ogrn</code> в ClientFirm</td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Дата регистрации</td><td>Отсутствует</td><td><code>registration_date</code></td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Признак инвестора</td><td>Отсутствует</td><td>—</td><td><span class="new-field">НОВОЕ ПОЛЕ / ТРЕБУЕТ ПОДТВЕРЖДЕНИЯ</span></td></tr>
+            <tr><td>Родительская компания</td><td>Отсутствует</td><td>—</td><td><span class="new-field">ТРЕБУЕТ НОВОГО UMI-ПОЛЯ</span></td></tr>
+            <tr><td>Телефоны / Email / Адрес</td><td>Нет явно; возможно в <code>$legal_point_check_info_*</code> (стр. 617, 727 — переменная <strong>не определена</strong> в content-116)</td><td>Нужна инвентаризация <code>$legal_point_check_info_*</code></td><td><span class="badge danger">Найти источник переменных</span></td></tr>
+            <tr><td>KYC / AML / Бенефициары / Санкции</td><td>Отсутствует</td><td>—</td><td><span class="new-field">НОВОЕ ПОЛЕ / ТРЕБУЕТ ПОДТВЕРЖДЕНИЯ</span></td></tr>
+            <tr><td>Таблица документов</td><td>Отсутствует</td><td>Возможно связанные UMI-объекты</td><td><span class="new-field">ТРЕБУЕТ ПОДТВЕРЖДЕНИЯ СХЕМЫ</span></td></tr>
+            <tr><td>Уровень риска</td><td>Отсутствует</td><td>—</td><td><span class="new-field">НОВОЕ ПОЛЕ / ТРЕБУЕТ ПОДТВЕРЖДЕНИЯ</span></td></tr>
+            <tr><td>Представитель / менеджер</td><td>Отсутствует</td><td><code>manager</code> или <code>agent</code></td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Офицер комплаенса</td><td>Только <code>$userLogin</code> в DualLog, не в полях объекта</td><td><code>komplajns_officer</code></td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Дата обновления</td><td>Отсутствует явно</td><td>UMI <code>object->getUpdatedAt()</code></td><td><span class="badge warn">Подтвердить</span></td></tr>
+            <tr><td>Черновик решения</td><td>Отсутствует</td><td>—</td><td><span class="new-field">НОВАЯ ФУНКЦИЯ</span></td></tr>
+            <tr><td>Формат кода (INV-XXXX vs CL-XXXX)</td><td>В demo списка <code>INV-1011</code>, в demo карточки <code>CL-4408</code></td><td><code>num_investika</code></td><td><span class="badge danger">Уточнить: одно поле или два?</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 15. РИСКИ ─── -->
+  <div class="section" id="s15">
+    <div class="section-head">
+      <span class="section-num">15</span>
+      <h2>Риски и вопросы к владельцу проекта</h2>
+    </div>
+    <div class="section-body">
+      <h3>Технические риски</h3>
+      <ul class="risk-list">
+        <li>
+          <span class="risk-badge badge danger">Р1</span>
+          <div><strong>Два selector'а вместо одного.</strong> UmiCMS selector работает с одним типом объекта. Объединение firm + phys требует двух запросов и PHP-merge. Глобальная сортировка и точный offset нетривиальны — возможно снижение производительности.</div>
+        </li>
+        <li>
+          <span class="risk-badge badge warn">Р2</span>
+          <div><strong>Тип данных status_klienta.</strong> <code>4</code> (int), <code>"5"</code> (string), <code>"-1"</code> (string) — несогласованность. Стандартизировать до int перед миграцией.</div>
+        </li>
+        <li>
+          <span class="risk-badge badge danger">Р3</span>
+          <div><strong><code>$legal_point_check_info_firms</code> / <code>$legal_point_check_info_phys</code> не определены.</strong> Используются в строках 617, 727, но нигде в файле не объявлены. Источник (вероятно <code>initialize.php</code>) неизвестен. Без них блок «Подробнее» пуст.</div>
+        </li>
+        <li>
+          <span class="risk-badge badge warn">Р4</span>
+          <div><strong>Старые GET-обработчики нельзя удалять досрочно.</strong> <code>?checked=</code>, <code>?checked_phys=</code>, <code>?redact_phys=</code> — прямые ссылки в HTML. До полного переключения на новый UI должны работать.</div>
+        </li>
+        <li>
+          <span class="risk-badge badge danger">Р5</span>
+          <div><strong>~60% полей карточки без источника.</strong> Начинать реализацию карточки без инвентаризации UMI-полей — риск переделки.</div>
+        </li>
+        <li>
+          <span class="risk-badge badge muted">Р6</span>
+          <div><strong>Черновик и CSV — полностью новые функции</strong> без прецедента в старом коде. Объём не включён в оценки.</div>
+        </li>
+      </ul>
+
+      <h3 style="margin-top:20px">Вопросы к владельцу проекта</h3>
+      <ol style="padding-left:20px;font-size:13px;line-height:2">
+        <li>Полная схема полей объектов <code>ClientFirm</code> и <code>ClientPhys</code> в UmiCMS (список + типы)?</li>
+        <li>Что содержат <code>$legal_point_check_info_firms</code> и <code>$legal_point_check_info_phys</code>? В каком файле определяются?</li>
+        <li>Как определить ИП: отдельный <code>TmpltId::$ClientIP</code>? Поле <code>is_ip</code>? По ОГРНИП?</li>
+        <li>Существует ли поле <code>org_type</code> (ООО/АО/ПАО)? Какие значения принимает?</li>
+        <li>Существует ли поле <code>residency</code>? Тип и допустимые значения?</li>
+        <li>Как хранятся документы клиента: поля объекта или связанные UMI-объекты?</li>
+        <li>Как вычисляется «Полный комплект документов» — ручной флаг или автоматически?</li>
+        <li>Нужен ли «Черновик решения» в первой версии или можно отложить?</li>
+        <li>Правильный формат кода клиента — <code>INV-XXXX</code> или <code>CL-XXXX</code>? Одно поле или разные?</li>
+        <li>Должен ли «Офицер комплаенса» сохраняться как поле объекта или достаточно текущего пользователя из сессии?</li>
+        <li>Существуют ли уже KYC/AML поля в UMI, или это полностью новая сущность?</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ─── 16. СЛЕДУЮЩИЙ ШАГ ─── -->
+  <div class="section" id="s16">
+    <div class="section-head">
+      <span class="section-num">16</span>
+      <h2>Рекомендованный следующий шаг</h2>
+    </div>
+    <div class="section-body">
+      <ol class="step-list">
+        <li>
+          <div>
+            <div class="step-title">Инвентаризация схемы UMI <span class="badge danger" style="vertical-align:middle;margin-left:6px">БЛОКИРУЮЩИЙ</span></div>
+            <div class="step-desc">Получить полный список полей объектов <code>ClientFirm</code> и <code>ClientPhys</code>. Найти источник <code>$legal_point_check_info_firms/phys</code>. Без этого маппинг карточки не может быть завершён.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Реализация <code>getComplianceList</code> + шаблон списка</div>
+            <div class="step-desc">Вся логика известна, источники подтверждены на 95%. Низкий риск. Разблокирует новый реестр.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Реализация <code>submitComplianceDecision</code></div>
+            <div class="step-desc">Объединить все 7 обработчиков. Бизнес-логика полностью задокументирована. Сохранить старые GET-обработчики до полного переключения.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Реализация <code>getComplianceCard</code> + шаблон карточки</div>
+            <div class="step-desc">Только после Шага 1. Новые поля (KYC/AML/документы/риск) реализовывать только после подтверждения их существования в UMI или решения о создании.</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
