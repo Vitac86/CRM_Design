@@ -1,0 +1,761 @@
+<?php
+/** @var umiTemplaterPHP $this */
+/** @var array $variables */
+//Фиксация клиента для комплаенса
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/halkoteka/initialize.php";
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/loger/logUser.php";
+include_once "/usr/local/www/vhosts/umi.investica.local/templates/front.investica.local/php/library/simpleParam.php";
+
+// -------------------- Logging: unified dual logger --------------------
+$__LOG_BASE_CTX = [
+    'script' => 'content-116',
+    'page_id' => 116,
+];
+
+function normForLog($v): string
+{
+    if ($v === null)
+        return '';
+    if (is_bool($v))
+        return $v ? '1' : '0';
+    if (is_scalar($v))
+        return (string) $v;
+    return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function trackUmiSet($object, array &$fieldsLog, string $field, $newValue, string $source = 'front_compliance'): bool
+{
+    $oldValue = $object->getValue($field);
+    $oldNorm = normForLog($oldValue);
+    $newNorm = normForLog($newValue);
+    $changed = ($oldNorm !== $newNorm);
+
+    if (!$changed) {
+        $fieldsLog[] = [
+            'field' => $field,
+            'value' => $newNorm,
+            'source' => $source,
+            'changed' => false,
+            'meta' => ['op' => 'set', 'prev' => $oldNorm],
+        ];
+        return false;
+    }
+
+    try {
+        $object->setValue($field, $newValue);
+        $fieldsLog[] = [
+            'field' => $field,
+            'value' => $newNorm,
+            'source' => $source,
+            'changed' => true,
+            'meta' => ['op' => 'set', 'prev' => $oldNorm],
+        ];
+        return true;
+    } catch (Throwable $e) {
+        $fieldsLog[] = [
+            'field' => $field,
+            'value' => $newNorm,
+            'source' => $source,
+            'changed' => false,
+            'meta' => ['op' => 'set', 'prev' => $oldNorm, 'error' => $e->getMessage()],
+        ];
+        return false;
+    }
+}
+
+// ==================== ОПРЕДЕЛЕНИЯ ФУНКЦИЙ ====================
+function getUserIdByStatus($status_klienta_input)
+{
+    $client = new selector('objects');
+    $client->types('object-type')->id(TmpltId::$ClientPhys);
+    $client->where('status_klienta')->equals($status_klienta_input);
+    return $client;
+}
+
+function getFirmsIdByStatus($status_klienta_input)
+{
+    $client = new selector('objects');
+    $client->types('object-type')->id(TmpltId::$ClientFirm);
+    $client->where('status_klienta')->equals($status_klienta_input);
+    return $client;
+}
+
+function addChatLines($date)
+{
+    if (!is_array($date))
+        return "";
+    if (count($date) < 1)
+        return "";
+
+    $print_flag = false;
+    $print_info = '<div class="uk-panel uk-panel-scrollable">';
+    $print_info .= '<dl class="uk-description-list uk-description-list-divider">';
+
+    foreach ($date as $infline) {
+        $inf = explode("|", $infline);
+        if (count($inf) < 4)
+            continue;
+
+        $print_info .= '<dt><div class="uk-width-expand">
+                                <h4 class="uk-comment-title uk-margin-remove">' . htmlspecialchars($inf[2]) . '</h4>
+                                <p class="uk-comment-meta uk-margin-remove-top">' . htmlspecialchars($inf[1]) . '</p>
+                            </div></dt>
+                        <dd>' . htmlspecialchars($inf[3]) . '</dd>';
+        $print_flag = true;
+    }
+    $print_info .= '</dl></div>';
+    return $print_flag ? $print_info : "";
+}
+
+/**
+ * Безопасное преобразование значения для вывода в таблице
+ */
+function safeValue($val)
+{
+    if (is_null($val))
+        return '';
+    if (is_scalar($val))
+        return htmlspecialchars((string) $val, ENT_QUOTES, 'UTF-8');
+    if (is_array($val)) {
+        $parts = [];
+        array_walk_recursive($val, function ($item) use (&$parts) {
+            $parts[] = htmlspecialchars((string) $item, ENT_QUOTES, 'UTF-8');
+        });
+        return implode(' ', $parts);
+    }
+    if (is_object($val) && method_exists($val, '__toString')) {
+        return htmlspecialchars((string) $val, ENT_QUOTES, 'UTF-8');
+    }
+    return htmlspecialchars(print_r($val, true), ENT_QUOTES, 'UTF-8');
+}
+// ==================== КОНЕЦ ОПРЕДЕЛЕНИЙ ====================
+
+$objectsCollection = umiObjectsCollection::getInstance();
+$typesCollection = umiObjectTypesCollection::getInstance();
+$yrflg = 'class="uk-active"';
+$phflg = '';
+
+$user = $variables['user'] ?? [];
+if (($user['@status'] ?? '') !== 'auth') {
+    $user = [];
+}
+$userLogin = $user['@login'] ?? '';
+
+// ==================== Обработка POST: отмена с замечаниями ====================
+if (isset($_POST["typesend"])) {
+    if ("firm" == $_POST["typesend"]) {
+        foreach ($_POST as $k => $v) {
+            if ("typesend" == $k)
+                continue;
+            $k = trim($k);
+            $client = new selector('objects');
+            $client->types('object-type')->id(TmpltId::$ClientFirm);
+            $client->where('hash')->equals($k);
+            if ($client && $client->length() > 0) {
+                foreach ($client as $vl) {
+                    $hystory = $vl->getValue('komplajns_zamechaniya') . "_|||_|" . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $v;
+                    $fieldsLog = [];
+                    $actions = [];
+                    trackUmiSet($vl, $fieldsLog, 'status_klienta', 4, 'front_compliance');
+                    trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $hystory, 'front_compliance');
+                    $vl->commit();
+                    $actions[] = ['action' => 'compliance_reject', 'result' => 'success', 'message' => 'Отмена с замечаниями (firm)'];
+                    $__hash = (string) $vl->getValue('hash');
+                    $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                        'operation' => 'COMPLIANCE_REJECT',
+                        'entity' => 'firm',
+                    ]), $userLogin)->setHash($__hash);
+                    $__env = $__dctx->env();
+                    $__env->kv('entity', 'firm');
+                    $__env->kv('event', 'COMPLIANCE_REJECT');
+                    $__env->kv('comment_len', mb_strlen($v));
+                    $__env->kv('received_keys', array_keys($_POST));
+                    $__env->in('data.received', $_POST);
+                    foreach ($fieldsLog as $__f) {
+                        if (!is_array($__f) || !isset($__f['field']))
+                            continue;
+                        $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                    }
+                    foreach ($actions as $__a) {
+                        if (!is_array($__a) || !isset($__a['action']))
+                            continue;
+                        $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                    }
+                    $__env->status('success');
+                    $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReject_done', 'COMPLIANCE_REJECT');
+                }
+            }
+        }
+        $yrflg = 'class="uk-active"';
+        $phflg = '';
+        $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+        header("Location: " . $redirect_url);
+        exit;
+    } else {
+        foreach ($_POST as $k => $v) {
+            if ("typesend" == $k)
+                continue;
+            $client = new selector('objects');
+            $client->types('object-type')->id(TmpltId::$ClientPhys);
+            $client->where('hash')->equals($k);
+            if ($client && $client->length() > 0) {
+                foreach ($client as $vl) {
+                    $hystory = $vl->getValue('komplajns_zamechaniya') . "_|||_|" . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $v;
+                    $fieldsLog = [];
+                    $actions = [];
+                    trackUmiSet($vl, $fieldsLog, 'status_klienta', 4, 'front_compliance');
+                    trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $hystory, 'front_compliance');
+                    $vl->commit();
+                    $actions[] = ['action' => 'compliance_reject', 'result' => 'success', 'message' => 'Отмена с замечаниями (phys)'];
+                    $__hash = (string) $vl->getValue('hash');
+                    $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                        'operation' => 'COMPLIANCE_REJECT',
+                        'entity' => 'phys',
+                    ]), $userLogin)->setHash($__hash);
+                    $__env = $__dctx->env();
+                    $__env->kv('entity', 'phys');
+                    $__env->kv('event', 'COMPLIANCE_REJECT');
+                    $__env->kv('comment_len', mb_strlen($v));
+                    $__env->kv('received_keys', array_keys($_POST));
+                    $__env->in('data.received', $_POST);
+                    foreach ($fieldsLog as $__f) {
+                        if (!is_array($__f) || !isset($__f['field']))
+                            continue;
+                        $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                    }
+                    foreach ($actions as $__a) {
+                        if (!is_array($__a) || !isset($__a['action']))
+                            continue;
+                        $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                    }
+                    $__env->status('success');
+                    $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReject_done', 'COMPLIANCE_REJECT');
+                }
+            }
+        }
+        $yrflg = '';
+        $phflg = 'class="uk-active"';
+        $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+        header("Location: " . $redirect_url);
+        exit;
+    }
+}
+
+// ==================== Обработка POST: блокировка физика с комментарием ====================
+if (isset($_POST["ban_phys_comment"])) {
+    $hash = (string) ($_POST["hash"] ?? '');
+    $comment = (string) ($_POST["comment"] ?? '');
+
+    if ($hash && $comment) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientPhys);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions = [];
+
+                $current = (string) $vl->getValue('komplajns_zamechaniya');
+                $newEntry = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+                $history = $current ? $current . $newEntry : $newEntry;
+
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "-1", 'front_compliance');
+                trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance');
+
+                $vl->commit();
+
+                $actions[] = ['action' => 'compliance_ban', 'result' => 'success', 'message' => 'Физик заблокирован с комментарием'];
+
+                $__hash = (string) $vl->getValue('hash');
+                $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                    'operation' => 'COMPLIANCE_BAN',
+                    'entity' => 'phys',
+                ]), $userLogin)->setHash($__hash);
+                $__env = $__dctx->env();
+                $__env->kv('entity', 'phys');
+                $__env->kv('event', 'COMPLIANCE_BAN');
+                $__env->kv('comment_len', mb_strlen($comment));
+                $__env->kv('received_keys', array_keys($_POST));
+                $__env->in('data.received', $_POST);
+                foreach ($fieldsLog as $__f) {
+                    if (!is_array($__f) || !isset($__f['field']))
+                        continue;
+                    $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                }
+                foreach ($actions as $__a) {
+                    if (!is_array($__a) || !isset($__a['action']))
+                        continue;
+                    $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceBan_done', 'COMPLIANCE_BAN');
+            }
+        }
+    }
+    $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+    header("Location: " . $redirect_url);
+    exit;
+}
+
+// ==================== Обработка POST: блокировка юрика с комментарием ====================
+if (isset($_POST["ban_firm_comment"])) {
+    $hash = (string) ($_POST["hash"] ?? '');
+    $comment = (string) ($_POST["comment"] ?? '');
+
+    if ($hash && $comment) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientFirm);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions = [];
+
+                $current = (string) $vl->getValue('komplajns_zamechaniya');
+                $newEntry = '_|||_|' . date("Y-m-d H:i:s") . "|" . $userLogin . "|" . $comment;
+                $history = $current ? $current . $newEntry : $newEntry;
+
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "-1", 'front_compliance');
+                trackUmiSet($vl, $fieldsLog, 'komplajns_zamechaniya', $history, 'front_compliance');
+
+                $vl->commit();
+
+                $actions[] = ['action' => 'compliance_ban', 'result' => 'success', 'message' => 'Юрик заблокирован с комментарием'];
+
+                $__hash = (string) $vl->getValue('hash');
+                $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                    'operation' => 'COMPLIANCE_BAN',
+                    'entity' => 'firm',
+                ]), $userLogin)->setHash($__hash);
+                $__env = $__dctx->env();
+                $__env->kv('entity', 'firm');
+                $__env->kv('event', 'COMPLIANCE_BAN');
+                $__env->kv('comment_len', mb_strlen($comment));
+                $__env->kv('received_keys', array_keys($_POST));
+                $__env->in('data.received', $_POST);
+                foreach ($fieldsLog as $__f) {
+                    if (!is_array($__f) || !isset($__f['field']))
+                        continue;
+                    $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                }
+                foreach ($actions as $__a) {
+                    if (!is_array($__a) || !isset($__a['action']))
+                        continue;
+                    $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceBan_done', 'COMPLIANCE_BAN');
+            }
+        }
+    }
+    $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+    header("Location: " . $redirect_url);
+    exit;
+}
+
+// ==================== Обработка GET: подтверждение физика ====================
+if (isset($_GET["checked_phys"])) {
+    $hash = (string) ($_GET["checked_phys"] ?? '');
+    if ($hash) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientPhys);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions = [];
+
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "5", 'front_compliance');
+                $vl->commit();
+
+                $actions[] = ['action' => 'compliance_approve', 'result' => 'success', 'message' => 'Подтвержден физик'];
+
+                $__hash = (string) $vl->getValue('hash');
+                $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                    'operation' => 'COMPLIANCE_APPROVE',
+                    'entity' => 'phys',
+                ]), $userLogin)->setHash($__hash);
+                $__env = $__dctx->env();
+                $__env->kv('entity', 'phys');
+                $__env->kv('event', 'COMPLIANCE_APPROVE');
+                $__env->kv('received_keys', array_keys($_GET));
+                $__env->in('data.received', $_GET);
+                foreach ($fieldsLog as $__f) {
+                    if (!is_array($__f) || !isset($__f['field']))
+                        continue;
+                    $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                }
+                foreach ($actions as $__a) {
+                    if (!is_array($__a) || !isset($__a['action']))
+                        continue;
+                    $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceApprove_done', 'COMPLIANCE_APPROVE');
+            }
+        }
+    }
+    $yrflg = '';
+    $phflg = 'class="uk-active"';
+    $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+    header("Location: " . $redirect_url);
+    exit;
+}
+
+// ==================== Обработка GET: отправка физика на исправление ====================
+if (isset($_GET["redact_phys"])) {
+    $hash = (string) ($_GET["redact_phys"] ?? '');
+    $bd = (string) ($_GET["bd"] ?? '');
+    if ($hash) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientPhys);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                if ($bd && $vl->getValue("birthday") != $bd) {
+                    continue;
+                }
+                $fieldsLog = [];
+                $actions = [];
+
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "4", 'front_compliance');
+                $vl->commit();
+
+                $actions[] = ['action' => 'compliance_return_to_fix', 'result' => 'success', 'message' => 'Физик отправлен на исправление (status_klienta=4)'];
+
+                $__hash = (string) $vl->getValue('hash');
+                $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                    'operation' => 'COMPLIANCE_RETURN_TO_FIX',
+                    'entity' => 'phys',
+                ]), $userLogin)->setHash($__hash);
+                $__env = $__dctx->env();
+                $__env->kv('entity', 'phys');
+                $__env->kv('event', 'COMPLIANCE_RETURN_TO_FIX');
+                $__env->kv('received_keys', array_keys($_GET));
+                $__env->in('data.received', $_GET);
+                foreach ($fieldsLog as $__f) {
+                    if (!is_array($__f) || !isset($__f['field']))
+                        continue;
+                    $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                }
+                foreach ($actions as $__a) {
+                    if (!is_array($__a) || !isset($__a['action']))
+                        continue;
+                    $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceReturnToFix_done', 'COMPLIANCE_RETURN_TO_FIX');
+            }
+        }
+    }
+    $yrflg = '';
+    $phflg = 'class="uk-active"';
+    $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+    header("Location: " . $redirect_url);
+    exit;
+}
+
+// ==================== Обработка GET: подтверждение юрика ====================
+if (isset($_GET["checked"])) {
+    $hash = (string) ($_GET["checked"] ?? '');
+    if ($hash) {
+        $client = new selector('objects');
+        $client->types('object-type')->id(TmpltId::$ClientFirm);
+        $client->where('hash')->equals($hash);
+        if ($client && $client->length() > 0) {
+            foreach ($client as $vl) {
+                $fieldsLog = [];
+                $actions = [];
+
+                trackUmiSet($vl, $fieldsLog, 'status_klienta', "5", 'front_compliance');
+                $vl->commit();
+
+                $actions[] = ['action' => 'compliance_approve', 'result' => 'success', 'message' => 'Юрик подтвержден (status_klienta=5)'];
+
+                $__hash = (string) $vl->getValue('hash');
+                $__dctx = DualLogContext::begin(array_merge($__LOG_BASE_CTX, [
+                    'operation' => 'COMPLIANCE_APPROVE',
+                    'entity' => 'firm',
+                ]), $userLogin)->setHash($__hash);
+                $__env = $__dctx->env();
+                $__env->kv('entity', 'firm');
+                $__env->kv('event', 'COMPLIANCE_APPROVE');
+                $__env->kv('received_keys', array_keys($_GET));
+                $__env->in('data.received', $_GET);
+                foreach ($fieldsLog as $__f) {
+                    if (!is_array($__f) || !isset($__f['field']))
+                        continue;
+                    $__env->field((string) $__f['field'], $__f['value'] ?? null, (string) ($__f['source'] ?? 'front_compliance'), (bool) ($__f['changed'] ?? true), (array) ($__f['meta'] ?? ['op' => 'set']));
+                }
+                foreach ($actions as $__a) {
+                    if (!is_array($__a) || !isset($__a['action']))
+                        continue;
+                    $__env->action((string) $__a['action'], (string) ($__a['result'] ?? 'processing'), (string) ($__a['message'] ?? ''), (array) ($__a['meta'] ?? []));
+                }
+                $__env->status('success');
+                $__dctx->save('fiksaciya-komplajnsom', 'ComplianceApprove_done', 'COMPLIANCE_APPROVE');
+            }
+        }
+    }
+    $yrflg = 'class="uk-active"';
+    $phflg = '';
+    $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+    header("Location: " . $redirect_url);
+    exit;
+}
+
+// ==================== ВЫВОД ====================
+?>
+
+
+<div class="crm-page">
+    <div class="crm-registry-shell crm-compliance-shell">
+
+
+        <!-- Begin Content -->
+        <div id="forajax">
+            <div class="gls-content" id="gls-content-container">
+                <div class="item-page" itemscope="">
+                    <meta itemprop="inLanguage" content="ru-RU">
+
+                    <div class="gls-page-header">
+                        <h1 itemprop="headline">Клиенты для проверки</h1>
+                    </div>
+
+                    <div itemprop="articleBody">
+                        <p itemprop="description" class="uk-text-lead">Список клиентов, которых необходимо проверить</p>
+
+                        <div class="uk-position-relative uk-margin-medium">
+                            <ul uk-switcher uk-tab class="uk-tab">
+                                <li <?= $yrflg ?>><a href="#">Юридические лица</a></li>
+                                <li <?= $phflg ?>><a href="#">Физические лица</a></li>
+                            </ul>
+
+                            <ul class="uk-switcher uk-margin" style="touch-action: pan-y pinch-zoom;">
+                                <li>
+                                    <?php
+                                    $firms_for_fix = getFirmsIdByStatus('3');
+                                    if ($firms_for_fix && $firms_for_fix->length() > 0) {
+                                        $iter = 0;
+                                        echo '<table class="uk-table uk-table-striped uk-table-hover"><thead>';
+                                        echo '<tr><th>Проверенно</th><th>Исправить</th><th>В списках</th><th>Подробнее</th>';
+                                        echo '<th>Переписка</th><th>Наименование</th><th>inn</th><th>num_investika</th></tr>';
+                                        echo '</thead><tbody>';
+
+                                        $modals = [];
+
+                                        foreach ($firms_for_fix as $object) {
+                                            $hash = $object->getValue('hash');
+                                            $basicname = htmlspecialchars($object->getValue('basicname'));
+                                            $inn = htmlspecialchars($object->getValue('inn'));
+                                            $num = htmlspecialchars($object->getValue('num_investika'));
+
+                                            echo '<tr>';
+                                            echo '<th><a href="?checked=' . urlencode($hash) . '" uk-icon="plus-circle"></a></th>';
+                                            echo '<th><a uk-toggle="target: #info_redact_' . $iter . '" href="#" uk-icon="minus-circle"></a></th>';
+                                            echo '<th><a uk-toggle="target: #ban_firm_modal_' . $iter . '" href="#" uk-icon="ban"></a></th>';
+                                            echo '<th><a uk-toggle="target: #info_res_' . $iter . '" href="#" uk-icon="info"></a></th>';
+                                            echo '<th><a uk-toggle="target: #info_firm_read_' . $iter . '" href="#" uk-icon="comments"></a></th>';
+                                            echo '<th>' . $basicname . '</th>';
+                                            echo '<th>' . $inn . '</th>';
+                                            echo '<th>' . $num . '</th>';
+                                            echo '</tr>';
+
+                                            // Сбор модальных окон в массив
+                                            ob_start();
+                                            ?>
+                                            <div id="ban_firm_modal_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title">Блокировка клиента</h2>
+                                                    <form action="./" method="POST" autocomplete="off">
+                                                        <input type="hidden" name="ban_firm_comment" value="1" />
+                                                        <input type="hidden" name="hash"
+                                                            value="<?= htmlspecialchars($hash) ?>" />
+                                                        <textarea class="uk-textarea" name="comment" rows="3"
+                                                            placeholder="Причина блокировки" required></textarea>
+                                                        <p><button class="uk-button uk-button-danger"
+                                                                type="submit">Заблокировать</button></p>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <div id="info_firm_read_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title"><?= $basicname ?></h2>
+                                                    <div class="uk-modal-body" uk-overflow-auto>
+                                                        <p><?= addChatLines(explode("_|||_", trim($object->getValue('komplajns_zamechaniya') ?? ''))) ?>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="info_redact_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title"><?= $basicname ?></h2>
+                                                    <div class="uk-modal-body" uk-overflow-auto>
+                                                        <form action="./" method="POST" autocomplete="off">
+                                                            <input type="hidden" name="typesend" value="firm" />
+                                                            <textarea class="uk-textarea" name="<?= htmlspecialchars($hash) ?>"
+                                                                placeholder="Причина отказа" required></textarea>
+                                                            <p><button class="uk-button" type="submit">Отправить</button></p>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="info_res_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title"><?= $basicname ?></h2>
+                                                    <div class="uk-modal-body" uk-overflow-auto>
+                                                        <table
+                                                            class="uk-table uk-table-small uk-table-divider uk-table-striped uk-table-hover">
+                                                            <?php
+                                                            if (isset($legal_point_check_info_firms) && is_array($legal_point_check_info_firms)) {
+                                                                foreach ($legal_point_check_info_firms as $k) {
+                                                                    $title = $object->getPropByName($k) ? $object->getPropByName($k)->getTitle() : $k;
+                                                                    $val = $object->getValue($k);
+                                                                    echo '<tr><td>' . htmlspecialchars($title) . '</td><td>' . safeValue($val) . '</td></tr>';
+                                                                }
+                                                            }
+                                                            ?>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php
+                                            $modals[] = ob_get_clean();
+                                            $iter++;
+                                        }
+                                        echo '</tbody></table>';
+                                        // Вывод модальных окон после таблицы
+                                        echo implode('', $modals);
+                                    } else {
+                                        echo '<p>Нет юридических лиц со статусом 3.</p>';
+                                    }
+                                    ?>
+                                </li>
+
+                                <li>
+                                    <?php
+                                    $phys_for_fix = getUserIdByStatus('3');
+                                    if ($phys_for_fix && $phys_for_fix->length() > 0) {
+                                        $iter = 0;
+                                        echo '<table class="uk-table uk-table-striped uk-table-hover"><thead>';
+                                        echo '<tr><th>Проверенно</th><th>Исправить</th><th>В списках</th><th>Подробнее</th>';
+                                        echo '<th>Переписка</th><th>ФИО</th><th>birthday</th><th>num_investika</th></tr>';
+                                        echo '</thead><tbody>';
+
+                                        $modals = [];
+
+                                        foreach ($phys_for_fix as $object) {
+                                            $hash = $object->getValue('hash');
+                                            $bd = $object->getValue('birthday');
+                                            $surname = htmlspecialchars($object->getValue('surname'));
+                                            $namecl = htmlspecialchars($object->getValue('namecl'));
+                                            $patronymic = htmlspecialchars($object->getValue('patronymic'));
+                                            $fio = trim("$surname $namecl $patronymic");
+                                            $num = htmlspecialchars($object->getValue('num_investika'));
+
+                                            echo '<tr>';
+                                            echo '<th><a href="?checked_phys=' . urlencode($hash) . '" uk-icon="plus-circle"></a></th>';
+                                            echo '<th><a uk-toggle="target: #info_phys_redact_' . $iter . '" href="#" uk-icon="minus-circle"></a></th>';
+                                            echo '<th><a uk-toggle="target: #ban_phys_modal_' . $iter . '" href="#" uk-icon="ban"></a></th>';
+                                            echo '<th><a uk-toggle="target: #info_phys_' . $iter . '" href="#" uk-icon="info"></a></th>';
+                                            echo '<th><a uk-toggle="target: #info_phys_read_' . $iter . '" href="#" uk-icon="comments"></a></th>';
+                                            echo '<th>' . $fio . '</th>';
+                                            echo '<th>' . htmlspecialchars($bd) . '</th>';
+                                            echo '<th>' . $num . '</th>';
+                                            echo '</tr>';
+
+                                            $hystoryText = explode("_|||_", trim($object->getValue('komplajns_zamechaniya') ?? ''));
+
+                                            ob_start();
+                                            ?>
+                                            <div id="info_phys_read_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title"><?= $fio ?></h2>
+                                                    <div class="uk-modal-body" uk-overflow-auto>
+                                                        <p><?= addChatLines($hystoryText) ?></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="info_phys_redact_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title"><?= $fio ?></h2>
+                                                    <div class="uk-modal-body" uk-overflow-auto>
+                                                        <form action="./" method="POST" autocomplete="off">
+                                                            <input type="hidden" name="typesend" value="phys" />
+                                                            <textarea class="uk-textarea" name="<?= htmlspecialchars($hash) ?>"
+                                                                placeholder="Причина отказа" required></textarea>
+                                                            <p><button class="uk-button" type="submit">Отправить</button></p>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="ban_phys_modal_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title">Блокировка клиента</h2>
+                                                    <form action="./" method="POST" autocomplete="off">
+                                                        <input type="hidden" name="ban_phys_comment" value="1" />
+                                                        <input type="hidden" name="hash"
+                                                            value="<?= htmlspecialchars($hash) ?>" />
+                                                        <textarea class="uk-textarea" name="comment" rows="3"
+                                                            placeholder="Причина блокировки" required></textarea>
+                                                        <p><button class="uk-button uk-button-danger"
+                                                                type="submit">Заблокировать</button></p>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <div id="info_phys_<?= $iter ?>" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body">
+                                                    <button class="uk-modal-close-outside" type="button" uk-close></button>
+                                                    <h2 class="uk-modal-title"><?= $fio ?></h2>
+                                                    <div class="uk-modal-body" uk-overflow-auto>
+                                                        <table
+                                                            class="uk-table uk-table-small uk-table-divider uk-table-striped uk-table-hover">
+                                                            <?php
+                                                            if (isset($legal_point_check_info_phys) && is_array($legal_point_check_info_phys)) {
+                                                                foreach ($legal_point_check_info_phys as $k) {
+                                                                    $title = $object->getPropByName($k) ? $object->getPropByName($k)->getTitle() : $k;
+                                                                    $val = $object->getValue($k);
+                                                                    echo '<tr><td>' . htmlspecialchars($title) . '</td><td>' . safeValue($val) . '</td></tr>';
+                                                                }
+                                                            }
+                                                            ?>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php
+                                            $modals[] = ob_get_clean();
+                                            $iter++;
+                                        }
+                                        echo '</tbody></table>';
+                                        echo implode('', $modals);
+                                    } else {
+                                        echo '<p>Нет физических лиц со статусом 3.</p>';
+                                    }
+                                    ?>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div id="system-message-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Content -->
+
+    </div>
+</div>
