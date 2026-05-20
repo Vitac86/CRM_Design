@@ -87,6 +87,13 @@
   width: 160px;
 }
 
+/* Table layout */
+.crm-page[data-page="brokerage"] .crm-brokerage-table .uk-table {
+  min-width: 1140px;
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Mobile rules */
 
 @media (max-width: 480px) {

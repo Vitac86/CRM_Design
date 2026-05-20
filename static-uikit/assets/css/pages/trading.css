@@ -24,6 +24,11 @@ body[data-page="trading-card"] {
   min-width: 1380px;
 }
 
+.crm-page[data-page="trading"] .crm-trading-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 .crm-page[data-page="trading"] .crm-trading-table .crm-row-main {
   font-size: 14px;
   font-weight: 600;

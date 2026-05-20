@@ -6979,6 +6979,13 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   width: 160px;
 }
 
+/* Table layout */
+.crm-page[data-page="brokerage"] .crm-brokerage-table .uk-table {
+  min-width: 1140px;
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Mobile rules */
 
 @media (max-width: 480px) {
@@ -7495,6 +7502,8 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table {
   min-width: 1120px;
+  table-layout: fixed;
+  width: 100%;
 }
 
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-row-main {
@@ -8279,6 +8288,11 @@ body[data-page="trading-card"] {
 .crm-page[data-page="trading"] .crm-trading-table .crm-table,
 .crm-page[data-page="trading"] .crm-trading-table .uk-table {
   min-width: 1380px;
+}
+
+.crm-page[data-page="trading"] .crm-trading-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
 }
 
 .crm-page[data-page="trading"] .crm-trading-table .crm-row-main {

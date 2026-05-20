@@ -64,6 +64,8 @@
 
 .crm-page[data-page="compliance"] .crm-compliance-table .uk-table {
   min-width: 1120px;
+  table-layout: fixed;
+  width: 100%;
 }
 
 .crm-page[data-page="compliance"] .crm-compliance-table .crm-row-main {

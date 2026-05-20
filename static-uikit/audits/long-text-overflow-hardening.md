@@ -154,8 +154,80 @@ npm run static:uikit:validate
 
 ---
 
+---
+
+## Registry Table Fixed-Layout Follow-up Notes
+
+**Date:** 2026-05-20
+
+### Registry/List Tables Audited
+
+| Page | colgroup style | Table min-width in CSS | Fixed-layout outcome |
+|---|---|---|---|
+| subjects.html | crm-col-* (`width:`) | 1240px | ✅ Already applied (prior commit) |
+| compliance.html | crm-col-* (`width:`) | 1120px | ✅ Applied in compliance.css |
+| brokerage.html | crm-brokerage-col-* (`width:`) | none → added 1140px | ✅ Applied in brokerage.css |
+| trading.html | mixed (`width:` + `min-width:`) | 1380px | ✅ Applied in trading.css |
+| agents.html | all `min-width:` | none | ⛔ Deferred — needs colgroup `width:` values |
+| archive.html | all `min-width:` | 1100px | ⛔ Deferred — equal distribution would shrink name col |
+| trust-management.html | all `min-width:` | none | ⛔ Deferred — needs colgroup `width:` values |
+| requests.html | mixed, name col `min-width:` | none | ⛔ Deferred — no table floor; name col could become ~0 |
+| back-office.html | none | none | ⛔ Deferred — no colgroup |
+
+### Detail/Card Tables Intentionally Excluded
+
+- subject-card.html document/relation/history tabs — no colgroup, content-driven widths
+- compliance-card.html embedded tables — detail view, no colgroup
+- middle-office-clients.html — has colgroup but no `.crm-registry-table` class; not a registry list page
+
+### Fixed-Layout Ownership
+
+Page-scoped rules were used (no shared `.crm-registry-table .uk-table` rule in tables.css) because:
+- `back-office.html` uses `.crm-registry-table` but has no colgroup
+- `agents.html`, `archive.html`, `trust-management.html` use all-`min-width:` colgroups which are ignored by `table-layout: fixed`
+- `requests.html` has no table `min-width` floor
+
+### subjects.css Page-Specific Rule
+
+Retained as-is. No shared component rule was added, so the existing `body[data-page="subjects"] .crm-subjects-table .uk-table { table-layout: fixed; width: 100%; }` remains the sole owner for subjects.
+
+### Files Changed
+
+| File | Change |
+|---|---|
+| `assets/css/pages/compliance.css` | Added `table-layout: fixed; width: 100%` to existing `.crm-compliance-table .uk-table` rule |
+| `assets/css/pages/brokerage.css` | Added new `.crm-brokerage-table .uk-table` rule with `min-width: 1140px; table-layout: fixed; width: 100%` |
+| `assets/css/pages/trading.css` | Added new `.crm-trading-table .uk-table` rule with `table-layout: fixed; width: 100%` (min-width: 1380px already present) |
+| `assets/css/crm-static.bundle.css` | Regenerated (auto-generated) |
+
+### Validator
+
+Not enhanced — deferred as low-value. Adding a guard that checks every `.crm-registry-table` page has a `table-layout: fixed` rule would require parsing CSS selector coverage across files, which is brittle and likely to produce false positives on the deferred tables.
+
+### Bundle Results
+
+```
+npm run static:uikit:bundle
+  ✓ Bundle written → static-uikit/assets/css/crm-static.bundle.css
+  Sections inlined : 42 / 42
+  Output size      : 243.9 KB
+
+npm run static:uikit:bundle:check
+  ✓ Bundle is up to date (42 / 42 sections, 243.9 KB)
+
+npm run static:uikit:validate
+  Errors   : 0
+  Warnings : 0
+  ✓ Validation passed.
+```
+
+---
+
 ## Deferred Items
 
-- `table-layout: fixed` not applied globally; other registry pages (compliance, brokerage, trading, requests, agents) inherit the improved `.crm-row-main` base rules from tables.css but do NOT get `table-layout: fixed` scoped rules. If a very long value is observed on those pages, add a page-scoped `table-layout: fixed` rule in the respective page CSS file following the subjects.css pattern.
+- **agents.html, trust-management.html** — colgroup uses `style="min-width:Xpx"` only; `table-layout: fixed` ignores `min-width` on `<col>`. Fix: convert colgroup `style="min-width:Xpx"` to `style="width:Xpx"` in HTML, then add page-scoped `table-layout: fixed` in agents.css / trust-management.css.
+- **archive.html** — colgroup uses `style="min-width:Xpx"` only; table has `min-width: 1100px` in archive.css. With 5 auto-width cols, equal distribution would give 220px each vs. intended 260px for name col. Fix: same as agents — convert col styles in HTML.
+- **requests.html** — mixed colgroup (`width:` + `min-width:`); no table min-width in CSS. Applying fixed layout without a floor risks the name col (col2, `min-width:240px`) collapsing to near 0. Fix: add `min-width` rule to requests.css AND convert the `min-width:` col styles to `width:` in HTML.
+- **back-office.html** — no colgroup at all (2-column simple table). Fix: add colgroup with explicit `<col>` widths in HTML, then add page-scoped `table-layout: fixed` in back-office.css.
 - `hyphens: auto` is effective only when the page has a `lang` attribute set correctly (e.g. `lang="ru"`). If HTML pages lack `lang`, hyphens won't trigger; `overflow-wrap: anywhere` is the primary break mechanism and works regardless.
 - No `title` attributes were added to table cells; the task instructs not to mass-edit HTML only for titles.
