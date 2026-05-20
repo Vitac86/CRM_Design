@@ -168,17 +168,17 @@ npm run static:uikit:validate
 | compliance.html | crm-col-* (`width:`) | 1120px | ✅ Applied in compliance.css |
 | brokerage.html | crm-brokerage-col-* (`width:`) | none → added 1140px | ✅ Applied in brokerage.css |
 | trading.html | mixed (`width:` + `min-width:`) | 1380px | ✅ Applied in trading.css |
-| agents.html | all `min-width:` | none | ⛔ Deferred — needs colgroup `width:` values |
-| archive.html | all `min-width:` | 1100px | ⛔ Deferred — equal distribution would shrink name col |
-| trust-management.html | all `min-width:` | none | ⛔ Deferred — needs colgroup `width:` values |
-| requests.html | mixed, name col `min-width:` | none | ⛔ Deferred — no table floor; name col could become ~0 |
-| back-office.html | none | none | ⛔ Deferred — no colgroup |
+| agents.html | all `min-width:` | none | ⛔ Deferred → ✅ Completed in follow-up commit |
+| archive.html | all `min-width:` | 1100px | ⛔ Deferred → ✅ Completed in follow-up commit |
+| trust-management.html | all `min-width:` | none | ⛔ Deferred → ✅ Completed in follow-up commit |
+| requests.html | mixed, name col `min-width:` | none | ⛔ Deferred → ✅ Completed in follow-up commit |
+| back-office.html | none | none | ⛔ Deferred → ✅ Completed in follow-up commit |
 
 ### Detail/Card Tables Intentionally Excluded
 
 - subject-card.html document/relation/history tabs — no colgroup, content-driven widths
 - compliance-card.html embedded tables — detail view, no colgroup
-- middle-office-clients.html — has colgroup but no `.crm-registry-table` class; not a registry list page
+- middle-office-clients.html — re-classified in follow-up as a registry-like list and hardened
 
 ### Fixed-Layout Ownership
 
@@ -225,9 +225,90 @@ npm run static:uikit:validate
 
 ## Deferred Items
 
-- **agents.html, trust-management.html** — colgroup uses `style="min-width:Xpx"` only; `table-layout: fixed` ignores `min-width` on `<col>`. Fix: convert colgroup `style="min-width:Xpx"` to `style="width:Xpx"` in HTML, then add page-scoped `table-layout: fixed` in agents.css / trust-management.css.
-- **archive.html** — colgroup uses `style="min-width:Xpx"` only; table has `min-width: 1100px` in archive.css. With 5 auto-width cols, equal distribution would give 220px each vs. intended 260px for name col. Fix: same as agents — convert col styles in HTML.
-- **requests.html** — mixed colgroup (`width:` + `min-width:`); no table min-width in CSS. Applying fixed layout without a floor risks the name col (col2, `min-width:240px`) collapsing to near 0. Fix: add `min-width` rule to requests.css AND convert the `min-width:` col styles to `width:` in HTML.
-- **back-office.html** — no colgroup at all (2-column simple table). Fix: add colgroup with explicit `<col>` widths in HTML, then add page-scoped `table-layout: fixed` in back-office.css.
+- ~~agents.html, trust-management.html~~ — completed in follow-up commit.
+- ~~archive.html~~ — completed in follow-up commit.
+- ~~requests.html~~ — completed in follow-up commit.
+- ~~back-office.html~~ — completed in follow-up commit.
 - `hyphens: auto` is effective only when the page has a `lang` attribute set correctly (e.g. `lang="ru"`). If HTML pages lack `lang`, hyphens won't trigger; `overflow-wrap: anywhere` is the primary break mechanism and works regardless.
 - No `title` attributes were added to table cells; the task instructs not to mass-edit HTML only for titles.
+
+---
+
+## Remaining Registry Tables Fixed-Layout Completion Notes
+
+**Date:** 2026-05-20
+
+### Pages Audited
+
+| Page | Classification | Outcome |
+|---|---|---|
+| agents.html | Registry/list — `.crm-registry-table` + `.crm-agents-table` + colgroup | ✅ Hardened |
+| archive.html | Registry/list — `.crm-registry-table` + `.crm-archive-table` + colgroup | ✅ Hardened |
+| trust-management.html | Registry/list — `.crm-registry-table` + `.crm-trust-management-table` + colgroup | ✅ Hardened |
+| requests.html | Registry/list — `.crm-registry-table` + `.crm-requests-table` + colgroup | ✅ Hardened |
+| back-office.html | Registry/list — `.crm-registry-table` + `.crm-back-office-table`, 2 cols, no prior colgroup | ✅ Hardened |
+| middle-office-clients.html | Registry-like list — `.crm-table-card` + `.crm-table-wrapper`, colgroup with all `width:` | ✅ Hardened |
+
+### Colgroup Changes (min-width → width)
+
+`table-layout: fixed` ignores `min-width` on `<col>` — only `width` is used for column sizing.
+
+| Page | Column(s) converted |
+|---|---|
+| agents.html | col1 `min-width:220px` → `width:220px`; col2 `min-width:180px` → `width:180px` |
+| archive.html | col1 `min-width:260px` → `width:260px`; col3 `min-width:220px` → `width:220px`; col5 `min-width:190px` → `width:190px` |
+| trust-management.html | col1 `min-width:220px` → `width:220px`; col2 `min-width:180px` → `width:180px` |
+| requests.html | col2 `min-width:240px` → `width:240px`; col6 `min-width:180px` → `width:180px` |
+| back-office.html | Added `<colgroup>` with `<col style="width:280px"/>` + `<col style="width:140px"/>` (total 420px = existing min-width) |
+
+### Table Min-Width Floors
+
+| Page | Source of min-width |
+|---|---|
+| agents.html | 1040px via `components/registry.css` comma group — no change needed |
+| archive.html | 1100px via `pages/archive.css` — no change needed |
+| trust-management.html | 1040px via `components/registry.css` comma group — no change needed |
+| requests.html | 1040px via `components/registry.css` comma group — no change needed |
+| back-office.html | 420px via `pages/back-office.css` — no change needed |
+| middle-office-clients.html | `min-width: 1240px` on `.crm-table` div + `min-width: 1460px` added on `.uk-table` (= column sum) |
+
+### Fixed-Layout Rules Added
+
+| CSS file | Rule added |
+|---|---|
+| `pages/agents.css` | `.crm-page[data-page="agents"] .crm-agents-table .uk-table { table-layout: fixed; width: 100%; }` |
+| `pages/archive.css` | `.crm-page[data-page="archive"] .crm-archive-table .uk-table { table-layout: fixed; width: 100%; }` |
+| `pages/trust-management.css` | `.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table { table-layout: fixed; width: 100%; }` |
+| `pages/requests.css` | `.crm-page[data-page="requests"] .crm-requests-table .uk-table { table-layout: fixed; width: 100%; }` |
+| `pages/back-office.css` | `.crm-page[data-page="back-office"] .crm-back-office-table .uk-table { table-layout: fixed; width: 100%; }` |
+| `pages/middle-office.css` | `body[data-page="middle-office-clients"] .crm-table-wrapper .uk-table { min-width: 1460px; table-layout: fixed; width: 100%; }` |
+
+### Middle-Office-Clients Decision
+
+Classified as a registry-like list page and hardened. It does not use `.crm-registry-table` class but follows the same visual pattern (`.crm-card.crm-table-card` + `.crm-table-wrapper` + `.crm-table` + `table.uk-table`). All colgroup columns already used `style="width:Xpx"` — no HTML changes needed. The page's `.crm-table-wrapper` already has `overflow-x: auto` from middle-office.css. No `crm-row-main` is used, so content in cells wraps rather than ellipsis, but columns are capped at declared widths and cannot push layout.
+
+### Pages Not Hardened (Detail/Card Embedded Tables)
+
+- `subject-card.html` document/relation/history tab tables — detail embedded, no colgroup, excluded
+- `compliance-card.html` embedded tables — detail view, excluded
+
+### Bundle Results
+
+```
+npm run static:uikit:bundle
+  ✓ Bundle written → static-uikit/assets/css/crm-static.bundle.css
+  Sections inlined : 42 / 42
+  Output size      : 244.6 KB
+
+npm run static:uikit:bundle:check
+  ✓ Bundle is up to date (42 / 42 sections, 244.6 KB)
+
+npm run static:uikit:validate
+  Errors   : 0
+  Warnings : 0
+  ✓ Validation passed.
+```
+
+### Remaining Deferred Items
+
+None. All registry/list tables across the static-uikit area now have `table-layout: fixed` protection with explicit `width:` colgroup values. Detail/card embedded tables are intentionally excluded.

@@ -153,6 +153,12 @@
   line-height: 1.4;
 }
 
+/* Table layout */
+.crm-page[data-page="agents"] .crm-agents-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Mobile Rules */
 @media (max-width:600px) {
   .crm-page[data-page="agents"] .crm-agents-form-grid {

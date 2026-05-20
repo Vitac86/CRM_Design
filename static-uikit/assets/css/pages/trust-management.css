@@ -29,6 +29,12 @@
 
 /* Column width values remain inline in the colgroup to preserve table geometry. */
 
+/* Table layout */
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Mobile rules */
 
 /* Mobile footer and filter behavior remains handled by shared responsive.css. */

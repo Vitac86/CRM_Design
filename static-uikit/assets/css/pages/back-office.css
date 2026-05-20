@@ -54,6 +54,11 @@
   min-width: 420px;
 }
 
+.crm-page[data-page="back-office"] .crm-back-office-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Cell Helpers / Row Helpers
    Row helper visuals are shared; no back-office-only rules are needed here. */
 

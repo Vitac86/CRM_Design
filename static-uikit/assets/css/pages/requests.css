@@ -64,6 +64,10 @@
 
 /* Table sizing */
 /* Shared 1040px registry table sizing lives in components/registry.css. */
+.crm-page[data-page="requests"] .crm-requests-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
 
 /* Cell Helpers / Row Helpers
    Row helper visuals are shared; no requests-only rules are needed here. */

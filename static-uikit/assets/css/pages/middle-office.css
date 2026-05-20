@@ -92,6 +92,12 @@ body[data-page="middle-office-clients"] .crm-table {
   min-width: 1240px;
 }
 
+body[data-page="middle-office-clients"] .crm-table-wrapper .uk-table {
+  min-width: 1460px;
+  table-layout: fixed;
+  width: 100%;
+}
+
 body[data-page="middle-office-clients"] .crm-table .uk-table {
   min-width: 1240px;
 }

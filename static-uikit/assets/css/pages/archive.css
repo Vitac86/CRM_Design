@@ -18,3 +18,8 @@
 .crm-page[data-page="archive"] .crm-archive-table .uk-table {
   min-width: 1100px;
 }
+
+.crm-page[data-page="archive"] .crm-archive-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}

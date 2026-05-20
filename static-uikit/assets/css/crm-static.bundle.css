@@ -7055,6 +7055,12 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 
 /* Column width values remain inline in the colgroup to preserve table geometry. */
 
+/* Table layout */
+.crm-page[data-page="trust-management"] .crm-trust-management-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Mobile rules */
 
 /* Mobile footer and filter behavior remains handled by shared responsive.css. */
@@ -7126,6 +7132,10 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 
 /* Table sizing */
 /* Shared 1040px registry table sizing lives in components/registry.css. */
+.crm-page[data-page="requests"] .crm-requests-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
 
 /* Cell Helpers / Row Helpers
    Row helper visuals are shared; no requests-only rules are needed here. */
@@ -7218,6 +7228,11 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   min-width: 420px;
 }
 
+.crm-page[data-page="back-office"] .crm-back-office-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 /* Cell Helpers / Row Helpers
    Row helper visuals are shared; no back-office-only rules are needed here. */
 
@@ -7270,6 +7285,11 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
 .crm-page[data-page="archive"] .crm-archive-table .crm-table,
 .crm-page[data-page="archive"] .crm-archive-table .uk-table {
   min-width: 1100px;
+}
+
+.crm-page[data-page="archive"] .crm-archive-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
 }
 
 /* ===== pages/agents.css ===== */
@@ -7426,6 +7446,12 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   font-size: 12px;
   color: #3b5a8a;
   line-height: 1.4;
+}
+
+/* Table layout */
+.crm-page[data-page="agents"] .crm-agents-table .uk-table {
+  table-layout: fixed;
+  width: 100%;
 }
 
 /* Mobile Rules */
@@ -8096,6 +8122,12 @@ body[data-page="middle-office-clients"] .crm-table-card .crm-table {
 
 body[data-page="middle-office-clients"] .crm-table {
   min-width: 1240px;
+}
+
+body[data-page="middle-office-clients"] .crm-table-wrapper .uk-table {
+  min-width: 1460px;
+  table-layout: fixed;
+  width: 100%;
 }
 
 body[data-page="middle-office-clients"] .crm-table .uk-table {
