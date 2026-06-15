@@ -795,6 +795,532 @@
     }
   });
 
+  /* ─── Account / contract closure flow ──────────────────────────────────── */
+
+  var closureRoot = subjectCardPage.querySelector('[data-role="closure-root"]');
+
+  var CLOSURE_USERS = {
+    depository: 'Петров П.П.',
+    'middle-office': 'Сидорова А.А.',
+  };
+
+  var CLOSURE_ROLE_NAMES = {
+    depository: 'Депозитарий',
+    'middle-office': 'Мидл-офис',
+    manager: 'Клиентский менеджер',
+  };
+
+  var CLOSURE_DECISION_WORDS = {
+    waiting: 'ожидает',
+    accepted: 'акцептовано',
+    returned: 'возвращено',
+  };
+
+  var closureState = {
+    role: 'manager',
+    decisions: { depository: 'waiting', 'middle-office': 'waiting' },
+    reasons: { depository: '', 'middle-office': '' },
+    decisionInfo: {
+      depository: { user: '—', date: '—' },
+      'middle-office': { user: '—', date: '—' },
+    },
+    items: [
+      { id: 'broker', contract: 'BR-2026/00444', account: '30601-000-4401', type: 'Брокерский' },
+      { id: 'depository', contract: 'DP-2026/00445', account: '30-016-00041-DP', type: 'Депозитарный' },
+    ],
+    source: 'Личный кабинет',
+    closed: false,
+    finalDate: null,
+  };
+
+  function closureNow() {
+    var d = new Date();
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    return '15.06.2026 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function closureAll(selector) {
+    return closureRoot ? Array.prototype.slice.call(closureRoot.querySelectorAll(selector)) : [];
+  }
+
+  function closureOne(selector) {
+    return closureRoot ? closureRoot.querySelector(selector) : null;
+  }
+
+  function setClosureText(role, text) {
+    closureAll('[data-role="' + role + '"]').forEach(function (el) { el.textContent = text; });
+  }
+
+  function setClosureBadgeAll(role, text, cls) {
+    closureAll('[data-role="' + role + '"]').forEach(function (el) {
+      el.textContent = text;
+      el.className = 'crm-badge ' + cls;
+    });
+  }
+
+  function setBadgeEl(el, text, cls) {
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'crm-badge ' + cls;
+  }
+
+  function getClosureDecisionRow(role) {
+    return closureRoot ? closureRoot.querySelector('.crm-closure-decision-row[data-decision-role="' + role + '"]') : null;
+  }
+
+  function addTimelineEvent(text) {
+    var list = closureOne('[data-role="closure-timeline"]');
+    if (!list) return;
+    var li = document.createElement('li');
+    li.className = 'crm-closure-event';
+    li.innerHTML =
+      '<span class="crm-closure-event-time">' + escapeHtml(closureNow()) + '</span>' +
+      '<span class="crm-closure-event-text">' + escapeHtml(text) + '</span>';
+    list.appendChild(li);
+  }
+
+  function getClosureComment() {
+    var ta = closureOne('[data-role="closure-comment"]');
+    return ta ? ta.value.trim() : '';
+  }
+
+  function setClosureCommentError(visible) {
+    var err = closureOne('[data-role="closure-comment-error"]');
+    if (err) err.hidden = !visible;
+  }
+
+  function setClosureRole(role) {
+    if (!closureRoot) return;
+    closureState.role = role;
+    closureRoot.setAttribute('data-role-current', role);
+    closureRoot.querySelectorAll('[data-action="set-closure-role"]').forEach(function (btn) {
+      var isActive = btn.getAttribute('data-role-value') === role;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-pressed', String(isActive));
+    });
+    recomputeClosure();
+  }
+
+  function renderClosureItems() {
+    var bannerItems = closureOne('[data-role="closure-banner-items"]');
+    if (bannerItems) {
+      var chipsHtml = '<span class="crm-closure-banner-items-label">Договоры/счета:</span>';
+      closureState.items.forEach(function (it) {
+        chipsHtml += '<span class="crm-closure-tagchip" data-closure-item="' + escapeHtml(it.id) + '">' + escapeHtml(it.contract) + '</span>';
+      });
+      bannerItems.innerHTML = chipsHtml;
+    }
+
+    var list = closureOne('[data-role="closure-items"]');
+    if (list) {
+      list.innerHTML = '';
+      var statusText = closureState.closed ? 'Закрыт' : 'Действующий';
+      var statusCls = closureState.closed ? 'muted' : 'success';
+      closureState.items.forEach(function (it) {
+        var li = document.createElement('li');
+        li.className = 'crm-closure-item' + (closureState.closed ? ' is-closed' : '');
+        li.setAttribute('data-closure-item', it.id);
+        li.innerHTML =
+          '<div class="crm-closure-item-main">' +
+            '<span class="crm-closure-item-contract">' + escapeHtml(it.contract) + '</span>' +
+            '<span class="crm-closure-item-sub">' + escapeHtml(it.type) + ' · счёт ' + escapeHtml(it.account) + '</span>' +
+          '</div>' +
+          '<span class="crm-badge ' + statusCls + '" data-role="closure-item-status">' + statusText + '</span>';
+        list.appendChild(li);
+      });
+    }
+  }
+
+  function updateClosureTableTags() {
+    var activeIds = closureState.items.map(function (it) { return it.id; });
+    subjectCardPage.querySelectorAll('[data-role="closure-tag"]').forEach(function (tag) {
+      var id = tag.getAttribute('data-closure-item');
+      if (activeIds.indexOf(id) === -1) {
+        tag.hidden = true;
+        return;
+      }
+      tag.hidden = false;
+      if (closureState.closed) {
+        tag.textContent = 'Закрыт';
+        tag.className = 'crm-badge muted crm-closure-tag';
+      } else {
+        tag.textContent = 'В заявке на закрытие';
+        tag.className = 'crm-badge info crm-closure-tag';
+      }
+    });
+  }
+
+  function updateClosureRowActions() {
+    var activeIds = closureState.items.map(function (it) { return it.id; });
+    subjectCardPage.querySelectorAll('[data-action="row-close-request"]').forEach(function (btn) {
+      var id = btn.getAttribute('data-closure-item');
+      var inRequest = activeIds.indexOf(id) !== -1;
+      if (inRequest && closureState.closed) {
+        btn.disabled = true;
+        btn.textContent = 'Закрыт';
+      } else if (inRequest) {
+        btn.disabled = true;
+        btn.textContent = 'В заявке';
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Закрыть';
+      }
+    });
+  }
+
+  function renderClosureChips() {
+    ['depository', 'middle-office'].forEach(function (r) {
+      var chip = closureOne('[data-chip-role="' + r + '"]');
+      if (!chip) return;
+      var st = closureState.decisions[r];
+      chip.setAttribute('data-state', st);
+      chip.textContent = CLOSURE_ROLE_NAMES[r] + ' — ' + CLOSURE_DECISION_WORDS[st];
+    });
+    var mgrChip = closureOne('[data-chip-role="manager"]');
+    if (mgrChip) {
+      var both = closureState.decisions.depository === 'accepted' && closureState.decisions['middle-office'] === 'accepted';
+      var st = closureState.closed ? 'done' : (both ? 'ready' : 'unavailable');
+      var word = { unavailable: 'недоступно', ready: 'готов к закрытию', done: 'выполнено' }[st];
+      mgrChip.setAttribute('data-state', st);
+      mgrChip.textContent = 'Клиентский менеджер — ' + word;
+    }
+  }
+
+  function renderClosureDecisionRow(role) {
+    var row = getClosureDecisionRow(role);
+    if (!row) return;
+    var state = closureState.decisions[role];
+    var info = closureState.decisionInfo[role];
+    var badge = row.querySelector('[data-role="decision-badge"]');
+    var userEl = row.querySelector('[data-role="decision-user"]');
+    var dateEl = row.querySelector('[data-role="decision-date"]');
+    row.setAttribute('data-state', state);
+    if (userEl) userEl.textContent = info.user;
+    if (dateEl) dateEl.textContent = info.date;
+    if (state === 'accepted') setBadgeEl(badge, 'Акцептовано', 'success');
+    else if (state === 'returned') setBadgeEl(badge, 'Возвращено', 'danger');
+    else setBadgeEl(badge, 'Ожидает', 'warning');
+  }
+
+  function syncClosureButtons(both) {
+    closureAll('[data-action="closure-accept"]').forEach(function (btn) {
+      var r = btn.getAttribute('data-decision-role');
+      btn.disabled = closureState.closed || closureState.decisions[r] === 'accepted';
+    });
+    closureAll('[data-action="closure-return"]').forEach(function (btn) {
+      btn.disabled = closureState.closed;
+    });
+    closureAll('[data-action="closure-final"]').forEach(function (btn) {
+      btn.disabled = !(both && closureState.role === 'manager' && !closureState.closed);
+      btn.textContent = closureState.closed ? 'Счёт закрыт' : 'Закрыть счёт';
+    });
+  }
+
+  function recomputeClosure() {
+    if (!closureRoot) return;
+
+    renderClosureDecisionRow('depository');
+    renderClosureDecisionRow('middle-office');
+    renderClosureChips();
+    renderClosureItems();
+
+    var dep = closureState.decisions.depository;
+    var mid = closureState.decisions['middle-office'];
+    var both = dep === 'accepted' && mid === 'accepted';
+    var anyReturned = dep === 'returned' || mid === 'returned';
+
+    var status, statusCls, step;
+    if (closureState.closed) {
+      status = 'Закрыта'; statusCls = 'success'; step = 'Закрытие выполнено';
+    } else if (anyReturned) {
+      status = 'Возвращена на уточнение'; statusCls = 'danger'; step = 'Уточнение у клиентского менеджера';
+    } else if (both) {
+      status = 'Готова к закрытию'; statusCls = 'info'; step = 'Клиентский менеджер';
+    } else {
+      status = 'Ожидает акцепта'; statusCls = 'warning';
+      var pending = [];
+      if (dep === 'waiting') pending.push('Депозитарий');
+      if (mid === 'waiting') pending.push('Мидл-офис');
+      step = pending.join(' и ') || 'Клиентский менеджер';
+    }
+
+    setClosureBadgeAll('closure-status-badge', status, statusCls);
+    setClosureText('closure-step', step);
+
+    var hintText = both ? 'Все согласования получены — закрытие доступно менеджеру.' : 'Доступно после акцепта Депозитария и Мидл-офиса';
+    if (closureState.closed) hintText = 'Закрытие выполнено клиентским менеджером.';
+    setClosureText('closure-final-hint', hintText);
+
+    var managerRow = getClosureDecisionRow('manager');
+    if (managerRow) {
+      var mgrBadge = managerRow.querySelector('[data-role="decision-badge"]');
+      var mgrDate = managerRow.querySelector('[data-role="decision-date"]');
+      if (closureState.closed) {
+        managerRow.setAttribute('data-state', 'done');
+        setBadgeEl(mgrBadge, 'Выполнено', 'success');
+        if (mgrDate) mgrDate.textContent = closureState.finalDate || closureNow();
+      } else {
+        managerRow.setAttribute('data-state', both ? 'ready' : 'unavailable');
+        setBadgeEl(mgrBadge, both ? 'Готово к закрытию' : 'Недоступно', both ? 'info' : 'muted');
+        if (mgrDate) mgrDate.textContent = '—';
+      }
+    }
+
+    syncClosureButtons(both);
+
+    var reasonBox = closureOne('[data-role="closure-reason"]');
+    var reasonText = closureOne('[data-role="closure-reason-text"]');
+    var parts = [];
+    ['depository', 'middle-office'].forEach(function (role) {
+      if (closureState.decisions[role] === 'returned' && closureState.reasons[role]) {
+        parts.push(CLOSURE_ROLE_NAMES[role] + ': ' + closureState.reasons[role]);
+      }
+    });
+    if (reasonBox && reasonText) {
+      if (parts.length && !closureState.closed) {
+        reasonText.textContent = parts.join('\n');
+        reasonBox.hidden = false;
+      } else {
+        reasonBox.hidden = true;
+      }
+    }
+
+    updateClosureTableTags();
+    updateClosureRowActions();
+  }
+
+  function acceptClosureDecision(role) {
+    if (closureState.closed || role === 'manager') return;
+    closureState.decisions[role] = 'accepted';
+    closureState.reasons[role] = '';
+    closureState.decisionInfo[role] = { user: CLOSURE_USERS[role] || '—', date: closureNow() };
+    setClosureCommentError(false);
+    var comment = getClosureComment();
+    addTimelineEvent(CLOSURE_ROLE_NAMES[role] + ' акцептовал заявку' + (comment ? ' · ' + comment : ''));
+    recomputeClosure();
+  }
+
+  function returnClosureDecision(role) {
+    if (closureState.closed || role === 'manager') return;
+    var comment = getClosureComment();
+    if (!comment) {
+      setClosureDrawerState(true);
+      setClosureCommentError(true);
+      var ta = closureOne('[data-role="closure-comment"]');
+      if (ta) ta.focus();
+      return;
+    }
+    setClosureCommentError(false);
+    closureState.decisions[role] = 'returned';
+    closureState.reasons[role] = comment;
+    closureState.decisionInfo[role] = { user: CLOSURE_USERS[role] || '—', date: closureNow() };
+    addTimelineEvent('Возвращено на уточнение · ' + CLOSURE_ROLE_NAMES[role] + ': ' + comment);
+    recomputeClosure();
+  }
+
+  function finalCloseClosure() {
+    if (closureState.closed || closureState.role !== 'manager') return;
+    if (!(closureState.decisions.depository === 'accepted' && closureState.decisions['middle-office'] === 'accepted')) return;
+    closureState.closed = true;
+    closureState.finalDate = closureNow();
+    addTimelineEvent('Клиентский менеджер закрыл договоры/счета. Заявка переведена в статус «Закрыта».');
+    recomputeClosure();
+  }
+
+  function setClosureDrawerState(open) {
+    var drawer = closureOne('[data-role="closure-drawer"]');
+    if (!drawer) return;
+    if (open) {
+      drawer.hidden = false;
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(function () { drawer.classList.add('is-visible'); });
+      } else {
+        drawer.classList.add('is-visible');
+      }
+      document.body.classList.add('crm-modal-open');
+    } else {
+      drawer.classList.remove('is-visible');
+      document.body.classList.remove('crm-modal-open');
+      window.setTimeout(function () { drawer.hidden = true; }, 220);
+    }
+  }
+
+  /* ─── Closure creation modal ───────────────────────────────────────────── */
+
+  function setClosureModalState(isOpen) {
+    var modal = subjectCardPage.querySelector('[data-role="closure-modal"]');
+    if (!modal) return;
+    modal.hidden = !isOpen;
+    document.body.classList.toggle('crm-modal-open', isOpen);
+    if (isOpen) {
+      updateClosureFormSummary();
+      var err = modal.querySelector('[data-role="closure-form-error"]');
+      if (err) err.hidden = true;
+    }
+  }
+
+  function getClosureFormChecks() {
+    var modal = subjectCardPage.querySelector('[data-role="closure-modal"]');
+    if (!modal) return [];
+    return Array.prototype.slice.call(modal.querySelectorAll('[data-role="closure-form-check"]'));
+  }
+
+  function updateClosureFormSummary() {
+    var summary = subjectCardPage.querySelector('[data-role="closure-form-summary"]');
+    if (!summary) return;
+    var count = getClosureFormChecks().filter(function (c) { return c.checked; }).length;
+    summary.textContent = 'Выбрано позиций: ' + count;
+  }
+
+  function openClosureModalForItem(itemId) {
+    var modal = subjectCardPage.querySelector('[data-role="closure-modal"]');
+    if (!modal) return;
+    getClosureFormChecks().forEach(function (check) {
+      check.checked = check.getAttribute('data-closure-item') === itemId;
+    });
+    setClosureModalState(true);
+  }
+
+  function submitClosureModal() {
+    var checks = getClosureFormChecks().filter(function (c) { return c.checked; });
+    if (!checks.length) {
+      var err = subjectCardPage.querySelector('[data-role="closure-form-error"]');
+      if (err) err.hidden = false;
+      return;
+    }
+
+    var modal = subjectCardPage.querySelector('[data-role="closure-modal"]');
+    var sourceSel = modal.querySelector('[data-role="closure-form-source"]');
+    var source = sourceSel ? sourceSel.value : 'Личный кабинет';
+    var commentEl = modal.querySelector('[data-role="closure-form-comment"]');
+    var comment = commentEl ? commentEl.value.trim() : '';
+
+    closureState.items = checks.map(function (check) {
+      var row = check.closest('tr');
+      var cells = row ? row.children : null;
+      return {
+        id: check.getAttribute('data-closure-item'),
+        contract: check.getAttribute('data-contract'),
+        account: check.getAttribute('data-account'),
+        type: cells ? cells[2].textContent.trim() : '',
+      };
+    });
+
+    closureState.decisions = { depository: 'waiting', 'middle-office': 'waiting' };
+    closureState.reasons = { depository: '', 'middle-office': '' };
+    closureState.decisionInfo = {
+      depository: { user: '—', date: '—' },
+      'middle-office': { user: '—', date: '—' },
+    };
+    closureState.closed = false;
+    closureState.finalDate = null;
+    closureState.source = source;
+
+    setClosureText('closure-source', source);
+    setClosureText('closure-created', closureNow());
+    var commentTa = closureOne('[data-role="closure-comment"]');
+    if (commentTa) commentTa.value = '';
+    setClosureCommentError(false);
+
+    var timeline = closureOne('[data-role="closure-timeline"]');
+    if (timeline) timeline.innerHTML = '';
+    addTimelineEvent('Заявка создана менеджером вручную · источник: ' + source + (comment ? ' · ' + comment : ''));
+    addTimelineEvent('Уведомления отправлены ответственным сотрудникам');
+
+    recomputeClosure();
+    setClosureModalState(false);
+
+    var banner = closureOne('[data-role="closure-banner"]');
+    if (banner && banner.scrollIntoView) {
+      banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  /* ─── Closure event wiring ─────────────────────────────────────────────── */
+
+  if (closureRoot) {
+    closureRoot.addEventListener('click', function (event) {
+      var roleBtn = event.target.closest('[data-action="set-closure-role"]');
+      if (roleBtn) { setClosureRole(roleBtn.getAttribute('data-role-value')); event.preventDefault(); return; }
+
+      var openDrawer = event.target.closest('[data-action="open-closure-drawer"]');
+      if (openDrawer) { setClosureDrawerState(true); event.preventDefault(); return; }
+
+      var closeDrawer = event.target.closest('[data-action="close-closure-drawer"]');
+      if (closeDrawer) { setClosureDrawerState(false); event.preventDefault(); return; }
+
+      var acceptBtn = event.target.closest('[data-action="closure-accept"]');
+      if (acceptBtn && !acceptBtn.disabled) { acceptClosureDecision(acceptBtn.getAttribute('data-decision-role')); event.preventDefault(); return; }
+
+      var returnBtn = event.target.closest('[data-action="closure-return"]');
+      if (returnBtn && !returnBtn.disabled) { returnClosureDecision(returnBtn.getAttribute('data-decision-role')); event.preventDefault(); return; }
+
+      var finalBtn = event.target.closest('[data-action="closure-final"]');
+      if (finalBtn && !finalBtn.disabled) { finalCloseClosure(); event.preventDefault(); return; }
+    });
+  }
+
+  document.addEventListener('click', function (event) {
+    var rowCloseBtn = event.target.closest('[data-action="row-close-request"]');
+    if (rowCloseBtn && !rowCloseBtn.disabled) { openClosureModalForItem(rowCloseBtn.getAttribute('data-closure-item')); event.preventDefault(); return; }
+    if (event.target.closest('[data-action="open-closure-modal"]')) { setClosureModalState(true); event.preventDefault(); return; }
+    if (event.target.closest('[data-action="close-closure-modal"]')) { setClosureModalState(false); event.preventDefault(); return; }
+    if (event.target.closest('[data-action="submit-closure-modal"]')) { submitClosureModal(); event.preventDefault(); return; }
+  });
+
+  document.addEventListener('change', function (event) {
+    if (event.target.matches('[data-role="closure-form-check"]')) { updateClosureFormSummary(); }
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      setClosureModalState(false);
+      setClosureDrawerState(false);
+    }
+  });
+
+  /* ─── Query-param tab + role bootstrap ─────────────────────────────────── */
+
+  function bootstrapClosureFromQuery() {
+    var params;
+    try {
+      params = new URLSearchParams(window.location.search);
+    } catch (e) {
+      return;
+    }
+
+    var roleParam = params.get('role');
+    var roleMap = { manager: 'manager', depository: 'depository', 'middle-office': 'middle-office' };
+    if (closureRoot && roleParam && roleMap[roleParam]) {
+      setClosureRole(roleMap[roleParam]);
+    }
+
+    if (params.get('tab') === 'contracts') {
+      var tabLinks = subjectCardPage.querySelectorAll('.crm-subject-tabs [data-tab-target]');
+      var index = -1;
+      tabLinks.forEach(function (link, i) {
+        if (link.getAttribute('data-tab-target') === 'contracts') index = i;
+      });
+      var tabsEl = subjectCardPage.querySelector('.crm-subject-tabs');
+      if (index >= 0 && tabsEl) {
+        setTimeout(function () {
+          if (window.UIkit && window.UIkit.tab) {
+            try {
+              window.UIkit.tab(tabsEl).show(index);
+              return;
+            } catch (e) { /* fall through to click */ }
+          }
+          if (tabLinks[index]) tabLinks[index].click();
+        }, 0);
+      }
+    }
+  }
+
+  if (closureRoot) {
+    recomputeClosure();
+  }
+  bootstrapClosureFromQuery();
+
   syncRepresentativeExpiry();
   setupDocumentUpload();
 })();
