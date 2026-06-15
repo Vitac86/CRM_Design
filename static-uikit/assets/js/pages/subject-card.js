@@ -1218,14 +1218,14 @@
 
     setClosureText('closure-source', source);
     setClosureText('closure-created', closureNow());
+    setClosureText('closure-manager-comment', comment || '—');
     var commentTa = closureOne('[data-role="closure-comment"]');
     if (commentTa) commentTa.value = '';
     setClosureCommentError(false);
 
     var timeline = closureOne('[data-role="closure-timeline"]');
     if (timeline) timeline.innerHTML = '';
-    addTimelineEvent('Заявка создана менеджером вручную · источник: ' + source + (comment ? ' · ' + comment : ''));
-    addTimelineEvent('Уведомления отправлены ответственным сотрудникам');
+    addTimelineEvent('Заявка создана менеджером вручную · источник: ' + source + ' · комментарий: ' + (comment || '—'));
 
     recomputeClosure();
     setClosureModalState(false);
