@@ -330,15 +330,39 @@
   line-height: 1.4;
 }
 
-.crm-closure-tasks .uk-table th {
-  font-size: 12px;
-  font-weight: 600;
-  color: #475569;
-  text-transform: none;
+/* Shared closure task table (Middle Office + Depository) */
+.crm-closure-tasks-table {
+  width: 100%;
+}
+
+.crm-closure-tasks-table th,
+.crm-closure-tasks-table td {
+  vertical-align: middle;
+}
+
+.crm-closure-tasks-table th {
   white-space: nowrap;
 }
 
-.crm-closure-tasks .uk-table td {
-  font-size: 13px;
-  vertical-align: middle;
+.crm-closure-tasks-table .crm-closure-task-action-cell {
+  width: 120px;
+  text-align: right;
+}
+
+/* Shared "Открыть" secondary table action button */
+.crm-closure-tasks .crm-closure-task-open {
+  min-width: 84px;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.crm-closure-tasks .crm-closure-task-open:hover {
+  text-decoration: none;
 }

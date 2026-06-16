@@ -2294,6 +2294,17 @@
   gap: 10px;
 }
 
+.crm-page[data-page="subject-card"] .crm-closure-drawer-section + .crm-closure-drawer-section {
+  border-top: 1px solid #eef2f8;
+  padding-top: 16px;
+}
+
+/* The role-focused card is self-contained — no extra separator line above it */
+.crm-page[data-page="subject-card"] .crm-closure-drawer-section + .crm-closure-user-decision {
+  border-top: 0;
+  padding-top: 14px;
+}
+
 .crm-page[data-page="subject-card"] .crm-closure-drawer-subtitle {
   margin: 0;
   font-size: 13px;
@@ -2344,19 +2355,17 @@
   color: var(--crm-umi-text-secondary);
 }
 
-/* Drawer: decision rows */
+/* Drawer: decision cards */
 .crm-page[data-page="subject-card"] .crm-closure-decisions {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-decision-row {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
-  padding: 12px;
+  padding: 12px 14px;
   border: 1px solid var(--crm-umi-border);
   border-radius: 10px;
   background: var(--crm-umi-surface);
@@ -2374,11 +2383,11 @@
   background: #fdf5f6;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-decision-info {
+.crm-page[data-page="subject-card"] .crm-closure-decision-header {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-decision-name {
@@ -2389,70 +2398,42 @@
 
 .crm-page[data-page="subject-card"] .crm-closure-decision-meta {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 6px 10px;
+  gap: 6px 24px;
+  margin: 0;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-decision-user,
-.crm-page[data-page="subject-card"] .crm-closure-decision-date {
-  font-size: 12px;
-  color: var(--crm-umi-text-secondary);
-}
-
-.crm-page[data-page="subject-card"] .crm-closure-decision-actions {
+.crm-page[data-page="subject-card"] .crm-closure-decision-meta-item {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  flex-shrink: 0;
+  gap: 1px;
+  min-width: 0;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-decision-hint {
-  max-width: 200px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: var(--crm-umi-text-muted);
-  text-align: right;
-}
-
-/* Role visibility for drawer decision actions */
-.crm-page[data-page="subject-card"] .crm-closure-workflow[data-role-current="manager"] .crm-closure-decision-row[data-decision-role="depository"] .crm-closure-decision-actions,
-.crm-page[data-page="subject-card"] .crm-closure-workflow[data-role-current="manager"] .crm-closure-decision-row[data-decision-role="middle-office"] .crm-closure-decision-actions,
-.crm-page[data-page="subject-card"] .crm-closure-workflow[data-role-current="depository"] .crm-closure-decision-row[data-decision-role="middle-office"] .crm-closure-decision-actions,
-.crm-page[data-page="subject-card"] .crm-closure-workflow[data-role-current="depository"] .crm-closure-decision-row[data-decision-role="manager"] .crm-closure-decision-actions,
-.crm-page[data-page="subject-card"] .crm-closure-workflow[data-role-current="middle-office"] .crm-closure-decision-row[data-decision-role="depository"] .crm-closure-decision-actions,
-.crm-page[data-page="subject-card"] .crm-closure-workflow[data-role-current="middle-office"] .crm-closure-decision-row[data-decision-role="manager"] .crm-closure-decision-actions {
-  display: none;
-}
-
-/* Drawer: return reason + comment */
-.crm-page[data-page="subject-card"] .crm-closure-reason {
-  display: grid;
-  gap: 4px;
-  padding: 10px 12px;
-  border: 1px solid #edb5bc;
-  border-radius: 10px;
-  background: #fdf5f6;
-}
-
-.crm-page[data-page="subject-card"] .crm-closure-reason-label {
-  font-size: 11px;
+.crm-page[data-page="subject-card"] .crm-closure-decision-meta-item dt {
+  margin: 0;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #7e2229;
+  color: var(--crm-umi-text-muted);
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-reason-text {
+.crm-page[data-page="subject-card"] .crm-closure-decision-meta-item dd {
   margin: 0;
   font-size: 13px;
-  line-height: 1.4;
-  color: #6b2a30;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
+  color: var(--crm-umi-text);
 }
 
+/* Checklist note (read-only checklist has no actions) */
+.crm-page[data-page="subject-card"] .crm-closure-checklist-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--crm-umi-text-muted);
+}
+
+/* Decision comment (lives inside "Ваше решение") */
 .crm-page[data-page="subject-card"] .crm-closure-comment {
   display: flex;
   flex-direction: column;
@@ -2471,6 +2452,93 @@
   font-size: 12px;
   color: #be123c;
   line-height: 1.4;
+}
+
+/* Role-focused "Ваше решение" block — the single active action area in the drawer */
+.crm-page[data-page="subject-card"] .crm-closure-user-decision {
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #cdddf6;
+  border-left: 3px solid var(--crm-umi-primary, #3347c8);
+  border-radius: 12px;
+  background: #f5f8ff;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-task {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b2b46;
+  line-height: 1.3;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-statusline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-statusline-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--crm-umi-text-muted);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-active {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-actions .crm-closure-act {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-final {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-done {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--crm-umi-border);
+  border-radius: 10px;
+  background: var(--crm-umi-surface);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-done-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-user-done-reason {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #6b2a30;
+  overflow-wrap: anywhere;
+}
+
+/* Decision hint (manager final helper in "Ваше решение") */
+.crm-page[data-page="subject-card"] .crm-closure-decision-hint {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--crm-umi-text-muted);
 }
 
 /* Drawer: timeline */
@@ -2738,18 +2806,8 @@
     grid-template-columns: 1fr;
   }
 
-  .crm-page[data-page="subject-card"] .crm-closure-decision-row {
+  .crm-page[data-page="subject-card"] .crm-closure-user-actions {
     flex-direction: column;
-  }
-
-  .crm-page[data-page="subject-card"] .crm-closure-decision-actions {
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .crm-page[data-page="subject-card"] .crm-closure-decision-hint {
-    max-width: none;
-    text-align: left;
   }
 
   .crm-page[data-page="subject-card"] .crm-closure-form-grid {

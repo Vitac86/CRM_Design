@@ -891,6 +891,7 @@
 
   function setClosureRole(role) {
     if (!closureRoot) return;
+    setClosureCommentError(false);
     closureState.role = role;
     closureRoot.setAttribute('data-role-current', role);
     closureRoot.querySelectorAll('[data-action="set-closure-role"]').forEach(function (btn) {
@@ -1067,30 +1068,87 @@
     }
 
     syncClosureButtons(both);
-
-    var reasonBox = closureOne('[data-role="closure-reason"]');
-    var reasonText = closureOne('[data-role="closure-reason-text"]');
-    var parts = [];
-    ['depository', 'middle-office'].forEach(function (role) {
-      if (closureState.decisions[role] === 'returned' && closureState.reasons[role]) {
-        parts.push(CLOSURE_ROLE_NAMES[role] + ': ' + closureState.reasons[role]);
-      }
-    });
-    if (reasonBox && reasonText) {
-      if (parts.length && !closureState.closed) {
-        reasonText.textContent = parts.join('\n');
-        reasonBox.hidden = false;
-      } else {
-        reasonBox.hidden = true;
-      }
-    }
+    renderUserDecision(both, anyReturned);
 
     updateClosureTableTags();
     updateClosureRowActions();
   }
 
+  /* Role-focused "Ваше решение" block — the only active action area in the drawer. */
+  function renderUserDecision(both, anyReturned) {
+    if (!closureRoot) return;
+    var role = closureState.role;
+
+    var taskEl = closureOne('[data-role="closure-user-task"]');
+    var statusBadge = closureOne('[data-role="closure-user-status-badge"]');
+    var activeEl = closureOne('[data-role="closure-user-active"]');
+    var finalEl = closureOne('[data-role="closure-user-final"]');
+    var doneEl = closureOne('[data-role="closure-user-done"]');
+    var doneTitle = closureOne('[data-role="closure-user-done-title"]');
+    var doneUser = closureOne('[data-role="closure-user-done-user"]');
+    var doneDate = closureOne('[data-role="closure-user-done-date"]');
+    var doneReason = closureOne('[data-role="closure-user-done-reason"]');
+
+    if (activeEl) activeEl.hidden = true;
+    if (finalEl) finalEl.hidden = true;
+    if (doneEl) doneEl.hidden = true;
+
+    function showDone(title, badgeText, badgeCls, info, reason) {
+      if (taskEl) taskEl.textContent = title;
+      if (doneTitle) doneTitle.textContent = title;
+      setBadgeEl(statusBadge, badgeText, badgeCls);
+      if (doneUser) doneUser.textContent = (info && info.user) || '—';
+      if (doneDate) doneDate.textContent = (info && info.date) || '—';
+      if (doneReason) {
+        if (reason) { doneReason.textContent = 'Причина: ' + reason; doneReason.hidden = false; }
+        else doneReason.hidden = true;
+      }
+      if (doneEl) doneEl.hidden = false;
+    }
+
+    if (closureState.closed) {
+      var closedInfo = role === 'manager'
+        ? { user: 'Иванов И.И.', date: closureState.finalDate }
+        : closureState.decisionInfo[role];
+      showDone('Заявка закрыта', 'Закрыта', 'success', closedInfo, null);
+      return;
+    }
+
+    if (role === 'manager') {
+      if (taskEl) taskEl.textContent = 'Финальное закрытие';
+      if (both) setBadgeEl(statusBadge, 'Готово к закрытию', 'info');
+      else if (anyReturned) setBadgeEl(statusBadge, 'Возвращена на уточнение', 'danger');
+      else setBadgeEl(statusBadge, 'Недоступно', 'muted');
+      if (finalEl) finalEl.hidden = false;
+      return;
+    }
+
+    var st = closureState.decisions[role];
+    var taskText = role === 'depository' ? 'Требуется акцепт Депозитария' : 'Требуется акцепт Мидл-офиса';
+
+    if (st === 'accepted') {
+      showDone('Решение уже принято', 'Акцептовано', 'success', closureState.decisionInfo[role], null);
+      return;
+    }
+    if (st === 'returned') {
+      showDone('Заявка возвращена на уточнение', 'Возвращено', 'danger', closureState.decisionInfo[role], closureState.reasons[role]);
+      return;
+    }
+    if (anyReturned) {
+      var returner = closureState.decisions.depository === 'returned' ? 'depository' : 'middle-office';
+      showDone('Заявка возвращена на уточнение', 'Возвращено', 'danger', closureState.decisionInfo[returner], closureState.reasons[returner]);
+      return;
+    }
+
+    /* waiting → active action area */
+    if (taskEl) taskEl.textContent = taskText;
+    setBadgeEl(statusBadge, 'Ожидает', 'warning');
+    if (activeEl) activeEl.hidden = false;
+  }
+
   function acceptClosureDecision(role) {
-    if (closureState.closed || role === 'manager') return;
+    if (closureState.closed || !role || role === 'manager') return;
+    setClosureCommentError(false);
     closureState.decisions[role] = 'accepted';
     closureState.reasons[role] = '';
     closureState.decisionInfo[role] = { user: CLOSURE_USERS[role] || '—', date: closureNow() };
@@ -1100,14 +1158,20 @@
     recomputeClosure();
   }
 
+  /* Return for clarification: comment + action live together in "Ваше решение".
+     Clicking "Вернуть на уточнение" returns immediately once a comment is present. */
   function returnClosureDecision(role) {
-    if (closureState.closed || role === 'manager') return;
+    if (closureState.closed || !role || role === 'manager') return;
     var comment = getClosureComment();
     if (!comment) {
+      // Ensure the comment field is visible (e.g. when triggered from the compact banner).
       setClosureDrawerState(true);
       setClosureCommentError(true);
       var ta = closureOne('[data-role="closure-comment"]');
-      if (ta) ta.focus();
+      if (ta) {
+        if (ta.scrollIntoView) ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ta.focus();
+      }
       return;
     }
     setClosureCommentError(false);
@@ -1139,6 +1203,7 @@
       }
       document.body.classList.add('crm-modal-open');
     } else {
+      setClosureCommentError(false);
       drawer.classList.remove('is-visible');
       document.body.classList.remove('crm-modal-open');
       window.setTimeout(function () { drawer.hidden = true; }, 220);
@@ -1250,10 +1315,10 @@
       if (closeDrawer) { setClosureDrawerState(false); event.preventDefault(); return; }
 
       var acceptBtn = event.target.closest('[data-action="closure-accept"]');
-      if (acceptBtn && !acceptBtn.disabled) { acceptClosureDecision(acceptBtn.getAttribute('data-decision-role')); event.preventDefault(); return; }
+      if (acceptBtn && !acceptBtn.disabled) { acceptClosureDecision(acceptBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
 
       var returnBtn = event.target.closest('[data-action="closure-return"]');
-      if (returnBtn && !returnBtn.disabled) { returnClosureDecision(returnBtn.getAttribute('data-decision-role')); event.preventDefault(); return; }
+      if (returnBtn && !returnBtn.disabled) { returnClosureDecision(returnBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
 
       var finalBtn = event.target.closest('[data-action="closure-final"]');
       if (finalBtn && !finalBtn.disabled) { finalCloseClosure(); event.preventDefault(); return; }
