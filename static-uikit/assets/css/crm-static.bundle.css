@@ -1293,27 +1293,87 @@ a:focus-visible {
   line-height: 1.4;
 }
 
-/* Shared closure task table (Middle Office + Depository) */
-.crm-closure-tasks-table {
-  width: 100%;
+/* Shared closure task-card list (Middle Office + Depository) */
+.crm-closure-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.crm-closure-tasks-table th,
-.crm-closure-tasks-table td {
-  vertical-align: middle;
+.crm-closure-task-card {
+  display: flex;
+  align-items: center;
+  gap: 16px 20px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #fff;
 }
 
-.crm-closure-tasks-table th {
-  white-space: nowrap;
+.crm-closure-task-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 220px;
 }
 
-.crm-closure-tasks-table .crm-closure-task-action-cell {
-  width: 120px;
-  text-align: right;
+.crm-closure-task-code {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b2b46;
+  line-height: 1.25;
 }
 
-/* Shared "Открыть" secondary table action button */
-.crm-closure-tasks .crm-closure-task-open {
+.crm-closure-task-client {
+  font-size: 13px;
+  color: #5e6f8c;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.crm-closure-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  flex: 2 1 300px;
+  min-width: 0;
+}
+
+.crm-closure-task-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.crm-closure-task-meta-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8097b9;
+  line-height: 1.3;
+}
+
+.crm-closure-task-meta-value {
+  font-size: 13px;
+  color: #1b2b46;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.crm-closure-task-side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* "Открыть" — proper secondary CRM button (not an underlined link) */
+.crm-closure-task-card .crm-closure-task-open {
   min-width: 84px;
   min-height: 32px;
   height: 32px;
@@ -1326,8 +1386,16 @@ a:focus-visible {
   line-height: 1;
 }
 
-.crm-closure-tasks .crm-closure-task-open:hover {
+.crm-closure-task-card .crm-closure-task-open:hover {
   text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .crm-closure-task-side {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 /* ===== components/buttons.css ===== */
@@ -6104,31 +6172,44 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
 
 /* Compact workflow banner */
 .crm-page[data-page="subject-card"] .crm-closure-banner {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(200px, auto);
-  gap: 14px;
+  gap: 14px 18px;
   align-items: center;
-  padding: 10px 14px;
-  border: 1px solid #e0e8f3;
-  border-left: 3px solid var(--crm-umi-primary, #3347c8);
+  padding: 12px 16px 12px 20px;
+  border: 1px solid #dbe4f1;
   border-radius: 12px;
   background: #fbfdff;
   box-shadow: none;
 }
 
+/* Integrated left accent rail — inset so it follows the rounded card cleanly */
+.crm-page[data-page="subject-card"] .crm-closure-banner::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--crm-umi-primary, #3347c8);
+}
+
 .crm-page[data-page="subject-card"] .crm-closure-banner-lead {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-banner-flag {
   flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 7px;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--crm-umi-primary) 10%, transparent);
   color: var(--crm-umi-primary-hover, var(--crm-umi-primary));
 }
@@ -6212,8 +6293,7 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   border-right: 1px solid #eaeff7;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-progress-label,
-.crm-page[data-page="subject-card"] .crm-closure-banner-step-label {
+.crm-page[data-page="subject-card"] .crm-closure-progress-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -6265,17 +6345,6 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   border-color: #c4cfef;
   background: #e4eaff;
   color: #2e4680;
-}
-
-.crm-page[data-page="subject-card"] .crm-closure-banner-step {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 2px;
-  font-size: 12px;
-  color: var(--crm-umi-text);
-  font-weight: 600;
 }
 
 /* Side action column */
@@ -6984,6 +7053,26 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   display: grid;
   gap: 14px;
   padding: 18px 20px;
+  min-width: 0;
+}
+
+/* Containment: keep every field inside the modal width */
+.crm-page[data-page="subject-card"] .crm-closure-modal-body .uk-input,
+.crm-page[data-page="subject-card"] .crm-closure-modal-body .uk-select {
+  width: 100%;
+  max-width: 100%;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-modal-body .uk-textarea {
+  width: 100%;
+  max-width: 100%;
+  resize: vertical;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-modal-body .crm-date-field {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-modal-subtitle {
@@ -7003,6 +7092,7 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-form-label {
@@ -7019,7 +7109,8 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-form-table-wrap {
-  overflow-x: visible;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-form-table {
@@ -7059,37 +7150,170 @@ body[data-page="subjects"] .crm-subjects-table .crm-badge[data-status="registrat
   color: #be123c;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-attachment {
+/* Attachment dropzone (static demo, no upload) */
+.crm-page[data-page="subject-card"] .crm-closure-dropzone {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px dashed #c8d4e8;
+  gap: 6px;
+  padding: 16px 14px;
+  border: 1.5px dashed #c8d4e8;
   border-radius: 10px;
   background: #f8fbff;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-attachment-icon {
+.crm-page[data-page="subject-card"] .crm-closure-dropzone:hover,
+.crm-page[data-page="subject-card"] .crm-closure-dropzone:focus-visible {
+  border-color: var(--crm-umi-primary, #3347c8);
+  background: #f1f6ff;
+  outline: none;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone.is-dragover {
+  border-color: var(--crm-umi-primary, #3347c8);
+  border-style: solid;
+  background: #e9f1ff;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-icon {
   color: var(--crm-umi-primary, #3347c8);
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-attachment-body {
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-prompt {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-attachment-name {
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-subtitle {
+  font-size: 12px;
+  color: var(--crm-umi-text-secondary);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-help {
+  margin: 0;
+  font-size: 11px;
+  color: var(--crm-umi-text-muted);
+}
+
+/* Selected state */
+.crm-page[data-page="subject-card"] .crm-closure-dropzone.is-selected {
+  flex-direction: row;
+  justify-content: flex-start;
+  text-align: left;
+  border-style: solid;
+  border-color: #cdddf6;
+  background: #f5f8ff;
+  cursor: default;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone.is-selected .crm-closure-dropzone-prompt,
+.crm-page[data-page="subject-card"] .crm-closure-dropzone.is-selected .crm-closure-dropzone-icon {
+  display: none;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-file-icon {
+  flex: 0 0 auto;
+  color: var(--crm-umi-primary, #3347c8);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-file-name {
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 13px;
   font-weight: 600;
   color: var(--crm-umi-text);
   overflow-wrap: anywhere;
 }
 
-.crm-page[data-page="subject-card"] .crm-closure-attachment-note {
-  font-size: 11px;
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-remove {
+  flex: 0 0 auto;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
   color: var(--crm-umi-text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-dropzone-remove:hover {
+  background: #eef2f9;
+  color: var(--crm-umi-text);
+}
+
+/* Confirmation modal (acceptance / final closure) */
+.crm-page[data-page="subject-card"] .crm-closure-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 1070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-confirm[hidden] {
+  display: none;
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 32, 56, 0.5);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-confirm-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  max-width: 420px;
+  padding: 20px 22px;
+  border: 1px solid #d7e2f2;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(20, 32, 56, 0.28);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-confirm-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-confirm-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--crm-umi-text-secondary);
+}
+
+.crm-page[data-page="subject-card"] .crm-closure-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
 }
 
 .crm-page[data-page="subject-card"] .crm-closure-modal-actions {

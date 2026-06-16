@@ -1301,6 +1301,152 @@
     }
   }
 
+  /* ─── Attachment dropzone (static demo, no upload) ─────────────────────── */
+
+  function getClosureDropzone() {
+    return subjectCardPage.querySelector('[data-role="closure-dropzone"]');
+  }
+
+  function selectClosureFile(name) {
+    var dz = getClosureDropzone();
+    if (!dz) return;
+    var nameEl = dz.querySelector('[data-role="closure-dropzone-file-name"]');
+    if (nameEl && name) nameEl.textContent = name;
+    var selected = dz.querySelector('[data-role="closure-dropzone-selected"]');
+    if (selected) selected.hidden = false;
+    dz.classList.add('is-selected');
+    dz.classList.remove('is-dragover');
+  }
+
+  function resetClosureFile() {
+    var dz = getClosureDropzone();
+    if (!dz) return;
+    dz.classList.remove('is-selected', 'is-dragover');
+    var selected = dz.querySelector('[data-role="closure-dropzone-selected"]');
+    if (selected) selected.hidden = true;
+    var input = dz.querySelector('[data-role="closure-dropzone-input"]');
+    if (input) input.value = '';
+  }
+
+  function setupClosureDropzone() {
+    var dz = getClosureDropzone();
+    if (!dz) return;
+    var input = dz.querySelector('[data-role="closure-dropzone-input"]');
+
+    dz.addEventListener('click', function (e) {
+      if (e.target.closest('[data-action="closure-dropzone-remove"]')) {
+        resetClosureFile();
+        e.preventDefault();
+        return;
+      }
+      if (input) input.click();
+    });
+
+    dz.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (input) input.click();
+      }
+    });
+
+    if (input) {
+      input.addEventListener('change', function () {
+        if (input.files && input.files.length > 0) {
+          selectClosureFile(input.files[0].name);
+        }
+      });
+    }
+
+    dz.addEventListener('dragenter', function (e) {
+      e.preventDefault();
+      dz.classList.add('is-dragover');
+    });
+    dz.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+      dz.classList.add('is-dragover');
+    });
+    dz.addEventListener('dragleave', function (e) {
+      if (!dz.contains(e.relatedTarget)) dz.classList.remove('is-dragover');
+    });
+    dz.addEventListener('drop', function (e) {
+      e.preventDefault();
+      dz.classList.remove('is-dragover');
+      var files = e.dataTransfer && e.dataTransfer.files;
+      var name = (files && files.length > 0) ? files[0].name : 'Заявление_на_закрытие.pdf';
+      selectClosureFile(name);
+    });
+
+    /* Contain accidental drops inside the modal so the browser never opens the file. */
+    var modalBody = subjectCardPage.querySelector('.crm-closure-modal-body');
+    if (modalBody) {
+      modalBody.addEventListener('dragover', function (e) { e.preventDefault(); });
+      modalBody.addEventListener('drop', function (e) { e.preventDefault(); });
+    }
+  }
+
+  /* ─── Confirmation modal (acceptance / final closure) ──────────────────── */
+
+  var pendingConfirmAction = null;
+
+  function getClosureConfirm() {
+    return subjectCardPage.querySelector('[data-role="closure-confirm"]');
+  }
+
+  function syncBodyModalLock() {
+    var drawer = closureOne('[data-role="closure-drawer"]');
+    var modal = subjectCardPage.querySelector('[data-role="closure-modal"]');
+    var confirm = getClosureConfirm();
+    var anyOpen =
+      (drawer && drawer.classList.contains('is-visible')) ||
+      (modal && !modal.hidden) ||
+      (confirm && !confirm.hidden);
+    document.body.classList.toggle('crm-modal-open', !!anyOpen);
+  }
+
+  function openClosureConfirm(text, onConfirm) {
+    var modal = getClosureConfirm();
+    if (!modal) { if (typeof onConfirm === 'function') onConfirm(); return; }
+    var textEl = modal.querySelector('[data-role="closure-confirm-text"]');
+    if (textEl) textEl.textContent = text;
+    pendingConfirmAction = onConfirm;
+    modal.hidden = false;
+    document.body.classList.add('crm-modal-open');
+  }
+
+  function closeClosureConfirm() {
+    var modal = getClosureConfirm();
+    if (modal) modal.hidden = true;
+    pendingConfirmAction = null;
+    syncBodyModalLock();
+  }
+
+  function runClosureConfirm() {
+    var fn = pendingConfirmAction;
+    var modal = getClosureConfirm();
+    if (modal) modal.hidden = true;
+    pendingConfirmAction = null;
+    syncBodyModalLock();
+    if (typeof fn === 'function') fn();
+  }
+
+  function requestAcceptConfirm(role) {
+    if (closureState.closed || !role || role === 'manager') return;
+    openClosureConfirm(
+      'Вы уверены, что хотите акцептовать закрытие по роли ' + (CLOSURE_ROLE_NAMES[role] || role) + '?',
+      function () { acceptClosureDecision(role); }
+    );
+  }
+
+  function requestFinalConfirm() {
+    if (closureState.closed || closureState.role !== 'manager') return;
+    if (!(closureState.decisions.depository === 'accepted' && closureState.decisions['middle-office'] === 'accepted')) return;
+    openClosureConfirm(
+      'Вы уверены, что хотите выполнить финальное закрытие выбранных договоров и счетов?',
+      function () { finalCloseClosure(); }
+    );
+  }
+
   /* ─── Closure event wiring ─────────────────────────────────────────────── */
 
   if (closureRoot) {
@@ -1314,14 +1460,20 @@
       var closeDrawer = event.target.closest('[data-action="close-closure-drawer"]');
       if (closeDrawer) { setClosureDrawerState(false); event.preventDefault(); return; }
 
+      var confirmCancelBtn = event.target.closest('[data-action="closure-confirm-cancel"]');
+      if (confirmCancelBtn) { closeClosureConfirm(); event.preventDefault(); return; }
+
+      var confirmOkBtn = event.target.closest('[data-action="closure-confirm-ok"]');
+      if (confirmOkBtn) { runClosureConfirm(); event.preventDefault(); return; }
+
       var acceptBtn = event.target.closest('[data-action="closure-accept"]');
-      if (acceptBtn && !acceptBtn.disabled) { acceptClosureDecision(acceptBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
+      if (acceptBtn && !acceptBtn.disabled) { requestAcceptConfirm(acceptBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
 
       var returnBtn = event.target.closest('[data-action="closure-return"]');
       if (returnBtn && !returnBtn.disabled) { returnClosureDecision(returnBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
 
       var finalBtn = event.target.closest('[data-action="closure-final"]');
-      if (finalBtn && !finalBtn.disabled) { finalCloseClosure(); event.preventDefault(); return; }
+      if (finalBtn && !finalBtn.disabled) { requestFinalConfirm(); event.preventDefault(); return; }
     });
   }
 
@@ -1339,6 +1491,10 @@
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
+      if (getClosureConfirm() && !getClosureConfirm().hidden) {
+        closeClosureConfirm();
+        return;
+      }
       setClosureModalState(false);
       setClosureDrawerState(false);
     }
@@ -1383,6 +1539,7 @@
 
   if (closureRoot) {
     recomputeClosure();
+    setupClosureDropzone();
   }
   bootstrapClosureFromQuery();
 

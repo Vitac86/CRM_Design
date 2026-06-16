@@ -140,10 +140,6 @@
                       <span class="crm-closure-chip" data-chip-role="middle-office" data-state="waiting">Мидл-офис — ожидает</span>
                       <span class="crm-closure-chip" data-chip-role="manager" data-state="unavailable">Клиентский менеджер — недоступно</span>
                     </div>
-                    <div class="crm-closure-banner-step">
-                      <span class="crm-closure-banner-step-label">Этап:</span>
-                      <span data-role="closure-step">Депозитарий и Мидл-офис</span>
-                    </div>
                   </div>
 
                   <div class="crm-closure-banner-side">
@@ -353,6 +349,19 @@
                       </section>
                     </div>
                   </aside>
+                </div>
+
+                <!-- Confirmation modal (acceptance / final closure) -->
+                <div class="crm-closure-confirm" data-role="closure-confirm" hidden>
+                  <div class="crm-closure-confirm-backdrop" data-action="closure-confirm-cancel"></div>
+                  <div class="crm-closure-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="closure-confirm-title">
+                    <h3 id="closure-confirm-title" class="crm-closure-confirm-title">Подтверждение</h3>
+                    <p class="crm-closure-confirm-text" data-role="closure-confirm-text"></p>
+                    <div class="crm-closure-confirm-actions">
+                      <button type="button" class="uk-button uk-button-default crm-button" data-action="closure-confirm-cancel">Отмена</button>
+                      <button type="button" class="uk-button crm-button-primary crm-button" data-action="closure-confirm-ok">Подтвердить</button>
+                    </div>
+                  </div>
                 </div>
               </section>
 
@@ -1545,12 +1554,19 @@
                     <textarea class="uk-textarea crm-input" id="closure-form-comment" rows="2" data-role="closure-form-comment" placeholder="Комментарий менеджера к заявке"></textarea>
                   </div>
 
-                  <div class="crm-closure-attachment">
-                    <span class="crm-closure-attachment-icon" uk-icon="file-text" aria-hidden="true"></span>
-                    <div class="crm-closure-attachment-body">
-                      <span class="crm-closure-attachment-name">Заявление_на_закрытие.pdf</span>
-                      <span class="crm-closure-attachment-note">Static demo: файл не загружается на сервер</span>
+                  <div class="crm-closure-dropzone" data-role="closure-dropzone" tabindex="0" role="button" aria-describedby="closure-dropzone-help">
+                    <input type="file" class="crm-closure-dropzone-input" data-role="closure-dropzone-input" hidden/>
+                    <span class="crm-closure-dropzone-icon" uk-icon="cloud-upload" aria-hidden="true"></span>
+                    <div class="crm-closure-dropzone-prompt" data-role="closure-dropzone-prompt">
+                      <strong class="crm-closure-dropzone-title">Перетащите файл заявления сюда</strong>
+                      <span class="crm-closure-dropzone-subtitle">или выберите файл вручную</span>
                     </div>
+                    <div class="crm-closure-dropzone-selected" data-role="closure-dropzone-selected" hidden>
+                      <span class="crm-closure-dropzone-file-icon" uk-icon="file-text" aria-hidden="true"></span>
+                      <span class="crm-closure-dropzone-file-name" data-role="closure-dropzone-file-name">Заявление_на_закрытие.pdf</span>
+                      <button type="button" class="crm-closure-dropzone-remove" data-action="closure-dropzone-remove" aria-label="Убрать файл">×</button>
+                    </div>
+                    <p id="closure-dropzone-help" class="crm-closure-dropzone-help">Static demo: файл не загружается на сервер</p>
                   </div>
                 </div>
 
