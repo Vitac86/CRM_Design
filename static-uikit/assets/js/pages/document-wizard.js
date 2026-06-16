@@ -786,6 +786,23 @@
           required: false
         }
       ]
+    },
+    {
+      id: 'account-closure',
+      title: 'Заявка на закрытие договора/счёта',
+      description: 'Создание заявки на закрытие брокерского и/или депозитарного договора с последующим акцептом подразделений.',
+      appliesTo: ['individual', 'company'],
+      category: 'Операционные заявки',
+      // Special operational-request flow: no print template, no document generation.
+      // Step 2 collects closure data; the final action creates a request and opens
+      // the standalone request card (account-closure-request.html).
+      closure: true,
+      requestHref: 'account-closure-request.html?role=manager&source=wizard',
+      contracts: [
+        { number: 'BR-2026/00444', type: 'Брокерский договор', account: '30601-000-4401', defaultChecked: true },
+        { number: 'DP-2026/00445', type: 'Депозитарный договор', account: '30-016-00041-DP', defaultChecked: true },
+        { number: 'IN-2026/00011', type: 'Иной договор', account: '40701-USD-4401', defaultChecked: false }
+      ]
     }
   ];
 
@@ -1185,6 +1202,74 @@
     }
   }
 
+  // ── Render account-closure step 2 (static demo) ──────────────────────────
+
+  function renderClosureFields(doc) {
+    var container = document.getElementById('docwiz-extra-fields');
+    if (!container) return;
+
+    var sources = ['Личный кабинет', 'Email', 'Офис / бумажное заявление', 'Другое'];
+    var sourceOptions = sources.map(function (s) {
+      return '<option value="' + escAttr(s) + '">' + escHtml(s) + '</option>';
+    }).join('');
+
+    var pickCards = (doc.contracts || []).map(function (c) {
+      return '' +
+        '<label class="crm-closure-pick">' +
+          '<input type="checkbox" data-closure-contract value="' + escAttr(c.number) + '"' +
+            (c.defaultChecked ? ' checked' : '') + '/>' +
+          '<span class="crm-closure-pick-body">' +
+            '<span class="crm-closure-pick-head">' +
+              '<strong>' + escHtml(c.number) + '</strong>' +
+              '<span class="crm-badge success">Действующий</span>' +
+            '</span>' +
+            '<span class="crm-closure-pick-type">' + escHtml(c.type) + '</span>' +
+            '<span class="crm-closure-pick-account">Счёт: ' + escHtml(c.account) + '</span>' +
+          '</span>' +
+        '</label>';
+    }).join('');
+
+    container.innerHTML = '' +
+      '<div class="crm-closure-fields">' +
+        '<div class="crm-docwiz-fields-grid">' +
+          '<div class="crm-closure-field">' +
+            '<label class="crm-document-form-label" for="closure-source">Источник заявки</label>' +
+            '<select class="uk-select crm-input" id="closure-source">' + sourceOptions + '</select>' +
+          '</div>' +
+          '<div class="crm-closure-field">' +
+            '<label class="crm-document-form-label" for="closure-request-date">Дата обращения клиента</label>' +
+            '<div class="crm-date-field crm-docwiz-date-field">' +
+              '<input class="uk-input crm-input crm-date-input" type="date" id="closure-request-date" value="2026-06-15" data-date-input/>' +
+              '<button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="crm-closure-field">' +
+          '<span class="crm-document-form-label">Договоры и счета к закрытию</span>' +
+          '<div class="crm-closure-pick-list">' + pickCards + '</div>' +
+        '</div>' +
+
+        '<div class="crm-closure-field">' +
+          '<label class="crm-document-form-label" for="closure-comment">Комментарий менеджера</label>' +
+          '<textarea class="uk-textarea crm-input" id="closure-comment" rows="2" ' +
+            'placeholder="Например: По инициативе клиента"></textarea>' +
+        '</div>' +
+
+        '<div class="crm-closure-field">' +
+          '<span class="crm-document-form-label">Вложение — заявление клиента</span>' +
+          '<div class="crm-closure-dropzone">' +
+            '<span class="crm-closure-dropzone-icon" uk-icon="icon: cloud-upload; ratio: 1.4"></span>' +
+            '<p class="crm-closure-dropzone-title">Перетащите заявление клиента сюда</p>' +
+            '<p class="crm-closure-dropzone-sub">или выберите файл вручную</p>' +
+            '<button type="button" class="uk-button uk-button-default crm-button">Выбрать файл</button>' +
+            '<span class="crm-closure-dropzone-file"><span uk-icon="icon: file-text"></span>Заявление_на_закрытие.pdf</span>' +
+            '<p class="crm-closure-dropzone-help">Static demo: файл не загружается на сервер</p>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
   // ── Render document cards ─────────────────────────────────────────────────
 
   function renderDocCards(docs, subject) {
@@ -1198,7 +1283,17 @@
       return;
     }
 
+    // Group by category (default group for documents without an explicit one).
+    var DEFAULT_CATEGORY = 'Документы и заявления клиента';
+    var groupOrder = [];
+    var groups = {};
     docs.forEach(function (doc) {
+      var cat = doc.category || DEFAULT_CATEGORY;
+      if (!groups[cat]) { groups[cat] = []; groupOrder.push(cat); }
+      groups[cat].push(doc);
+    });
+
+    function appendDocCard(doc) {
       var card = document.createElement('article');
       card.className = 'crm-docwiz-doc-card';
       card.setAttribute('data-doc-id', doc.id);
@@ -1219,6 +1314,18 @@
         '</div>';
 
       grid.appendChild(card);
+    }
+
+    // Only show group headings when more than one category is present.
+    var showGroupTitles = groupOrder.length > 1;
+    groupOrder.forEach(function (cat) {
+      if (showGroupTitles) {
+        var title = document.createElement('p');
+        title.className = 'crm-docwiz-doc-group-title';
+        title.textContent = cat;
+        grid.appendChild(title);
+      }
+      groups[cat].forEach(appendDocCard);
     });
 
     grid.querySelectorAll('.crm-docwiz-select-btn').forEach(function (btn) {
@@ -1246,7 +1353,11 @@
     if (titleEl)    titleEl.textContent    = doc.title;
     if (subtitleEl) subtitleEl.textContent = doc.description;
 
-    renderExtraFields(doc);
+    if (doc.closure) {
+      renderClosureFields(doc);
+    } else {
+      renderExtraFields(doc);
+    }
 
     if (step2) step2.hidden = false;
     if (step3) step3.hidden = false;
@@ -1255,13 +1366,29 @@
 
     if (step2) step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-    // Wire generate button (replace to remove stale listeners)
+    // Step 3 note + final action label depend on the document type.
+    var noteEl = step3 ? step3.querySelector('.crm-docwiz-generate-note') : null;
+    if (noteEl) {
+      noteEl.textContent = doc.closure
+        ? 'Static demo: после создания открывается карточка заявки на закрытие.'
+        : 'Нажмите «Сформировать документ» для открытия печатной версии в новой вкладке. ' +
+          'Используйте браузерный диалог печати → «Сохранить как PDF».';
+    }
+
+    // Wire generate / create button (replace to remove stale listeners)
     var genBtn = document.getElementById('docwiz-generate-btn');
     if (genBtn) {
       var newGen = genBtn.cloneNode(true);
       newGen.id = 'docwiz-generate-btn';
+      newGen.textContent = doc.closure ? 'Создать заявку' : 'Сформировать документ';
       genBtn.parentNode.replaceChild(newGen, genBtn);
-      newGen.addEventListener('click', function () { generateDoc(doc, subject); });
+      if (doc.closure) {
+        newGen.addEventListener('click', function () {
+          window.location.href = doc.requestHref || 'account-closure-request.html?role=manager&source=wizard';
+        });
+      } else {
+        newGen.addEventListener('click', function () { generateDoc(doc, subject); });
+      }
     }
 
     // Wire back button
@@ -1403,6 +1530,14 @@
 
     renderDocCards(filteredDocs, subject);
     setActiveStep(1);
+
+    // Preselect a document type when requested via ?type=<id>
+    // (e.g. ?type=account-closure from the subject card "Закрыть" action).
+    var requestedType = params.get('type');
+    if (requestedType) {
+      var preselect = filteredDocs.find(function (doc) { return doc.id === requestedType; });
+      if (preselect) selectDoc(preselect, subject);
+    }
   }
 
   initWizard();

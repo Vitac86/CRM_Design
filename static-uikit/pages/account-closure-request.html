@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Заявка на закрытие CL-2026-00017</title>
+  <link rel="icon" href="../assets/icons/favicon_blue.ico" type="image/x-icon" />
+  <link rel="icon" href="../assets/icons/favicon_blue.ico" type="image/x-icon" media="(prefers-color-scheme: light)" />
+  <link rel="icon" href="../assets/icons/favicon_white.ico" type="image/x-icon" media="(prefers-color-scheme: dark)" />
+  <link rel="stylesheet" href="../assets/css/uikit.min.css"/>
+  <link rel="stylesheet" href="../assets/css/crm-static.bundle.css"/>
+</head>
+<body data-page="account-closure-request">
+<div class="crm-app">
+  <div class="crm-layout">
+    <aside class="crm-sidebar" data-entity="layout-sidebar">
+      <div class="crm-sidebar-brand">
+        <a class="crm-sidebar-brand-link" href="dashboard.html" aria-label="На главную страницу CRM">
+          <img src="../assets/brand/logo-full-ru-white.svg" alt="Инвестика"/>
+        </a>
+      </div>
+
+      <nav class="crm-nav" aria-label="Основная навигация">
+        <div class="crm-nav-group" data-group="front-office">
+          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+            <span>
+              <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use>
+              </svg>Фронт-офис
+            </span>
+            <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+          </button>
+
+          <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
+            <a class="crm-nav-link crm-nav-item" href="dashboard.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use>
+                </svg>Дашборд
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="subjects.html" data-match="subject-card.html subject-card-individual.html subject-register.html subject-edit.html subject-edit-individual.html contract-wizard.html contract-edit.html document-wizard.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-subjects"></use>
+                </svg>Субъекты
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="brokerage.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use>
+                </svg>Брок. деятельность
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="trust-management.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-trust"></use>
+                </svg>Дов. управление
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="agents.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-agents"></use>
+                </svg>Агенты
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="archive.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use>
+                </svg>Архив
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item is-active" href="requests.html" aria-current="page">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-requests"></use>
+                </svg>Поручения
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <a class="crm-nav-link crm-nav-item" href="compliance.html" data-match="compliance-card.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-compliance"></use>
+            </svg>Комплаенс
+          </span>
+        </a>
+
+        <div class="crm-nav-group" data-group="middle-office">
+          <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+            <span><img class="crm-nav-icon crm-nav-icon-img" src="../assets/icons/Building A Fill.svg" alt="" aria-hidden="true"/>Мидл-офис</span>
+            <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+          </button>
+
+          <div class="crm-nav-submenu" role="group" aria-label="Мидл-офис">
+            <a class="crm-nav-link crm-nav-item" href="middle-office-clients.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-middle-office-clients"></use>
+                </svg>Журнал клиентов
+              </span>
+            </a>
+
+            <a class="crm-nav-link crm-nav-item" href="middle-office-reports.html">
+              <span>
+                <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <use href="../assets/icons/crm-sidebar-icons.svg#icon-middle-office-reports"></use>
+                </svg>Журнал отправленных отчётов
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <a class="crm-nav-link crm-nav-item" href="back-office.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-archive"></use>
+            </svg>Бэк-офис
+          </span>
+        </a>
+
+        <a class="crm-nav-link crm-nav-item" href="trading.html" data-match="trading-card.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-trading"></use>
+            </svg>Трейдинг
+          </span>
+        </a>
+
+        <a class="crm-nav-link crm-nav-item" href="depository.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-depository"></use>
+            </svg>Депозитарий
+          </span>
+        </a>
+
+        <a class="crm-nav-link crm-nav-item" href="administration.html">
+          <span>
+            <svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <use href="../assets/icons/crm-sidebar-icons.svg#icon-administration"></use>
+            </svg>Администрирование
+          </span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="crm-main">
+      <header class="crm-topbar">
+        <button class="uk-button uk-button-default" type="button" data-sidebar-toggle aria-label="Открыть меню">
+          <span uk-icon="menu"></span>
+        </button>
+
+        <div class="crm-search">
+          <span class="crm-search-icon" uk-icon="search"></span>
+          <input class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск" autocomplete="off"/>
+        </div>
+
+        <div class="crm-user">
+          <div>
+            <div data-role="topbar-user-name">Иванов И.И.</div>
+            <small data-role="topbar-user-role">менеджер</small>
+          </div>
+          <div class="crm-avatar" data-role="topbar-user-initials">ИИ</div>
+        </div>
+      </header>
+
+      <section id="crm-page">
+        <div class="crm-page crm-account-closure-page" data-page="account-closure-request">
+
+          <!-- Breadcrumbs -->
+          <div class="crm-breadcrumbs">
+            <a href="requests.html">Заявки</a>
+            <span uk-icon="chevron-right"></span>
+            <span>Заявка на закрытие CL-2026-00017</span>
+          </div>
+
+          <!-- Hero / summary -->
+          <section class="crm-card crm-account-closure-hero">
+            <div class="crm-account-closure-hero-top">
+              <div>
+                <p class="crm-account-closure-hero-id">CL-2026-00017</p>
+                <h1>Заявка на закрытие договора/счёта</h1>
+                <div class="crm-inline-badges">
+                  <span class="crm-badge warning" data-role="request-status">Ожидает акцепта</span>
+                  <span class="crm-badge info">Личный кабинет</span>
+                </div>
+              </div>
+              <div class="crm-account-closure-hero-created">
+                Создана
+                <strong>15.06.2026 10:42</strong>
+              </div>
+            </div>
+
+            <div class="crm-account-closure-hero-meta">
+              <div class="crm-account-closure-hero-cell">
+                <span>Клиент</span>
+                <strong>АО «Восток Майнинг Системс»</strong>
+              </div>
+              <div class="crm-account-closure-hero-cell">
+                <span>Код клиента</span>
+                <strong>INV-1011</strong>
+              </div>
+              <div class="crm-account-closure-hero-cell">
+                <span>Клиентский менеджер</span>
+                <strong>Иванов И.И.</strong>
+              </div>
+            </div>
+          </section>
+
+          <!-- Workflow progress strip -->
+          <section class="crm-card crm-account-closure-progress" aria-label="Ход обработки заявки">
+            <div class="crm-account-closure-progress-list">
+              <div class="crm-account-closure-step is-done" data-step="created">
+                <span class="crm-account-closure-step-index" aria-hidden="true">✓</span>
+                <span class="crm-account-closure-step-body">
+                  <strong>Создана</strong>
+                  <span data-role="step-state">Выполнено</span>
+                </span>
+              </div>
+              <div class="crm-account-closure-step is-current" data-step="depository">
+                <span class="crm-account-closure-step-index" aria-hidden="true">2</span>
+                <span class="crm-account-closure-step-body">
+                  <strong>Депозитарий</strong>
+                  <span data-role="step-state">Ожидает</span>
+                </span>
+              </div>
+              <div class="crm-account-closure-step" data-step="middle-office">
+                <span class="crm-account-closure-step-index" aria-hidden="true">3</span>
+                <span class="crm-account-closure-step-body">
+                  <strong>Мидл-офис</strong>
+                  <span data-role="step-state">Ожидает</span>
+                </span>
+              </div>
+              <div class="crm-account-closure-step is-locked" data-step="final">
+                <span class="crm-account-closure-step-index" aria-hidden="true">4</span>
+                <span class="crm-account-closure-step-body">
+                  <strong>Финальное закрытие</strong>
+                  <span data-role="step-state">Заблокировано</span>
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Main grid -->
+          <div class="crm-account-closure-grid">
+
+            <!-- Left column -->
+            <div class="crm-account-closure-main">
+
+              <!-- Contracts / accounts to close -->
+              <section class="crm-card">
+                <h3 class="crm-account-closure-section-title">Договоры и счета к закрытию</h3>
+                <div class="crm-account-closure-item-list">
+                  <div class="crm-account-closure-item">
+                    <div class="crm-account-closure-item-main">
+                      <strong>BR-2026/00444</strong>
+                      <span>Брокерский договор · счёт 30601-000-4401</span>
+                    </div>
+                    <div class="crm-account-closure-item-aside">
+                      <span class="crm-badge success">Действующий</span>
+                      <span class="crm-account-closure-target">Закрыть</span>
+                    </div>
+                  </div>
+                  <div class="crm-account-closure-item">
+                    <div class="crm-account-closure-item-main">
+                      <strong>DP-2026/00445</strong>
+                      <span>Депозитарный договор · счёт 30-016-00041-DP</span>
+                    </div>
+                    <div class="crm-account-closure-item-aside">
+                      <span class="crm-badge success">Действующий</span>
+                      <span class="crm-account-closure-target">Закрыть</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Document basis -->
+              <section class="crm-card">
+                <h3 class="crm-account-closure-section-title">Документ-основание</h3>
+                <div class="crm-account-closure-basis">
+                  <div class="crm-account-closure-row">
+                    <span>Тип основания</span>
+                    <strong>Заявление клиента</strong>
+                  </div>
+                  <div class="crm-account-closure-row">
+                    <span>Источник</span>
+                    <strong>Личный кабинет</strong>
+                  </div>
+                  <div class="crm-account-closure-row">
+                    <span>Файл</span>
+                    <strong>
+                      <span class="crm-account-closure-file">
+                        <span uk-icon="icon: file-text"></span>Заявление_на_закрытие.pdf
+                      </span>
+                    </strong>
+                  </div>
+                  <div class="crm-account-closure-row">
+                    <span>Комментарий менеджера</span>
+                    <strong>По инициативе клиента</strong>
+                  </div>
+                </div>
+                <p class="crm-account-closure-help">Документ используется как основание для запуска согласования закрытия.</p>
+              </section>
+
+              <!-- Approvals checklist (read-only) -->
+              <section class="crm-card">
+                <h3 class="crm-account-closure-section-title">Согласования</h3>
+                <div class="crm-account-closure-approvals">
+                  <div class="crm-account-closure-approval" data-approval="depository">
+                    <div class="crm-account-closure-approval-main">
+                      <strong>Депозитарий</strong>
+                      <span data-role="approval-meta">— · —</span>
+                    </div>
+                    <span class="crm-badge warning crm-account-closure-approval-status" data-role="approval-status">Ожидает</span>
+                  </div>
+                  <div class="crm-account-closure-approval" data-approval="middle-office">
+                    <div class="crm-account-closure-approval-main">
+                      <strong>Мидл-офис</strong>
+                      <span data-role="approval-meta">— · —</span>
+                    </div>
+                    <span class="crm-badge warning crm-account-closure-approval-status" data-role="approval-status">Ожидает</span>
+                  </div>
+                  <div class="crm-account-closure-approval" data-approval="manager">
+                    <div class="crm-account-closure-approval-main">
+                      <strong>Клиентский менеджер</strong>
+                      <span data-role="approval-meta">Иванов И.И. · —</span>
+                    </div>
+                    <span class="crm-badge muted crm-account-closure-approval-status" data-role="approval-status">Недоступно</span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- History -->
+              <section class="crm-card">
+                <h3 class="crm-account-closure-section-title">История</h3>
+                <ol class="crm-account-closure-timeline" data-role="history">
+                  <li><time>15.06.2026 10:42</time>Заявка получена из Личного кабинета</li>
+                  <li><time>15.06.2026 10:43</time>Создана карточка заявки CL-2026-00017</li>
+                </ol>
+              </section>
+
+            </div>
+
+            <!-- Right column: sticky decision panel -->
+            <aside class="crm-account-closure-side">
+              <section class="crm-card crm-account-closure-panel" data-role="decision-panel">
+                <div class="crm-account-closure-decision-head">
+                  <h3>Ваше решение</h3>
+                  <p class="crm-account-closure-decision-subtitle" data-role="decision-subtitle">—</p>
+                </div>
+
+                <div class="crm-account-closure-decision-status">
+                  Статус:
+                  <span class="crm-badge warning" data-role="decision-status">Ожидает</span>
+                </div>
+
+                <!-- Review controls (Depository / Middle Office) -->
+                <div data-role="decision-review" hidden>
+                  <div class="crm-account-closure-field">
+                    <label for="closure-decision-comment">Комментарий к решению</label>
+                    <textarea
+                      id="closure-decision-comment"
+                      class="uk-textarea crm-input crm-account-closure-textarea"
+                      rows="3"
+                      placeholder="Комментарий к акцепту или причина возврата"
+                    ></textarea>
+                    <p class="crm-account-closure-error" data-role="decision-error" hidden>
+                      Укажите причину возврата.
+                    </p>
+                  </div>
+                  <div class="crm-account-closure-actions">
+                    <button class="uk-button crm-button-primary crm-button" type="button" data-action="closure-accept">
+                      Акцептовать
+                    </button>
+                    <button class="uk-button uk-button-default crm-button" type="button" data-action="closure-return">
+                      Вернуть на уточнение
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Manager final-close controls -->
+                <div data-role="decision-manager" hidden>
+                  <p class="crm-account-closure-helper">
+                    Финальное закрытие доступно после акцепта Депозитария и Мидл-офиса.
+                  </p>
+                  <div class="crm-account-closure-actions">
+                    <button class="uk-button crm-button-primary crm-button" type="button" data-action="closure-final" disabled>
+                      Закрыть договор/счёт
+                    </button>
+                  </div>
+                </div>
+
+                <p class="crm-account-closure-note">
+                  В демо-версии акцепты отображаются в карточке заявки.
+                </p>
+              </section>
+            </aside>
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- CRM-style confirmation modal -->
+<div class="crm-modal" data-role="closure-confirm-modal" hidden>
+  <div class="crm-modal-backdrop" data-action="closure-modal-cancel"></div>
+  <div class="crm-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="closure-confirm-title">
+    <button class="crm-modal-close" type="button" aria-label="Закрыть" data-action="closure-modal-cancel">×</button>
+    <h3 id="closure-confirm-title">Подтвердить действие</h3>
+    <p data-role="closure-modal-body">—</p>
+    <div class="crm-modal-actions">
+      <button class="uk-button uk-button-default crm-button" type="button" data-action="closure-modal-cancel">Отмена</button>
+      <button class="uk-button crm-button-primary crm-button" type="button" data-action="closure-modal-confirm">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/uikit.min.js"></script>
+<script src="../assets/js/uikit-icons.min.js"></script>
+<script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/account-closure-request.js"></script>
+</body>
+</html>

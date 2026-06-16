@@ -1,0 +1,445 @@
+/* Account / contract closure request — standalone request page */
+
+.crm-account-closure-page {
+  display: grid;
+  gap: 14px;
+}
+
+/* ── Hero / summary ──────────────────────────────────────────────────────── */
+
+.crm-account-closure-hero {
+  padding: 16px 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.crm-account-closure-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.crm-account-closure-hero-id {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--crm-primary);
+  text-transform: uppercase;
+}
+
+.crm-account-closure-hero h1 {
+  margin: 4px 0 10px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.crm-account-closure-hero-created {
+  text-align: right;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-hero-created strong {
+  display: block;
+  font-size: 13px;
+  color: var(--crm-text);
+}
+
+.crm-account-closure-hero-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid #d8e1f0;
+  border-radius: 12px;
+  background: #f4f8ff;
+  padding: 10px 12px;
+}
+
+.crm-account-closure-hero-cell span {
+  display: block;
+  font-size: 11px;
+  color: #6f7f99;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.crm-account-closure-hero-cell strong {
+  font-size: 13px;
+  color: #253656;
+}
+
+/* ── Workflow progress strip ─────────────────────────────────────────────── */
+
+.crm-account-closure-progress {
+  padding: 14px 16px;
+}
+
+.crm-account-closure-progress-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.crm-account-closure-step {
+  flex: 1 1 0;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.crm-account-closure-step-index {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--crm-surface-muted);
+  color: var(--crm-text-secondary);
+  border: 1px solid var(--crm-border);
+}
+
+.crm-account-closure-step-body strong {
+  display: block;
+  font-size: 13px;
+  color: #20304b;
+}
+
+.crm-account-closure-step-body span {
+  font-size: 11px;
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-step.is-done {
+  border-color: #bfe0cd;
+  background: var(--crm-success-bg);
+}
+
+.crm-account-closure-step.is-done .crm-account-closure-step-index {
+  background: var(--crm-success);
+  border-color: var(--crm-success);
+  color: #fff;
+}
+
+.crm-account-closure-step.is-current {
+  border-color: #9db6ef;
+  background: var(--crm-primary-soft);
+}
+
+.crm-account-closure-step.is-current .crm-account-closure-step-index {
+  background: var(--crm-primary);
+  border-color: var(--crm-primary);
+  color: #fff;
+}
+
+.crm-account-closure-step.is-locked {
+  opacity: 0.6;
+}
+
+/* ── Main grid ───────────────────────────────────────────────────────────── */
+
+.crm-account-closure-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.crm-account-closure-main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.crm-account-closure-main > .crm-card {
+  padding: 14px 16px;
+}
+
+.crm-account-closure-section-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1c2b45;
+}
+
+/* ── Contracts / accounts items ──────────────────────────────────────────── */
+
+.crm-account-closure-item-list {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-account-closure-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.crm-account-closure-item-main strong {
+  display: block;
+  font-size: 13px;
+  color: #20304b;
+}
+
+.crm-account-closure-item-main span {
+  display: block;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-item-aside {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.crm-account-closure-target {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a2d34;
+  background: var(--crm-danger-bg);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+/* ── Document basis ──────────────────────────────────────────────────────── */
+
+.crm-account-closure-basis {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-account-closure-row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 13px;
+}
+
+.crm-account-closure-row > span {
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-row > strong {
+  color: var(--crm-text);
+  font-weight: 600;
+}
+
+.crm-account-closure-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #cfd9ec;
+  border-radius: 8px;
+  background: var(--crm-surface-muted);
+  font-size: 12px;
+  color: #3f5376;
+  width: max-content;
+}
+
+.crm-account-closure-help {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+/* ── Approvals checklist ─────────────────────────────────────────────────── */
+
+.crm-account-closure-approvals {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-account-closure-approval {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.crm-account-closure-approval-main strong {
+  display: block;
+  font-size: 13px;
+  color: #20304b;
+}
+
+.crm-account-closure-approval-main span {
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-approval-status {
+  flex-shrink: 0;
+}
+
+/* ── History timeline ────────────────────────────────────────────────────── */
+
+.crm-account-closure-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.crm-account-closure-timeline li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.crm-account-closure-timeline li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--crm-primary);
+}
+
+.crm-account-closure-timeline li::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: -12px;
+  width: 1px;
+  background: var(--crm-border);
+}
+
+.crm-account-closure-timeline li:last-child::after {
+  display: none;
+}
+
+.crm-account-closure-timeline time {
+  display: block;
+  font-size: 11px;
+  color: var(--crm-muted);
+}
+
+/* ── Decision panel (sticky) ─────────────────────────────────────────────── */
+
+.crm-account-closure-panel {
+  position: sticky;
+  top: calc(var(--crm-topbar-h) + 12px);
+  padding: 16px 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.crm-account-closure-decision-head h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.crm-account-closure-decision-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--crm-text-secondary);
+}
+
+.crm-account-closure-decision-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-field {
+  display: grid;
+  gap: 4px;
+}
+
+.crm-account-closure-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4e6286;
+}
+
+.crm-account-closure-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--crm-danger);
+}
+
+.crm-account-closure-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-account-closure-helper,
+.crm-account-closure-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-account-closure-note {
+  padding: 9px 10px;
+  border: 1px solid #d8e1f0;
+  border-radius: 8px;
+  background: #f4f8ff;
+  color: #4e6286;
+}
+
+.crm-account-closure-textarea.crm-input-error {
+  border-color: var(--crm-danger);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .crm-account-closure-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-account-closure-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .crm-account-closure-hero-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .crm-account-closure-hero-created {
+    text-align: left;
+  }
+
+  .crm-account-closure-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .crm-account-closure-hero-meta {
+    grid-template-columns: 1fr;
+  }
+}

@@ -224,6 +224,150 @@
   flex-shrink: 0;
 }
 
+/* Document selection group heading (e.g. "Операционные заявки") */
+
+.crm-docwiz-doc-group-title {
+  margin: 8px 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5b6c8a;
+}
+
+.crm-docwiz-doc-group-title:first-child {
+  margin-top: 0;
+}
+
+/* Step 2: account-closure specific fields */
+
+.crm-closure-fields {
+  display: grid;
+  gap: 14px;
+}
+
+.crm-closure-field {
+  display: grid;
+  gap: 4px;
+}
+
+.crm-closure-field > .crm-document-form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4e6286;
+}
+
+.crm-closure-pick-list {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-closure-pick {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #d6e0ef;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.crm-closure-pick:hover {
+  border-color: #b9c9e8;
+  background: #f9fbff;
+}
+
+.crm-closure-pick:has(input:checked) {
+  border-color: #6f90de;
+  background: #edf3ff;
+  box-shadow: inset 0 0 0 1px rgba(82, 116, 205, 0.2);
+}
+
+.crm-closure-pick input {
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+.crm-closure-pick-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.crm-closure-pick-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.crm-closure-pick-head strong {
+  font-size: 13px;
+  color: #20304b;
+}
+
+.crm-closure-pick-type {
+  font-size: 12px;
+  color: #4e6286;
+}
+
+.crm-closure-pick-account {
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+/* Attachment dropzone (static demo — no real upload) */
+
+.crm-closure-dropzone {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 18px;
+  border: 1.5px dashed #b9c9e8;
+  border-radius: 12px;
+  background: #f7faff;
+  text-align: center;
+}
+
+.crm-closure-dropzone-icon {
+  color: #4a72d8;
+}
+
+.crm-closure-dropzone-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #253656;
+}
+
+.crm-closure-dropzone-sub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-closure-dropzone-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 1px solid #cfd9ec;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  color: #3f5376;
+}
+
+.crm-closure-dropzone-help {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--crm-muted);
+}
+
 /* Mobile */
 
 @media (max-width: 960px) {

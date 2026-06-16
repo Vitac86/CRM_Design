@@ -1771,3 +1771,38 @@
     justify-content: center;
   }
 }
+
+/* Read-only entry point: active account/contract closure request banner.
+   Client-manager surface only — no depository/middle-office actions here. */
+.crm-page[data-page="subject-card"] .crm-subject-closure-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-left: 3px solid #f0b537;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-closure-banner-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-closure-banner-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #6f7f99;
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-closure-banner-main strong {
+  font-size: 14px;
+  color: #20304b;
+}
+
+.crm-page[data-page="subject-card"] .crm-contract-close-action {
+  white-space: nowrap;
+}

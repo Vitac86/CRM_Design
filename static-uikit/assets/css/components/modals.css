@@ -1,6 +1,83 @@
 /* modals */
-.crm-modal .crm-modal-dialog {
-  border: var(--crm-layer-card-border);
-  border-radius: var(--crm-layer-card-radius);
+
+/* Shared CRM modal shell — used by trading-card, account-closure-request, etc.
+   The dialog border/radius below is the original rule; the overlay/backdrop
+   primitives complete the component so consuming pages don't re-define them. */
+.crm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
+/* Keep hidden modals hidden — .crm-modal{display:flex} would otherwise
+   beat the user-agent [hidden]{display:none} rule (equal specificity). */
+.crm-modal[hidden] {
+  display: none;
+}
+
+.crm-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.crm-modal .crm-modal-dialog {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: var(--crm-surface);
+  border: var(--crm-layer-card-border);
+  border-radius: var(--crm-layer-card-radius);
+  box-shadow: var(--crm-shadow-md);
+  padding: 20px;
+}
+
+.crm-modal-dialog h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--crm-text);
+  padding-right: 24px;
+}
+
+.crm-modal-dialog p {
+  margin: 0;
+  color: var(--crm-text-secondary);
+  font-size: 13px;
+}
+
+.crm-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--crm-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.crm-modal-close:hover {
+  background: var(--crm-surface-muted);
+  color: var(--crm-text);
+}
+
+.crm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+body.crm-modal-open {
+  overflow: hidden;
+}

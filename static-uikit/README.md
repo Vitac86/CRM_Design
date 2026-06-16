@@ -70,6 +70,7 @@ Global scripts:
 
 Page-specific scripts (active only when the matching HTML file explicitly links them):
 
+- `account-closure-request.html` → `assets/js/pages/account-closure-request.js`
 - `contract-edit.html` → `assets/js/pages/contract-edit.js`
 - `document-wizard.html` → `assets/js/pages/document-wizard.js`
 - `middle-office-clients.html` → `assets/js/pages/middle-office.js`
@@ -128,6 +129,7 @@ Operations:
 
 - `agents.html`
 - `requests.html`
+- `account-closure-request.html` — standalone account/contract closure request card; reads `?role=manager|depository|middle-office` to drive the "Ваше решение" panel. Created from the Document Wizard ("Заявка на закрытие договора/счёта"); Depository and Middle Office open it from their own task queues.
 - `middle-office-clients.html`
 - `middle-office-reports.html`
 - `depository.html`

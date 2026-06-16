@@ -304,3 +304,87 @@
     align-items: flex-start;
   }
 }
+
+/* ========================================================================== */
+/* closure task cards — shared by depository & middle-office task queues      */
+/* base class + state/modifier only; no per-page duplication                  */
+/* ========================================================================== */
+.crm-closure-tasks {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.crm-closure-task-list {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-closure-task-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--crm-border);
+  border-left: 3px solid #f0b537;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.crm-closure-task-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.crm-closure-task-main strong {
+  display: block;
+  font-size: 13px;
+  color: #20304b;
+}
+
+.crm-closure-task-main span {
+  display: block;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-closure-task-meta {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.crm-closure-task-meta code {
+  background: var(--crm-surface-muted);
+  color: #3f5376;
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.crm-closure-task-aside {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crm-closure-task-open {
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .crm-closure-task-card {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .crm-closure-task-aside {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

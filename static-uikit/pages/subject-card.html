@@ -109,6 +109,15 @@
                 </div>
               </article>
 
+              <!-- Read-only entry point: active account/contract closure request -->
+              <div class="crm-card crm-subject-closure-banner" data-entity="active-closure-request">
+                <div class="crm-subject-closure-banner-main">
+                  <span class="crm-subject-closure-banner-label">Активная заявка на закрытие</span>
+                  <strong>CL-2026-00017 · Ожидает акцепта</strong>
+                </div>
+                <a class="uk-button uk-button-default crm-button" href="account-closure-request.html?role=manager">Открыть заявку</a>
+              </div>
+
               <div class="crm-subject-tabs-wrap" data-entity="subject-sections">
                 <ul class="crm-tabs crm-detail-tabs crm-subject-tabs" uk-tab="connect: .crm-subject-switcher; animation: uk-animation-fade">
                   <li class="uk-active">
@@ -1010,6 +1019,7 @@
                                 <th>Дата открытия</th>
                                 <th>Дата закрытия</th>
                                 <th>Статус</th>
+                                <th>Действия</th>
                               </tr>
                             </thead>
                             <tbody data-role="contracts-tbody">
@@ -1023,6 +1033,7 @@
                                 <td>
                                   <span class="crm-badge success">Действующий</span>
                                 </td>
+                                <td>—</td>
                               </tr>
                               <tr>
                                 <td>
@@ -1034,6 +1045,9 @@
                                 <td>
                                   <span class="crm-badge success">Действующий</span>
                                 </td>
+                                <td>
+                                  <a class="crm-link-action crm-contract-close-action" href="document-wizard.html?subject=c-011&amp;type=account-closure&amp;contract=BR-2026/00444">Закрыть</a>
+                                </td>
                               </tr>
                               <tr>
                                 <td>
@@ -1044,6 +1058,9 @@
                                 <td>—</td>
                                 <td>
                                   <span class="crm-badge success">Действующий</span>
+                                </td>
+                                <td>
+                                  <a class="crm-link-action crm-contract-close-action" href="document-wizard.html?subject=c-011&amp;type=account-closure&amp;contract=DP-2026/00445">Закрыть</a>
                                 </td>
                               </tr>
                             </tbody>
