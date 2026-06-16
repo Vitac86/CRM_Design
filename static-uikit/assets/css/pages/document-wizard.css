@@ -321,48 +321,103 @@
 
 /* Attachment dropzone (static demo — no real upload) */
 
-.crm-closure-dropzone {
+.crm-dropzone {
+  position: relative;
   display: grid;
   justify-items: center;
   gap: 6px;
-  padding: 18px;
+  padding: 20px 18px;
   border: 1.5px dashed #b9c9e8;
   border-radius: 12px;
   background: #f7faff;
   text-align: center;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
 }
 
-.crm-closure-dropzone-icon {
+.crm-dropzone.is-dragover {
+  border-color: #5f83da;
+  background: #e9f1ff;
+  box-shadow: inset 0 0 0 1px rgba(95, 131, 218, 0.35);
+}
+
+.crm-dropzone-icon {
   color: #4a72d8;
+  transition: transform 0.15s;
 }
 
-.crm-closure-dropzone-title {
+.crm-dropzone.is-dragover .crm-dropzone-icon {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.crm-dropzone-title {
   margin: 0;
   font-size: 13px;
   font-weight: 600;
   color: #253656;
 }
 
-.crm-closure-dropzone-sub {
+.crm-dropzone-sub {
   margin: 0;
   font-size: 12px;
   color: var(--crm-muted);
 }
 
-.crm-closure-dropzone-file {
+/* Selected-file chip */
+.crm-dropzone-file {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-top: 4px;
-  padding: 4px 10px;
+  padding: 6px 8px 6px 12px;
   border: 1px solid #cfd9ec;
   border-radius: 8px;
   background: #fff;
   font-size: 12px;
   color: #3f5376;
+  max-width: 100%;
 }
 
-.crm-closure-dropzone-help {
+/* Hidden until a file is chosen (class-driven so inline-flex can't leak through [hidden]) */
+.crm-dropzone:not(.has-file) .crm-dropzone-file {
+  display: none;
+}
+
+.crm-dropzone-file-icon {
+  color: #4a72d8;
+  flex: 0 0 auto;
+}
+
+.crm-dropzone-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 240px;
+}
+
+.crm-dropzone-remove {
+  appearance: none;
+  border: 0;
+  background: #eef2f9;
+  color: #5b6c8a;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.crm-dropzone-remove:hover {
+  background: var(--crm-danger-bg);
+  color: var(--crm-danger);
+}
+
+.crm-dropzone-help {
   margin: 2px 0 0;
   font-size: 11px;
   color: var(--crm-muted);

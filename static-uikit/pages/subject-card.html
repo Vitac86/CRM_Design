@@ -109,13 +109,16 @@
                 </div>
               </article>
 
-              <!-- Read-only entry point: active account/contract closure request -->
-              <div class="crm-card crm-subject-closure-banner" data-entity="active-closure-request">
+              <!-- Read-only entry point: active account/contract closure request (synced from demo state) -->
+              <div class="crm-card crm-subject-closure-banner" data-entity="active-closure-request" data-role="closure-banner" data-request="CL-2026-00017">
                 <div class="crm-subject-closure-banner-main">
-                  <span class="crm-subject-closure-banner-label">Активная заявка на закрытие</span>
-                  <strong>CL-2026-00017 · Ожидает акцепта</strong>
+                  <span class="crm-subject-closure-banner-label" data-role="closure-banner-label">Активная заявка на закрытие</span>
+                  <strong>
+                    <span data-role="closure-banner-title">CL-2026-00017</span>
+                    <span class="crm-badge warning" data-role="closure-banner-badge">Ожидает акцепта</span>
+                  </strong>
                 </div>
-                <a class="uk-button uk-button-default crm-button" href="account-closure-request.html?role=manager">Открыть заявку</a>
+                <a class="uk-button uk-button-default crm-button" data-role="closure-banner-link" href="account-closure-request.html?role=manager&amp;request=CL-2026-00017">Открыть заявку</a>
               </div>
 
               <div class="crm-subject-tabs-wrap" data-entity="subject-sections">
@@ -1232,6 +1235,7 @@
     <script src="../assets/js/uikit.min.js"></script>
     <script src="../assets/js/uikit-icons.min.js"></script>
     <script src="../assets/js/crm-static.js"></script>
+    <script src="../assets/js/pages/account-closure-state.js"></script>
     <script src="../assets/js/pages/subject-card.js"></script>
   </body>
 </html>

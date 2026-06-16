@@ -1,115 +1,313 @@
 // Account / contract closure request — standalone request page (static demo).
 // Scoped to body[data-page="account-closure-request"].
 //
-// Responsibilities:
-//   - read `role` from the URL (manager | depository | middle-office);
-//   - configure the "Ваше решение" decision panel for that role;
-//   - drive a CRM-style confirmation modal (no native confirm());
-//   - apply accept / return actions statically to THIS page only.
+// Reads role + request id from the URL, renders the whole card from the shared
+// localStorage demo state (window.CrmClosureDemo), and applies accept / return /
+// final-close actions back into that state so every other entry point stays in
+// sync. No backend.
 //
-// No backend, no cross-page state sync — acceptances are reflected in this card only.
+//   ?role=manager | depository | middle-office   (default: manager)
+//   ?request=CL-2026-00017                        (default: CL-2026-00017)
 
 (function () {
   'use strict';
 
   if (!document.body || document.body.dataset.page !== 'account-closure-request') return;
 
-  // ── Role configuration ─────────────────────────────────────────────────────
-  var ROLES = {
-    manager: {
-      kind: 'manager',
-      subtitle: 'Финальное закрытие',
-      decisionStatus: 'Ожидает акцепта',
-      decisionStatusClass: 'warning',
-      topbar: { name: 'Иванов И.И.', role: 'менеджер', initials: 'ИИ' }
-    },
-    depository: {
-      kind: 'review',
-      subtitle: 'Требуется акцепт Депозитария',
-      decisionStatus: 'Ожидает',
-      decisionStatusClass: 'warning',
-      approval: 'depository',
-      step: 'depository',
-      nextStep: 'middle-office',
-      acceptUser: 'Петров П.П.',
-      label: 'Депозитарий',
-      acceptBody: 'Вы уверены, что хотите акцептовать закрытие по роли Депозитарий?',
-      topbar: { name: 'Петров П.П.', role: 'депозитарий', initials: 'ПП' }
-    },
-    'middle-office': {
-      kind: 'review',
-      subtitle: 'Требуется акцепт Мидл-офиса',
-      decisionStatus: 'Ожидает',
-      decisionStatusClass: 'warning',
-      approval: 'middle-office',
-      step: 'middle-office',
-      nextStep: 'final',
-      acceptUser: 'Сидорова А.А.',
-      label: 'Мидл-офис',
-      acceptBody: 'Вы уверены, что хотите акцептовать закрытие по роли Мидл-офис?',
-      topbar: { name: 'Сидорова А.А.', role: 'мидл-офис', initials: 'СА' }
-    }
-  };
+  var Demo = window.CrmClosureDemo;
+  if (!Demo) return; // shared state module must load first
 
-  var FINAL_BODY = 'Вы уверены, что хотите выполнить финальное закрытие выбранных договоров и счетов?';
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function esc(s) { return Demo.escapeHtml(s); }
 
-  function setBadge(el, text, variant) {
+  var params    = new URLSearchParams(window.location.search);
+  var roleParam = params.get('role') || 'manager';
+  var role      = Demo.roleByParam(roleParam);
+  var requestId = params.get('request') || 'CL-2026-00017';
+
+  function currentReq() { return Demo.get(requestId); }
+
+  // ── Topbar identity reflects the acting role ────────────────────────────────
+  function applyTopbar() {
+    var n = $('[data-role="topbar-user-name"]');
+    var r = $('[data-role="topbar-user-role"]');
+    var i = $('[data-role="topbar-user-initials"]');
+    if (n) n.textContent = role.user;
+    if (r) r.textContent = role.topbarRole;
+    if (i) i.textContent = role.initials;
+  }
+
+  function setBadge(el, meta) {
     if (!el) return;
-    el.className = 'crm-badge ' + variant;
-    // Preserve decoration classes that some badges carry.
-    if (el.hasAttribute('data-role') && el.getAttribute('data-role') === 'approval-status') {
-      el.classList.add('crm-account-closure-approval-status');
+    el.className = 'crm-badge ' + meta.badge;
+    el.textContent = meta.label;
+  }
+
+  // ── Hero ────────────────────────────────────────────────────────────────────
+  function renderHero(req) {
+    var sm = Demo.statusMeta(req);
+    setText('[data-role="bc-id"]', 'Заявка на закрытие ' + req.id);
+    setText('[data-role="hero-id"]', req.id);
+    setBadge($('[data-role="request-status"]'), sm);
+    var sourceEl = $('[data-role="hero-source"]');
+    if (sourceEl) sourceEl.textContent = req.source;
+    setText('[data-role="hero-created"]', req.createdAt);
+    setText('[data-role="hero-client"]', req.client);
+    setText('[data-role="hero-code"]', req.clientCode);
+    setText('[data-role="hero-manager"]', req.manager);
+    document.title = 'Заявка на закрытие ' + req.id;
+  }
+
+  function setText(sel, text) {
+    var el = $(sel);
+    if (el) el.textContent = text;
+  }
+
+  // ── Workflow strip ──────────────────────────────────────────────────────────
+  function stepHtml(opts) {
+    var idx = opts.state === 'is-done' ? '✓'
+            : opts.state === 'is-returned' ? '!'
+            : String(opts.index);
+    return '' +
+      '<div class="crm-account-closure-step ' + opts.state + '" data-step="' + opts.key + '">' +
+        '<span class="crm-account-closure-step-index" aria-hidden="true">' + idx + '</span>' +
+        '<span class="crm-account-closure-step-body">' +
+          '<strong>' + esc(opts.label) + '</strong>' +
+          '<span>' + esc(opts.stateText) + '</span>' +
+        '</span>' +
+      '</div>';
+  }
+
+  function renderWorkflow(req) {
+    var host = $('[data-role="workflow"]');
+    if (!host) return;
+
+    var steps = [];
+    steps.push(stepHtml({ key: 'created', label: 'Создана', state: 'is-done', stateText: 'Выполнено' }));
+
+    var counter = 2;
+    // Don't highlight a "current" step while the request is parked on clarification.
+    var pendingMarked = req.status === 'returned';
+    var labels = { depository: 'Депозитарий', middleOffice: 'Мидл-офис' };
+
+    Demo.requiredKeys(req).forEach(function (key) {
+      var st = Demo.approvalStatus(req, key);
+      var state = '', text = '';
+      if (req.status === 'closed' || st === 'accepted') { state = 'is-done'; text = 'Акцептовано'; }
+      else if (st === 'returned') { state = 'is-returned'; text = 'Возвращено'; }
+      else if (!pendingMarked) { state = 'is-current'; text = 'Ожидает'; pendingMarked = true; }
+      else { state = ''; text = 'Ожидает'; }
+      steps.push(stepHtml({ key: key, label: labels[key] || key, state: state, stateText: text, index: counter++ }));
+    });
+
+    var finalState, finalText;
+    if (req.status === 'closed') { finalState = 'is-done'; finalText = 'Выполнено'; }
+    else if (Demo.isReady(req)) { finalState = 'is-current'; finalText = 'Готово к закрытию'; }
+    else { finalState = 'is-locked'; finalText = 'Заблокировано'; }
+    steps.push(stepHtml({ key: 'final', label: 'Финальное закрытие', state: finalState, stateText: finalText, index: counter }));
+
+    host.innerHTML = steps.join('');
+  }
+
+  // ── Contracts ───────────────────────────────────────────────────────────────
+  function renderContracts(req) {
+    var host = $('[data-role="contracts"]');
+    if (!host) return;
+    var closed = req.status === 'closed';
+
+    host.innerHTML = (req.contracts || []).map(function (c) {
+      return '' +
+        '<div class="crm-account-closure-item">' +
+          '<div class="crm-account-closure-item-main">' +
+            '<strong>' + esc(c.number) + '</strong>' +
+            '<span>' + esc(c.type) + ' · счёт ' + esc(c.account) + '</span>' +
+          '</div>' +
+          '<div class="crm-account-closure-item-aside">' +
+            (closed
+              ? '<span class="crm-badge muted">Закрыт</span>' +
+                '<span class="crm-account-closure-target is-done">Закрыто</span>'
+              : '<span class="crm-badge success">Действующий</span>' +
+                '<span class="crm-account-closure-target">Закрыть</span>') +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ── Document basis ──────────────────────────────────────────────────────────
+  function renderBasis(req) {
+    setText('[data-role="basis-type"]', req.basisType || '—');
+    setText('[data-role="basis-source"]', req.source || '—');
+    setText('[data-role="basis-comment"]', req.managerComment || '—');
+
+    var fileWrap = $('[data-role="basis-file"]');
+    var fileName = $('[data-role="basis-file-name"]');
+    if (req.attachmentName) {
+      if (fileWrap) fileWrap.hidden = false;
+      if (fileName) fileName.textContent = req.attachmentName;
+    } else if (fileWrap) {
+      fileWrap.hidden = true;
+      var holder = fileWrap.parentNode;
+      if (holder && !holder.querySelector('.crm-account-closure-file-empty')) {
+        var em = document.createElement('span');
+        em.className = 'crm-account-closure-file-empty';
+        em.textContent = 'Без вложения';
+        holder.appendChild(em);
+      }
     }
-    el.textContent = text;
   }
 
-  function nowStamp() {
-    var d = new Date();
-    var p = function (n) { return (n < 10 ? '0' : '') + n; };
-    return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear() +
-           ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  // ── Approvals ───────────────────────────────────────────────────────────────
+  function approvalRowHtml(label, ap) {
+    var status = (ap && ap.status) || 'pending';
+    var meta = Demo.approvalMeta(status);
+    var who = (ap && ap.user) ? ap.user : '—';
+    var when = (ap && ap.datetime) ? ap.datetime : '—';
+    return '' +
+      '<div class="crm-account-closure-approval">' +
+        '<div class="crm-account-closure-approval-main">' +
+          '<strong>' + esc(label) + '</strong>' +
+          '<span class="crm-account-closure-approval-meta">' +
+            '<span class="crm-account-closure-approval-user">' + esc(who) + '</span>' +
+            '<span class="crm-account-closure-approval-dot" aria-hidden="true">·</span>' +
+            '<span class="crm-account-closure-approval-time">' + esc(when) + '</span>' +
+          '</span>' +
+        '</div>' +
+        '<span class="crm-badge ' + meta.badge + ' crm-account-closure-approval-status">' + esc(meta.label) + '</span>' +
+      '</div>';
   }
 
-  function addHistory(text) {
-    var list = $('[data-role="history"]');
-    if (!list) return;
-    var li = document.createElement('li');
-    var t = document.createElement('time');
-    t.textContent = nowStamp();
-    li.appendChild(t);
-    li.appendChild(document.createTextNode(text));
-    list.appendChild(li);
+  function renderApprovals(req) {
+    var host = $('[data-role="approvals"]');
+    if (!host) return;
+    var rows = [];
+    Demo.requiredKeys(req).forEach(function (key) {
+      rows.push(approvalRowHtml(Demo.APPROVAL_LABEL[key], req.approvals[key]));
+    });
+    rows.push(approvalRowHtml(Demo.APPROVAL_LABEL.manager, req.approvals.manager));
+    host.innerHTML = rows.join('');
   }
 
-  function getStep(name) { return $('[data-step="' + name + '"]'); }
-
-  function markStepDone(name, stateText) {
-    var step = getStep(name);
-    if (!step) return;
-    step.classList.remove('is-current', 'is-locked');
-    step.classList.add('is-done');
-    var idx = $('.crm-account-closure-step-index', step);
-    if (idx) idx.textContent = '✓';
-    var state = $('[data-role="step-state"]', step);
-    if (state) state.textContent = stateText || 'Выполнено';
+  // ── History ─────────────────────────────────────────────────────────────────
+  function renderHistory(req) {
+    var host = $('[data-role="history"]');
+    if (!host) return;
+    host.innerHTML = (req.history || []).map(function (ev) {
+      return '<li><time>' + esc(ev.at) + '</time>' + esc(ev.text) + '</li>';
+    }).join('');
   }
 
-  function markStepCurrent(name) {
-    var step = getStep(name);
-    if (!step || step.classList.contains('is-locked')) return;
-    step.classList.add('is-current');
+  // ── Decision panel ──────────────────────────────────────────────────────────
+  function show(el, visible) { if (el) el.hidden = !visible; }
+
+  function renderDecision(req) {
+    var isManager = role.approval === 'manager';
+    var myStatus  = Demo.approvalStatus(req, role.approval);
+    var ready     = Demo.isReady(req);
+    var closed    = req.status === 'closed';
+
+    setBadge($('[data-role="decision-status"]'), Demo.statusMeta(req));
+    setText('[data-role="decision-role-label"]', role.label);
+    setText('[data-role="decision-title"]', isManager ? 'Финальное закрытие' : 'Ваше решение');
+
+    // Returned callout
+    var returnedBlock = $('[data-role="decision-returned"]');
+    if (req.status === 'returned') {
+      show(returnedBlock, true);
+      setText('[data-role="decision-returned-text"]',
+        (req.returnedBy ? req.returnedBy + ': ' : '') + (req.returnReason || '—'));
+    } else {
+      show(returnedBlock, false);
+    }
+
+    var reviewBlock  = $('[data-role="decision-review"]');
+    var managerBlock = $('[data-role="decision-manager"]');
+    var doneBlock    = $('[data-role="decision-done"]');
+    show(reviewBlock, false);
+    show(managerBlock, false);
+    show(doneBlock, false);
+
+    var subtitle = '';
+
+    if (isManager) {
+      if (closed) {
+        subtitle = 'Заявка закрыта';
+        show(doneBlock, true);
+        var mgr = req.approvals.manager || {};
+        setText('[data-role="decision-done-text"]',
+          'Заявка закрыта' + (mgr.user ? ' (' + mgr.user + (mgr.datetime ? ', ' + mgr.datetime : '') + ')' : '') + '.');
+      } else {
+        subtitle = ready ? 'Все согласования получены'
+                 : req.status === 'returned' ? 'Заявка возвращена на уточнение'
+                 : 'Ожидаются согласования подразделений';
+        show(managerBlock, true);
+        var finalBtn = $('[data-action="closure-final"]');
+        if (finalBtn) finalBtn.disabled = !ready;
+        var pending = Demo.requiredKeys(req)
+          .filter(function (k) { return Demo.approvalStatus(req, k) !== 'accepted'; })
+          .map(function (k) { return Demo.APPROVAL_LABEL[k]; });
+        setText('[data-role="manager-hint"]', ready
+          ? 'Все согласования получены — можно выполнить финальное закрытие.'
+          : 'Финальное закрытие станет доступно после акцепта: ' + (pending.join(', ') || '—') + '.');
+      }
+    } else {
+      if (closed) {
+        subtitle = 'Заявка закрыта';
+        show(doneBlock, true);
+        setText('[data-role="decision-done-text"]', 'Заявка закрыта. Действия по согласованию недоступны.');
+      } else if (myStatus === 'accepted') {
+        subtitle = 'Вы уже акцептовали';
+        show(doneBlock, true);
+        var ap = req.approvals[role.approval] || {};
+        setText('[data-role="decision-done-text"]',
+          'Вы акцептовали закрытие' + (ap.datetime ? ' (' + ap.datetime + ')' : '') + '.');
+      } else if (req.status === 'returned') {
+        subtitle = 'Заявка на уточнении';
+        show(doneBlock, true);
+        setText('[data-role="decision-done-text"]', 'Заявка возвращена на уточнение — действия недоступны до повторной подачи.');
+      } else {
+        subtitle = 'Требуется ваш акцепт';
+        show(reviewBlock, true);
+      }
+    }
+
+    setText('[data-role="decision-subtitle"]', subtitle);
   }
 
-  // ── Confirmation modal ───────────────────────────────────────────────────────
-  var modal = $('[data-role="closure-confirm-modal"]');
+  // ── Full render ─────────────────────────────────────────────────────────────
+  function render() {
+    var req = currentReq();
+    if (!req) { renderMissing(); return; }
+    renderHero(req);
+    renderWorkflow(req);
+    renderContracts(req);
+    renderBasis(req);
+    renderApprovals(req);
+    renderHistory(req);
+    renderDecision(req);
+  }
+
+  function renderMissing() {
+    var page = $('.crm-account-closure-page');
+    if (!page) return;
+    page.innerHTML =
+      '<div class="crm-breadcrumbs"><a href="requests.html">Заявки</a></div>' +
+      '<section class="crm-card crm-account-closure-hero">' +
+        '<h1>Заявка не найдена</h1>' +
+        '<p class="crm-account-closure-help">Запрошенная заявка «' + esc(requestId) +
+          '» отсутствует в демо-состоянии. Откройте заявку из журнала или ' +
+          '<a href="#" data-action="closure-reset">сбросьте демо-сценарий</a>.</p>' +
+      '</section>';
+  }
+
+  // ── Confirmation modal ──────────────────────────────────────────────────────
+  var modal     = $('[data-role="closure-confirm-modal"]');
   var modalBody = $('[data-role="closure-modal-body"]');
+  var modalTitle = $('[data-role="closure-modal-title"]');
   var pendingConfirm = null;
 
-  function openModal(bodyText, onConfirm) {
+  function openModal(title, bodyText, onConfirm) {
     pendingConfirm = onConfirm || null;
+    if (modalTitle) modalTitle.textContent = title;
     if (modalBody) modalBody.textContent = bodyText;
     if (modal) modal.hidden = false;
     document.body.classList.add('crm-modal-open');
@@ -121,181 +319,90 @@
     document.body.classList.remove('crm-modal-open');
   }
 
-  // ── Apply decisions (this page only) ─────────────────────────────────────────
-  function applyAccept(role) {
-    var stamp = nowStamp();
-
-    // Approval row
-    var approvalRow = $('[data-approval="' + role.approval + '"]');
-    if (approvalRow) {
-      setBadge($('[data-role="approval-status"]', approvalRow), 'Акцептовано', 'success');
-      var meta = $('[data-role="approval-meta"]', approvalRow);
-      if (meta) meta.textContent = role.acceptUser + ' · ' + stamp;
-    }
-
-    // Workflow strip
-    markStepDone(role.step, 'Акцептовано');
-    if (role.nextStep) markStepCurrent(role.nextStep);
-
-    // Decision panel state
-    setBadge($('[data-role="decision-status"]'), 'Акцептовано', 'success');
-    lockReviewControls('Решение принято: закрытие акцептовано.');
-
-    addHistory(role.label + ': закрытие акцептовано (' + role.acceptUser + ')');
+  // ── Actions ─────────────────────────────────────────────────────────────────
+  function handleAccept() {
+    var textarea = $('#closure-decision-comment');
+    var comment = textarea ? textarea.value.trim() : '';
+    openModal('Подтвердить акцепт',
+      'Вы уверены, что хотите акцептовать закрытие по роли «' + role.label + '»?',
+      function () {
+        Demo.accept(requestId, role.approval, role.user, comment);
+        render();
+      });
   }
 
-  function applyReturn(role, reason) {
-    var stamp = nowStamp();
-
-    // Request-level status
-    setBadge($('[data-role="request-status"]'), 'Возвращена на уточнение', 'danger');
-
-    // Approval row
-    var approvalRow = $('[data-approval="' + role.approval + '"]');
-    if (approvalRow) {
-      setBadge($('[data-role="approval-status"]', approvalRow), 'Возвращено', 'danger');
-      var meta = $('[data-role="approval-meta"]', approvalRow);
-      if (meta) meta.textContent = role.acceptUser + ' · ' + stamp;
-    }
-
-    // Workflow strip — step is no longer the active/completed stage
-    var step = getStep(role.step);
-    if (step) {
-      step.classList.remove('is-current', 'is-done');
-      var state = $('[data-role="step-state"]', step);
-      if (state) state.textContent = 'Возвращено';
-    }
-
-    // Decision panel state + visible return reason
-    setBadge($('[data-role="decision-status"]'), 'Возвращено', 'danger');
-    lockReviewControls('Заявка возвращена на уточнение.');
-    showReturnReason(reason);
-
-    addHistory(role.label + ': возврат на уточнение — ' + reason + ' (' + role.acceptUser + ')');
-  }
-
-  function lockReviewControls(message) {
-    var review = $('[data-role="decision-review"]');
-    if (!review) return;
-    review.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-    var textarea = $('#closure-decision-comment', review);
-    if (textarea) textarea.readOnly = true;
-    var done = document.createElement('p');
-    done.className = 'crm-account-closure-helper';
-    done.textContent = message;
-    review.appendChild(done);
-  }
-
-  function showReturnReason(reason) {
-    var review = $('[data-role="decision-review"]');
-    if (!review) return;
-    var box = document.createElement('p');
-    box.className = 'crm-account-closure-note';
-    box.textContent = 'Причина возврата: ' + reason;
-    review.appendChild(box);
-  }
-
-  // ── Decision panel setup per role ─────────────────────────────────────────────
-  function configurePanel(role) {
-    var subtitle = $('[data-role="decision-subtitle"]');
-    if (subtitle) subtitle.textContent = role.subtitle;
-
-    setBadge($('[data-role="decision-status"]'), role.decisionStatus, role.decisionStatusClass);
-
-    var review = $('[data-role="decision-review"]');
-    var manager = $('[data-role="decision-manager"]');
-
-    if (role.kind === 'review') {
-      if (review) review.hidden = false;
-      if (manager) manager.hidden = true;
-    } else {
-      if (review) review.hidden = true;
-      if (manager) manager.hidden = false;
-    }
-
-    // Topbar identity reflects the acting role.
-    if (role.topbar) {
-      var n = $('[data-role="topbar-user-name"]');
-      var r = $('[data-role="topbar-user-role"]');
-      var i = $('[data-role="topbar-user-initials"]');
-      if (n) n.textContent = role.topbar.name;
-      if (r) r.textContent = role.topbar.role;
-      if (i) i.textContent = role.topbar.initials;
-    }
-  }
-
-  // ── Event wiring ───────────────────────────────────────────────────────────
-  function wireActions(role) {
-    document.addEventListener('click', function (e) {
-      var action = e.target.closest('[data-action]');
-
-      // Modal controls are global (work regardless of role).
-      if (action) {
-        var name = action.getAttribute('data-action');
-
-        if (name === 'closure-modal-cancel') { closeModal(); return; }
-        if (name === 'closure-modal-confirm') {
-          var fn = pendingConfirm;
-          closeModal();
-          if (typeof fn === 'function') fn();
-          return;
-        }
-
-        if (role.kind === 'review') {
-          if (name === 'closure-accept') {
-            openModal(role.acceptBody, function () { applyAccept(role); });
-            return;
-          }
-          if (name === 'closure-return') {
-            handleReturn(role);
-            return;
-          }
-        }
-
-        if (role.kind === 'manager' && name === 'closure-final') {
-          // Disabled by default in this first pass; wired for future enablement.
-          if (action.disabled) return;
-          openModal(FINAL_BODY, function () { addHistory('Клиентский менеджер: выполнено финальное закрытие'); });
-          return;
-        }
-      }
-    });
-
-    // Close modal on Escape.
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
-    });
-  }
-
-  function handleReturn(role) {
+  function handleReturn() {
     var textarea = $('#closure-decision-comment');
     var error = $('[data-role="decision-error"]');
     var reason = textarea ? textarea.value.trim() : '';
 
     if (!reason) {
       if (error) error.hidden = false;
-      if (textarea) {
-        textarea.classList.add('crm-input-error');
-        textarea.focus();
-      }
+      if (textarea) { textarea.classList.add('crm-input-error'); textarea.focus(); }
       return;
     }
-
     if (error) error.hidden = true;
     if (textarea) textarea.classList.remove('crm-input-error');
-    applyReturn(role, reason);
+
+    openModal('Подтвердить возврат',
+      'Вернуть заявку на уточнение? Финальное закрытие будет заблокировано.',
+      function () {
+        Demo.returnForClarification(requestId, role.approval, role.user, reason);
+        render();
+      });
   }
 
-  // ── Init ─────────────────────────────────────────────────────────────────────
-  function init() {
-    var params = new URLSearchParams(window.location.search);
-    var roleKey = params.get('role') || 'manager';
-    var role = ROLES[roleKey] || ROLES.manager;
-
-    configurePanel(role);
-    wireActions(role);
+  function handleFinal() {
+    var req = currentReq();
+    if (!req || !Demo.isReady(req) || req.status === 'closed') return;
+    openModal('Финальное закрытие',
+      'Вы уверены, что хотите выполнить финальное закрытие выбранных договоров и счетов? Действие необратимо в рамках демо.',
+      function () {
+        Demo.finalClose(requestId, role.user);
+        render();
+      });
   }
 
-  init();
+  function handleReset() {
+    Demo.reset();
+    window.location.reload();
+  }
+
+  function wire() {
+    document.addEventListener('click', function (e) {
+      var action = e.target.closest('[data-action]');
+      if (!action) return;
+      var name = action.getAttribute('data-action');
+
+      switch (name) {
+        case 'closure-modal-cancel': closeModal(); break;
+        case 'closure-modal-confirm': {
+          var fn = pendingConfirm;
+          closeModal();
+          if (typeof fn === 'function') fn();
+          break;
+        }
+        case 'closure-accept': if (role.approval !== 'manager') handleAccept(); break;
+        case 'closure-return': if (role.approval !== 'manager') handleReturn(); break;
+        case 'closure-final':
+          if (role.approval === 'manager' && !action.disabled) handleFinal();
+          break;
+        case 'closure-reset':
+          e.preventDefault();
+          handleReset();
+          break;
+        default: break;
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
+    });
+  }
+
+  // ── Init ────────────────────────────────────────────────────────────────────
+  applyTopbar();
+  render();
+  wire();
 
 }());

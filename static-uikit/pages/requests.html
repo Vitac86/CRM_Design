@@ -363,7 +363,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr data-entity="request" data-id="CL-2026-00017" data-href="account-closure-request.html?role=manager" data-filter-filter-source="opt-1" data-filter-filter-status="opt-1">
+                    <tr data-entity="request" data-id="CL-2026-00017" data-closure-request data-href="account-closure-request.html?role=manager&amp;request=CL-2026-00017" data-filter-filter-source="opt-1" data-filter-filter-status="opt-1">
                       <td>
                         <div class="crm-row-main">CL-2026-00017</div>
                         <div class="crm-row-sub">Заявка на закрытие договора/счёта</div>
@@ -374,12 +374,52 @@
                       </td>
                       <td>—</td>
                       <td>
-                        <span class="crm-badge warning" data-status="request-waiting">Ожидает акцепта</span>
+                        <span class="crm-badge warning" data-status="request-waiting" data-role="closure-row-status">Ожидает акцепта</span>
                       </td>
                       <td>15.06.2026</td>
                       <td>
                         <div class="crm-row-actions">
-                          <a class="uk-button uk-button-text crm-link-action" href="account-closure-request.html?role=manager">Открыть</a>
+                          <a class="uk-button uk-button-text crm-link-action" data-role="closure-row-open" href="account-closure-request.html?role=manager&amp;request=CL-2026-00017">Открыть</a>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr data-entity="request" data-id="CL-2026-00018" data-closure-request data-href="account-closure-request.html?role=manager&amp;request=CL-2026-00018" data-filter-filter-source="opt-1" data-filter-filter-status="opt-1">
+                      <td>
+                        <div class="crm-row-main">CL-2026-00018</div>
+                        <div class="crm-row-sub">Заявка на закрытие договора/счёта</div>
+                      </td>
+                      <td>
+                        <div class="crm-row-main">ООО «Северный Альянс»</div>
+                        <div class="crm-row-sub">INV-1018</div>
+                      </td>
+                      <td>—</td>
+                      <td>
+                        <span class="crm-badge warning" data-status="request-waiting" data-role="closure-row-status">Ожидает акцепта</span>
+                      </td>
+                      <td>15.06.2026</td>
+                      <td>
+                        <div class="crm-row-actions">
+                          <a class="uk-button uk-button-text crm-link-action" data-role="closure-row-open" href="account-closure-request.html?role=manager&amp;request=CL-2026-00018">Открыть</a>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr data-entity="request" data-id="CL-2026-00019" data-closure-request data-href="account-closure-request.html?role=manager&amp;request=CL-2026-00019" data-filter-filter-source="opt-1" data-filter-filter-status="opt-1">
+                      <td>
+                        <div class="crm-row-main">CL-2026-00019</div>
+                        <div class="crm-row-sub">Заявка на закрытие договора/счёта</div>
+                      </td>
+                      <td>
+                        <div class="crm-row-main">АО «Полярные Активы»</div>
+                        <div class="crm-row-sub">INV-1019</div>
+                      </td>
+                      <td>—</td>
+                      <td>
+                        <span class="crm-badge warning" data-status="request-waiting" data-role="closure-row-status">Ожидает акцепта</span>
+                      </td>
+                      <td>15.06.2026</td>
+                      <td>
+                        <div class="crm-row-actions">
+                          <a class="uk-button uk-button-text crm-link-action" data-role="closure-row-open" href="account-closure-request.html?role=manager&amp;request=CL-2026-00019">Открыть</a>
                         </div>
                       </td>
                     </tr>
@@ -567,5 +607,6 @@
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/account-closure-state.js"></script>
 </body>
 </html>

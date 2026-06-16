@@ -1799,10 +1799,29 @@
 }
 
 .crm-page[data-page="subject-card"] .crm-subject-closure-banner-main strong {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   font-size: 14px;
   color: #20304b;
 }
 
+/* Banner state accents reflect the current request status. */
+.crm-page[data-page="subject-card"] .crm-subject-closure-banner.is-closed {
+  border-left-color: var(--crm-success);
+}
+
+.crm-page[data-page="subject-card"] .crm-subject-closure-banner.is-returned {
+  border-left-color: var(--crm-danger);
+}
+
 .crm-page[data-page="subject-card"] .crm-contract-close-action {
   white-space: nowrap;
+}
+
+/* Small "В заявке" / "Закрыта" flag injected next to the row-level action. */
+.crm-page[data-page="subject-card"] .crm-contract-closure-flag {
+  margin-right: 8px;
+  vertical-align: middle;
 }

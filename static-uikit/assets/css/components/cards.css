@@ -308,6 +308,7 @@
 /* ========================================================================== */
 /* closure task cards — shared by depository & middle-office task queues      */
 /* base class + state/modifier only; no per-page duplication                  */
+/* Layout: 3-part actionable queue item (identity | meta | status + action). */
 /* ========================================================================== */
 .crm-closure-tasks {
   display: grid;
@@ -317,74 +318,128 @@
 
 .crm-closure-task-list {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .crm-closure-task-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) auto;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 14px 16px;
   border: 1px solid var(--crm-border);
   border-left: 3px solid #f0b537;
   border-radius: 12px;
   background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+.crm-closure-task-card:hover {
+  border-color: #c3d0e8;
+  box-shadow: var(--crm-shadow-sm);
+}
+
+/* Left — identity */
 .crm-closure-task-main {
-  flex: 1 1 auto;
   min-width: 0;
+  display: grid;
+  gap: 2px;
 }
 
-.crm-closure-task-main strong {
-  display: block;
-  font-size: 13px;
+.crm-closure-task-id {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--crm-primary);
+}
+
+.crm-closure-task-client {
+  font-size: 14px;
   color: #20304b;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.crm-closure-task-main span {
-  display: block;
+.crm-closure-task-code {
   font-size: 12px;
   color: var(--crm-muted);
 }
 
+/* Middle — contract chips + stage label */
 .crm-closure-task-meta {
-  flex: 0 1 auto;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: flex-start;
+  display: grid;
+  gap: 6px;
 }
 
-.crm-closure-task-meta code {
-  background: var(--crm-surface-muted);
-  color: #3f5376;
+.crm-closure-task-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.crm-closure-chip {
   font-size: 12px;
-  padding: 2px 7px;
+  color: #3f5376;
+  background: var(--crm-surface-muted);
+  border: 1px solid var(--crm-border);
   border-radius: 6px;
+  padding: 2px 8px;
   white-space: nowrap;
 }
 
+.crm-closure-task-stage {
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+/* Right — status badge + primary action */
 .crm-closure-task-aside {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .crm-closure-task-open {
   white-space: nowrap;
 }
 
-@media (max-width: 720px) {
+/* State accents — left border + subtle tint */
+.crm-closure-task-card.is-ready {
+  border-left-color: var(--crm-info);
+}
+
+.crm-closure-task-card.is-returned {
+  border-left-color: var(--crm-danger);
+  background: #fffafa;
+}
+
+.crm-closure-task-card.is-closed {
+  border-left-color: var(--crm-success);
+  opacity: 0.75;
+}
+
+/* Empty queue state */
+.crm-closure-empty {
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--crm-muted);
+  background: var(--crm-surface-muted);
+  border-radius: 10px;
+}
+
+/* Responsive — stack the three parts into a single column */
+@media (max-width: 860px) {
   .crm-closure-task-card {
-    flex-wrap: wrap;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .crm-closure-task-aside {
-    width: 100%;
     justify-content: space-between;
   }
 }

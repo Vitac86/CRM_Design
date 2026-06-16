@@ -143,6 +143,17 @@
   color: #fff;
 }
 
+.crm-account-closure-step.is-returned {
+  border-color: #f0c4c4;
+  background: var(--crm-danger-bg);
+}
+
+.crm-account-closure-step.is-returned .crm-account-closure-step-index {
+  background: var(--crm-danger);
+  border-color: var(--crm-danger);
+  color: #fff;
+}
+
 .crm-account-closure-step.is-locked {
   opacity: 0.6;
 }
@@ -219,6 +230,11 @@
   padding: 2px 8px;
 }
 
+.crm-account-closure-target.is-done {
+  color: #1c5a3f;
+  background: var(--crm-success-bg);
+}
+
 /* ── Document basis ──────────────────────────────────────────────────────── */
 
 .crm-account-closure-basis {
@@ -255,6 +271,11 @@
   width: max-content;
 }
 
+.crm-account-closure-file-empty {
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
 .crm-account-closure-help {
   margin: 4px 0 0;
   font-size: 12px;
@@ -285,9 +306,24 @@
   color: #20304b;
 }
 
-.crm-account-closure-approval-main span {
+/* User + datetime aligned on a single baseline row, not stacked. */
+.crm-account-closure-approval-meta {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
   font-size: 12px;
   color: var(--crm-muted);
+}
+
+.crm-account-closure-approval-user {
+  font-weight: 500;
+  color: var(--crm-text-secondary);
+}
+
+.crm-account-closure-approval-dot {
+  color: var(--crm-border);
 }
 
 .crm-account-closure-approval-status {
@@ -348,36 +384,61 @@
   top: calc(var(--crm-topbar-h) + 12px);
   padding: 16px 18px;
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  align-content: start;
 }
 
-.crm-account-closure-decision-head h3 {
-  margin: 0 0 4px;
-  font-size: 16px;
+/* Head — role context + title sit above a subtle divider. */
+.crm-account-closure-panel-head {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--crm-border);
 }
 
-.crm-account-closure-decision-subtitle {
+.crm-account-closure-panel-role {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--crm-primary);
+}
+
+.crm-account-closure-panel-head h3 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.crm-account-closure-panel-subtitle {
   margin: 0;
   font-size: 13px;
   color: var(--crm-text-secondary);
 }
 
-.crm-account-closure-decision-status {
+.crm-account-closure-panel-status {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   font-size: 12px;
   color: var(--crm-muted);
 }
 
+/* Action blocks — comment + buttons grouped, the role-relevant primary area. */
+.crm-account-closure-action-block {
+  display: grid;
+  gap: 12px;
+}
+
 .crm-account-closure-field {
   display: grid;
-  gap: 4px;
+  gap: 5px;
 }
 
 .crm-account-closure-field label {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: #4e6286;
 }
 
@@ -392,23 +453,84 @@
   gap: 8px;
 }
 
-.crm-account-closure-helper,
-.crm-account-closure-note {
-  margin: 0;
-  font-size: 12px;
-  color: var(--crm-muted);
+/* Consistent full-width, equal-height buttons. */
+.crm-account-closure-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
 }
 
-.crm-account-closure-note {
-  padding: 9px 10px;
-  border: 1px solid #d8e1f0;
-  border-radius: 8px;
-  background: #f4f8ff;
-  color: #4e6286;
+.crm-account-closure-helper {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--crm-muted);
 }
 
 .crm-account-closure-textarea.crm-input-error {
   border-color: var(--crm-danger);
+}
+
+/* The hidden attribute must win over component display values (grid/inline-flex). */
+.crm-account-closure-action-block[hidden],
+.crm-account-closure-callout[hidden],
+.crm-account-closure-file[hidden] {
+  display: none;
+}
+
+/* Callouts — returned reason / completion confirmation. */
+.crm-account-closure-callout {
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--crm-border);
+  display: grid;
+  gap: 3px;
+}
+
+.crm-account-closure-callout strong {
+  font-size: 13px;
+}
+
+.crm-account-closure-callout p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.crm-account-closure-callout.is-danger {
+  border-color: #f0c4c4;
+  background: var(--crm-danger-bg);
+  color: #8a2d34;
+}
+
+.crm-account-closure-callout.is-success {
+  border-color: #bfe0cd;
+  background: var(--crm-success-bg);
+  color: #1c5a3f;
+}
+
+/* Footer — discreet demo reset control. */
+.crm-account-closure-panel-foot {
+  padding-top: 12px;
+  border-top: 1px solid var(--crm-border);
+}
+
+.crm-account-closure-reset {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--crm-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.crm-account-closure-reset:hover {
+  color: var(--crm-primary);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */

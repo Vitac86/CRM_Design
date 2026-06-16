@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Заявка на закрытие CL-2026-00017</title>
+  <title>Заявка на закрытие договора/счёта</title>
   <link rel="icon" href="../assets/icons/favicon_blue.ico" type="image/x-icon" />
   <link rel="icon" href="../assets/icons/favicon_blue.ico" type="image/x-icon" media="(prefers-color-scheme: light)" />
   <link rel="icon" href="../assets/icons/favicon_white.ico" type="image/x-icon" media="(prefers-color-scheme: dark)" />
@@ -184,74 +184,45 @@
           <div class="crm-breadcrumbs">
             <a href="requests.html">Заявки</a>
             <span uk-icon="chevron-right"></span>
-            <span>Заявка на закрытие CL-2026-00017</span>
+            <span data-role="bc-id">Заявка на закрытие</span>
           </div>
 
           <!-- Hero / summary -->
           <section class="crm-card crm-account-closure-hero">
             <div class="crm-account-closure-hero-top">
               <div>
-                <p class="crm-account-closure-hero-id">CL-2026-00017</p>
+                <p class="crm-account-closure-hero-id" data-role="hero-id">—</p>
                 <h1>Заявка на закрытие договора/счёта</h1>
                 <div class="crm-inline-badges">
                   <span class="crm-badge warning" data-role="request-status">Ожидает акцепта</span>
-                  <span class="crm-badge info">Личный кабинет</span>
+                  <span class="crm-badge info" data-role="hero-source">Личный кабинет</span>
                 </div>
               </div>
               <div class="crm-account-closure-hero-created">
                 Создана
-                <strong>15.06.2026 10:42</strong>
+                <strong data-role="hero-created">—</strong>
               </div>
             </div>
 
             <div class="crm-account-closure-hero-meta">
               <div class="crm-account-closure-hero-cell">
                 <span>Клиент</span>
-                <strong>АО «Восток Майнинг Системс»</strong>
+                <strong data-role="hero-client">—</strong>
               </div>
               <div class="crm-account-closure-hero-cell">
                 <span>Код клиента</span>
-                <strong>INV-1011</strong>
+                <strong data-role="hero-code">—</strong>
               </div>
               <div class="crm-account-closure-hero-cell">
                 <span>Клиентский менеджер</span>
-                <strong>Иванов И.И.</strong>
+                <strong data-role="hero-manager">—</strong>
               </div>
             </div>
           </section>
 
           <!-- Workflow progress strip -->
           <section class="crm-card crm-account-closure-progress" aria-label="Ход обработки заявки">
-            <div class="crm-account-closure-progress-list">
-              <div class="crm-account-closure-step is-done" data-step="created">
-                <span class="crm-account-closure-step-index" aria-hidden="true">✓</span>
-                <span class="crm-account-closure-step-body">
-                  <strong>Создана</strong>
-                  <span data-role="step-state">Выполнено</span>
-                </span>
-              </div>
-              <div class="crm-account-closure-step is-current" data-step="depository">
-                <span class="crm-account-closure-step-index" aria-hidden="true">2</span>
-                <span class="crm-account-closure-step-body">
-                  <strong>Депозитарий</strong>
-                  <span data-role="step-state">Ожидает</span>
-                </span>
-              </div>
-              <div class="crm-account-closure-step" data-step="middle-office">
-                <span class="crm-account-closure-step-index" aria-hidden="true">3</span>
-                <span class="crm-account-closure-step-body">
-                  <strong>Мидл-офис</strong>
-                  <span data-role="step-state">Ожидает</span>
-                </span>
-              </div>
-              <div class="crm-account-closure-step is-locked" data-step="final">
-                <span class="crm-account-closure-step-index" aria-hidden="true">4</span>
-                <span class="crm-account-closure-step-body">
-                  <strong>Финальное закрытие</strong>
-                  <span data-role="step-state">Заблокировано</span>
-                </span>
-              </div>
-            </div>
+            <div class="crm-account-closure-progress-list" data-role="workflow"></div>
           </section>
 
           <!-- Main grid -->
@@ -263,28 +234,7 @@
               <!-- Contracts / accounts to close -->
               <section class="crm-card">
                 <h3 class="crm-account-closure-section-title">Договоры и счета к закрытию</h3>
-                <div class="crm-account-closure-item-list">
-                  <div class="crm-account-closure-item">
-                    <div class="crm-account-closure-item-main">
-                      <strong>BR-2026/00444</strong>
-                      <span>Брокерский договор · счёт 30601-000-4401</span>
-                    </div>
-                    <div class="crm-account-closure-item-aside">
-                      <span class="crm-badge success">Действующий</span>
-                      <span class="crm-account-closure-target">Закрыть</span>
-                    </div>
-                  </div>
-                  <div class="crm-account-closure-item">
-                    <div class="crm-account-closure-item-main">
-                      <strong>DP-2026/00445</strong>
-                      <span>Депозитарный договор · счёт 30-016-00041-DP</span>
-                    </div>
-                    <div class="crm-account-closure-item-aside">
-                      <span class="crm-badge success">Действующий</span>
-                      <span class="crm-account-closure-target">Закрыть</span>
-                    </div>
-                  </div>
-                </div>
+                <div class="crm-account-closure-item-list" data-role="contracts"></div>
               </section>
 
               <!-- Document basis -->
@@ -293,23 +243,23 @@
                 <div class="crm-account-closure-basis">
                   <div class="crm-account-closure-row">
                     <span>Тип основания</span>
-                    <strong>Заявление клиента</strong>
+                    <strong data-role="basis-type">—</strong>
                   </div>
                   <div class="crm-account-closure-row">
                     <span>Источник</span>
-                    <strong>Личный кабинет</strong>
+                    <strong data-role="basis-source">—</strong>
                   </div>
                   <div class="crm-account-closure-row">
                     <span>Файл</span>
                     <strong>
-                      <span class="crm-account-closure-file">
-                        <span uk-icon="icon: file-text"></span>Заявление_на_закрытие.pdf
+                      <span class="crm-account-closure-file" data-role="basis-file">
+                        <span uk-icon="icon: file-text"></span><span data-role="basis-file-name">—</span>
                       </span>
                     </strong>
                   </div>
                   <div class="crm-account-closure-row">
                     <span>Комментарий менеджера</span>
-                    <strong>По инициативе клиента</strong>
+                    <strong data-role="basis-comment">—</strong>
                   </div>
                 </div>
                 <p class="crm-account-closure-help">Документ используется как основание для запуска согласования закрытия.</p>
@@ -318,38 +268,13 @@
               <!-- Approvals checklist (read-only) -->
               <section class="crm-card">
                 <h3 class="crm-account-closure-section-title">Согласования</h3>
-                <div class="crm-account-closure-approvals">
-                  <div class="crm-account-closure-approval" data-approval="depository">
-                    <div class="crm-account-closure-approval-main">
-                      <strong>Депозитарий</strong>
-                      <span data-role="approval-meta">— · —</span>
-                    </div>
-                    <span class="crm-badge warning crm-account-closure-approval-status" data-role="approval-status">Ожидает</span>
-                  </div>
-                  <div class="crm-account-closure-approval" data-approval="middle-office">
-                    <div class="crm-account-closure-approval-main">
-                      <strong>Мидл-офис</strong>
-                      <span data-role="approval-meta">— · —</span>
-                    </div>
-                    <span class="crm-badge warning crm-account-closure-approval-status" data-role="approval-status">Ожидает</span>
-                  </div>
-                  <div class="crm-account-closure-approval" data-approval="manager">
-                    <div class="crm-account-closure-approval-main">
-                      <strong>Клиентский менеджер</strong>
-                      <span data-role="approval-meta">Иванов И.И. · —</span>
-                    </div>
-                    <span class="crm-badge muted crm-account-closure-approval-status" data-role="approval-status">Недоступно</span>
-                  </div>
-                </div>
+                <div class="crm-account-closure-approvals" data-role="approvals"></div>
               </section>
 
               <!-- History -->
               <section class="crm-card">
                 <h3 class="crm-account-closure-section-title">История</h3>
-                <ol class="crm-account-closure-timeline" data-role="history">
-                  <li><time>15.06.2026 10:42</time>Заявка получена из Личного кабинета</li>
-                  <li><time>15.06.2026 10:43</time>Создана карточка заявки CL-2026-00017</li>
-                </ol>
+                <ol class="crm-account-closure-timeline" data-role="history"></ol>
               </section>
 
             </div>
@@ -357,18 +282,25 @@
             <!-- Right column: sticky decision panel -->
             <aside class="crm-account-closure-side">
               <section class="crm-card crm-account-closure-panel" data-role="decision-panel">
-                <div class="crm-account-closure-decision-head">
-                  <h3>Ваше решение</h3>
-                  <p class="crm-account-closure-decision-subtitle" data-role="decision-subtitle">—</p>
-                </div>
+                <header class="crm-account-closure-panel-head">
+                  <span class="crm-account-closure-panel-role" data-role="decision-role-label">Решение</span>
+                  <h3 data-role="decision-title">Ваше решение</h3>
+                  <p class="crm-account-closure-panel-subtitle" data-role="decision-subtitle">—</p>
+                </header>
 
-                <div class="crm-account-closure-decision-status">
-                  Статус:
+                <div class="crm-account-closure-panel-status">
+                  <span>Статус заявки</span>
                   <span class="crm-badge warning" data-role="decision-status">Ожидает</span>
                 </div>
 
+                <!-- Returned callout -->
+                <div class="crm-account-closure-callout is-danger" data-role="decision-returned" hidden>
+                  <strong>Возвращена на уточнение</strong>
+                  <p data-role="decision-returned-text">—</p>
+                </div>
+
                 <!-- Review controls (Depository / Middle Office) -->
-                <div data-role="decision-review" hidden>
+                <div class="crm-account-closure-action-block" data-role="decision-review" hidden>
                   <div class="crm-account-closure-field">
                     <label for="closure-decision-comment">Комментарий к решению</label>
                     <textarea
@@ -382,30 +314,37 @@
                     </p>
                   </div>
                   <div class="crm-account-closure-actions">
-                    <button class="uk-button crm-button-primary crm-button" type="button" data-action="closure-accept">
+                    <button class="uk-button crm-button-primary crm-button crm-account-closure-btn" type="button" data-action="closure-accept">
                       Акцептовать
                     </button>
-                    <button class="uk-button uk-button-default crm-button" type="button" data-action="closure-return">
+                    <button class="uk-button uk-button-default crm-button crm-account-closure-btn" type="button" data-action="closure-return">
                       Вернуть на уточнение
                     </button>
                   </div>
                 </div>
 
                 <!-- Manager final-close controls -->
-                <div data-role="decision-manager" hidden>
-                  <p class="crm-account-closure-helper">
+                <div class="crm-account-closure-action-block" data-role="decision-manager" hidden>
+                  <p class="crm-account-closure-helper" data-role="manager-hint">
                     Финальное закрытие доступно после акцепта Депозитария и Мидл-офиса.
                   </p>
                   <div class="crm-account-closure-actions">
-                    <button class="uk-button crm-button-primary crm-button" type="button" data-action="closure-final" disabled>
+                    <button class="uk-button crm-button-primary crm-button crm-account-closure-btn" type="button" data-action="closure-final" disabled>
                       Закрыть договор/счёт
                     </button>
                   </div>
                 </div>
 
-                <p class="crm-account-closure-note">
-                  В демо-версии акцепты отображаются в карточке заявки.
-                </p>
+                <!-- Completed / read-only confirmation -->
+                <div class="crm-account-closure-callout is-success" data-role="decision-done" hidden>
+                  <p data-role="decision-done-text">—</p>
+                </div>
+
+                <footer class="crm-account-closure-panel-foot">
+                  <button type="button" class="crm-account-closure-reset" data-action="closure-reset">
+                    Сбросить демо-сценарий
+                  </button>
+                </footer>
               </section>
             </aside>
 
@@ -421,7 +360,7 @@
   <div class="crm-modal-backdrop" data-action="closure-modal-cancel"></div>
   <div class="crm-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="closure-confirm-title">
     <button class="crm-modal-close" type="button" aria-label="Закрыть" data-action="closure-modal-cancel">×</button>
-    <h3 id="closure-confirm-title">Подтвердить действие</h3>
+    <h3 id="closure-confirm-title" data-role="closure-modal-title">Подтвердить действие</h3>
     <p data-role="closure-modal-body">—</p>
     <div class="crm-modal-actions">
       <button class="uk-button uk-button-default crm-button" type="button" data-action="closure-modal-cancel">Отмена</button>
@@ -433,6 +372,7 @@
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/account-closure-state.js"></script>
 <script src="../assets/js/pages/account-closure-request.js"></script>
 </body>
 </html>

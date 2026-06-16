@@ -1258,16 +1258,134 @@
 
         '<div class="crm-closure-field">' +
           '<span class="crm-document-form-label">Вложение — заявление клиента</span>' +
-          '<div class="crm-closure-dropzone">' +
-            '<span class="crm-closure-dropzone-icon" uk-icon="icon: cloud-upload; ratio: 1.4"></span>' +
-            '<p class="crm-closure-dropzone-title">Перетащите заявление клиента сюда</p>' +
-            '<p class="crm-closure-dropzone-sub">или выберите файл вручную</p>' +
-            '<button type="button" class="uk-button uk-button-default crm-button">Выбрать файл</button>' +
-            '<span class="crm-closure-dropzone-file"><span uk-icon="icon: file-text"></span>Заявление_на_закрытие.pdf</span>' +
-            '<p class="crm-closure-dropzone-help">Static demo: файл не загружается на сервер</p>' +
+          '<div class="crm-dropzone has-file" data-role="closure-dropzone">' +
+            '<input type="file" data-role="closure-file-input" hidden/>' +
+            '<span class="crm-dropzone-icon" uk-icon="icon: cloud-upload; ratio: 1.4"></span>' +
+            '<p class="crm-dropzone-title">Перетащите заявление клиента сюда</p>' +
+            '<p class="crm-dropzone-sub">или выберите файл вручную</p>' +
+            '<button type="button" class="uk-button uk-button-default crm-button" ' +
+              'data-role="closure-pick-btn" data-action="closure-pick-file">Выбрать другой файл</button>' +
+            '<span class="crm-dropzone-file" data-role="closure-file">' +
+              '<span class="crm-dropzone-file-icon" uk-icon="icon: file-text"></span>' +
+              '<span class="crm-dropzone-file-name" data-role="closure-file-name">Заявление_на_закрытие.pdf</span>' +
+              '<button type="button" class="crm-dropzone-remove" data-action="closure-remove-file" ' +
+                'aria-label="Удалить файл">×</button>' +
+            '</span>' +
+            '<p class="crm-dropzone-help">Static demo: файл не загружается на сервер</p>' +
           '</div>' +
         '</div>' +
       '</div>';
+
+    wireClosureDropzone();
+  }
+
+  // ── Attachment dropzone (static demo — no real upload) ────────────────────
+
+  function wireClosureDropzone() {
+    var zone = document.querySelector('[data-role="closure-dropzone"]');
+    if (!zone) return;
+
+    var input  = zone.querySelector('[data-role="closure-file-input"]');
+    var chip   = zone.querySelector('[data-role="closure-file"]');
+    var nameEl = zone.querySelector('[data-role="closure-file-name"]');
+    var pickBtn = zone.querySelector('[data-role="closure-pick-btn"]');
+
+    function setFile(name) {
+      if (name) {
+        if (nameEl) nameEl.textContent = name;
+        if (chip) chip.hidden = false;
+        zone.classList.add('has-file');
+        if (pickBtn) pickBtn.textContent = 'Выбрать другой файл';
+      } else {
+        if (chip) chip.hidden = true;
+        zone.classList.remove('has-file');
+        if (pickBtn) pickBtn.textContent = 'Выбрать файл';
+        if (input) input.value = '';
+      }
+    }
+
+    // Click-to-select / replace / remove
+    zone.addEventListener('click', function (e) {
+      var act = e.target.closest('[data-action]');
+      if (!act) return;
+      var name = act.getAttribute('data-action');
+      if (name === 'closure-pick-file') {
+        e.preventDefault();
+        if (input) input.click();
+      } else if (name === 'closure-remove-file') {
+        e.preventDefault();
+        setFile('');
+      }
+    });
+
+    if (input) {
+      input.addEventListener('change', function () {
+        if (input.files && input.files.length) setFile(input.files[0].name);
+      });
+    }
+
+    // Drag-and-drop (visual only — nothing is uploaded)
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      zone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        zone.classList.add('is-dragover');
+      });
+    });
+
+    zone.addEventListener('dragleave', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (zone.contains(e.relatedTarget)) return; // still inside the zone
+      zone.classList.remove('is-dragover');
+    });
+
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('is-dragover');
+      var files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length) setFile(files[0].name);
+    });
+  }
+
+  // ── Collect closure data + create the request in shared demo state ────────
+
+  function collectClosureData(doc, subject) {
+    var contracts = [];
+    document.querySelectorAll('[data-closure-contract]:checked').forEach(function (cb) {
+      var match = (doc.contracts || []).find(function (c) { return c.number === cb.value; });
+      if (match) contracts.push({ number: match.number, type: match.type, account: match.account });
+    });
+
+    var sourceEl  = document.getElementById('closure-source');
+    var commentEl = document.getElementById('closure-comment');
+    var zone      = document.querySelector('[data-role="closure-dropzone"]');
+    var nameEl    = document.querySelector('[data-role="closure-file-name"]');
+    var hasFile   = zone && zone.classList.contains('has-file');
+
+    return {
+      subjectId: subject.id,
+      client: subject.displayName,
+      clientCode: subject.code,
+      manager: 'Иванов И.И.',
+      source: sourceEl ? sourceEl.value : 'Личный кабинет',
+      managerComment: commentEl ? commentEl.value.trim() : '',
+      attachmentName: (hasFile && nameEl) ? nameEl.textContent.trim() : '',
+      contracts: contracts
+    };
+  }
+
+  function createClosureRequest(doc, subject) {
+    var data = collectClosureData(doc, subject);
+    if (!data.contracts.length) {
+      alert('Выберите хотя бы один договор или счёт для закрытия.');
+      return;
+    }
+    var id = (window.CrmClosureDemo && window.CrmClosureDemo.upsertFromWizard)
+      ? window.CrmClosureDemo.upsertFromWizard(data)
+      : 'CL-2026-00017';
+    window.location.href = 'account-closure-request.html?role=manager&request=' + encodeURIComponent(id);
   }
 
   // ── Render document cards ─────────────────────────────────────────────────
@@ -1383,9 +1501,7 @@
       newGen.textContent = doc.closure ? 'Создать заявку' : 'Сформировать документ';
       genBtn.parentNode.replaceChild(newGen, genBtn);
       if (doc.closure) {
-        newGen.addEventListener('click', function () {
-          window.location.href = doc.requestHref || 'account-closure-request.html?role=manager&source=wizard';
-        });
+        newGen.addEventListener('click', function () { createClosureRequest(doc, subject); });
       } else {
         newGen.addEventListener('click', function () { generateDoc(doc, subject); });
       }

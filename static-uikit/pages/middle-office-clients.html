@@ -109,40 +109,13 @@
             </div>
           </div>
 
-          <!-- Account closure acceptance tasks -->
+          <!-- Account closure acceptance tasks (rendered from shared demo state) -->
           <section class="crm-card crm-closure-tasks" aria-label="Задачи на акцепт закрытия">
             <div class="crm-section-head">
               <h3>Задачи на акцепт закрытия</h3>
-              <span class="crm-badge warning">2</span>
+              <span class="crm-badge warning" data-role="closure-queue-count">0</span>
             </div>
-            <div class="crm-closure-task-list">
-              <article class="crm-closure-task-card">
-                <div class="crm-closure-task-main">
-                  <strong>CL-2026-00017</strong>
-                  <span>АО «Восток Майнинг Системс»</span>
-                </div>
-                <div class="crm-closure-task-meta">
-                  <code>BR-2026/00444 · DP-2026/00445</code>
-                  <span class="crm-badge warning">Ожидает акцепта</span>
-                </div>
-                <div class="crm-closure-task-aside">
-                  <a class="uk-button crm-button-primary crm-button crm-closure-task-open" href="account-closure-request.html?role=middle-office">Открыть</a>
-                </div>
-              </article>
-              <article class="crm-closure-task-card">
-                <div class="crm-closure-task-main">
-                  <strong>CL-2026-00018</strong>
-                  <span>ООО «Северный Альянс»</span>
-                </div>
-                <div class="crm-closure-task-meta">
-                  <code>BR-2026/00451</code>
-                  <span class="crm-badge warning">Ожидает акцепта</span>
-                </div>
-                <div class="crm-closure-task-aside">
-                  <a class="uk-button crm-button-primary crm-button crm-closure-task-open" href="account-closure-request.html?role=middle-office">Открыть</a>
-                </div>
-              </article>
-            </div>
+            <div class="crm-closure-task-list" data-role="closure-queue" data-queue="middle-office"></div>
           </section>
 
           <!-- Toolbar -->
@@ -595,6 +568,7 @@
 <script src="../assets/js/uikit.min.js"></script>
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
+<script src="../assets/js/pages/account-closure-state.js"></script>
 <script src="../assets/js/pages/middle-office.js"></script>
 </body>
 </html>
