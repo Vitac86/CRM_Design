@@ -109,220 +109,6 @@
                 </div>
               </article>
 
-              <section class="crm-closure-workflow" data-entity="closure-workflow" data-role="closure-root" data-role-current="manager">
-                <div class="crm-card crm-closure-banner" data-role="closure-banner">
-                  <div class="crm-closure-banner-lead">
-                    <span class="crm-closure-banner-flag" aria-hidden="true" uk-icon="info"></span>
-                    <div class="crm-closure-banner-lead-text">
-                      <div class="crm-closure-banner-titlerow">
-                        <span class="crm-closure-banner-title">Активная заявка на закрытие</span>
-                        <span class="crm-badge warning" data-role="closure-status-badge">Ожидает акцепта</span>
-                      </div>
-                      <div class="crm-closure-banner-metarow">
-                        <span class="crm-closure-banner-code">CL-2026-00017</span>
-                        <span class="crm-closure-banner-sep" aria-hidden="true">·</span>
-                        <span data-role="closure-source">Личный кабинет</span>
-                        <span class="crm-closure-banner-sep" aria-hidden="true">·</span>
-                        <span data-role="closure-created">15.06.2026 10:42</span>
-                      </div>
-                      <div class="crm-closure-banner-items" data-role="closure-banner-items">
-                        <span class="crm-closure-banner-items-label">Договоры/счета:</span>
-                        <span class="crm-closure-tagchip" data-closure-item="broker">BR-2026/00444</span>
-                        <span class="crm-closure-tagchip" data-closure-item="depository">DP-2026/00445</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="crm-closure-banner-progress">
-                    <span class="crm-closure-progress-label">Согласование</span>
-                    <div class="crm-closure-chips">
-                      <span class="crm-closure-chip" data-chip-role="depository" data-state="waiting">Депозитарий — ожидает</span>
-                      <span class="crm-closure-chip" data-chip-role="middle-office" data-state="waiting">Мидл-офис — ожидает</span>
-                      <span class="crm-closure-chip" data-chip-role="manager" data-state="unavailable">Клиентский менеджер — недоступно</span>
-                    </div>
-                    <div class="crm-closure-banner-step">
-                      <span class="crm-closure-banner-step-label">Этап:</span>
-                      <span data-role="closure-step">Депозитарий и Мидл-офис</span>
-                    </div>
-                  </div>
-
-                  <div class="crm-closure-banner-side">
-                    <div class="crm-closure-rolebar">
-                      <span class="crm-closure-rolebar-label">Роль</span>
-                      <div class="crm-closure-role-switch" role="group" aria-label="Переключение роли">
-                        <button type="button" class="crm-closure-role-chip is-active" data-action="set-closure-role" data-role-value="manager" aria-pressed="true">Менеджер</button>
-                        <button type="button" class="crm-closure-role-chip" data-action="set-closure-role" data-role-value="depository" aria-pressed="false">Депозитарий</button>
-                        <button type="button" class="crm-closure-role-chip" data-action="set-closure-role" data-role-value="middle-office" aria-pressed="false">Мидл-офис</button>
-                      </div>
-                    </div>
-
-                    <div class="crm-closure-action" data-role="closure-action">
-                      <div class="crm-closure-action-block" data-action-for="manager">
-                        <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act crm-closure-act-final" data-action="closure-final" disabled>Закрыть счёт</button>
-                        <span class="crm-closure-action-hint" data-role="closure-final-hint">Доступно после акцепта Депозитария и Мидл-офиса</span>
-                      </div>
-                      <div class="crm-closure-action-block" data-action-for="depository">
-                        <span class="crm-closure-action-task">Требуется акцепт Депозитария</span>
-                        <div class="crm-closure-action-buttons">
-                          <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept" data-decision-role="depository">Акцептовать</button>
-                          <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return" data-decision-role="depository">Вернуть</button>
-                        </div>
-                      </div>
-                      <div class="crm-closure-action-block" data-action-for="middle-office">
-                        <span class="crm-closure-action-task">Требуется акцепт Мидл-офиса</span>
-                        <div class="crm-closure-action-buttons">
-                          <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept" data-decision-role="middle-office">Акцептовать</button>
-                          <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return" data-decision-role="middle-office">Вернуть</button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button type="button" class="uk-button uk-button-default crm-button crm-closure-details-btn" data-action="open-closure-drawer">Открыть детали</button>
-                  </div>
-                </div>
-
-                <!-- Closure details drawer -->
-                <div class="crm-closure-drawer" data-role="closure-drawer" hidden>
-                  <div class="crm-closure-drawer-backdrop" data-action="close-closure-drawer"></div>
-                  <aside class="crm-closure-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="closure-drawer-title">
-                    <header class="crm-closure-drawer-head">
-                      <div class="crm-closure-drawer-head-info">
-                        <span class="crm-closure-drawer-eyebrow">Заявка на закрытие</span>
-                        <h3 id="closure-drawer-title">CL-2026-00017</h3>
-                      </div>
-                      <div class="crm-closure-drawer-head-right">
-                        <span class="crm-badge warning" data-role="closure-status-badge">Ожидает акцепта</span>
-                        <button type="button" class="crm-closure-drawer-close" data-action="close-closure-drawer" aria-label="Закрыть">×</button>
-                      </div>
-                    </header>
-
-                    <div class="crm-closure-drawer-body">
-                      <dl class="crm-closure-drawer-meta">
-                        <div class="crm-closure-drawer-meta-item">
-                          <dt>Источник</dt>
-                          <dd data-role="closure-source">Личный кабинет</dd>
-                        </div>
-                        <div class="crm-closure-drawer-meta-item">
-                          <dt>Создана</dt>
-                          <dd data-role="closure-created">15.06.2026 10:42</dd>
-                        </div>
-                        <div class="crm-closure-drawer-meta-item">
-                          <dt>Клиент</dt>
-                          <dd>АО «Восток Майнинг Системс»</dd>
-                        </div>
-                        <div class="crm-closure-drawer-meta-item">
-                          <dt>Код клиента</dt>
-                          <dd>INV-1011</dd>
-                        </div>
-                        <div class="crm-closure-drawer-meta-item">
-                          <dt>Текущий этап</dt>
-                          <dd data-role="closure-step">Депозитарий и Мидл-офис</dd>
-                        </div>
-                        <div class="crm-closure-drawer-meta-item">
-                          <dt>Уведомления</dt>
-                          <dd data-role="closure-notify">Уведомления отправлены</dd>
-                        </div>
-                      </dl>
-
-                      <section class="crm-closure-drawer-section">
-                        <h4 class="crm-closure-drawer-subtitle">Договоры и счета</h4>
-                        <ul class="crm-closure-items-list" data-role="closure-items">
-                          <li class="crm-closure-item" data-closure-item="broker">
-                            <div class="crm-closure-item-main">
-                              <span class="crm-closure-item-contract">BR-2026/00444</span>
-                              <span class="crm-closure-item-sub">Брокерский · счёт 30601-000-4401</span>
-                            </div>
-                            <span class="crm-badge success" data-role="closure-item-status">Действующий</span>
-                          </li>
-                          <li class="crm-closure-item" data-closure-item="depository">
-                            <div class="crm-closure-item-main">
-                              <span class="crm-closure-item-contract">DP-2026/00445</span>
-                              <span class="crm-closure-item-sub">Депозитарный · счёт 30-016-00041-DP</span>
-                            </div>
-                            <span class="crm-badge success" data-role="closure-item-status">Действующий</span>
-                          </li>
-                        </ul>
-                      </section>
-
-                      <section class="crm-closure-drawer-section">
-                        <h4 class="crm-closure-drawer-subtitle">Согласования</h4>
-                        <div class="crm-closure-decisions">
-                          <div class="crm-closure-decision-row" data-decision-role="depository" data-state="waiting">
-                            <div class="crm-closure-decision-info">
-                              <span class="crm-closure-decision-name">Депозитарий</span>
-                              <div class="crm-closure-decision-meta">
-                                <span class="crm-badge warning" data-role="decision-badge">Ожидает</span>
-                                <span class="crm-closure-decision-user" data-role="decision-user">—</span>
-                                <span class="crm-closure-decision-date" data-role="decision-date">—</span>
-                              </div>
-                            </div>
-                            <div class="crm-closure-decision-actions">
-                              <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept" data-decision-role="depository">Акцептовать</button>
-                              <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return" data-decision-role="depository">Вернуть</button>
-                            </div>
-                          </div>
-
-                          <div class="crm-closure-decision-row" data-decision-role="middle-office" data-state="waiting">
-                            <div class="crm-closure-decision-info">
-                              <span class="crm-closure-decision-name">Мидл-офис</span>
-                              <div class="crm-closure-decision-meta">
-                                <span class="crm-badge warning" data-role="decision-badge">Ожидает</span>
-                                <span class="crm-closure-decision-user" data-role="decision-user">—</span>
-                                <span class="crm-closure-decision-date" data-role="decision-date">—</span>
-                              </div>
-                            </div>
-                            <div class="crm-closure-decision-actions">
-                              <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept" data-decision-role="middle-office">Акцептовать</button>
-                              <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return" data-decision-role="middle-office">Вернуть</button>
-                            </div>
-                          </div>
-
-                          <div class="crm-closure-decision-row crm-closure-decision-row--final" data-decision-role="manager" data-state="unavailable">
-                            <div class="crm-closure-decision-info">
-                              <span class="crm-closure-decision-name">Клиентский менеджер</span>
-                              <div class="crm-closure-decision-meta">
-                                <span class="crm-badge muted" data-role="decision-badge">Недоступно</span>
-                                <span class="crm-closure-decision-user" data-role="decision-user">Иванов И.И.</span>
-                                <span class="crm-closure-decision-date" data-role="decision-date">—</span>
-                              </div>
-                            </div>
-                            <div class="crm-closure-decision-actions">
-                              <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act crm-closure-act-final" data-action="closure-final" disabled>Закрыть счёт</button>
-                              <span class="crm-closure-decision-hint" data-role="closure-final-hint">Доступно после акцепта Депозитария и Мидл-офиса</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="crm-closure-reason" data-role="closure-reason" hidden>
-                          <span class="crm-closure-reason-label">Возврат на уточнение</span>
-                          <p class="crm-closure-reason-text" data-role="closure-reason-text"></p>
-                        </div>
-
-                        <div class="crm-closure-comment">
-                          <label class="crm-closure-comment-label" for="closure-comment">Комментарий к решению</label>
-                          <textarea class="uk-textarea crm-input" id="closure-comment" data-role="closure-comment" rows="3" placeholder="Укажите причину возврата или комментарий к акцепту"></textarea>
-                          <span class="crm-closure-comment-error" data-role="closure-comment-error" hidden>Укажите комментарий для возврата на уточнение.</span>
-                        </div>
-                      </section>
-
-                      <section class="crm-closure-drawer-section">
-                        <h4 class="crm-closure-drawer-subtitle">История</h4>
-                        <ul class="crm-closure-timeline-list" data-role="closure-timeline">
-                          <li class="crm-closure-event">
-                            <span class="crm-closure-event-time">15.06.2026 10:42</span>
-                            <span class="crm-closure-event-text">Заявка получена из Личного кабинета</span>
-                          </li>
-                          <li class="crm-closure-event">
-                            <span class="crm-closure-event-time">15.06.2026 10:43</span>
-                            <span class="crm-closure-event-text">Уведомления отправлены ответственным сотрудникам</span>
-                          </li>
-                        </ul>
-                      </section>
-                    </div>
-                  </aside>
-                </div>
-              </section>
-
               <div class="crm-subject-tabs-wrap" data-entity="subject-sections">
                 <ul class="crm-tabs crm-detail-tabs crm-subject-tabs" uk-tab="connect: .crm-subject-switcher; animation: uk-animation-fade">
                   <li class="uk-active">
@@ -1224,7 +1010,6 @@
                                 <th>Дата открытия</th>
                                 <th>Дата закрытия</th>
                                 <th>Статус</th>
-                                <th class="crm-contracts-action-th">Действие</th>
                               </tr>
                             </thead>
                             <tbody data-role="contracts-tbody">
@@ -1237,10 +1022,6 @@
                                 <td>—</td>
                                 <td>
                                   <span class="crm-badge success">Действующий</span>
-                                  <span class="crm-badge info crm-closure-tag" data-role="closure-tag" data-closure-item="other" hidden>В заявке на закрытие</span>
-                                </td>
-                                <td class="crm-contracts-action-td">
-                                  <button class="uk-button uk-button-default crm-button crm-closure-row-btn" type="button" data-action="row-close-request" data-closure-item="other" data-contract="IN-2026/00011">Закрыть</button>
                                 </td>
                               </tr>
                               <tr>
@@ -1252,10 +1033,6 @@
                                 <td>—</td>
                                 <td>
                                   <span class="crm-badge success">Действующий</span>
-                                  <span class="crm-badge info crm-closure-tag" data-role="closure-tag" data-closure-item="broker">В заявке на закрытие</span>
-                                </td>
-                                <td class="crm-contracts-action-td">
-                                  <button class="uk-button uk-button-default crm-button crm-closure-row-btn" type="button" data-action="row-close-request" data-closure-item="broker" data-contract="BR-2026/00444" disabled>В заявке</button>
                                 </td>
                               </tr>
                               <tr>
@@ -1267,10 +1044,6 @@
                                 <td>—</td>
                                 <td>
                                   <span class="crm-badge success">Действующий</span>
-                                  <span class="crm-badge info crm-closure-tag" data-role="closure-tag" data-closure-item="depository">В заявке на закрытие</span>
-                                </td>
-                                <td class="crm-contracts-action-td">
-                                  <button class="uk-button uk-button-default crm-button crm-closure-row-btn" type="button" data-action="row-close-request" data-closure-item="depository" data-contract="DP-2026/00445" disabled>В заявке</button>
                                 </td>
                               </tr>
                             </tbody>
@@ -1328,7 +1101,7 @@
                             </thead>
                             <tbody data-role="client-accounts-tbody">
                               <tr>
-                                <td><span class="crm-closure-cell"><span>30601-000-4401</span><span class="crm-badge info crm-closure-tag" data-role="closure-tag" data-closure-item="broker">В заявке на закрытие</span></span></td>
+                                <td>30601-000-4401</td>
                                 <td>Брокерский</td>
                                 <td>22.01.2021</td>
                               </tr>
@@ -1338,7 +1111,7 @@
                                 <td>14.07.2023</td>
                               </tr>
                               <tr>
-                                <td><span class="crm-closure-cell"><span>30-016-00041-DP</span><span class="crm-badge info crm-closure-tag" data-role="closure-tag" data-closure-item="depository">В заявке на закрытие</span></span></td>
+                                <td>30-016-00041-DP</td>
                                 <td>Депозитарный</td>
                                 <td>26.04.2026</td>
                               </tr>
@@ -1431,109 +1204,6 @@
                   </section>
                 </li>
               </ul>
-            </div>
-
-            <!-- ── Closure request creation modal ── -->
-            <div class="crm-closure-modal" data-role="closure-modal" hidden>
-              <div class="crm-closure-modal-backdrop" data-action="close-closure-modal"></div>
-              <div class="crm-closure-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="closure-modal-title">
-                <div class="crm-closure-modal-head">
-                  <h3 id="closure-modal-title">Создать заявку на закрытие</h3>
-                  <button class="crm-closure-modal-close" type="button" data-action="close-closure-modal" aria-label="Закрыть">×</button>
-                </div>
-
-                <div class="crm-closure-modal-body">
-                  <p class="crm-closure-modal-subtitle">Будет создана заявка на закрытие выбранных договоров и связанных счетов.</p>
-                  <div class="crm-closure-form-grid">
-                    <div class="crm-closure-form-field">
-                      <label class="crm-closure-form-label" for="closure-source">Источник заявки</label>
-                      <select class="uk-select crm-input" id="closure-source" data-role="closure-form-source">
-                        <option value="Личный кабинет">Личный кабинет</option>
-                        <option value="Email">Email</option>
-                        <option value="Офис / бумажное заявление">Офис / бумажное заявление</option>
-                        <option value="Другое">Другое</option>
-                      </select>
-                    </div>
-                    <div class="crm-closure-form-field">
-                      <label class="crm-closure-form-label" for="closure-request-date">Дата заявления клиента</label>
-                      <div class="crm-date-field">
-                        <input class="uk-input crm-input crm-date-input" id="closure-request-date" type="date" value="2026-06-15" data-role="closure-form-date" data-date-input/>
-                        <button class="crm-date-trigger" type="button" data-date-trigger aria-label="Открыть календарь" uk-icon="calendar"></button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="crm-closure-form-block">
-                    <span class="crm-closure-form-label">Договоры и счета к закрытию</span>
-                    <div class="crm-table-wrapper crm-table-card crm-closure-form-table-wrap">
-                      <div class="crm-table crm-table-compact">
-                        <table class="uk-table uk-table-divider uk-table-small crm-closure-form-table">
-                          <thead>
-                            <tr>
-                              <th class="crm-closure-form-th-check"><span class="uk-hidden">Выбор</span></th>
-                              <th>Договор</th>
-                              <th>Вид договора</th>
-                              <th>Счёт</th>
-                              <th>Вид счёта</th>
-                              <th>Текущий статус</th>
-                              <th>Цель закрытия</th>
-                            </tr>
-                          </thead>
-                          <tbody data-role="closure-form-rows">
-                            <tr>
-                              <td><input type="checkbox" class="uk-checkbox" data-role="closure-form-check" data-closure-item="broker" data-contract="BR-2026/00444" data-account="30601-000-4401" checked/></td>
-                              <td>BR-2026/00444</td>
-                              <td>Брокерский</td>
-                              <td>30601-000-4401</td>
-                              <td>Брокерский</td>
-                              <td><span class="crm-badge success">Действующий</span></td>
-                              <td>Полное закрытие</td>
-                            </tr>
-                            <tr>
-                              <td><input type="checkbox" class="uk-checkbox" data-role="closure-form-check" data-closure-item="depository" data-contract="DP-2026/00445" data-account="30-016-00041-DP" checked/></td>
-                              <td>DP-2026/00445</td>
-                              <td>Депозитарный</td>
-                              <td>30-016-00041-DP</td>
-                              <td>Депозитарный</td>
-                              <td><span class="crm-badge success">Действующий</span></td>
-                              <td>Полное закрытие</td>
-                            </tr>
-                            <tr>
-                              <td><input type="checkbox" class="uk-checkbox" data-role="closure-form-check" data-closure-item="other" data-contract="IN-2026/00011" data-account="40701-USD-4401"/></td>
-                              <td>IN-2026/00011</td>
-                              <td>Иной</td>
-                              <td>40701-USD-4401</td>
-                              <td>Иной</td>
-                              <td><span class="crm-badge success">Действующий</span></td>
-                              <td>Полное закрытие</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="crm-closure-form-summary" data-role="closure-form-summary">Выбрано позиций: 2</div>
-                    <p class="crm-closure-form-error" data-role="closure-form-error" hidden>Выберите хотя бы один договор/счёт для закрытия.</p>
-                  </div>
-
-                  <div class="crm-closure-form-field">
-                    <label class="crm-closure-form-label" for="closure-form-comment">Комментарий</label>
-                    <textarea class="uk-textarea crm-input" id="closure-form-comment" rows="2" data-role="closure-form-comment" placeholder="Комментарий менеджера к заявке"></textarea>
-                  </div>
-
-                  <div class="crm-closure-attachment">
-                    <span class="crm-closure-attachment-icon" uk-icon="file-text" aria-hidden="true"></span>
-                    <div class="crm-closure-attachment-body">
-                      <span class="crm-closure-attachment-name">Заявление_на_закрытие.pdf</span>
-                      <span class="crm-closure-attachment-note">Static demo: файл не загружается на сервер</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="crm-closure-modal-actions">
-                  <button class="uk-button uk-button-default crm-button" type="button" data-action="close-closure-modal">Отмена</button>
-                  <button class="uk-button crm-button-primary crm-button" type="button" data-action="submit-closure-modal">Создать заявку</button>
-                </div>
-              </div>
             </div>
 
           </div>
