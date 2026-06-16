@@ -140,6 +140,10 @@
                       <span class="crm-closure-chip" data-chip-role="middle-office" data-state="waiting">Мидл-офис — ожидает</span>
                       <span class="crm-closure-chip" data-chip-role="manager" data-state="unavailable">Клиентский менеджер — недоступно</span>
                     </div>
+                    <div class="crm-closure-banner-step">
+                      <span class="crm-closure-banner-step-label">Этап:</span>
+                      <span data-role="closure-step">Депозитарий и Мидл-офис</span>
+                    </div>
                   </div>
 
                   <div class="crm-closure-banner-side">
@@ -215,8 +219,8 @@
                           <dd data-role="closure-step">Депозитарий и Мидл-офис</dd>
                         </div>
                         <div class="crm-closure-drawer-meta-item">
-                          <dt>Комментарий менеджера</dt>
-                          <dd data-role="closure-manager-comment">По инициативе клиента</dd>
+                          <dt>Уведомления</dt>
+                          <dd data-role="closure-notify">Уведомления отправлены</dd>
                         </div>
                       </dl>
 
@@ -240,101 +244,64 @@
                         </ul>
                       </section>
 
-                      <section class="crm-closure-drawer-section crm-closure-user-decision" data-role="closure-user-decision">
-                        <h4 class="crm-closure-drawer-subtitle">Ваше решение</h4>
-                        <p class="crm-closure-user-task" data-role="closure-user-task">Требуется акцепт Депозитария</p>
-                        <div class="crm-closure-user-statusline">
-                          <span class="crm-closure-user-statusline-label">Статус</span>
-                          <span class="crm-badge warning" data-role="closure-user-status-badge">Ожидает</span>
-                        </div>
-
-                        <div class="crm-closure-user-active" data-role="closure-user-active" hidden>
-                          <div class="crm-closure-comment">
-                            <label class="crm-closure-comment-label" for="closure-comment">Комментарий к решению</label>
-                            <textarea class="uk-textarea crm-input" id="closure-comment" data-role="closure-comment" rows="3" placeholder="Укажите комментарий к акцепту или причину возврата"></textarea>
-                            <span class="crm-closure-comment-error" data-role="closure-comment-error" hidden>Укажите комментарий для возврата на уточнение.</span>
-                          </div>
-                          <div class="crm-closure-user-actions">
-                            <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept">Акцептовать</button>
-                            <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return">Вернуть на уточнение</button>
-                          </div>
-                        </div>
-
-                        <div class="crm-closure-user-final" data-role="closure-user-final" hidden>
-                          <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act crm-closure-act-final" data-action="closure-final" disabled>Закрыть счёт</button>
-                          <span class="crm-closure-decision-hint" data-role="closure-final-hint">Доступно после акцепта Депозитария и Мидл-офиса</span>
-                        </div>
-
-                        <div class="crm-closure-user-done" data-role="closure-user-done" hidden>
-                          <p class="crm-closure-user-done-title" data-role="closure-user-done-title">Решение уже принято</p>
-                          <dl class="crm-closure-decision-meta">
-                            <div class="crm-closure-decision-meta-item">
-                              <dt>Пользователь</dt>
-                              <dd data-role="closure-user-done-user">—</dd>
-                            </div>
-                            <div class="crm-closure-decision-meta-item">
-                              <dt>Дата</dt>
-                              <dd data-role="closure-user-done-date">—</dd>
-                            </div>
-                          </dl>
-                          <p class="crm-closure-user-done-reason" data-role="closure-user-done-reason" hidden></p>
-                        </div>
-                      </section>
-
                       <section class="crm-closure-drawer-section">
                         <h4 class="crm-closure-drawer-subtitle">Согласования</h4>
-                        <p class="crm-closure-checklist-note">Текущие статусы согласования. Действия выполняются в блоке «Ваше решение».</p>
                         <div class="crm-closure-decisions">
                           <div class="crm-closure-decision-row" data-decision-role="depository" data-state="waiting">
-                            <div class="crm-closure-decision-header">
+                            <div class="crm-closure-decision-info">
                               <span class="crm-closure-decision-name">Депозитарий</span>
-                              <span class="crm-badge warning" data-role="decision-badge">Ожидает</span>
+                              <div class="crm-closure-decision-meta">
+                                <span class="crm-badge warning" data-role="decision-badge">Ожидает</span>
+                                <span class="crm-closure-decision-user" data-role="decision-user">—</span>
+                                <span class="crm-closure-decision-date" data-role="decision-date">—</span>
+                              </div>
                             </div>
-                            <dl class="crm-closure-decision-meta">
-                              <div class="crm-closure-decision-meta-item">
-                                <dt>Пользователь</dt>
-                                <dd data-role="decision-user">—</dd>
-                              </div>
-                              <div class="crm-closure-decision-meta-item">
-                                <dt>Дата</dt>
-                                <dd data-role="decision-date">—</dd>
-                              </div>
-                            </dl>
+                            <div class="crm-closure-decision-actions">
+                              <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept" data-decision-role="depository">Акцептовать</button>
+                              <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return" data-decision-role="depository">Вернуть</button>
+                            </div>
                           </div>
 
                           <div class="crm-closure-decision-row" data-decision-role="middle-office" data-state="waiting">
-                            <div class="crm-closure-decision-header">
+                            <div class="crm-closure-decision-info">
                               <span class="crm-closure-decision-name">Мидл-офис</span>
-                              <span class="crm-badge warning" data-role="decision-badge">Ожидает</span>
+                              <div class="crm-closure-decision-meta">
+                                <span class="crm-badge warning" data-role="decision-badge">Ожидает</span>
+                                <span class="crm-closure-decision-user" data-role="decision-user">—</span>
+                                <span class="crm-closure-decision-date" data-role="decision-date">—</span>
+                              </div>
                             </div>
-                            <dl class="crm-closure-decision-meta">
-                              <div class="crm-closure-decision-meta-item">
-                                <dt>Пользователь</dt>
-                                <dd data-role="decision-user">—</dd>
-                              </div>
-                              <div class="crm-closure-decision-meta-item">
-                                <dt>Дата</dt>
-                                <dd data-role="decision-date">—</dd>
-                              </div>
-                            </dl>
+                            <div class="crm-closure-decision-actions">
+                              <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act" data-action="closure-accept" data-decision-role="middle-office">Акцептовать</button>
+                              <button type="button" class="uk-button uk-button-default crm-button crm-closure-act crm-closure-act-return" data-action="closure-return" data-decision-role="middle-office">Вернуть</button>
+                            </div>
                           </div>
 
                           <div class="crm-closure-decision-row crm-closure-decision-row--final" data-decision-role="manager" data-state="unavailable">
-                            <div class="crm-closure-decision-header">
+                            <div class="crm-closure-decision-info">
                               <span class="crm-closure-decision-name">Клиентский менеджер</span>
-                              <span class="crm-badge muted" data-role="decision-badge">Недоступно</span>
+                              <div class="crm-closure-decision-meta">
+                                <span class="crm-badge muted" data-role="decision-badge">Недоступно</span>
+                                <span class="crm-closure-decision-user" data-role="decision-user">Иванов И.И.</span>
+                                <span class="crm-closure-decision-date" data-role="decision-date">—</span>
+                              </div>
                             </div>
-                            <dl class="crm-closure-decision-meta">
-                              <div class="crm-closure-decision-meta-item">
-                                <dt>Пользователь</dt>
-                                <dd data-role="decision-user">Иванов И.И.</dd>
-                              </div>
-                              <div class="crm-closure-decision-meta-item">
-                                <dt>Дата</dt>
-                                <dd data-role="decision-date">—</dd>
-                              </div>
-                            </dl>
+                            <div class="crm-closure-decision-actions">
+                              <button type="button" class="uk-button crm-button-primary crm-button crm-closure-act crm-closure-act-final" data-action="closure-final" disabled>Закрыть счёт</button>
+                              <span class="crm-closure-decision-hint" data-role="closure-final-hint">Доступно после акцепта Депозитария и Мидл-офиса</span>
+                            </div>
                           </div>
+                        </div>
+
+                        <div class="crm-closure-reason" data-role="closure-reason" hidden>
+                          <span class="crm-closure-reason-label">Возврат на уточнение</span>
+                          <p class="crm-closure-reason-text" data-role="closure-reason-text"></p>
+                        </div>
+
+                        <div class="crm-closure-comment">
+                          <label class="crm-closure-comment-label" for="closure-comment">Комментарий к решению</label>
+                          <textarea class="uk-textarea crm-input" id="closure-comment" data-role="closure-comment" rows="3" placeholder="Укажите причину возврата или комментарий к акцепту"></textarea>
+                          <span class="crm-closure-comment-error" data-role="closure-comment-error" hidden>Укажите комментарий для возврата на уточнение.</span>
                         </div>
                       </section>
 
@@ -345,23 +312,14 @@
                             <span class="crm-closure-event-time">15.06.2026 10:42</span>
                             <span class="crm-closure-event-text">Заявка получена из Личного кабинета</span>
                           </li>
+                          <li class="crm-closure-event">
+                            <span class="crm-closure-event-time">15.06.2026 10:43</span>
+                            <span class="crm-closure-event-text">Уведомления отправлены ответственным сотрудникам</span>
+                          </li>
                         </ul>
                       </section>
                     </div>
                   </aside>
-                </div>
-
-                <!-- Confirmation modal (acceptance / final closure) -->
-                <div class="crm-closure-confirm" data-role="closure-confirm" hidden>
-                  <div class="crm-closure-confirm-backdrop" data-action="closure-confirm-cancel"></div>
-                  <div class="crm-closure-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="closure-confirm-title">
-                    <h3 id="closure-confirm-title" class="crm-closure-confirm-title">Подтверждение</h3>
-                    <p class="crm-closure-confirm-text" data-role="closure-confirm-text"></p>
-                    <div class="crm-closure-confirm-actions">
-                      <button type="button" class="uk-button uk-button-default crm-button" data-action="closure-confirm-cancel">Отмена</button>
-                      <button type="button" class="uk-button crm-button-primary crm-button" data-action="closure-confirm-ok">Подтвердить</button>
-                    </div>
-                  </div>
                 </div>
               </section>
 
@@ -1514,9 +1472,11 @@
                             <tr>
                               <th class="crm-closure-form-th-check"><span class="uk-hidden">Выбор</span></th>
                               <th>Договор</th>
-                              <th>Вид</th>
+                              <th>Вид договора</th>
                               <th>Счёт</th>
-                              <th>Статус</th>
+                              <th>Вид счёта</th>
+                              <th>Текущий статус</th>
+                              <th>Цель закрытия</th>
                             </tr>
                           </thead>
                           <tbody data-role="closure-form-rows">
@@ -1525,21 +1485,27 @@
                               <td>BR-2026/00444</td>
                               <td>Брокерский</td>
                               <td>30601-000-4401</td>
+                              <td>Брокерский</td>
                               <td><span class="crm-badge success">Действующий</span></td>
+                              <td>Полное закрытие</td>
                             </tr>
                             <tr>
                               <td><input type="checkbox" class="uk-checkbox" data-role="closure-form-check" data-closure-item="depository" data-contract="DP-2026/00445" data-account="30-016-00041-DP" checked/></td>
                               <td>DP-2026/00445</td>
                               <td>Депозитарный</td>
                               <td>30-016-00041-DP</td>
+                              <td>Депозитарный</td>
                               <td><span class="crm-badge success">Действующий</span></td>
+                              <td>Полное закрытие</td>
                             </tr>
                             <tr>
                               <td><input type="checkbox" class="uk-checkbox" data-role="closure-form-check" data-closure-item="other" data-contract="IN-2026/00011" data-account="40701-USD-4401"/></td>
                               <td>IN-2026/00011</td>
                               <td>Иной</td>
                               <td>40701-USD-4401</td>
+                              <td>Иной</td>
                               <td><span class="crm-badge success">Действующий</span></td>
+                              <td>Полное закрытие</td>
                             </tr>
                           </tbody>
                         </table>
@@ -1554,19 +1520,12 @@
                     <textarea class="uk-textarea crm-input" id="closure-form-comment" rows="2" data-role="closure-form-comment" placeholder="Комментарий менеджера к заявке"></textarea>
                   </div>
 
-                  <div class="crm-closure-dropzone" data-role="closure-dropzone" tabindex="0" role="button" aria-describedby="closure-dropzone-help">
-                    <input type="file" class="crm-closure-dropzone-input" data-role="closure-dropzone-input" hidden/>
-                    <span class="crm-closure-dropzone-icon" uk-icon="cloud-upload" aria-hidden="true"></span>
-                    <div class="crm-closure-dropzone-prompt" data-role="closure-dropzone-prompt">
-                      <strong class="crm-closure-dropzone-title">Перетащите файл заявления сюда</strong>
-                      <span class="crm-closure-dropzone-subtitle">или выберите файл вручную</span>
+                  <div class="crm-closure-attachment">
+                    <span class="crm-closure-attachment-icon" uk-icon="file-text" aria-hidden="true"></span>
+                    <div class="crm-closure-attachment-body">
+                      <span class="crm-closure-attachment-name">Заявление_на_закрытие.pdf</span>
+                      <span class="crm-closure-attachment-note">Static demo: файл не загружается на сервер</span>
                     </div>
-                    <div class="crm-closure-dropzone-selected" data-role="closure-dropzone-selected" hidden>
-                      <span class="crm-closure-dropzone-file-icon" uk-icon="file-text" aria-hidden="true"></span>
-                      <span class="crm-closure-dropzone-file-name" data-role="closure-dropzone-file-name">Заявление_на_закрытие.pdf</span>
-                      <button type="button" class="crm-closure-dropzone-remove" data-action="closure-dropzone-remove" aria-label="Убрать файл">×</button>
-                    </div>
-                    <p id="closure-dropzone-help" class="crm-closure-dropzone-help">Static demo: файл не загружается на сервер</p>
                   </div>
                 </div>
 

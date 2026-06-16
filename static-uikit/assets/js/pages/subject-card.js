@@ -891,7 +891,6 @@
 
   function setClosureRole(role) {
     if (!closureRoot) return;
-    setClosureCommentError(false);
     closureState.role = role;
     closureRoot.setAttribute('data-role-current', role);
     closureRoot.querySelectorAll('[data-action="set-closure-role"]').forEach(function (btn) {
@@ -1068,87 +1067,30 @@
     }
 
     syncClosureButtons(both);
-    renderUserDecision(both, anyReturned);
+
+    var reasonBox = closureOne('[data-role="closure-reason"]');
+    var reasonText = closureOne('[data-role="closure-reason-text"]');
+    var parts = [];
+    ['depository', 'middle-office'].forEach(function (role) {
+      if (closureState.decisions[role] === 'returned' && closureState.reasons[role]) {
+        parts.push(CLOSURE_ROLE_NAMES[role] + ': ' + closureState.reasons[role]);
+      }
+    });
+    if (reasonBox && reasonText) {
+      if (parts.length && !closureState.closed) {
+        reasonText.textContent = parts.join('\n');
+        reasonBox.hidden = false;
+      } else {
+        reasonBox.hidden = true;
+      }
+    }
 
     updateClosureTableTags();
     updateClosureRowActions();
   }
 
-  /* Role-focused "Ваше решение" block — the only active action area in the drawer. */
-  function renderUserDecision(both, anyReturned) {
-    if (!closureRoot) return;
-    var role = closureState.role;
-
-    var taskEl = closureOne('[data-role="closure-user-task"]');
-    var statusBadge = closureOne('[data-role="closure-user-status-badge"]');
-    var activeEl = closureOne('[data-role="closure-user-active"]');
-    var finalEl = closureOne('[data-role="closure-user-final"]');
-    var doneEl = closureOne('[data-role="closure-user-done"]');
-    var doneTitle = closureOne('[data-role="closure-user-done-title"]');
-    var doneUser = closureOne('[data-role="closure-user-done-user"]');
-    var doneDate = closureOne('[data-role="closure-user-done-date"]');
-    var doneReason = closureOne('[data-role="closure-user-done-reason"]');
-
-    if (activeEl) activeEl.hidden = true;
-    if (finalEl) finalEl.hidden = true;
-    if (doneEl) doneEl.hidden = true;
-
-    function showDone(title, badgeText, badgeCls, info, reason) {
-      if (taskEl) taskEl.textContent = title;
-      if (doneTitle) doneTitle.textContent = title;
-      setBadgeEl(statusBadge, badgeText, badgeCls);
-      if (doneUser) doneUser.textContent = (info && info.user) || '—';
-      if (doneDate) doneDate.textContent = (info && info.date) || '—';
-      if (doneReason) {
-        if (reason) { doneReason.textContent = 'Причина: ' + reason; doneReason.hidden = false; }
-        else doneReason.hidden = true;
-      }
-      if (doneEl) doneEl.hidden = false;
-    }
-
-    if (closureState.closed) {
-      var closedInfo = role === 'manager'
-        ? { user: 'Иванов И.И.', date: closureState.finalDate }
-        : closureState.decisionInfo[role];
-      showDone('Заявка закрыта', 'Закрыта', 'success', closedInfo, null);
-      return;
-    }
-
-    if (role === 'manager') {
-      if (taskEl) taskEl.textContent = 'Финальное закрытие';
-      if (both) setBadgeEl(statusBadge, 'Готово к закрытию', 'info');
-      else if (anyReturned) setBadgeEl(statusBadge, 'Возвращена на уточнение', 'danger');
-      else setBadgeEl(statusBadge, 'Недоступно', 'muted');
-      if (finalEl) finalEl.hidden = false;
-      return;
-    }
-
-    var st = closureState.decisions[role];
-    var taskText = role === 'depository' ? 'Требуется акцепт Депозитария' : 'Требуется акцепт Мидл-офиса';
-
-    if (st === 'accepted') {
-      showDone('Решение уже принято', 'Акцептовано', 'success', closureState.decisionInfo[role], null);
-      return;
-    }
-    if (st === 'returned') {
-      showDone('Заявка возвращена на уточнение', 'Возвращено', 'danger', closureState.decisionInfo[role], closureState.reasons[role]);
-      return;
-    }
-    if (anyReturned) {
-      var returner = closureState.decisions.depository === 'returned' ? 'depository' : 'middle-office';
-      showDone('Заявка возвращена на уточнение', 'Возвращено', 'danger', closureState.decisionInfo[returner], closureState.reasons[returner]);
-      return;
-    }
-
-    /* waiting → active action area */
-    if (taskEl) taskEl.textContent = taskText;
-    setBadgeEl(statusBadge, 'Ожидает', 'warning');
-    if (activeEl) activeEl.hidden = false;
-  }
-
   function acceptClosureDecision(role) {
-    if (closureState.closed || !role || role === 'manager') return;
-    setClosureCommentError(false);
+    if (closureState.closed || role === 'manager') return;
     closureState.decisions[role] = 'accepted';
     closureState.reasons[role] = '';
     closureState.decisionInfo[role] = { user: CLOSURE_USERS[role] || '—', date: closureNow() };
@@ -1158,20 +1100,14 @@
     recomputeClosure();
   }
 
-  /* Return for clarification: comment + action live together in "Ваше решение".
-     Clicking "Вернуть на уточнение" returns immediately once a comment is present. */
   function returnClosureDecision(role) {
-    if (closureState.closed || !role || role === 'manager') return;
+    if (closureState.closed || role === 'manager') return;
     var comment = getClosureComment();
     if (!comment) {
-      // Ensure the comment field is visible (e.g. when triggered from the compact banner).
       setClosureDrawerState(true);
       setClosureCommentError(true);
       var ta = closureOne('[data-role="closure-comment"]');
-      if (ta) {
-        if (ta.scrollIntoView) ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        ta.focus();
-      }
+      if (ta) ta.focus();
       return;
     }
     setClosureCommentError(false);
@@ -1203,7 +1139,6 @@
       }
       document.body.classList.add('crm-modal-open');
     } else {
-      setClosureCommentError(false);
       drawer.classList.remove('is-visible');
       document.body.classList.remove('crm-modal-open');
       window.setTimeout(function () { drawer.hidden = true; }, 220);
@@ -1283,14 +1218,14 @@
 
     setClosureText('closure-source', source);
     setClosureText('closure-created', closureNow());
-    setClosureText('closure-manager-comment', comment || '—');
     var commentTa = closureOne('[data-role="closure-comment"]');
     if (commentTa) commentTa.value = '';
     setClosureCommentError(false);
 
     var timeline = closureOne('[data-role="closure-timeline"]');
     if (timeline) timeline.innerHTML = '';
-    addTimelineEvent('Заявка создана менеджером вручную · источник: ' + source + ' · комментарий: ' + (comment || '—'));
+    addTimelineEvent('Заявка создана менеджером вручную · источник: ' + source + (comment ? ' · ' + comment : ''));
+    addTimelineEvent('Уведомления отправлены ответственным сотрудникам');
 
     recomputeClosure();
     setClosureModalState(false);
@@ -1299,152 +1234,6 @@
     if (banner && banner.scrollIntoView) {
       banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-  }
-
-  /* ─── Attachment dropzone (static demo, no upload) ─────────────────────── */
-
-  function getClosureDropzone() {
-    return subjectCardPage.querySelector('[data-role="closure-dropzone"]');
-  }
-
-  function selectClosureFile(name) {
-    var dz = getClosureDropzone();
-    if (!dz) return;
-    var nameEl = dz.querySelector('[data-role="closure-dropzone-file-name"]');
-    if (nameEl && name) nameEl.textContent = name;
-    var selected = dz.querySelector('[data-role="closure-dropzone-selected"]');
-    if (selected) selected.hidden = false;
-    dz.classList.add('is-selected');
-    dz.classList.remove('is-dragover');
-  }
-
-  function resetClosureFile() {
-    var dz = getClosureDropzone();
-    if (!dz) return;
-    dz.classList.remove('is-selected', 'is-dragover');
-    var selected = dz.querySelector('[data-role="closure-dropzone-selected"]');
-    if (selected) selected.hidden = true;
-    var input = dz.querySelector('[data-role="closure-dropzone-input"]');
-    if (input) input.value = '';
-  }
-
-  function setupClosureDropzone() {
-    var dz = getClosureDropzone();
-    if (!dz) return;
-    var input = dz.querySelector('[data-role="closure-dropzone-input"]');
-
-    dz.addEventListener('click', function (e) {
-      if (e.target.closest('[data-action="closure-dropzone-remove"]')) {
-        resetClosureFile();
-        e.preventDefault();
-        return;
-      }
-      if (input) input.click();
-    });
-
-    dz.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if (input) input.click();
-      }
-    });
-
-    if (input) {
-      input.addEventListener('change', function () {
-        if (input.files && input.files.length > 0) {
-          selectClosureFile(input.files[0].name);
-        }
-      });
-    }
-
-    dz.addEventListener('dragenter', function (e) {
-      e.preventDefault();
-      dz.classList.add('is-dragover');
-    });
-    dz.addEventListener('dragover', function (e) {
-      e.preventDefault();
-      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-      dz.classList.add('is-dragover');
-    });
-    dz.addEventListener('dragleave', function (e) {
-      if (!dz.contains(e.relatedTarget)) dz.classList.remove('is-dragover');
-    });
-    dz.addEventListener('drop', function (e) {
-      e.preventDefault();
-      dz.classList.remove('is-dragover');
-      var files = e.dataTransfer && e.dataTransfer.files;
-      var name = (files && files.length > 0) ? files[0].name : 'Заявление_на_закрытие.pdf';
-      selectClosureFile(name);
-    });
-
-    /* Contain accidental drops inside the modal so the browser never opens the file. */
-    var modalBody = subjectCardPage.querySelector('.crm-closure-modal-body');
-    if (modalBody) {
-      modalBody.addEventListener('dragover', function (e) { e.preventDefault(); });
-      modalBody.addEventListener('drop', function (e) { e.preventDefault(); });
-    }
-  }
-
-  /* ─── Confirmation modal (acceptance / final closure) ──────────────────── */
-
-  var pendingConfirmAction = null;
-
-  function getClosureConfirm() {
-    return subjectCardPage.querySelector('[data-role="closure-confirm"]');
-  }
-
-  function syncBodyModalLock() {
-    var drawer = closureOne('[data-role="closure-drawer"]');
-    var modal = subjectCardPage.querySelector('[data-role="closure-modal"]');
-    var confirm = getClosureConfirm();
-    var anyOpen =
-      (drawer && drawer.classList.contains('is-visible')) ||
-      (modal && !modal.hidden) ||
-      (confirm && !confirm.hidden);
-    document.body.classList.toggle('crm-modal-open', !!anyOpen);
-  }
-
-  function openClosureConfirm(text, onConfirm) {
-    var modal = getClosureConfirm();
-    if (!modal) { if (typeof onConfirm === 'function') onConfirm(); return; }
-    var textEl = modal.querySelector('[data-role="closure-confirm-text"]');
-    if (textEl) textEl.textContent = text;
-    pendingConfirmAction = onConfirm;
-    modal.hidden = false;
-    document.body.classList.add('crm-modal-open');
-  }
-
-  function closeClosureConfirm() {
-    var modal = getClosureConfirm();
-    if (modal) modal.hidden = true;
-    pendingConfirmAction = null;
-    syncBodyModalLock();
-  }
-
-  function runClosureConfirm() {
-    var fn = pendingConfirmAction;
-    var modal = getClosureConfirm();
-    if (modal) modal.hidden = true;
-    pendingConfirmAction = null;
-    syncBodyModalLock();
-    if (typeof fn === 'function') fn();
-  }
-
-  function requestAcceptConfirm(role) {
-    if (closureState.closed || !role || role === 'manager') return;
-    openClosureConfirm(
-      'Вы уверены, что хотите акцептовать закрытие по роли ' + (CLOSURE_ROLE_NAMES[role] || role) + '?',
-      function () { acceptClosureDecision(role); }
-    );
-  }
-
-  function requestFinalConfirm() {
-    if (closureState.closed || closureState.role !== 'manager') return;
-    if (!(closureState.decisions.depository === 'accepted' && closureState.decisions['middle-office'] === 'accepted')) return;
-    openClosureConfirm(
-      'Вы уверены, что хотите выполнить финальное закрытие выбранных договоров и счетов?',
-      function () { finalCloseClosure(); }
-    );
   }
 
   /* ─── Closure event wiring ─────────────────────────────────────────────── */
@@ -1460,20 +1249,14 @@
       var closeDrawer = event.target.closest('[data-action="close-closure-drawer"]');
       if (closeDrawer) { setClosureDrawerState(false); event.preventDefault(); return; }
 
-      var confirmCancelBtn = event.target.closest('[data-action="closure-confirm-cancel"]');
-      if (confirmCancelBtn) { closeClosureConfirm(); event.preventDefault(); return; }
-
-      var confirmOkBtn = event.target.closest('[data-action="closure-confirm-ok"]');
-      if (confirmOkBtn) { runClosureConfirm(); event.preventDefault(); return; }
-
       var acceptBtn = event.target.closest('[data-action="closure-accept"]');
-      if (acceptBtn && !acceptBtn.disabled) { requestAcceptConfirm(acceptBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
+      if (acceptBtn && !acceptBtn.disabled) { acceptClosureDecision(acceptBtn.getAttribute('data-decision-role')); event.preventDefault(); return; }
 
       var returnBtn = event.target.closest('[data-action="closure-return"]');
-      if (returnBtn && !returnBtn.disabled) { returnClosureDecision(returnBtn.getAttribute('data-decision-role') || closureState.role); event.preventDefault(); return; }
+      if (returnBtn && !returnBtn.disabled) { returnClosureDecision(returnBtn.getAttribute('data-decision-role')); event.preventDefault(); return; }
 
       var finalBtn = event.target.closest('[data-action="closure-final"]');
-      if (finalBtn && !finalBtn.disabled) { requestFinalConfirm(); event.preventDefault(); return; }
+      if (finalBtn && !finalBtn.disabled) { finalCloseClosure(); event.preventDefault(); return; }
     });
   }
 
@@ -1491,10 +1274,6 @@
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
-      if (getClosureConfirm() && !getClosureConfirm().hidden) {
-        closeClosureConfirm();
-        return;
-      }
       setClosureModalState(false);
       setClosureDrawerState(false);
     }
@@ -1539,7 +1318,6 @@
 
   if (closureRoot) {
     recomputeClosure();
-    setupClosureDropzone();
   }
   bootstrapClosureFromQuery();
 

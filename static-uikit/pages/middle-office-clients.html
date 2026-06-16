@@ -115,48 +115,31 @@
               <h2 class="crm-closure-tasks-title">Задачи на акцепт закрытия</h2>
               <p class="crm-closure-tasks-sub">Заявки на закрытие договоров/счетов, ожидающие акцепта мидл-офиса.</p>
             </div>
-            <div class="crm-closure-task-list">
-              <article class="crm-closure-task-card">
-                <div class="crm-closure-task-main">
-                  <span class="crm-closure-task-code">CL-2026-00017</span>
-                  <span class="crm-closure-task-client">АО «Восток Майнинг Системс»</span>
-                </div>
-                <div class="crm-closure-task-meta">
-                  <div class="crm-closure-task-meta-item">
-                    <span class="crm-closure-task-meta-label">Договор / счёт</span>
-                    <span class="crm-closure-task-meta-value">BR-2026/00444 · DP-2026/00445</span>
-                  </div>
-                  <div class="crm-closure-task-meta-item">
-                    <span class="crm-closure-task-meta-label">Текущий этап</span>
-                    <span class="crm-closure-task-meta-value">Депозитарий и Мидл-офис</span>
-                  </div>
-                </div>
-                <div class="crm-closure-task-side">
-                  <span class="crm-badge warning crm-closure-task-status">Ожидает акцепта</span>
-                  <a class="uk-button uk-button-default crm-button crm-closure-task-open" href="subject-card.html?tab=contracts&amp;role=middle-office">Открыть</a>
-                </div>
-              </article>
-
-              <article class="crm-closure-task-card">
-                <div class="crm-closure-task-main">
-                  <span class="crm-closure-task-code">CL-2026-00018</span>
-                  <span class="crm-closure-task-client">ООО «Северный Альянс»</span>
-                </div>
-                <div class="crm-closure-task-meta">
-                  <div class="crm-closure-task-meta-item">
-                    <span class="crm-closure-task-meta-label">Договор / счёт</span>
-                    <span class="crm-closure-task-meta-value">BR-2026/00451</span>
-                  </div>
-                  <div class="crm-closure-task-meta-item">
-                    <span class="crm-closure-task-meta-label">Текущий этап</span>
-                    <span class="crm-closure-task-meta-value">Мидл-офис</span>
-                  </div>
-                </div>
-                <div class="crm-closure-task-side">
-                  <span class="crm-badge warning crm-closure-task-status">Ожидает акцепта</span>
-                  <a class="uk-button uk-button-default crm-button crm-closure-task-open" href="subject-card.html?tab=contracts&amp;role=middle-office">Открыть</a>
-                </div>
-              </article>
+            <div class="crm-table-wrapper crm-table-card">
+              <div class="crm-table crm-table-compact">
+                <table class="uk-table uk-table-divider uk-table-small">
+                  <thead>
+                    <tr>
+                      <th>Заявка</th>
+                      <th>Клиент</th>
+                      <th>Договор / счёт</th>
+                      <th>Статус</th>
+                      <th>Текущий этап</th>
+                      <th>Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>CL-2026-00017</td>
+                      <td>АО «Восток Майнинг Системс»</td>
+                      <td>BR-2026/00444 · DP-2026/00445</td>
+                      <td><span class="crm-badge warning">Ожидает акцепта</span></td>
+                      <td>Депозитарий и Мидл-офис</td>
+                      <td><a class="uk-button uk-button-text crm-link-action" href="subject-card.html?tab=contracts&amp;role=middle-office">Открыть</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
