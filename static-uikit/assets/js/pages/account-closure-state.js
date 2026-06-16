@@ -24,7 +24,9 @@
   'use strict';
 
   var STORAGE_KEY = 'crmAccountClosureDemoState';
-  var STATE_VERSION = 2;
+  // v3: independent per-role decisions + "clarification" aggregate status.
+  // Bumping the version forces a clean reseed of any older-shape demo state.
+  var STATE_VERSION = 3;
 
   // ── Role configuration ──────────────────────────────────────────────────────
   // Keyed by the URL `role` parameter; `approval` is the internal approvals key.
@@ -49,12 +51,18 @@
     manager: 'Клиентский менеджер'
   };
 
-  // Request-level status → display label + badge variant.
+  // Request-level (aggregate) status → display label + badge variant.
+  //   pending       — at least one required role still pending, none returned
+  //   clarification — one role returned BUT another is still pending (not final)
+  //   returned      — a return stands and no role is still pending (final)
+  //   ready         — every required role accepted
+  //   closed        — manager performed the final close
   var STATUS = {
-    pending:  { label: 'Ожидает акцепта',         badge: 'warning' },
-    returned: { label: 'Возвращена на уточнение',  badge: 'danger'  },
-    ready:    { label: 'Готова к закрытию',        badge: 'info'    },
-    closed:   { label: 'Закрыта',                  badge: 'success' }
+    pending:       { label: 'Ожидает акцепта',        badge: 'warning' },
+    clarification: { label: 'Требует уточнения',       badge: 'danger'  },
+    returned:      { label: 'Возвращена на уточнение',  badge: 'danger'  },
+    ready:         { label: 'Готова к закрытию',        badge: 'info'    },
+    closed:        { label: 'Закрыта',                  badge: 'success' }
   };
 
   // Per-approval status → display label + badge variant.
@@ -253,10 +261,24 @@
     return false;
   }
 
-  // Recompute the request-level status from approvals (never un-closes).
+  function hasPending(req) {
+    var keys = requiredKeys(req);
+    for (var i = 0; i < keys.length; i++) {
+      if (approvalStatus(req, keys[i]) === 'pending') return true;
+    }
+    return false;
+  }
+
+  // Recompute the request-level status from the independent role decisions.
+  // A return by one role never "freezes" the request while another role is
+  // still pending — that case is surfaced as `clarification`, not `returned`.
+  // Never un-closes a closed request.
   function recomputeStatus(req) {
     if (req.status === 'closed') return;
-    if (hasReturn(req)) { req.status = 'returned'; return; }
+    if (hasReturn(req)) {
+      req.status = hasPending(req) ? 'clarification' : 'returned';
+      return;
+    }
     req.status = isReady(req) ? 'ready' : 'pending';
   }
 
@@ -279,6 +301,48 @@
       .filter(function (k) { return approvalStatus(req, k) !== 'accepted'; })
       .map(function (k) { return APPROVAL_LABEL[k]; });
     return pending.length ? 'Ожидает: ' + pending.join(', ') : 'В работе';
+  }
+
+  // Labels of the required roles currently sitting in a given decision state.
+  function rolesInState(req, decision) {
+    return requiredKeys(req)
+      .filter(function (k) { return approvalStatus(req, k) === decision; })
+      .map(function (k) { return APPROVAL_LABEL[k]; });
+  }
+
+  // Status meta as seen from ONE role's perspective (used by the task queues).
+  // Independent of how the other role decided, except for the shared end-states
+  // (ready / closed). Returned by another role while this one is still pending
+  // surfaces as "Есть возврат" — a flag, not a block.
+  function roleStatusMeta(req, approvalKey) {
+    if (req.status === 'closed') return { label: 'Закрыта', badge: 'muted' };
+    if (isReady(req))            return { label: 'Готова к закрытию', badge: 'success' };
+    var my = approvalStatus(req, approvalKey);
+    if (my === 'accepted')       return { label: 'Акцептовано', badge: 'success' };
+    if (my === 'returned')       return { label: 'Возвращена', badge: 'danger' };
+    if (hasReturn(req))          return { label: 'Есть возврат', badge: 'danger' };
+    return { label: 'Ожидает акцепта', badge: 'warning' };
+  }
+
+  // Short stage line for a queue card, from one role's perspective.
+  function queueStageText(req, approvalKey) {
+    if (req.status === 'closed') return 'Закрыта';
+    if (isReady(req)) return 'Все согласования получены';
+    var returned = rolesInState(req, 'returned');
+    if (returned.length) return 'Есть возврат: ' + returned.join(', ');
+    var pending = rolesInState(req, 'pending');
+    return pending.length ? 'Ожидает: ' + pending.join(', ') : 'В работе';
+  }
+
+  // CSS state-class for a queue card, from one role's perspective.
+  function queueStateClass(req, approvalKey) {
+    if (req.status === 'closed') return ' is-closed';
+    if (isReady(req)) return ' is-ready';
+    var my = approvalStatus(req, approvalKey);
+    if (my === 'accepted') return ' is-accepted';
+    if (my === 'returned') return ' is-returned';
+    if (hasReturn(req)) return ' is-clarification';
+    return '';
   }
 
   function pushHistory(req, text) {
@@ -311,7 +375,10 @@
       req.returnReason = reason || '';
       req.returnedBy = APPROVAL_LABEL[approvalKey] || 'Подразделение';
       req.returnedByKey = approvalKey;
-      req.status = 'returned';
+      // Aggregate status is derived: if the other required role is still
+      // pending it must remain able to act, so this becomes `clarification`,
+      // not a hard `returned` that blocks everyone.
+      recomputeStatus(req);
       pushHistory(req, req.returnedBy + ': возврат на уточнение — ' + reason + ' (' + user + ')');
     });
   }
@@ -408,16 +475,13 @@
 
   // ── Cross-page rendering (queues / banner / journal) ────────────────────────
 
-  function queueCardHtml(req, roleParam) {
-    var sm = statusMeta(req);
-    var stage = currentStageLabel(req);
+  function queueCardHtml(req, roleParam, approvalKey) {
+    var sm = roleStatusMeta(req, approvalKey);
+    var stage = queueStageText(req, approvalKey);
     var chips = (req.contracts || []).map(function (c) {
       return '<span class="crm-closure-chip">' + escapeHtml(c.number) + '</span>';
     }).join('');
-    var stateClass = '';
-    if (req.status === 'returned') stateClass = ' is-returned';
-    else if (req.status === 'closed') stateClass = ' is-closed';
-    else if (isReady(req)) stateClass = ' is-ready';
+    var stateClass = queueStateClass(req, approvalKey);
 
     return '' +
       '<article class="crm-closure-task-card' + stateClass + '">' +
@@ -443,24 +507,18 @@
     var role = ROLES[roleParam] || ROLES.depository;
     var approvalKey = role.approval;
 
+    // Show every request that requires this role and isn't closed. A return by
+    // the OTHER role never removes a task that still needs this role's decision.
     var requests = getAll().filter(function (req) {
       return requiredKeys(req).indexOf(approvalKey) !== -1 && req.status !== 'closed';
     });
 
     if (requests.length) {
       listEl.innerHTML = requests.map(function (req) {
-        return queueCardHtml(req, roleParam);
+        return queueCardHtml(req, roleParam, approvalKey);
       }).join('');
     } else {
       listEl.innerHTML = '<p class="crm-closure-empty">Нет активных задач на акцепт закрытия.</p>';
-    }
-
-    // Update the count badge in the section head, if present.
-    var section = listEl.closest('.crm-closure-tasks');
-    var countEl = section ? section.querySelector('[data-role="closure-queue-count"]') : null;
-    if (countEl) {
-      countEl.textContent = String(requests.length);
-      countEl.className = 'crm-badge ' + (requests.length ? 'warning' : 'muted');
     }
   }
 
@@ -583,9 +641,13 @@
     requiredKeys: requiredKeys,
     approvalStatus: approvalStatus,
     isReady: isReady,
+    hasReturn: hasReturn,
+    hasPending: hasPending,
+    rolesInState: rolesInState,
     recomputeStatus: recomputeStatus,
     statusMeta: statusMeta,
     approvalMeta: approvalMeta,
+    roleStatusMeta: roleStatusMeta,
     currentStageLabel: currentStageLabel,
     nowStamp: nowStamp,
     escapeHtml: escapeHtml,

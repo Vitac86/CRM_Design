@@ -406,14 +406,32 @@
   white-space: nowrap;
 }
 
-/* State accents — left border + subtle tint */
-.crm-closure-task-card.is-ready {
-  border-left-color: var(--crm-info);
+/* State accents — thin left status rail + subtle tint.
+   Default rail (amber) = this role still pending. */
+.crm-closure-task-card.is-ready,
+.crm-closure-task-card.is-accepted {
+  border-left-color: var(--crm-success);
 }
 
+/* Another role returned, but this role is still pending — flag, not a block. */
+.crm-closure-task-card.is-clarification {
+  border-left-color: var(--crm-danger);
+}
+
+.crm-closure-task-card.is-clarification .crm-closure-task-stage {
+  color: var(--crm-danger);
+  font-weight: 500;
+}
+
+/* This role itself returned the request. */
 .crm-closure-task-card.is-returned {
   border-left-color: var(--crm-danger);
   background: #fffafa;
+}
+
+.crm-closure-task-card.is-returned .crm-closure-task-stage {
+  color: var(--crm-danger);
+  font-weight: 500;
 }
 
 .crm-closure-task-card.is-closed {

@@ -86,8 +86,9 @@
     steps.push(stepHtml({ key: 'created', label: 'Создана', state: 'is-done', stateText: 'Выполнено' }));
 
     var counter = 2;
-    // Don't highlight a "current" step while the request is parked on clarification.
-    var pendingMarked = req.status === 'returned';
+    // Each role step reflects ITS OWN decision. A return by one role must not
+    // stop the other still-pending role from being shown as the current step.
+    var pendingMarked = false;
     var labels = { depository: 'Депозитарий', middleOffice: 'Мидл-офис' };
 
     Demo.requiredKeys(req).forEach(function (key) {
@@ -199,22 +200,41 @@
   // ── Decision panel ──────────────────────────────────────────────────────────
   function show(el, visible) { if (el) el.hidden = !visible; }
 
+  // Text for the "return" callout, written from the acting role's perspective.
+  function returnCalloutText(req, isManager) {
+    var returnedRoles = Demo.rolesInState(req, 'returned');
+    var fromRoles = returnedRoles.join(', ') || (req.returnedBy || '—');
+    var myStatus = Demo.approvalStatus(req, role.approval);
+
+    // A still-pending reviewing role: make clear they can — and must — still act.
+    if (!isManager && myStatus === 'pending') {
+      return 'Есть возврат от: ' + fromRoles +
+        '. Решение «' + role.label + '» ещё требуется.';
+    }
+    // Manager / already-decided role: surface who returned and why.
+    return fromRoles + ': ' + (req.returnReason || '—');
+  }
+
   function renderDecision(req) {
     var isManager = role.approval === 'manager';
     var myStatus  = Demo.approvalStatus(req, role.approval);
     var ready     = Demo.isReady(req);
     var closed    = req.status === 'closed';
+    var anyReturn = Demo.hasReturn(req);
 
     setBadge($('[data-role="decision-status"]'), Demo.statusMeta(req));
     setText('[data-role="decision-role-label"]', role.label);
     setText('[data-role="decision-title"]', isManager ? 'Финальное закрытие' : 'Ваше решение');
 
-    // Returned callout
+    // Return callout — shown whenever a return stands and the request is open.
+    // Crucially it does NOT gate the still-pending role's actions below.
     var returnedBlock = $('[data-role="decision-returned"]');
-    if (req.status === 'returned') {
+    var stillPending  = !isManager && myStatus === 'pending';
+    if (anyReturn && !closed) {
       show(returnedBlock, true);
-      setText('[data-role="decision-returned-text"]',
-        (req.returnedBy ? req.returnedBy + ': ' : '') + (req.returnReason || '—'));
+      setText('[data-role="decision-returned-title"]',
+        stillPending ? 'Есть возврат на уточнение' : 'Возвращена на уточнение');
+      setText('[data-role="decision-returned-text"]', returnCalloutText(req, isManager));
     } else {
       show(returnedBlock, false);
     }
@@ -236,18 +256,24 @@
         setText('[data-role="decision-done-text"]',
           'Заявка закрыта' + (mgr.user ? ' (' + mgr.user + (mgr.datetime ? ', ' + mgr.datetime : '') + ')' : '') + '.');
       } else {
-        subtitle = ready ? 'Все согласования получены'
-                 : req.status === 'returned' ? 'Заявка возвращена на уточнение'
-                 : 'Ожидаются согласования подразделений';
         show(managerBlock, true);
         var finalBtn = $('[data-action="closure-final"]');
         if (finalBtn) finalBtn.disabled = !ready;
-        var pending = Demo.requiredKeys(req)
-          .filter(function (k) { return Demo.approvalStatus(req, k) !== 'accepted'; })
-          .map(function (k) { return Demo.APPROVAL_LABEL[k]; });
-        setText('[data-role="manager-hint"]', ready
-          ? 'Все согласования получены — можно выполнить финальное закрытие.'
-          : 'Финальное закрытие станет доступно после акцепта: ' + (pending.join(', ') || '—') + '.');
+
+        if (anyReturn) {
+          subtitle = 'Есть возврат на уточнение';
+          setText('[data-role="manager-hint"]',
+            'Финальное закрытие недоступно: есть возврат на уточнение.');
+        } else if (ready) {
+          subtitle = 'Все согласования получены';
+          setText('[data-role="manager-hint"]',
+            'Все согласования получены — можно выполнить финальное закрытие.');
+        } else {
+          subtitle = 'Ожидаются согласования подразделений';
+          var pending = Demo.rolesInState(req, 'pending');
+          setText('[data-role="manager-hint"]',
+            'Финальное закрытие доступно после акцепта: ' + (pending.join(', ') || '—') + '.');
+        }
       }
     } else {
       if (closed) {
@@ -260,12 +286,16 @@
         var ap = req.approvals[role.approval] || {};
         setText('[data-role="decision-done-text"]',
           'Вы акцептовали закрытие' + (ap.datetime ? ' (' + ap.datetime + ')' : '') + '.');
-      } else if (req.status === 'returned') {
-        subtitle = 'Заявка на уточнении';
+      } else if (myStatus === 'returned') {
+        subtitle = 'Вы вернули на уточнение';
         show(doneBlock, true);
-        setText('[data-role="decision-done-text"]', 'Заявка возвращена на уточнение — действия недоступны до повторной подачи.');
+        var mine = req.approvals[role.approval] || {};
+        setText('[data-role="decision-done-text"]',
+          'Вы вернули заявку на уточнение' + (mine.datetime ? ' (' + mine.datetime + ')' : '') +
+          '. Решение примет инициатор после доработки.');
       } else {
-        subtitle = 'Требуется ваш акцепт';
+        // PENDING — actions stay available even if the other role returned.
+        subtitle = anyReturn ? 'Требуется ваше решение' : 'Требуется ваш акцепт';
         show(reviewBlock, true);
       }
     }
