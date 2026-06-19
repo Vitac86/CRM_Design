@@ -70,6 +70,7 @@ Global scripts:
 
 Page-specific scripts (active only when the matching HTML file explicitly links them):
 
+- `404.html` → `assets/js/pages/404.js`
 - `account-closure-request.html` → `assets/js/pages/account-closure-request.js`
 - `contract-edit.html` → `assets/js/pages/contract-edit.js`
 - `document-wizard.html` → `assets/js/pages/document-wizard.js`
@@ -141,6 +142,7 @@ System:
 - `administration.html` — placeholder / developer-owned.
 - `search-results.html` — full-page global search results.
 - `error.html` — static fallback/prototype page.
+- `404.html` — polished "Страница не найдена" (Ошибка 404) state inside the CRM shell; page CSS `assets/css/pages/404.css` (bundled via `crm-static.css`), page script `assets/js/pages/404.js` drives the "Назад" action.
 
 ## Global search
 - The header includes a live search preview (client-side, UIkit dropdown).

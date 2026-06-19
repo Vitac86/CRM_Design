@@ -1,0 +1,140 @@
+/* ==========================================================================
+   pages/404.css — "Страница не найдена" (Ошибка 404)
+
+   A controlled CRM error state, not a generic browser error page.
+   Everything is scoped under the page root .crm-error-page so this file
+   adds no global overrides and reuses the shared card / button / badge
+   components and the base color/spacing tokens.
+   ========================================================================== */
+
+/* Page root — centers the error card in the available content area without
+   leaving a large empty band on tall screens. */
+.crm-error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--crm-topbar-h) - 64px);
+}
+
+/* Error card — hero variant of the shared .crm-card surface. */
+.crm-error-page .crm-error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(600px, 100%);
+  margin: 16px auto;
+  padding: 44px 40px 38px;
+  text-align: center;
+  border-radius: var(--crm-radius-lg);
+  box-shadow: var(--crm-shadow-md);
+  /* Subtle decorative shapes via layered radials over the surface token —
+     no pseudo-element stacking, no external images. */
+  background:
+    radial-gradient(140% 120% at 50% -25%, rgba(63, 102, 216, 0.10) 0%, rgba(63, 102, 216, 0) 56%),
+    radial-gradient(70% 60% at 112% -8%, rgba(63, 102, 216, 0.07) 0%, rgba(63, 102, 216, 0) 60%),
+    var(--crm-surface);
+}
+
+/* Soft decorative icon (document/search metaphor) — CSS-only circular badge. */
+.crm-error-page .crm-error-visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  color: var(--crm-primary);
+  background: var(--crm-primary-soft);
+  border: 1px solid #d4e0fb;
+  box-shadow: inset 0 0 0 6px rgba(63, 102, 216, 0.06);
+}
+
+.crm-error-page .crm-error-visual svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Large muted-blue 404 — decorative hero numeral (aria-hidden in markup). */
+.crm-error-page .crm-error-code {
+  margin: 2px 0 0;
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-size: clamp(64px, 12vw, 96px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #9db5e8; /* fallback when background-clip:text is unsupported */
+  background: linear-gradient(180deg, #7d9be3 0%, #b7c8ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Eyebrow badge reuses the shared .crm-badge component (variant .info). */
+.crm-error-page .crm-error-eyebrow {
+  letter-spacing: 0.02em;
+}
+
+.crm-error-page .crm-error-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--crm-text);
+}
+
+.crm-error-page .crm-error-text {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--crm-text-secondary);
+}
+
+.crm-error-page .crm-error-meta {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--crm-muted);
+}
+
+/* Compact action block — primary + secondary side by side. */
+.crm-error-page .crm-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.crm-error-page .crm-error-actions .uk-button {
+  min-height: 40px;
+  padding: 0 20px;
+}
+
+/* Tertiary link — reuses the shared .crm-link-action text-link style. */
+.crm-error-page .crm-error-tertiary {
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .crm-error-page {
+    min-height: 0;
+  }
+
+  .crm-error-page .crm-error-card {
+    padding: 32px 20px 28px;
+  }
+
+  .crm-error-page .crm-error-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crm-error-page .crm-error-actions .uk-button {
+    width: 100%;
+  }
+}
