@@ -1,0 +1,1436 @@
+<!-- Передаем управление на отрисовку страниц основному шаблону-->
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link rel="icon" href="/templates/front.investica.local/assets/icons/favicon_blue.ico" type="image/x-icon" />
+    <link rel="icon" href="/templates/front.investica.local/assets/icons/favicon_blue.ico" type="image/x-icon"
+        media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/templates/front.investica.local/assets/icons/favicon_white.ico" type="image/x-icon"
+        media="(prefers-color-scheme: dark)" />
+    <link rel="stylesheet" href="/templates/front.investica.local/assets/css/uikit.min.css" />
+    <link rel="stylesheet" href="/templates/front.investica.local/assets/css/crm-static.css" />
+</head>
+
+<body data-page="subject-card">
+    <!-- Проверяем авторизован ли пользователь и если нет, перенаправляем на страницу авторизации -->
+
+    <div class="crm-app">
+        <div class="crm-layout">
+            <aside class="crm-sidebar" data-entity="layout-sidebar">
+                <div class="crm-sidebar-brand">
+                    <a class="crm-sidebar-brand-link" href="/" aria-label="На главную страницу CRM">
+                        <img src="/templates/front.investica.local/assets/brand/logo-full-ru-white.svg"
+                            alt="Инвестика" />
+                    </a>
+                </div>
+                <nav class="crm-nav" aria-label="Основная навигация">
+                    <!--Формируем меню-->
+                                    <a class="crm-nav-link crm-nav-item" href="/dashboard/" data-match="dashboard"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-dashboard"></use></svg>Дашбоард</span></a>
+                                <div class="crm-nav-group" data-group="front-office">
+            <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+                <span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-front-office"></use></svg>Фронт-офис</span>
+                <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+            </button>
+            <div class="crm-nav-submenu" role="group" aria-label="Фронт-офис">
+                <!--Формируем меню второго уровня-->
+                                                        <a class="crm-nav-link crm-nav-item" href="/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-subjects"></use></svg>Субъекты</span></a>
+                                                        <a class="crm-nav-link crm-nav-item" href="/front-office/brokerage/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-brokerage"></use></svg>Брокерская деятельность</span></a>
+                                                        <a class="crm-nav-link crm-nav-item" href="/front-office/trust-management/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-trust-management"></use></svg>Доверительное управление</span></a>
+                                                        <a class="crm-nav-link crm-nav-item" href="/front-office/agents/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-agents"></use></svg>Агенты</span></a>
+                                                        <a class="crm-nav-link crm-nav-item" href="/front-office/archive/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-archive"></use></svg>Архив</span></a>
+                                                        <a class="crm-nav-link crm-nav-item" href="/front-office/requests/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-requests"></use></svg>Поручения</span></a>
+                            </div>
+        </div>
+                                <a class="crm-nav-link crm-nav-item" href="/compliance/" data-match="compliance"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-compliance"></use></svg>Комплаенс</span></a>
+                                <div class="crm-nav-group" data-group="middle-office">
+            <button class="crm-nav-link crm-nav-group-toggle" type="button" aria-expanded="false">
+                <span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-middle-office"></use></svg>Миддл-офис</span>
+                <span class="crm-nav-chevron" uk-icon="chevron-down"></span>
+            </button>
+            <div class="crm-nav-submenu" role="group" aria-label="Миддл-офис">
+                <!--Формируем меню второго уровня-->
+                                                        <a class="crm-nav-link crm-nav-item" href="/middle-office/middle-office-clients/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-middle-office-clients"></use></svg>Журнал клиентов</span></a>
+                                                        <a class="crm-nav-link crm-nav-item" href="/middle-office/middle-office-reports/"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-middle-office-reports"></use></svg>Журнал отчетов</span></a>
+                            </div>
+        </div>
+                                <a class="crm-nav-link crm-nav-item" href="/back-office-clients/" data-match="back-office-clients"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-back-office-clients"></use></svg>Бэк-офис</span></a>
+                                <a class="crm-nav-link crm-nav-item" href="/trading/" data-match="trading"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-trading"></use></svg>Трейдинг</span></a>
+                                <a class="crm-nav-link crm-nav-item" href="/depository/" data-match="depository"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-depository"></use></svg>Депозитарий</span></a>
+                                <a class="crm-nav-link crm-nav-item" href="/administration/" data-match="administration"><span><svg class="crm-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/templates/front.investica.local/assets/icons/crm-sidebar-icons.svg#icon-administration"></use></svg>Администрирование</span></a>
+                            </nav>
+            </aside>
+            <main class="crm-main">
+                <header class="crm-topbar">
+                    <!-- Зачем нужен это блок, я не понял, на странице он не отображается -->
+                    <button class="uk-button uk-button-default" type="button" data-sidebar-toggle
+                        aria-label="Открыть меню"><span uk-icon="menu"></span></button>
+                    <!-- -->
+                    <div class="crm-search"><span class="crm-search-icon" uk-icon="search"></span><input
+                            class="uk-input crm-input" type="search" name="global-search" placeholder="Глобальный поиск"
+                            autocomplete="off" /></div>
+                    <div class="crm-user">
+                        <div>
+                            <div>v.pyatakov</div>
+                            <small>user · <a
+                                    href="/users/logout">Выход</a></small>
+                        </div>
+                        <div class="crm-avatar">V.</div>
+                    </div>
+                </header>
+                <!-- Определяем тип страницы и передаем на отрисовку соответствущему шаблону вида content/content-тип_страницы -->
+<section class="crm-page" data-page="subject-card">
+    <!-- Опять непонятный блок, на странице не отображается -->
+    <div class="crm-registry-shell crm-subject-detail-shell crm-subject-card-shell">
+        <div class="crm-breadcrumbs">
+            <a href="/front-office/subjects/">Субъекты</a>
+            <span uk-icon="chevron-right"></span>
+            <span>Карточка субъекта</span>
+        </div>
+                
+        
+        <article class="crm-card crm-subject-hero crm-detail-hero" data-entity="subject" data-id="c-19473"
+            data-subject-type-id="109"
+            data-subject-source="physical_persons"
+            data-compliance-status="3">
+            <div class="crm-subject-hero-main crm-detail-hero-main">
+                <!-- Не знаю, что здесь за аватар должен быть... -->
+                <div class="crm-subject-avatar">
+                    ВМ
+                </div>
+                <div class="crm-subject-identity crm-subject-hero-text">
+                    <h1 class="crm-page-title" data-entity="page-title">
+                        Тестов16 Тест Тестович7н6                    </h1>
+                    <div class="crm-subject-code">
+                        <span class="crm-subject-code-label">Код клиента</span>
+                        <strong></strong>
+                    </div>
+                    <div class="crm-subject-badge-groups" aria-label="Статусы клиента">
+                        <div class="crm-inline-badges crm-inline-badges-primary">
+                                                                                                <span class="crm-badge crm-subject-label info"
+                                        data-status="type">Физ. лицо</span>
+                                                                                                                                <span class="crm-badge crm-subject-label success"
+                                        data-status="residency">Резидент РФ</span>
+                                                                                                                                <span class="crm-badge crm-subject-label info"
+                                        data-status="representative">Является представителем</span>
+                                                                                                                                <span class="crm-badge crm-subject-label warning"
+                                        data-status="qualified">Неквалифицированный</span>
+                                                                                    </div>
+                        <div class="crm-subject-actions crm-subject-hero-actions crm-detail-actions"
+                            aria-label="Действия по клиенту">
+                                                            <form action="/front-office/subjects/subject-card/?id=19473" method="POST" class="crm-form-inline"
+                                    onsubmit="return confirm('Переместить субъекта в архив? Будет изменён только статус клиента на -1.');">
+                                    <input type="hidden" name="subject_archive_action" value="archive" />
+                                    <button class="uk-button uk-button-default crm-button" type="submit"
+                                        data-action="move-to-archive">В архив</button>
+                                </form>
+                                                        <a href="/front-office/subjects/subject-edit/?id=19473"
+                                class="uk-button uk-button-default crm-button"
+                                data-action="edit-subject">Редактировать</a>
+                                                            <button type="button"
+                                    class="uk-button uk-button-default crm-button crm-button-compliance-pending"
+                                    data-action="client-on-compliance"
+                                    title="Статус клиента 3. Ожидается решение комплайнса."
+                                    aria-disabled="true" disabled>
+                                    Клиент на комплайнсе
+                                </button>
+                                                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </article>
+        <div class="crm-subject-tabs-wrap" data-entity="subject-sections">
+            <ul class="crm-tabs crm-detail-tabs crm-subject-tabs"
+                uk-tab="connect: .crm-subject-switcher; animation: uk-animation-fade">
+                                    <li class="uk-active">
+                        <a class="crm-tab" href="#" data-action="switch-subject-section"
+                            data-tab-target="profile">Профиль</a>
+                    </li>
+                                    <li class="">
+                        <a class="crm-tab" href="#" data-action="switch-subject-section"
+                            data-tab-target="bank">Банковские реквизиты</a>
+                    </li>
+                                    <li class="">
+                        <a class="crm-tab" href="#" data-action="switch-subject-section"
+                            data-tab-target="contracts">Договоры / Счета</a>
+                    </li>
+                                    <li class="">
+                        <a class="crm-tab" href="#" data-action="switch-subject-section"
+                            data-tab-target="documents">Документы</a>
+                    </li>
+                                    <li class="">
+                        <a class="crm-tab" href="#" data-action="switch-subject-section"
+                            data-tab-target="relations">Связи</a>
+                    </li>
+                                    <li class="">
+                        <a class="crm-tab" href="#" data-action="switch-subject-section"
+                            data-tab-target="history">История</a>
+                    </li>
+                            </ul>
+        </div>
+        <ul class="uk-switcher crm-subject-switcher">
+                            <li class="crm-subject-tab-panel uk-active" data-tab-panel="profile">
+
+                    <!-- Вкладка "Профиль" -->
+                                            <section class="crm-subject-section-layout crm-subject-form-layout">
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="lichnye_dannyj_klientov_fizikov">
+                                    <div class="crm-form-section-head">
+                                        <h3>Личные данный Клиентов Физиков</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Налоговый резидент</div>
+                                                <div class="crm-profile-value">Да</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Дееспособность</div>
+                                                <div class="crm-profile-value">full</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Услуги</div>
+                                                <div class="crm-profile-value">Брокерские услуги, Депозитарные услуги</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Откуда средства</div>
+                                                <div class="crm-profile-value">Личные сбережения, Доход по основному месту работы (включая доход от работы по совместительству)</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Уровень риска</div>
+                                                <div class="crm-profile-value">initial</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="osnovnye_dannye">
+                                    <div class="crm-form-section-head">
+                                        <h3>Основные данные</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Фамилия</div>
+                                                <div class="crm-profile-value">Тестов16</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Имя</div>
+                                                <div class="crm-profile-value">Тест</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Отчество</div>
+                                                <div class="crm-profile-value">Тестович7н6</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Гражданин РФ</div>
+                                                <div class="crm-profile-value">Да</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">inn</div>
+                                                <div class="crm-profile-value">805556491783</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Квалифицированный инвестор</div>
+                                                <div class="crm-profile-value">Нет</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="personalnye_dannye">
+                                    <div class="crm-form-section-head">
+                                        <h3>Персональные данные</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Дата рождения</div>
+                                                <div class="crm-profile-value">13.06.1998</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Место рождения</div>
+                                                <div class="crm-profile-value">Волгоград</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка страна</div>
+                                                <div class="crm-profile-value">Российская Федерация</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">snils</div>
+                                                <div class="crm-profile-value">15700175537</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="dokument_udostoveryayuwij_lichnost">
+                                    <div class="crm-form-section-head">
+                                        <h3>Документ, удостоверяющий личность</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Паспорт серия</div>
+                                                <div class="crm-profile-value">6021</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Паспорт номер</div>
+                                                <div class="crm-profile-value">753275</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Кем выдан паспорт</div>
+                                                <div class="crm-profile-value">ГУ МВД России по Ростовской области</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Дата выдачи паспорта</div>
+                                                <div class="crm-profile-value">16.02.2022</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Паспорт код</div>
+                                                <div class="crm-profile-value">610-014</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="adresa">
+                                    <div class="crm-form-section-head">
+                                        <h3>Адреса</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Индекс ZIP</div>
+                                                <div class="crm-profile-value">344041</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка квартира</div>
+                                                <div class="crm-profile-value">1</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка город</div>
+                                                <div class="crm-profile-value">Ростов-на-Дону г</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка регион</div>
+                                                <div class="crm-profile-value">Ростовская обл</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка улица</div>
+                                                <div class="crm-profile-value">Малиновского ул</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка дом</div>
+                                                <div class="crm-profile-value">1</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Прописка корпус</div>
+                                                <div class="crm-profile-value">1</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="kontaktnye_dannye">
+                                    <div class="crm-form-section-head">
+                                        <h3>Контактные данные</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Номер телефона</div>
+                                                <div class="crm-profile-value">9185163124</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">email</div>
+                                                <div class="crm-profile-value">testing2@winvestor.ru</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="komplaens">
+                                    <div class="crm-form-section-head">
+                                        <h3>Комплаенс</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="prava_ispolzovaniya">
+                                    <div class="crm-form-section-head">
+                                        <h3>Права использования</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">С правом использования ДС</div>
+                                                <div class="crm-profile-value">Да</div>
+                                            </div>
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">С правом использования ЦБ</div>
+                                                <div class="crm-profile-value">Да</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="menedzher_i_agent">
+                                    <div class="crm-form-section-head">
+                                        <h3>Менеджер и агент</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="sposob_polucheniya_otchtov">
+                                    <div class="crm-form-section-head">
+                                        <h3>Способ получения отчётов</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Отчет на почту</div>
+                                                <div class="crm-profile-value">Нет</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="kommentarij_menedzhera">
+                                    <div class="crm-form-section-head">
+                                        <h3>Комментарий менеджера</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Комплайнс замечания</div>
+                                                <div class="crm-profile-value">|Клиент восстановлен из userlk</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                            <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                    data-entity="client_errors">
+                                    <div class="crm-form-section-head">
+                                        <h3>Ошибки по клиенту</h3>
+                                    </div>
+                                    <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                        data-role="main-data-grid">
+                                                                                    <div class="crm-profile-row crm-data-field">
+                                                <div class="crm-profile-label">Статус</div>
+                                                <div class="crm-profile-value">Ошибок по клиенту не найдено.</div>
+                                            </div>
+                                                                            </div>
+                                </article>
+                                                    </section>
+                    
+                    <!-- Вкладка "Банковские реквизиты" -->
+                    
+
+<!-- Вкладка "Договоры / Счета" -->
+                    
+                    <!-- Вкладка "Связи": представитель / представляемый -->
+                    
+                    <!-- Вкладка "История": Front логирование изменения клиента, UMI ID=144 -->
+                    
+                    <!-- Остальные вкладки (заглушки) -->
+                    
+                </li>
+                            <li class="crm-subject-tab-panel" data-tab-panel="bank">
+
+                    <!-- Вкладка "Профиль" -->
+                    
+                    <!-- Вкладка "Банковские реквизиты" -->
+                                            <section class="crm-subject-section-layout crm-subject-form-layout" id="bank">
+                            
+                            <div class="crm-section-head-inline">
+                                <h3 class="crm-section-head-title">Банковские реквизиты</h3>
+                                <a href="/front-office/subjects/subject-card/?id=19473&amp;tab=bank&amp;req_add=1#bank"
+                                    class="uk-button uk-button-default crm-button">+ Добавить реквизит</a>
+                            </div>
+
+                                                                                                <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                        data-entity="requisite_22222222222222222222_54">
+                                        <div class="crm-form-section-head">
+                                            <h3>Счёт в ОТДЕЛЕНИЕ ОРЕНБУРГ БАНКА РОССИИ</h3>
+                                        </div>
+                                        <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                            data-role="main-data-grid">
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Наименование банка</div>
+                                                    <div class="crm-profile-value">11111111111119123</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">БИК</div>
+                                                    <div class="crm-profile-value">045354001</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Валюта</div>
+                                                    <div class="crm-profile-value">rub</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Расчётный счёт</div>
+                                                    <div class="crm-profile-value">22222222222222222222</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Корреспондентский счёт</div>
+                                                    <div class="crm-profile-value">33333333333333393333</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Основной</div>
+                                                    <div class="crm-profile-value">Да</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Название счёта</div>
+                                                    <div class="crm-profile-value">Счёт в ОТДЕЛЕНИЕ ОРЕНБУРГ БАНКА РОССИИ</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Синхронизация с ЛК</div>
+                                                    <div class="crm-profile-value">Добавлено в ЛК</div>
+                                                </div>
+                                                                                    </div>
+                                        <div class="crm-bank-account-actions">
+                                            <a class="uk-button uk-button-default crm-button crm-bank-action-btn"
+                                                href="/front-office/subjects/subject-card/?id=19473&tab=bank&req_edit=4867#bank">Редактировать</a>
+                                            <form action="/front-office/subjects/subject-card/?id=19473&tab=bank#bank" method="POST" class="crm-form-inline"
+                                                onsubmit="return confirm('Удалить банковский реквизит?');">
+                                                <input type="hidden" name="requisite_action" value="delete" />
+                                                <input type="hidden" name="hash" value="Тестов1998_06_13" />
+                                                <input type="hidden" name="requisite_object_id" value="4867" />
+                                                <input type="hidden" name="id_lk_requisities" value="54" />
+                                                <input type="hidden" name="hash_rekvizita" value="22222222222222222222_54" />
+                                                <button type="submit" class="uk-button uk-button-default crm-button crm-bank-action-btn">Удалить</button>
+                                            </form>
+                                        </div>
+                                    </article>
+                                                                    <article class="crm-card crm-subject-profile-section crm-profile-section crm-form-card crm-section"
+                                        data-entity="requisite_66666666666696654666_111">
+                                        <div class="crm-form-section-head">
+                                            <h3>Счёт в ОТДЕЛЕНИЕ ОРЕНБУРГ БАНКА РОССИИ</h3>
+                                        </div>
+                                        <div class="crm-profile-rows crm-data-grid crm-profile-rows-main crm-profile-rows-3"
+                                            data-role="main-data-grid">
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Наименование банка</div>
+                                                    <div class="crm-profile-value">БАНКА РОССИИ</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">БИК</div>
+                                                    <div class="crm-profile-value">045354001</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Валюта</div>
+                                                    <div class="crm-profile-value">rub</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Расчётный счёт</div>
+                                                    <div class="crm-profile-value">66666666666696654666</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Корреспондентский счёт</div>
+                                                    <div class="crm-profile-value">33333333333333356333</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Основной</div>
+                                                    <div class="crm-profile-value">Нет</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Название счёта</div>
+                                                    <div class="crm-profile-value">Счёт в ОТДЕЛЕНИЕ ОРЕНБУРГ БАНКА РОССИИ</div>
+                                                </div>
+                                                                                            <div class="crm-profile-row crm-data-field">
+                                                    <div class="crm-profile-label">Синхронизация с ЛК</div>
+                                                    <div class="crm-profile-value">Добавлено в ЛК</div>
+                                                </div>
+                                                                                    </div>
+                                        <div class="crm-bank-account-actions">
+                                            <a class="uk-button uk-button-default crm-button crm-bank-action-btn"
+                                                href="/front-office/subjects/subject-card/?id=19473&tab=bank&req_edit=6105#bank">Редактировать</a>
+                                            <form action="/front-office/subjects/subject-card/?id=19473&tab=bank#bank" method="POST" class="crm-form-inline"
+                                                onsubmit="return confirm('Удалить банковский реквизит?');">
+                                                <input type="hidden" name="requisite_action" value="delete" />
+                                                <input type="hidden" name="hash" value="Тестов1998_06_13" />
+                                                <input type="hidden" name="requisite_object_id" value="6105" />
+                                                <input type="hidden" name="id_lk_requisities" value="111" />
+                                                <input type="hidden" name="hash_rekvizita" value="66666666666696654666_111" />
+                                                <button type="submit" class="uk-button uk-button-default crm-button crm-bank-action-btn">Удалить</button>
+                                            </form>
+                                        </div>
+                                    </article>
+                                                            
+                                                    </section>
+                    
+
+<!-- Вкладка "Договоры / Счета" -->
+                    
+                    <!-- Вкладка "Связи": представитель / представляемый -->
+                    
+                    <!-- Вкладка "История": Front логирование изменения клиента, UMI ID=144 -->
+                    
+                    <!-- Остальные вкладки (заглушки) -->
+                    
+                </li>
+                            <li class="crm-subject-tab-panel" data-tab-panel="contracts">
+
+                    <!-- Вкладка "Профиль" -->
+                    
+                    <!-- Вкладка "Банковские реквизиты" -->
+                    
+
+<!-- Вкладка "Договоры / Счета" -->
+                                            <section class="crm-subject-section-layout crm-contracts-accounts-section" id="contracts"
+                            data-entity="contracts-accounts">
+
+                            <!-- ДОГОВОРЫ -->
+                            <article class="crm-card crm-subject-profile-section" data-entity="contracts">
+                                <div class="crm-section-head-inline">
+                                    <h3 class="crm-section-head-title">Договоры</h3>
+                                                                            <button type="button"
+                                            class="uk-button uk-button-default crm-button crm-button-compliance-pending"
+                                            data-action="client-on-compliance"
+                                            title="Статус клиента 3. Ожидается решение комплайнса."
+                                            aria-disabled="true" disabled>
+                                            Клиент на комплайнсе
+                                        </button>
+                                                                    </div>
+
+                                
+                                <div class="crm-table-wrapper crm-table-card">
+                                    <div class="crm-table crm-table-compact">
+                                        <table class="uk-table uk-table-divider uk-table-small crm-contracts-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Номер договора</th>
+                                                    <th>Вид договора</th>
+                                                    <th>Дата открытия</th>
+                                                    <th>Дата закрытия</th>
+                                                    <th>Статус</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                                                                                                                                                                                                                                    <tr>
+                                                            <td>
+                                                                <a href="/front-office/subjects/dogovor-o-prisoedinenii/?client_id=19473&amp;mask=%D0%A2%D0%B5%D1%81%D1%82%D0%BE%D0%B21998_06_13&amp;contract_id=17777">
+                                                                    Заявление о присоединении                                                                </a>
+                                                            </td>
+                                                            <td>Front-договор</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>
+                                                                                                                                    <span class="crm-badge info">На редактировании</span>
+                                                                                                                            </td>
+                                                            <td>
+                                                                <a href="/front-office/subjects/dogovor-o-prisoedinenii/?client_id=19473&amp;mask=%D0%A2%D0%B5%D1%81%D1%82%D0%BE%D0%B21998_06_13&amp;contract_id=17777"
+                                                                    class="uk-button uk-button-default crm-button">Редактировать</a>
+                                                                                                                                    <button type="button"
+                                                                        class="uk-button uk-button-danger crm-button js-contract-close"
+                                                                        data-action="open-contract-close-modal"
+                                                                        data-contract-number="Заявление о присоединении"
+                                                                        uk-toggle="target: #contract-close-modal">Удалить договор</button>
+                                                                                                                            </td>
+                                                        </tr>
+                                                                                                                                                                                                                                                        </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </article>
+
+                                                            <div id="contract-close-modal" class="uk-flex-top" uk-modal>
+                                    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+                                        <button class="uk-modal-close-default" type="button" uk-close></button>
+                                        <h3 class="uk-modal-title">Закрытие договора</h3>
+                                        <p>
+                                            Вы точно хотите закрыть договор №
+                                            <strong id="contract-close-modal-number">—</strong>
+                                            датой <strong>23.06.2026</strong>?
+                                        </p>
+                                        <p class="crm-field-note">
+                                            Договор не будет физически удалён. В UMI поле «Договор активен» станет «Нет»,
+                                            а дата расторжения будет установлена датой подтверждения.
+                                        </p>
+                                        <form action="/front-office/subjects/subject-card/?id=19473&tab=contracts#contracts" method="POST">
+                                            <input type="hidden" name="subject_contract_action" value="close" />
+                                            <input type="hidden" name="contract_id" value="17777" />
+                                            <input type="hidden" name="contract_number" id="contract-close-modal-number-input" value="" />
+                                            <div class="uk-flex uk-flex-right" style="gap:8px;">
+                                                <button type="button" class="uk-button uk-button-default uk-modal-close">Отмена</button>
+                                                <button type="submit" class="uk-button uk-button-danger">Да, закрыть договор</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <script>
+                                    (function () {
+                                        var numberText = document.getElementById('contract-close-modal-number');
+                                        var numberInput = document.getElementById('contract-close-modal-number-input');
+                                        var buttons = document.querySelectorAll('.js-contract-close');
+                                        if (!numberText || !numberInput || !buttons.length) {
+                                            return;
+                                        }
+                                        buttons.forEach(function (button) {
+                                            button.addEventListener('click', function () {
+                                                var number = button.getAttribute('data-contract-number') || 'без номера';
+                                                numberText.textContent = number;
+                                                numberInput.value = number;
+                                            });
+                                        });
+                                    }());
+                                </script>
+                            
+                            <!-- СЧЕТА -->
+                            <article class="crm-card crm-subject-profile-section" data-entity="client-accounts">
+                                <div class="crm-section-head-inline">
+                                    <h3 class="crm-section-head-title">Счета</h3>
+                                    <button class="uk-button uk-button-default crm-button" disabled>+ Добавить счёт</button>
+                                </div>
+                                <div class="crm-table-wrapper crm-table-card">
+                                    <div class="crm-table crm-table-compact">
+                                        <table class="uk-table uk-table-divider uk-table-small crm-accounts-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Счёт</th>
+                                                    <th>Код / подразделение</th>
+                                                    <th>Договор / владелец</th>
+                                                    <th>DateStart</th>
+                                                    <th>DEPOCode</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                                                                                                                    <tr>
+                                                        <td colspan="5" class="crm-empty-state">Нет счетов</td>
+                                                    </tr>
+                                                                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </article>
+
+                        </section>
+                    
+                    <!-- Вкладка "Связи": представитель / представляемый -->
+                    
+                    <!-- Вкладка "История": Front логирование изменения клиента, UMI ID=144 -->
+                    
+                    <!-- Остальные вкладки (заглушки) -->
+                    
+                </li>
+                            <li class="crm-subject-tab-panel" data-tab-panel="documents">
+
+                    <!-- Вкладка "Профиль" -->
+                    
+                    <!-- Вкладка "Банковские реквизиты" -->
+                    
+
+<!-- Вкладка "Договоры / Счета" -->
+                    
+                    <!-- Вкладка "Связи": представитель / представляемый -->
+                    
+                    <!-- Вкладка "История": Front логирование изменения клиента, UMI ID=144 -->
+                    
+                    <!-- Остальные вкладки (заглушки) -->
+                                            <div class="crm-card crm-subject-profile-section">
+                            <p>Раздел «Документы» в разработке</p>
+                        </div>
+                    
+                </li>
+                            <li class="crm-subject-tab-panel" data-tab-panel="relations">
+
+                    <!-- Вкладка "Профиль" -->
+                    
+                    <!-- Вкладка "Банковские реквизиты" -->
+                    
+
+<!-- Вкладка "Договоры / Счета" -->
+                    
+                    <!-- Вкладка "Связи": представитель / представляемый -->
+                                            <section class="crm-subject-section-layout crm-subject-form-layout" id="relations">
+                            
+                            <div class="crm-section-head-inline">
+                                <h3 class="crm-section-head-title">Связи / представители</h3>
+                                                                    <a href="/front-office/subjects/subject-card/?id=19473&amp;tab=relations&amp;rep_add=1#relations"
+                                        class="uk-button uk-button-default crm-button">+ Создать связь</a>
+                                                            </div>
+
+                                                            <div class="crm-card crm-subject-profile-section">
+                                    <div class="crm-table-wrapper">
+                                        <table class="uk-table uk-table-divider uk-table-small crm-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Роль</th>
+                                                    <th>Кого представляют</th>
+                                                    <th>Тип</th>
+                                                    <th>Должность / основание</th>
+                                                    <th>Полномочия до</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                                                                    <tr>
+                                                        <td>
+                                                            <span class="crm-badge info">Является представителем</span>
+                                                        </td>
+                                                        <td>
+                                                                                                                            ООО_ПЕКАРНЯ_ВОЛЬЧЕК123_7814601035                                                                                                                        <div class="crm-field-note">
+                                                                Представитель:
+                                                                                                                                    <a href="/front-office/subjects/subject-card/?id=19473">
+                                                                        Тестов1998-06-13                                                                    </a>
+                                                                                                                            </div>
+                                                        </td>
+                                                        <td>Физическое лицо</td>
+                                                        <td>Директор</td>
+                                                        <td>12.03.2027</td>
+                                                    </tr>
+                                                                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            
+                                                    </section>
+                    
+                    <!-- Вкладка "История": Front логирование изменения клиента, UMI ID=144 -->
+                    
+                    <!-- Остальные вкладки (заглушки) -->
+                    
+                </li>
+                            <li class="crm-subject-tab-panel" data-tab-panel="history">
+
+                    <!-- Вкладка "Профиль" -->
+                    
+                    <!-- Вкладка "Банковские реквизиты" -->
+                    
+
+<!-- Вкладка "Договоры / Счета" -->
+                    
+                    <!-- Вкладка "Связи": представитель / представляемый -->
+                    
+                    <!-- Вкладка "История": Front логирование изменения клиента, UMI ID=144 -->
+                                            <section class="crm-subject-section-layout crm-subject-form-layout" id="history">
+                            <div class="crm-section-head-inline">
+                                <h3 class="crm-section-head-title">История изменений</h3>
+                            </div>
+
+                                                            <div class="crm-card crm-subject-profile-section">
+                                    <div class="crm-table-wrapper">
+                                        <table class="uk-table uk-table-divider uk-table-small crm-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Дата и время</th>
+                                                    <th>Раздел</th>
+                                                    <th>Поле, изменение</th>
+                                                    <th>Пользователь</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                                                                    <tr>
+                                                        <td>19.06.2026 14:52:15</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фамилия                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестов1</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестов16</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>18.06.2026 12:17:59</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Юридическое лицо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Да</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Нет</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>18.06.2026 10:40:23</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фамилия                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестов</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестов1</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 17:18:50</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фамилия                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестов24swq23</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестов</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 17:11:52</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фамилия                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестов24swq</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестов24swq23</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 13:44:33</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фамилия                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестов24</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестов24swq</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 13:44:18</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Юридическое лицо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:40:22</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Дата заключения договра                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>17.06.2026</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>05.06.2026</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:40:08</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Физическое лицо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Да</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Нет</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:38:47</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Отчество                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестович7</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестович7н6</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:38:11</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фамилия                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестов2</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестов24</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:36:29</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Юридическое лицо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Да</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Нет</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:36:29</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Дата заключения договра                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>17.06.2026</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:35:36</td>
+                                                        <td>Профиль клиента</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Отчество                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Тестович</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Тестович7</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:33:38</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Юридическое лицо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Нет</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>front</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:08:09</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Депозитарный договор                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Нет</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>front</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:04:37</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Депозитарный договор                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span>Да</span>
+                                                                        <span class="crm-history-arrow">→</span>
+                                                                        <span>Нет</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>front</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.06.2026 12:04:37</td>
+                                                        <td>Договор о присоединении</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Сохранили Договор                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>1</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill crm-history-pill-success"
+                                                                            title="ручной ввод">
+                                                                            РВ                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>front</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                mask                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Тестов1998_06_13</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Договор о брокерском обслуживании                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Депозитарный договор                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Физическое лицо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Владельца                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                ООО «Инвестика» оператором счета депо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Владельца                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                ООО «Инвестика» оператор торгового счета депо                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                НКО НКЦ (АО) (ОГРН 1067711004481)                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                По системе ЭДО                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Фондовый рынок                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Валютный рынок и рынок драгоценных металлов                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>23.04.2026 12:54:43</td>
+                                                        <td>DOC_DEFAULT_CREATED</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                На специальный брокерский счет                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Да</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            umi_doc                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.03.2026 14:05:34</td>
+                                                        <td>COMPLIANCE_APPROVE</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                Статус клиента                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>5</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            front_compliance                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>a.kolosov</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.03.2026 12:05:00</td>
+                                                        <td>UMI_UPDATE</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                hash                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Тестов1998_06_13</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            UserLK                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>UserLK</td>
+                                                    </tr>
+                                                                                                    <tr>
+                                                        <td>17.03.2026 12:05:00</td>
+                                                        <td>UMI_UPDATE</td>
+                                                        <td>
+                                                            <div class="crm-profile-value">
+                                                                hash                                                            </div>
+                                                                                                                            <div class="crm-field-note crm-history-change">
+                                                                                                                                            <span class="crm-history-pill crm-history-pill-success" title="Новое значение">new</span>
+                                                                        <span>Тестов1998_06_13</span>
+                                                                                                                                                                                                                <span class="crm-history-source-divider">·</span>
+                                                                        <span class="crm-history-pill"
+                                                                            >
+                                                                            UserLK                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                    </td>
+                                                        <td>UserLK</td>
+                                                    </tr>
+                                                                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                                    </section>
+                    
+                    <!-- Остальные вкладки (заглушки) -->
+                    
+                </li>
+                    </ul>
+    </div>
+</section>
+            </main>
+        </div>
+    </div>
+    <script src="/templates/front.investica.local/assets/js/uikit.min.js"></script>
+    <script src="/templates/front.investica.local/assets/js/uikit-icons.min.js"></script>
+    <script src="/templates/front.investica.local/assets/js/crm-static.js"></script>
+</body>
+
+</html><!-- This page generated in 0.356446 secs by PHP, SITE MODE -->
