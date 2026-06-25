@@ -7527,25 +7527,6 @@ body[data-page="subject-edit"] .crm-form-section[hidden] {
   color: var(--crm-umi-text-secondary);
 }
 
-.crm-edit-select-page .crm-edit-block-examples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 2px;
-}
-
-.crm-edit-select-page .crm-edit-block-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 9px;
-  border: 1px solid var(--crm-border);
-  border-radius: 999px;
-  background: var(--crm-surface-muted);
-  font-size: 12px;
-  line-height: 18px;
-  color: var(--crm-umi-text-secondary);
-}
-
 /* ── Sticky action bar ───────────────────────────────────────────────── */
 
 .crm-edit-select-page .crm-edit-select-actions {
