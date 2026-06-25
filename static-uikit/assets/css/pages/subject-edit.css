@@ -286,3 +286,141 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
     width: 100%;
   }
 }
+
+/* ── Selected-blocks summary (individual edit flow) ───────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary {
+  padding: 14px 18px;
+  border: 1px solid #dbe3ee;
+  background: #fff;
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary-info {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+body[data-page="subject-edit"] .crm-edit-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border: 1px solid #cdd8ec;
+  border-radius: 999px;
+  background: #edf3ff;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: #2f4e96;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-change {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d5ddf4;
+  border-radius: 8px;
+  background: var(--crm-info-bg);
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--crm-info);
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--crm-umi-text-secondary);
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert-text a,
+body[data-page="subject-edit"] .crm-edit-blocks-note a {
+  color: var(--crm-primary);
+  font-weight: 600;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--crm-umi-text-muted);
+}
+
+/* Inline section head with a trailing action (documents section) */
+body[data-page="subject-edit"] .crm-edit-section-head-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+body[data-page="subject-edit"] .crm-edit-section-head-inline .uk-button {
+  min-height: 30px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+body[data-page="subject-edit"] .crm-edit-form-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--crm-umi-text-muted);
+}
+
+/* Sections deselected on the block-selection step are hidden via [hidden]. */
+body[data-page="subject-edit"] .crm-form-section[hidden] {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  body[data-page="subject-edit"] .crm-edit-blocks-summary-head {
+    flex-direction: column;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-blocks-change {
+    width: 100%;
+    justify-content: center;
+  }
+}

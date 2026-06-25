@@ -78,7 +78,8 @@ Page-specific scripts (active only when the matching HTML file explicitly links 
 - `middle-office-reports.html` → `assets/js/pages/middle-office.js`
 - `subject-card.html` → `assets/js/pages/subject-card.js`
 - `subject-edit.html` → `assets/js/pages/subject-edit.js`
-- `subject-edit-individual.html` → `assets/js/pages/subject-edit.js`
+- `subject-edit-individual.html` → `assets/js/pages/subject-edit.js` + `assets/js/pages/subject-edit-individual.js` (the latter renders only the `?blocks=` sections and the selected-block summary chips)
+- `subject-edit-select.html` → `assets/js/pages/subject-edit-select.js`
 - `subject-register.html` → `assets/js/pages/subject-register.js`
 - `trading-card.html` → `assets/js/pages/trading-card.js`
 
@@ -110,6 +111,7 @@ Subjects / contracts:
 - `subject-register.html`
 - `subject-edit.html`
 - `subject-edit-individual.html`
+- `subject-edit-select.html` — intermediate block-selection step for the individual edit flow; reads `?subject=<id>` and `?blocks=<csv>`, then forwards the chosen blocks to `subject-edit-individual.html?subject=<id>&blocks=contact,personal,...`. Page script: `assets/js/pages/subject-edit-select.js`; page CSS: `assets/css/pages/subject-edit-select.css` (bundled via `crm-static.css`, no direct page link needed).
 - `document-wizard.html`
 - `contract-wizard.html`
 - `contract-edit.html`

@@ -7177,6 +7177,454 @@ body[data-page="subject-edit"] .crm-address-module.crm-form-section {
   }
 }
 
+/* ── Selected-blocks summary (individual edit flow) ───────────────────── */
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary {
+  padding: 14px 18px;
+  border: 1px solid #dbe3ee;
+  background: #fff;
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary-info {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-summary-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+body[data-page="subject-edit"] .crm-edit-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border: 1px solid #cdd8ec;
+  border-radius: 999px;
+  background: #edf3ff;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: #2f4e96;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-change {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d5ddf4;
+  border-radius: 8px;
+  background: var(--crm-info-bg);
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--crm-info);
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--crm-umi-text-secondary);
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-alert-text a,
+body[data-page="subject-edit"] .crm-edit-blocks-note a {
+  color: var(--crm-primary);
+  font-weight: 600;
+}
+
+body[data-page="subject-edit"] .crm-edit-blocks-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--crm-umi-text-muted);
+}
+
+/* Inline section head with a trailing action (documents section) */
+body[data-page="subject-edit"] .crm-edit-section-head-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+body[data-page="subject-edit"] .crm-edit-section-head-inline .uk-button {
+  min-height: 30px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+body[data-page="subject-edit"] .crm-edit-form-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--crm-umi-text-muted);
+}
+
+/* Sections deselected on the block-selection step are hidden via [hidden]. */
+body[data-page="subject-edit"] .crm-form-section[hidden] {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  body[data-page="subject-edit"] .crm-edit-blocks-summary-head {
+    flex-direction: column;
+  }
+
+  body[data-page="subject-edit"] .crm-edit-blocks-change {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ===== pages/subject-edit-select.css ===== */
+/* ==========================================================================
+   Subject edit — block selection page
+   Intermediate step where the user picks which logical blocks of an
+   individual client's data to edit. Page root: .crm-edit-select-page
+   ========================================================================== */
+
+.crm-edit-select-page {
+  display: grid;
+  gap: 12px;
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────── */
+
+.crm-edit-select-page .crm-edit-select-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crm-edit-select-page .crm-edit-select-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+/* ── Client summary card ─────────────────────────────────────────────── */
+
+.crm-edit-select-page .crm-edit-select-summary {
+  padding: 16px 18px;
+  border: 1px solid var(--crm-border);
+  background: var(--crm-surface);
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+}
+
+.crm-edit-select-page .crm-edit-select-summary-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.crm-edit-select-page .crm-edit-select-summary-text {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.crm-edit-select-page .crm-edit-select-client-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+.crm-edit-select-page .crm-edit-select-summary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  font-size: 13px;
+  color: var(--crm-umi-text-secondary);
+}
+
+.crm-edit-select-page .crm-edit-select-meta-item strong {
+  color: var(--crm-umi-text);
+  font-weight: 600;
+}
+
+.crm-edit-select-page .crm-edit-select-helper {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid #eef1f7;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--crm-umi-text-secondary);
+}
+
+/* ── Toolbar (count + bulk actions) ──────────────────────────────────── */
+
+.crm-edit-select-page .crm-edit-select-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.crm-edit-select-page .crm-edit-select-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-umi-text);
+}
+
+.crm-edit-select-page .crm-edit-select-toolbar-actions {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.crm-edit-select-page .crm-edit-select-link-btn {
+  min-height: 32px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* ── Block grid ──────────────────────────────────────────────────────── */
+
+.crm-edit-select-page .crm-edit-block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.crm-edit-select-page .crm-edit-block-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius-md);
+  background: var(--crm-surface);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.crm-edit-select-page .crm-edit-block-card:hover {
+  border-color: #b9c9e8;
+  background: #f9fbff;
+}
+
+.crm-edit-select-page .crm-edit-block-card.is-selected {
+  border-color: #6f90de;
+  background: var(--crm-primary-soft);
+  box-shadow: inset 0 0 0 1px rgba(82, 116, 205, 0.2);
+}
+
+.crm-edit-select-page .crm-edit-block-card:focus-within {
+  outline: none;
+  box-shadow: var(--crm-focus-ring);
+}
+
+/* Custom checkbox */
+
+.crm-edit-select-page .crm-edit-block-check {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+
+.crm-edit-select-page .crm-edit-block-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.crm-edit-select-page .crm-edit-block-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--crm-input-border);
+  border-radius: 6px;
+  background: var(--crm-surface);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.crm-edit-select-page .crm-edit-block-input:checked + .crm-edit-block-checkbox {
+  border-color: var(--crm-primary);
+  background: var(--crm-primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.2 3.2L13 5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 14px 14px;
+}
+
+/* Card body */
+
+.crm-edit-select-page .crm-edit-block-body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.crm-edit-select-page .crm-edit-block-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.crm-edit-select-page .crm-edit-block-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--crm-umi-text);
+  line-height: 1.2;
+}
+
+.crm-edit-select-page .crm-edit-block-desc {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--crm-umi-text-secondary);
+}
+
+.crm-edit-select-page .crm-edit-block-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.crm-edit-select-page .crm-edit-block-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border: 1px solid var(--crm-border);
+  border-radius: 999px;
+  background: var(--crm-surface-muted);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--crm-umi-text-secondary);
+}
+
+/* ── Sticky action bar ───────────────────────────────────────────────── */
+
+.crm-edit-select-page .crm-edit-select-actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.crm-edit-select-page .crm-edit-select-validation {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #efc8ce;
+  border-radius: 8px;
+  background: var(--crm-danger-bg);
+  color: #8a2d34;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.crm-edit-select-page .crm-edit-select-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.crm-edit-select-page .crm-edit-select-back {
+  min-height: 38px;
+}
+
+.crm-edit-select-page .crm-edit-select-submit {
+  min-height: 40px;
+  padding: 0 22px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.crm-edit-select-page .crm-edit-select-submit.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .crm-edit-select-page .crm-edit-block-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .crm-edit-select-page .crm-edit-select-actions-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .crm-edit-select-page .crm-edit-select-actions-primary {
+    width: 100%;
+  }
+
+  .crm-edit-select-page .crm-edit-select-submit,
+  .crm-edit-select-page .crm-edit-select-back {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* ===== pages/brokerage.css ===== */
 /* ============================================================
    Brokerage page — scoped styles
