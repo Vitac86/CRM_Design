@@ -48,6 +48,20 @@
   min-width: 0;
 }
 
+.crm-edit-select-page .crm-edit-select-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #d5deea;
+  background: #edf3fb;
+  color: var(--crm-primary-hover);
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .crm-edit-select-page .crm-edit-select-summary-text {
   min-width: 0;
   display: grid;

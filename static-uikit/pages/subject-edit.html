@@ -124,9 +124,30 @@
             </div>
           </div>
 
+          <section class="crm-card crm-edit-blocks-summary" data-entity="edit-blocks-summary">
+            <div class="crm-edit-blocks-summary-head">
+              <div class="crm-edit-blocks-summary-info">
+                <h2 class="crm-edit-blocks-summary-title">Редактирование выбранных разделов</h2>
+                <div class="crm-edit-blocks-chips" data-role="selected-block-chips"></div>
+              </div>
+              <a
+                href="subject-edit-select.html?subject=c-011&amp;type=company"
+                class="uk-button uk-button-default crm-button crm-edit-blocks-change"
+                data-role="change-blocks-link">Изменить набор разделов</a>
+            </div>
+            <div class="crm-edit-blocks-alert" data-role="all-blocks-alert" hidden>
+              <span class="crm-edit-blocks-alert-icon" uk-icon="info" aria-hidden="true"></span>
+              <p class="crm-edit-blocks-alert-text">
+                Открыты все разделы. Чтобы выбрать конкретные данные для редактирования, вернитесь к выбору разделов.
+                <a href="subject-edit-select.html?subject=c-011&amp;type=company" data-role="change-blocks-link-alert">Изменить набор разделов</a>
+              </p>
+            </div>
+            <p class="crm-edit-blocks-note">Static demo: сохраняются только выбранные разделы.</p>
+          </section>
+
           <form class="crm-card crm-edit-form-card" data-entity="subject-edit-form" novalidate>
 
-            <section class="crm-form-section" data-entity="edit-main-data">
+            <section class="crm-form-section" data-entity="edit-main-data" data-edit-block="company">
               <div class="crm-form-section-head">
                 <h3>Основные данные</h3>
               </div>
@@ -239,7 +260,7 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-address">
+            <section class="crm-form-section" data-entity="edit-address" data-edit-block="registration">
               <div class="crm-form-section-head">
                 <h3>Адрес регистрации</h3>
               </div>
@@ -308,7 +329,7 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-registration">
+            <section class="crm-form-section" data-entity="edit-registration" data-edit-block="registration">
               <div class="crm-form-section-head">
                 <h3>Регистрационные данные</h3>
               </div>
@@ -386,7 +407,7 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-contacts">
+            <section class="crm-form-section" data-entity="edit-contacts" data-edit-block="contact">
               <div class="crm-form-section-head">
                 <h3>Контактные данные</h3>
               </div>
@@ -464,7 +485,56 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-compliance">
+            <section class="crm-form-section" data-entity="edit-management" data-edit-block="management">
+              <div class="crm-form-section-head">
+                <h3>Руководитель и подписанты</h3>
+              </div>
+              <div class="crm-form-grid uk-grid-small" uk-grid>
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="edit-ceo-name">ФИО руководителя</label>
+                  <input
+                    id="edit-ceo-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="ceoName"
+                    value="Крылов Денис Олегович"
+                    autocomplete="off" />
+                </div>
+                <div class="uk-width-1-4@m">
+                  <label class="uk-form-label" for="edit-ceo-position">Должность</label>
+                  <input
+                    id="edit-ceo-position"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="ceoPosition"
+                    value="Генеральный директор"
+                    autocomplete="off" />
+                </div>
+                <div class="uk-width-1-4@m">
+                  <label class="uk-form-label" for="edit-authority-basis">Основание полномочий</label>
+                  <select
+                    id="edit-authority-basis"
+                    class="uk-select crm-select"
+                    name="authorityBasis">
+                    <option value="charter" selected>Устав</option>
+                    <option value="power-of-attorney">Доверенность</option>
+                    <option value="order">Приказ</option>
+                  </select>
+                </div>
+                <div class="uk-width-1-1@m">
+                  <label class="uk-form-label" for="edit-signers">Лица с правом подписи</label>
+                  <input
+                    id="edit-signers"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="signers"
+                    value="Крылов Д. О. (генеральный директор), Соколова М. В. (главный бухгалтер)"
+                    autocomplete="off" />
+                </div>
+              </div>
+            </section>
+
+            <section class="crm-form-section" data-entity="edit-compliance" data-edit-block="compliance">
               <div class="crm-form-section-head">
                 <h3>Комплаенс</h3>
               </div>
@@ -544,7 +614,7 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-rights">
+            <section class="crm-form-section" data-entity="edit-rights" data-edit-block="compliance">
               <div class="crm-form-section-head">
                 <h3>Права использования</h3>
               </div>
@@ -574,7 +644,67 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-report-delivery">
+            <section class="crm-form-section" data-entity="edit-bank" data-edit-block="bank">
+              <div class="crm-form-section-head">
+                <h3>Банковские реквизиты</h3>
+              </div>
+              <div class="crm-form-grid uk-grid-small" uk-grid>
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="edit-bank-name">Наименование банка</label>
+                  <input
+                    id="edit-bank-name"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="bankName"
+                    value="Банк ВТБ (ПАО), г. Москва"
+                    autocomplete="off" />
+                </div>
+                <div class="uk-width-1-4@m">
+                  <label class="uk-form-label" for="edit-bank-bik">БИК</label>
+                  <input
+                    id="edit-bank-bik"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="bik"
+                    value="044525187"
+                    autocomplete="off" />
+                </div>
+                <div class="uk-width-1-4@m">
+                  <label class="uk-form-label" for="edit-bank-currency">Валюта</label>
+                  <select
+                    id="edit-bank-currency"
+                    class="uk-select crm-select"
+                    name="currency">
+                    <option value="RUB" selected>RUB</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="CNY">CNY</option>
+                  </select>
+                </div>
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="edit-bank-account">Расчётный счёт</label>
+                  <input
+                    id="edit-bank-account"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="accountNumber"
+                    value="40702810100000012345"
+                    autocomplete="off" />
+                </div>
+                <div class="uk-width-1-2@m">
+                  <label class="uk-form-label" for="edit-bank-corr">Корреспондентский счёт</label>
+                  <input
+                    id="edit-bank-corr"
+                    class="uk-input crm-input"
+                    type="text"
+                    name="correspondentAccount"
+                    value="30101810700000000187"
+                    autocomplete="off" />
+                </div>
+              </div>
+            </section>
+
+            <section class="crm-form-section" data-entity="edit-report-delivery" data-edit-block="contact">
               <div class="crm-form-section-head">
                 <h3>Способ получения отчётов</h3>
               </div>
@@ -602,7 +732,7 @@
               </div>
             </section>
 
-            <section class="crm-form-section" data-entity="edit-manager-comment">
+            <section class="crm-form-section" data-entity="edit-manager-comment" data-edit-block="compliance">
               <div class="crm-form-section-head">
                 <h3>Комментарий менеджера</h3>
               </div>
@@ -627,5 +757,6 @@
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
 <script src="../assets/js/pages/subject-edit.js"></script>
+<script src="../assets/js/pages/subject-edit-company.js"></script>
 </body>
 </html>

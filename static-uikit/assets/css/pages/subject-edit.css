@@ -385,30 +385,6 @@ body[data-page="subject-edit"] .crm-edit-blocks-note {
   color: var(--crm-umi-text-muted);
 }
 
-/* Inline section head with a trailing action (documents section) */
-body[data-page="subject-edit"] .crm-edit-section-head-inline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-body[data-page="subject-edit"] .crm-edit-section-head-inline .uk-button {
-  min-height: 30px;
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 7px;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-body[data-page="subject-edit"] .crm-edit-form-note {
-  margin: 10px 0 0;
-  font-size: 12px;
-  color: var(--crm-umi-text-muted);
-}
-
 /* Sections deselected on the block-selection step are hidden via [hidden]. */
 body[data-page="subject-edit"] .crm-form-section[hidden] {
   display: none;

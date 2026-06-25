@@ -86,12 +86,12 @@
 
       <section id="crm-page">
         <div class="crm-page" data-page="subject-edit-select">
-        <div class="crm-wizard-shell crm-edit-select-page" data-subject="i-014">
+        <div class="crm-wizard-shell crm-edit-select-page" data-subject="i-014" data-subject-kind="individual">
 
           <div class="crm-breadcrumbs">
             <a href="subjects.html">Субъекты</a>
             <span uk-icon="chevron-right"></span>
-            <a href="subject-card-individual.html">Иван Петров</a>
+            <a href="subject-card-individual.html" data-role="breadcrumb-link">Иван Петров</a>
             <span uk-icon="chevron-right"></span>
             <span>Выбор разделов</span>
           </div>
@@ -102,14 +102,14 @@
 
           <article class="crm-card crm-edit-select-summary" data-entity="select-client-summary">
             <div class="crm-edit-select-summary-main">
-              <div class="crm-subject-avatar">ИП</div>
+              <div class="crm-edit-select-avatar" data-role="client-avatar">ИП</div>
               <div class="crm-edit-select-summary-text">
-                <span class="crm-edit-select-client-name">Петров Иван Сергеевич</span>
+                <span class="crm-edit-select-client-name" data-role="client-name">Петров Иван Сергеевич</span>
                 <div class="crm-edit-select-summary-meta">
-                  <span class="crm-edit-select-meta-item">Код клиента <strong>INV-014</strong></span>
+                  <span class="crm-edit-select-meta-item">Код клиента <strong data-role="client-code">INV-014</strong></span>
                   <span class="crm-inline-badges">
-                    <span class="crm-badge muted">Физическое лицо</span>
-                    <span class="crm-badge success">Активен</span>
+                    <span class="crm-badge muted" data-role="client-type">Физическое лицо</span>
+                    <span class="crm-badge success" data-role="client-status">Активен</span>
                   </span>
                 </div>
               </div>
@@ -127,143 +127,22 @@
             </div>
           </div>
 
-          <form class="crm-edit-block-grid" data-entity="edit-block-grid" novalidate>
-
-            <label class="crm-edit-block-card" data-edit-block-card data-block-id="contact">
-              <span class="crm-edit-block-check">
-                <input class="crm-edit-block-input" type="checkbox" name="block-contact" value="contact" data-block-input />
-                <span class="crm-edit-block-checkbox" aria-hidden="true"></span>
-              </span>
-              <span class="crm-edit-block-body">
-                <span class="crm-edit-block-head">
-                  <span class="crm-edit-block-title">Контактные данные</span>
-                  <span class="crm-badge muted crm-edit-block-count">4 поля</span>
-                </span>
-                <span class="crm-edit-block-desc">Телефон, email, адрес регистрации и адрес проживания.</span>
-                <span class="crm-edit-block-examples">
-                  <span class="crm-edit-block-chip">Телефон</span>
-                  <span class="crm-edit-block-chip">Email</span>
-                  <span class="crm-edit-block-chip">Адрес регистрации</span>
-                  <span class="crm-edit-block-chip">Адрес проживания</span>
-                </span>
-              </span>
-            </label>
-
-            <label class="crm-edit-block-card" data-edit-block-card data-block-id="personal">
-              <span class="crm-edit-block-check">
-                <input class="crm-edit-block-input" type="checkbox" name="block-personal" value="personal" data-block-input />
-                <span class="crm-edit-block-checkbox" aria-hidden="true"></span>
-              </span>
-              <span class="crm-edit-block-body">
-                <span class="crm-edit-block-head">
-                  <span class="crm-edit-block-title">Персональная информация</span>
-                  <span class="crm-badge muted crm-edit-block-count">5 полей</span>
-                </span>
-                <span class="crm-edit-block-desc">ФИО, дата рождения, пол, гражданство и налоговое резидентство.</span>
-                <span class="crm-edit-block-examples">
-                  <span class="crm-edit-block-chip">ФИО</span>
-                  <span class="crm-edit-block-chip">Дата рождения</span>
-                  <span class="crm-edit-block-chip">Пол</span>
-                  <span class="crm-edit-block-chip">Гражданство</span>
-                  <span class="crm-edit-block-chip">ИНН</span>
-                </span>
-              </span>
-            </label>
-
-            <label class="crm-edit-block-card" data-edit-block-card data-block-id="passport">
-              <span class="crm-edit-block-check">
-                <input class="crm-edit-block-input" type="checkbox" name="block-passport" value="passport" data-block-input />
-                <span class="crm-edit-block-checkbox" aria-hidden="true"></span>
-              </span>
-              <span class="crm-edit-block-body">
-                <span class="crm-edit-block-head">
-                  <span class="crm-edit-block-title">Паспортные данные</span>
-                  <span class="crm-badge muted crm-edit-block-count">6 полей</span>
-                </span>
-                <span class="crm-edit-block-desc">Серия, номер, дата выдачи, код подразделения и кем выдан.</span>
-                <span class="crm-edit-block-examples">
-                  <span class="crm-edit-block-chip">Серия и номер</span>
-                  <span class="crm-edit-block-chip">Дата выдачи</span>
-                  <span class="crm-edit-block-chip">Код подразделения</span>
-                  <span class="crm-edit-block-chip">Кем выдан</span>
-                </span>
-              </span>
-            </label>
-
-            <label class="crm-edit-block-card" data-edit-block-card data-block-id="compliance">
-              <span class="crm-edit-block-check">
-                <input class="crm-edit-block-input" type="checkbox" name="block-compliance" value="compliance" data-block-input />
-                <span class="crm-edit-block-checkbox" aria-hidden="true"></span>
-              </span>
-              <span class="crm-edit-block-body">
-                <span class="crm-edit-block-head">
-                  <span class="crm-edit-block-title">Идентификация и комплаенс</span>
-                  <span class="crm-badge muted crm-edit-block-count">4 поля</span>
-                </span>
-                <span class="crm-edit-block-desc">Статус идентификации, риск-профиль, KYC и сведения для проверки.</span>
-                <span class="crm-edit-block-examples">
-                  <span class="crm-edit-block-chip">Статус идентификации</span>
-                  <span class="crm-edit-block-chip">Риск-профиль</span>
-                  <span class="crm-edit-block-chip">KYC</span>
-                  <span class="crm-edit-block-chip">PEP / санкционные признаки</span>
-                </span>
-              </span>
-            </label>
-
-            <label class="crm-edit-block-card" data-edit-block-card data-block-id="bank">
-              <span class="crm-edit-block-check">
-                <input class="crm-edit-block-input" type="checkbox" name="block-bank" value="bank" data-block-input />
-                <span class="crm-edit-block-checkbox" aria-hidden="true"></span>
-              </span>
-              <span class="crm-edit-block-body">
-                <span class="crm-edit-block-head">
-                  <span class="crm-edit-block-title">Банковские реквизиты</span>
-                  <span class="crm-badge muted crm-edit-block-count">5 полей</span>
-                </span>
-                <span class="crm-edit-block-desc">Банковские счета, БИК, банк получателя и реквизиты для выплат.</span>
-                <span class="crm-edit-block-examples">
-                  <span class="crm-edit-block-chip">Расчётный счёт</span>
-                  <span class="crm-edit-block-chip">БИК</span>
-                  <span class="crm-edit-block-chip">Банк</span>
-                  <span class="crm-edit-block-chip">Корреспондентский счёт</span>
-                </span>
-              </span>
-            </label>
-
-            <label class="crm-edit-block-card" data-edit-block-card data-block-id="documents">
-              <span class="crm-edit-block-check">
-                <input class="crm-edit-block-input" type="checkbox" name="block-documents" value="documents" data-block-input />
-                <span class="crm-edit-block-checkbox" aria-hidden="true"></span>
-              </span>
-              <span class="crm-edit-block-body">
-                <span class="crm-edit-block-head">
-                  <span class="crm-edit-block-title">Документы</span>
-                  <span class="crm-badge muted crm-edit-block-count">4 поля</span>
-                </span>
-                <span class="crm-edit-block-desc">Скан-копии и подтверждающие документы клиента.</span>
-                <span class="crm-edit-block-examples">
-                  <span class="crm-edit-block-chip">Паспорт</span>
-                  <span class="crm-edit-block-chip">Анкета</span>
-                  <span class="crm-edit-block-chip">Заявление</span>
-                  <span class="crm-edit-block-chip">Подтверждающий файл</span>
-                </span>
-              </span>
-            </label>
-
-          </form>
+          <!-- Block cards are rendered by subject-edit-select.js based on subject type. -->
+          <form class="crm-edit-block-grid" data-entity="edit-block-grid" data-role="block-grid" novalidate></form>
 
           <div class="crm-sticky-actions crm-edit-select-actions" data-entity="select-actions">
             <p class="crm-edit-select-validation" data-role="select-validation" hidden>
               Выберите хотя бы один раздел, чтобы продолжить.
             </p>
             <div class="crm-edit-select-actions-row">
-              <a href="subject-card-individual.html" class="uk-button uk-button-default crm-button crm-edit-select-back">Назад к карточке</a>
+              <a href="subject-card-individual.html" class="uk-button uk-button-default crm-button crm-edit-select-back" data-role="back-link">Назад к карточке</a>
               <div class="crm-page-actions crm-edit-select-actions-primary">
                 <button
                   type="button"
                   class="uk-button crm-button-primary crm-button crm-edit-select-submit is-disabled"
                   data-action="go-to-edit"
                   data-target="subject-edit-individual.html"
+                  data-role="submit"
                   aria-disabled="true">Перейти к редактированию</button>
               </div>
             </div>

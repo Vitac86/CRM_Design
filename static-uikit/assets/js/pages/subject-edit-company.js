@@ -1,27 +1,29 @@
 (function () {
   'use strict';
 
-  /* Individual subject edit page — selected-block rendering.
+  /* Company (legal entity) subject edit page — selected-block rendering.
    *
-   * Reads ?blocks=contact,passport,... and shows only the matching form
+   * Mirror of subject-edit-individual.js for company subjects. Reads
+   * ?blocks=company,registration,... and shows only the matching form
    * sections (each section is tagged with data-edit-block). Without a blocks
-   * query it falls back to showing every section plus an info alert.
+   * query it falls back to showing every supported section plus an info alert.
    *
    * Static prototype only — no backend, no persistence. The shared
-   * subject-edit.js still owns save/draft/cancel and the address module;
-   * this script only governs which sections are visible and the summary
-   * chips at the top of the page. */
+   * subject-edit.js still owns save/draft/cancel; this script only governs
+   * which sections are visible and the summary chips at the top of the page. */
 
   if (document.body.getAttribute('data-page') !== 'subject-edit') return;
-  if (document.body.getAttribute('data-subject-kind') !== 'individual') return;
+  var kind = document.body.getAttribute('data-subject-kind');
+  if (kind !== 'legal' && kind !== 'company') return;
 
-  var BLOCK_ORDER = ['contact', 'personal', 'passport', 'compliance', 'bank'];
+  var BLOCK_ORDER = ['company', 'registration', 'contact', 'management', 'compliance', 'bank'];
 
   var BLOCK_LABELS = {
+    company: 'Сведения о компании',
+    registration: 'Регистрационные данные',
     contact: 'Контактные данные',
-    personal: 'Персональная информация',
-    passport: 'Паспортные данные',
-    compliance: 'Идентификация и комплаенс',
+    management: 'Руководитель и подписанты',
+    compliance: 'Комплаенс и идентификация',
     bank: 'Банковские реквизиты'
   };
 
@@ -44,7 +46,7 @@
     }
   }
 
-  var subjectId = getParam('subject') || 'i-014';
+  var subjectId = getParam('subject') || 'c-011';
 
   var requested = (getParam('blocks') || '')
     .split(',')
@@ -62,8 +64,6 @@
 
   sections.forEach(function (section) {
     var block = section.getAttribute('data-edit-block');
-    /* Only supported blocks are ever shown — keeps removed blocks (e.g. an
-     * old documents section) out of both selection and fallback modes. */
     var supported = BLOCK_ORDER.indexOf(block) !== -1;
     var visible = supported && (showAll || selected.indexOf(block) !== -1);
     section.hidden = !visible;
@@ -95,7 +95,7 @@
 
   /* ── "Изменить набор разделов" — preserve current blocks ──────────── */
 
-  var backUrl = 'subject-edit-select.html?subject=' + encodeURIComponent(subjectId) + '&type=individual';
+  var backUrl = 'subject-edit-select.html?subject=' + encodeURIComponent(subjectId) + '&type=company';
   if (!showAll) backUrl += '&blocks=' + selected.join(',');
 
   changeLinks.forEach(function (link) {
