@@ -60,8 +60,76 @@
     }
   };
 
+  // ── Local PDF generation config ────────────────────────────────────────────
+  // First pass: keep form fields editable (do not flatten) for testing.
+  var PDF_FLATTEN_FORM = false;
+
+  // Optional internal upload endpoint. When empty, the wizard NEVER uploads:
+  // PDFs are generated locally and offered as a download link only.
+  var DOCUMENT_UPLOAD_ENDPOINT =
+    window.CRM_DOCUMENT_UPLOAD_ENDPOINT ||
+    (document.body && document.body.getAttribute('data-document-upload-endpoint')) ||
+    '';
+
+  // Signer / representative identity fields. Added dynamically for subjects that
+  // do not carry personal passport data (companies, or individuals without it),
+  // because the notifications confirmation page needs a physical person's details.
+  var SIGNER_FIELDS = [
+    { key: 'extra-signer-full-name',           label: 'ФИО подписанта / представителя', type: 'text',     required: true },
+    { key: 'extra-signer-passport-series',      label: 'Серия паспорта',                 type: 'text',     required: true },
+    { key: 'extra-signer-passport-number',      label: 'Номер паспорта',                 type: 'text',     required: true },
+    { key: 'extra-signer-passport-issued-by',   label: 'Кем выдан',                      type: 'text',     required: true },
+    { key: 'extra-signer-passport-issue-date',  label: 'Дата выдачи',                    type: 'date',     required: true },
+    { key: 'extra-signer-registration-address', label: 'Адрес регистрации',              type: 'textarea', required: true }
+  ];
+
   // ── Document configuration ─────────────────────────────────────────────────
   var DOCUMENTS = [
+    {
+      id: 'client-notifications',
+      title: 'Уведомления клиента',
+      description: 'Комплект уведомлений и подтверждение ознакомления клиента перед заключением брокерского договора.',
+      category: 'Стартовый пакет брокерского договора',
+      categoryLayout: 'inline-two',
+      appliesTo: ['individual', 'company'],
+      pdfTemplateUrl: '../assets/document-pdf-templates/client-notifications.pdf',
+      pdfOutputFilename: 'client-notifications-filled.pdf',
+      pdfRequired: true,
+      fields: [
+        {
+          key: 'extra-document-date',
+          label: 'Дата подписания / подтверждения',
+          type: 'date',
+          required: true
+        }
+      ],
+      // Signer details are appended automatically when the subject has no
+      // personal passport data on file (see getEffectiveFields / needsSignerData).
+      signerFields: SIGNER_FIELDS,
+      pdfFieldMap: {
+        'client_full_name':          'field.clientFullName',
+        'client_passport_series':    'field.passportSeries',
+        'client_passport_number':    'field.passportNumber',
+        'client_passport_issued_by': 'field.passportIssuedBy',
+        'client_passport_issue_date':'field.passportIssueDate',
+        'client_registration_address':'field.registrationAddress',
+        'client_signature_full_name':'field.clientFullName',
+        'document_date':             'extra.extra-document-date'
+      }
+    },
+    {
+      id: 'brokerage-key-information',
+      title: 'Ключевая информация о договоре',
+      description: 'Ключевая информация о договоре брокерского обслуживания.',
+      category: 'Стартовый пакет брокерского договора',
+      categoryLayout: 'inline-two',
+      appliesTo: ['individual', 'company'],
+      pdfTemplateUrl: '../assets/document-pdf-templates/brokerage-key-information.pdf',
+      pdfOutputFilename: 'brokerage-key-information.pdf',
+      pdfRequired: true,
+      // Static information document — no client-specific blanks, no AcroForm fields.
+      fields: []
+    },
     {
       id: 'anketa-fl',
       title: 'Анкета ФЛ',
@@ -883,7 +951,47 @@
       f[key] = isoToRu(extraValues[key]);
     });
 
+    // Normalized identity values consumed by the PDF field mapping
+    // (brokerage starter package). Individuals use their own subject data;
+    // companies and data-less subjects fall back to signer extra fields.
+    var indivWithPassport = subject.kind === 'individual' && !!subject.passportSeries;
+    f.clientFullName = (subject.kind === 'individual' && subject.displayName)
+      ? subject.displayName
+      : (extraValues['extra-signer-full-name'] || '');
+    f.passportSeries = indivWithPassport
+      ? subject.passportSeries
+      : (extraValues['extra-signer-passport-series'] || '');
+    f.passportNumber = indivWithPassport
+      ? subject.passportNumber
+      : (extraValues['extra-signer-passport-number'] || '');
+    f.passportIssuedBy = indivWithPassport
+      ? subject.passportIssuedBy
+      : (extraValues['extra-signer-passport-issued-by'] || '');
+    f.passportIssueDate = indivWithPassport
+      ? subject.passportIssueDate
+      : isoToRu(extraValues['extra-signer-passport-issue-date'] || '');
+    f.registrationAddress = indivWithPassport
+      ? subject.registrationAddress
+      : (extraValues['extra-signer-registration-address'] || '');
+
     return f;
+  }
+
+  // ── Effective field list (adds signer fields when subject lacks passport) ──
+
+  function needsSignerData(subject) {
+    // The confirmation page requires a physical person's details. Individuals
+    // with passport data on file are auto-filled; companies (and individuals
+    // without passport data) must supply signer/representative details.
+    return !(subject && subject.kind === 'individual' && subject.passportSeries);
+  }
+
+  function getEffectiveFields(doc, subject) {
+    var base = (doc.fields || []).slice();
+    if (doc.signerFields && needsSignerData(subject)) {
+      base = base.concat(doc.signerFields);
+    }
+    return base;
   }
 
   // ── Build check map ──────────────────────────────────────────────────────
@@ -1085,13 +1193,15 @@
 
   // ── Render extra fields ───────────────────────────────────────────────────
 
-  function renderExtraFields(doc) {
+  function renderExtraFields(doc, subject) {
     var container = document.getElementById('docwiz-extra-fields');
     if (!container) return;
 
     container.innerHTML = '';
 
-    if ((!doc.fields || !doc.fields.length) && (!doc.checkFields || !doc.checkFields.length)) {
+    var effectiveFields = getEffectiveFields(doc, subject);
+
+    if ((!effectiveFields.length) && (!doc.checkFields || !doc.checkFields.length)) {
       var p = document.createElement('p');
       p.className = 'crm-docwiz-no-fields';
       p.textContent = 'Дополнительные поля не требуются.';
@@ -1102,7 +1212,7 @@
     var grid = document.createElement('div');
     grid.className = 'crm-docwiz-fields-grid';
 
-    (doc.fields || []).forEach(function (field) {
+    effectiveFields.forEach(function (field) {
       var wrap = document.createElement('div');
       wrap.className = 'crm-docwiz-field-wrap';
       if (field.type === 'textarea' || field.fullWidth) wrap.classList.add('crm-docwiz-field-wrap-full');
@@ -1411,9 +1521,9 @@
       groups[cat].push(doc);
     });
 
-    function appendDocCard(doc) {
+    function appendDocCard(doc, container, compact) {
       var card = document.createElement('article');
-      card.className = 'crm-docwiz-doc-card';
+      card.className = 'crm-docwiz-doc-card' + (compact ? ' crm-docwiz-doc-card--compact' : '');
       card.setAttribute('data-doc-id', doc.id);
 
       card.innerHTML =
@@ -1431,19 +1541,45 @@
           '</button>' +
         '</div>';
 
-      grid.appendChild(card);
+      (container || grid).appendChild(card);
     }
 
     // Only show group headings when more than one category is present.
     var showGroupTitles = groupOrder.length > 1;
     groupOrder.forEach(function (cat) {
+      var docsInCat = groups[cat];
+
+      // Compact one-row group (e.g. "Стартовый пакет брокерского договора"):
+      // two documents side by side on desktop, stacked on narrow screens.
+      var inlineTwo = docsInCat.length > 0 && docsInCat.every(function (d) {
+        return d.categoryLayout === 'inline-two';
+      });
+
+      if (inlineTwo) {
+        var group = document.createElement('div');
+        group.className = 'crm-docwiz-doc-group';
+
+        var groupTitle = document.createElement('p');
+        groupTitle.className = 'crm-docwiz-doc-group-title';
+        groupTitle.textContent = cat;
+        group.appendChild(groupTitle);
+
+        var row = document.createElement('div');
+        row.className = 'crm-docwiz-doc-row crm-docwiz-doc-row--two';
+        docsInCat.forEach(function (doc) { appendDocCard(doc, row, true); });
+        group.appendChild(row);
+
+        grid.appendChild(group);
+        return;
+      }
+
       if (showGroupTitles) {
         var title = document.createElement('p');
         title.className = 'crm-docwiz-doc-group-title';
         title.textContent = cat;
         grid.appendChild(title);
       }
-      groups[cat].forEach(appendDocCard);
+      docsInCat.forEach(function (doc) { appendDocCard(doc, grid, false); });
     });
 
     grid.querySelectorAll('.crm-docwiz-select-btn').forEach(function (btn) {
@@ -1474,7 +1610,7 @@
     if (doc.closure) {
       renderClosureFields(doc);
     } else {
-      renderExtraFields(doc);
+      renderExtraFields(doc, subject);
     }
 
     if (step2) step2.hidden = false;
@@ -1484,26 +1620,61 @@
 
     if (step2) step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-    // Step 3 note + final action label depend on the document type.
+    // Reset any PDF status / download link from a previously selected document.
+    resetPdfStatus();
+
+    var hasHtml = !!doc.templateUrl;
+    var hasPdf  = !!doc.pdfTemplateUrl;
+
+    // Privacy note is relevant only for the local PDF flow.
+    var secNote = document.getElementById('docwiz-security-note');
+    if (secNote) secNote.hidden = !hasPdf;
+
+    // Step 3 note depends on the document type.
     var noteEl = step3 ? step3.querySelector('.crm-docwiz-generate-note') : null;
     if (noteEl) {
       noteEl.textContent = doc.closure
         ? 'Static demo: после создания открывается карточка заявки на закрытие.'
-        : 'Нажмите «Сформировать документ» для открытия печатной версии в новой вкладке. ' +
-          'Используйте браузерный диалог печати → «Сохранить как PDF».';
+        : hasHtml
+          ? 'Нажмите «Сформировать документ» для открытия печатной версии в новой вкладке. ' +
+            'Используйте браузерный диалог печати → «Сохранить как PDF».'
+          : 'Нажмите «Сформировать PDF» — документ формируется локально с помощью pdf-lib, ' +
+            'без отправки данных во внешние сервисы.';
     }
 
-    // Wire generate / create button (replace to remove stale listeners)
+    // Wire HTML / closure generate button (replace to remove stale listeners).
     var genBtn = document.getElementById('docwiz-generate-btn');
     if (genBtn) {
       var newGen = genBtn.cloneNode(true);
       newGen.id = 'docwiz-generate-btn';
-      newGen.textContent = doc.closure ? 'Создать заявку' : 'Сформировать документ';
       genBtn.parentNode.replaceChild(newGen, genBtn);
       if (doc.closure) {
+        newGen.hidden = false;
+        newGen.textContent = 'Создать заявку';
         newGen.addEventListener('click', function () { createClosureRequest(doc, subject); });
-      } else {
+      } else if (hasHtml) {
+        newGen.hidden = false;
+        newGen.textContent = 'Сформировать документ';
         newGen.addEventListener('click', function () { generateDoc(doc, subject); });
+      } else {
+        // PDF-only documents have no HTML print template.
+        newGen.hidden = true;
+      }
+    }
+
+    // Wire PDF generate button (hidden for the operational-request closure flow).
+    var pdfBtn = document.getElementById('docwiz-generate-pdf-btn');
+    if (pdfBtn) {
+      var newPdf = pdfBtn.cloneNode(true);
+      newPdf.id = 'docwiz-generate-pdf-btn';
+      pdfBtn.parentNode.replaceChild(newPdf, pdfBtn);
+      if (doc.closure) {
+        newPdf.hidden = true;
+      } else {
+        newPdf.hidden = false;
+        newPdf.disabled = false;
+        newPdf.textContent = 'Сформировать PDF';
+        newPdf.addEventListener('click', function () { generatePdf(doc, subject); });
       }
     }
 
@@ -1516,6 +1687,7 @@
       newBack.addEventListener('click', function () {
         if (step2) step2.hidden = true;
         if (step3) step3.hidden = true;
+        resetPdfStatus();
         setActiveStep(1);
         document.querySelectorAll('.crm-docwiz-doc-card').forEach(function (c) {
           c.classList.remove('crm-docwiz-doc-card-selected');
@@ -1524,18 +1696,21 @@
     }
   }
 
-  // ── Generate document ─────────────────────────────────────────────────────
+  // ── Shared payload builder (HTML + PDF flows) ─────────────────────────────
 
-  function generateDoc(doc, subject) {
+  // Validates visible required fields, collects extra/check values and builds
+  // the normalized field/check maps reused by both the HTML print flow and the
+  // local PDF generation flow.
+  function buildDocumentPayload(doc, subject) {
     var extraValues  = {};
     var checkValues  = {};
     var valid        = true;
     var firstInvalid = null;
 
-    // Collect text/date/select field values
+    // Collect text/date/select field values from [data-field-key].
     document.querySelectorAll('#docwiz-extra-fields [data-field-key]').forEach(function (el) {
       var key = el.getAttribute('data-field-key');
-      var val = el.value.trim();
+      var val = (el.value || '').trim();
       extraValues[key] = val;
       if (el.required && !val) {
         el.classList.add('crm-input-error');
@@ -1546,17 +1721,12 @@
       }
     });
 
-    if (!valid) {
-      alert('Заполните все обязательные поля (отмечены *).');
-      if (firstInvalid) firstInvalid.focus();
-      return;
-    }
-
-    // Collect checkbox values
+    // Collect checkbox values from [data-check-key].
     document.querySelectorAll('#docwiz-extra-fields [data-check-key]').forEach(function (el) {
       checkValues[el.getAttribute('data-check-key')] = el.checked;
     });
-    // Pass select value to buildChecks for code-word operation
+
+    // Select values that drive derived checkbox state.
     if (doc.id === 'code-word-request') {
       checkValues['extra-code-word-operation'] = extraValues['extra-code-word-operation'] || '';
     }
@@ -1565,8 +1735,32 @@
       checkValues['extra-questionnaire-mode'] = extraValues['extra-questionnaire-mode'] || '';
     }
 
-    var allFields = buildFields(subject, extraValues);
-    var allChecks = buildChecks(doc, checkValues);
+    return {
+      doc:          doc,
+      subject:      subject,
+      valid:        valid,
+      firstInvalid: firstInvalid,
+      extraValues:  extraValues,
+      checkValues:  checkValues,
+      fields:       buildFields(subject, extraValues),
+      checks:       buildChecks(doc, checkValues),
+      pdfFilename:  doc.pdfOutputFilename || (doc.id + '.pdf')
+    };
+  }
+
+  // ── Generate document (HTML print flow) ───────────────────────────────────
+
+  function generateDoc(doc, subject) {
+    var payload = buildDocumentPayload(doc, subject);
+
+    if (!payload.valid) {
+      alert('Заполните все обязательные поля (отмечены *).');
+      if (payload.firstInvalid) payload.firstInvalid.focus();
+      return;
+    }
+
+    var allFields = payload.fields;
+    var allChecks = payload.checks;
 
     // Resolve template URL
     var templateUrl;
@@ -1614,6 +1808,200 @@
           genBtn.disabled    = false;
           genBtn.textContent = 'Сформировать документ';
         }
+      });
+  }
+
+  // ── Local PDF generation (pdf-lib, no CDN, no canvas, no html2pdf) ─────────
+
+  // PDF status helpers.
+  function setPdfStatus(msg, kind) {
+    var statusEl = document.getElementById('docwiz-pdf-status');
+    if (!statusEl) return;
+    statusEl.textContent = msg || '';
+    statusEl.className = 'crm-docwiz-pdf-status' + (kind ? (' is-' + kind) : '');
+  }
+
+  function resetPdfStatus() {
+    setPdfStatus('');
+    var dlEl = document.getElementById('docwiz-pdf-download');
+    if (!dlEl) return;
+    if (dlEl.dataset && dlEl.dataset.objectUrl) {
+      try { URL.revokeObjectURL(dlEl.dataset.objectUrl); } catch (e) {}
+      dlEl.dataset.objectUrl = '';
+    }
+    dlEl.hidden = true;
+    dlEl.removeAttribute('href');
+  }
+
+  // Resolve a pdfFieldMap reference (e.g. "field.clientFullName" or
+  // "extra.extra-document-date") to a value from the built payload.
+  function resolvePdfValue(ref, payload) {
+    if (!ref) return '';
+    var dot = ref.indexOf('.');
+    var key = dot === -1 ? ref : ref.slice(dot + 1);
+    if (payload.fields && Object.prototype.hasOwnProperty.call(payload.fields, key)) {
+      return payload.fields[key];
+    }
+    if (payload.checks && Object.prototype.hasOwnProperty.call(payload.checks, key)) {
+      return payload.checks[key];
+    }
+    return '';
+  }
+
+  // Load the local PDF template, fill mapped AcroForm fields and return a Blob.
+  function generatePdfFromTemplate(payload) {
+    var PDFLib = window.PDFLib;
+    if (!PDFLib) {
+      return Promise.reject(new Error('PDF-модуль не загружен.'));
+    }
+
+    var doc = payload.doc;
+    var templateUrl;
+    try {
+      templateUrl = new URL(doc.pdfTemplateUrl, window.location.href).href;
+    } catch (e) {
+      return Promise.reject(new Error('Не удалось определить URL PDF-шаблона.'));
+    }
+
+    // Fetch ONLY the local template URL.
+    return fetch(templateUrl)
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.arrayBuffer();
+      })
+      .then(function (buf) {
+        return PDFLib.PDFDocument.load(buf, { ignoreEncryption: true }).then(function (pdfDoc) {
+          var form;
+          try { form = pdfDoc.getForm(); } catch (e) { form = null; }
+          var fields = form ? form.getFields() : [];
+
+          // No AcroForm fields (e.g. brokerage-key-information): return the
+          // original PDF bytes untouched.
+          if (!form || !fields.length) {
+            return new Blob([buf], { type: 'application/pdf' });
+          }
+
+          var fieldMap = doc.pdfFieldMap || {};
+          Object.keys(fieldMap).forEach(function (pdfName) {
+            var value = resolvePdfValue(fieldMap[pdfName], payload);
+            var field;
+            try {
+              field = form.getField(pdfName);
+            } catch (e) {
+              // Mapped field not present in this template — warn, do not crash.
+              console.warn('PDF template has no field "' + pdfName + '" — skipped.');
+              return;
+            }
+            try {
+              if (typeof field.setText === 'function') {
+                field.setText(value == null ? '' : String(value));
+              } else if (typeof field.check === 'function') {
+                if (value) field.check(); else field.uncheck();
+              }
+            } catch (e) {
+              console.warn('Could not set PDF field "' + pdfName + '":', e);
+            }
+          });
+
+          // Let PDF viewers regenerate field appearances using their own fonts.
+          // This renders Cyrillic values without bundling/embedding a font and
+          // avoids the WinAnsi encoding limitation of the standard PDF fonts.
+          try {
+            form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.True);
+          } catch (e) {
+            console.warn('Could not set NeedAppearances flag:', e);
+          }
+
+          if (PDF_FLATTEN_FORM) {
+            try { form.flatten(); } catch (e) { console.warn('Form flatten failed:', e); }
+          }
+
+          // Save without forcing appearance generation (skips font encoding).
+          return pdfDoc.save({ updateFieldAppearances: false }).then(function (bytes) {
+            return new Blob([bytes], { type: 'application/pdf' });
+          });
+        });
+      });
+  }
+
+  // Optional internal upload — only when an endpoint is explicitly configured.
+  function uploadPdf(pdfBlob, payload) {
+    var formData = new FormData();
+    formData.append('file', pdfBlob, payload.pdfFilename);
+    formData.append('subjectId', payload.subject.id);
+    formData.append('subjectCode', payload.subject.code || '');
+    formData.append('subjectName', payload.subject.displayName || '');
+    formData.append('documentType', payload.doc.id);
+    formData.append('documentTitle', payload.doc.title);
+    formData.append('source', 'document-wizard');
+
+    return fetch(DOCUMENT_UPLOAD_ENDPOINT, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res;
+    });
+  }
+
+  function generatePdf(doc, subject) {
+    resetPdfStatus();
+
+    if (!doc.pdfTemplateUrl) {
+      setPdfStatus('PDF-шаблон пока не подключён.', 'warn');
+      return;
+    }
+    if (!window.PDFLib) {
+      setPdfStatus('PDF-модуль не загружен.', 'error');
+      return;
+    }
+
+    var payload = buildDocumentPayload(doc, subject);
+    if (!payload.valid) {
+      setPdfStatus('Заполните обязательные поля (отмечены *).', 'error');
+      if (payload.firstInvalid) payload.firstInvalid.focus();
+      return;
+    }
+
+    var btn = document.getElementById('docwiz-generate-pdf-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Формируем PDF…'; }
+    setPdfStatus('Формируем PDF…');
+    setActiveStep(3);
+
+    generatePdfFromTemplate(payload)
+      .then(function (blob) {
+        // Always offer a local download link first.
+        var dlEl = document.getElementById('docwiz-pdf-download');
+        if (dlEl) {
+          var url = URL.createObjectURL(blob);
+          dlEl.href = url;
+          dlEl.setAttribute('download', payload.pdfFilename);
+          dlEl.dataset.objectUrl = url;
+          dlEl.hidden = false;
+        }
+
+        if (DOCUMENT_UPLOAD_ENDPOINT) {
+          return uploadPdf(blob, payload)
+            .then(function () {
+              setPdfStatus('PDF сформирован и отправлен во внутренний сервис.', 'ok');
+            })
+            .catch(function (err) {
+              console.error('PDF upload failed:', err);
+              setPdfStatus('PDF сформирован локально. Не удалось отправить во внутренний сервис — файл доступен по ссылке ниже.', 'warn');
+            });
+        }
+
+        // No endpoint configured: never upload, local download only.
+        setPdfStatus('PDF сформирован. Endpoint загрузки не настроен — файл не отправлялся.', 'ok');
+      })
+      .catch(function (err) {
+        console.error('PDF generation failed:', err);
+        setPdfStatus((err && err.message) ? err.message : 'Не удалось сформировать PDF.', 'error');
+        setActiveStep(2);
+      })
+      .finally(function () {
+        if (btn) { btn.disabled = false; btn.textContent = 'Сформировать PDF'; }
       });
   }
 

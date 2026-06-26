@@ -239,6 +239,85 @@
   margin-top: 0;
 }
 
+/* Compact one-row document group ("Стартовый пакет брокерского договора") */
+
+.crm-docwiz-doc-group {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-docwiz-doc-group .crm-docwiz-doc-group-title {
+  margin: 0;
+}
+
+.crm-docwiz-doc-row {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-docwiz-doc-row--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Compact card: keep icon + info on the first line, button wraps full-width */
+.crm-docwiz-doc-card--compact {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.crm-docwiz-doc-card--compact .crm-docwiz-doc-action {
+  flex: 1 1 100%;
+}
+
+.crm-docwiz-doc-card--compact .crm-docwiz-doc-action .crm-button {
+  width: 100%;
+}
+
+/* Step 3: local PDF status, download link and privacy note */
+
+.crm-docwiz-generate-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.crm-docwiz-security-note {
+  margin: 0;
+  font-size: 11px;
+  color: #6f7f99;
+}
+
+.crm-docwiz-pdf-status {
+  margin: 0;
+  font-size: 12px;
+  color: #4e6286;
+  min-height: 1em;
+}
+
+.crm-docwiz-pdf-status.is-ok {
+  color: #2e7d32;
+}
+
+.crm-docwiz-pdf-status.is-warn {
+  color: #80540d;
+}
+
+.crm-docwiz-pdf-status.is-error {
+  color: #c0392b;
+}
+
+.crm-docwiz-pdf-download {
+  justify-self: start;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f6fed;
+  text-decoration: underline;
+}
+
+.crm-docwiz-pdf-download[hidden] {
+  display: none;
+}
+
 /* Step 2: account-closure specific fields */
 
 .crm-closure-fields {
@@ -446,6 +525,11 @@
 
 @media (max-width: 600px) {
   .crm-docwiz-subject-summary {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stack the compact starter-package row vertically on narrow screens */
+  .crm-docwiz-doc-row--two {
     grid-template-columns: 1fr;
   }
 }

@@ -259,16 +259,26 @@
 
           <!-- Step 3: generate & print (hidden until a document is selected) -->
           <div id="docwiz-step3" class="crm-docwiz-generate-section" hidden>
-            <p class="crm-docwiz-generate-note">
-              Нажмите «Сформировать документ» для открытия печатной версии в новой вкладке.
-              Используйте браузерный диалог печати → «Сохранить как PDF».
-            </p>
+            <div class="crm-docwiz-generate-main">
+              <p class="crm-docwiz-generate-note">
+                Нажмите «Сформировать документ» для открытия печатной версии в новой вкладке.
+                Используйте браузерный диалог печати → «Сохранить как PDF».
+              </p>
+              <p id="docwiz-security-note" class="crm-docwiz-security-note" hidden>
+                PDF формируется локально в браузере. Без настроенного внутреннего endpoint файл не отправляется.
+              </p>
+              <p id="docwiz-pdf-status" class="crm-docwiz-pdf-status" aria-live="polite"></p>
+              <a id="docwiz-pdf-download" class="crm-docwiz-pdf-download" download hidden>Скачать PDF</a>
+            </div>
             <div class="crm-docwiz-generate-actions">
               <button id="docwiz-back-btn" class="uk-button uk-button-default crm-button" type="button">
                 ← Назад
               </button>
               <button id="docwiz-generate-btn" class="uk-button crm-button-primary crm-button" type="button">
                 Сформировать документ
+              </button>
+              <button id="docwiz-generate-pdf-btn" class="uk-button crm-button-primary crm-button" type="button" hidden>
+                Сформировать PDF
               </button>
             </div>
           </div>
@@ -290,6 +300,7 @@
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
 <script src="../assets/js/pages/account-closure-state.js"></script>
+<script src="../assets/vendor/pdf-lib.min.js"></script>
 <script src="../assets/js/pages/document-wizard.js"></script>
 </body>
 </html>

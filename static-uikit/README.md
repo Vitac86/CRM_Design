@@ -212,6 +212,9 @@ Direct high-quality PDF download should be implemented by UMI.CMS/backend using 
 
 The wizard includes:
 
+- Стартовый пакет брокерского договора (compact one-row group):
+  - Уведомления клиента (local PDF template)
+  - Ключевая информация о договоре (local PDF template)
 - Анкета ФЛ
 - Анкета ЮЛ
 - Заявление о признании ФЛ квалифицированным инвестором
@@ -225,6 +228,19 @@ It explicitly excludes "Заявление о присоединении": that 
 The Document Wizard output is HTML plus the browser print dialog. It does not use html2pdf, jsPDF, html2canvas, or rasterization. `assets/js/pages/document-wizard.js` resolves relative stylesheet URLs in fetched templates to absolute URLs before writing the filled document to a blank tab, waits for stylesheets to load with a timeout fallback, then invokes `print()`.
 
 The wizard uses static demo subject data and client-side field binding only. Future UMI.CMS integration should replace this with backend subject data binding and, if needed, server-side PDF rendering.
+
+#### Local PDF templates (pdf-lib)
+
+The "Стартовый пакет брокерского договора" group fills **local PDF templates** with [pdf-lib](https://pdf-lib.js.org/) instead of the HTML print flow:
+
+- PDF templates live in `assets/document-pdf-templates/` (separate from the HTML `assets/document-templates/`):
+  - `client-notifications.pdf` — has AcroForm fields on the confirmation page (`client_full_name`, `client_passport_series`, `client_passport_number`, `client_passport_issued_by`, `client_passport_issue_date`, `client_registration_address`, `client_signature_full_name`, `document_date`).
+  - `brokerage-key-information.pdf` — static information document, no AcroForm fields; it is downloaded/uploaded as-is.
+- pdf-lib is bundled **locally** at `assets/vendor/pdf-lib.min.js` and loaded before `document-wizard.js`. **No CDN** (unpkg / jsdelivr / cdnjs) and **no external runtime dependencies** are used. The UIKit works fully offline.
+- "Сформировать PDF" generates the PDF **in the browser**. No screenshot/canvas rasterization, no `html2pdf`, no `html2canvas`, and **no external conversion service** is used.
+- Cyrillic values are rendered by setting the AcroForm `NeedAppearances` flag and saving with `updateFieldAppearances: false`, so PDF viewers regenerate field appearances with their own Unicode fonts — no font embedding required.
+- For individual subjects, identity fields are auto-filled from the static subject data. For company subjects (or subjects without passport data on file), the wizard adds required signer/representative fields and uses them for the confirmation page.
+- Upload happens **only** when an internal endpoint is explicitly configured via `window.CRM_DOCUMENT_UPLOAD_ENDPOINT` or `<body data-document-upload-endpoint="…">`. When no endpoint is configured, sensitive data never leaves the browser: the PDF is generated locally and offered as a download link only (`Скачать PDF`), with the status «PDF сформирован. Endpoint загрузки не настроен — файл не отправлялся.». When configured, the PDF is POSTed as `multipart/form-data` (`credentials: 'include'`, no manually set `Content-Type`).
 
 ## Client-side demo pagination
 Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.
