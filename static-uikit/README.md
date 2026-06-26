@@ -170,6 +170,8 @@ Replace client-side filter logic with server-side filtering and pagination. The 
 
 ## Document templates
 
+> **Deprecated for the Document Wizard.** The active Document Wizard is now PDF-template-only (see "Document Wizard" below); it no longer uses these HTML print templates. They remain in the repository for reference and for the contract statement export flow only. Runtime PDF templates live in `assets/document-pdf-templates/`.
+
 Print-ready HTML templates for client-facing documents live in `assets/document-templates/`.
 
 | Template file | Document |
@@ -205,42 +207,38 @@ Direct high-quality PDF download should be implemented by UMI.CMS/backend using 
 
 ### Document Wizard
 
-`pages/document-wizard.html` is a static demo wizard for additional client documents. The normal entry point is the subject card → Documents tab → "Открыть Document Wizard". The wizard reads `?subject=<id>`, shows the selected demo subject summary, links back to the correct subject card, and filters documents by subject kind:
+`pages/document-wizard.html` is a static demo wizard for additional client documents. The normal entry point is the subject card → Documents tab → "Открыть Document Wizard". The wizard reads `?subject=<id>`, shows the selected demo subject summary, links back to the correct subject card, and filters documents by subject kind.
 
-- company subjects see ЮЛ-only forms plus shared notices/requests;
-- individual subjects see ФЛ-only forms plus shared notices/requests.
+**The Document Wizard is now PDF-template-oriented.** Documents are generated from **local PDF templates** with [pdf-lib](https://pdf-lib.js.org/). The old HTML print flow (fetch template → fill → open print dialog → "Save as PDF") is **removed from the active wizard**. There is no `html2pdf`, `html2canvas`, screenshot/rasterization, CDN, or external conversion service. Local pdf-lib is the only PDF library.
 
-The wizard includes:
+The active wizard shows only documents that produce a PDF (a single `pdfTemplateUrl` or a `packageDocuments` package) plus the operational, non-document account-closure flow. Legacy HTML-only documents (анкеты, заявления о признании квал. инвестором, уведомления, заявление о кодовом слове) are **hidden** from the user-facing list; their configs and HTML templates remain in the repo for reference but are not used by the active wizard. It also excludes "Заявление о присоединении": that document remains part of the contract flow only (`contract-wizard.html` / `contract-edit.html`) through the existing "Выгрузить заявление" button.
 
-- Стартовый пакет брокерского договора (compact one-row group):
-  - Уведомления клиента (local PDF template)
-  - Ключевая информация о договоре (local PDF template)
-- Анкета ФЛ
-- Анкета ЮЛ
-- Заявление о признании ФЛ квалифицированным инвестором
-- Заявление о признании ЮЛ квалифицированным инвестором
-- Уведомление о признании лица квалифицированным инвестором
-- Уведомление об открытии брокерского-депозитарного счета
-- Заявление об установлении/замене кодового слова
+The wizard uses static demo subject data and client-side field binding only. Future UMI.CMS integration should replace this with backend subject data binding and, if needed, server-side PDF finalization.
 
-It explicitly excludes "Заявление о присоединении": that document remains part of the contract flow only (`contract-wizard.html` / `contract-edit.html`) through the existing "Выгрузить заявление" button.
+#### Стартовый пакет брокерского договора (one wizard item → three PDFs)
 
-The Document Wizard output is HTML plus the browser print dialog. It does not use html2pdf, jsPDF, html2canvas, or rasterization. `assets/js/pages/document-wizard.js` resolves relative stylesheet URLs in fetched templates to absolute URLs before writing the filled document to a blank tab, waits for stylesheets to load with a timeout fallback, then invokes `print()`.
+The starter package is represented as **one** wizard row (`brokerage-starter-package`), not several selectable cards. Selecting it generates **three** PDFs together from local templates in `assets/document-pdf-templates/`:
 
-The wizard uses static demo subject data and client-side field binding only. Future UMI.CMS integration should replace this with backend subject data binding and, if needed, server-side PDF rendering.
+- `client-notifications.pdf` — Уведомления клиента (has AcroForm fields on the confirmation page: `client_full_name`, `client_passport_series`, `client_passport_number`, `client_passport_issued_by`, `client_passport_issue_date`, `client_registration_address`, `client_signature_full_name`, `document_date`).
+- `Risks.pdf` — Декларация о рисках (static, no AcroForm fields; returned as-is).
+- `brokerage-key-information.pdf` — Ключевая информация о договоре (static, no AcroForm fields; returned as-is).
 
-#### Local PDF templates (pdf-lib)
+Step 2 inputs depend on the subject:
 
-The "Стартовый пакет брокерского договора" group fills **local PDF templates** with [pdf-lib](https://pdf-lib.js.org/) instead of the HTML print flow:
+- **Individual client (`?subject=c-006`)** enters only `Дата подписания / подтверждения`. All `client-notifications.pdf` identity fields are auto-filled from the individual subject data already in `SUBJECTS` (no representative select, no manual passport/signer fields).
+- **Legal entity (`?subject=c-011`)** enters `Дата подписания / подтверждения` and selects a `Представитель / подписант`. The representative is chosen from `subject.representatives` (static demo records reused from `subject-card.html`; future UMI integration will load them from the subject card/backend). The selected representative's passport data fills `client-notifications.pdf` — no manual passport fields. If a company has no representatives, a warning («У субъекта нет представителей для заполнения стартового пакета.») is shown and PDF generation is disabled.
 
-- PDF templates live in `assets/document-pdf-templates/` (separate from the HTML `assets/document-templates/`):
-  - `client-notifications.pdf` — has AcroForm fields on the confirmation page (`client_full_name`, `client_passport_series`, `client_passport_number`, `client_passport_issued_by`, `client_passport_issue_date`, `client_registration_address`, `client_signature_full_name`, `document_date`).
-  - `brokerage-key-information.pdf` — static information document, no AcroForm fields; it is downloaded/uploaded as-is.
-- pdf-lib is bundled **locally** at `assets/vendor/pdf-lib.min.js` and loaded before `document-wizard.js`. **No CDN** (unpkg / jsdelivr / cdnjs) and **no external runtime dependencies** are used. The UIKit works fully offline.
-- "Сформировать PDF" generates the PDF **in the browser**. No screenshot/canvas rasterization, no `html2pdf`, no `html2canvas`, and **no external conversion service** is used.
-- Cyrillic values are rendered by setting the AcroForm `NeedAppearances` flag and saving with `updateFieldAppearances: false`, so PDF viewers regenerate field appearances with their own Unicode fonts — no font embedding required.
-- For individual subjects, identity fields are auto-filled from the static subject data. For company subjects (or subjects without passport data on file), the wizard adds required signer/representative fields and uses them for the confirmation page.
-- Upload happens **only** when an internal endpoint is explicitly configured via `window.CRM_DOCUMENT_UPLOAD_ENDPOINT` or `<body data-document-upload-endpoint="…">`. When no endpoint is configured, sensitive data never leaves the browser: the PDF is generated locally and offered as a download link only (`Скачать PDF`), with the status «PDF сформирован. Endpoint загрузки не настроен — файл не отправлялся.». When configured, the PDF is POSTed as `multipart/form-data` (`credentials: 'include'`, no manually set `Content-Type`).
+For `client-notifications.pdf`, `clientFullName` is the physical person confirming/signing the notification: the individual client for FL subjects, the selected representative for UL subjects.
+
+#### Local PDF generation (pdf-lib)
+
+- Runtime PDF templates live **only** in `assets/document-pdf-templates/`. `assets/document-templates/` is for legacy HTML templates and must not hold runtime PDFs. Do not use `assets/document-templates/document-pdf-templates/`.
+- pdf-lib is bundled **locally** at `assets/vendor/pdf-lib.min.js` and loaded before `document-wizard.js`. **No CDN** (unpkg / jsdelivr / cdnjs), **no external converter/service**, and **no external runtime dependencies** are used. The UIKit works fully offline.
+- "Сформировать комплект PDF" (package) / "Сформировать PDF" (single) generates the PDFs **in the browser**. The payload is built once from the parent fields and reused for every child PDF; each child config can carry its own `pdfFieldMap`. A child PDF with no AcroForm fields is returned as its original bytes.
+- Field filling uses the explicit `pdfFieldMap` first, then a direct field-name fallback: any remaining AcroForm field whose name is a payload path (`subject.*`, `field.*`, `extra.*`, `check.*`) is filled automatically, so future templates often need no custom map. New documents are config-only — no HTML template required.
+- Cyrillic rendering is **demo-mode**: the AcroForm `NeedAppearances` flag is set and the file is saved with `updateFieldAppearances: false` and `PDF_FLATTEN_FORM = false`, so the PDF viewer regenerates field appearances with its own fonts (no font embedding). The visual result depends on the viewer; production with stable appearances should embed fonts or finalize server-side.
+- Each generated PDF gets its own download link («Скачать: …») in the `#docwiz-pdf-downloads` container. All Object URLs are revoked when another document is selected, so blobs never leak.
+- Upload happens **only** when an internal endpoint is explicitly configured via `window.CRM_DOCUMENT_UPLOAD_ENDPOINT` or `<body data-document-upload-endpoint="…">`. When no endpoint is configured, sensitive data never leaves the browser: the PDFs are generated locally and offered as download links only, with the status «PDF-комплект сформирован. Endpoint загрузки не настроен — файлы не отправлялись.». When configured, all generated files are POSTed in one `multipart/form-data` request (`files[]`, `credentials: 'include'`, no manually set `Content-Type`).
 
 ## Client-side demo pagination
 Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.

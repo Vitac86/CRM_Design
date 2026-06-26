@@ -9855,41 +9855,16 @@ body[data-page="trading-card"] {
   margin-top: 0;
 }
 
-/* Compact one-row document group ("Стартовый пакет брокерского договора") */
+/* Optional package meta line ("3 PDF-документа") inside a document card */
 
-.crm-docwiz-doc-group {
-  display: grid;
-  gap: 8px;
+.crm-docwiz-doc-meta {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4a72d8;
 }
 
-.crm-docwiz-doc-group .crm-docwiz-doc-group-title {
-  margin: 0;
-}
-
-.crm-docwiz-doc-row {
-  display: grid;
-  gap: 8px;
-}
-
-.crm-docwiz-doc-row--two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-/* Compact card: keep icon + info on the first line, button wraps full-width */
-.crm-docwiz-doc-card--compact {
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
-.crm-docwiz-doc-card--compact .crm-docwiz-doc-action {
-  flex: 1 1 100%;
-}
-
-.crm-docwiz-doc-card--compact .crm-docwiz-doc-action .crm-button {
-  width: 100%;
-}
-
-/* Step 3: local PDF status, download link and privacy note */
+/* Step 3: local PDF status, download links and privacy note */
 
 .crm-docwiz-generate-main {
   display: grid;
@@ -9922,6 +9897,17 @@ body[data-page="trading-card"] {
   color: #c0392b;
 }
 
+/* Download links container: one "Скачать: …" link per generated PDF */
+.crm-docwiz-pdf-downloads {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.crm-docwiz-pdf-downloads[hidden] {
+  display: none;
+}
+
 .crm-docwiz-pdf-download {
   justify-self: start;
   font-size: 13px;
@@ -9930,8 +9916,15 @@ body[data-page="trading-card"] {
   text-decoration: underline;
 }
 
-.crm-docwiz-pdf-download[hidden] {
-  display: none;
+/* Legal entity without representatives — starter package cannot be filled */
+.crm-docwiz-rep-warning {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #f0cf8a;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #80540d;
+  font-size: 12px;
 }
 
 /* Step 2: account-closure specific fields */
@@ -10141,11 +10134,6 @@ body[data-page="trading-card"] {
 
 @media (max-width: 600px) {
   .crm-docwiz-subject-summary {
-    grid-template-columns: 1fr;
-  }
-
-  /* Stack the compact starter-package row vertically on narrow screens */
-  .crm-docwiz-doc-row--two {
     grid-template-columns: 1fr;
   }
 }

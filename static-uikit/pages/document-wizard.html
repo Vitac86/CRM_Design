@@ -231,7 +231,7 @@
               </div>
               <div class="crm-wizard-step">
                 <strong>3</strong>
-                <span>Сформировать и распечатать</span>
+                <span>Сформировать PDF</span>
               </div>
             </div>
           </div>
@@ -257,25 +257,25 @@
             </div>
           </div>
 
-          <!-- Step 3: generate & print (hidden until a document is selected) -->
+          <!-- Step 3: generate PDF (hidden until a document is selected) -->
           <div id="docwiz-step3" class="crm-docwiz-generate-section" hidden>
             <div class="crm-docwiz-generate-main">
               <p class="crm-docwiz-generate-note">
-                Нажмите «Сформировать документ» для открытия печатной версии в новой вкладке.
-                Используйте браузерный диалог печати → «Сохранить как PDF».
+                Документы формируются локально через pdf-lib, без отправки данных во внешние сервисы.
               </p>
               <p id="docwiz-security-note" class="crm-docwiz-security-note" hidden>
-                PDF формируется локально в браузере. Без настроенного внутреннего endpoint файл не отправляется.
+                PDF формируется локально в браузере. Без настроенного внутреннего endpoint файлы не отправляются.
               </p>
               <p id="docwiz-pdf-status" class="crm-docwiz-pdf-status" aria-live="polite"></p>
-              <a id="docwiz-pdf-download" class="crm-docwiz-pdf-download" download hidden>Скачать PDF</a>
+              <div id="docwiz-pdf-downloads" class="crm-docwiz-pdf-downloads" hidden></div>
             </div>
             <div class="crm-docwiz-generate-actions">
               <button id="docwiz-back-btn" class="uk-button uk-button-default crm-button" type="button">
                 ← Назад
               </button>
-              <button id="docwiz-generate-btn" class="uk-button crm-button-primary crm-button" type="button">
-                Сформировать документ
+              <!-- Operational closure flow only (no HTML print flow). -->
+              <button id="docwiz-generate-btn" class="uk-button crm-button-primary crm-button" type="button" hidden>
+                Создать заявку
               </button>
               <button id="docwiz-generate-pdf-btn" class="uk-button crm-button-primary crm-button" type="button" hidden>
                 Сформировать PDF
