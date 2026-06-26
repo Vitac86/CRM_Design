@@ -300,6 +300,29 @@
   text-decoration: underline;
 }
 
+/* Collapsed technical details (hidden by default, opt-in via <summary>) */
+.crm-docwiz-tech-details {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #6f7f99;
+}
+
+.crm-docwiz-tech-details > summary {
+  cursor: pointer;
+  color: #4e6286;
+  font-weight: 500;
+  list-style: revert;
+}
+
+.crm-docwiz-tech-details > summary:hover {
+  color: #2f6fed;
+}
+
+.crm-docwiz-tech-details > p {
+  margin: 6px 0 0;
+  line-height: 1.45;
+}
+
 /* Legal entity without representatives — starter package cannot be filled */
 .crm-docwiz-rep-warning {
   margin: 0;

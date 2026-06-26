@@ -260,14 +260,20 @@
           <!-- Step 3: generate PDF (hidden until a document is selected) -->
           <div id="docwiz-step3" class="crm-docwiz-generate-section" hidden>
             <div class="crm-docwiz-generate-main">
-              <p class="crm-docwiz-generate-note">
-                Документы формируются локально через pdf-lib, без отправки данных во внешние сервисы.
-              </p>
-              <p id="docwiz-security-note" class="crm-docwiz-security-note" hidden>
-                PDF формируется локально в браузере. Без настроенного внутреннего endpoint файлы не отправляются.
-              </p>
+              <p class="crm-docwiz-generate-note"></p>
               <p id="docwiz-pdf-status" class="crm-docwiz-pdf-status" aria-live="polite"></p>
               <div id="docwiz-pdf-downloads" class="crm-docwiz-pdf-downloads" hidden></div>
+              <p id="docwiz-security-note" class="crm-docwiz-security-note" hidden>
+                Файлы сформированы локально. Без внутреннего endpoint они не отправляются.
+              </p>
+              <details id="docwiz-tech-details" class="crm-docwiz-tech-details" hidden>
+                <summary>Технические детали</summary>
+                <p>
+                  PDF-документы формируются локально в браузере через pdf-lib с встроенным
+                  шрифтом Inter (поддержка кириллицы). Данные не отправляются во внешние сервисы.
+                  Если задан внутренний endpoint, файлы отправляются одним multipart-запросом.
+                </p>
+              </details>
             </div>
             <div class="crm-docwiz-generate-actions">
               <button id="docwiz-back-btn" class="uk-button uk-button-default crm-button" type="button">
@@ -300,7 +306,9 @@
 <script src="../assets/js/uikit-icons.min.js"></script>
 <script src="../assets/js/crm-static.js"></script>
 <script src="../assets/js/pages/account-closure-state.js"></script>
+<!-- Local PDF generation: pdf-lib + fontkit (Cyrillic font embedding). No CDN. -->
 <script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
 <script src="../assets/js/pages/document-wizard.js"></script>
 </body>
 </html>

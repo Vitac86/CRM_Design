@@ -88,8 +88,16 @@
   };
 
   // ── Local PDF generation config ────────────────────────────────────────────
-  // First pass: keep form fields editable (do not flatten) for testing.
-  var PDF_FLATTEN_FORM = false;
+  // Generated client-facing files are flattened: field appearances are baked in
+  // (with the embedded Cyrillic font) so values render identically in every PDF
+  // viewer and the document becomes final/non-editable. Set to false only for a
+  // template that needs to stay editable after generation.
+  var PDF_FLATTEN_FORM = true;
+
+  // Local Unicode/Cyrillic-capable font embedded into generated PDFs so filled
+  // AcroForm values render in every viewer (the 14 standard PDF fonts are
+  // WinAnsi-only and cannot draw Cyrillic). Served locally — never from a CDN.
+  var PDF_FONT_URL = '../assets/fonts/pdf/Inter-Regular.ttf';
 
   // Optional internal upload endpoint. When empty, the wizard NEVER uploads:
   // PDFs are generated locally and offered as a download link only.
@@ -135,6 +143,7 @@
         {
           id: 'client-notifications',
           title: 'Уведомления клиента',
+          downloadLabel: 'Скачать уведомления',
           pdfTemplateUrl: '../assets/document-pdf-templates/client-notifications.pdf',
           pdfOutputFilename: 'client-notifications-filled.pdf',
           pdfFieldMap: {
@@ -145,12 +154,14 @@
             'client_passport_issue_date': 'field.passportIssueDate',
             'client_registration_address':'field.registrationAddress',
             'client_signature_full_name': 'field.clientFullName',
-            'document_date':              'extra.extra-document-date'
+            // Russian-formatted date (DD.MM.YYYY), never the raw ISO value.
+            'document_date':              'field.documentDateRu'
           }
         },
         {
           id: 'risks-declaration',
           title: 'Декларация о рисках',
+          downloadLabel: 'Скачать декларацию о рисках',
           pdfTemplateUrl: '../assets/document-pdf-templates/Risks.pdf',
           pdfOutputFilename: 'Risks.pdf'
           // Static declaration — no AcroForm fields; returned as-is.
@@ -158,6 +169,7 @@
         {
           id: 'brokerage-key-information',
           title: 'Ключевая информация о договоре',
+          downloadLabel: 'Скачать ключевую информацию',
           pdfTemplateUrl: '../assets/document-pdf-templates/brokerage-key-information.pdf',
           pdfOutputFilename: 'brokerage-key-information.pdf'
           // Static information document — no AcroForm fields; returned as-is.
@@ -994,6 +1006,10 @@
       f[key] = isoToRu(extraValues[key]);
     });
 
+    // Russian-formatted signing/confirmation date (DD.MM.YYYY) for PDF mapping.
+    // Mapped as field.documentDateRu so generated PDFs never show raw ISO dates.
+    f.documentDateRu = isoToRu(extraValues['extra-document-date'] || '');
+
     // Normalized identity values consumed by the PDF field mapping
     // (brokerage starter package, client-notifications.pdf). clientFullName is
     // the physical person confirming/signing the notification: the individual
@@ -1611,22 +1627,28 @@
     var hasPdf    = isPackage || !!doc.pdfTemplateUrl;
     var blocked   = isPackageBlocked(doc, subject);
 
-    // Privacy note is relevant only for the local PDF flow.
+    // Privacy note (short) is relevant only for the local PDF flow.
     var secNote = document.getElementById('docwiz-security-note');
     if (secNote) secNote.hidden = !hasPdf;
 
-    // Step 3 note depends on the document type (PDF-only architecture).
+    // Technical details live in a collapsed <details> shown only for PDF docs.
+    var techDetails = document.getElementById('docwiz-tech-details');
+    if (techDetails) {
+      techDetails.hidden = !hasPdf;
+      techDetails.open = false;
+    }
+
+    // Step 3 note: a compact one-liner (verbose explanation lives in <details>).
     var pdfBtnLabel = isPackage ? 'Сформировать комплект PDF' : 'Сформировать PDF';
     var noteEl = step3 ? step3.querySelector('.crm-docwiz-generate-note') : null;
     if (noteEl) {
       noteEl.textContent = doc.closure
         ? 'Static demo: после создания открывается карточка заявки на закрытие.'
         : isPackage
-          ? 'Нажмите «' + pdfBtnLabel + '» — все ' + doc.packageDocuments.length +
-            ' PDF-документа формируются локально через pdf-lib, без отправки данных во внешние сервисы.'
+          ? 'Формируется ' + doc.packageDocuments.length + ' ' +
+            filesWord(doc.packageDocuments.length) + ' PDF.'
           : hasPdf
-            ? 'Нажмите «Сформировать PDF» — документ формируется локально с помощью pdf-lib, ' +
-              'без отправки данных во внешние сервисы.'
+            ? 'Документ формируется в PDF.'
             : 'PDF-шаблон пока не подключён.';
     }
 
@@ -1766,7 +1788,9 @@
     box.hidden = true;
   }
 
-  // Render one download link per generated PDF ("Скачать: <title>").
+  // Render one compact download link per generated PDF. Uses the document's
+  // short downloadLabel ("Скачать уведомления") when present, otherwise a
+  // generic "Скачать: <title>".
   function renderDownloadLinks(results) {
     var box = document.getElementById('docwiz-pdf-downloads');
     if (!box) return;
@@ -1778,10 +1802,34 @@
       a.href = url;
       a.setAttribute('download', item.filename);
       a.setAttribute('data-object-url', url);
-      a.textContent = 'Скачать: ' + item.title;
+      a.textContent = item.downloadLabel || ('Скачать: ' + item.title);
       box.appendChild(a);
     });
     box.hidden = results.length === 0;
+  }
+
+  // Russian plural for "файл" (1 файл / 3 файла / 5 файлов).
+  function filesWord(n) {
+    var d = n % 10, dd = n % 100;
+    if (d === 1 && dd !== 11) return 'файл';
+    if (d >= 2 && d <= 4 && (dd < 10 || dd >= 20)) return 'файла';
+    return 'файлов';
+  }
+
+  // Cyrillic-capable font bytes, fetched once from the local assets folder and
+  // reused for every PDF in a package. Never fetched from a CDN.
+  var _pdfFontBytesPromise = null;
+  function loadPdfFontBytes() {
+    if (!_pdfFontBytesPromise) {
+      var url;
+      try { url = new URL(PDF_FONT_URL, window.location.href).href; }
+      catch (e) { return Promise.reject(new Error('Не удалось определить URL шрифта PDF.')); }
+      _pdfFontBytesPromise = fetch(url).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.arrayBuffer();
+      });
+    }
+    return _pdfFontBytesPromise;
   }
 
   // Resolve a payload path to its raw value. Supported namespaces:
@@ -1825,6 +1873,92 @@
     }
   }
 
+  // Fill mapped AcroForm fields, regenerate appearances with the embedded
+  // Cyrillic font, optionally flatten, and return a PDF Blob. cyrillicFont may
+  // be null when fontkit is unavailable (falls back to default appearances).
+  function finishFill(pdfDoc, form, fields, doc, payload, cyrillicFont) {
+    var PDFLib = window.PDFLib;
+
+    // 1) Explicit mapping from doc.pdfFieldMap (authoritative).
+    var handled = {};
+    var fieldMap = doc.pdfFieldMap || {};
+    Object.keys(fieldMap).forEach(function (pdfName) {
+      var field;
+      try {
+        field = form.getField(pdfName);
+      } catch (e) {
+        // Mapped field not present in this template — warn, do not crash.
+        console.warn('PDF template has no field "' + pdfName + '" — skipped.');
+        return;
+      }
+      handled[pdfName] = true;
+      applyPdfFieldValue(field, resolvePdfValue(fieldMap[pdfName], payload), pdfName);
+    });
+
+    // 2) Direct field-name fallback. For any field not covered by an explicit
+    // mapping, treat its AcroForm name as a payload path (e.g.
+    // "subject.displayName", "field.clientFullName", "check.notice-scope-all").
+    // Only applied when a value actually resolves, so unmapped fields stay
+    // untouched and do not generate noisy warnings.
+    fields.forEach(function (field) {
+      var pdfName = field.getName();
+      if (handled[pdfName]) return;
+      var value = resolvePdfValue(pdfName, payload);
+      if (value === undefined || value === null) return;       // no mapping
+      if (typeof value === 'string' && value === '') return;   // empty string -> skip
+      applyPdfFieldValue(field, value, pdfName);
+    });
+
+    // Generate field appearances with the embedded Cyrillic font BEFORE
+    // flattening, so the baked-in text uses a Unicode-capable font (the 14
+    // standard fonts are WinAnsi-only and cannot draw Cyrillic).
+    try {
+      if (cyrillicFont) form.updateFieldAppearances(cyrillicFont);
+      else form.updateFieldAppearances();
+    } catch (e) {
+      console.warn('updateFieldAppearances failed:', e);
+    }
+
+    if (PDF_FLATTEN_FORM) {
+      // Final client-facing document: bake appearances into page content.
+      try {
+        form.flatten({ updateFieldAppearances: false });
+        removeDanglingAnnots(pdfDoc);
+      } catch (e) {
+        console.warn('Form flatten failed:', e);
+      }
+    } else {
+      // Keep editable: NeedAppearances asks viewers to refresh field rendering.
+      try {
+        form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.True);
+      } catch (e) {
+        console.warn('Could not set NeedAppearances flag:', e);
+      }
+    }
+
+    return pdfDoc.save({ updateFieldAppearances: false }).then(function (bytes) {
+      return new Blob([bytes], { type: 'application/pdf' });
+    });
+  }
+
+  // flatten() leaves the flattened widgets' references in each page's /Annots
+  // array, dangling in the xref (some viewers warn). Keep only annotation refs
+  // that still resolve — this preserves real link annotations and drops the
+  // now-empty widgets whose appearance is already baked into page content.
+  function removeDanglingAnnots(pdfDoc) {
+    var PDFLib = window.PDFLib;
+    var ctx = pdfDoc.context;
+    var Annots = PDFLib.PDFName.of('Annots');
+    pdfDoc.getPages().forEach(function (page) {
+      var annots = page.node.lookup(Annots);
+      if (!annots || !annots.array) return;
+      var kept = annots.array.filter(function (ref) { return !!ctx.lookup(ref); });
+      if (kept.length === annots.array.length) return;
+      if (kept.length === 0) page.node.delete(Annots);
+      else page.node.set(Annots, ctx.obj(kept));
+    });
+  }
+
   // Load the local PDF template, fill mapped AcroForm fields and return a Blob.
   function generatePdfFromTemplate(payload) {
     var PDFLib = window.PDFLib;
@@ -1852,63 +1986,33 @@
           try { form = pdfDoc.getForm(); } catch (e) { form = null; }
           var fields = form ? form.getFields() : [];
 
-          // No AcroForm fields (e.g. brokerage-key-information): return the
-          // original PDF bytes untouched.
+          // No AcroForm fields (e.g. Risks / brokerage-key-information): return
+          // the original PDF bytes untouched (no font needed).
           if (!form || !fields.length) {
             return new Blob([buf], { type: 'application/pdf' });
           }
 
-          // 1) Explicit mapping from doc.pdfFieldMap (authoritative).
-          var handled = {};
-          var fieldMap = doc.pdfFieldMap || {};
-          Object.keys(fieldMap).forEach(function (pdfName) {
-            var field;
-            try {
-              field = form.getField(pdfName);
-            } catch (e) {
-              // Mapped field not present in this template — warn, do not crash.
-              console.warn('PDF template has no field "' + pdfName + '" — skipped.');
-              return;
+          // Embed a local Cyrillic-capable font so filled values render in every
+          // viewer. If fontkit is missing, fall back to default appearances.
+          return loadPdfFontBytes().then(function (fontBytes) {
+            if (window.fontkit && fontBytes) {
+              try {
+                pdfDoc.registerFontkit(window.fontkit);
+                return pdfDoc.embedFont(fontBytes, { subset: true })
+                  .then(function (font) {
+                    return finishFill(pdfDoc, form, fields, doc, payload, font);
+                  })
+                  .catch(function (e) {
+                    console.warn('Cyrillic font embedding failed; using default appearances:', e);
+                    return finishFill(pdfDoc, form, fields, doc, payload, null);
+                  });
+              } catch (e) {
+                console.warn('registerFontkit failed; using default appearances:', e);
+              }
+            } else {
+              console.warn('fontkit not loaded — Cyrillic field values may not render.');
             }
-            handled[pdfName] = true;
-            applyPdfFieldValue(field, resolvePdfValue(fieldMap[pdfName], payload), pdfName);
-          });
-
-          // 2) Direct field-name fallback. For any field not covered by an
-          // explicit mapping, treat its AcroForm name as a payload path (e.g.
-          // "subject.displayName", "field.clientFullName", "check.notice-scope-all").
-          // Only applied when a value actually resolves, so unmapped fields stay
-          // untouched and do not generate noisy warnings.
-          fields.forEach(function (field) {
-            var pdfName = field.getName();
-            if (handled[pdfName]) return;
-            var value = resolvePdfValue(pdfName, payload);
-            if (value === undefined || value === null) return;       // no mapping
-            if (typeof value === 'string' && value === '') return;   // empty string -> skip
-            applyPdfFieldValue(field, value, pdfName);
-          });
-
-          // Demo-mode appearance handling:
-          // Setting NeedAppearances and saving with updateFieldAppearances:false
-          // lets the PDF viewer regenerate field appearances with its own fonts.
-          // This avoids the WinAnsi/Cyrillic encoding limitation of the standard
-          // PDF fonts WITHOUT embedding fonts here. The visual result therefore
-          // depends on the viewer. For production with stable appearances, embed
-          // fonts or finalize server-side (not implemented in this demo).
-          try {
-            form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.True);
-          } catch (e) {
-            console.warn('Could not set NeedAppearances flag:', e);
-          }
-
-          // First pass keeps fields editable for testing (PDF_FLATTEN_FORM = false).
-          if (PDF_FLATTEN_FORM) {
-            try { form.flatten(); } catch (e) { console.warn('Form flatten failed:', e); }
-          }
-
-          // Save without forcing appearance generation (skips font encoding).
-          return pdfDoc.save({ updateFieldAppearances: false }).then(function (bytes) {
-            return new Blob([bytes], { type: 'application/pdf' });
+            return finishFill(pdfDoc, form, fields, doc, payload, null);
           });
         });
       });
@@ -1923,6 +2027,12 @@
     results.forEach(function (item) {
       formData.append('files[]', item.blob, item.filename);
     });
+
+    // Manifest describing every attached file (id / title / filename).
+    formData.append('documentsManifest', JSON.stringify(results.map(function (item) {
+      return { id: item.id, title: item.title, filename: item.filename };
+    })));
+
     formData.append('subjectId', payload.subject.id);
     formData.append('subjectCode', payload.subject.code || '');
     formData.append('subjectName', payload.subject.displayName || '');
@@ -1930,6 +2040,7 @@
     formData.append('documentTitle', payload.doc.title);
     formData.append('source', 'document-wizard');
 
+    // Do NOT set Content-Type manually — the browser adds the multipart boundary.
     return fetch(DOCUMENT_UPLOAD_ENDPOINT, {
       method: 'POST',
       body: formData,
@@ -1976,22 +2087,25 @@
 
     generatePdfFromTemplate(payload)
       .then(function (blob) {
-        var results = [{ blob: blob, filename: payload.pdfFilename, title: doc.title }];
+        var results = [{
+          id: doc.id, blob: blob, filename: payload.pdfFilename,
+          title: doc.title, downloadLabel: doc.downloadLabel
+        }];
         renderDownloadLinks(results);
 
         if (DOCUMENT_UPLOAD_ENDPOINT) {
           return uploadPdfs(results, payload)
             .then(function () {
-              setPdfStatus('PDF сформирован и отправлен во внутренний сервис.', 'ok');
+              setPdfStatus('PDF сформирован: 1 файл. Файл отправлен во внутренний сервис.', 'ok');
             })
             .catch(function (err) {
               console.error('PDF upload failed:', err);
-              setPdfStatus('PDF сформирован локально. Не удалось отправить во внутренний сервис — файл доступен по ссылке ниже.', 'warn');
+              setPdfStatus('PDF сформирован: 1 файл. Не удалось отправить во внутренний сервис — файл доступен по ссылке ниже.', 'warn');
             });
         }
 
         // No endpoint configured: never upload, local download only.
-        setPdfStatus('PDF сформирован. Endpoint загрузки не настроен — файл не отправлялся.', 'ok');
+        setPdfStatus('PDF сформирован: 1 файл. Файл не отправлялся.', 'ok');
       })
       .catch(function (err) {
         console.error('PDF generation failed:', err);
@@ -2040,7 +2154,10 @@
         pdfFilename: child.pdfOutputFilename || (child.id + '.pdf')
       };
       return generatePdfFromTemplate(childPayload).then(function (blob) {
-        return { blob: blob, filename: childPayload.pdfFilename, title: child.title };
+        return {
+          id: child.id, blob: blob, filename: childPayload.pdfFilename,
+          title: child.title, downloadLabel: child.downloadLabel
+        };
       });
     });
 
@@ -2048,19 +2165,22 @@
       .then(function (results) {
         renderDownloadLinks(results);
 
+        var n = results.length;
+        var head = 'PDF-комплект сформирован: ' + n + ' ' + filesWord(n) + '.';
+
         if (DOCUMENT_UPLOAD_ENDPOINT) {
           return uploadPdfs(results, payload)
             .then(function () {
-              setPdfStatus('PDF-комплект сформирован и отправлен во внутренний сервис.', 'ok');
+              setPdfStatus(head + ' Файлы отправлены во внутренний сервис.', 'ok');
             })
             .catch(function (err) {
               console.error('PDF package upload failed:', err);
-              setPdfStatus('PDF-комплект сформирован локально. Не удалось отправить во внутренний сервис — файлы доступны по ссылкам ниже.', 'warn');
+              setPdfStatus(head + ' Не удалось отправить во внутренний сервис — файлы доступны по ссылкам ниже.', 'warn');
             });
         }
 
         // No endpoint configured: never upload, local downloads only.
-        setPdfStatus('PDF-комплект сформирован. Endpoint загрузки не настроен — файлы не отправлялись.', 'ok');
+        setPdfStatus(head + ' Файлы не отправлялись.', 'ok');
       })
       .catch(function (err) {
         console.error('PDF package generation failed:', err);

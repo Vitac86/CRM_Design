@@ -170,7 +170,7 @@ Replace client-side filter logic with server-side filtering and pagination. The 
 
 ## Document templates
 
-> **Deprecated for the Document Wizard.** The active Document Wizard is now PDF-template-only (see "Document Wizard" below); it no longer uses these HTML print templates. They remain in the repository for reference and for the contract statement export flow only. Runtime PDF templates live in `assets/document-pdf-templates/`.
+> **Deprecated for the Document Wizard.** The active Document Wizard is now PDF-template-only (see "Document Wizard" below); it no longer uses these HTML print templates. They remain in the repository for reference and for the contract statement export flow only. Runtime PDF templates live in `assets/document-pdf-templates/`. The original Word (`.docx`) sources have moved out of `assets/` into `reference/document-source-docx/` (source/reference only — see that folder's `README.md`).
 
 Print-ready HTML templates for client-facing documents live in `assets/document-templates/`.
 
@@ -233,12 +233,26 @@ For `client-notifications.pdf`, `clientFullName` is the physical person confirmi
 #### Local PDF generation (pdf-lib)
 
 - Runtime PDF templates live **only** in `assets/document-pdf-templates/`. `assets/document-templates/` is for legacy HTML templates and must not hold runtime PDFs. Do not use `assets/document-templates/document-pdf-templates/`.
-- pdf-lib is bundled **locally** at `assets/vendor/pdf-lib.min.js` and loaded before `document-wizard.js`. **No CDN** (unpkg / jsdelivr / cdnjs), **no external converter/service**, and **no external runtime dependencies** are used. The UIKit works fully offline.
+- pdf-lib is bundled **locally** at `assets/vendor/pdf-lib.min.js` and `@pdf-lib/fontkit` at `assets/vendor/fontkit.umd.min.js`, both loaded before `document-wizard.js`. **No CDN** (unpkg / jsdelivr / cdnjs), **no external converter/service**, and **no external runtime dependencies** are used. The UIKit works fully offline.
 - "Сформировать комплект PDF" (package) / "Сформировать PDF" (single) generates the PDFs **in the browser**. The payload is built once from the parent fields and reused for every child PDF; each child config can carry its own `pdfFieldMap`. A child PDF with no AcroForm fields is returned as its original bytes.
 - Field filling uses the explicit `pdfFieldMap` first, then a direct field-name fallback: any remaining AcroForm field whose name is a payload path (`subject.*`, `field.*`, `extra.*`, `check.*`) is filled automatically, so future templates often need no custom map. New documents are config-only — no HTML template required.
-- Cyrillic rendering is **demo-mode**: the AcroForm `NeedAppearances` flag is set and the file is saved with `updateFieldAppearances: false` and `PDF_FLATTEN_FORM = false`, so the PDF viewer regenerates field appearances with its own fonts (no font embedding). The visual result depends on the viewer; production with stable appearances should embed fonts or finalize server-side.
-- Each generated PDF gets its own download link («Скачать: …») in the `#docwiz-pdf-downloads` container. All Object URLs are revoked when another document is selected, so blobs never leak.
-- Upload happens **only** when an internal endpoint is explicitly configured via `window.CRM_DOCUMENT_UPLOAD_ENDPOINT` or `<body data-document-upload-endpoint="…">`. When no endpoint is configured, sensitive data never leaves the browser: the PDFs are generated locally and offered as download links only, with the status «PDF-комплект сформирован. Endpoint загрузки не настроен — файлы не отправлялись.». When configured, all generated files are POSTed in one `multipart/form-data` request (`files[]`, `credentials: 'include'`, no manually set `Content-Type`).
+- **Visible Cyrillic rendering (real font embedding, not viewer-dependent).** A local Unicode/Cyrillic-capable font, `assets/fonts/pdf/Inter-Regular.ttf` (the project Inter typeface, merged Cyrillic + Latin coverage), is embedded with fontkit. The flow is: load → `registerFontkit` → `embedFont` → fill → `form.updateFieldAppearances(font)` → (default) `form.flatten()`. `PDF_FLATTEN_FORM = true`, so generated client-facing files are flattened and final; appearances are baked in and render identically in every viewer (not a screenshot/canvas — still a real PDF). Flatten leaves the flattened widgets' refs dangling in each page's `/Annots`; the wizard prunes non-resolving refs so the output PDF is clean. The font is never fetched from a CDN or external domain.
+- **Dates** are inserted Russian-formatted as `DD.MM.YYYY` via the normalized `field.documentDateRu`; raw ISO (`YYYY-MM-DD`) values are never written into a PDF.
+- After generation the UI is compact: a one-line status (e.g. «PDF-комплект сформирован: 3 файла. Файлы не отправлялись.»), three short download links («Скачать уведомления», «Скачать декларацию о рисках», «Скачать ключевую информацию»), a short privacy note, and a collapsed `<details>Технические детали` block. All Object URLs are revoked when another document is selected, so blobs never leak.
+- Upload happens **only** when an internal endpoint is explicitly configured via `window.CRM_DOCUMENT_UPLOAD_ENDPOINT` or `<body data-document-upload-endpoint="…">`. When no endpoint is configured, sensitive data never leaves the browser: the PDFs are generated locally and offered as download links only. When configured, all generated files are POSTed in **one** `multipart/form-data` request — each blob under `files[]`, plus a `documentsManifest` (JSON array of `{id, title, filename}`) and `subjectId` / `subjectCode` / `subjectName` / `documentType` / `documentTitle` / `source` fields (`credentials: 'include'`, no manually set `Content-Type`).
+
+#### Field classification (auto-filled vs user-entered)
+
+To avoid asking the user to retype data that already exists, every document config splits fields into two groups:
+
+- **Auto-filled (never shown):** client/representative name, passport series/number, issued-by, issue date, registration address, ИНН, КПП, ОГРН, phone, email, company data. These come from `SUBJECTS` (and `subject.representatives` for legal entities), and will come from backend/UMI subject data later.
+- **User-entered (shown in step 2):** only document-specific values — signing/confirmation date, selected representative (legal entities), operation type, reason, contract number when not known from context, code-word action, qualification basis, specific declarations/checkboxes.
+
+New wizard configs must keep this split: list only document-specific entries in `fields` / `checkFields`, and resolve everything else from subject/representative data.
+
+#### Word-source templates (DOCX)
+
+Word templates are **source/reference** materials only and live in `reference/document-source-docx/` (not runtime). The active wizard consumes prepared, fillable **PDF** templates from `assets/document-pdf-templates/`. Runtime DOCX → PDF conversion in the browser is intentionally not implemented (not reliable enough for final financial/legal documents). To activate a DOCX document: prepare a fillable PDF (AcroForm fields named per the convention), drop it in `assets/document-pdf-templates/`, and add a config entry. A DOCX-only document is not shown in the wizard until its PDF template exists. See `reference/document-source-docx/README.md` for the full workflow and field-naming convention.
 
 ## Client-side demo pagination
 Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.
