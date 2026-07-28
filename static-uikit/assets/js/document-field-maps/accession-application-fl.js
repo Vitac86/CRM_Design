@@ -127,10 +127,12 @@
       check('reportsEmail', 'extra.report-delivery', 'email', 0, 56.6, 419.09),
       check('reportsEdo', 'extra.report-delivery', 'edo', 0, 56.6, 430.37),
       {
-        // Address printed on the "По электронной почте ______" line. Only
-        // meaningful when e-mail delivery is selected; blank otherwise.
+        // Address printed on the "По электронной почте ______" line. It belongs
+        // to that delivery option only, so it stays blank whenever another
+        // method (офис / почта / ЭДО) is selected.
         id: 'reportEmail',
         source: 'subject.email', optional: true,
+        showWhen: { source: 'extra.report-delivery', equals: 'email' },
         page: 0, left: 149.4, baselineTop: 419.09, width: 93.4,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
       },

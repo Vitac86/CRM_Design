@@ -161,9 +161,24 @@ rule, which is what "typed on the line" means.
   fallbacks: ['surname'],          // shorter renderings to try if too wide
   required: true,                  // fail if empty
   optional: true,                  // suppress "source missing" validation
-  baselineShift: 0                 // fine vertical nudge
+  baselineShift: 0,                // fine vertical nudge
+  showWhen: {                      // draw only when a condition holds
+    source: 'extra.report-delivery',
+    equals: 'email'
+  }
 }
 ```
+
+### Conditional values (`showWhen`)
+
+Some printed lines belong to one branch of a mutually exclusive choice. In
+Appendix 1A the "По электронной почте ______" line must carry the address only
+when e-mail delivery is chosen, and stay blank for офис / почта / ЭДО. Express
+that with `showWhen`; `equals` may be an array, and omitting it means "draw
+when the source is truthy".
+
+Without such a condition the value would print under every option — a defect
+that structural checks do not catch and only visual QA reveals.
 
 ### Field source paths
 

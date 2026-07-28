@@ -110,7 +110,15 @@ complete and validated.
 
 **User-entered (transaction-specific only):** signing date; счёт депо type;
 торговый счёт депо type; report delivery method; income payout destination;
-three tariff plan names.
+three tariff plan names. Every one of these has a corresponding position or
+checkbox in the PDF — the wizard shows no input that generation ignores.
+
+The e-mail address on the "По электронной почте ______" line is conditional
+(`showWhen`): it prints only when e-mail delivery is selected.
+
+**Wizard status:** offered to individual subjects, hidden for legal entities,
+generated through the standard "Сформировать PDF" flow with the same status and
+download behaviour as the starter package.
 
 **Checkboxes (21 in the template, 20 mappable):**
 §1 accession ×2 · §2 счёт депо ×3, торговый счёт депо ×3, operator ×1 ·

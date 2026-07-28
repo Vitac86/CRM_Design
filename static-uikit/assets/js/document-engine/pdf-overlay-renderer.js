@@ -136,6 +136,23 @@
   }
   Renderer.resolve = resolve;
 
+  // Optional visibility condition: { source, equals }. Draw the value only when
+  // the referenced business value matches — used for text that belongs to one
+  // branch of a mutually exclusive choice, such as the address printed on the
+  // "По электронной почте ______" line, which must stay blank when a different
+  // delivery method is selected.
+  function isVisible(field, payload) {
+    var cond = field.showWhen;
+    if (!cond || !cond.source) return true;
+    var value = resolve(cond.source, payload);
+    if (Object.prototype.hasOwnProperty.call(cond, 'equals')) {
+      return Array.isArray(cond.equals)
+        ? cond.equals.indexOf(value) !== -1
+        : value === cond.equals;
+    }
+    return !!value;
+  }
+
   function formatValue(field, raw) {
     var fmt = field.format;
     if (!fmt) return raw == null ? '' : String(raw);
@@ -272,6 +289,8 @@
   // ── Drawing ────────────────────────────────────────────────────────────────
 
   function drawTextField(ctx, field) {
+    if (!isVisible(field, ctx.payload)) return;
+
     var page = ctx.pages[field.page];
     var pageHeight = page.getSize().height;
     var font = ctx.fonts[field.font || 'legalSerif'];
