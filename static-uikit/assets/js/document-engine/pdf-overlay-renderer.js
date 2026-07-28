@@ -60,6 +60,26 @@
     return null;
   }
 
+  // Reusable Russian document-date splitter.
+  //
+  //   ruDateParts('20.04.2008')  ->  { day: '20', monthGenitive: 'апреля',
+  //                                    monthNumber: '04', year: '2008' }
+  //
+  // Russian forms are printed as «__» ________ 20__ г., where the month is
+  // written in the genitive ("20 апреля 2008"), never as a number. Returns
+  // null for an unparseable value so callers can leave the slot blank.
+  function ruDateParts(value) {
+    var p = parseRuOrIso(value);
+    if (!p) return null;
+    return {
+      day: p.d,
+      monthNumber: p.m,
+      monthGenitive: MONTHS_RU[parseInt(p.m, 10) - 1] || '',
+      year: p.y
+    };
+  }
+  Renderer.ruDateParts = ruDateParts;
+
   var FORMATTERS = {
     // '2008-04-20' | '20.04.2008' -> '20.04.2008'
     dateRu: function (v) {
@@ -85,8 +105,24 @@
     // date -> month name only, for '«__» ________ 20__ г.' lines where the
     // template already prints the '20' of the year
     monthOnly: function (v) {
-      var p = parseRuOrIso(v);
-      return p ? MONTHS_RU[parseInt(p.m, 10) - 1] : '';
+      var p = ruDateParts(v);
+      return p ? p.monthGenitive : '';
+    },
+    // date -> genitive month name, e.g. 'сентября'
+    dateMonthGenitive: function (v) {
+      var p = ruDateParts(v);
+      return p ? p.monthGenitive : '';
+    },
+    // date -> four-digit year, e.g. '2008'
+    dateYear4: function (v) {
+      var p = ruDateParts(v);
+      return p ? p.year : '';
+    },
+    // date -> 'апреля 2008' — genitive month plus the four-digit year, for a
+    // single printed blank that ends just before "г.".
+    dateMonthYearGenitive: function (v) {
+      var p = ruDateParts(v);
+      return p ? (p.monthGenitive + ' ' + p.year) : '';
     },
     // date -> last two digits of the year, for '20__ г.' slots
     dateYear2: function (v) {

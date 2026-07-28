@@ -156,6 +156,22 @@
         p.extraValues['report-delivery'] = '';
         p.extraValues['income-payout'] = '';
       });
+    },
+
+    // Passport issue-date variants. The month is printed as a genitive word in
+    // a 38.24 pt slot, so these cover the shortest name (мая, which fits at the
+    // full 8.52 pt) and the longest (сентября, the worst case at 6.25 pt).
+    'date-may': function () {
+      return payload(function (p) { p.fields.passportIssueDate = '05.05.2020'; });
+    },
+    'date-april': function () {
+      return payload(function (p) { p.fields.passportIssueDate = '20.04.2008'; });
+    },
+    'date-september': function () {
+      return payload(function (p) { p.fields.passportIssueDate = '01.09.2018'; });
+    },
+    'date-december': function () {
+      return payload(function (p) { p.fields.passportIssueDate = '31.12.2026'; });
     }
   };
 

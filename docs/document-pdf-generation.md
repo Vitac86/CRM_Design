@@ -194,9 +194,31 @@ reports rather than silently drawing nothing.
 
 ### Built-in formatters
 
-`dateRu` (DD.MM.YYYY) · `dateDay` · `monthOnly` · `dateMonthYear` ·
+`dateRu` (DD.MM.YYYY) · `dateDay` · `monthOnly` · `dateMonthGenitive` ·
+`dateYear4` · `dateMonthYearGenitive` ("апреля 2008") · `dateMonthYear` ·
 `dateMonthYearShort` (MM.YYYY) · `dateYear2` · `initials` ("Ковалёв Д.О.") ·
 `surname` · `upper` · `trim`. A `format` may also be a function.
+
+### Russian document dates
+
+`CRMDocumentEngine.overlayRenderer.ruDateParts(value)` splits a date (ISO or
+`DD.MM.YYYY`) into the parts these forms print separately:
+
+```js
+ruDateParts('20.04.2008')
+// -> { day: '20', monthGenitive: 'апреля', monthNumber: '04', year: '2008' }
+```
+
+Russian legal forms read `«__» ________ 20__ г.` and are filled in with the
+month **spelled out in the genitive** — "20 апреля 2008", never "20 04.2008".
+Use `dateDay` for the quoted slot and `dateMonthYearGenitive` (or
+`dateMonthGenitive` + `dateYear4` when the form really does print two separate
+rules) for the rest. Returns `null` for an unparseable value, so the slot is
+simply left blank.
+
+Month names are long, so measure the slot before mapping and let shrink-to-fit
+absorb the difference: in Appendix 1A the 38.24 pt slot renders "мая 2020" at
+the full 8.52 pt and the longest name, "сентября 2018", at 6.02 pt.
 
 ## 6. Text fitting
 

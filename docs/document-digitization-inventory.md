@@ -146,9 +146,12 @@ Also the handwritten signature rule on page 2.
 4. **`transfer-requisites`** (ПРИЛОЖЕНИЕ 4) appears to be a pure reference sheet
    of the broker's bank details with no client-specific values. Confirm whether
    it needs any dynamic data at all.
-5. **Passport issue date format.** The printed slot «__» ______г. is 38 pt wide
-   — too narrow for a spelled-out month ("апреля 2008" ≈ 46 pt at 8.5 pt). The
-   map currently prints `MM.YYYY` (e.g. «20» 04.2008 г.). Confirm acceptable.
+5. ~~**Passport issue date format.**~~ **Resolved.** The date now prints as
+   `«20» апреля 2008 г.` — day in the quotes, genitive month and four-digit
+   year on the printed line. Exact glyph measurement of the 38.24 pt slot
+   (513.69 → "г." at 551.93) showed every month fits: "мая 2020" at the full
+   8.52 pt down to "сентября 2018" at 6.02 pt, above the 6.0 pt floor. The
+   numeric `MM.YYYY` form and the `«20» 04 2008` fallback are not used.
 6. **Signature name.** The `(_________)` slot holds ~11 characters. The renderer
    prints "Фамилия И.О.", falls back to the surname alone, and fails loudly if
    even that cannot fit (roughly beyond a 15-character surname).

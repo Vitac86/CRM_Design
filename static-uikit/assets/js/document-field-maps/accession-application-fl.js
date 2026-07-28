@@ -83,19 +83,30 @@
         page: 0, left: 56.6, baselineTop: 118.82, width: 352.6,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
       },
-      // The printed date reads «__» ______г. — day inside the quotes, month and
-      // year after them. That slot is 38 pt wide, too narrow for a spelled-out
-      // month ("апреля 2008" needs ~46 pt at 8.5 pt), so MM.YYYY is used.
+      // The printed date reads:  дата выдачи «___» _________г.
+      // Measured glyph geometry of that line (tools/probe-pdf-coords.py):
+      //   «  ends at 487.01,  » starts at 499.66   -> day slot     12.65 pt
+      //   underline starts 513.69, "г." starts 551.93 -> month+year 38.24 pt
+      //
+      // The form provides ONE blank for the month and the year together, so
+      // both are drawn into it as "апреля 2008": a spelled-out genitive month
+      // followed by the four-digit year, the way these forms are filled in by
+      // hand. Never a numeric MM.YYYY.
+      //
+      // Every month name fits. Measured widths of "<month> 2008" at 8.52 pt
+      // range from 32.26 pt (мая) to 51.45 pt (сентября); shrink-to-fit keeps
+      // мая at the full 8.52 pt and puts the longest, сентября, at 6.25 pt —
+      // above the 6.0 pt floor — leaving a clear gap before "г.".
       {
         id: 'passportIssueDay',
         source: 'field.passportIssueDate', format: 'dateDay',
-        page: 0, left: 487.0, baselineTop: 118.82, width: 12.8,
+        page: 0, left: 487.0, baselineTop: 118.82, width: 12.6,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
       },
       {
         id: 'passportIssueMonthYear',
-        source: 'field.passportIssueDate', format: 'dateMonthYearShort',
-        page: 0, left: 513.7, baselineTop: 118.82, width: 38.2,
+        source: 'field.passportIssueDate', format: 'dateMonthYearGenitive',
+        page: 0, left: 513.7, baselineTop: 118.82, width: 37.5,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
       },
       {
