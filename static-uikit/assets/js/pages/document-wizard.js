@@ -141,22 +141,19 @@
       companyFields: [REPRESENTATIVE_FIELD],
       packageDocuments: [
         {
+          // Static notification pack, 10 pages, identical to the source
+          // document. It previously carried an 11th, generated "confirmation
+          // sheet" holding blue AcroForm fields — that page and its form have
+          // been removed: client data must appear inside the original layout,
+          // never on an appended data sheet.
+          //
+          // The document has no in-place mapping yet, so it is issued exactly
+          // as supplied. See docs/document-digitization-inventory.md.
           id: 'client-notifications',
           title: 'Уведомления клиента',
           downloadLabel: 'Скачать уведомления',
           pdfTemplateUrl: '../assets/document-pdf-templates/client-notifications.pdf',
-          pdfOutputFilename: 'client-notifications-filled.pdf',
-          pdfFieldMap: {
-            'client_full_name':           'field.clientFullName',
-            'client_passport_series':     'field.passportSeries',
-            'client_passport_number':     'field.passportNumber',
-            'client_passport_issued_by':  'field.passportIssuedBy',
-            'client_passport_issue_date': 'field.passportIssueDate',
-            'client_registration_address':'field.registrationAddress',
-            'client_signature_full_name': 'field.clientFullName',
-            // Russian-formatted date (DD.MM.YYYY), never the raw ISO value.
-            'document_date':              'field.documentDateRu'
-          }
+          pdfOutputFilename: 'client-notifications.pdf'
         },
         {
           id: 'risks-declaration',
@@ -174,6 +171,87 @@
           pdfOutputFilename: 'brokerage-key-information.pdf'
           // Static information document — no AcroForm fields; returned as-is.
         }
+      ]
+    },
+    {
+      // In-place PDF overlay. Values are drawn straight onto the pages of the
+      // Word-derived template; the coordinates live in
+      // assets/js/document-field-maps/accession-application-fl.js.
+      // Identity, passport, address, phone and e-mail come from the subject
+      // card, so the wizard only asks for the transaction-specific choices.
+      id: 'accession-application-fl',
+      title: 'Заявление о присоединении (ФЛ)',
+      description: 'Приложение 1А к Регламенту брокерского обслуживания.',
+      category: 'Документы и заявления клиента',
+      appliesTo: ['individual'],
+      overlayTemplateId: 'accession-application-fl',
+      pdfOutputFilename: 'zayavlenie-o-prisoedinenii-fl.pdf',
+      downloadLabel: 'Скачать заявление',
+      checkGroupLabel: 'Отметки заявления:',
+      fields: [
+        {
+          key: 'extra-document-date',
+          label: 'Дата подписания',
+          type: 'date',
+          required: true
+        },
+        {
+          key: 'depo-account-type',
+          label: 'Счёт депо (п. 2)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не открывать' },
+            { value: 'owner', label: 'Владельца' },
+            { value: 'nominee', label: 'Номинального держателя' },
+            { value: 'trustee', label: 'Доверительного управляющего' }
+          ]
+        },
+        {
+          key: 'trading-depo-account-type',
+          label: 'Торговый счёт депо (п. 2)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не открывать' },
+            { value: 'owner', label: 'Владельца' },
+            { value: 'nominee', label: 'Номинального держателя' },
+            { value: 'trustee', label: 'Доверительного управляющего' }
+          ]
+        },
+        {
+          key: 'report-delivery',
+          label: 'Способ получения отчётов (п. 3)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'office', label: 'В офисе ООО «Инвестика»' },
+            { value: 'post', label: 'По почте заказным письмом' },
+            { value: 'email', label: 'По электронной почте' },
+            { value: 'edo', label: 'По системе ЭДО' }
+          ]
+        },
+        {
+          key: 'income-payout',
+          label: 'Перечисление доходов по ценным бумагам (п. 6)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не выбрано' },
+            { value: 'broker-account', label: 'На специальный брокерский счёт' },
+            { value: 'bank-details', label: 'На банковские реквизиты из анкеты' }
+          ]
+        },
+        { key: 'tariff-stock', label: 'Тарифный план — фондовый рынок', type: 'text' },
+        { key: 'tariff-derivatives', label: 'Тарифный план — срочный рынок', type: 'text' },
+        { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' }
+      ],
+      checkFields: [
+        { key: 'accession-brokerage', label: 'Присоединение к Регламенту брокерского обслуживания', defaultChecked: true },
+        { key: 'accession-depository', label: 'Присоединение к Депозитарному договору' },
+        { key: 'depo-operator', label: 'Назначить ООО «Инвестика» оператором счёта депо' },
+        { key: 'market-stock', label: 'Фондовый рынок' },
+        { key: 'market-derivatives', label: 'Срочный рынок' },
+        { key: 'market-currency', label: 'Валютный рынок и рынок драгоценных металлов' },
+        { key: 'agreement-esignature', label: 'Соглашение об использовании электронной подписи' },
+        { key: 'agreement-quik', label: 'Соглашение о праве использования ПО QUIK' }
       ]
     },
     {
@@ -1959,6 +2037,27 @@
     });
   }
 
+  // Draw the payload onto a Word-derived PDF template with the overlay engine.
+  // The result is ordinary static page content: no AcroForm, no widgets and no
+  // appended data sheet — the document looks as if it had been typed in Word.
+  function generatePdfByOverlay(payload) {
+    var engine = window.CRMDocumentEngine;
+    if (!engine || !engine.overlayRenderer) {
+      return Promise.reject(new Error('Модуль формирования документов не загружен.'));
+    }
+    var templateId = payload.doc.overlayTemplateId;
+    var template = (engine.fieldMaps || {})[templateId];
+    if (!template) {
+      return Promise.reject(new Error('Не найдена карта полей документа "' + templateId + '".'));
+    }
+    return engine.overlayRenderer.render(template, {
+      subject:     payload.subject,
+      fields:      payload.fields,
+      extraValues: payload.extraValues,
+      checks:      payload.checks
+    });
+  }
+
   // Load the local PDF template, fill mapped AcroForm fields and return a Blob.
   function generatePdfFromTemplate(payload) {
     var PDFLib = window.PDFLib;
@@ -1967,6 +2066,9 @@
     }
 
     var doc = payload.doc;
+
+    // Documents migrated to the in-place overlay engine take that path.
+    if (doc.overlayTemplateId) return generatePdfByOverlay(payload);
     var templateUrl;
     try {
       templateUrl = new URL(doc.pdfTemplateUrl, window.location.href).href;
@@ -2221,7 +2323,8 @@
     // user-facing list; their configs/templates remain in the repo for reference.
     var filteredDocs = DOCUMENTS.filter(function (doc) {
       if (doc.appliesTo.indexOf(subject.kind) === -1) return false;
-      return !!(doc.pdfTemplateUrl ||
+      return !!(doc.overlayTemplateId ||
+                doc.pdfTemplateUrl ||
                 (doc.packageDocuments && doc.packageDocuments.length) ||
                 doc.closure);
     });
