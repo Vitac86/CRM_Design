@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<title>Document engine — QA harness</title>
+<!--
+  Visual-QA harness for the PDF overlay engine.
+
+  Development aid only — it is not linked from the CRM and ships no client data.
+  All fixtures below are obviously fictional.
+
+  Serve static-uikit over HTTP (fetch() cannot read file:// URLs), then open:
+
+      python -m http.server 8000        # run inside static-uikit/
+      http://localhost:8000/tools/document-qa-harness.html
+
+  Query parameters (used by the automated check):
+      ?doc=<template-id>&fixture=<fixture-name>&auto=1
+  With auto=1 the page renders once and writes base64 PDF bytes into #out,
+  so a headless browser can extract and inspect the result.
+-->
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; max-width: 900px; }
+  h1 { font-size: 18px; }
+  button { padding: 6px 12px; margin: 2px; cursor: pointer; }
+  #status { padding: 8px; border-radius: 4px; background: #f2f2f2; white-space: pre-wrap; }
+  #out { display: none; }
+  .err { background: #fde8e8 !important; }
+  .ok { background: #e8f6ec !important; }
+  table { border-collapse: collapse; margin-top: 12px; }
+  td, th { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+</style>
+</head>
+<body>
+<h1>Document engine — QA harness</h1>
+<p>Renders a template with fictional fixture data using the production engine.</p>
+
+<div id="controls"></div>
+<p id="status">idle</p>
+<pre id="out"></pre>
+
+<script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
+<script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+<script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+<script src="../assets/js/document-field-maps/accession-application-fl.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var engine = window.CRMDocumentEngine;
+
+  // ── Fictional fixtures ───────────────────────────────────────────────────
+  // Deliberately invented people and addresses. Never commit real client data.
+
+  function payload(over) {
+    var base = {
+      subject: {
+        id: 'test-fl',
+        kind: 'individual',
+        displayName: 'Ковалёв Даниил Олегович',
+        email: 'd.kovalev@example.test',
+        phone: '+7 (903) 215-44-89'
+      },
+      fields: {
+        clientFullName: 'Ковалёв Даниил Олегович',
+        passportSeries: '4510',
+        passportNumber: '234567',
+        passportIssuedBy: 'ОВД района Пресненский г. Москвы',
+        passportIssueDate: '20.04.2008',
+        registrationAddress: '125009, Россия, г. Москва, ул. Тверская, д. 14, кв. 38',
+        documentDateRu: '28.07.2026'
+      },
+      extraValues: {
+        'depo-account-type': 'owner',
+        'trading-depo-account-type': 'owner',
+        'report-delivery': 'email',
+        'tariff-stock': 'Базовый',
+        'tariff-derivatives': '',
+        'tariff-currency': ''
+      },
+      checks: {
+        'accession-brokerage': true,
+        'accession-depository': true,
+        'depo-operator': true,
+        'market-stock': true,
+        'market-derivatives': false,
+        'market-currency': false,
+        'agreement-esignature': true,
+        'agreement-quik': false
+      }
+    };
+    var p = JSON.parse(JSON.stringify(base));
+    (over || function () {})(p);
+    return p;
+  }
+
+  var FIXTURES = {
+    'normal': function () { return payload(); },
+
+    // Long full name AND a hyphenated surname, so this also exercises the
+    // signature-slot fallback chain: "Ковалёв-Донской М.И." is too wide for the
+    // 47 pt parentheses, so the renderer falls back to the surname alone.
+    'long-name': function () {
+      return payload(function (p) {
+        p.fields.clientFullName =
+          'Ковалёв-Донской Максимилиан Иннокентьевич';
+        p.subject.displayName = p.fields.clientFullName;
+      });
+    },
+
+    'long-authority': function () {
+      return payload(function (p) {
+        p.fields.passportIssuedBy =
+          'Отделением по вопросам миграции ОМВД России по Пресненскому ' +
+          'району города Москвы';
+      });
+    },
+
+    'long-address': function () {
+      return payload(function (p) {
+        p.fields.registrationAddress =
+          '125009, г. Москва, внутригородская территория муниципальный ' +
+          'округ Пресненский, ул. Тверская, д. 14, к. 3, стр. 2, кв. 385';
+      });
+    },
+
+    'missing-optional': function () {
+      return payload(function (p) {
+        p.extraValues['tariff-stock'] = '';
+        p.extraValues['report-delivery'] = 'office';
+        p.subject.email = '';
+        p.checks['agreement-esignature'] = false;
+      });
+    },
+
+    'all-checks': function () {
+      return payload(function (p) {
+        Object.keys(p.checks).forEach(function (k) { p.checks[k] = true; });
+        p.extraValues['depo-account-type'] = 'trustee';
+        p.extraValues['trading-depo-account-type'] = 'nominee';
+        p.extraValues['report-delivery'] = 'edo';
+        p.extraValues['income-payout'] = 'bank-details';
+        p.extraValues['tariff-stock'] = 'Базовый';
+        p.extraValues['tariff-derivatives'] = 'Стандарт';
+        p.extraValues['tariff-currency'] = 'Единый';
+      });
+    },
+
+    'no-checks': function () {
+      return payload(function (p) {
+        Object.keys(p.checks).forEach(function (k) { p.checks[k] = false; });
+        p.extraValues['depo-account-type'] = '';
+        p.extraValues['trading-depo-account-type'] = '';
+        p.extraValues['report-delivery'] = '';
+        p.extraValues['income-payout'] = '';
+      });
+    }
+  };
+
+  // ── Runner ───────────────────────────────────────────────────────────────
+
+  var statusEl = document.getElementById('status');
+  var outEl = document.getElementById('out');
+
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = cls || '';
+  }
+
+  function blobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () { resolve(String(r.result).split(',')[1]); };
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+  }
+
+  function run(docId, fixtureName, download) {
+    var template = engine.fieldMaps[docId];
+    if (!template) { setStatus('unknown template: ' + docId, 'err'); return; }
+    var make = FIXTURES[fixtureName];
+    if (!make) { setStatus('unknown fixture: ' + fixtureName, 'err'); return; }
+
+    setStatus('rendering ' + docId + ' / ' + fixtureName + ' …');
+
+    return engine.overlayRenderer.render(template, make())
+      .then(function (blob) {
+        if (download) {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = docId + '--' + fixtureName + '.pdf';
+          a.click();
+        }
+        return blobToBase64(blob).then(function (b64) {
+          outEl.textContent = 'BASE64_START' + b64 + 'BASE64_END';
+          setStatus('OK ' + docId + ' / ' + fixtureName +
+            ' — ' + blob.size + ' bytes', 'ok');
+          document.title = 'DONE';
+        });
+      })
+      .catch(function (e) {
+        outEl.textContent = 'ERROR_START' + (e && e.message ? e.message : String(e)) + 'ERROR_END';
+        setStatus('FAILED: ' + (e && e.message ? e.message : e), 'err');
+        document.title = 'FAILED';
+        console.error(e);
+      });
+  }
+
+  // Buttons for manual visual QA
+  var controls = document.getElementById('controls');
+  Object.keys(engine.fieldMaps).forEach(function (docId) {
+    var h = document.createElement('h3');
+    h.textContent = docId;
+    controls.appendChild(h);
+    Object.keys(FIXTURES).forEach(function (fx) {
+      var b = document.createElement('button');
+      b.textContent = fx;
+      b.onclick = function () { run(docId, fx, true); };
+      controls.appendChild(b);
+    });
+  });
+
+  // Automated mode
+  var params = new URLSearchParams(location.search);
+  if (params.get('auto')) {
+    run(params.get('doc') || 'accession-application-fl',
+        params.get('fixture') || 'normal', false);
+  }
+}());
+</script>
+</body>
+</html>
