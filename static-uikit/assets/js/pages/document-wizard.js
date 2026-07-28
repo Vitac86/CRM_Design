@@ -1702,7 +1702,8 @@
     resetPdfStatus();
 
     var isPackage = !!(doc.packageDocuments && doc.packageDocuments.length);
-    var hasPdf    = isPackage || !!doc.pdfTemplateUrl;
+    // PDF-capable = a rendering strategy is configured, whichever one it is.
+    var hasPdf    = !!resolveRenderStrategy(doc);
     var blocked   = isPackageBlocked(doc, subject);
 
     // Privacy note (short) is relevant only for the local PDF flow.
@@ -1843,6 +1844,30 @@
   }
 
   // ── Local PDF generation (pdf-lib, no CDN, no canvas, no html2pdf) ─────────
+
+  // Single source of truth for "how does this document become a PDF?".
+  // The production visibility filter, the step-3 capability check and the
+  // generation dispatch all read this, so adding a rendering strategy never
+  // means updating a hardcoded allowlist in three separate places.
+  //
+  //   'package'  — one wizard item that emits several child PDFs
+  //   'overlay'  — values drawn onto a Word-derived template (document-engine)
+  //   'acroform' — legacy: fill the AcroForm fields of a prepared PDF
+  //   null       — no PDF rendering configured for this document
+  function resolveRenderStrategy(doc) {
+    if (!doc) return null;
+    if (doc.packageDocuments && doc.packageDocuments.length) return 'package';
+    if (doc.overlayTemplateId) return 'overlay';
+    if (doc.pdfTemplateUrl) return 'acroform';
+    return null;
+  }
+
+  // Coordinate map registered by assets/js/document-field-maps/<id>.js.
+  function getOverlayTemplate(doc) {
+    var engine = window.CRMDocumentEngine;
+    if (!engine || !engine.fieldMaps || !doc || !doc.overlayTemplateId) return null;
+    return engine.fieldMaps[doc.overlayTemplateId] || null;
+  }
 
   // PDF status helpers.
   function setPdfStatus(msg, kind) {
@@ -2041,14 +2066,17 @@
   // The result is ordinary static page content: no AcroForm, no widgets and no
   // appended data sheet — the document looks as if it had been typed in Word.
   function generatePdfByOverlay(payload) {
+    var doc = payload.doc;
     var engine = window.CRMDocumentEngine;
     if (!engine || !engine.overlayRenderer) {
+      console.error('Document "' + doc.id + '": document-engine scripts are not loaded.');
       return Promise.reject(new Error('Модуль формирования документов не загружен.'));
     }
-    var templateId = payload.doc.overlayTemplateId;
-    var template = (engine.fieldMaps || {})[templateId];
+    var template = getOverlayTemplate(doc);
     if (!template) {
-      return Promise.reject(new Error('Не найдена карта полей документа "' + templateId + '".'));
+      console.error('Document "' + doc.id + '": overlay map "' +
+        doc.overlayTemplateId + '" is not registered.');
+      return Promise.reject(new Error('Карта полей документа не загружена.'));
     }
     return engine.overlayRenderer.render(template, {
       subject:     payload.subject,
@@ -2068,7 +2096,8 @@
     var doc = payload.doc;
 
     // Documents migrated to the in-place overlay engine take that path.
-    if (doc.overlayTemplateId) return generatePdfByOverlay(payload);
+    if (resolveRenderStrategy(doc) === 'overlay') return generatePdfByOverlay(payload);
+
     var templateUrl;
     try {
       templateUrl = new URL(doc.pdfTemplateUrl, window.location.href).href;
@@ -2156,7 +2185,7 @@
   // Public entry point. Packages generate several PDFs at once; everything else
   // generates a single PDF from its own template.
   function generatePdf(doc, subject) {
-    if (doc.packageDocuments && doc.packageDocuments.length) {
+    if (resolveRenderStrategy(doc) === 'package') {
       return generatePdfPackage(doc, subject);
     }
     return generateSinglePdf(doc, subject);
@@ -2165,12 +2194,22 @@
   function generateSinglePdf(doc, subject) {
     resetPdfStatus();
 
-    if (!doc.pdfTemplateUrl) {
+    var strategy = resolveRenderStrategy(doc);
+    if (!strategy) {
       setPdfStatus('PDF-шаблон пока не подключён.', 'warn');
       return;
     }
     if (!window.PDFLib) {
       setPdfStatus('PDF-модуль не загружен.', 'error');
+      return;
+    }
+    // An overlay document needs its coordinate map module to have loaded.
+    // Report that precisely instead of silently emitting a blank template.
+    if (strategy === 'overlay' && !getOverlayTemplate(doc)) {
+      console.error('Document "' + doc.id + '": overlay map "' +
+        doc.overlayTemplateId + '" is not registered. Check that its ' +
+        'document-field-maps script is loaded before document-wizard.js.');
+      setPdfStatus('Карта полей документа не загружена — обратитесь в поддержку.', 'error');
       return;
     }
 
@@ -2323,10 +2362,7 @@
     // user-facing list; their configs/templates remain in the repo for reference.
     var filteredDocs = DOCUMENTS.filter(function (doc) {
       if (doc.appliesTo.indexOf(subject.kind) === -1) return false;
-      return !!(doc.overlayTemplateId ||
-                doc.pdfTemplateUrl ||
-                (doc.packageDocuments && doc.packageDocuments.length) ||
-                doc.closure);
+      return !!resolveRenderStrategy(doc) || !!doc.closure;
     });
 
     renderDocCards(filteredDocs, subject);
