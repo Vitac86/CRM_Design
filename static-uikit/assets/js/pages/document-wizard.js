@@ -1465,6 +1465,286 @@
       ]
     },
     {
+      // ПРИЛОЖЕНИЕ 7 — one authoritative four-page file holding three separate
+      // order forms, kept as a single registry entry rather than split into
+      // duplicate cards. «Тип поручения» selects which of the three is filled;
+      // the other two stay blank and all four pages are always emitted.
+      // The order-type names are taken verbatim from the source.
+      id: 'order-forms',
+      title: 'Поручение (формы поручений)',
+      description: 'Приложение 7 к Регламенту брокерского обслуживания.',
+      category: 'Операционные заявки',
+      appliesTo: ['individual', 'company'],
+      overlayTemplateId: 'order-forms',
+      pdfOutputFilename: 'poruchenie.pdf',
+      downloadLabel: 'Скачать поручение',
+      extraGroupLabel: 'Параметры поручения',
+      checkGroupLabel: 'Дополнительные отметки:',
+      aliases: ['приложение 7', 'заявка', 'сделка', 'вывод средств', 'перевод средств'],
+      fields: [
+        {
+          key: 'extra-order-type',
+          label: 'Тип поручения',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'trade', label: 'Поручение на совершение сделки' },
+            { value: 'transfer', label: 'Поручение на операции с денежными средствами (перевод между торговыми площадками)' },
+            { value: 'withdrawal', label: 'Поручение на операции с денежными средствами (вывод на банковский счет)' }
+          ]
+        },
+        {
+          key: 'extra-submission-kind',
+          label: 'Вид подачи',
+          type: 'select',
+          required: true,
+          defaultValue: 'primary',
+          options: [
+            { value: 'primary', label: 'Первичная подача заявки' },
+            { value: 'cancellation', label: 'Отмена ранее поданной заявки' }
+          ]
+        },
+        {
+          key: 'extra-order-number-date',
+          label: 'Номер и дата заявки (при отмене — ранее поданной)',
+          type: 'text'
+        },
+        {
+          key: 'extra-contract-number-date',
+          label: 'Номер и дата договора с клиентом',
+          type: 'text',
+          required: true
+        },
+        {
+          key: 'extra-brokerage-account',
+          label: 'Брокерский счёт №',
+          type: 'text',
+          required: true
+        },
+
+        // ─── Поручение на совершение сделки ───────────────────────────────
+        {
+          key: 'extra-trade-kind',
+          label: 'Вид сделки',
+          type: 'select',
+          options: [
+            { value: 'buy', label: 'Покупка' },
+            { value: 'sell', label: 'Продажа' },
+            { value: 'other', label: 'Иной вид сделки' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+        },
+        {
+          key: 'extra-trade-kind-other',
+          label: 'Иной вид сделки (указать)',
+          type: 'text',
+          showWhen: { source: 'extra.extra-trade-kind', equals: 'other' }
+        },
+        {
+          key: 'extra-order-market',
+          label: 'Вид рынка',
+          type: 'select',
+          options: [
+            { value: 'stock', label: 'Фондовый' },
+            { value: 'currency', label: 'Валютный' },
+            { value: 'derivatives', label: 'Срочный' },
+            { value: 'otc', label: 'Внебиржевой' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+        },
+        {
+          key: 'extra-order-kind',
+          label: 'Вид поручения',
+          type: 'select',
+          options: [
+            { value: 'market', label: 'Рыночное' },
+            { value: 'limit', label: 'Лимитированное' },
+            { value: 'conditional', label: 'Условное' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+        },
+        {
+          key: 'extra-order-kind-conditional',
+          label: 'Условное поручение (указать)',
+          type: 'text',
+          showWhen: { source: 'extra.extra-order-kind', equals: 'conditional' }
+        },
+        { key: 'extra-order-validity', label: 'Срок действия заявки', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-settlement-period', label: 'Срок расчётов', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-counterparty', label: 'Информация о контрагенте', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-order-other-info', label: 'Иная информация', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+
+        { key: 'extra-security-issuer', label: 'Наименование эмитента', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-security-type', label: 'Вид, категория (тип), выпуск, транш, серия, ISIN/CFI', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-security-quantity', label: 'Количество ценных бумаг', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-security-price', label: 'Цена одной ценной бумаги / НКД / валюта цены', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        {
+          key: 'extra-repo-ccp',
+          label: 'Сделка РЕПО с ЦК',
+          type: 'select',
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+        },
+        { key: 'extra-trade-amount', label: 'Сумма сделки в валюте сделки', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+
+        { key: 'extra-derivative-kind', label: 'Вид инструмента срочного рынка', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-derivative-name', label: 'Наименование ПФИ', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-derivative-quantity', label: 'Количество ПФИ, шт. (лотов)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-derivative-premium', label: 'Цена ПФИ (премия)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-derivative-strike', label: 'Цена исполнения страйк (для опционов)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-derivative-expiry', label: 'Дата исполнения (экспирации)', type: 'date',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-derivative-amount', label: 'Сумма сделки (ПФИ)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+
+        { key: 'extra-fx-instrument', label: 'Наименование валютного инструмента / инструмента драг. металлов', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-fx-lots', label: 'Количество лотов валютного инструмента', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-fx-rate', label: 'Курс валюты / цена сделки с драг. металлами', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        { key: 'extra-fx-amount', label: 'Сумма сделки в валюте котировки', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        {
+          key: 'extra-fx-swap-ccp',
+          label: 'Сделка валютный СВОП с ЦК',
+          type: 'select',
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+        },
+
+        // ─── Перевод между торговыми площадками ───────────────────────────
+        {
+          key: 'extra-move-from',
+          label: 'С торговой площадки',
+          type: 'select',
+          options: [
+            { value: 'stock', label: 'ПАО Московская Биржа (фондовый рынок и рынок депозитов)' },
+            { value: 'currency', label: 'ПАО Московская Биржа (валютный рынок и рынок драг. металлов)' },
+            { value: 'derivatives', label: 'ПАО Московская Биржа (срочный рынок)' },
+            { value: 'otc', label: 'Внебиржевой рынок' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' }
+        },
+        {
+          key: 'extra-move-to',
+          label: 'На торговую площадку',
+          type: 'select',
+          options: [
+            { value: 'stock', label: 'ПАО Московская Биржа (фондовый рынок и рынок депозитов)' },
+            { value: 'currency', label: 'ПАО Московская Биржа (валютный рынок и рынок драг. металлов)' },
+            { value: 'derivatives', label: 'ПАО Московская Биржа (срочный рынок)' },
+            { value: 'otc', label: 'Внебиржевой рынок' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' }
+        },
+        { key: 'extra-move-amount', label: 'Сумма (цифрами)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' } },
+        { key: 'extra-move-amount-words', label: 'Сумма (прописью)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' } },
+        {
+          key: 'extra-move-currency',
+          label: 'Валюта перевода',
+          type: 'select',
+          options: [
+            { value: 'RUB', label: 'RUB' },
+            { value: 'USD', label: 'USD' },
+            { value: 'EURO', label: 'EURO' },
+            { value: 'CNY', label: 'CNY' },
+            { value: 'other', label: 'Иная валюта' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' }
+        },
+
+        // ─── Вывод на банковский счёт ─────────────────────────────────────
+        {
+          key: 'extra-payout-currency',
+          label: 'Валюта вывода',
+          type: 'select',
+          options: [
+            { value: 'RUB', label: 'RUB' },
+            { value: 'USD', label: 'USD' },
+            { value: 'EURO', label: 'EURO' },
+            { value: 'CNY', label: 'CNY' },
+            { value: 'other', label: 'Иная валюта' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' }
+        },
+        {
+          key: 'extra-payout-amount-mode',
+          label: 'Сумма вывода',
+          type: 'select',
+          options: [
+            { value: 'whole', label: 'В размере свободного остатка' },
+            { value: 'amount', label: 'В сумме' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' }
+        },
+        { key: 'extra-payout-amount', label: 'Сумма вывода (цифрами)', type: 'text',
+          showWhen: { source: 'extra.extra-payout-amount-mode', equals: 'amount' } },
+        { key: 'extra-payout-amount-words', label: 'Сумма вывода (прописью)', type: 'text',
+          showWhen: { source: 'extra.extra-payout-amount-mode', equals: 'amount' } },
+        {
+          key: 'extra-payout-from',
+          label: 'С торговой площадки',
+          type: 'select',
+          options: [
+            { value: 'stock', label: 'ПАО Московская Биржа (фондовый рынок и рынок депозитов)' },
+            { value: 'currency', label: 'ПАО Московская Биржа (валютный рынок и рынок драг. металлов)' },
+            { value: 'derivatives', label: 'ПАО Московская Биржа (срочный рынок)' },
+            { value: 'otc', label: 'Внебиржевой рынок' }
+          ],
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' }
+        },
+        { key: 'extra-bank-recipient', label: 'Получатель (наименование/ФИО)', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-bic', label: 'БИК/SWIFT банка получателя', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-name', label: 'Наименование банка получателя', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-corr-swift', label: 'SWIFT банка-корреспондента', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-corr-name', label: 'Наименование банка-корреспондента', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-corr-account', label: 'Корреспондентский счёт банка получателя', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-account', label: 'Счёт получателя', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-inn', label: 'ИНН получателя', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-personal-account', label: 'Лицевой счёт', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
+        { key: 'extra-bank-other', label: 'Прочее', type: 'text',
+          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } }
+      ],
+      checkFields: [
+        {
+          key: 'order-uncovered-ack',
+          label: 'Я проинформирован, что данная сделка может привести к открытию непокрытой позиции (для клиентов с начальным уровнем риска)'
+        }
+      ]
+    },
+    {
       id: 'code-word-request',
       title: 'Заявление об установлении/изменении кодового слова',
       description: 'Приложение 14 к Регламенту брокерского обслуживания.',
