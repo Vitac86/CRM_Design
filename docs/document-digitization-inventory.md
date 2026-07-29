@@ -59,10 +59,10 @@ without an overlay map cannot appear even by accident.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | ПРИЛОЖЕНИЕ 1А … ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ (ФЛ).docx | `accession-application-fl` | ФЛ | 3 | legacy | ✅ | ✅ | ✅ migrated |
 | 2 | ПРИЛОЖЕНИЕ 1В … ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ (ЮЛ).docx | `accession-application-yul` | ЮЛ | 2 | — | ✅ | ✅ | ✅ migrated |
-| 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | — | — | ⛔ blocked — conversion |
-| 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | — | — | ⛔ blocked — conversion |
-| 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | оба | 4 | — | — | — | ⛔ blocked — conversion |
-| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | — | — | ⛔ blocked — conversion |
+| 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | ✅ | — | ▣ template only |
+| 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | ✅ | — | ◐ static, not exposed |
+| 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | ЮЛ | 4 | — | ✅ | — | ▣ template only |
+| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | — | ▣ template only |
 | 7 | ПРИЛОЖЕНИЕ 9 … ОТКАЗ ОТ ПРЕДОСТАВЛЕНИЯ БРОКЕРУ ПРАВА ….docx | `broker-use-refusal-request` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 8 | ПРИЛОЖЕНИЕ 10 … ОТКАЗ ИСПОЛНЕНИЯ РЕГЛАМЕНТА В ЦЕЛОМ.docx | `regulation-full-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 9 | ПРИЛОЖЕНИЕ 11 … ОТКАЗ ОТ ЧАСТИ УСЛУГ ПО РЕГЛАМЕНТУ.docx | `regulation-partial-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
@@ -74,8 +74,8 @@ without an overlay map cannot appear even by accident.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 11 | Приложение1 физ л.docx | `qualification-request-fl` | ФЛ | 3 | ✔ | ✅ | ✅ | ✅ migrated |
 | 12 | ЗАЯВЛЕНИЕ о признании Юр. Лица квал. инвестором.docx | `qualification-request-yul` | ЮЛ | 2 | ✔ | ✅ | ✅ | ✅ migrated |
-| 13 | УВЕДОМЛЕНИЕ о признании лица квал. инвестором.docx | `qualification-notice` | оба | 1 | ✔ | — | — | ⛔ blocked — conversion |
-| 14 | Приложение 11 Уведомление риски.docx | `qualification-consequences-notice` | ФЛ | 1 | — | — | — | ⛔ blocked — conversion |
+| 13 | УВЕДОМЛЕНИЕ о признании лица квал. инвестором.docx | `qualification-notice` | оба | 1 | ✔ | ✅ | ✅ | ✅ migrated |
+| 14 | Приложение 11 Уведомление риски.docx | `qualification-consequences-notice` | ФЛ | 1 | — | ✅ | ✅ | ✅ migrated |
 
 ## Анкеты
 
@@ -99,10 +99,17 @@ without an overlay map cannot appear even by accident.
 | Metric | Count |
 | --- | --- |
 | Distinct source documents | **21** |
-| ✅ migrated (in-place values, QA'd, generates from the real wizard) | **12** |
-| ◐ static (correct pages, no dynamic values) | **1** |
-| ▣ template only (clean PDF committed, no field map yet) | **1** |
-| ⛔ blocked | **7** |
+| ✅ migrated (in-place values, QA'd, generates from the real wizard) | **14** |
+| ◐ static | **2** (1 exposed, 1 not) |
+| ▣ template only (clean PDF committed and verified, no field map yet) | **4** |
+| ⛔ blocked | **1** |
+
+**Every source document now has a verified clean PDF base template.** The Word
+export that previously blocked six of them was performed by hand and the
+resulting PDFs supplied alongside their sources; each was matched to its Word
+original by title, page count and extracted-text overlap and copied
+byte-identically. What remains outstanding is coordinate mapping, not
+conversion.
 
 Migrated: приложения 1А, 1В, 9, 10, 11, 14, обе анкеты ФЛ/ЮЛ, анкета ФЛ
 (упрощённая идентификация), оба заявления о признании квалифицированным
@@ -112,31 +119,66 @@ identity drawn onto its original pages instead of being issued blank).
 Static: `brokerage-key-information` — a disclosure sheet with no client-specific
 blanks, issued unchanged.
 
+## Manually exported templates
+
+Word's PDF export hangs on the conversion workstation (isolated with a
+one-line test document: `Documents.Open` and `ComputeStatistics` succeed,
+`ExportAsFixedFormat` and `SaveAs2` never return). Rather than repair Office,
+the six affected documents were exported by hand and the PDFs placed beside
+their sources.
+
+Each was matched to its Word original by normalized title, page count and
+extracted-text overlap — never by appendix number, which collides across the
+two regulations — then copied into the repository byte-identically.
+
+| Template | Source SHA-256 (docx) | PDF SHA-256 | Pages |
+| --- | --- | --- | --- |
+| `account-opening-notice` | `600f6fb1…` | `3e26d753…` | 2 |
+| `transfer-requisites` | `5ce12f3b…` | `7a4317aa…` | 1 |
+| `power-of-attorney` | `e2138404…` | `a7bcaf8d…` | 4 |
+| `order-forms` | `adf2f86d…` | `24e593d1…` | 4 |
+| `qualification-consequences-notice` | `13b4d6e0…` | `471b0828…` | 1 |
+| `qualification-notice` | `a097d95d…` | `2a9fab02…` | 1 |
+
+All six carry zero AcroForm fields, zero widgets, zero annotations, no blank or
+appended page, and page counts matching their sources.
+
+> **Observation, not corrected:** these hand-exported PDFs retain a `/Author`
+> value from whoever exported them. That is metadata only — nothing is visible
+> on the page — and the repository already contains such values on
+> `accession-application-fl.pdf` and `Risks.pdf`. Left as supplied so the
+> committed template stays byte-identical to the approved export.
+
 ## Blocked documents and the exact reason
 
 | Document | Reason |
 | --- | --- |
-| ПРИЛОЖЕНИЕ 3, 4, 6, 7 · УВЕДОМЛЕНИЕ о признании · Приложение 11 Уведомление риски | **No PDF base template can currently be produced.** Word's PDF export hangs on the conversion workstation — see below. Everything else about these six is understood; they need only the one-time conversion. |
-| Анкета ИСБЮЛ (`anketa-isbyul`) | **Unresolved business mapping.** The clean 4-page template is committed and verified, but the CRM has no «иностранная структура без образования юридического лица» subject type, and none of the ~50 values the form asks for (код КИО, место присвоения, состав имущества в управлении, протектор, учредители) exist in any CRM record. Exposing it on ordinary Russian legal entities would be misleading. Needs a business decision on the subject type and data source first. |
+| Анкета ИСБЮЛ (`anketa-isbyul`) | **Blocked — authoritative template available, but the CRM has no ИСБЮЛ subject model or required data sources. Intentionally not exposed.** The clean 4-page template is committed and verified, but none of the ~50 values the form asks for (код КИО, место присвоения, состав имущества в управлении, протектор, учредители) exist in any CRM record, and there is no «иностранная структура без образования юридического лица» subject type. It has no wizard card, no company applicability and no default values; ordinary Russian-company fields are deliberately *not* mapped onto it. |
 
-### The conversion blocker, precisely
+## Awaiting coordinate mapping (template only)
 
-`docx-to-pdf.ps1` cannot produce new templates on this workstation. Isolated
-with a trivially small, newly created document containing one line of text:
-Word COM connects, `Documents.Open` succeeds and `ComputeStatistics(2)` returns
-the correct page count, but both `ExportAsFixedFormat` and `SaveAs2(…, 17)`
-never return.
+These four have a verified clean template but no field map, so
+`resolveRenderStrategy()` returns `null` and none of them is selectable.
 
-So it is **not** the source documents, the Cyrillic filenames, the network
-drive or Protected View. Ruled out in turn: mark-of-the-web (`Unblock-File`), a
-stale `Word\Resiliency` key with an orphaned `.asd` recovery file (both
-cleared), copying the sources to a local disk, running Word visible rather than
-hidden, and one-process-per-file (already the documented approach). Repairing
-the Office installation was deliberately not attempted.
+| Document | What is still needed |
+| --- | --- |
+| `account-opening-notice` (Прил. 3) | The document's substance is internal back-office data — brokerage and depositary contract numbers/dates, three market account numbers, the счёт депо number, and on page 2 the торговый/неторговый раздел numbers and междепозитарный договор. The CRM holds none of it, so mapping needs a decision on which values an operator types and which stay blank. The broker's own bank requisites (ИНН, Р/сч, Банк, К/сч, БИК) are **blank in the authoritative source**. |
+| `power-of-attorney` (Прил. 6) | Legal-entity power of attorney (the form says «доверенность от юридического лица»), 4 pages, mixed page sizes. Needs the representative-selection pattern and a decision on the list of delegated powers. |
+| `order-forms` (Прил. 7) | 4 pages and 45 checkbox glyphs covering several distinct order types in one file. Needs a decision on whether this is one wizard document or several before any map is written. |
+| `anketa-ip-sz` (Прил. 18) | ~45 value cells and ~40 checkboxes. Identity, passport, address, contacts, INN and SNILS all come from the subject card; the ИП/ОГРНИП, private-practice, licence and FATCA blocks need form-specific inputs. |
 
-This affects **build-time only**. Nothing about the browser runtime changes:
-the twelve migrated documents generate from committed PDFs with no native
-dependency whatsoever.
+## `transfer-requisites` (ПРИЛОЖЕНИЕ 4) — static, deliberately not exposed
+
+This resolves an inventory question that was previously open. The appendix is a
+reference sheet of the **broker's own** payment details, and it contains no
+client-specific values at all. Its cells — Получатель, ИНН, Р/сч, Банк, К/сч,
+БИК — plus the whole торговый/неторговый раздел table are **blank in the
+authoritative source**.
+
+So it needs no overlay and no wizard inputs, and it is not offered as a card:
+issuing a client a requisites sheet whose requisites are empty would be worse
+than not issuing one. The template is committed and ready should the broker
+constants be supplied.
 
 ## Migrated document detail
 
@@ -195,6 +237,8 @@ and maintained aliases sits above the list.
 | Анкета физического лица | Анкета юридического лица |
 | Анкета ФЛ (упрощённая идентификация) | — |
 | Заявление о признании ФЛ квалифицированным инвестором | Заявление о признании ЮЛ квалифицированным инвестором |
+| Уведомление о признании лица квалифицированным инвестором | Уведомление о признании лица квалифицированным инвестором |
+| Уведомление о последствиях признания квалифицированным инвестором | — |
 | Заявка на закрытие договора/счёта | Заявка на закрытие договора/счёта |
 
 Verified in the real wizard: ФЛ-only forms never appear for a legal entity and
@@ -241,3 +285,7 @@ standalone card.
 | ПРИЛОЖЕНИЕ 14 | Prints `202__ г.`, i.e. three fixed year digits, so only the final digit can be filled. Writing a two-digit year would produce a five-digit year, so the renderer fills one digit and leaves the defect visible. |
 | АНКЕТА ФЛ Упр. идент. | §11 reads «Укажите статус **бубличного** должностного лица» — "бубличного" should be "публичного". Left exactly as written. |
 | УВЕДОМЛЕНИЕ о признании | Extracted text contains stray digit runs (`810768208285`, `11537152896293122689289629`) where merge fields sit, rather than blank rules. |
+| УВЕДОМЛЕНИЕ о признании | The register-entry date slot after «признанных квалифицированными инвесторами» is **10.86 pt** wide, measured from real glyph boxes. No date fits even at the 6 pt floor, so the slot is left blank rather than overprinted onto the "(дата)" caption. |
+| Приложение 11 Уведомление риски | The broker's e-mail rule in clause 3 is **20.64 pt** wide — no address fits. The broker's own address is also not held in the CRM. Left blank. |
+| ПРИЛОЖЕНИЕ 4 | The broker's own payment details (ИНН, Р/сч, Банк, К/сч, БИК) and the whole торговый/неторговый раздел table are blank in the authoritative source. |
+| ПРИЛОЖЕНИЕ 3 | Same blank broker requisites, plus «Код INV0000X» / «Код XXXXXXХ» placeholder codes left in the payment-purpose rows. |
