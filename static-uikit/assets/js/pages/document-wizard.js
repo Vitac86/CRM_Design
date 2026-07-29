@@ -1285,45 +1285,57 @@
       id: 'account-opening-notice',
       title: 'Уведомление об открытии брокерского-депозитарного счета',
       description: 'Уведомление об открытии брокерского-депозитарного счета',
+      // Operator-facing notice issued by Investica after the accounts are
+      // opened. Client identity comes from the subject card; everything else
+      // is back-office data the CRM does not hold.
+      //
+      // Inputs removed when the authoritative template was updated with
+      // Investica's own constants printed in:
+      //   * extra-payment-details            — §5 requisites are now printed
+      //     (ИНН 7802953900, Р/сч, АО "Райффайзенбанк", К/сч, БИК 044525700);
+      //   * extra-securities-transfer-details — the page-2 депо tables are now
+      //     printed (HL2509080091 / ML2508290147 / MC0742000000 / НКО АО НРД /
+      //     №7420/ДНД).
+      // Inputs removed because the source reserves no usable space or no slot:
+      //   * extra-authority-basis    — the gap after «Доверенности №» is 8.18 pt;
+      //   * extra-account-opening-date and extra-brokerage-account — neither has
+      //     a position anywhere in the two pages.
       appliesTo: ['individual', 'company'],
-      templateUrl: '../assets/document-templates/account-opening-notice.html',
-      outputFilename: 'account-opening-notice.pdf',
+      category: 'Уведомления и раскрытие информации',
+      overlayTemplateId: 'account-opening-notice',
+      pdfOutputFilename: 'uvedomlenie-ob-otkrytii-scheta.pdf',
+      downloadLabel: 'Скачать уведомление',
+      extraGroupLabel: 'Данные открытия счетов и договоров',
+      aliases: ['приложение 3 регламент', 'открытие счета', 'счет депо'],
       fields: [
         {
           key: 'extra-document-date',
-          label: 'Дата уведомления',
+          label: 'Дата формирования',
           type: 'date',
           required: true
         },
         {
           key: 'extra-authorized-signer',
-          label: 'Уполномоченное лицо ООО «Инвестика»',
+          label: 'Уполномоченное лицо ООО «Инвестика» (в лице …)',
           type: 'text',
           required: true,
-          placeholder: 'ФИО подписанта'
-        },
-        {
-          key: 'extra-authority-basis',
-          label: 'Основание полномочий подписанта',
-          type: 'text',
-          required: true,
-          placeholder: 'Например: доверенность № ...'
+          placeholder: 'ФИО в родительном падеже'
         },
         {
           key: 'extra-brokerage-contract',
-          label: 'Номер договора брокерского обслуживания',
+          label: 'Номер договора на брокерское обслуживание',
           type: 'text',
           required: true
         },
         {
           key: 'extra-brokerage-contract-date',
-          label: 'Дата договора брокерского обслуживания',
+          label: 'Дата договора на брокерское обслуживание',
           type: 'date',
           required: true
         },
         {
           key: 'extra-depository-contract',
-          label: 'Номер депозитарного договора',
+          label: 'Номер депозитарного договора (договора счёта ДЕПО)',
           type: 'text',
           required: true
         },
@@ -1334,55 +1346,25 @@
           required: true
         },
         {
-          key: 'extra-account-opening-date',
-          label: 'Дата открытия счетов',
-          type: 'date',
-          required: true
-        },
-        {
-          key: 'extra-brokerage-account',
-          label: 'Номер брокерского счёта',
-          type: 'text',
-          required: true,
-          placeholder: 'Например: БС-2024-001'
-        },
-        {
-          key: 'extra-depo-account',
-          label: 'Номер счёта депо',
-          type: 'text',
-          required: true,
-          placeholder: 'Например: Д-2024-001'
-        },
-        {
           key: 'extra-stock-market-account',
-          label: 'Счет внутреннего учета: фондовый рынок',
-          type: 'text',
-          required: false
+          label: 'Счёт внутреннего учёта: фондовый рынок',
+          type: 'text'
         },
         {
           key: 'extra-futures-market-account',
-          label: 'Счет внутреннего учета: срочный рынок',
-          type: 'text',
-          required: false
+          label: 'Счёт внутреннего учёта: срочный рынок',
+          type: 'text'
         },
         {
           key: 'extra-currency-market-account',
-          label: 'Счет внутреннего учета: валютный рынок / драг. металлы',
+          label: 'Счёт внутреннего учёта: валютный рынок и рынок драг. металлов',
+          type: 'text'
+        },
+        {
+          key: 'extra-depo-account',
+          label: 'Номер счёта депо клиента',
           type: 'text',
-          required: false
-        },
-        {
-          key: 'extra-payment-details',
-          label: 'Реквизиты для перечисления денежных средств',
-          type: 'textarea',
-          required: false,
-          placeholder: 'Получатель, банк, р/с, к/с, БИК'
-        },
-        {
-          key: 'extra-securities-transfer-details',
-          label: 'Реквизиты для перевода ценных бумаг',
-          type: 'textarea',
-          required: false
+          required: true
         }
       ]
     },
@@ -1773,6 +1755,16 @@
       p.textContent = 'Дополнительные поля не требуются.';
       container.appendChild(p);
       return;
+    }
+
+    // Optional heading above the input grid. Operator-facing documents such as
+    // the account-opening notice ask for a block of back-office data that reads
+    // better under its own title than as a bare list.
+    if (doc.extraGroupLabel && effectiveFields.length) {
+      var groupHead = document.createElement('p');
+      groupHead.className = 'crm-document-form-label';
+      groupHead.textContent = doc.extraGroupLabel;
+      container.appendChild(groupHead);
     }
 
     var grid = document.createElement('div');
