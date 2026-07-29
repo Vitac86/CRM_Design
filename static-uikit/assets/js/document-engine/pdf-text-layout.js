@@ -82,8 +82,17 @@
     var step = opts.step || 0.25;
     var value = String(text == null ? '' : text);
 
-    for (var s = size; s >= minSize - 1e-9; s -= step) {
-      var current = Math.round(s * 1000) / 1000;
+    // `size - n * step` does not necessarily land on `minSize` (for example,
+    // 9.48 with a 0.25 step skips from 6.23 to 5.98).  Build the stepped
+    // candidates above the boundary, then always test the exact minimum once.
+    var candidateSizes = [];
+    for (var s = size; s > minSize + 1e-9; s -= step) {
+      candidateSizes.push(Math.round(s * 1000) / 1000);
+    }
+    candidateSizes.push(minSize);
+
+    for (var candidateIndex = 0; candidateIndex < candidateSizes.length; candidateIndex += 1) {
+      var current = candidateSizes[candidateIndex];
 
       if (!multiline) {
         if (widthOf(font, value, current) <= maxWidth) {
