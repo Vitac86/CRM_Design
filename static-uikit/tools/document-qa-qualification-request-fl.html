@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"/><title>QA — qualification-request-fl</title></head>
+<body>
+<p id="status">rendering</p><a id="download" hidden>download</a><pre id="out" hidden></pre>
+<script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
+<script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+<script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+<script src="../assets/js/document-field-maps/qualification-request-fl.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  function payload(longValues) {
+    return {
+      subject: { kind: 'individual' },
+      fields: {
+        clientFullName: longValues
+          ? 'Рождественская-Ковалевская Екатерина Константиновна'
+          : 'Громова Елена Сергеевна'
+      },
+      extraValues: {
+        'extra-contract-number': longValues ? 'БО-2026/000123-А' : 'БО-2026/144',
+        'extra-contract-date': longValues ? '2026-09-01' : '2026-07-28',
+        'extra-qualification-scope': longValues ? 'other' : 'all',
+        'extra-qualification-instruments-other': longValues
+          ? 'паев закрытых паевых инвестиционных фондов и структурных облигаций'
+          : '',
+        'extra-securities-value-millions': longValues ? '1250,75' : '24',
+        'extra-work-experience-basis': longValues
+          ? 'qualified-two-years'
+          : 'other-three-years',
+        'extra-quarterly-transactions-value-millions': longValues ? '18,75' : '8',
+        'extra-assets-value-millions': longValues ? '248,90' : '36',
+        'extra-education-basis': longValues ? 'certificate' : 'higher-education',
+        'extra-supporting-docs-securities-holdings': longValues
+          ? 'Отчёт брокера и депозитарная выписка о стоимости ценных бумаг и обязательств по производным финансовым инструментам, 42 листа'
+          : 'Отчёт брокера и выписка депозитария, 8 листов',
+        'extra-supporting-docs-work-experience': longValues
+          ? 'Заверенная копия трудовой книжки, должностная инструкция и справка работодателя о работе с финансовыми инструментами, 19 листов'
+          : 'Копия трудовой книжки и справка работодателя, 7 листов',
+        'extra-supporting-docs-bank-approved-position': longValues
+          ? 'Решение о назначении и согласование Банка России, 12 листов'
+          : 'Решение о назначении, 3 листа',
+        'extra-supporting-docs-quarterly-transactions': longValues
+          ? 'Брокерские отчёты за четыре последних квартала с реестром сделок, расчётом их периодичности и совокупной цены, 96 листов'
+          : 'Брокерские отчёты за четыре квартала, 24 листа',
+        'extra-supporting-docs-assets': longValues
+          ? 'Банковские выписки, отчёт депозитария, справки о вкладах и расчёт общей стоимости имущества, 58 листов'
+          : 'Банковские и депозитарные выписки, 14 листов',
+        'extra-supporting-docs-education': longValues
+          ? 'Свидетельство о квалификации и сертификаты специалиста финансового рынка, 11 листов'
+          : 'Диплом о высшем экономическом образовании, 4 листа',
+        'extra-supporting-docs-qualified-registry': longValues
+          ? 'Выписка из реестра лиц, признанных квалифицированными инвесторами другим профессиональным участником, 5 листов'
+          : 'Выписка из реестра квалифицированных лиц, 2 листа',
+        'extra-delivery-method': longValues ? 'office' : 'address',
+        'extra-delivery-address': longValues
+          ? '125009, г. Москва, внутригородская территория муниципальный округ Пресненский, улица Тверская, дом 14, строение 3, офис 125'
+          : '125009, г. Москва, ул. Тверская, д. 14'
+      },
+      checks: {
+        'qualification-assets-cash-deposits': true,
+        'qualification-assets-precious-metals': longValues,
+        'qualification-assets-securities': true
+      }
+    };
+  }
+
+  var name = new URLSearchParams(location.search).get('fixture') || 'normal';
+  var template = window.CRMDocumentEngine.fieldMaps['qualification-request-fl'];
+  var status = document.getElementById('status');
+  var out = document.getElementById('out');
+  window.CRMDocumentEngine.overlayRenderer.render(
+    template,
+    payload(name === 'long'),
+    { validatePayload: true }
+  ).then(function (blob) {
+    var link = document.getElementById('download');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'qualification-request-fl--' + name + '.pdf';
+    link.hidden = false;
+    var reader = new FileReader();
+    reader.onload = function () {
+      out.textContent = String(reader.result).split(',')[1];
+      status.textContent = 'OK ' + name + ' ' + blob.size;
+    };
+    reader.readAsDataURL(blob);
+  }).catch(function (error) {
+    status.textContent = 'ERROR ' + error.message;
+  });
+}());
+</script>
+</body>
+</html>

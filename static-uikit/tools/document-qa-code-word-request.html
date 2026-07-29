@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"/><title>QA — code-word-request</title></head>
+<body>
+<p id="status">rendering</p><a id="download" hidden>download</a><pre id="out" hidden></pre>
+<script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
+<script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+<script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+<script src="../assets/js/document-field-maps/code-word-request.js"></script>
+<script>
+(function () {
+  'use strict';
+  var FIXTURES = {
+    normal: {
+      subject: { kind: 'individual', displayName: 'Громова Елена Сергеевна', inn: '771234567890' },
+      fields: { clientFullName: 'Громова Елена Сергеевна' }, checks: {},
+      extraValues: {
+        'extra-document-date': '2026-07-28',
+        'extra-new-code-word': 'Северное сияние'
+      }
+    },
+    long: {
+      subject: {
+        kind: 'company',
+        displayName: 'АО «Научно-производственные технологии»',
+        inn: '7712345678'
+      },
+      fields: {
+        clientFullName: 'Рождественская-Александрова Екатерина Константиновна'
+      }, checks: {},
+      extraValues: {
+        'extra-document-date': '2026-09-01',
+        'extra-new-code-word': 'Сверхдлинное конфиденциальное кодовое выражение'
+      }
+    }
+  };
+  var name = new URLSearchParams(location.search).get('fixture') || 'normal';
+  var fixture = FIXTURES[name];
+  var template = window.CRMDocumentEngine.fieldMaps['code-word-request'];
+  var status = document.getElementById('status');
+  var out = document.getElementById('out');
+  window.CRMDocumentEngine.overlayRenderer.render(template, fixture, { validatePayload: true })
+    .then(function (blob) {
+      var link = document.getElementById('download');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'code-word-request--' + name + '.pdf';
+      link.hidden = false;
+      var reader = new FileReader();
+      reader.onload = function () {
+        out.textContent = String(reader.result).split(',')[1];
+        status.textContent = 'OK ' + name + ' ' + blob.size;
+      };
+      reader.readAsDataURL(blob);
+    })
+    .catch(function (error) { status.textContent = 'ERROR ' + error.message; });
+}());
+</script>
+</body>
+</html>

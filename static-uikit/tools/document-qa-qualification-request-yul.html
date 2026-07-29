@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"/><title>QA — qualification-request-yul</title></head>
+<body>
+<p id="status">rendering</p><a id="download" hidden>download</a><pre id="out" hidden></pre>
+<script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
+<script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+<script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+<script src="../assets/js/document-field-maps/qualification-request-yul.js"></script>
+<script>
+(function () {
+  'use strict';
+  function payload(longValues) {
+    return {
+      subject: {
+        kind: 'company',
+        fullLegalName: longValues
+          ? 'Акционерное общество «Научно-производственное объединение перспективных промышленных технологий»'
+          : 'Акционерное общество «Северный вектор»'
+      },
+      fields: {
+        representativeFullName: longValues
+          ? 'Рождественская-Ковалевская Екатерина Константиновна'
+          : 'Громов Алексей Сергеевич'
+      },
+      extraValues: {
+        'extra-document-date': longValues ? '2026-09-01' : '2026-07-28',
+        'extra-contract-number': longValues ? 'БО-КВАЛИФИКАЦИЯ-2026/000000000123-А' : 'БО-2026/144',
+        'extra-contract-date': '2026-02-14',
+        'extra-delivery-method': longValues ? 'office' : 'address',
+        'extra-supporting-docs-1': longValues ? 'Аудированная бухгалтерская отчётность за 2025 год, 148 листов' : 'Расчёт собственного капитала, 4 листа',
+        'extra-supporting-docs-2': longValues ? 'Реестр сделок с финансовыми инструментами за четыре последних квартала, 92 листа' : 'Реестр сделок, 12 листов',
+        'extra-supporting-docs-3': longValues ? 'Отчёт о финансовых результатах и пояснительная записка к бухгалтерской отчётности, 76 листов' : 'Отчёт о выручке, 8 листов',
+        'extra-supporting-docs-4': longValues ? 'Бухгалтерский баланс с расшифровкой активов и заключением независимого аудитора, 64 листа' : 'Бухгалтерский баланс, 6 листов',
+        'extra-supporting-docs-5': longValues ? 'Выписка из реестра лиц, признанных квалифицированными инвесторами, 3 листа' : 'Выписка из реестра, 2 листа',
+        'extra-delivery-address': longValues
+          ? '125009, Российская Федерация, город Москва, внутригородская территория муниципальный округ Пресненский, улица Тверская, дом 14, строение 3, офис 125'
+          : '125009, г. Москва, ул. Тверская, д. 14'
+      },
+      checks: {}
+    };
+  }
+  var name = new URLSearchParams(location.search).get('fixture') || 'normal';
+  var template = window.CRMDocumentEngine.fieldMaps['qualification-request-yul'];
+  var status = document.getElementById('status');
+  var out = document.getElementById('out');
+  window.CRMDocumentEngine.overlayRenderer.render(template, payload(name === 'long'), { validatePayload: true })
+    .then(function (blob) {
+      var link = document.getElementById('download');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'qualification-request-yul--' + name + '.pdf';
+      link.hidden = false;
+      var reader = new FileReader();
+      reader.onload = function () {
+        out.textContent = String(reader.result).split(',')[1];
+        status.textContent = 'OK ' + name + ' ' + blob.size;
+      };
+      reader.readAsDataURL(blob);
+    })
+    .catch(function (error) { status.textContent = 'ERROR ' + error.message; });
+}());
+</script>
+</body>
+</html>

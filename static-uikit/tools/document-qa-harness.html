@@ -45,6 +45,16 @@
 <script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
 <script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
 <script src="../assets/js/document-field-maps/accession-application-fl.js"></script>
+<script src="../assets/js/document-field-maps/accession-application-yul.js"></script>
+<script src="../assets/js/document-field-maps/anketa-fl.js"></script>
+<script src="../assets/js/document-field-maps/anketa-yul.js"></script>
+<script src="../assets/js/document-field-maps/broker-use-refusal-request.js"></script>
+<script src="../assets/js/document-field-maps/client-notifications.js"></script>
+<script src="../assets/js/document-field-maps/code-word-request.js"></script>
+<script src="../assets/js/document-field-maps/qualification-request-fl.js"></script>
+<script src="../assets/js/document-field-maps/qualification-request-yul.js"></script>
+<script src="../assets/js/document-field-maps/regulation-full-refusal-notice.js"></script>
+<script src="../assets/js/document-field-maps/regulation-partial-refusal-notice.js"></script>
 <script>
 (function () {
   'use strict';
@@ -156,6 +166,41 @@
         p.extraValues['report-delivery'] = '';
         p.extraValues['income-payout'] = '';
       });
+    },
+
+    // Delivery branches exercise showWhen as well as every mutually exclusive
+    // report-delivery mark. The e-mail value must appear only in the e-mail
+    // branch and remain absent from the other three outputs.
+    'reports-office': function () {
+      return payload(function (p) { p.extraValues['report-delivery'] = 'office'; });
+    },
+    'reports-post': function () {
+      return payload(function (p) { p.extraValues['report-delivery'] = 'post'; });
+    },
+    'reports-email': function () {
+      return payload(function (p) { p.extraValues['report-delivery'] = 'email'; });
+    },
+    'reports-edo': function () {
+      return payload(function (p) { p.extraValues['report-delivery'] = 'edo'; });
+    },
+
+    // Remaining mutually exclusive account/payout branches. Together with
+    // normal/all-checks/no-checks these bring Appendix 1A back to the expected
+    // 20 named regression fixtures without changing its approved field map.
+    'depo-nominee': function () {
+      return payload(function (p) { p.extraValues['depo-account-type'] = 'nominee'; });
+    },
+    'depo-trustee': function () {
+      return payload(function (p) { p.extraValues['depo-account-type'] = 'trustee'; });
+    },
+    'trading-depo-nominee': function () {
+      return payload(function (p) { p.extraValues['trading-depo-account-type'] = 'nominee'; });
+    },
+    'payout-broker-account': function () {
+      return payload(function (p) { p.extraValues['income-payout'] = 'broker-account'; });
+    },
+    'payout-bank-details': function () {
+      return payload(function (p) { p.extraValues['income-payout'] = 'bank-details'; });
     },
 
     // Passport issue-date variants. The month is printed as a genitive word in
