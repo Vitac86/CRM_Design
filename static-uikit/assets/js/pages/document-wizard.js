@@ -657,6 +657,80 @@
       ]
     },
     {
+      // Приложение 16.1 — the short questionnaire used when the client is
+      // identified in a simplified way through the personal cabinet. A
+      // different form from Приложение 16 (`anketa-fl`), with its own bank and
+      // PDL blocks, so it gets its own card rather than sharing that one.
+      // Identity, passport, address and contacts come from the subject card;
+      // the wizard asks only for what the CRM does not hold.
+      id: 'anketa-fl-simplified-id',
+      title: 'Анкета ФЛ (упрощённая идентификация)',
+      description: 'Приложение 16.1 — упрощённая идентификация через личный кабинет.',
+      category: 'Анкеты и идентификация',
+      appliesTo: ['individual'],
+      overlayTemplateId: 'anketa-fl-simplified-id',
+      pdfOutputFilename: 'anketa-fl-uproshchennaya-identifikaciya.pdf',
+      downloadLabel: 'Скачать анкету',
+      aliases: ['упрощенная идентификация', 'приложение 16.1', 'личный кабинет'],
+      fields: [
+        {
+          key: 'extra-document-date',
+          label: 'Дата заполнения анкеты',
+          type: 'date',
+          required: true
+        },
+        {
+          key: 'extra-landline-phone',
+          label: 'Стационарный телефон (код страны, код города, номер)',
+          type: 'text'
+        },
+        {
+          key: 'extra-medical-policy',
+          label: 'Полис ОМС (при наличии)',
+          type: 'text'
+        },
+        {
+          key: 'extra-pdl-status',
+          label: 'Статус публичного должностного лица (п. 11)',
+          type: 'select',
+          defaultValue: 'none',
+          options: [
+            { value: 'none', label: 'Не является ПДЛ' },
+            { value: 'foreign', label: 'Иностранное публичное должностное лицо' },
+            { value: 'international', label: 'Должностное лицо публичной международной организации' },
+            { value: 'russian', label: 'Государственная или приравненная должность в РФ' }
+          ]
+        },
+        {
+          key: 'extra-pdl-details',
+          label: 'Должность, наименование и адрес работодателя (при статусе ПДЛ)',
+          type: 'textarea',
+          showWhen: { source: 'extra.extra-pdl-status', notEquals: 'none' }
+        },
+        {
+          key: 'extra-kinship-degree',
+          label: 'Степень родства либо статус по отношению к ПДЛ (п. 12)',
+          type: 'textarea'
+        },
+        { key: 'extra-bank-name', label: 'Полное наименование банка', type: 'text' },
+        { key: 'extra-bank-address', label: 'Полный адрес банка с указанием страны', type: 'text' },
+        { key: 'extra-bank-inn', label: 'ИНН банка', type: 'text' },
+        { key: 'extra-bank-bic', label: 'БИК/SWIFT', type: 'text' },
+        { key: 'extra-bank-corr-account', label: 'Корреспондентский счёт', type: 'text' },
+        { key: 'extra-bank-account', label: 'Расчётный счёт/IBAN', type: 'text' },
+        {
+          key: 'extra-bank-additional',
+          label: 'Дополнительные сведения: лицевой счёт, получатель, иное',
+          type: 'text'
+        },
+        {
+          key: 'extra-other-information',
+          label: 'Иная информация (п. 14)',
+          type: 'textarea'
+        }
+      ]
+    },
+    {
       id: 'anketa-yul',
       title: 'Анкета юридического лица',
       description: 'Анкета юридического лица — клиента ООО «Инвестика»',
@@ -1394,6 +1468,15 @@
 
   // ── Build field map from subject + extra form values ─────────────────────
 
+  // Some forms print the identity document's series and number in one cell
+  // ("Серия (при наличии) и номер документа") rather than two.
+  function joinSeriesNumber(series, number) {
+    return [series, number]
+      .map(function (part) { return String(part == null ? '' : part).trim(); })
+      .filter(Boolean)
+      .join(' ');
+  }
+
   function buildFields(subject, extraValues) {
     var f = {};
 
@@ -1461,6 +1544,7 @@
       f.passportIssuedBy    = subject.passportIssuedBy || '';
       f.passportIssueDate   = subject.passportIssueDate || '';
       f.registrationAddress = subject.registrationAddress || '';
+      f.passportSeriesNumber = joinSeriesNumber(subject.passportSeries, subject.passportNumber);
     } else {
       var rep = getSelectedRepresentative(subject, extraValues);
       f.clientFullName      = rep ? (rep.fullName || '') : '';
@@ -1474,6 +1558,9 @@
       f.representativeAuthority = rep ? (rep.authority || '') : '';
       f.representativeSignerLine = rep
         ? ((rep.fullName || '') + (rep.role ? (', ' + rep.role) : ''))
+        : '';
+      f.passportSeriesNumber = rep
+        ? joinSeriesNumber(rep.passportSeries, rep.passportNumber)
         : '';
     }
 
