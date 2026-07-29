@@ -18,16 +18,6 @@
   var BODY = 9;
   var MIN = 6;
 
-  function contractNumber(value) {
-    value = String(value || '').trim();
-    return value ? '№ ' + value : '';
-  }
-
-  function contractDate(value) {
-    value = String(value || '').trim();
-    return value ? 'от ' + value : '';
-  }
-
   var TEMPLATE = {
     id: 'broker-use-refusal-request',
     title: 'Заявление об отказе от права использования средств/ценных бумаг',
@@ -54,14 +44,14 @@
       },
       {
         id: 'contractNumber',
-        source: 'field.extra-contract-number', format: contractNumber,
+        source: 'field.extra-contract-number', format: 'prefixNumber',
         page: 0, left: 252.0, baselineTop: 206.06, width: 175.0,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'contractDate',
-        source: 'field.extra-contract-date', format: contractDate,
+        source: 'field.extra-contract-date', format: 'prefixFrom',
         page: 0, left: 432.0, baselineTop: 206.06, width: 109.0,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'left', required: true

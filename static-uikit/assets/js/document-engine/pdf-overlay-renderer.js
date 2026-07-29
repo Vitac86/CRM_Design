@@ -146,6 +146,21 @@
       var parts = String(v || '').trim().split(/\s+/).filter(Boolean);
       return parts.length ? parts[0] : '';
     },
+    // Stable declarative replacements for the legacy inline formatters used
+    // by the refusal forms. Keeping these in the production renderer lets
+    // builder projects name behavior without serializing executable code.
+    prefixNumber: function (v) {
+      var value = String(v || '').trim();
+      return value ? '\u2116 ' + value : '';
+    },
+    prefixFrom: function (v) {
+      var value = String(v || '').trim();
+      return value ? '\u043e\u0442 ' + value : '';
+    },
+    dateYearLastDigit: function (v) {
+      var match = String(v || '').match(/(?:^|\D)(\d{4})(?:\D|$)/);
+      return match ? match[1].slice(-1) : '';
+    },
     upper: function (v) { return String(v || '').toUpperCase(); },
     trim: function (v) { return String(v == null ? '' : v).trim(); }
   };

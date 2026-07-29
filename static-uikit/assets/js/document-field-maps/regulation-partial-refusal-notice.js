@@ -17,16 +17,6 @@
   var SERVICE = 10.56;
   var MIN = 6;
 
-  function contractNumber(value) {
-    value = String(value || '').trim();
-    return value ? '№ ' + value : '';
-  }
-
-  function contractDate(value) {
-    value = String(value || '').trim();
-    return value ? 'от ' + value : '';
-  }
-
   function check(id, source, baselineTop) {
     return {
       id: id,
@@ -79,14 +69,14 @@
       },
       {
         id: 'contractNumber',
-        source: 'field.extra-contract-number', format: contractNumber,
+        source: 'field.extra-contract-number', format: 'prefixNumber',
         page: 0, left: 252.0, baselineTop: 192.74, width: 175.0,
         font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'contractDate',
-        source: 'field.extra-contract-date', format: contractDate,
+        source: 'field.extra-contract-date', format: 'prefixFrom',
         page: 0, left: 432.0, baselineTop: 192.74, width: 109.0,
         font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
         align: 'left', required: true

@@ -46,11 +46,6 @@
   // The source literally prints "202__ г." (three fixed year digits). Preserve
   // that defect and fill only the final year digit; writing YY would produce a
   // five-digit year and silently alter what the source says.
-  function finalYearDigit(value) {
-    var match = String(value || '').match(/(?:^|\D)(\d{4})(?:\D|$)/);
-    return match ? match[1].slice(-1) : '';
-  }
-
   var TEMPLATE = {
     id: 'code-word-request',
     title: 'Заявление об установлении/изменении кодового слова',
@@ -72,7 +67,7 @@
         format: 'dateMonthGenitive', align: 'center', required: true
       }),
       text('documentDateYearLastDigit', 'extra.extra-document-date', 369.00, 202.94, 10.00, {
-        format: finalYearDigit, align: 'center', required: true
+        format: 'dateYearLastDigit', align: 'center', required: true
       }),
 
       // "Настоящим ________, ________ (ФИО, ИНН), далее — Клиент..."

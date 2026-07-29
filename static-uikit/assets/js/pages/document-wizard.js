@@ -5,7 +5,8 @@
 (function () {
   'use strict';
 
-  if (!document.body || document.body.dataset.page !== 'document-wizard') return;
+  var isDocumentWizardPage = document.body &&
+    document.body.dataset.page === 'document-wizard';
 
   // ── Static subject registry ────────────────────────────────────────────────
   // Static demo data. UMI.CMS should replace with server-side subject lookup.
@@ -127,6 +128,34 @@
     required: true,
     optionsFrom: 'subject.representatives',
     representativeRole: 'Генеральный директор'
+  };
+
+  // Declarative dependency metadata for builder/QA consumers. The production
+  // payload normalizer below remains authoritative; this describes which
+  // normalized PDF sources are supplied by wizard controls so a direct
+  // source-name comparison does not mislabel operational inputs as unused.
+  var NORMALIZED_SOURCE_PROVIDERS = {
+    extraPassThroughToField: true,
+    providers: {
+      'subject.citizenship': ['check.citizenship-rf', 'check.citizenship-other'],
+      'extra.extra-document-date': ['field.documentDateRu'],
+      'extra.extra-representative-id': [
+        'field.clientFullName', 'field.passportSeries', 'field.passportNumber',
+        'field.passportIssuedBy', 'field.passportIssueDate',
+        'field.registrationAddress', 'field.passportSeriesNumber',
+        'field.representativeFullName', 'field.representativeRole',
+        'field.representativeAuthority', 'field.representativeSignerLine'
+      ],
+      'extra.extra-questionnaire-role': [
+        'check.anketa-role-client', 'check.anketa-role-representative',
+        'check.anketa-role-beneficiary', 'check.anketa-role-beneficial-owner'
+      ],
+      'extra.extra-questionnaire-mode': ['check.anketa-mode-first', 'check.anketa-mode-change'],
+      'extra.extra-tax-residency': ['check.tax-resident-rf-yes', 'check.tax-resident-rf-no'],
+      'extra.extra-foreign-taxpayer': ['check.fatca-yes', 'check.fatca-no'],
+      'extra.extra-strategic-company': ['check.strategic-company-yes', 'check.strategic-company-no'],
+      'extra.extra-licensed-activity': ['check.licensed-activity-yes', 'check.licensed-activity-no']
+    }
   };
 
   // ── Document configuration ─────────────────────────────────────────────────
@@ -2089,6 +2118,34 @@
       ]
     }
   ];
+
+  // The visual template builder consumes the real production registry without
+  // mounting the wizard UI or maintaining a second hand-written catalog. The
+  // exposed value is a detached, recursively frozen clone so builder code can
+  // never mutate the configuration used by this page.
+  function cloneCatalogValue(value) {
+    if (Array.isArray(value)) return value.map(cloneCatalogValue);
+    if (!value || typeof value !== 'object') return value;
+    var clone = {};
+    Object.keys(value).forEach(function (key) {
+      clone[key] = cloneCatalogValue(value[key]);
+    });
+    return clone;
+  }
+
+  function freezeCatalogValue(value) {
+    if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+    Object.keys(value).forEach(function (key) { freezeCatalogValue(value[key]); });
+    return Object.freeze(value);
+  }
+
+  window.CRMDocumentCatalog = freezeCatalogValue({
+    schemaVersion: 1,
+    documents: cloneCatalogValue(DOCUMENTS),
+    normalization: cloneCatalogValue(NORMALIZED_SOURCE_PROVIDERS)
+  });
+
+  if (!isDocumentWizardPage) return;
 
   // ── HTML escaping helpers ─────────────────────────────────────────────────
 
