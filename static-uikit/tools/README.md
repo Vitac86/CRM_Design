@@ -9,6 +9,7 @@ by the deployed CRM** — production users only need a modern browser.
 | `validate-static-uikit.mjs` | static UI kit validation | Node |
 | `docx-to-pdf.ps1` | export one source Word document to a clean PDF base template | Windows + Microsoft Word |
 | `probe-pdf-coords.py` | measure overlay coordinates from a converted template | Python + `pymupdf` |
+| `probe-pdf-table-cells.py` | measure value cells in table-shaped forms (анкеты) | Python + `pymupdf` |
 | `document-qa-harness.html` | render document fixtures with the production engine for visual QA | a browser + a static server |
 
 See [docs/document-pdf-generation.md](../../docs/document-pdf-generation.md) for
@@ -28,6 +29,26 @@ for f in /path/to/source/*.docx; do
       -Dst "static-uikit/assets/document-pdf-templates/$name.pdf"
 done
 ```
+
+## Probing table-shaped forms
+
+`probe-pdf-coords.py` finds runs of underscores — the fill-in rules used by the
+Regulation appendices. The анкеты have no underscores at all: their blanks are
+empty **table cells**, so that probe reports nothing useful for them.
+
+`probe-pdf-table-cells.py` rebuilds the cell grid from the drawn rules and
+prints, for every row, the printed label and the coordinates of the empty cell
+beside it — ready to paste into a field map:
+
+```bash
+python static-uikit/tools/probe-pdf-table-cells.py TEMPLATE.pdf --page 0
+python static-uikit/tools/probe-pdf-table-cells.py TEMPLATE.pdf --page 0 --find "ИНН"
+```
+
+Only vertical rules running down at least `--min-span` (default 0.25) of the
+table count as column boundaries. Without that filter a rule that splits a
+single row — the three-way ПДЛ box column, for example — is mistaken for a
+column edge and every value cell comes out a fraction of its real width.
 
 ## Refreshing the PDF fonts
 
