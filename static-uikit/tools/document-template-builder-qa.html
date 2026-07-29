@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Document Template Builder · QA</title>
+  <link rel="icon" href="../assets/icons/favicon_blue.ico"/>
+  <style>
+    body { margin: 20px; color: #1e293b; font: 13px/1.4 system-ui, sans-serif; }
+    h1 { font-size: 20px; }
+    #summary { margin: 10px 0; padding: 10px; border-radius: 5px; background: #eef2f7; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #d7dee8; padding: 5px 7px; text-align: left; }
+    .pass { color: #087443; } .fail { color: #b42318; }
+    iframe { position: fixed; left: -20000px; width: 1440px; height: 900px; border: 0; }
+    #qa-output { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Document Template Builder · automated browser QA</h1>
+  <p>Runs against the actual builder, local PDF.js worker, production renderer and all committed maps.</p>
+  <div id="summary">Starting…</div>
+  <table><thead><tr><th>#</th><th>Test</th><th>Result</th><th>Details</th></tr></thead><tbody id="results"></tbody></table>
+  <pre id="qa-output"></pre>
+  <iframe id="builder" src="document-template-builder.html?embeddedQa=1" title="Builder under test"></iframe>
+  <script>
+  (function () {
+    'use strict';
+    var tests = [];
+    var results = [];
+    var frame;
+    var app;
+    var ns;
+
+    function add(name, fn) { tests.push({ name: name, fn: fn }); }
+    function assert(value, message) { if (!value) throw new Error(message || 'Assertion failed'); }
+    function equal(a, b, message) { if (a !== b) throw new Error((message || 'Values differ') + ': ' + a + ' !== ' + b); }
+    function pdfFile(bytes, name) { return new frame.File([bytes], name || 'replacement.pdf', { type: 'application/pdf' }); }
+    function makePdf(sizes) {
+      return frame.PDFLib.PDFDocument.create().then(function (doc) {
+        sizes.forEach(function (size) { doc.addPage(frame.Array.of(Number(size.width), Number(size.height))); });
+        return doc.save();
+      });
+    }
+    function currentField() { return app.state.field(); }
+
+    add('Builder opens through HTTP', function () { assert(/^https?:$/.test(frame.location.protocol)); assert(app.ready); });
+    add('file:// blocker has the required message', function () { equal(ns.constants.protocolMessage, 'Конструктор должен быть открыт через локальный HTTP-сервер.'); });
+    add('Existing template catalog loads', function () { assert(app.catalogAudit && !app.catalogAudit.pdfFailures.length); });
+    add('All 18 maps are discoverable and open', function () {
+      equal(app.catalog.length, 18); equal(Object.keys(frame.CRMDocumentEngine.fieldMaps).length, 18);
+      var opened = [];
+      var chain = Promise.resolve();
+      app.catalog.forEach(function (entry) {
+        chain = chain.then(function () { return app.openExisting(entry.overlayTemplateId); })
+          .then(function () {
+            assert(!app.state.validation.warnings.some(function (warning) { return warning.code === 'unused-wizard'; }), 'False unused wizard source: ' + entry.overlayTemplateId);
+            opened.push(entry.overlayTemplateId);
+          });
+      });
+      return chain.then(function () { equal(opened.length, 18); });
+    });
+    add('A multi-page PDF renders', function () { return app.openExisting('accession-application-fl').then(function () { equal(app.viewer.pages.length, 3); assert(app.viewer.canvas.width > 0); }); });
+    add('A mixed-page-size PDF renders correctly', function () {
+      return makePdf([{width: 595, height: 842}, {width: 842, height: 595}]).then(function (bytes) { return app.viewer.load(bytes, 'mixed-size.pdf'); })
+        .then(function (info) { equal(info.pageCount, 2); assert(info.pages[0].width !== info.pages[1].width); return app.openExisting('accession-application-fl'); });
+    });
+    add('Selecting a field opens its properties', function () { var id = app.state.project.fields[0].id; app.state.selectField(id); equal(currentField().id, id); assert(frame.document.querySelector('#dtb-inspector h2')); });
+    add('Moving a field changes PDF-point coordinates', function () { var field = currentField(); var before = field.left; app.state.updateField(field.id, { left: before + 1 }, 'qa move'); equal(currentField().left, before + 1); });
+    add('Undo restores old coordinates', function () { var after = currentField().left; app.state.undo(); equal(currentField().left, after - 1); });
+    add('Redo reapplies the move', function () { var before = currentField().left; app.state.redo(); equal(currentField().left, before + 1); });
+    add('Keyboard nudge works at 0.25 pt', function () { var before = currentField().left; frame.document.body.dispatchEvent(new frame.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); equal(currentField().left, before + 0.25); });
+    add('Field resize works from keyboard', function () { var before = currentField().width; frame.document.body.dispatchEvent(new frame.KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true, bubbles: true })); equal(currentField().width, before + 0.25); });
+    add('Text baseline editing works', function () { var field = currentField(); var before = field.baselineTop; app.state.updateField(field.id, { baselineTop: before + 0.25 }, 'qa baseline'); equal(currentField().baselineTop, before + 0.25); });
+    add('Checkbox editing works', function () { var check = app.state.project.fields.find(function (field) { return field.type === 'check'; }); assert(check); app.state.selectField(check.id); app.state.updateField(check.id, { markStyle: 'cross', boxSize: 7.5 }, 'qa checkbox'); equal(currentField().markStyle, 'cross'); });
+    add('Source selection works', function () { var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'check'; }); app.state.selectField(field.id); app.state.updateField(field.id, { source: 'subject.displayName' }, 'qa source'); equal(currentField().source, 'subject.displayName'); });
+    add('showWhen editing works', function () { app.state.updateField(currentField().id, { showWhen: { source: 'subject.kind', equals: 'individual' } }, 'qa condition'); equal(currentField().showWhen.equals, 'individual'); });
+    add('Russian test data renders', function () { app.state.profileId = 'ru-resident-normal'; app.state.payloadOverrides = {}; return app.openExisting('accession-application-fl').then(function () { app.state.profileId = 'ru-resident-normal'; return app.generatePreview(); }).then(function (result) { assert(result.blob.size > 1000); }); });
+    add('English test data renders', function () { app.state.profileId = 'en-nonresident-normal'; app.state.payloadOverrides = {}; return app.generatePreview().then(function (result) { assert(result.blob.size > 1000); }); });
+    add('Long values use production fit logic', function () { return ns.validation.analyzeProfile(app.state.project, 'ru-resident-long', {}).then(function (fit) { assert(fit.fields.length === app.state.project.fields.length); assert(frame.CRMDocumentEngine.textLayout.fitText); }); });
+    add('Unsupported glyph produces a clear error', function () {
+      var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'check' && item.source; });
+      var overrides = {}; overrides[field.source] = '测试';
+      return ns.validation.analyzeProfile(app.state.project, 'ru-resident-normal', overrides).then(function (fit) {
+        var result = fit.fields.find(function (entry) { return entry.fieldId === field.id; }).result;
+        equal(result.status, 'unsupported-glyph'); assert(/^U\+/.test(result.unsupported[0].unicode));
+      });
+    });
+    add('Real PDF preview generates', function () { app.state.profileId = 'ru-resident-normal'; app.state.payloadOverrides = {}; return app.generatePreview().then(function (result) { assert(result.blob instanceof frame.Blob); }); });
+    add('Preview has the correct page count', function () { equal(app.previewInspection.pageCount, app.state.project.expectedPages); assert(app.previewInspection.noAppendedPages); });
+    add('Preview has zero AcroForm fields', function () { equal(app.previewInspection.acroFormFields, 0); });
+    add('Preview has zero widgets', function () { equal(app.previewInspection.widgets, 0); });
+    add('Stale Blob URLs are revoked', function () { var old = app.previewUrl; return app.generatePreview().then(function () { assert(app.revokedUrls.indexOf(old) !== -1); }); });
+    add('Builder JSON export/import round-trips', function () { var text = ns.io.exportProject(app.state.project); var imported = ns.io.importProjectText(text).project; assert(ns.io.semanticEqual(app.state.project, imported)); });
+    add('Production JS export is deterministic', function () { var a = ns.io.productionJs(app.state.project); var b = ns.io.productionJs(app.state.project); equal(a, b); assert(!/function\s*\(/.test(a.replace(/\(function \(global\)/, ''))); });
+    add('Existing-map semantic round-trip succeeds for 18 maps', function () {
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var exported = ns.schema.toProduction(project);
+        assert(ns.io.semanticEqual(map, exported), 'Round-trip failed: ' + map.id);
+      });
+    });
+    add('Replacement PDF comparison works', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        return makePdf(app.sourceInfo.pages.map(function (page) { return { width: page.width, height: page.height }; }));
+      }).then(function (bytes) { return app.replacePdf(pdfFile(bytes, 'replacement-same-size.pdf')); })
+        .then(function (summary) { assert(summary.oldHash !== summary.newHash); equal(summary.oldPageCount, summary.newPageCount); assert(summary.pagesRequiringReview.length > 0); });
+    });
+    add('Out-of-bounds replacement fields block export', function () {
+      return makePdf([{width: 100,height:100},{width:100,height:100},{width:100,height:100}])
+        .then(function (bytes) { return app.replacePdf(pdfFile(bytes, 'replacement-small.pdf')); })
+        .then(function () {
+          assert(app.state.validation.errors.some(function (error) { return error.code === 'out-of-bounds'; }));
+          var expectedErrorIndex = frame.__qaConsoleErrors.length;
+          assert(!app.productionExportAllowed());
+          frame.__qaConsoleErrors.splice(expectedErrorIndex);
+        });
+    });
+    add('Unused wizard field is reported', function () {
+      var project = cloneProject(app.state.project); project.wizard.fields.push({ key: 'qa-unused', label: 'Unused', type: 'text' });
+      var result = ns.validation.structural(project, app.sourceInfo, ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.warnings.some(function (warning) { return warning.code === 'unused-wizard'; }));
+    });
+    add('Missing required source is reported', function () {
+      var project = cloneProject(app.state.project); project.fields.push({ id: 'qa-missing', type: 'text', source: 'extra.qa-missing-provider', page: 0, left: 1, top: 1, height: 10, baselineTop: 9, width: 20, font: 'legalSerif', fontSize: 8, minFontSize: 6, required: true });
+      var result = ns.validation.structural(project, app.sourceInfo, { subject: {}, fields: {}, extraValues: {}, checks: {} });
+      assert(result.errors.some(function (error) { return error.code === 'unresolved-wizard-source' || error.code === 'missing-required'; }));
+    });
+    add('No external network requests are allowed', function () { return app.safeFetch('https://example.com/private.pdf').then(function () { throw new Error('External fetch was allowed'); }, function (error) { assert(/запрещены/.test(error.message)); }); });
+    add('No console errors occur in a successful run', function () { equal(frame.__qaConsoleErrors.length, 0, 'console.error calls'); });
+
+    function cloneProject(project) { return ns.schema.clone(project); }
+
+    function run() {
+      var chain = Promise.resolve();
+      tests.forEach(function (test, index) {
+        chain = chain.then(function () {
+          return Promise.resolve().then(test.fn).then(function () {
+            results.push({ number: index + 1, name: test.name, pass: true, details: 'OK' });
+          }, function (error) {
+            results.push({ number: index + 1, name: test.name, pass: false, details: error && error.message || String(error) });
+          }).then(render);
+        });
+      });
+      return chain.then(finish);
+    }
+
+    function render() {
+      var body = document.getElementById('results'); body.textContent = '';
+      results.forEach(function (result) {
+        var row = body.insertRow(); row.insertCell().textContent = result.number; row.insertCell().textContent = result.name;
+        var status = row.insertCell(); status.textContent = result.pass ? 'PASS' : 'FAIL'; status.className = result.pass ? 'pass' : 'fail';
+        row.insertCell().textContent = result.details;
+      });
+      var passed = results.filter(function (result) { return result.pass; }).length;
+      document.getElementById('summary').textContent = passed + '/' + results.length + ' passed';
+    }
+
+    function finish() {
+      var passed = results.filter(function (result) { return result.pass; }).length;
+      var report = { total: results.length, passed: passed, failed: results.length - passed, results: results };
+      document.getElementById('qa-output').textContent = 'QA_JSON_START' + JSON.stringify(report) + 'QA_JSON_END';
+      document.documentElement.dataset.qaComplete = 'true';
+      document.title = passed === results.length ? 'DONE · Builder QA' : 'FAILED · Builder QA';
+    }
+
+    document.getElementById('builder').addEventListener('load', function () {
+      frame = this.contentWindow;
+      ns = frame.CRMDocumentBuilder;
+      if (!ns || !ns.app) { document.getElementById('summary').textContent = 'Builder did not initialize.'; return; }
+      var originalError = frame.console.error.bind(frame.console);
+      frame.__qaConsoleErrors = [];
+      frame.console.error = function () { frame.__qaConsoleErrors.push(Array.prototype.join.call(arguments, ' ')); originalError.apply(null, arguments); };
+      ns.app.readyPromise.then(function () { app = ns.app; run(); }, function (error) { document.getElementById('summary').textContent = error.message; });
+    });
+  }());
+  </script>
+</body>
+</html>
