@@ -1217,71 +1217,68 @@
       id: 'qualification-notice',
       title: 'Уведомление о признании лица квалифицированным инвестором',
       description: 'Уведомление о признании лица квалифицированным инвестором',
+      // Приложение № 3 of the qualification regulation — not to be confused
+      // with ПРИЛОЖЕНИЕ 3 of the brokerage regulation below.
+      //
+      // Migrated from the legacy HTML print template onto the authoritative
+      // PDF. The old form asked for a decision number, a decision date, a
+      // "qualified from" date, a register-entry date and the signing officer's
+      // name and position. None of those has a slot in the authoritative
+      // document: it prints one recognition date, and the officer block is
+      // filled in by hand after printing. They were dropped rather than shown
+      // and ignored.
       appliesTo: ['individual', 'company'],
-      templateUrl: '../assets/document-templates/qualification-notice.html',
-      outputFilename: 'qualification-notice.pdf',
-      checkGroupLabel: 'Виды инструментов:',
+      category: 'Квалифицированный инвестор',
+      overlayTemplateId: 'qualification-notice',
+      pdfOutputFilename: 'uvedomlenie-o-priznanii-kvalinvestorom.pdf',
+      downloadLabel: 'Скачать уведомление',
+      aliases: ['приложение 3 квалификация', 'реестр квалифицированных инвесторов'],
+      fields: [
+        {
+          key: 'extra-document-date',
+          label: 'Дата признания квалифицированным инвестором',
+          type: 'date',
+          required: true
+        },
+        {
+          key: 'extra-qualification-scope',
+          label: 'Виды сделок, ценных бумаг и финансовых инструментов',
+          type: 'select',
+          required: true,
+          defaultValue: 'all',
+          options: [
+            { value: 'all', label: 'Все виды, предназначенные для квалифицированных инвесторов' },
+            { value: 'other', label: 'Иное (указать перечень)' }
+          ]
+        },
+        {
+          key: 'extra-qualification-instruments-other',
+          label: 'Перечень инструментов («иное»)',
+          type: 'text',
+          showWhen: { source: 'extra.extra-qualification-scope', equals: 'other' }
+        }
+      ]
+    },
+    {
+      // Приложение № 11 of the same qualification regulation. Despite its
+      // filename it is unrelated to ПРИЛОЖЕНИЕ 11 К РЕГЛАМЕНТУ (отказ от части
+      // услуг) and to the 17-page Risks.pdf.
+      id: 'qualification-consequences-notice',
+      title: 'Уведомление о последствиях признания квалифицированным инвестором',
+      description: 'Приложение 11 к Регламенту признания квалифицированным инвестором.',
+      category: 'Квалифицированный инвестор',
+      appliesTo: ['individual'],
+      overlayTemplateId: 'qualification-consequences-notice',
+      pdfOutputFilename: 'uvedomlenie-o-posledstviyah-priznaniya-kvalinvestorom.pdf',
+      downloadLabel: 'Скачать уведомление',
+      aliases: ['последствия признания', 'риски квалифицированного инвестора'],
       fields: [
         {
           key: 'extra-document-date',
           label: 'Дата уведомления',
           type: 'date',
           required: true
-        },
-        {
-          key: 'extra-recipient-address',
-          label: 'Адрес получателя',
-          type: 'textarea',
-          required: false
-        },
-        {
-          key: 'extra-decision-number',
-          label: 'Номер решения о признании',
-          type: 'text',
-          required: true,
-          placeholder: 'Например: 001/2024'
-        },
-        {
-          key: 'extra-decision-date',
-          label: 'Дата решения',
-          type: 'date',
-          required: true
-        },
-        {
-          key: 'extra-qualified-from',
-          label: 'Квалифицирован(а) с',
-          type: 'date',
-          required: true
-        },
-        {
-          key: 'extra-registry-entry-date',
-          label: 'Дата внесения записи в реестр',
-          type: 'date',
-          required: true
-        },
-        {
-          key: 'extra-instrument-other',
-          label: 'Иной перечень инструментов',
-          type: 'textarea',
-          required: false
-        },
-        {
-          key: 'extra-authorized-signer-position',
-          label: 'Должность уполномоченного лица',
-          type: 'text',
-          required: false,
-          placeholder: 'Например: Генеральный директор'
-        },
-        {
-          key: 'extra-authorized-signer',
-          label: 'ФИО уполномоченного лица',
-          type: 'text',
-          required: false
         }
-      ],
-      checkFields: [
-        { key: 'notice-scope-all', label: 'Все виды ценных бумаг / финансовых инструментов', defaultChecked: true },
-        { key: 'notice-scope-other', label: 'Иное / ограниченный перечень' }
       ]
     },
     {
