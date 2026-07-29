@@ -35,8 +35,17 @@
   }
 
   function fontFor(url) {
-    if (!fontCache[url]) {
-      fontCache[url] = fetch(new URL(url, global.location.href).href)
+    var absolute;
+    try {
+      absolute = new URL(url, global.location.href);
+    } catch (error) {
+      return Promise.reject(new Error('URL шрифта некорректен.'));
+    }
+    if (absolute.protocol !== 'blob:' && absolute.origin !== global.location.origin) {
+      return Promise.reject(new Error('Внешний URL шрифта запрещён.'));
+    }
+    if (!fontCache[absolute.href]) {
+      fontCache[absolute.href] = fetch(absolute.href)
         .then(function (response) {
           if (!response.ok) throw new Error('Шрифт не загружен: HTTP ' + response.status + '.');
           return response.arrayBuffer();
@@ -49,7 +58,7 @@
           });
         });
     }
-    return fontCache[url];
+    return fontCache[absolute.href];
   }
 
   function unsupportedCharacters(font, value) {
@@ -207,6 +216,16 @@
         errors.push(item('error', 'template-url', 'URL PDF-шаблона некорректен.', null, 'templateUrl'));
       }
     }
+    Object.keys(project.fonts || {}).forEach(function (fontName) {
+      try {
+        var fontAbsolute = new URL(project.fonts[fontName], global.location.href);
+        if (fontAbsolute.protocol !== 'blob:' && fontAbsolute.origin !== global.location.origin) {
+          errors.push(item('error', 'external-font-url', 'Внешний URL шрифта запрещён: ' + fontName + '.', null, 'fonts.' + fontName));
+        }
+      } catch (fontUrlError) {
+        errors.push(item('error', 'font-url', 'URL шрифта некорректен: ' + fontName + '.', null, 'fonts.' + fontName));
+      }
+    });
     if (baseInfo) {
       if (Number(project.expectedPages) !== Number(baseInfo.pageCount)) {
         errors.push(item('error', 'page-count', 'Ожидалось страниц: ' + project.expectedPages + ', в PDF: ' + baseInfo.pageCount + '.'));

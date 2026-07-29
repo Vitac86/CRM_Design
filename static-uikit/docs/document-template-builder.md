@@ -19,11 +19,24 @@ Run `static-uikit/start-template-builder.cmd`. The launcher:
 - opens `/tools/document-template-builder.html`;
 - never terminates an existing Python, Chrome, console, or other process.
 
-Stop only the launched server with the printed command:
+Before stopping a server from a saved launch record, verify that the PID still
+belongs to the expected loopback `http.server` command. This prevents a stale
+record from stopping an unrelated process after Windows reuses a PID:
 
 ```powershell
-Stop-Process -Id <recorded-pid>
+$builderServerPid = <recorded-pid>
+$builderPort = <recorded-port>
+$builderRoot = 'P:\Kolosov\CRM_Design\static-uikit'
+$server = Get-CimInstance Win32_Process -Filter "ProcessId = $builderServerPid"
+$expected = "-m http.server $builderPort --bind 127.0.0.1 --directory $builderRoot"
+if (-not $server -or $server.Name -notlike 'python*.exe' -or $server.CommandLine -notlike "*$expected*") {
+  throw 'The recorded PID is not the expected Template Builder server.'
+}
+Stop-Process -Id $builderServerPid
 ```
+
+The launcher and its record never execute a stop command automatically; they do
+not terminate by image name and do not consume old PID records.
 
 The local HTTP process serves committed files only. There is no upload endpoint,
 telemetry, analytics, CDN, external font, external API, or backend PDF service.

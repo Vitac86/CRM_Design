@@ -127,7 +127,16 @@
       var result = ns.validation.structural(project, app.sourceInfo, { subject: {}, fields: {}, extraValues: {}, checks: {} });
       assert(result.errors.some(function (error) { return error.code === 'unresolved-wizard-source' || error.code === 'missing-required'; }));
     });
-    add('No external network requests are allowed', function () { return app.safeFetch('https://example.com/private.pdf').then(function () { throw new Error('External fetch was allowed'); }, function (error) { assert(/запрещены/.test(error.message)); }); });
+    add('No external network requests are allowed', function () {
+      var project = cloneProject(app.state.project);
+      project.fonts.externalQaFont = 'https://example.com/private.ttf';
+      return app.safeFetch('https://example.com/private.pdf')
+        .then(function () { throw new Error('External fetch was allowed'); }, function (error) { assert(/запрещены/.test(error.message)); })
+        .then(function () {
+          return ns.validation.loadProjectFonts(project)
+            .then(function () { throw new Error('External font fetch was allowed'); }, function (error) { assert(/Внешний URL шрифта запрещён/.test(error.message)); });
+        });
+    });
     add('No console errors occur in a successful run', function () { equal(frame.__qaConsoleErrors.length, 0, 'console.error calls'); });
 
     function cloneProject(project) { return ns.schema.clone(project); }
