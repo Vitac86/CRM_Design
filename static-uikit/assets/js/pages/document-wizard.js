@@ -118,6 +118,17 @@
     optionsFrom: 'subject.representatives'
   };
 
+  // Appendix 1В prints this role beside the signature line, so another
+  // representative type would contradict the unmodified source wording.
+  var GENERAL_DIRECTOR_REPRESENTATIVE_FIELD = {
+    key: 'extra-representative-id',
+    label: 'Генеральный директор / подписант',
+    type: 'select',
+    required: true,
+    optionsFrom: 'subject.representatives',
+    representativeRole: 'Генеральный директор'
+  };
+
   // ── Document configuration ─────────────────────────────────────────────────
   var DOCUMENTS = [
     {
@@ -141,18 +152,13 @@
       companyFields: [REPRESENTATIVE_FIELD],
       packageDocuments: [
         {
-          // Static notification pack, 10 pages, identical to the source
-          // document. It previously carried an 11th, generated "confirmation
-          // sheet" holding blue AcroForm fields — that page and its form have
-          // been removed: client data must appear inside the original layout,
-          // never on an appended data sheet.
-          //
-          // The document has no in-place mapping yet, so it is issued exactly
-          // as supplied. See docs/document-digitization-inventory.md.
+          // Authoritative 10-page notification pack. Identity and confirmation
+          // date are drawn into the original acknowledgement on pages 9–10;
+          // there is no appended sheet, AcroForm or visible widget.
           id: 'client-notifications',
           title: 'Уведомления клиента',
           downloadLabel: 'Скачать уведомления',
-          pdfTemplateUrl: '../assets/document-pdf-templates/client-notifications.pdf',
+          overlayTemplateId: 'client-notifications',
           pdfOutputFilename: 'client-notifications.pdf'
         },
         {
@@ -255,13 +261,192 @@
       ]
     },
     {
+      id: 'accession-application-yul',
+      title: 'Заявление о присоединении (ЮЛ)',
+      description: 'Приложение 1В к Регламенту брокерского обслуживания.',
+      category: 'Документы и заявления клиента',
+      appliesTo: ['company'],
+      overlayTemplateId: 'accession-application-yul',
+      pdfOutputFilename: 'zayavlenie-o-prisoedinenii-yul.pdf',
+      downloadLabel: 'Скачать заявление',
+      fields: [
+        { key: 'extra-document-date', label: 'Дата подписания', type: 'date', required: true },
+        {
+          key: 'depo-account-type',
+          label: 'Счёт депо (п. 2)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не открывать' },
+            { value: 'owner', label: 'Владельца' },
+            { value: 'nominee', label: 'Номинального держателя' },
+            { value: 'trustee', label: 'Доверительного управляющего' }
+          ]
+        },
+        {
+          key: 'trading-depo-account-type',
+          label: 'Торговый счёт депо (п. 2)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не открывать' },
+            { value: 'owner', label: 'Владельца' },
+            { value: 'nominee', label: 'Номинального держателя' },
+            { value: 'trustee', label: 'Доверительного управляющего' }
+          ]
+        },
+        {
+          key: 'report-delivery',
+          label: 'Способ получения отчётов (п. 3)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'office', label: 'В офисе ООО «Инвестика»' },
+            { value: 'post', label: 'По почте заказным письмом' },
+            { value: 'email', label: 'По электронной почте' },
+            { value: 'edo', label: 'По системе ЭДО' }
+          ]
+        },
+        {
+          key: 'income-payout',
+          label: 'Перечисление доходов по ценным бумагам (п. 6)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не выбрано' },
+            { value: 'broker-account', label: 'На специальный брокерский счёт' },
+            { value: 'bank-details', label: 'На банковские реквизиты из анкеты' }
+          ]
+        },
+        { key: 'tariff-stock', label: 'Тарифный план — фондовый рынок', type: 'text' },
+        { key: 'tariff-derivatives', label: 'Тарифный план — срочный рынок', type: 'text' },
+        { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' },
+        GENERAL_DIRECTOR_REPRESENTATIVE_FIELD
+      ],
+      checkGroupLabel: 'Отметки заявления:',
+      checkFields: [
+        { key: 'accession-brokerage', label: 'Присоединение к Регламенту брокерского обслуживания', defaultChecked: true },
+        { key: 'accession-depository', label: 'Присоединение к Депозитарному договору' },
+        { key: 'depo-operator', label: 'Назначить ООО «Инвестика» оператором счёта депо' },
+        { key: 'market-stock', label: 'Фондовый рынок' },
+        { key: 'market-derivatives', label: 'Срочный рынок' },
+        { key: 'market-currency', label: 'Валютный рынок и рынок драгоценных металлов' },
+        { key: 'agreement-esignature', label: 'Соглашение об использовании электронной подписи' },
+        { key: 'agreement-quik', label: 'Соглашение о праве использования ПО QUIK' }
+      ]
+    },
+    {
+      id: 'broker-use-refusal-request',
+      title: 'Отказ от права использования средств и ценных бумаг',
+      description: 'Приложение 9 к Регламенту брокерского обслуживания.',
+      category: 'Брокерское обслуживание',
+      appliesTo: ['individual', 'company'],
+      overlayTemplateId: 'broker-use-refusal-request',
+      pdfOutputFilename: 'broker-use-refusal-request.pdf',
+      downloadLabel: 'Скачать заявление',
+      fields: [
+        { key: 'extra-document-date', label: 'Дата заявления', type: 'date', required: true },
+        { key: 'extra-contract-number', label: 'Номер договора', type: 'text', required: true },
+        { key: 'extra-contract-date', label: 'Дата договора', type: 'date', required: true },
+        { key: 'extra-account-portfolio', label: 'Счёт / портфель', type: 'text', required: true }
+      ],
+      companyFields: [REPRESENTATIVE_FIELD]
+    },
+    {
+      id: 'regulation-full-refusal-notice',
+      title: 'Отказ от исполнения Регламента в целом',
+      description: 'Приложение 10 к Регламенту брокерского обслуживания.',
+      category: 'Брокерское обслуживание',
+      appliesTo: ['individual', 'company'],
+      overlayTemplateId: 'regulation-full-refusal-notice',
+      pdfOutputFilename: 'regulation-full-refusal-notice.pdf',
+      downloadLabel: 'Скачать уведомление',
+      fields: [
+        { key: 'extra-document-date', label: 'Дата уведомления', type: 'date', required: true },
+        { key: 'extra-contract-number', label: 'Номер договора', type: 'text', required: true },
+        { key: 'extra-contract-date', label: 'Дата договора', type: 'date', required: true },
+        { key: 'extra-account-portfolio', label: 'Счёт / портфель', type: 'text', required: true }
+      ],
+      companyFields: [REPRESENTATIVE_FIELD],
+      checkGroupLabel: 'Отказаться от исполнения:',
+      checkFields: [
+        { key: 'full-refusal-brokerage', label: 'Регламента брокерского обслуживания' },
+        { key: 'full-refusal-depository', label: 'Депозитарного договора' }
+      ],
+      validationRules: [
+        {
+          type: 'atLeastOneCheck',
+          keys: ['full-refusal-brokerage', 'full-refusal-depository'],
+          message: 'Выберите хотя бы один договор, от исполнения которого клиент отказывается.'
+        }
+      ]
+    },
+    {
+      id: 'regulation-partial-refusal-notice',
+      title: 'Отказ от части услуг по Регламенту',
+      description: 'Приложение 11 к Регламенту брокерского обслуживания.',
+      category: 'Брокерское обслуживание',
+      appliesTo: ['individual', 'company'],
+      overlayTemplateId: 'regulation-partial-refusal-notice',
+      pdfOutputFilename: 'regulation-partial-refusal-notice.pdf',
+      downloadLabel: 'Скачать уведомление',
+      fields: [
+        { key: 'extra-document-date', label: 'Дата уведомления', type: 'date', required: true },
+        { key: 'extra-contract-number', label: 'Номер договора', type: 'text', required: true },
+        { key: 'extra-contract-date', label: 'Дата договора', type: 'date', required: true },
+        { key: 'extra-account-portfolio', label: 'Счёт / портфель', type: 'text', required: true },
+        {
+          key: 'extra-stock-portfolio',
+          label: 'Портфель фондового рынка',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'check.partial-refusal-stock', equals: true }
+        },
+        {
+          key: 'extra-derivatives-portfolio',
+          label: 'Портфель срочного рынка',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'check.partial-refusal-derivatives', equals: true }
+        },
+        {
+          key: 'extra-currency-portfolio',
+          label: 'Портфель валютного рынка',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'check.partial-refusal-currency', equals: true }
+        }
+      ],
+      companyFields: [REPRESENTATIVE_FIELD],
+      checkGroupLabel: 'Прекратить предоставление:',
+      checkFields: [
+        { key: 'partial-refusal-stock', label: 'Услуг на фондовом рынке' },
+        { key: 'partial-refusal-derivatives', label: 'Услуг на срочном рынке' },
+        { key: 'partial-refusal-currency', label: 'Услуг на валютном рынке' },
+        { key: 'partial-refusal-quik', label: 'Соглашения о праве использования ПО QUIK' },
+        { key: 'partial-refusal-esignature', label: 'Соглашения об электронной подписи' }
+      ],
+      validationRules: [
+        {
+          type: 'atLeastOneCheck',
+          keys: [
+            'partial-refusal-stock',
+            'partial-refusal-derivatives',
+            'partial-refusal-currency',
+            'partial-refusal-quik',
+            'partial-refusal-esignature'
+          ],
+          message: 'Выберите хотя бы одну услугу или соглашение для прекращения.'
+        }
+      ]
+    },
+    {
       id: 'anketa-fl',
-      title: 'Анкета ФЛ',
+      title: 'Анкета физического лица',
       description: 'Анкета физического лица — клиента ООО «Инвестика»',
+      category: 'Анкеты и идентификация',
       appliesTo: ['individual'],
-      templateUrl: '../assets/document-templates/anketa-fl.html',
-      outputFilename: 'anketa-fl.pdf',
-      checkGroupLabel: 'Отметки анкеты:',
+      overlayTemplateId: 'anketa-fl',
+      pdfOutputFilename: 'anketa-fl.pdf',
+      downloadLabel: 'Скачать анкету',
+      checkGroupLabel: 'Независимые признаки и декларации:',
       fields: [
         {
           key: 'extra-document-date',
@@ -274,6 +459,7 @@
           label: 'Роль лица в анкете',
           type: 'select',
           required: true,
+          defaultValue: 'client',
           options: [
             { value: 'client', label: 'Клиент' },
             { value: 'representative', label: 'Представитель' },
@@ -286,56 +472,99 @@
           label: 'Тип заполнения',
           type: 'select',
           required: true,
+          defaultValue: 'first',
           options: [
             { value: 'first', label: 'Заполняется впервые' },
             { value: 'change', label: 'Изменение анкетных данных' }
           ]
         },
         {
-          key: 'extra-employment-status',
-          label: 'Статус занятости',
+          key: 'extra-tax-residency',
+          label: 'Налоговое резидентство',
           type: 'select',
           required: true,
+          defaultValue: 'rf',
           options: [
-            { value: 'Работник по найму', label: 'Работник по найму' },
-            { value: 'Индивидуальный предприниматель', label: 'Индивидуальный предприниматель' },
-            { value: 'Самозанятый', label: 'Самозанятый' },
-            { value: 'Пенсионер', label: 'Пенсионер' },
-            { value: 'Студент', label: 'Студент' },
-            { value: 'Безработный', label: 'Безработный' },
-            { value: 'Иное', label: 'Иное' }
+            { value: 'rf', label: 'Российская Федерация' },
+            { value: 'other', label: 'Иное государство' }
           ]
         },
         {
-          key: 'extra-income-source',
-          label: 'Источник происхождения денежных средств / имущества',
-          type: 'textarea',
-          required: false,
-          placeholder: 'Например: заработная плата'
+          key: 'tax-residency-countries',
+          label: 'Иные государства налогового резидентства',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        {
+          key: 'extra-foreign-taxpayer',
+          label: 'Налогоплательщик иностранного государства',
+          type: 'select',
+          required: true,
+          defaultValue: 'no',
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        {
+          key: 'migration-document-series-number',
+          label: 'Миграционный документ: серия и номер',
+          type: 'text',
+          showWhen: { source: 'subject.citizenship', notEquals: ['Россия', 'Российская Федерация'] }
+        },
+        {
+          key: 'migration-stay-start-date',
+          label: 'Срок пребывания в РФ: с',
+          type: 'date',
+          showWhen: { source: 'subject.citizenship', notEquals: ['Россия', 'Российская Федерация'] }
+        },
+        {
+          key: 'migration-stay-end-date',
+          label: 'Срок пребывания в РФ: по',
+          type: 'date',
+          showWhen: { source: 'subject.citizenship', notEquals: ['Россия', 'Российская Федерация'] }
+        },
+        {
+          key: 'pep-position-employer',
+          label: 'Должность и работодатель публичного должностного лица',
+          type: 'textarea'
         },
         {
           key: 'extra-pep-relation',
           label: 'Связь с публичным должностным лицом',
-          type: 'textarea',
-          required: false
+          type: 'textarea'
         },
+        { key: 'landline-phone', label: 'Стационарный телефон', type: 'text' },
+        { key: 'bank-name', label: 'Наименование банка', type: 'text' },
+        { key: 'bank-address', label: 'Адрес банка', type: 'text' },
+        { key: 'bank-inn', label: 'ИНН банка', type: 'text' },
+        { key: 'bank-bic-swift', label: 'БИК / SWIFT банка', type: 'text' },
+        { key: 'bank-correspondent-account', label: 'Корреспондентский счёт', type: 'text' },
+        { key: 'bank-settlement-account', label: 'Расчётный счёт', type: 'text' },
         {
-          key: 'extra-bank-details',
-          label: 'Банковские реквизиты',
-          type: 'textarea',
-          required: false
+          key: 'bank-additional-details',
+          label: 'Дополнительные банковские реквизиты',
+          type: 'textarea'
         },
+        { key: 'representative-name', label: 'ФИО представителя', type: 'text' },
         {
-          key: 'extra-representative-details',
-          label: 'Сведения о представителе',
-          type: 'textarea',
-          required: false
+          key: 'representative-authority-details',
+          label: 'Основание полномочий представителя',
+          type: 'textarea'
         },
+        { key: 'beneficiary-name', label: 'ФИО выгодоприобретателя', type: 'text' },
         {
-          key: 'extra-beneficiary-details',
-          label: 'Выгодоприобретатель / бенефициарный владелец',
+          key: 'beneficiary-basis-details',
+          label: 'Основание выгодоприобретателя',
+          type: 'textarea'
+        },
+        { key: 'beneficial-owner-name', label: 'ФИО бенефициарного владельца', type: 'text' },
+        {
+          key: 'beneficial-owner-basis',
+          label: 'Основание бенефициарного владения',
           type: 'textarea',
-          required: false
+          rows: 2
         },
         {
           key: 'extra-business-purpose',
@@ -350,6 +579,13 @@
           ]
         },
         {
+          key: 'business-purpose-other',
+          label: 'Иная цель деловых отношений',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-business-purpose', equals: 'Иное' }
+        },
+        {
           key: 'extra-financial-goal',
           label: 'Цель финансово-хозяйственной деятельности',
           type: 'select',
@@ -362,11 +598,21 @@
           ]
         },
         {
-          key: 'extra-financial-position',
-          label: 'Сведения о финансовом положении',
-          type: 'textarea',
-          required: false,
-          placeholder: 'При отсутствии сведений можно оставить пустым'
+          key: 'financial-goal-other',
+          label: 'Иная цель финансово-хозяйственной деятельности',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-financial-goal', equals: 'Иное' }
+        },
+        {
+          key: 'financial-solvency',
+          label: 'Признаки банкротства или неплатёжеспособности',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'no-bankruptcy', label: 'Да, отсутствуют' },
+            { value: 'bankruptcy-present', label: 'Нет, имеются' }
+          ]
         },
         {
           key: 'extra-business-reputation',
@@ -375,47 +621,51 @@
           required: false
         },
         {
-          key: 'extra-other-info',
-          label: 'Иные сведения',
-          type: 'textarea',
-          required: false
+          key: 'foreign-trust-owner-status',
+          label: 'Статус доверительного собственника иностранной структуры',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
         },
         {
-          key: 'extra-fatca-details',
-          label: 'Признаки налогоплательщика США',
-          type: 'textarea',
-          required: false
-        }
+          key: 'foreign-trust-protector-status',
+          label: 'Статус протектора иностранной структуры',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        { key: 'extra-other-info', label: 'Иные сведения', type: 'textarea' }
       ],
       checkFields: [
-        { key: 'anketa-role-client', label: 'Клиент', defaultChecked: true },
-        { key: 'anketa-role-representative', label: 'Представитель' },
-        { key: 'anketa-role-beneficiary', label: 'Выгодоприобретатель' },
-        { key: 'anketa-role-beneficial-owner', label: 'Бенефициарный владелец' },
-        { key: 'anketa-mode-first', label: 'Заполняется впервые', defaultChecked: true },
-        { key: 'anketa-mode-change', label: 'Изменение анкетных данных' },
-        { key: 'citizenship-rf', label: 'Гражданство: Российская Федерация', defaultChecked: true },
-        { key: 'citizenship-other', label: 'Иное гражданство' },
-        { key: 'tax-resident-rf-yes', label: 'Налоговый резидент РФ', defaultChecked: true },
-        { key: 'tax-resident-rf-no', label: 'Налоговый резидент иного государства' },
-        { key: 'fatca-yes', label: 'FATCA: да' },
-        { key: 'fatca-no', label: 'FATCA: нет', defaultChecked: true },
         { key: 'pep-foreign', label: 'Иностранное публичное должностное лицо' },
         { key: 'pep-international', label: 'Должностное лицо публичной международной организации' },
         { key: 'pep-russian', label: 'Лицо, замещающее государственные должности РФ' },
-        { key: 'financial-bankruptcy-no', label: 'Отсутствуют признаки банкротства', defaultChecked: true },
-        { key: 'foreign-trust-owner-no', label: 'Нет статуса доверительного собственника иностранной структуры', defaultChecked: true },
-        { key: 'foreign-trust-protector-no', label: 'Нет статуса протектора иностранной структуры', defaultChecked: true }
+        { key: 'fatca-us-citizen', label: 'Гражданство США' },
+        { key: 'fatca-us-permanent-resident', label: 'Разрешение на постоянное пребывание в США' },
+        { key: 'fatca-us-birth-country', label: 'Место рождения в США' },
+        { key: 'fatca-us-address', label: 'Адрес проживания в США' },
+        { key: 'fatca-us-mailing-address', label: 'Почтовый адрес в США' },
+        { key: 'fatca-us-phone', label: 'Телефонный номер США' },
+        { key: 'fatca-us-payment-instructions', label: 'Платёжные инструкции в США' },
+        { key: 'fatca-us-attorney', label: 'Доверенность лицу с адресом в США' }
       ]
     },
     {
       id: 'anketa-yul',
-      title: 'Анкета ЮЛ',
+      title: 'Анкета юридического лица',
       description: 'Анкета юридического лица — клиента ООО «Инвестика»',
+      category: 'Анкеты и идентификация',
       appliesTo: ['company'],
-      templateUrl: '../assets/document-templates/anketa-yul.html',
-      outputFilename: 'anketa-yul.pdf',
-      checkGroupLabel: 'Отметки анкеты:',
+      overlayTemplateId: 'anketa-yul',
+      pdfOutputFilename: 'anketa-yul.pdf',
+      downloadLabel: 'Скачать анкету',
+      checkGroupLabel: 'Независимые признаки и подтверждающие документы:',
       fields: [
         {
           key: 'extra-document-date',
@@ -428,6 +678,7 @@
           label: 'Роль организации в анкете',
           type: 'select',
           required: true,
+          defaultValue: 'client',
           options: [
             { value: 'client', label: 'Клиент' },
             { value: 'representative', label: 'Представитель' },
@@ -439,11 +690,89 @@
           label: 'Тип заполнения',
           type: 'select',
           required: true,
+          defaultValue: 'first',
           options: [
             { value: 'first', label: 'Заполняется впервые' },
             { value: 'change', label: 'Изменение анкетных данных' }
           ]
         },
+        {
+          key: 'extra-tax-residency',
+          label: 'Налоговое резидентство',
+          type: 'select',
+          required: true,
+          defaultValue: 'rf',
+          options: [
+            { value: 'rf', label: 'Российская Федерация' },
+            { value: 'other', label: 'Иное государство' }
+          ]
+        },
+        {
+          key: 'tax-residency-countries',
+          label: 'Иные государства налогового резидентства',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        {
+          key: 'extra-foreign-taxpayer',
+          label: 'Налогоплательщик иностранного государства',
+          type: 'select',
+          required: true,
+          defaultValue: 'no',
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        {
+          key: 'extra-strategic-company',
+          label: 'Стратегическое общество или подконтрольная организация',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        { key: 'tax-registration-date', label: 'Дата постановки на налоговый учёт', type: 'date' },
+        {
+          key: 'foreign-tax-identifier',
+          label: 'Иностранный налоговый идентификатор',
+          type: 'text',
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        {
+          key: 'foreign-registration-number',
+          label: 'Иностранный регистрационный номер',
+          type: 'text',
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        {
+          key: 'foreign-branch-accreditation-number',
+          label: 'Номер аккредитации филиала иностранной организации',
+          type: 'text',
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        { key: 'pre2002-registration-document', label: 'Документ о регистрации до 01.07.2002', type: 'text' },
+        { key: 'pre2002-registration-number', label: 'Номер регистрации до 01.07.2002', type: 'text' },
+        { key: 'pre2002-registration-date', label: 'Дата регистрации до 01.07.2002', type: 'date' },
+        { key: 'pre2002-registration-authority', label: 'Орган регистрации до 01.07.2002', type: 'text' },
+        { key: 'executive-body-address', label: 'Адрес исполнительного органа', type: 'textarea' },
+        {
+          key: 'nonresident-representation-address',
+          label: 'Адрес представительства нерезидента',
+          type: 'textarea',
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        {
+          key: 'nonresident-representative-residence',
+          label: 'Место жительства представителя нерезидента',
+          type: 'textarea',
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        { key: 'landline-phone', label: 'Стационарный телефон', type: 'text' },
+        { key: 'credit-organisation-bic', label: 'БИК кредитной организации', type: 'text' },
         {
           key: 'extra-okpo',
           label: 'ОКПО',
@@ -459,15 +788,20 @@
         {
           key: 'extra-management-structure',
           label: 'Структура органов управления',
-          type: 'textarea',
+          type: 'text',
           required: false,
           placeholder: 'Совет директоров, правление, ЕИО и т.п.'
         },
+        { key: 'management-composition', label: 'Состав органов управления', type: 'text' },
         {
-          key: 'extra-shareholders',
-          label: 'Акционеры / участники от 5%',
-          type: 'textarea',
-          required: false
+          key: 'shareholders-names-inn',
+          label: 'Участники от 5%: наименования / ФИО и ИНН',
+          type: 'text'
+        },
+        {
+          key: 'shareholders-percentages',
+          label: 'Доли участников от 5%',
+          type: 'text'
         },
         {
           key: 'extra-controlling-persons',
@@ -476,29 +810,38 @@
           required: false
         },
         {
-          key: 'extra-license-details',
-          label: 'Лицензируемая деятельность / лицензии',
-          type: 'textarea',
-          required: false
+          key: 'extra-licensed-activity',
+          label: 'Осуществляется лицензируемая деятельность',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
         },
+        { key: 'licence-number', label: 'Номер лицензии', type: 'text', showWhen: { source: 'extra.extra-licensed-activity', equals: 'yes' } },
+        { key: 'licence-issue-date', label: 'Дата выдачи лицензии', type: 'date', showWhen: { source: 'extra.extra-licensed-activity', equals: 'yes' } },
+        { key: 'licence-authority', label: 'Орган, выдавший лицензию', type: 'text', showWhen: { source: 'extra.extra-licensed-activity', equals: 'yes' } },
+        { key: 'licence-expiry', label: 'Срок действия лицензии', type: 'text', showWhen: { source: 'extra.extra-licensed-activity', equals: 'yes' } },
+        { key: 'licensed-activities', label: 'Виды лицензируемой деятельности', type: 'text', showWhen: { source: 'extra.extra-licensed-activity', equals: 'yes' } },
+        { key: 'bank-name', label: 'Наименование банка', type: 'text' },
+        { key: 'bank-address', label: 'Адрес банка', type: 'text' },
+        { key: 'bank-inn', label: 'ИНН банка', type: 'text' },
+        { key: 'bank-bic-swift', label: 'БИК / SWIFT банка', type: 'text' },
+        { key: 'bank-correspondent-account', label: 'Корреспондентский счёт', type: 'text' },
+        { key: 'bank-settlement-account', label: 'Расчётный счёт', type: 'text' },
         {
-          key: 'extra-bank-details',
-          label: 'Банковские реквизиты',
+          key: 'correspondent-bank-details',
+          label: 'Реквизиты банка-корреспондента',
           type: 'textarea',
           required: false
         },
-        {
-          key: 'extra-beneficiaries',
-          label: 'Выгодоприобретатели / бенефициары',
-          type: 'textarea',
-          required: false
-        },
-        {
-          key: 'extra-representative-details',
-          label: 'Представитель юридического лица',
-          type: 'textarea',
-          required: false
-        },
+        { key: 'representative-name', label: 'ФИО представителя', type: 'text' },
+        { key: 'representative-authority-details', label: 'Основание полномочий представителя', type: 'textarea' },
+        { key: 'beneficiary-name', label: 'ФИО / наименование выгодоприобретателя', type: 'text' },
+        { key: 'beneficiary-basis-details', label: 'Основание выгодоприобретателя', type: 'textarea' },
+        { key: 'beneficial-owner-name', label: 'ФИО бенефициарного владельца', type: 'text' },
+        { key: 'beneficial-owner-basis', label: 'Основание бенефициарного владения', type: 'textarea' },
         {
           key: 'extra-business-purpose',
           label: 'Цель деловых отношений',
@@ -510,6 +853,13 @@
             { value: 'Конверсионные операции', label: 'Конверсионные операции' },
             { value: 'Иное', label: 'Иное' }
           ]
+        },
+        {
+          key: 'business-purpose-other',
+          label: 'Иная цель деловых отношений',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-business-purpose', equals: 'Иное' }
         },
         {
           key: 'extra-financial-goal',
@@ -524,22 +874,23 @@
           ]
         },
         {
-          key: 'extra-financial-docs',
-          label: 'Документы о финансовом положении',
-          type: 'textarea',
-          required: false
+          key: 'financial-goal-other',
+          label: 'Иная цель финансово-хозяйственной деятельности',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-financial-goal', equals: 'Иное' }
         },
         {
-          key: 'extra-reputation-docs',
-          label: 'Документы о деловой репутации',
+          key: 'reputation-other-details',
+          label: 'Иные документы о деловой репутации',
           type: 'textarea',
-          required: false
+          showWhen: { source: 'check.reputation-other', equals: true }
         },
         {
-          key: 'extra-source-of-funds',
-          label: 'Источник происхождения средств / имущества',
-          type: 'textarea',
-          required: false
+          key: 'source-of-funds-other',
+          label: 'Иной источник происхождения средств / имущества',
+          type: 'text',
+          showWhen: { source: 'check.funds-other', equals: true }
         },
         {
           key: 'extra-other-info',
@@ -548,53 +899,58 @@
           required: false
         },
         {
-          key: 'extra-fatca-details',
-          label: 'Признаки налогоплательщика США',
-          type: 'textarea',
-          required: false
+          key: 'foreign-trust-owner-status',
+          label: 'Статус доверительного собственника иностранной структуры',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        {
+          key: 'foreign-trust-protector-status',
+          label: 'Статус протектора иностранной структуры',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
         }
       ],
       checkFields: [
-        { key: 'anketa-role-client', label: 'Клиент', defaultChecked: true },
-        { key: 'anketa-role-representative', label: 'Представитель' },
-        { key: 'anketa-role-beneficiary', label: 'Выгодоприобретатель' },
-        { key: 'anketa-mode-first', label: 'Заполняется впервые', defaultChecked: true },
-        { key: 'anketa-mode-change', label: 'Изменение анкетных данных' },
-        { key: 'tax-resident-rf-yes', label: 'Налоговый резидент РФ', defaultChecked: true },
-        { key: 'tax-resident-rf-no', label: 'Нерезидент' },
-        { key: 'fatca-yes', label: 'FATCA: да' },
-        { key: 'fatca-no', label: 'FATCA: нет', defaultChecked: true },
-        { key: 'strategic-company-yes', label: 'Стратегическое общество / под контролем такого общества' },
-        { key: 'strategic-company-no', label: 'Не относится к стратегическим обществам', defaultChecked: true },
-        { key: 'licensed-activity-no', label: 'Лицензируемая деятельность не осуществляется', defaultChecked: true },
-        { key: 'licensed-activity-yes', label: 'Лицензируемая деятельность осуществляется' },
-        { key: 'funds-own', label: 'Источник средств: собственные средства', defaultChecked: true },
+        { key: 'financial-docs-annual-accounts', label: 'Годовая бухгалтерская отчётность' },
+        { key: 'financial-docs-audit-report', label: 'Аудиторское заключение' },
+        { key: 'reputation-client-reviews', label: 'Отзывы клиентов о деловой репутации' },
+        { key: 'reputation-financial-reviews', label: 'Отзывы кредитных организаций о деловой репутации' },
+        { key: 'reputation-other', label: 'Иные документы о деловой репутации' },
         { key: 'funds-borrowed', label: 'Источник средств: заемные средства' },
-        { key: 'foreign-trust-owner-no', label: 'Нет статуса доверительного собственника иностранной структуры', defaultChecked: true },
-        { key: 'foreign-trust-protector-no', label: 'Нет статуса протектора иностранной структуры', defaultChecked: true }
+        { key: 'funds-other', label: 'Источник средств: иное' },
+        { key: 'fatca-us-tax-residence', label: 'Налоговое резидентство США' },
+        { key: 'fatca-us-registration-address', label: 'Адрес регистрации в США' },
+        { key: 'fatca-us-beneficial-owners', label: 'Бенефициарные владельцы — налогоплательщики США' },
+        { key: 'fatca-us-phone', label: 'Телефонный номер США' },
+        { key: 'fatca-us-signatory', label: 'Подписант с адресом в США' },
+        { key: 'fatca-us-payment-instructions', label: 'Платёжные инструкции в США' }
       ]
     },
     {
       id: 'qualification-request-fl',
       title: 'Заявление о признании ФЛ квалифицированным инвестором',
-      description: 'Заявление физического лица о признании квалифицированным инвестором',
+      description: 'Приложение № 1 к Регламенту признания лиц квалифицированными инвесторами.',
+      category: 'Квалифицированный инвестор',
       appliesTo: ['individual'],
-      templateUrl: '../assets/document-templates/qualification-request-fl.html',
-      outputFilename: 'qualification-request-fl.pdf',
-      checkGroupLabel: 'Критерии и способ получения документов:',
+      overlayTemplateId: 'qualification-request-fl',
+      pdfOutputFilename: 'qualification-request-fl.pdf',
+      downloadLabel: 'Скачать заявление',
+      checkGroupLabel: 'Виды имущества для критерия стоимости:',
       fields: [
-        {
-          key: 'extra-document-date',
-          label: 'Дата заявления',
-          type: 'date',
-          required: true
-        },
         {
           key: 'extra-contract-number',
           label: 'Номер договора',
           type: 'text',
-          required: true,
-          placeholder: 'Например: БО-1006'
+          required: true
         },
         {
           key: 'extra-contract-date',
@@ -603,88 +959,112 @@
           required: true
         },
         {
-          key: 'extra-instrument-other',
-          label: 'Иные инструменты / ограничения',
+          key: 'extra-qualification-scope',
+          label: 'Перечень инструментов',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'all', label: 'Все виды ценных бумаг и финансовых инструментов' },
+            { value: 'other', label: 'Ограниченный перечень' }
+          ]
+        },
+        {
+          key: 'extra-qualification-instruments-other',
+          label: 'Ограниченный перечень инструментов',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'extra.extra-qualification-scope', equals: 'other' }
+        },
+        { key: 'extra-securities-value-millions', label: 'Стоимость ценных бумаг / ПФИ, млн руб.', type: 'text' },
+        {
+          key: 'extra-work-experience-basis',
+          label: 'Основание по опыту работы',
+          type: 'select',
+          options: [
+            { value: 'qualified-two-years', label: 'Не менее 2 лет в организации — квалифицированном инвесторе' },
+            { value: 'other-three-years', label: 'Не менее 3 лет в иной организации' }
+          ]
+        },
+        { key: 'extra-quarterly-transactions-value-millions', label: 'Стоимость сделок за квартал, млн руб.', type: 'text' },
+        { key: 'extra-assets-value-millions', label: 'Стоимость имущества, млн руб.', type: 'text' },
+        {
+          key: 'extra-education-basis',
+          label: 'Основание по образованию / квалификации',
+          type: 'select',
+          options: [
+            { value: 'higher-education', label: 'Высшее экономическое образование' },
+            { value: 'certificate', label: 'Свидетельство НОК / квалификационный аттестат' }
+          ]
+        },
+        {
+          key: 'extra-supporting-docs-securities-holdings',
+          label: 'Документы: стоимость ценных бумаг / ПФИ',
           type: 'textarea',
           required: false
         },
         {
-          key: 'extra-securities-amount',
-          label: 'Стоимость ценных бумаг / ПФИ, млн руб.',
-          type: 'text',
-          required: false
+          key: 'extra-supporting-docs-work-experience',
+          label: 'Документы: опыт работы',
+          type: 'textarea'
         },
         {
-          key: 'extra-transactions-amount',
-          label: 'Объём сделок, млн руб.',
-          type: 'text',
-          required: false
+          key: 'extra-supporting-docs-bank-approved-position',
+          label: 'Документы: должность, согласованная Банком России',
+          type: 'textarea'
         },
         {
-          key: 'extra-property-amount',
-          label: 'Размер имущества, млн руб.',
-          type: 'text',
-          required: false
+          key: 'extra-supporting-docs-quarterly-transactions',
+          label: 'Документы: сделки за квартал',
+          type: 'textarea'
         },
         {
-          key: 'extra-education-details',
-          label: 'Образование / свидетельство НОК / сертификаты',
-          type: 'textarea',
-          required: false
+          key: 'extra-supporting-docs-assets',
+          label: 'Документы: стоимость имущества',
+          type: 'textarea'
         },
         {
-          key: 'extra-supporting-docs-1',
-          label: 'Приложенный документ 1',
-          type: 'text',
-          required: false,
-          placeholder: 'Например: выписка из брокерского счёта'
+          key: 'extra-supporting-docs-education',
+          label: 'Документы: образование / квалификация',
+          type: 'textarea'
         },
         {
-          key: 'extra-supporting-docs-2',
-          label: 'Приложенный документ 2',
-          type: 'text',
-          required: false,
-          placeholder: 'Например: справка о составе и стоимости активов'
+          key: 'extra-supporting-docs-qualified-registry',
+          label: 'Документы: выписка из реестра квалифицированных лиц',
+          type: 'textarea'
         },
         {
-          key: 'extra-supporting-docs-3',
-          label: 'Приложенный документ 3',
-          type: 'text',
-          required: false,
-          placeholder: 'Например: диплом / аттестат'
+          key: 'extra-delivery-method',
+          label: 'Способ получения уведомлений и выписок',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'address', label: 'По указанному адресу' },
+            { value: 'office', label: 'Лично в офисе ООО «Инвестика»' }
+          ]
         },
         {
           key: 'extra-delivery-address',
-          label: 'Адрес для уведомлений / выписок',
+          label: 'Адрес доставки уведомлений и выписок',
           type: 'textarea',
-          required: false
+          required: true,
+          showWhen: { source: 'extra.extra-delivery-method', equals: 'address' }
         }
       ],
       checkFields: [
-        { key: 'qual-scope-all', label: 'Все виды ценных бумаг / финансовых инструментов', defaultChecked: true },
-        { key: 'qual-scope-other', label: 'Иное / ограниченный перечень' },
-        { key: 'qual-fl-securities', label: 'Стоимость ценных бумаг / ПФИ не менее 12 млн руб. (с 01.01.2026 — 24 млн руб.)' },
-        { key: 'qual-fl-experience-2', label: 'Опыт работы не менее 2 лет в организации-квалифицированном инвесторе' },
-        { key: 'qual-fl-experience-3', label: 'Опыт работы не менее 3 лет в иной организации' },
-        { key: 'qual-fl-cbr-position', label: 'Опыт работы в должности, требующей согласования Банка России' },
-        { key: 'qual-fl-transactions', label: 'Не менее 10 сделок в квартал, объём не менее 6 млн руб.' },
-        { key: 'qual-fl-property-cash', label: 'Имущество: денежные средства / депозиты' },
-        { key: 'qual-fl-property-metal', label: 'Имущество: требования к кредитной организации по драгоценному металлу' },
-        { key: 'qual-fl-property-securities', label: 'Имущество: ценные бумаги, включая переданные в ДУ' },
-        { key: 'qual-fl-education', label: 'Высшее экономическое образование / свидетельство НОК / сертификаты' },
-        { key: 'qual-fl-registry', label: 'Выписка из реестра квалифицированных лиц' },
-        { key: 'delivery-address', label: 'Документы предоставлять по адресу' },
-        { key: 'delivery-office', label: 'Документы предоставлять лично в ООО «Инвестика»', defaultChecked: true }
+        { key: 'qualification-assets-cash-deposits', label: 'Денежные средства и вклады' },
+        { key: 'qualification-assets-precious-metals', label: 'Требования по обезличенным металлическим счетам' },
+        { key: 'qualification-assets-securities', label: 'Ценные бумаги, включая переданные в доверительное управление' }
       ]
     },
     {
       id: 'qualification-request-yul',
       title: 'Заявление о признании ЮЛ квалифицированным инвестором',
-      description: 'Заявление юридического лица о признании квалифицированным инвестором',
+      description: 'Приложение № 2 к Регламенту признания лиц квалифицированными инвесторами.',
+      category: 'Квалифицированный инвестор',
       appliesTo: ['company'],
-      templateUrl: '../assets/document-templates/qualification-request-yul.html',
-      outputFilename: 'qualification-request-yul.pdf',
-      checkGroupLabel: 'Критерии и способ получения документов:',
+      overlayTemplateId: 'qualification-request-yul',
+      pdfOutputFilename: 'qualification-request-yul.pdf',
+      downloadLabel: 'Скачать заявление',
       fields: [
         {
           key: 'extra-document-date',
@@ -704,12 +1084,6 @@
           label: 'Дата договора',
           type: 'date',
           required: true
-        },
-        {
-          key: 'extra-instrument-other',
-          label: 'Иные инструменты / ограничения',
-          type: 'textarea',
-          required: false
         },
         {
           key: 'extra-supporting-docs-1',
@@ -746,23 +1120,24 @@
           placeholder: 'Например: выписка из реестра квалифицированных лиц'
         },
         {
+          key: 'extra-delivery-method',
+          label: 'Способ получения уведомлений и выписок',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'address', label: 'По указанному адресу' },
+            { value: 'office', label: 'Лично в офисе ООО «Инвестика»' }
+          ]
+        },
+        {
           key: 'extra-delivery-address',
-          label: 'Адрес для уведомлений / выписок',
+          label: 'Адрес доставки уведомлений и выписок',
           type: 'textarea',
-          required: false
+          required: true,
+          showWhen: { source: 'extra.extra-delivery-method', equals: 'address' }
         }
       ],
-      checkFields: [
-        { key: 'qual-scope-all', label: 'Все виды ценных бумаг / финансовых инструментов', defaultChecked: true },
-        { key: 'qual-scope-other', label: 'Иное / ограниченный перечень' },
-        { key: 'qual-yul-criteria-1', label: 'Собственные средства (капитал) ≥ 200 млн руб.' },
-        { key: 'qual-yul-criteria-2', label: 'Не менее 5 сделок в квартал, объём не менее 50 млн руб.' },
-        { key: 'qual-yul-criteria-3', label: 'Выручка ≥ 2 млрд руб. (по годовой отчётности)' },
-        { key: 'qual-yul-criteria-4', label: 'Активы ≥ 2 млрд руб. (по годовой отчётности)' },
-        { key: 'qual-yul-criteria-5', label: 'Выписка из реестра квалифицированных лиц' },
-        { key: 'delivery-address', label: 'Документы предоставлять по адресу' },
-        { key: 'delivery-office', label: 'Документы предоставлять лично в офисе ООО «Инвестика»', defaultChecked: true }
-      ]
+      companyFields: [REPRESENTATIVE_FIELD]
     },
     {
       id: 'qualification-notice',
@@ -942,11 +1317,13 @@
     },
     {
       id: 'code-word-request',
-      title: 'Заявление об установлении/замене кодового слова',
-      description: 'Заявление об установлении или изменении кодового слова для идентификации клиента',
+      title: 'Заявление об установлении/изменении кодового слова',
+      description: 'Приложение 14 к Регламенту брокерского обслуживания.',
+      category: 'Документы и заявления клиента',
       appliesTo: ['individual', 'company'],
-      templateUrl: '../assets/document-templates/code-word-request.html',
-      outputFilename: 'code-word-request.pdf',
+      overlayTemplateId: 'code-word-request',
+      pdfOutputFilename: 'code-word-request.pdf',
+      downloadLabel: 'Скачать заявление',
       fields: [
         {
           key: 'extra-document-date',
@@ -955,29 +1332,14 @@
           required: true
         },
         {
-          key: 'extra-code-word-operation',
-          label: 'Вид операции',
-          type: 'select',
-          required: true,
-          options: [
-            { value: 'установление', label: 'Установление кодового слова' },
-            { value: 'изменение', label: 'Изменение кодового слова' }
-          ]
-        },
-        {
           key: 'extra-new-code-word',
           label: 'Новое кодовое слово',
           type: 'text',
           required: true,
           placeholder: 'Введите кодовое слово'
-        },
-        {
-          key: 'extra-effective-date',
-          label: 'Дата начала действия',
-          type: 'date',
-          required: false
         }
-      ]
+      ],
+      companyFields: [REPRESENTATIVE_FIELD]
     },
     {
       id: 'account-closure',
@@ -1110,6 +1472,9 @@
       f.representativeFullName  = rep ? (rep.fullName || '') : '';
       f.representativeRole      = rep ? (rep.role || '') : '';
       f.representativeAuthority = rep ? (rep.authority || '') : '';
+      f.representativeSignerLine = rep
+        ? ((rep.fullName || '') + (rep.role ? (', ' + rep.role) : ''))
+        : '';
     }
 
     return f;
@@ -1129,7 +1494,7 @@
 
   // ── Build check map ──────────────────────────────────────────────────────
 
-  function buildChecks(doc, checkValues) {
+  function buildChecks(doc, checkValues, extraValues, subject) {
     var checks = {};
 
     // Initialise from doc config checkFields defaults (all false)
@@ -1159,14 +1524,29 @@
       var mode = checkValues['extra-questionnaire-mode'] || 'first';
       checks['anketa-mode-first'] = mode === 'first';
       checks['anketa-mode-change'] = mode === 'change';
-    }
 
-    // Anketa tax residency defaults (static: Russia = yes, FATCA = no)
-    if (doc.id === 'anketa-fl' || doc.id === 'anketa-yul') {
-      if (!Object.prototype.hasOwnProperty.call(checks, 'tax-resident-rf-yes'))  checks['tax-resident-rf-yes'] = true;
-      if (!Object.prototype.hasOwnProperty.call(checks, 'tax-resident-rf-no'))   checks['tax-resident-rf-no']  = false;
-      if (!Object.prototype.hasOwnProperty.call(checks, 'fatca-yes'))            checks['fatca-yes']           = false;
-      if (!Object.prototype.hasOwnProperty.call(checks, 'fatca-no'))             checks['fatca-no']            = true;
+      var taxResidency = extraValues['extra-tax-residency'] || '';
+      checks['tax-resident-rf-yes'] = taxResidency === 'rf';
+      checks['tax-resident-rf-no'] = taxResidency === 'other';
+
+      var foreignTaxpayer = extraValues['extra-foreign-taxpayer'] || '';
+      checks['fatca-yes'] = foreignTaxpayer === 'yes';
+      checks['fatca-no'] = foreignTaxpayer === 'no';
+
+      if (doc.id === 'anketa-fl') {
+        var citizenship = String((subject && subject.citizenship) || '').toLocaleLowerCase('ru-RU');
+        var russianCitizen = citizenship === 'россия' || citizenship === 'российская федерация';
+        checks['citizenship-rf'] = russianCitizen;
+        checks['citizenship-other'] = !russianCitizen;
+      } else {
+        var strategic = extraValues['extra-strategic-company'] || '';
+        checks['strategic-company-yes'] = strategic === 'yes';
+        checks['strategic-company-no'] = strategic === 'no';
+
+        var licensed = extraValues['extra-licensed-activity'] || '';
+        checks['licensed-activity-yes'] = licensed === 'yes';
+        checks['licensed-activity-no'] = licensed === 'no';
+      }
     }
 
     return checks;
@@ -1265,7 +1645,12 @@
   // registry is supported for now).
   function getFieldOptions(field, subject) {
     if (field.optionsFrom === 'subject.representatives') {
-      return (subject.representatives || []).map(function (rep) {
+      var representatives = (subject.representatives || []).filter(function (rep) {
+        if (field.representativeRole && rep.role !== field.representativeRole) return false;
+        if (field.representativeRoles && field.representativeRoles.indexOf(rep.role) === -1) return false;
+        return true;
+      });
+      return representatives.map(function (rep) {
         return { value: rep.id, label: rep.fullName + ' — ' + rep.role };
       });
     }
@@ -1308,6 +1693,7 @@
 
     var grid = document.createElement('div');
     grid.className = 'crm-docwiz-fields-grid';
+    var conditionalFields = [];
 
     effectiveFields.forEach(function (field) {
       var wrap = document.createElement('div');
@@ -1374,6 +1760,9 @@
       if (field.required) input.required = true;
       wrap.appendChild(dateField || input);
       grid.appendChild(wrap);
+      if (field.showWhen && field.showWhen.source) {
+        conditionalFields.push({ wrap: wrap, input: input, condition: field.showWhen });
+      }
     });
 
     container.appendChild(grid);
@@ -1406,6 +1795,51 @@
       });
 
       container.appendChild(checkGroup);
+    }
+
+    function currentControlValue(source) {
+      var dot = source.indexOf('.');
+      if (dot === -1) return undefined;
+      var namespace = source.slice(0, dot);
+      var key = source.slice(dot + 1);
+      if (namespace === 'subject') return subject ? subject[key] : undefined;
+      var control = namespace === 'check'
+        ? container.querySelector('[data-check-key="' + key + '"]')
+        : container.querySelector('[data-field-key="' + key + '"]');
+      if (!control) return undefined;
+      return namespace === 'check' ? !!control.checked : control.value;
+    }
+
+    function conditionMatches(condition) {
+      var value = currentControlValue(condition.source);
+      if (Object.prototype.hasOwnProperty.call(condition, 'equals')) {
+        return Array.isArray(condition.equals)
+          ? condition.equals.indexOf(value) !== -1
+          : value === condition.equals;
+      }
+      if (Object.prototype.hasOwnProperty.call(condition, 'notEquals')) {
+        return Array.isArray(condition.notEquals)
+          ? condition.notEquals.indexOf(value) === -1
+          : value !== condition.notEquals;
+      }
+      return !!value;
+    }
+
+    function syncConditionalFields() {
+      conditionalFields.forEach(function (entry) {
+        var visible = conditionMatches(entry.condition);
+        entry.wrap.hidden = !visible;
+        entry.input.disabled = !visible;
+        if (!visible) entry.input.classList.remove('crm-input-error');
+      });
+    }
+
+    if (conditionalFields.length) {
+      container.querySelectorAll('[data-field-key], [data-check-key]').forEach(function (control) {
+        control.addEventListener('change', syncConditionalFields);
+        control.addEventListener('input', syncConditionalFields);
+      });
+      syncConditionalFields();
     }
   }
 
@@ -1604,7 +2038,7 @@
     grid.innerHTML = '';
 
     if (!docs.length) {
-      grid.innerHTML = '<p class="crm-docwiz-no-results">Нет доступных документов для данного субъекта.</p>';
+      grid.innerHTML = '<p class="crm-docwiz-no-results">Документы по заданным условиям не найдены.</p>';
       return;
     }
 
@@ -1801,12 +2235,14 @@
     var checkValues  = {};
     var valid        = true;
     var firstInvalid = null;
+    var validationMessage = '';
 
     // Collect text/date/select field values from [data-field-key].
     document.querySelectorAll('#docwiz-extra-fields [data-field-key]').forEach(function (el) {
       var key = el.getAttribute('data-field-key');
       var val = (el.value || '').trim();
       extraValues[key] = val;
+      if (el.disabled) return;
       if (el.required && !val) {
         el.classList.add('crm-input-error');
         valid = false;
@@ -1819,6 +2255,17 @@
     // Collect checkbox values from [data-check-key].
     document.querySelectorAll('#docwiz-extra-fields [data-check-key]').forEach(function (el) {
       checkValues[el.getAttribute('data-check-key')] = el.checked;
+    });
+
+    (doc.validationRules || []).forEach(function (rule) {
+      if (rule.type !== 'atLeastOneCheck') return;
+      var selected = (rule.keys || []).some(function (key) { return !!checkValues[key]; });
+      if (!selected) {
+        valid = false;
+        if (!validationMessage) {
+          validationMessage = rule.message || 'Выберите хотя бы один вариант.';
+        }
+      }
     });
 
     // Select values that drive derived checkbox state.
@@ -1835,10 +2282,11 @@
       subject:      subject,
       valid:        valid,
       firstInvalid: firstInvalid,
+      validationMessage: validationMessage,
       extraValues:  extraValues,
       checkValues:  checkValues,
       fields:       buildFields(subject, extraValues),
-      checks:       buildChecks(doc, checkValues),
+      checks:       buildChecks(doc, checkValues, extraValues, subject),
       pdfFilename:  doc.pdfOutputFilename || (doc.id + '.pdf')
     };
   }
@@ -2083,7 +2531,7 @@
       fields:      payload.fields,
       extraValues: payload.extraValues,
       checks:      payload.checks
-    });
+    }, { validatePayload: true });
   }
 
   // Load the local PDF template, fill mapped AcroForm fields and return a Blob.
@@ -2215,7 +2663,7 @@
 
     var payload = buildDocumentPayload(doc, subject);
     if (!payload.valid) {
-      setPdfStatus('Заполните обязательные поля (отмечены *).', 'error');
+      setPdfStatus(payload.validationMessage || 'Заполните обязательные поля (отмечены *).', 'error');
       if (payload.firstInvalid) payload.firstInvalid.focus();
       return;
     }
@@ -2274,7 +2722,7 @@
     // reuses the same identity/date data but carries its own template + map.
     var payload = buildDocumentPayload(doc, subject);
     if (!payload.valid) {
-      setPdfStatus('Заполните обязательные поля (отмечены *).', 'error');
+      setPdfStatus(payload.validationMessage || 'Заполните обязательные поля (отмечены *).', 'error');
       if (payload.firstInvalid) payload.firstInvalid.focus();
       return;
     }
@@ -2366,6 +2814,25 @@
     });
 
     renderDocCards(filteredDocs, subject);
+
+    var documentSearch = document.getElementById('docwiz-document-search');
+    if (documentSearch) {
+      documentSearch.addEventListener('input', function () {
+        var query = String(documentSearch.value || '')
+          .toLocaleLowerCase('ru-RU')
+          .replace(/ё/g, 'е')
+          .trim();
+        var matches = !query ? filteredDocs : filteredDocs.filter(function (doc) {
+          var haystack = [doc.title, doc.description, doc.category]
+            .concat(doc.aliases || [])
+            .join(' ')
+            .toLocaleLowerCase('ru-RU')
+            .replace(/ё/g, 'е');
+          return haystack.indexOf(query) !== -1;
+        });
+        renderDocCards(matches, subject);
+      });
+    }
     setActiveStep(1);
 
     // Preselect a document type when requested via ?type=<id>
