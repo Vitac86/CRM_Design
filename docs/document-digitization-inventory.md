@@ -59,10 +59,10 @@ without an overlay map cannot appear even by accident.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | ПРИЛОЖЕНИЕ 1А … ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ (ФЛ).docx | `accession-application-fl` | ФЛ | 3 | legacy | ✅ | ✅ | ✅ migrated |
 | 2 | ПРИЛОЖЕНИЕ 1В … ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ (ЮЛ).docx | `accession-application-yul` | ЮЛ | 2 | — | ✅ | ✅ | ✅ migrated |
-| 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | ✅ | — | ▣ template only |
+| 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | ✅ | ✅ | ✅ migrated |
 | 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | ✅ | — | ◐ static, not exposed |
-| 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | ЮЛ | 4 | — | ✅ | — | ▣ template only |
-| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | — | ▣ template only |
+| 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
+| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
 | 7 | ПРИЛОЖЕНИЕ 9 … ОТКАЗ ОТ ПРЕДОСТАВЛЕНИЯ БРОКЕРУ ПРАВА ….docx | `broker-use-refusal-request` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 8 | ПРИЛОЖЕНИЕ 10 … ОТКАЗ ИСПОЛНЕНИЯ РЕГЛАМЕНТА В ЦЕЛОМ.docx | `regulation-full-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 9 | ПРИЛОЖЕНИЕ 11 … ОТКАЗ ОТ ЧАСТИ УСЛУГ ПО РЕГЛАМЕНТУ.docx | `regulation-partial-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
@@ -84,7 +84,7 @@ without an overlay map cannot appear even by accident.
 | 15 | Анкета ФЛ.docx | `anketa-fl` | ФЛ | 4 | ✔ | ✅ | ✅ | ✅ migrated |
 | 16 | Анкета ЮЛ.docx | `anketa-yul` | ЮЛ | 5 | ✔ | ✅ | ✅ | ✅ migrated |
 | 17 | АНКЕТА ФЛ Упр. идент..docx | `anketa-fl-simplified-id` | ФЛ | 2 | — | ✅ | ✅ | ✅ migrated |
-| 18 | Анкета ФЛ - ИП и СЗ.docx | `anketa-ip-sz` | ФЛ (ИП/СЗ) | 5 | — | ✅ | — | ▣ template only |
+| 18 | Анкета ФЛ - ИП и СЗ.docx | `anketa-ip-sz` | ФЛ (ИП / частная практика) | 5 | — | ✅ | ✅ | ✅ migrated |
 | 19 | Анкета ИСБЮЛ.docx | `anketa-isbyul` | ИСБЮЛ | 4 | — | ✅ | — | ⛔ blocked — mapping |
 
 ## Source PDFs (no DOCX supplied)
@@ -99,22 +99,17 @@ without an overlay map cannot appear even by accident.
 | Metric | Count |
 | --- | --- |
 | Distinct source documents | **21** |
-| ✅ migrated (in-place values, QA'd, generates from the real wizard) | **14** |
+| ✅ migrated (in-place values, QA'd, generates from the real wizard) | **18** |
 | ◐ static | **2** (1 exposed, 1 not) |
-| ▣ template only (clean PDF committed and verified, no field map yet) | **4** |
-| ⛔ blocked | **1** |
+| ⛔ blocked, intentionally hidden | **1** |
 
-**Every source document now has a verified clean PDF base template.** The Word
-export that previously blocked six of them was performed by hand and the
-resulting PDFs supplied alongside their sources; each was matched to its Word
-original by title, page count and extracted-text overlap and copied
-byte-identically. What remains outstanding is coordinate mapping, not
-conversion.
+**Every dynamic source document is migrated.** All 18 generate through the real
+Document Wizard and have passed structural, visual and browser QA. Nothing is
+left template-only, map-only or registry-only.
 
-Migrated: приложения 1А, 1В, 9, 10, 11, 14, обе анкеты ФЛ/ЮЛ, анкета ФЛ
-(упрощённая идентификация), оба заявления о признании квалифицированным
-инвестором, and `client-notifications` (УВЕДОМЛЕНИЯ.pdf, which now has client
-identity drawn onto its original pages instead of being issued blank).
+The only documents not offered are the two intentional cases below:
+`anketa-isbyul` (no CRM subject model) and `transfer-requisites` (a broker
+requisites sheet whose requisites are blank in the authoritative source).
 
 Static: `brokerage-key-information` — a disclosure sheet with no client-specific
 blanks, issued unchanged.
@@ -143,6 +138,21 @@ two regulations — then copied into the repository byte-identically.
 All six carry zero AcroForm fields, zero widgets, zero annotations, no blank or
 appended page, and page counts matching their sources.
 
+### The company seal on ПРИЛОЖЕНИЕ 3
+
+The re-supplied `account-opening-notice` template carries Investica's seal as a
+raster image on **page 2 at (200.65, 647.30)–(329.25, 805.65)**, 129 × 158 pt.
+It is present in the authoritative Z: source, in the committed template and in
+generated output as the same object (`xref 38`) — **exactly one image in all
+three**, so nothing duplicates or covers it. It is static template content and
+is intended to appear on every generated document.
+
+That is consistent with "signature areas blank": the seal is a printed part of
+the form, while the «Подпись ответственного лица ______ /______» rules beside
+it stay empty, as do all other signature and employee-completion areas. The
+document's only page-2 overlays are the three agreement numbers in the
+payment-purpose rows at y ≈ 59–136 pt, far above the seal.
+
 > **Observation, not corrected:** these hand-exported PDFs retain a `/Author`
 > value from whoever exported them. That is metadata only — nothing is visible
 > on the page — and the repository already contains such values on
@@ -155,17 +165,89 @@ appended page, and page counts matching their sources.
 | --- | --- |
 | Анкета ИСБЮЛ (`anketa-isbyul`) | **Blocked — authoritative template available, but the CRM has no ИСБЮЛ subject model or required data sources. Intentionally not exposed.** The clean 4-page template is committed and verified, but none of the ~50 values the form asks for (код КИО, место присвоения, состав имущества в управлении, протектор, учредители) exist in any CRM record, and there is no «иностранная структура без образования юридического лица» subject type. It has no wizard card, no company applicability and no default values; ordinary Russian-company fields are deliberately *not* mapped onto it. |
 
-## Awaiting coordinate mapping (template only)
+## Per-document detail for the documents completed last
 
-These four have a verified clean template but no field map, so
-`resolveRenderStrategy()` returns `null` and none of them is selectable.
+### `account-opening-notice` — ПРИЛОЖЕНИЕ 3, 2 pages, both subject kinds
 
-| Document | What is still needed |
-| --- | --- |
-| `account-opening-notice` (Прил. 3) | The document's substance is internal back-office data — brokerage and depositary contract numbers/dates, three market account numbers, the счёт депо number, and on page 2 the торговый/неторговый раздел numbers and междепозитарный договор. The CRM holds none of it, so mapping needs a decision on which values an operator types and which stay blank. The broker's own bank requisites (ИНН, Р/сч, Банк, К/сч, БИК) are **blank in the authoritative source**. |
-| `power-of-attorney` (Прил. 6) | Legal-entity power of attorney (the form says «доверенность от юридического лица»), 4 pages, mixed page sizes. Needs the representative-selection pattern and a decision on the list of delegated powers. |
-| `order-forms` (Прил. 7) | 4 pages and 45 checkbox glyphs covering several distinct order types in one file. Needs a decision on whether this is one wizard document or several before any map is written. |
-| `anketa-ip-sz` (Прил. 18) | ~45 value cells and ~40 checkboxes. Identity, passport, address, contacts, INN and SNILS all come from the subject card; the ИП/ОГРНИП, private-practice, licence and FATCA blocks need form-specific inputs. |
+Map `assets/js/document-field-maps/account-opening-notice.js`; output
+`uvedomlenie-ob-otkrytii-scheta.pdf`; PDF SHA-256 `d46681cf…` (the source was
+re-supplied with constants printed in and the template replaced).
+
+**Static template content — never overlaid, verified to appear exactly once:**
+§5 requisites (Получатель «ООО «Инвестика»», ИНН `7802953900`, Р/сч
+`40701810700000002900`, Банк `АО "Райффайзенбанк"`, К/сч
+`30101810200000000700`, БИК `044525700`), the whole page-2 депо table
+(`HL2509080091`, `ML2508290147`, `MC0742000000`, `36MC0742000000F00`,
+«НКО АО НРД», «№7420/ДНД от 29 августа 2025 г.»), the same agreement repeated
+under «Основание для перевода», and the company seal image on page 2 at
+(200.65, 647.30)–(329.25, 805.65).
+
+**CRM:** client name, ИНН/document number, client code.
+**Operator:** formation date, signing officer, both agreement numbers and dates,
+three internal market accounts, счёт депо. One agreement-number input drives
+four overlays.
+**Blank:** «Подпись ответственного лица», the 8.18 pt gap after «Доверенности №»,
+the 11.04 pt «дата__» rules, and the printed «Код INV0000X» placeholders.
+
+### `power-of-attorney` — ПРИЛОЖЕНИЕ 6, 4 pages, both subject kinds
+
+Map `…/power-of-attorney.js`; output `doverennost.pdf`; PDF SHA-256 `a7bcaf8d…`.
+
+The file holds **two** powers of attorney — «от юридического лица» (pages 1–2)
+and «от физического лица» (pages 3–4). The variant matching the subject is
+filled and the other verified byte-for-byte blank. Page sizes are mixed
+(595.56 × 842.04 and 595.32 × 841.92) and are preserved.
+
+**The powers are not selectable:** zero checkbox glyphs anywhere in the
+document, no "other powers" line, no validity blank and no substitution option
+— the wording fixes «сроком на три года без права передоверия».
+
+**CRM:** legal name, ОГРН, ИНН, short name, executive, authority basis; and for
+individuals name, citizenship, passport, issuing authority, issue date, address.
+**Operator:** the поверенный only.
+
+### `order-forms` — ПРИЛОЖЕНИЕ 7, 4 pages, both subject kinds
+
+Map `…/order-forms.js`; output `poruchenie.pdf`; PDF SHA-256 `24e593d1…`.
+
+Three separate order forms in one file, one registry entry. «Тип поручения»
+selects one; the other two stay blank and all four pages are always emitted.
+
+**Mutually exclusive groups:** primary/cancellation, вид сделки, вид рынка, вид
+поручения, РЕПО с ЦК, валютный СВОП с ЦК, both trading-venue lists, both
+currency rows, payout amount mode. **Independent:** the непокрытая-позиция
+acknowledgement. **Explanatory, never marked:** the «(указать)» captions.
+
+**Blank:** every «Заполняется ООО «Инвестика»» block and every signature rule.
+
+### `anketa-ip-sz` — Приложение 18, 5 pages, individuals only
+
+Map `…/anketa-ip-sz.js`; output `anketa-ip-chastnaya-praktika.pdf`;
+source SHA-256 `6102dedd…`.
+
+The filename abbreviates the second category as «СЗ», but the form never says
+«самозанятый». Its own wording is **«Индивидуальный предприниматель»** and
+**«Лицо, занимающееся частной практикой»**, and the two are kept distinct. The
+CRM has no field recording that status, so the operator selects it with no
+default.
+
+**CRM:** full name, birth date and place, citizenship, identity document
+(name, series+number, issue date, authority, department code), registration and
+postal addresses, phone, e-mail, INN, SNILS, representative name.
+**Operator:** status, role, completion mode, citizenship and tax-residency
+branches with country lists, foreign-taxpayer answer, residence-permit block,
+PDL status and relation, bank details, ОГРНИП block, private-practice block,
+licensing block, website, beneficiary and beneficial-owner data, purposes,
+goals, financial position, trustee and protector status, other information.
+
+**39 checkboxes:** mutually exclusive — status (2), role (2), completion mode
+(2), citizenship (2), tax residency (2), foreign taxpayer (2), PDL (3),
+licensing (2), purposes (4), goals (4), financial position (2), trustee (2),
+protector (2). Independent — eight US-taxpayer indicators in п. 31, any number
+of which may be ticked.
+
+**Blank:** «(подпись клиента)», «МП (при наличии)» and the entire page-5
+«Для служебных отметок» block — verified zero overlay tokens on page 5.
 
 ## `transfer-requisites` (ПРИЛОЖЕНИЕ 4) — static, deliberately not exposed
 
@@ -236,6 +318,10 @@ and maintained aliases sits above the list.
 | Отказ от части услуг по Регламенту | Отказ от части услуг по Регламенту |
 | Анкета физического лица | Анкета юридического лица |
 | Анкета ФЛ (упрощённая идентификация) | — |
+| Анкета (досье) ИП или лица, занимающегося частной практикой | — |
+| Доверенность | Доверенность |
+| Уведомление об открытии брокерского/депозитарного счета | Уведомление об открытии брокерского/депозитарного счета |
+| Поручение (формы поручений) | Поручение (формы поручений) |
 | Заявление о признании ФЛ квалифицированным инвестором | Заявление о признании ЮЛ квалифицированным инвестором |
 | Уведомление о признании лица квалифицированным инвестором | Уведомление о признании лица квалифицированным инвестором |
 | Уведомление о последствиях признания квалифицированным инвестором | — |
@@ -289,3 +375,9 @@ standalone card.
 | Приложение 11 Уведомление риски | The broker's e-mail rule in clause 3 is **20.64 pt** wide — no address fits. The broker's own address is also not held in the CRM. Left blank. |
 | ПРИЛОЖЕНИЕ 4 | The broker's own payment details (ИНН, Р/сч, Банк, К/сч, БИК) and the whole торговый/неторговый раздел table are blank in the authoritative source. |
 | ПРИЛОЖЕНИЕ 3 | Same blank broker requisites, plus «Код INV0000X» / «Код XXXXXXХ» placeholder codes left in the payment-purpose rows. |
+| ПРИЛОЖЕНИЕ 3 | The gap after «на основании Доверенности №» is 8.18 pt and the «дата__» rules in the payment-purpose rows are 11.04 pt — neither can hold a value. Left blank. |
+| ПРИЛОЖЕНИЕ 6 (ЮЛ) | «серии» ends its line with no rule after it, so series and number share the «№» rule; «дата выдачи _,» reserves 4.56 pt and stays blank. |
+| ПРИЛОЖЕНИЕ 6 (ФЛ) | «выданный» reserves 50.2 pt against 114.5 pt for the same value in the legal-entity variant, so a normal issuing authority needs three wrapped lines. |
+| ПРИЛОЖЕНИЕ 7 | Only the «Первичная подача заявки» row has underlined blanks; the «Отмена ранее поданной заявки» row has none, so its number and date go in the adjacent value column. |
+| Анкета ФЛ - ИП и СЗ | п. 13 prints **«Должностного лица публичной международной Организации.» twice** — as both the second and third ПДЛ category. By 115-ФЗ the third should be the Russian state-official category. Left exactly as written; the third box is mapped by position. |
+| Анкета ФЛ - ИП и СЗ | The filename says «ИП и СЗ», but the form's own wording is «Лицо, занимающееся частной практикой» — never «самозанятый». The form wording is used. |
