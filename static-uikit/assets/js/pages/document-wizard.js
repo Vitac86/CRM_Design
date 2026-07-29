@@ -1369,6 +1369,102 @@
       ]
     },
     {
+      // ПРИЛОЖЕНИЕ 6. One four-page file holding two powers of attorney — one
+      // from a legal entity (pages 1–2) and one from an individual (pages 3–4)
+      // — so it is offered to both subject kinds and the field map fills only
+      // the matching variant.
+      //
+      // The delegated powers are fixed prose in the source, with no checkbox
+      // glyphs anywhere in the document, no "other powers" line, no validity
+      // blank and no substitution option (the wording fixes three years without
+      // передоверие). Nothing of that is therefore offered as a choice.
+      id: 'power-of-attorney',
+      title: 'Доверенность',
+      description: 'Приложение 6 к Регламенту брокерского обслуживания.',
+      category: 'Документы и заявления клиента',
+      appliesTo: ['individual', 'company'],
+      overlayTemplateId: 'power-of-attorney',
+      pdfOutputFilename: 'doverennost.pdf',
+      downloadLabel: 'Скачать доверенность',
+      extraGroupLabel: 'Данные поверенного',
+      aliases: ['приложение 6', 'поверенный', 'представитель'],
+      fields: [
+        {
+          key: 'extra-poa-date-words',
+          label: 'Дата доверенности прописью',
+          type: 'text',
+          required: true,
+          placeholder: 'двадцать восьмое июля две тысячи двадцать шестого года'
+        },
+        {
+          key: 'extra-poa-city',
+          label: 'Место выдачи (город)',
+          type: 'text',
+          required: true,
+          placeholder: 'Санкт-Петербург',
+          // The individual variant prints «г. Москва», so it has no blank.
+          showWhen: { source: 'subject.kind', equals: 'company' }
+        },
+        {
+          key: 'extra-attorney-name',
+          label: 'Поверенный — ФИО',
+          type: 'text',
+          required: true
+        },
+        {
+          key: 'extra-attorney-citizenship',
+          label: 'Поверенный — гражданство',
+          type: 'text',
+          required: true,
+          placeholder: 'РФ'
+        },
+        {
+          key: 'extra-attorney-passport',
+          label: 'Поверенный — серия и номер паспорта',
+          type: 'text',
+          required: true,
+          placeholder: '4510 234567',
+          // The legal-entity variant prints «серии» with no rule after it, so
+          // series and number share one slot there.
+          showWhen: { source: 'subject.kind', equals: 'company' }
+        },
+        {
+          key: 'extra-attorney-passport-series',
+          label: 'Поверенный — серия паспорта',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'subject.kind', equals: 'individual' }
+        },
+        {
+          key: 'extra-attorney-passport-number',
+          label: 'Поверенный — номер паспорта',
+          type: 'text',
+          required: true,
+          showWhen: { source: 'subject.kind', equals: 'individual' }
+        },
+        {
+          key: 'extra-attorney-issued-by',
+          label: 'Поверенный — кем выдан паспорт',
+          type: 'text',
+          required: true
+        },
+        {
+          key: 'extra-attorney-issue-date',
+          label: 'Поверенный — дата выдачи паспорта',
+          type: 'date',
+          required: true,
+          // The legal-entity variant reserves only 4.56 pt after «дата выдачи».
+          showWhen: { source: 'subject.kind', equals: 'individual' }
+        },
+        {
+          key: 'extra-attorney-address',
+          label: 'Поверенный — адрес регистрации',
+          type: 'textarea',
+          required: true
+        }
+      ]
+    },
+    {
       id: 'code-word-request',
       title: 'Заявление об установлении/изменении кодового слова',
       description: 'Приложение 14 к Регламенту брокерского обслуживания.',

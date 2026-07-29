@@ -274,6 +274,12 @@
     if (payload) {
       fields.forEach(function (f) {
         if (!f.source || f.optional) return;
+        // A field switched off by `showWhen` is never drawn, so its source does
+        // not have to resolve. Documents that carry two variants of a form in
+        // one file — the power of attorney holds a legal-entity version and an
+        // individual one — legitimately reference values that exist for only
+        // one kind of subject.
+        if (!isVisible(f, payload)) return;
         if (resolve(f.source, payload) === undefined) {
           problems.push((f.id || f.source) + ': source "' + f.source +
             '" is not present in the payload');
