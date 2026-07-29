@@ -731,6 +731,307 @@
       ]
     },
     {
+      // Приложение 18. The filename abbreviates the second category as «СЗ»,
+      // but the form itself never says «самозанятый» — its wording is
+      // «Индивидуальный предприниматель» and «Лицо, занимающееся частной
+      // практикой». Those two legally distinct categories are kept separate.
+      // Individuals only: an ИП is a physical person, and the CRM has no
+      // trusted field recording that status, so the operator selects it.
+      id: 'anketa-ip-sz',
+      title: 'Анкета (досье) ИП или лица, занимающегося частной практикой',
+      description: 'Приложение 18 — анкета индивидуального предпринимателя или частной практики.',
+      category: 'Анкеты и идентификация',
+      appliesTo: ['individual'],
+      overlayTemplateId: 'anketa-ip-sz',
+      pdfOutputFilename: 'anketa-ip-chastnaya-praktika.pdf',
+      downloadLabel: 'Скачать анкету',
+      extraGroupLabel: 'Сведения для анкеты',
+      checkGroupLabel: 'Признаки налогоплательщика США (п. 31):',
+      aliases: ['приложение 18', 'индивидуальный предприниматель', 'частная практика', 'огрнип'],
+      fields: [
+        {
+          key: 'extra-document-date',
+          label: 'Дата заполнения анкеты',
+          type: 'date',
+          required: true
+        },
+        {
+          key: 'extra-ipsz-status',
+          label: 'Статус клиента',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'entrepreneur', label: 'Индивидуальный предприниматель' },
+            { value: 'private-practice', label: 'Лицо, занимающееся частной практикой' }
+          ]
+        },
+        {
+          key: 'extra-questionnaire-role',
+          label: 'Роль лица в анкете (п. «Представитель / Выгодоприобретатель»)',
+          type: 'select',
+          options: [
+            { value: '', label: 'Не указывать' },
+            { value: 'representative', label: 'Представитель' },
+            { value: 'beneficiary', label: 'Выгодоприобретатель' }
+          ]
+        },
+        {
+          key: 'extra-questionnaire-mode',
+          label: 'Тип заполнения',
+          type: 'select',
+          required: true,
+          defaultValue: 'first',
+          options: [
+            { value: 'first', label: 'Заполняется впервые' },
+            { value: 'change', label: 'Изменение анкетных данных' }
+          ]
+        },
+        {
+          key: 'extra-citizenship-kind',
+          label: 'Гражданство (п. 4)',
+          type: 'select',
+          required: true,
+          defaultValue: 'rf',
+          options: [
+            { value: 'rf', label: 'Российская Федерация' },
+            { value: 'other', label: 'Иное государство' }
+          ]
+        },
+        {
+          key: 'extra-citizenship-countries',
+          label: 'Укажите все страны, гражданином которых Вы являетесь',
+          type: 'text',
+          showWhen: { source: 'extra.extra-citizenship-kind', equals: 'other' }
+        },
+        {
+          key: 'extra-tax-residency',
+          label: 'Сведения о налоговом резидентстве (п. 5)',
+          type: 'select',
+          required: true,
+          defaultValue: 'rf',
+          options: [
+            { value: 'rf', label: 'Российская Федерация' },
+            { value: 'other', label: 'Иное государство' }
+          ]
+        },
+        {
+          key: 'extra-tax-residency-countries',
+          label: 'Укажите все страны налогового резидентства',
+          type: 'text',
+          showWhen: { source: 'extra.extra-tax-residency', equals: 'other' }
+        },
+        {
+          key: 'extra-foreign-taxpayer',
+          label: 'Принадлежность к иностранным налогоплательщикам (п. 6)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        {
+          key: 'extra-residence-permit-number',
+          label: 'Документ о праве пребывания (проживания): серия и номер',
+          type: 'text',
+          showWhen: { source: 'extra.extra-citizenship-kind', equals: 'other' }
+        },
+        {
+          key: 'extra-residence-permit-from',
+          label: 'Дата начала срока права пребывания (проживания)',
+          type: 'date',
+          showWhen: { source: 'extra.extra-citizenship-kind', equals: 'other' }
+        },
+        {
+          key: 'extra-residence-permit-to',
+          label: 'Дата окончания срока права пребывания (проживания)',
+          type: 'date',
+          showWhen: { source: 'extra.extra-citizenship-kind', equals: 'other' }
+        },
+
+        { key: 'extra-landline-phone', label: 'Телефон (код страны, код города, номер)', type: 'text' },
+
+        {
+          key: 'extra-pdl-status',
+          label: 'Наличие статуса публичного должностного лица (п. 13)',
+          type: 'select',
+          defaultValue: '',
+          options: [
+            { value: '', label: 'Не является ПДЛ' },
+            { value: 'foreign', label: 'Иностранного публичного должностного лица, его супруга, близкого родственника или действие в интересах такого лица' },
+            { value: 'international', label: 'Должностного лица публичной международной организации' },
+            { value: 'russian', label: 'Лица, замещающего государственные должности РФ и приравненные к ним' }
+          ]
+        },
+        {
+          key: 'extra-pdl-relation',
+          label: 'Статус родства по отношению к ПДЛ (п. 14)',
+          type: 'textarea'
+        },
+
+        { key: 'extra-bank-name', label: 'Полное наименование банка', type: 'text' },
+        { key: 'extra-bank-address', label: 'Полный адрес банка с указанием страны', type: 'text' },
+        { key: 'extra-bank-inn', label: 'ИНН банка', type: 'text' },
+        { key: 'extra-bank-bic', label: 'БИК/SWIFT', type: 'text' },
+        { key: 'extra-bank-corr-account', label: 'Корреспондентский счёт', type: 'text' },
+        { key: 'extra-bank-account', label: 'Расчётный счёт/IBAN', type: 'text' },
+        { key: 'extra-bank-additional', label: 'Дополнительные сведения: лицевой счёт, получатель, иное', type: 'text' },
+
+        // ─── ИП registration (п. 17) ───────────────────────────────────────
+        {
+          key: 'extra-ogrnip', label: 'ОГРНИП', type: 'text',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'entrepreneur' }
+        },
+        {
+          key: 'extra-ip-registration-date', label: 'Дата государственной регистрации ИП', type: 'date',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'entrepreneur' }
+        },
+        {
+          key: 'extra-ip-certificate',
+          label: 'Данные свидетельства о регистрации в ЕГРИП / о записи об ИП',
+          type: 'textarea',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'entrepreneur' }
+        },
+        {
+          key: 'extra-ip-registration-authority', label: 'Наименование регистрирующего органа', type: 'text',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'entrepreneur' }
+        },
+        {
+          key: 'extra-ip-registration-place', label: 'Место регистрации ИП', type: 'text',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'entrepreneur' }
+        },
+        {
+          key: 'extra-okved', label: 'ОКВЭД (перечислить все)', type: 'text',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'entrepreneur' }
+        },
+
+        // ─── Private practice registration (п. 18) ─────────────────────────
+        {
+          key: 'extra-practice-document',
+          label: 'Наименование документа, подтверждающего регистрацию в качестве лица, занимающегося частной практикой',
+          type: 'textarea',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'private-practice' }
+        },
+        {
+          key: 'extra-practice-document-number', label: 'Номер документа', type: 'text',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'private-practice' }
+        },
+        {
+          key: 'extra-practice-document-date', label: 'Дата выдачи документа', type: 'date',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'private-practice' }
+        },
+        {
+          key: 'extra-practice-document-authority', label: 'Наименование органа, выдавшего документ', type: 'text',
+          showWhen: { source: 'extra.extra-ipsz-status', equals: 'private-practice' }
+        },
+
+        // ─── Licensing (п. 19) ─────────────────────────────────────────────
+        {
+          key: 'extra-licensing',
+          label: 'Деятельность, подлежащая лицензированию',
+          type: 'select',
+          required: true,
+          defaultValue: 'none',
+          options: [
+            { value: 'none', label: 'Не осуществляется' },
+            { value: 'yes', label: 'Осуществляется (указать ниже)' }
+          ]
+        },
+        {
+          key: 'extra-licence-number-date', label: 'Номер и дата выдачи лицензии', type: 'text',
+          showWhen: { source: 'extra.extra-licensing', equals: 'yes' }
+        },
+        {
+          key: 'extra-licence-authority', label: 'Наименование органа, выдавшего лицензию', type: 'text',
+          showWhen: { source: 'extra.extra-licensing', equals: 'yes' }
+        },
+        {
+          key: 'extra-licence-validity', label: 'Срок действия лицензии', type: 'text',
+          showWhen: { source: 'extra.extra-licensing', equals: 'yes' }
+        },
+        {
+          key: 'extra-licence-activities', label: 'Перечень видов лицензируемой деятельности', type: 'text',
+          showWhen: { source: 'extra.extra-licensing', equals: 'yes' }
+        },
+
+        { key: 'extra-website', label: 'Доменное имя / указатель страницы в сети Интернет', type: 'text' },
+        { key: 'extra-representative-basis', label: 'Реквизиты документа, на основании которого действует представитель', type: 'textarea' },
+        { key: 'extra-beneficiary-name', label: 'ФИО или наименование выгодоприобретателя', type: 'text' },
+        { key: 'extra-beneficiary-basis', label: 'Реквизиты документа, на основании которого лицо действует к выгоде', type: 'textarea' },
+        { key: 'extra-beneficial-owner', label: 'ФИО бенефициарного владельца', type: 'text' },
+        { key: 'extra-beneficial-owner-basis', label: 'Основание для признания лица бенефициарным владельцем', type: 'textarea' },
+
+        {
+          key: 'extra-business-purpose',
+          label: 'Цели установления деловых отношений (п. 24)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'brokerage', label: 'Брокерское обслуживание' },
+            { value: 'trust', label: 'Доверительное управление' },
+            { value: 'conversion', label: 'Конверсионные операции' },
+            { value: 'other', label: 'Иное' }
+          ]
+        },
+        {
+          key: 'extra-financial-goal',
+          label: 'Цели финансово-хозяйственной деятельности (п. 25)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'income', label: 'Получение инвестиционного дохода' },
+            { value: 'preservation', label: 'Сохранение активов' },
+            { value: 'risk-control', label: 'Контроль рисков' },
+            { value: 'other', label: 'Иное' }
+          ]
+        },
+        {
+          key: 'extra-financial-position',
+          label: 'Сведения о финансовом положении: отсутствие производства по делу о несостоятельности (п. 26)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'yes', label: 'Да' },
+            { value: 'no', label: 'Нет' }
+          ]
+        },
+        {
+          key: 'extra-trustee-status',
+          label: 'Статус доверительного собственника (управляющего) ИСБОЮЛ (п. 29)',
+          type: 'select',
+          required: true,
+          defaultValue: 'no',
+          options: [
+            { value: 'yes', label: 'Имеется' },
+            { value: 'no', label: 'Отсутствует' }
+          ]
+        },
+        {
+          key: 'extra-protector-status',
+          label: 'Статус протектора ИСБОЮЛ (п. 30)',
+          type: 'select',
+          required: true,
+          defaultValue: 'no',
+          options: [
+            { value: 'yes', label: 'Имеется' },
+            { value: 'no', label: 'Отсутствует' }
+          ]
+        },
+        { key: 'extra-other-info', label: 'Иные сведения (п. 32)', type: 'textarea' }
+      ],
+      // Eight independent US-taxpayer indicators; any number may be ticked.
+      checkFields: [
+        { key: 'fatca-us-citizen', label: 'Являюсь гражданином США' },
+        { key: 'fatca-us-greencard', label: 'Имею разрешение на постоянное пребывание в США (greencard)' },
+        { key: 'fatca-us-birth-country', label: 'Страна моего рождения является США' },
+        { key: 'fatca-us-address', label: 'Имею фактический адрес проживания, адрес регистрации или почтовый адрес на территории США' },
+        { key: 'fatca-us-mailing-address', label: 'Имею адрес «для передачи» или «до востребования» на территории США' },
+        { key: 'fatca-us-phone', label: 'Имею действующий номер контактного телефона на территории США' },
+        { key: 'fatca-us-payment-instructions', label: 'Имею долгосрочные платёжные инструкции по перечислению средств на счёт в США' },
+        { key: 'fatca-us-attorney', label: 'Выдана доверенность лицу, имеющему адрес в США' }
+      ]
+    },
+    {
       id: 'anketa-yul',
       title: 'Анкета юридического лица',
       description: 'Анкета юридического лица — клиента ООО «Инвестика»',
