@@ -256,6 +256,106 @@
       });
     });
 
+    // ── Page-section expansion ────────────────────────────────────────────
+    add('A suggested expansion is never approved automatically', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var field = app.state.project.fields.filter(function (item) {
+          return item.id === 'recognitionDate';
+        })[0];
+        var suggestion = ns.schema.suggestExpansion(field, { width: 595.32, height: 841.92 }, {});
+        equal(suggestion.reviewStatus, 'suggested', 'review status');
+        equal(suggestion.page, field.page, 'page');
+        assert(suggestion.insertionTop > field.baselineTop, 'anchor sits below the field');
+        assert(suggestion.line.width > 0, 'the row has a width');
+        assert(suggestion.line.ruleThickness > 0, 'the row has a rule');
+      });
+    });
+    add('An unreviewed expansion blocks production export', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) { return item.id === 'recognitionDate'; })[0];
+      field.overflowStrategy = 'expand-layout';
+      field.expansion = ns.schema.suggestExpansion(field, { width: 595.32, height: 841.92 },
+        { bottomReserve: 100 });
+      var blocked = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(blocked.errors.some(function (error) {
+        return error.code === 'expansion-unreviewed';
+      }), 'unreviewed expansion did not block export');
+      field.expansion.reviewStatus = 'approved';
+      var allowed = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(!allowed.errors.some(function (error) {
+        return error.code === 'expansion-unreviewed';
+      }), 'approved expansion still blocked');
+    });
+    add('An expansion larger than the page reserve is rejected', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) { return item.id === 'recognitionDate'; })[0];
+      field.overflowStrategy = 'expand-layout';
+      field.expansion = ns.schema.suggestExpansion(field, { width: 595.32, height: 841.92 },
+        { bottomReserve: 10, maxExtraRows: 3, rowHeight: 14 });
+      field.expansion.reviewStatus = 'approved';
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-reserve';
+      }), 'oversized expansion not rejected');
+    });
+    add('An incomplete expansion is rejected rather than guessed', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) { return item.id === 'recognitionDate'; })[0];
+      field.overflowStrategy = 'expand-layout';
+      field.expansion = { page: 0, insertionTop: 400, reviewStatus: 'approved' };
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-incomplete';
+      }), 'incomplete expansion accepted');
+    });
+    add('Expansion definitions survive a builder JSON round trip', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var text = ns.io.exportProject(app.state.project);
+        var imported = ns.io.importProjectText(text).project;
+        assert(ns.io.semanticEqual(app.state.project, imported), 'project changed');
+        var source = app.state.project.fields.filter(function (item) { return item.expansion; });
+        assert(source.length > 0, 'the fixture map has no expansion to test');
+        source.forEach(function (field) {
+          var round = imported.fields.filter(function (item) { return item.id === field.id; })[0];
+          assert(ns.io.semanticEqual(round.expansion, field.expansion),
+            'expansion changed for ' + field.id);
+          equal(round.overflowStrategy, 'expand-layout', 'strategy changed');
+        });
+      });
+    });
+    add('Expansion definitions survive a production JS round trip', function () {
+      var expandable = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var exported = ns.schema.toProduction(project);
+        (map.fields || []).forEach(function (field) {
+          if (!field.expansion) return;
+          expandable += 1;
+          var round = exported.fields.filter(function (item) { return item.id === field.id; })[0];
+          assert(ns.io.semanticEqual(round.expansion, field.expansion),
+            'expansion changed for ' + map.id + '/' + field.id);
+        });
+      });
+      assert(expandable >= 10, 'expected expandable fields across the maps: ' + expandable);
+    });
+    add('Every committed expansion is already visually approved', function () {
+      var pending = [];
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        (map.fields || []).forEach(function (field) {
+          if (field.expansion && field.expansion.reviewStatus !== 'approved') {
+            pending.push(map.id + '/' + field.id);
+          }
+        });
+      });
+      equal(pending.length, 0, 'unreviewed: ' + pending.join(', '));
+    });
+
     add('Replacement PDF comparison works', function () {
       return app.openExisting('accession-application-fl').then(function () {
         return makePdf(app.sourceInfo.pages.map(function (page) { return { width: page.width, height: page.height }; }));

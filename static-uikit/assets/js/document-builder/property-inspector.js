@@ -203,7 +203,144 @@
     this._addFieldControl(section, field, 'Форматтер', 'format', select(field.format || '', formats), function (value) { return value || undefined; });
     this.container.appendChild(section);
     this._renderFlowRegions(field);
+    this._renderExpansion(field);
     this._renderFallbacks(field, formats);
+  };
+
+  // ── Page-section expansion ─────────────────────────────────────────────────
+  //
+  // Where a continuation line has nowhere to go because the form is full, the
+  // document can grow a row instead: the page content below an anchor moves
+  // down and a real ruled row or table row opens in the space. There is still
+  // one authoritative PDF — the variation exists only in the generated file.
+  Inspector.prototype._renderExpansion = function (field) {
+    var self = this;
+    var section = this._section('Расширение страницы');
+    var spec = field.expansion;
+    var pageSize = (this.state.project.pageGeometry || [])[field.page] ||
+      { width: 595.32, height: 841.92 };
+
+    if (!spec) {
+      section.appendChild(element('p', 'dtb-inspector-hint',
+        'Если у поля нет свободного места для строки продолжения, документ ' +
+        'может добавить строку сам: содержимое ниже точки вставки сдвигается ' +
+        'вниз. Шаблон PDF при этом не дублируется.'));
+      var add = element('button', 'dtb-button is-primary', 'Добавить расширяемую строку');
+      add.type = 'button';
+      add.addEventListener('click', function () {
+        self.state.updateField(field.id, {
+          overflowStrategy: 'expand-layout',
+          expansion: ns.schema.suggestExpansion(field, pageSize, {})
+        }, 'add layout expansion');
+      });
+      section.appendChild(add);
+      this.container.appendChild(section);
+      return;
+    }
+
+    function patch(changes) {
+      var next = ns.schema.clone(field.expansion);
+      Object.keys(changes).forEach(function (key) {
+        if (changes[key] === undefined || changes[key] === '') delete next[key];
+        else next[key] = changes[key];
+      });
+      self.state.updateField(field.id, { expansion: next }, 'edit layout expansion');
+    }
+
+    function patchLine(changes) {
+      var next = ns.schema.clone(field.expansion);
+      next.line = next.line || {};
+      Object.keys(changes).forEach(function (key) {
+        if (changes[key] === undefined || changes[key] === '') delete next.line[key];
+        else next.line[key] = changes[key];
+      });
+      self.state.updateField(field.id, { expansion: next }, 'edit expansion rule');
+    }
+
+    if (spec.reviewStatus !== 'approved') {
+      section.appendChild(element('p', 'dtb-warning-text',
+        'Правило расширения не подтверждено визуально — production-экспорт ' +
+        'заблокирован.'));
+    }
+
+    // The movable block, the anchor and the reserve.
+    [['page', 'Страница', 1], ['insertionTop', 'Точка вставки', 0.25],
+     ['rowHeight', 'Высота строки', 0.25], ['maxExtraRows', 'Максимум строк', 1],
+     ['shiftFromTop', 'Подвижный блок: от', 0.25],
+     ['shiftToTop', 'Подвижный блок: до', 0.25],
+     ['bottomReserve', 'Запас внизу страницы', 0.25]]
+      .forEach(function (entry) {
+        var control = input('number', spec[entry[0]] == null ? '' : spec[entry[0]],
+          { step: entry[2] });
+        control.classList.add('dtb-control');
+        control.addEventListener('change', function () {
+          var changes = {};
+          changes[entry[0]] = control.value === '' ? undefined : Number(control.value);
+          patch(changes);
+        });
+        section.appendChild(row(entry[1], control));
+      });
+
+    var style = select(spec.lineStyle || 'underline', [
+      { value: 'underline', label: 'Строка с подчёркиванием' },
+      { value: 'table-row', label: 'Пустая строка таблицы' }
+    ]);
+    style.classList.add('dtb-control');
+    style.addEventListener('change', function () { patch({ lineStyle: style.value }); });
+    section.appendChild(row('Вид вставляемой строки', style));
+
+    var line = spec.line || {};
+    [['left', 'Строка: left'], ['width', 'Строка: ширина'],
+     ['baselineOffset', 'Строка: baseline'], ['ruleOffset', 'Строка: линия'],
+     ['ruleThickness', 'Строка: толщина линии']]
+      .forEach(function (entry) {
+        var control = input('number', line[entry[0]] == null ? '' : line[entry[0]],
+          { step: 0.05 });
+        control.classList.add('dtb-control');
+        control.addEventListener('change', function () {
+          var changes = {};
+          changes[entry[0]] = control.value === '' ? undefined : Number(control.value);
+          patchLine(changes);
+        });
+        section.appendChild(row(entry[1], control));
+      });
+
+    // Copy the weight of a printed rule nearby, so the inserted row matches.
+    var match = element('button', 'dtb-button', 'Взять толщину соседней линии');
+    match.type = 'button';
+    match.addEventListener('click', function () {
+      patchLine({ ruleThickness: self._nearbyUnderlineThickness(field) });
+      self.onMessage('Толщина линии скопирована с ближайшего правила формы.');
+    });
+    section.appendChild(match);
+
+    // How far the page would move at zero, one and the maximum row count.
+    var rows = Number(spec.maxExtraRows || 1);
+    var height = Number(spec.rowHeight || 14);
+    section.appendChild(element('p', 'dtb-inspector-hint',
+      'Сдвиг: 0 строк — 0 pt · 1 строка — ' + height + ' pt · максимум (' +
+      rows + ') — ' + Math.round(rows * height * 100) / 100 + ' pt из ' +
+      (spec.bottomReserve || 0) + ' pt запаса.'));
+
+    var approved = input('checkbox', spec.reviewStatus === 'approved');
+    approved.classList.add('dtb-control');
+    approved.addEventListener('change', function () {
+      patch({ reviewStatus: approved.checked ? 'approved' : 'suggested' });
+    });
+    section.appendChild(row('Правило проверено визуально', approved,
+      'Проверьте на странице, что вставленная строка не задевает статичный ' +
+      'текст, подпись или колонтитул.'));
+
+    var remove = element('button', 'dtb-button is-danger', 'Убрать расширение');
+    remove.type = 'button';
+    remove.addEventListener('click', function () {
+      self.state.updateField(field.id, {
+        expansion: undefined, overflowStrategy: undefined
+      }, 'remove layout expansion');
+    });
+    section.appendChild(remove);
+
+    this.container.appendChild(section);
   };
 
   // ── Continuation lines ─────────────────────────────────────────────────────

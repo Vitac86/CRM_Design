@@ -97,6 +97,15 @@ textarea.dtb-control { resize: vertical; }
 .dtb-flow-rule { stroke: #23324d; stroke-width: 1; vector-effect: non-scaling-stroke; pointer-events: none; }
 .dtb-flow-rule.is-suggested { stroke: #d99b23; stroke-dasharray: 3 2; }
 .dtb-flow-label { fill: #2f6fed; font-size: 9px; pointer-events: none; }
+
+/* Page-section expansion: anchor, movable block and inserted-row preview. */
+.dtb-expansion-anchor { stroke: #0b8a5b; stroke-width: 1.4; vector-effect: non-scaling-stroke; pointer-events: none; }
+.dtb-expansion-anchor.is-suggested { stroke: #d99b23; stroke-dasharray: 5 3; }
+.dtb-expansion-block-end { stroke: #0b8a5b; stroke-width: 1; stroke-dasharray: 2 4; vector-effect: non-scaling-stroke; pointer-events: none; }
+.dtb-expansion-block-end.is-suggested { stroke: #d99b23; }
+.dtb-expansion-row { fill: rgba(11, 138, 91, 0.10); stroke: #0b8a5b; stroke-width: 0.8; stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; pointer-events: none; }
+.dtb-expansion-row.is-suggested { fill: rgba(217, 155, 35, 0.12); stroke: #d99b23; }
+.dtb-expansion-label { fill: #0b8a5b; font-size: 9px; pointer-events: none; }
 .dtb-icon-button { border: 1px solid #c5cfdb; border-radius: 3px; background: #fff; cursor: pointer; }
 .dtb-warning-text { color: var(--dtb-warn); font-size: 11px; }
 .dtb-empty-state { padding: 24px 10px; color: var(--dtb-muted); text-align: center; }

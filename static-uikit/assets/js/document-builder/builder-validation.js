@@ -286,6 +286,115 @@
     });
   }
 
+  // ── Page-section expansion ─────────────────────────────────────────────────
+  //
+  // Blocks export when anything about growing the page is undefined, unsafe or
+  // unreviewed. Production refuses the same configurations; this just says so
+  // while the template is still being authored.
+  function validateExpansion(field, pageSizes, errors, warnings, project) {
+    var spec = field.expansion;
+    if (!spec) {
+      if (field.overflowStrategy === 'expand-layout') {
+        errors.push(item('error', 'expansion-missing',
+          'Стратегия «expand-layout» требует блока расширения.', field));
+      }
+      return;
+    }
+    if (field.overflowStrategy !== 'expand-layout') {
+      errors.push(item('error', 'expansion-strategy',
+        'Блок расширения задан, но стратегия поля не «expand-layout».', field));
+    }
+
+    var page = spec.page != null ? Number(spec.page) : Number(field.page);
+    if (!Number.isInteger(page) || page < 0 || page >= pageSizes.length) {
+      errors.push(item('error', 'expansion-page',
+        'Некорректная страница расширения.', field));
+      return;
+    }
+    var size = pageSizes[page];
+
+    var numbers = ['insertionTop', 'rowHeight', 'maxExtraRows', 'shiftFromTop',
+                   'shiftToTop', 'bottomReserve'];
+    var missing = numbers.filter(function (key) {
+      return !Number.isFinite(Number(spec[key]));
+    });
+    if (missing.length) {
+      errors.push(item('error', 'expansion-incomplete',
+        'Не заданы параметры расширения: ' + missing.join(', ') + '.', field));
+      return;
+    }
+
+    var rows = Number(spec.maxExtraRows);
+    var height = Number(spec.rowHeight);
+    var reserve = Number(spec.bottomReserve);
+
+    if (height <= 0) {
+      errors.push(item('error', 'expansion-row-height',
+        'Высота вставляемой строки должна быть положительной.', field));
+    }
+    if (rows < 1) {
+      errors.push(item('error', 'expansion-max-rows',
+        'Максимум вставляемых строк должен быть не меньше одной.', field));
+    }
+    if (rows * height > reserve + 1e-6) {
+      errors.push(item('error', 'expansion-reserve',
+        'Максимальное расширение (' + Math.round(rows * height * 100) / 100 +
+        ' pt) больше запаса внизу страницы (' + reserve + ' pt).', field));
+    }
+    if (Number(spec.shiftFromTop) > Number(spec.insertionTop) + 1e-6) {
+      errors.push(item('error', 'expansion-block',
+        'Начало подвижного блока ниже точки вставки.', field));
+    }
+    if (Number(spec.shiftToTop) <= Number(spec.shiftFromTop)) {
+      errors.push(item('error', 'expansion-block',
+        'Подвижный блок страницы не задан.', field));
+    }
+    if (Number(spec.shiftToTop) > size.height + 0.5) {
+      errors.push(item('error', 'expansion-bounds',
+        'Подвижный блок выходит за нижнюю границу страницы.', field));
+    }
+
+    var line = spec.line || {};
+    if (!Number.isFinite(Number(line.width)) || Number(line.width) <= 0) {
+      errors.push(item('error', 'expansion-line',
+        'У вставляемой строки не задана ширина.', field));
+    } else if (Number(line.left) < 0 ||
+               Number(line.left) + Number(line.width) > size.width + 0.5) {
+      errors.push(item('error', 'expansion-line',
+        'Вставляемая строка выходит за границы страницы.', field));
+    }
+    if (!Number.isFinite(Number(line.ruleThickness))) {
+      errors.push(item('error', 'expansion-line',
+        'Не задана толщина линии вставляемой строки.', field));
+    }
+    if ((spec.lineStyle || 'underline') === 'table-row' &&
+        !(spec.columns || []).length && spec.borders &&
+        spec.borders.left === false && spec.borders.right === false) {
+      warnings.push(item('warning', 'expansion-table-row',
+        'У строки таблицы не заданы ни боковые границы, ни колонки.', field));
+    }
+
+    // An inserted row must not land on top of something fixed.
+    var rowTop = Number(spec.insertionTop);
+    var rowBottom = rowTop + rows * height;
+    (project.fields || []).forEach(function (other) {
+      if (other === field || other.id === field.id) return;
+      if (Number(other.page) !== page) return;
+      if (other.expansion) return;               // it moves with the shift
+      var top = Number(other.baselineTop) - Number(other.fontSize || 12) * 0.7;
+      if (top >= rowTop - 1e-6 && top <= rowBottom + 1e-6) {
+        warnings.push(item('warning', 'expansion-overlap',
+          'Вставляемая строка перекрывает поле ' + other.id + '.', field));
+      }
+    });
+
+    if (spec.reviewStatus !== 'approved') {
+      errors.push(item('error', 'expansion-unreviewed',
+        'Правило расширения не подтверждено визуально — production-экспорт ' +
+        'заблокирован.', field));
+    }
+  }
+
   function structural(project, baseInfo, payload) {
     var errors = [];
     var warnings = [];
@@ -402,6 +511,7 @@
       if (field.minFontSize != null && Number(field.minFontSize) > Number(field.fontSize)) errors.push(item('error', 'font-size', 'Минимальный кегль больше начального.', field));
       if (type !== 'check') validateReadability(field, errors);
       if (type !== 'check') validateFlowRegions(field, page, pageSizes, errors, warnings, project);
+      if (type !== 'check') validateExpansion(field, pageSizes, errors, warnings, project);
       if (field.showWhen) {
         if (!ns.sourceCatalog.isValid(field.showWhen.source)) errors.push(item('error', 'show-when', 'Некорректный источник условия.', field));
         if (field.showWhen.invert != null || field.showWhen.expression != null) errors.push(item('error', 'show-when', 'Условие содержит неподдерживаемое выражение.', field));

@@ -19,7 +19,16 @@
     'offsetX', 'offsetY', 'boxSize', 'thickness', 'inset', 'text',
     // Continuation regions and the properties that travel with them.
     'flowRegions', 'overflowStrategy', 'allowPrintOverride', 'tokenBreak',
-    'firstLineIndent'
+    'firstLineIndent', 'expansion'
+  ];
+
+  // Everything a page-expansion definition may carry. Nothing here may be lost
+  // on an import/export round trip.
+  var EXPANSION_KEYS = [
+    'page', 'insertionTop', 'rowHeight', 'maxExtraRows', 'shiftFromTop',
+    'shiftToTop', 'bottomReserve', 'lineStyle', 'reviewStatus', 'line',
+    'maxFontSize', 'rowLeft', 'rowWidth', 'borders', 'columns',
+    'bottomSegments', 'topSegments'
   ];
 
   // Every property a continuation region may carry. Anything here must survive
@@ -320,10 +329,43 @@
     return region;
   }
 
+  // A starting expansion definition for a field, measured as far as the
+  // builder can from what it already knows. Everything is a suggestion until a
+  // human has looked at the page: `reviewStatus` stays 'suggested' and
+  // validation blocks production export while it does.
+  function suggestExpansion(field, pageSize, options) {
+    var opts = options || {};
+    var size = Number(field.fontSize || policy().preferredFontSize);
+    var rowHeight = Number(opts.rowHeight || Math.round(size * 1.15 * 100) / 100);
+    var insertionTop = Number(opts.insertionTop != null
+      ? opts.insertionTop : Number(field.baselineTop) + size * 0.3);
+    return {
+      page: Number(field.page),
+      insertionTop: Math.round(insertionTop * 100) / 100,
+      rowHeight: rowHeight,
+      maxExtraRows: Number(opts.maxExtraRows || 1),
+      shiftFromTop: Math.round(insertionTop * 100) / 100,
+      shiftToTop: Number(opts.shiftToTop != null
+        ? opts.shiftToTop : Math.round((pageSize.height - 2) * 100) / 100),
+      bottomReserve: Number(opts.bottomReserve || rowHeight),
+      lineStyle: opts.lineStyle || 'underline',
+      reviewStatus: 'suggested',
+      line: {
+        left: Number(field.left),
+        width: Number(field.width),
+        baselineOffset: Math.round(rowHeight * 0.75 * 100) / 100,
+        ruleOffset: Math.round(rowHeight * 0.9 * 100) / 100,
+        ruleThickness: Number(opts.ruleThickness || 0.36)
+      }
+    };
+  }
+
   Schema.SCHEMA_VERSION = SCHEMA_VERSION;
   Schema.DEFAULT_FONTS = DEFAULT_FONTS;
   Schema.FIELD_PRODUCTION_KEYS = FIELD_PRODUCTION_KEYS;
   Schema.FLOW_REGION_KEYS = FLOW_REGION_KEYS;
+  Schema.EXPANSION_KEYS = EXPANSION_KEYS;
+  Schema.suggestExpansion = suggestExpansion;
   Schema.policy = policy;
   Schema.flowRegions = flowRegions;
   Schema.suggestContinuation = suggestContinuation;

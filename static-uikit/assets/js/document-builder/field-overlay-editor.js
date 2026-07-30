@@ -366,6 +366,13 @@
         group.appendChild(caption);
       }, this);
 
+      // Page expansion: show the anchor, the movable block, the reserve and
+      // where the inserted rows would land, so the geometry can be judged on
+      // the page rather than from numbers alone.
+      if (field.expansion && Number(field.expansion.page) === this.state.pageIndex) {
+        this._renderExpansion(group, field, isSelected);
+      }
+
       var payload = this.getPayload();
       var raw = type === 'static' ? field.text : payload && global.CRMDocumentEngine.overlayRenderer.resolve(field.source, payload);
       var formatted = ns.validation && ns.validation.format ? ns.validation.format(field.format, raw) : raw;
@@ -428,6 +435,56 @@
       }
     }
     this.svg.appendChild(group);
+  };
+
+  // Draw the expansion rule on the canvas: the insertion anchor, the block of
+  // page content that would move, the declared bottom reserve and a preview of
+  // each row that could be inserted.
+  OverlayEditor.prototype._renderExpansion = function (group, field, isSelected) {
+    var spec = field.expansion;
+    var pageWidth = (this.viewer.pages[this.state.pageIndex] || {}).width || 595.32;
+    var pending = spec.reviewStatus !== 'approved';
+    var self = this;
+
+    function horizontal(top, className) {
+      var a = self.viewer.pdfToCss(0, top);
+      var b = self.viewer.pdfToCss(pageWidth, top);
+      group.appendChild(svg('line', {
+        x1: a.x, y1: a.y, x2: b.x, y2: b.y,
+        class: className + (pending ? ' is-suggested' : '') +
+          (isSelected ? ' is-selected' : ''),
+        'data-field-id': field.id
+      }));
+    }
+
+    horizontal(Number(spec.insertionTop), 'dtb-expansion-anchor');
+    horizontal(Number(spec.shiftToTop), 'dtb-expansion-block-end');
+
+    // The rows that could open, previewed at their maximum count.
+    var rows = Number(spec.maxExtraRows || 1);
+    var height = Number(spec.rowHeight || 14);
+    var line = spec.line || {};
+    for (var index = 0; index < rows; index += 1) {
+      var top = Number(spec.insertionTop) + index * height;
+      var rect = this.viewer.rectToCss(Number(line.left || field.left), top,
+        Number(line.width || field.width), height);
+      group.appendChild(svg('rect', {
+        x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+        class: 'dtb-expansion-row' + (pending ? ' is-suggested' : ''),
+        'data-field-id': field.id
+      }));
+    }
+
+    var caption = this.viewer.pdfToCss(Number(line.left || field.left),
+      Number(spec.insertionTop));
+    var label = svg('text', {
+      x: caption.x + 2, y: caption.y - 3, class: 'dtb-expansion-label',
+      'data-field-id': field.id
+    });
+    label.textContent = 'Расширение: до ' + rows + '×' + height + ' pt' +
+      ' (запас ' + (spec.bottomReserve || 0) + ' pt)' +
+      (pending ? ' · не подтверждено' : '');
+    group.appendChild(label);
   };
 
   ns.OverlayEditor = OverlayEditor;
