@@ -104,18 +104,6 @@
       },
       {
         id: 'clientPrintedName',
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 528.93,
-          rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 528.93, shiftToTop: 580.13,
-          bottomReserve: 259.79,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 56.16, width: 504.87,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
-          }
-        },
         source: 'field.clientFullName', format: 'initials', fallbacks: ['surname'],
         page: 0, left: 195.5, baselineTop: 515.35, width: 77.5,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,

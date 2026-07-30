@@ -3159,6 +3159,7 @@
   function resetPdfStatus() {
     setPdfStatus('');
     clearOverflowReport();
+    clearExpansionNotice();
     var box = document.getElementById('docwiz-pdf-downloads');
     if (!box) return;
     box.querySelectorAll('a[data-object-url]').forEach(function (a) {
@@ -3167,6 +3168,58 @@
     });
     box.innerHTML = '';
     box.hidden = true;
+  }
+
+  // ── Layout expansion notice ───────────────────────────────────────────────
+  //
+  // Purely informational, and neutral: the document grew a line, the manager
+  // has nothing to choose and nothing to fix. Never ask them to shorten a legal
+  // name, drop part of an address or pick a smaller font.
+  var expansionNotes = [];
+
+  function noteExpansion(doc, notes) {
+    expansionNotes = (notes || []).map(function (note) {
+      return { documentTitle: doc.title, label: note.label, rows: note.rows };
+    });
+  }
+
+  function clearExpansionNotice() {
+    expansionNotes = [];
+    var box = document.getElementById('docwiz-pdf-expansion');
+    if (!box) return;
+    box.innerHTML = '';
+    box.hidden = true;
+  }
+
+  function renderExpansionNotice() {
+    var box = document.getElementById('docwiz-pdf-expansion');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!expansionNotes.length) { box.hidden = true; return; }
+
+    var head = document.createElement('p');
+    head.className = 'crm-docwiz-expansion-head';
+    head.textContent = 'Длинное значение будет перенесено на дополнительную строку документа.';
+    box.appendChild(head);
+
+    var list = document.createElement('ul');
+    list.className = 'crm-docwiz-expansion-list';
+    expansionNotes.forEach(function (note) {
+      var item = document.createElement('li');
+      item.textContent = note.label + ' — ' + note.rows + ' ' +
+        rowsWord(note.rows) + ' в «' + note.documentTitle + '»';
+      list.appendChild(item);
+    });
+    box.appendChild(list);
+    box.hidden = false;
+  }
+
+  // Russian plural for "строка" (1 строка / 3 строки / 5 строк).
+  function rowsWord(n) {
+    var d = n % 10, dd = n % 100;
+    if (d === 1 && dd !== 11) return 'дополнительная строка';
+    if (d >= 2 && d <= 4 && (dd < 10 || dd >= 20)) return 'дополнительные строки';
+    return 'дополнительных строк';
   }
 
   // ── Layout preflight result ───────────────────────────────────────────────
@@ -3495,7 +3548,12 @@
       extraValues:    payload.extraValues,
       checks:         payload.checks,
       printOverrides: payload.printOverrides || {}
-    }, { validatePayload: true });
+    }, {
+      validatePayload: true,
+      // Expansion is automatic: the manager picks no template variant and no
+      // mode. They are simply told that a value moved onto an added line.
+      onExpansion: function (notes) { noteExpansion(doc, notes); }
+    });
   }
 
   // Load the local PDF template, fill mapped AcroForm fields and return a Blob.
@@ -3659,6 +3717,7 @@
 
         // No endpoint configured: never upload, local download only.
         setPdfStatus('PDF сформирован: 1 файл. Файл не отправлялся.', 'ok');
+        renderExpansionNotice();
       })
       .catch(function (err) {
         handleGenerationError(err, doc, function () { generateSinglePdf(doc, subject); });
@@ -3749,6 +3808,7 @@
 
         // No endpoint configured: never upload, local downloads only.
         setPdfStatus(head + ' Файлы не отправлялись.', 'ok');
+        renderExpansionNotice();
       })
       .catch(function (err) {
         handleGenerationError(err, doc, function () { generatePdfPackage(doc, subject); },

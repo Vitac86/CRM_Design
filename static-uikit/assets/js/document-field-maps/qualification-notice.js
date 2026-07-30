@@ -183,18 +183,6 @@
         showWhen: { source: 'subject.kind', equals: 'individual' }
       }),
       text('registerEntryOrgName', 'field.client-full-name', 232.0, 472.03, 89.0, {
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 486.3,
-          rowHeight: 14, maxExtraRows: 2,
-          shiftFromTop: 486.3, shiftToTop: 556.34,
-          bottomReserve: 283.58,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 63.8, width: 477.47,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
-          }
-        },
         required: true,
         showWhen: { source: 'subject.kind', equals: 'company' }
       }),

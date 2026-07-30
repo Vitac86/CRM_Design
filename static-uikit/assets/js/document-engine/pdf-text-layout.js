@@ -221,7 +221,14 @@
       underlineOffset: source.underlineOffset,
       underlineColor: source.underlineColor,
       reviewStatus: source.reviewStatus,
-      generated: !!source.generated
+      generated: !!source.generated,
+      // Set on a region opened by page expansion: the row's own borders and
+      // where it sits. The renderer needs these to draw the row it was given.
+      inserted: !!source.inserted,
+      lineStyle: source.lineStyle,
+      tableRow: source.tableRow,
+      rowTop: source.rowTop,
+      rowHeight: source.rowHeight
     };
   }
   Layout.normalizeRegion = normalizeRegion;

@@ -906,8 +906,23 @@
       });
     }
 
-    if (borders.top) line(left, top, right, top);
-    if (borders.bottom !== false) line(left, bottom, right, bottom);
+    // A printed table often breaks its horizontal rules at the column
+    // boundaries; `bottomSegments` reproduces that exactly rather than laying
+    // one long line across gaps the form leaves open.
+    if (spec.bottomSegments && spec.bottomSegments.length) {
+      spec.bottomSegments.forEach(function (segment) {
+        line(Number(segment[0]), bottom, Number(segment[1]), bottom);
+      });
+    } else if (borders.bottom !== false) {
+      line(left, bottom, right, bottom);
+    }
+    if (spec.topSegments && spec.topSegments.length) {
+      spec.topSegments.forEach(function (segment) {
+        line(Number(segment[0]), top, Number(segment[1]), top);
+      });
+    } else if (borders.top) {
+      line(left, top, right, top);
+    }
     if (borders.left !== false) line(left, top, left, bottom);
     if (borders.right !== false) line(right, top, right, bottom);
     (spec.columns || []).forEach(function (x) { line(Number(x), top, Number(x), bottom); });
@@ -1108,6 +1123,26 @@
           });
 
           ctx.plans = plans;
+
+          // What the manager is told about: rows were added, nothing to decide.
+          if (typeof opts.onExpansion === 'function') {
+            var notes = [];
+            Object.keys(plans).forEach(function (index) {
+              plans[index].shifts.forEach(function (shift) {
+                var field = template.fields.filter(function (item) {
+                  return item.id === shift.fieldId;
+                })[0] || {};
+                notes.push({
+                  page: Number(index),
+                  fieldId: shift.fieldId,
+                  label: field.label || shift.fieldId,
+                  rows: Math.round(shift.delta / (((field.expansion || {}).rowHeight) || 14)),
+                  delta: shift.delta
+                });
+              });
+            });
+            if (notes.length) opts.onExpansion(notes);
+          }
 
           template.fields.forEach(function (field) {
             if ((field.type || 'text') === 'check') drawCheckField(ctx, field);
