@@ -22,8 +22,12 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.96;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
 
   function text(id, source, left, baselineTop, width, extra) {
     var field = {
@@ -82,7 +86,7 @@
       // 246.89..278.09 pt border rectangle.
       text('newCodeWord', 'extra.extra-new-code-word', 228.80, 259.00, 171.80, {
         align: 'center', required: true,
-        multiline: true, lineHeight: 10.0, maxLines: 2, maxHeight: 21.0
+        multiline: true, lineHeightRatio: 0.95, maxHeight: 21.0
       }),
 
       // The handwritten signature rule at 155.90..240.80 remains blank. The

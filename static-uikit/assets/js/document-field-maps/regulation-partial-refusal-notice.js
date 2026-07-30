@@ -13,9 +13,16 @@
 (function (global) {
   'use strict';
 
-  var TABLE = 9;
-  var SERVICE = 10.56;
-  var MIN = 6;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var SIZE_10_5 = 10.5;      // measured room: 10.91, 10.91 pt
+  var SIZE_10 = 10;        // measured room: 10.35 pt
+  var SIZE_9 = 9;         // measured room: 9.41 pt
+  var CHECK_GLYPH = 10.56; // printed checkbox glyph — not dynamic text
 
   function check(id, source, baselineTop) {
     return {
@@ -25,7 +32,7 @@
       page: 0,
       left: 65.2,
       baselineTop: baselineTop,
-      glyphSize: SERVICE
+      glyphSize: CHECK_GLYPH
     };
   }
 
@@ -39,8 +46,8 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: SERVICE,
-      minFontSize: 6.5,
+      fontSize: BODY,
+      minFontSize: MIN,
       align: 'left',
       required: true
     };
@@ -63,29 +70,29 @@
         id: 'clientName',
         source: 'field.client-full-name',
         page: 0, left: 252.0, baselineTop: 171.84, width: 289.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
-        align: 'left', multiline: true, lineHeight: 8.5,
-        maxHeight: 17, maxLines: 2, required: true
+        font: 'legalSerif', fontSize: SIZE_10, minFontSize: MIN,
+        align: 'left', multiline: true, lineHeightRatio: 0.95,
+        maxHeight: 17, required: true
       },
       {
         id: 'contractNumber',
         source: 'field.extra-contract-number', format: 'prefixNumber',
         page: 0, left: 252.0, baselineTop: 192.74, width: 175.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'contractDate',
         source: 'field.extra-contract-date', format: 'prefixFrom',
         page: 0, left: 432.0, baselineTop: 192.74, width: 109.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'accountPortfolio',
         source: 'field.extra-account-portfolio',
         page: 0, left: 252.0, baselineTop: 211.80, width: 289.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
         align: 'left', multiline: true, lineHeight: 8.5,
         maxHeight: 17, maxLines: 2, required: true
       },
@@ -110,35 +117,35 @@
         source: 'field.representativeRole', optional: true, required: true,
         showWhen: { source: 'subject.kind', equals: 'company' },
         page: 0, left: 110.0, baselineTop: 593.71, width: 169.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center'
       },
       {
         id: 'clientPrintedName',
         source: 'field.clientFullName', format: 'initials', fallbacks: ['surname'],
         page: 0, left: 195.5, baselineTop: 652.78, width: 77.5,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center', required: true
       },
       {
         id: 'clientDateDay',
         source: 'field.documentDateRu', format: 'dateDay',
         page: 0, left: 60.5, baselineTop: 712.42, width: 23.7,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center', required: true
       },
       {
         id: 'clientDateMonth',
         source: 'field.documentDateRu', format: 'monthOnly',
         page: 0, left: 91.0, baselineTop: 712.42, width: 85.9,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center', required: true
       },
       {
         id: 'clientDateYear',
         source: 'field.documentDateRu', format: 'dateYear2',
         page: 0, left: 185.4, baselineTop: 712.42, width: 27.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center', required: true
       }
 

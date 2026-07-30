@@ -23,10 +23,31 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.48;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 11;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
   var VALUE_LEFT = 329.1;
   var VALUE_WIDTH = 226.0;
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    beneficialOwnerBasis: 9.5,       // 9.97 pt of room
+    beneficialOwnerName: 10,         // 10.10 pt of room
+    beneficiaryBasis: 10,            // 10.10 pt of room
+    beneficiaryName: 9.5,            // 9.97 pt of room
+    citizenshipCountries: 12,        // 25.59 pt of room
+    idDocumentName: 9.5,             // 9.99 pt of room
+    idSeriesNumber: 9.5,             // 9.97 pt of room
+    ipCertificate: 11.5,             // 11.58 pt of room
+    ipRegistrationDate: 11.5,        // 11.72 pt of room
+    questionnaireDate: 12,           // 28.55 pt of room
+    signaturePrintedName: 12,        // 34.49 pt of room
+    taxResidencyCountries: 12,       // 25.59 pt of room
+  };
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
@@ -38,7 +59,7 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
@@ -46,15 +67,88 @@
       multiline: !!o.multiline,
       maxLines: o.maxLines,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }
 
   // Value typed into the right-hand column beside the label on `baselineTop`.
+  // Height of each printed value box, measured from the committed
+  // template with tools/qa/measure_field_room.py. A cell may use as many
+  // lines as its own box holds at the chosen size — wrapping inside the
+  // row is what the form was designed for and always beats shrinking.
+  var CELL_BOX = {
+    bankAdditional: 25.0,
+    bankAddress: 26.4,
+    bankBic: 26.4,
+    bankCorrAccount: 26.3,
+    bankInn: 26.4,
+    bankName: 26.4,
+    bankSettlementAccount: 38.3,
+    beneficialOwnerBasis: 21.8,
+    beneficialOwnerName: 13.0,
+    beneficiaryBasis: 25.9,
+    beneficiaryName: 17.8,
+    birthDate: 13.0,
+    birthPlace: 26.3,
+    citizenship: 15.8,
+    citizenshipCountries: 38.3,
+    clientFullName: 13.1,
+    email: 26.8,
+    idDepartmentCode: 14.8,
+    idDocumentName: 13.0,
+    idIssueDate: 37.3,
+    idIssuedBy: 23.9,
+    idSeriesNumber: 13.0,
+    ipCertificate: 46.9,
+    ipRegistrationAuthority: 26.3,
+    ipRegistrationDate: 13.6,
+    ipRegistrationPlace: 26.4,
+    landlinePhone: 26.4,
+    licenceActivities: 15.2,
+    licenceAuthority: 15.2,
+    licenceNumberDate: 15.4,
+    licenceValidity: 15.2,
+    mobilePhone: 26.4,
+    ogrnip: 23.8,
+    okved: 14.9,
+    otherInformation: 24.5,
+    pdlRelation: 34.8,
+    postalAddress: 34.8,
+    practiceDocumentAuthority: 13.0,
+    practiceDocumentDate: 26.4,
+    practiceDocumentName: 34.8,
+    practiceDocumentNumber: 26.4,
+    questionnaireDate: 49.8,
+    registrationAddress: 46.7,
+    representativeBasis: 48.7,
+    representativeName: 15.2,
+    residencePermitFrom: 45.7,
+    residencePermitSeriesNumber: 59.2,
+    residencePermitTo: 45.8,
+    signaturePrintedName: 74.0,
+    snils: 15.1,
+    taxResidencyCountries: 38.3,
+    website: 36.9,
+  };
+
   function cell(id, source, page, baselineTop, options) {
-    return text(id, source, page, VALUE_LEFT, baselineTop, VALUE_WIDTH, options);
+    var o = options || {};
+    if (CELL_BOX[id]) {
+      o.multiline = o.multiline !== false;
+      o.maxHeight = o.maxHeight || CELL_BOX[id];
+      o.lineHeightRatio = o.lineHeightRatio || 0.95;
+    }
+    return text(id, source, page, VALUE_LEFT, baselineTop, VALUE_WIDTH, o);
   }
 
   function check(id, source, equals, page, left, baselineTop, showWhen) {

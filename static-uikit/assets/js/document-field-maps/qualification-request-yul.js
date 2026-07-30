@@ -15,8 +15,20 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.96;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var CHECK_GLYPH = 9.96;  // printed ☐ box — geometry, not dynamic text
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    companyFullLegalName: 10,        // 10.47 pt of room
+    contractDate: 10,                // 10.20 pt of room
+  };
 
   function text(id, source, page, left, baselineTop, width, extra) {
     var field = {
@@ -28,7 +40,7 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: BODY,
+      fontSize: ROW_SIZE[id] || BODY,
       minFontSize: MIN,
       align: 'left'
     };
@@ -45,7 +57,7 @@
       page: page,
       left: left,
       baselineTop: baselineTop,
-      glyphSize: BODY
+      glyphSize: CHECK_GLYPH
     };
   }
 
@@ -88,19 +100,19 @@
       // criterion, in the same top-to-bottom order as the wizard's numbered
       // supporting-document inputs.
       text('supportingDocument1', 'extra.extra-supporting-docs-1', 0, 314.00, 412.00, 230.00, {
-        optional: true, multiline: true, lineHeight: 9.0, maxLines: 1, maxHeight: 11.0
+        optional: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 11.0
       }),
       text('supportingDocument2', 'extra.extra-supporting-docs-2', 0, 314.00, 439.00, 230.00, {
-        optional: true, multiline: true, lineHeight: 9.5, maxLines: 6, maxHeight: 61.0
+        optional: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 61.0
       }),
       text('supportingDocument3', 'extra.extra-supporting-docs-3', 0, 314.00, 522.00, 230.00, {
-        optional: true, multiline: true, lineHeight: 9.5, maxLines: 5, maxHeight: 50.0
+        optional: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 50.0
       }),
       text('supportingDocument4', 'extra.extra-supporting-docs-4', 0, 314.00, 592.00, 230.00, {
-        optional: true, multiline: true, lineHeight: 9.5, maxLines: 4, maxHeight: 42.0
+        optional: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 42.0
       }),
       text('supportingDocument5', 'extra.extra-supporting-docs-5', 0, 314.00, 657.00, 230.00, {
-        optional: true, multiline: true, lineHeight: 9.5, maxLines: 3, maxHeight: 27.0
+        optional: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 27.0
       }),
 
       // Page 2 — delivery choice and applicant signature block.

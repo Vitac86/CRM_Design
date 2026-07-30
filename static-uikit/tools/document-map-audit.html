@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<title>Document engine — production map audit</title>
+<link rel="icon" href="../assets/icons/favicon_blue.ico"/>
+<!--
+  Runs the PRODUCTION layout engine over every production field map with the
+  synthetic RU/EN fixture profiles and reports, per field, what the engine did:
+  printed at the preferred size, wrapped, flowed into a continuation region,
+  shrank, used a safe formatter fallback, or overflowed.
+
+  Development aid only — not linked from the CRM. Every fixture value is
+  obviously fictional; no client data is involved.
+
+      python -m http.server 8000        # run inside static-uikit/
+      http://localhost:8000/tools/document-map-audit.html
+
+  Query parameters (used by tools/qa/audit_field_maps.py):
+      ?auto=1                run everything and write JSON into #out
+      ?doc=<id>              restrict to one template
+-->
+<style>
+  body { font: 13px/1.5 system-ui, sans-serif; margin: 24px; max-width: 1200px; }
+  h1 { font-size: 18px; }
+  #status { padding: 8px; border-radius: 4px; background: #f2f2f2; }
+  #out { display: none; }
+  .ok { background: #e8f6ec !important; }
+  .err { background: #fde8e8 !important; }
+  table { border-collapse: collapse; margin-top: 12px; width: 100%; }
+  td, th { border: 1px solid #ccc; padding: 3px 6px; text-align: left; }
+  tr.overflow { background: #fde8e8; }
+  tr.shrink { background: #fff6e5; }
+  tr.flow, tr.wrap { background: #eef4ff; }
+</style>
+</head>
+<body>
+<h1>Document engine — production map audit</h1>
+<p>Every production map × every synthetic RU/EN profile, laid out by the production engine.</p>
+<p id="status">idle</p>
+<div id="summary"></div>
+<pre id="out"></pre>
+
+<script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
+<script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+<script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+<script src="../assets/js/document-builder/project-schema.js"></script>
+<script src="../assets/js/document-builder/source-catalog.js"></script>
+<script src="../assets/js/document-builder/test-fixtures.js"></script>
+<script src="../assets/js/document-field-maps/accession-application-fl.js"></script>
+<script src="../assets/js/document-field-maps/accession-application-yul.js"></script>
+<script src="../assets/js/document-field-maps/account-opening-notice.js"></script>
+<script src="../assets/js/document-field-maps/anketa-fl.js"></script>
+<script src="../assets/js/document-field-maps/anketa-fl-simplified-id.js"></script>
+<script src="../assets/js/document-field-maps/anketa-ip-sz.js"></script>
+<script src="../assets/js/document-field-maps/anketa-yul.js"></script>
+<script src="../assets/js/document-field-maps/broker-use-refusal-request.js"></script>
+<script src="../assets/js/document-field-maps/client-notifications.js"></script>
+<script src="../assets/js/document-field-maps/code-word-request.js"></script>
+<script src="../assets/js/document-field-maps/order-forms.js"></script>
+<script src="../assets/js/document-field-maps/power-of-attorney.js"></script>
+<script src="../assets/js/document-field-maps/qualification-consequences-notice.js"></script>
+<script src="../assets/js/document-field-maps/qualification-notice.js"></script>
+<script src="../assets/js/document-field-maps/qualification-request-fl.js"></script>
+<script src="../assets/js/document-field-maps/qualification-request-yul.js"></script>
+<script src="../assets/js/document-field-maps/regulation-full-refusal-notice.js"></script>
+<script src="../assets/js/document-field-maps/regulation-partial-refusal-notice.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var engine = window.CRMDocumentEngine;
+  var builder = window.CRMDocumentBuilder;
+  var statusEl = document.getElementById('status');
+  var summaryEl = document.getElementById('summary');
+  var outEl = document.getElementById('out');
+
+  var fontCache = {};
+
+  function fontFor(url) {
+    if (!fontCache[url]) {
+      fontCache[url] = fetch(url)
+        .then(function (response) {
+          if (!response.ok) throw new Error('font HTTP ' + response.status + ' ' + url);
+          return response.arrayBuffer();
+        })
+        .then(function (bytes) {
+          return PDFLib.PDFDocument.create().then(function (doc) {
+            doc.registerFontkit(window.fontkit);
+            return doc.embedFont(bytes, { subset: false });
+          });
+        });
+    }
+    return fontCache[url];
+  }
+
+  function loadFonts(template) {
+    var spec = template.fonts || {};
+    var keys = Object.keys(spec);
+    return Promise.all(keys.map(function (key) { return fontFor(spec[key]); }))
+      .then(function (fonts) {
+        var map = {};
+        keys.forEach(function (key, index) { map[key] = fonts[index]; });
+        return map;
+      });
+  }
+
+  // Classify what the production engine did with one field.
+  function classify(result) {
+    if (!result) return 'absent';
+    if (!result.drawn) return result.reason;              // hidden / empty / missing / overflow
+    if (result.usedFallback) return 'fallback';
+    if (result.layout.shrunk) return 'shrink';
+    if (result.layout.strategy === 'flow') return 'flow';
+    if (result.layout.strategy === 'wrap') return 'wrap';
+    return 'preferred';
+  }
+
+  function auditTemplate(template) {
+    var project = builder.schema.fromProduction(template, null);
+    return loadFonts(template).then(function (fonts) {
+      var profiles = builder.fixtures.profiles.map(function (profile) {
+        var payload = builder.fixtures.payloadFor(profile.id, project);
+        var planned = engine.overlayRenderer.plan(template, payload, fonts);
+        var fields = {};
+        Object.keys(planned.byField).forEach(function (fieldId) {
+          var result = planned.byField[fieldId];
+          fields[fieldId] = {
+            status: classify(result),
+            size: result.drawn ? result.layout.size : null,
+            lines: result.drawn ? result.layout.lines.length : 0,
+            regions: result.drawn ? result.layout.usedRegions.length : 0,
+            formatter: result.drawn ? result.formatter : null,
+            valueLength: result.drawn ? String(result.value).length
+              : (result.diagnostics ? result.diagnostics.valueLength : 0),
+            reason: result.diagnostics ? result.diagnostics.reason : null,
+            message: result.diagnostics ? engine.overlayRenderer.overflowMessage(result.diagnostics) : null
+          };
+        });
+        return { profileId: profile.id, fields: fields, overflows: planned.overflows.length };
+      });
+      return { documentId: template.id, title: template.title || template.id, profiles: profiles };
+    });
+  }
+
+  function run(only) {
+    var ids = Object.keys(engine.fieldMaps).filter(function (id) {
+      return !only || id === only;
+    }).sort();
+    var report = { documents: [] };
+    var chain = Promise.resolve();
+    ids.forEach(function (id) {
+      chain = chain.then(function () {
+        statusEl.textContent = 'auditing ' + id + '…';
+        return auditTemplate(engine.fieldMaps[id]).then(function (entry) {
+          report.documents.push(entry);
+        });
+      });
+    });
+    return chain.then(function () {
+      var counts = {};
+      var overflowing = [];
+      report.documents.forEach(function (doc) {
+        doc.profiles.forEach(function (profile) {
+          Object.keys(profile.fields).forEach(function (fieldId) {
+            var entry = profile.fields[fieldId];
+            counts[entry.status] = (counts[entry.status] || 0) + 1;
+            if (entry.status === 'overflow') {
+              overflowing.push({
+                documentId: doc.documentId, fieldId: fieldId,
+                profileId: profile.profileId, message: entry.message
+              });
+            }
+          });
+        });
+      });
+      report.counts = counts;
+      report.overflowing = overflowing;
+
+      var rows = Object.keys(counts).sort().map(function (key) {
+        return '<tr><td>' + key + '</td><td>' + counts[key] + '</td></tr>';
+      }).join('');
+      summaryEl.innerHTML = '<table><tr><th>status</th><th>field × profile</th></tr>' +
+        rows + '</table>';
+      statusEl.textContent = report.documents.length + ' documents audited, ' +
+        overflowing.length + ' overflowing field/profile combinations';
+      statusEl.className = overflowing.length ? 'err' : 'ok';
+      outEl.textContent = 'JSON_START' + JSON.stringify(report) + 'JSON_END';
+      document.title = 'DONE';
+    }).catch(function (error) {
+      statusEl.textContent = 'audit failed: ' + (error && error.message || error);
+      statusEl.className = 'err';
+      outEl.textContent = 'JSON_START' + JSON.stringify({
+        harnessError: String(error && error.message || error)
+      }) + 'JSON_END';
+      document.title = 'FAILED';
+      console.error(error);
+    });
+  }
+
+  window.CRMMapAudit = { run: run };
+
+  var params = new URLSearchParams(location.search);
+  if (params.get('auto')) run(params.get('doc') || null);
+}());
+</script>
+</body>
+</html>

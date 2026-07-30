@@ -28,8 +28,19 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.96;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 11;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    acknowledgementName: 12,         // 65.51 pt of room
+    applicantFullName: 12,           // 33.01 pt of room
+  };
 
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
@@ -41,13 +52,20 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
       optional: !!o.optional,
       format: o.format,
-      fallbacks: o.fallbacks
+      fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
     };
   }
 

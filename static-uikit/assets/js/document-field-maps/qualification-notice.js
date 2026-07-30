@@ -29,8 +29,12 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.96;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
 
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
@@ -50,8 +54,16 @@
       multiline: !!o.multiline,
       maxLines: o.maxLines,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }
@@ -93,7 +105,7 @@
         required: true
       }),
       text('recipientAddress', 'field.client-postal-address', 407.7, 200.42, 117.9, {
-        required: true, multiline: true, maxLines: 2, lineHeight: 10.5
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 21.0
       }),
 
       // "ООО «Инвестика» настоящим уведомляет, что ______" — the printed text

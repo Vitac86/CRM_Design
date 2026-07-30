@@ -13,8 +13,12 @@
 (function (global) {
   'use strict';
 
-  var BODY = 11.04;
-  var MIN = 7.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
 
   var TEMPLATE = {
     id: 'client-notifications',
@@ -82,7 +86,7 @@
         id: 'signatureName',
         source: 'field.clientFullName', format: 'initials', fallbacks: ['surname'],
         page: 9, left: 55.22, baselineTop: 498.14, width: 101.40,
-        font: 'legalSerif', fontSize: 10.0, minFontSize: 6.0,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center', required: true
       },
       {

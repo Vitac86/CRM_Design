@@ -105,27 +105,75 @@
     return { subject: subject, fields: fields, extraValues: {}, checks: {} };
   }
 
+  // Synthesise a value for a source path the profile does not carry explicitly.
+  //
+  // The point of the long profiles is to find real layout defects, so a value
+  // must stay plausible for the slot it lands in: a "long" ОКПО is still eight
+  // digits and a "long" expiry is still a date. Feeding a 75-character sentence
+  // into a code cell only manufactures overflow that no manager will ever hit
+  // and hides the fields that genuinely need more room.
   function defaultValue(path, profile, field) {
     var key = path.split('.').slice(1).join('.');
     var long = profile.length === 'long';
     var short = profile.length === 'short';
     var en = profile.language === 'en';
+
+    // ── Fixed-shape values: never lengthened ────────────────────────────────
+    if (/expiry|expire|validity|valid-until|deadline/i.test(key)) return '2027-12-31';
     if (/date/i.test(key)) return '2026-07-29';
-    if (/email/i.test(key)) return long ? 'international.client.notifications.department@example.test' : 'client@example.test';
-    if (/phone/i.test(key)) return en ? '+44 20 7946 0958' : '+7 (903) 215-44-89';
+    if (/okpo/i.test(key)) return '12345678';
+    if (/okved/i.test(key)) return '64.99';
+    if (/okato|oktmo/i.test(key)) return '45286585000';
+    if (/\bbik\b|\bbic\b/i.test(key)) return '044525225';
+    if (/snils/i.test(key)) return '123-456-789 01';
+    if (/kpp/i.test(key)) return '770101001';
+    if (/inn|tax-?(id|identifier|number)/i.test(key)) return '772201234567';
+    if (/ogrn/i.test(key)) return '1217700011256';
     if (/passport.*series|series/i.test(key)) return en ? 'AB' : '4510';
     if (/passport.*number/i.test(key)) return en ? 'AB-7789' : '234567';
+    if (/percent|share-?of|percentage/i.test(key)) return '100 %';
+    if (/tariff/i.test(key)) return long ? 'Стандартный' : 'Базовый';
+    if (/website|site|url/i.test(key)) return 'https://example.test';
+    if (/policy|polis/i.test(key)) return '1234 5678 9012 3456';
+    if (/lots|quantity/i.test(key)) return long ? '1 000 000' : '150';
+    if (/rate|price|nkd/i.test(key)) return long ? '1 234,5678' : '98,45';
+    if (/amount|capital|income|turnover|assets|sum|value|premium|strike/i.test(key)) {
+      return long ? '9 999 999 999,99' : '150 000,00';
+    }
+    if (/period|settlement/i.test(key)) return long ? 'Т+2 (расчёты на второй рабочий день)' : 'Т+2';
+
+    // ── Identifiers: long but still identifier-shaped ───────────────────────
+    if (/registration-number|identifier/i.test(key)) {
+      return long ? 'REG-GB-2026-00000000007789' : '1217700011256';
+    }
+    if (/account|portfolio|contract|agreement|number|code/i.test(key)) {
+      return long ? 'BR-2026/00444-INTL-00000017' : 'AB-7789';
+    }
+
+    // ── Free text: genuinely long in the long profiles ──────────────────────
+    if (/email/i.test(key)) {
+      return long ? 'international.client.notifications.department@example.test'
+        : 'client@example.test';
+    }
+    if (/phone/i.test(key)) return en ? '+44 20 7946 0958' : '+7 (903) 215-44-89';
     if (/citizenship/i.test(key)) return en ? 'United Kingdom' : 'Россия';
-    if (/authority|issued|issuer/i.test(key)) return en ? 'United Kingdom Passport and Immigration Authority' : 'ГУ МВД России по г. Москве';
-    if (/amount|capital|price|quantity|income|turnover|assets|sum|value/i.test(key)) return long ? '999999999999999999.99' : '8';
-    if (/inn/i.test(key)) return '772201234567';
-    if (/kpp/i.test(key)) return '770101001';
-    if (/ogrn|registration-number|identifier/i.test(key)) return long ? 'REG-GB-2026-0000000000000000007789' : '1217700011256';
-    if (/account|portfolio|contract|agreement|number|code/i.test(key)) return long ? 'AB-7789-2026-00000000000000000000017' : 'AB-7789';
+    if (/country|residence/i.test(key)) {
+      return en ? 'United Kingdom of Great Britain and Northern Ireland'
+        : 'Российская Федерация';
+    }
+    if (/authority|issued|issuer/i.test(key)) {
+      return en
+        ? (long ? 'Department of Immigration and Citizenship Services of the United Kingdom' : 'United Kingdom Passport Office')
+        : (long ? 'Отделение по вопросам миграции ОМВД России по Пресненскому району города Москвы' : 'ГУ МВД России по г. Москве');
+    }
+    if (/counterparty|broker|bank-name/i.test(key)) {
+      return en ? 'North Star Investments Ltd.' : 'АО «Инвестиционный Банк»';
+    }
+    if (/kind|type/i.test(key)) return en ? 'Purchase' : 'Покупка';
     if (/address|place/i.test(key)) return en
       ? '27 King George the Fifth Avenue, London, United Kingdom, SW1A 2AA'
       : '125009, Россия, г. Москва, ул. Тверская, д. 14, кв. 38';
-    if (/name|fio|client|representative|director/i.test(key)) return en
+    if (/name|fio|client|representative|director|position/i.test(key)) return en
       ? (long ? "Maximilian-Alexander O'Connor-Smith-Jones" : "Patrick O'Connor-Smith")
       : (long ? 'Александров-Смирнов Максим Константинович' : (short ? 'Иванов И.И.' : 'Соколов Алексей Михайлович'));
     if (field && field.equals != null) return Array.isArray(field.equals) ? field.equals[0] : field.equals;

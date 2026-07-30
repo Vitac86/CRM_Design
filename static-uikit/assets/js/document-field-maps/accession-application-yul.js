@@ -13,9 +13,16 @@
 (function (global) {
   'use strict';
 
-  var BODY = 8.52;
-  var TABLE = 9;
-  var MIN = 6;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var CHECK_GLYPH = 8.52;  // printed ☐ box — geometry, not dynamic text
+  var SIZE_10_5 = 10.5;      // measured room: 10.64 pt
+  var SIZE_10 = 10;        // measured room: 10.08 pt
+  var SIZE_9 = 9;         // measured room: 9.43, 8.98, 8.98, 7.60 pt
 
   function check(id, source, equals, page, left, baselineTop) {
     return {
@@ -26,7 +33,7 @@
       page: page,
       left: left,
       baselineTop: baselineTop,
-      glyphSize: BODY
+      glyphSize: CHECK_GLYPH
     };
   }
 
@@ -63,14 +70,14 @@
         id: 'companyOgrn',
         source: 'field.client-ogrn',
         page: 0, left: 224.0, baselineTop: 131.18, width: 305.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'companyLegalAddress',
         source: 'field.client-legal-address',
         page: 0, left: 84.5, baselineTop: 150.74, width: 444.5,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
         align: 'left', required: true
       },
       {
@@ -116,7 +123,7 @@
         source: 'subject.email', optional: true,
         showWhen: { source: 'extra.report-delivery', equals: 'email' },
         page: 0, left: 155.4, baselineTop: 458.35, width: 93.4,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10, minFontSize: MIN,
         align: 'left'
       },
 
@@ -130,21 +137,21 @@
         id: 'tariffStock',
         source: 'extra.tariff-stock', optional: true,
         page: 0, left: 471.5, baselineTop: 533.5, width: 71.5,
-        font: 'legalSerif', fontSize: 7.5, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center'
       },
       {
         id: 'tariffDerivatives',
         source: 'extra.tariff-derivatives', optional: true,
         page: 0, left: 471.5, baselineTop: 559.0, width: 71.5,
-        font: 'legalSerif', fontSize: 7.0, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
         align: 'center'
       },
       {
         id: 'tariffCurrency',
         source: 'extra.tariff-currency', optional: true,
         page: 0, left: 471.5, baselineTop: 593.0, width: 71.5,
-        font: 'legalSerif', fontSize: 7.5, minFontSize: MIN,
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'center'
       },
 
@@ -161,14 +168,14 @@
         id: 'clientPhone',
         source: 'subject.phone',
         page: 1, left: 102.0, baselineTop: 464.35, width: 191.5,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'clientEmail',
         source: 'subject.email',
         page: 1, left: 140.0, baselineTop: 476.23, width: 153.5,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
 

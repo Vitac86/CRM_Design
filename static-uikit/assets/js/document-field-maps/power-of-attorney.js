@@ -36,8 +36,12 @@
 (function (global) {
   'use strict';
 
-  var BODY = 12.0;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
 
   var UL_ONLY = { source: 'subject.kind', equals: 'company' };
   var FL_ONLY = { source: 'subject.kind', equals: 'individual' };
@@ -60,8 +64,16 @@
       multiline: !!o.multiline,
       maxLines: o.maxLines,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }
@@ -97,7 +109,7 @@
       // 27.48 pt for a 10–13 digit OGRN/INN: a 10-digit INN needs 5.5 pt, so
       // this one slot is allowed below the usual 6 pt floor rather than failing.
       text('ulInn', 'subject.inn', 0, 403.5, 156.86, 27.2, {
-        required: true, align: 'center', minFontSize: 4.8, showWhen: UL_ONLY
+        required: true, align: 'center', showWhen: UL_ONLY
       }),
 
       // «в лице ______, действующего на основании ______»
@@ -149,7 +161,7 @@
         required: true, fallbacks: ['initials', 'surname'], showWhen: FL_ONLY
       }),
       text('flPrincipalCitizenship', 'subject.citizenship', 2, 488.0, 125.78, 18.5, {
-        required: true, align: 'center', minFontSize: 5.5, showWhen: FL_ONLY
+        required: true, align: 'center', showWhen: FL_ONLY
       }),
       text('flPrincipalPassport', 'field.passportSeriesNumber', 2, 81.0, 143.90, 50.0, {
         required: true, showWhen: FL_ONLY
@@ -160,16 +172,16 @@
       // needs three wrapped lines even at a reduced floor. The next printed
       // line is 18.1 pt below, so three lines at 6.2 pt just fit above it.
       text('flPrincipalIssuedBy', 'field.client-passport-issued-by', 2, 189.5, 143.90, 50.2, {
-        required: true, multiline: true, maxLines: 3, lineHeight: 5.8,
-        fontSize: 5.5, minFontSize: 4.5, showWhen: FL_ONLY
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 17.4,
+        showWhen: FL_ONLY
       }),
       text('flPrincipalIssueDate', 'field.client-passport-issue-date', 2, 320.5, 143.90, 63.0, {
         required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY
       }),
       // «(регистрации):» ends its line; the rule sits on the line below.
       text('flPrincipalAddress', 'field.client-registration-address', 2, 71.5, 180.14, 126.0, {
-        required: true, multiline: true, maxLines: 2, lineHeight: 9.0,
-        fontSize: 8.5, showWhen: FL_ONLY
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 18.0,
+        showWhen: FL_ONLY
       }),
 
       // «уполномочиваю гр. ____ ,далее» reserves 47 pt and the sentence has no
@@ -177,7 +189,7 @@
       // than wrapping a full name into the printed text below it.
       text('flAttorneyName', 'extra.extra-attorney-name', 2, 436.0, 180.14, 47.0, {
         required: true, format: 'initials', fallbacks: ['surname'],
-        minFontSize: 5.2, showWhen: FL_ONLY
+        showWhen: FL_ONLY
       }),
       text('flAttorneyCitizenship', 'extra.extra-attorney-citizenship',
            2, 243.0, 216.38, 28.0, { required: true, align: 'center', showWhen: FL_ONLY }),
@@ -186,15 +198,15 @@
       text('flAttorneyNumber', 'extra.extra-attorney-passport-number',
            2, 338.0, 216.38, 65.0, { required: true, showWhen: FL_ONLY }),
       text('flAttorneyIssuedBy', 'extra.extra-attorney-issued-by', 2, 461.0, 216.38, 84.0, {
-        required: true, multiline: true, maxLines: 2, lineHeight: 9.0,
-        fontSize: 8.5, showWhen: FL_ONLY
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 18.0,
+        showWhen: FL_ONLY
       }),
       text('flAttorneyIssueDate', 'extra.extra-attorney-issue-date', 2, 125.5, 234.50, 35.5, {
-        required: true, format: 'dateRu', align: 'center', minFontSize: 5.5, showWhen: FL_ONLY
+        required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY
       }),
       text('flAttorneyAddress', 'extra.extra-attorney-address', 2, 354.0, 234.50, 126.0, {
-        required: true, multiline: true, maxLines: 2, lineHeight: 9.0,
-        fontSize: 8.5, showWhen: FL_ONLY
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 18.0,
+        showWhen: FL_ONLY
       }),
 
       // Page 4 «Доверитель ____ / ____ /» — подпись rule stays empty.

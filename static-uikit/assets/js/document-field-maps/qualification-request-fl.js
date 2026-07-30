@@ -15,8 +15,22 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.96;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var CHECK_GLYPH = 9.96;  // printed ☐ box — geometry, not dynamic text
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    assetsValueMillions: 10.5,       // 10.51 pt of room
+    contractDate: 11,                // 11.46 pt of room
+    quarterlyTransactionsValueMillions: 10.5, // 10.52 pt of room
+    securitiesValueMillions: 10.5,   // 10.65 pt of room
+  };
 
   function text(id, source, page, left, baselineTop, width, extra) {
     var field = {
@@ -28,7 +42,7 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: BODY,
+      fontSize: ROW_SIZE[id] || BODY,
       minFontSize: MIN,
       align: 'left'
     };
@@ -45,16 +59,18 @@
       page: page,
       left: left,
       baselineTop: baselineTop,
-      glyphSize: BODY
+      glyphSize: CHECK_GLYPH
     };
   }
 
-  function evidence(id, source, page, baselineTop, maxLines, maxHeight) {
+  // The evidence blocks are blank boxes of a measured height, so their line
+  // capacity follows the font size: at 12 pt the box holds fewer, larger lines,
+  // and stepping down really does buy another line inside the same box.
+  function evidence(id, source, page, baselineTop, maxHeight) {
     return text(id, source, page, 319.00, baselineTop, 232.00, {
       optional: true,
       multiline: true,
-      lineHeight: 9.0,
-      maxLines: maxLines,
+      lineHeightRatio: 0.95,
       maxHeight: maxHeight
     });
   }
@@ -96,7 +112,7 @@
       text('securitiesValueMillions', 'extra.extra-securities-value-millions', 0,
         42.36, 398.57, 69.98, { optional: true, align: 'center' }),
       evidence('securitiesEvidence', 'extra.extra-supporting-docs-securities-holdings',
-        0, 345.00, 7, 63.00),
+        0, 345.00, 63.00),
 
       // Criterion 2 — one of the two printed work-experience bases.
       check('workExperienceQualifiedTwoYears', 'extra.extra-work-experience-basis',
@@ -104,18 +120,18 @@
       check('workExperienceOtherThreeYears', 'extra.extra-work-experience-basis',
         'other-three-years', 0, 42.36, 532.87),
       evidence('workExperienceEvidence', 'extra.extra-supporting-docs-work-experience',
-        0, 434.00, 12, 108.00),
+        0, 434.00, 108.00),
 
       // Criterion 3 — position requiring Bank of Russia approval.
       evidence('bankApprovedPositionEvidence',
-        'extra.extra-supporting-docs-bank-approved-position', 0, 570.00, 3, 27.00),
+        'extra.extra-supporting-docs-bank-approved-position', 0, 570.00, 27.00),
 
       // Criterion 4 — quarterly transaction value and matching evidence.
       text('quarterlyTransactionsValueMillions',
         'extra.extra-quarterly-transactions-value-millions', 0,
         258.65, 665.26, 26.18, { optional: true, align: 'center' }),
       evidence('quarterlyTransactionsEvidence',
-        'extra.extra-supporting-docs-quarterly-transactions', 0, 624.00, 10, 90.00),
+        'extra.extra-supporting-docs-quarterly-transactions', 0, 624.00, 90.00),
 
       // Page 2, criterion 5 — asset value, independent printed asset-type marks,
       // and the evidence cell that continues the table from page 1.
@@ -128,7 +144,7 @@
       check('assetsSecurities', 'check.qualification-assets-securities',
         true, 1, 42.24, 193.46),
       evidence('assetsEvidence', 'extra.extra-supporting-docs-assets',
-        1, 60.00, 16, 144.00),
+        1, 60.00, 144.00),
 
       // Criterion 6 — the source says “или”, so this is one select value.
       check('educationHigher', 'extra.extra-education-basis',
@@ -136,11 +152,11 @@
       check('educationCertificate', 'extra.extra-education-basis',
         'certificate', 1, 42.36, 335.93),
       evidence('educationEvidence', 'extra.extra-supporting-docs-education',
-        1, 237.00, 12, 108.00),
+        1, 237.00, 108.00),
 
       // Criterion 7 — recognition recorded by another entity.
       evidence('qualifiedRegistryEvidence',
-        'extra.extra-supporting-docs-qualified-registry', 1, 371.50, 4, 36.00),
+        'extra.extra-supporting-docs-qualified-registry', 1, 371.50, 36.00),
 
       // Page 2 — mutually exclusive delivery method and applicant signature.
       check('deliveryByAddress', 'extra.extra-delivery-method',

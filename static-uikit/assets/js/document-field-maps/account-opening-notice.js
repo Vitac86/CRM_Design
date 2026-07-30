@@ -45,10 +45,23 @@
 (function (global) {
   'use strict';
 
-  var BODY = 11.04;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
   var VALUE_LEFT = 327.05;
   var VALUE_WIDTH = 237.70;
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    brokerRepresentative: 11.5,      // 11.60 pt of room
+    paymentPurposeCurrency: 11,      // 11.47 pt of room
+    paymentPurposeDerivatives: 11,   // 11.47 pt of room
+    paymentPurposeStock: 11.5,       // 11.60 pt of room
+  };
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
@@ -60,7 +73,7 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
@@ -68,8 +81,16 @@
       multiline: !!o.multiline,
       maxLines: o.maxLines,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }

@@ -12,8 +12,16 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9;
-  var MIN = 6;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var CHECK_GLYPH = 9;  // printed ☐ box — geometry, not dynamic text
+  var SIZE_10_5 = 10.5;      // measured room: 10.91, 10.91 pt
+  var SIZE_10 = 10;        // measured room: 10.35 pt
+  var SIZE_9_5 = 9.5;       // measured room: 9.58 pt
 
   function check(id, source, baselineTop) {
     return {
@@ -23,7 +31,7 @@
       page: 0,
       left: 56.2,
       baselineTop: baselineTop,
-      glyphSize: BODY
+      glyphSize: CHECK_GLYPH
     };
   }
 
@@ -44,31 +52,31 @@
         id: 'clientName',
         source: 'field.client-full-name',
         page: 0, left: 252.0, baselineTop: 192.0, width: 289.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', multiline: true, lineHeight: 8.5,
-        maxHeight: 17, maxLines: 2, required: true
+        font: 'legalSerif', fontSize: SIZE_10, minFontSize: MIN,
+        align: 'left', multiline: true, lineHeightRatio: 0.95,
+        maxHeight: 17, required: true
       },
       {
         id: 'contractNumber',
         source: 'field.extra-contract-number', format: 'prefixNumber',
         page: 0, left: 252.0, baselineTop: 212.90, width: 175.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'contractDate',
         source: 'field.extra-contract-date', format: 'prefixFrom',
         page: 0, left: 432.0, baselineTop: 212.90, width: 109.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'accountPortfolio',
         source: 'field.extra-account-portfolio',
         page: 0, left: 252.0, baselineTop: 232.0, width: 289.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', multiline: true, lineHeight: 8.5,
-        maxHeight: 17, maxLines: 2, required: true
+        font: 'legalSerif', fontSize: SIZE_9_5, minFontSize: MIN,
+        align: 'left', multiline: true, lineHeightRatio: 0.95,
+        maxHeight: 17, required: true
       },
 
       check('refuseBrokerageServices', 'check.full-refusal-brokerage', 289.97),

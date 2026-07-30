@@ -22,9 +22,16 @@
 (function (global) {
   'use strict';
 
-  var BODY = 8.52;          // body text size measured in the template
-  var TABLE = 9;            // §16 contact table
-  var MIN = 6.0;            // never shrink below this — below it stops looking typed
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var CHECK_GLYPH = 8.52;  // printed ☐ box — geometry, not dynamic text
+  var SIZE_10_5 = 10.5;      // measured room: 10.64, 10.59 pt
+  var SIZE_9_5 = 9.5;       // measured room: 9.56 pt
+  var SIZE_9 = 9;         // measured room: 8.89, 8.89, 8.89 pt
 
   // Every checkbox glyph in this template is drawn at the body size.
   // (The source mixes MS-Gothic and Segoe UI Symbol for "☐"; both render the
@@ -38,7 +45,7 @@
       page: page,
       left: left,
       baselineTop: baselineTop,
-      glyphSize: BODY
+      glyphSize: CHECK_GLYPH
     };
   }
 
@@ -77,11 +84,44 @@
         page: 0, left: 475.3, baselineTop: 99.26, width: 46.7,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
       },
+      // ── Continuation lines for the identity paragraph ─────────────────────
+      // The paragraph is justified prose with fixed blanks, so a long issuing
+      // authority or address cannot simply take more of its own line. Below it
+      // the page is empty from 140.22 down to 159.95, where «1. Присоединяется»
+      // begins — 19.73 pt, which holds exactly two 9.5 pt lines:
+      //
+      //     140.22 ┄┄┄┄┄┄┄┄ top of the blank band
+      //     148.70  continuation of the registration address
+      //     157.70  continuation of the passport issuing authority
+      //     159.95 ┄┄┄┄┄┄┄┄ §1 heading
+      //
+      // Each is a real, reviewed line: a baseline plus a rule of the same
+      // 0.36 pt weight and the same 1.5 pt drop below the baseline as the
+      // underscore rules Word produced on this page, so the filled form reads
+      // as though the lines had been in the source document all along.
+      // `maxFontSize` records that this particular band cannot hold more than
+      // 9.5 pt — without it the engine would happily draw 12 pt text over the
+      // printed paragraph above.
+      //
+      // Band measured with tools/qa/measure_field_room.py --gaps; rule weight
+      // measured from a 1200 dpi rendering. See AUDIT_REPORT.md.
       {
         id: 'passportIssuedBy',
+        label: 'Кем выдан паспорт',
         source: 'field.passportIssuedBy',
         page: 0, left: 56.6, baselineTop: 118.82, width: 352.6,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left',
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 0, left: 56.6, baselineTop: 118.82, width: 352.6, maxLines: 1 },
+          {
+            page: 0, left: 56.6, baselineTop: 157.70, width: 501.0, maxLines: 1,
+            // The §1 heading starts at 159.95, so this rule is pulled a little
+            // closer to its baseline than the first one to keep clear air.
+            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.2
+          }
+        ]
       },
       // The printed date reads:  дата выдачи «___» _________г.
       // Measured glyph geometry of that line (tools/probe-pdf-coords.py):
@@ -93,10 +133,10 @@
       // followed by the four-digit year, the way these forms are filled in by
       // hand. Never a numeric MM.YYYY.
       //
-      // Every month name fits. Measured widths of "<month> 2008" at 8.52 pt
-      // range from 32.26 pt (мая) to 51.45 pt (сентября); shrink-to-fit keeps
-      // мая at the full 8.52 pt and puts the longest, сентября, at 6.25 pt —
-      // above the 6.0 pt floor — leaving a clear gap before "г.".
+      // Widths of "<month> 2008" range from 32.26 pt (мая) to 51.45 pt
+      // (сентября) at 8.52 pt, so at the 9 pt readability floor only the
+      // shortest month names still fit the 37.5 pt blank. The rest fall back to
+      // the numeric form below rather than being drawn at an unreadable size.
       {
         id: 'passportIssueDay',
         source: 'field.passportIssueDate', format: 'dateDay',
@@ -104,16 +144,34 @@
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
       },
       {
+        // A genitive month plus the year needs up to 51 pt at 8.52 pt and far
+        // more at the readable 9 pt floor, but the printed blank is 37.5 pt.
+        // «09.2018» is the same date, is unambiguous, and is an accepted way of
+        // completing this slot by hand — so it is the declared safe fallback
+        // rather than an error the manager cannot act on.
         id: 'passportIssueMonthYear',
         source: 'field.passportIssueDate', format: 'dateMonthYearGenitive',
+        fallbacks: ['dateMonthYearShort'],
         page: 0, left: 513.7, baselineTop: 118.82, width: 37.5,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
       },
+      // The address closes the identity sentence, so its continuation takes the
+      // first of the two reviewed lines — directly under the line it continues.
       {
         id: 'registrationAddress',
+        label: 'Адрес регистрации',
         source: 'field.registrationAddress',
         page: 0, left: 217.7, baselineTop: 138.38, width: 339.9,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left',
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 0, left: 217.7, baselineTop: 138.38, width: 339.9, maxLines: 1 },
+          {
+            page: 0, left: 56.6, baselineTop: 148.70, width: 501.0, maxLines: 1,
+            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
+          }
+        ]
       },
 
       // ── §1 Присоединение ──────────────────────────────────────────────────
@@ -145,7 +203,7 @@
         source: 'subject.email', optional: true,
         showWhen: { source: 'extra.report-delivery', equals: 'email' },
         page: 0, left: 149.4, baselineTop: 419.09, width: 93.4,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN, align: 'left'
       },
 
       // ── §4 Рынки и тарифные планы ─────────────────────────────────────────
@@ -158,19 +216,19 @@
         id: 'tariffStock',
         source: 'extra.tariff-stock', optional: true,
         page: 0, left: 506.8, baselineTop: 470.35, width: 50.8,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left'
       },
       {
         id: 'tariffDerivatives',
         source: 'extra.tariff-derivatives', optional: true,
         page: 0, left: 506.5, baselineTop: 511.15, width: 51.1,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left'
       },
       {
         id: 'tariffCurrency',
         source: 'extra.tariff-currency', optional: true,
         page: 0, left: 506.5, baselineTop: 531.19, width: 51.1,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left'
       },
 
       // ── §5 Соглашения ─────────────────────────────────────────────────────
@@ -193,13 +251,13 @@
         id: 'clientPhone',
         source: 'subject.phone',
         page: 1, left: 101.5, baselineTop: 700.9, width: 193.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9_5, minFontSize: MIN, align: 'left'
       },
       {
         id: 'clientEmail',
         source: 'subject.email',
         page: 1, left: 139.6, baselineTop: 712.78, width: 155.0,
-        font: 'legalSerif', fontSize: TABLE, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN, align: 'left'
       },
 
       // ── Page 2 — signature block ──────────────────────────────────────────
@@ -227,14 +285,32 @@
       // The long rule before the parentheses is where the client signs by hand
       // and is deliberately left empty. Only the printed name is drawn.
       {
-        // Only ~47 pt of rule between the parentheses — a full name does not
-        // fit and the printed convention here is "Фамилия И.О." anyway. A very
-        // long hyphenated surname falls back to the surname alone; if even that
-        // does not fit, generation fails loudly rather than clipping the name.
+        // Only 46.68 pt between the printed parentheses (measured: 400.28 to
+        // 446.96), which at the 9 pt readability floor holds about ten Cyrillic
+        // characters — the printed convention here is "Фамилия И.О." anyway.
+        //
+        // A long hyphenated surname needs more than that, and the area directly
+        // under the parentheses is blank down to the page margin («Подпись»
+        // ends at 764.06 and «М.П.» sits to the right, from x 453.34). One
+        // reviewed continuation line therefore sits under the parentheses, the
+        // same width and centred the same way, so the transcript continues
+        // inside the signature block instead of failing. The surname keeps its
+        // own hyphen as the break, so nothing is abbreviated or invented.
         id: 'signatureName',
+        label: 'Расшифровка подписи',
         source: 'field.clientFullName', format: 'initials', fallbacks: ['surname'],
         page: 1, left: 400.3, baselineTop: 752.38, width: 46.7,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center',
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 1, left: 400.3, baselineTop: 752.38, width: 46.7, maxLines: 1 },
+          {
+            page: 1, left: 400.3, baselineTop: 778.00, width: 46.7, maxLines: 1,
+            align: 'center', maxFontSize: 9.5,
+            generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
+          }
+        ]
       }
 
       // ── Page 3 — "Заполняется ООО «Инвестика»" ────────────────────────────

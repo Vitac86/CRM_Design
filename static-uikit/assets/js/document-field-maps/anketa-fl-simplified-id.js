@@ -25,10 +25,25 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.48;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 11;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
   var VALUE_LEFT = 329.1;
   var VALUE_WIDTH = 242.1;
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    idDocumentName: 10,              // 10.10 pt of room
+    idIssueDate: 9.5,                // 9.97 pt of room
+    idSeriesNumber: 10,              // 10.10 pt of room
+    otherInformation: 10,            // 10.10 pt of room
+    questionnaireDate: 12,           // 22.92 pt of room
+    signatureName: 12,               // 34.47 pt of room
+  };
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
@@ -40,7 +55,7 @@
       baselineTop: baselineTop,
       width: width,
       font: o.font || 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
@@ -49,16 +64,63 @@
       maxLines: o.maxLines,
       maxHeight: o.maxHeight,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }
 
   // A value typed into the right-hand column of the row whose printed label
   // sits on `baselineTop`, so the value lands on the label's own line.
+  // Height of each printed value box, measured from the committed
+  // template with tools/qa/measure_field_room.py. A cell may use as many
+  // lines as its own box holds at the chosen size — wrapping inside the
+  // row is what the form was designed for and always beats shrinking.
+  var CELL_BOX = {
+    bankAdditional: 24.8,
+    bankAddress: 26.4,
+    bankBic: 26.3,
+    bankCorrespondentAccount: 26.4,
+    bankInn: 26.3,
+    bankName: 26.4,
+    bankSettlementAccount: 13.0,
+    birthDate: 13.6,
+    clientFullName: 13.8,
+    email: 13.7,
+    idDepartmentCode: 13.7,
+    idDocumentName: 13.7,
+    idIssueDate: 13.7,
+    idIssuedBy: 25.3,
+    idSeriesNumber: 13.7,
+    inn: 13.7,
+    kinshipDegree: 36.8,
+    landlinePhone: 13.6,
+    medicalPolicy: 25.3,
+    mobilePhone: 13.7,
+    otherInformation: 22.8,
+    pdlDetails: 97.1,
+    questionnaireDate: 44.7,
+    registrationAddress: 49.0,
+    signatureName: 64.2,
+    snils: 13.7,
+  };
+
   function cell(id, source, baselineTop, options) {
-    return text(id, source, 0, VALUE_LEFT, baselineTop, VALUE_WIDTH, options);
+    var o = options || {};
+    if (CELL_BOX[id]) {
+      o.multiline = o.multiline !== false;
+      o.maxHeight = o.maxHeight || CELL_BOX[id];
+      o.lineHeightRatio = o.lineHeightRatio || 0.95;
+    }
+    return text(id, source, 0, VALUE_LEFT, baselineTop, VALUE_WIDTH, o);
   }
 
   function check(id, source, equals, page, left, baselineTop) {

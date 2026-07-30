@@ -36,8 +36,39 @@
 (function (global) {
   'use strict';
 
-  var BODY = 10.0;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 10;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    counterparty: 12,                // 23.16 pt of room
+    fxAmount: 12,                    // 15.53 pt of room
+    fxInstrument: 9,                 // 9.43 pt of room
+    moveAmountFigures: 12,           // 14.05 pt of room
+    moveAmountWords: 12,             // 14.05 pt of room
+    moveClientName: 10.5,            // 10.91 pt of room
+    moveContractNumberDate: 10.5,    // 10.91 pt of room
+    moveOrderNumberDate: 10.5,       // 10.54 pt of room
+    orderKindConditionalText: 12,    // 21.08 pt of room
+    orderValidity: 12,               // 23.03 pt of room
+    otherInformation: 12,            // 23.03 pt of room
+    payoutAmount: 11,                // 11.19 pt of room
+    payoutAmountWords: 12,           // 14.61 pt of room
+    payoutClientName: 10.5,          // 10.91 pt of room
+    payoutContractNumberDate: 10.5,  // 10.91 pt of room
+    payoutOrderNumberDate: 10.5,     // 10.67 pt of room
+    settlementPeriod: 12,            // 23.05 pt of room
+    tradeAmount: 12,                 // 16.18 pt of room
+    tradeClientName: 10.5,           // 10.91 pt of room
+    tradeContractNumberDate: 10.5,   // 10.91 pt of room
+    tradeKindOtherText: 12,          // 24.51 pt of room
+    tradeOrderNumberDate: 12,        // 23.04 pt of room
+  };
 
   // «Тип поручения» — one of the three forms in the file.
   var TRADE = { source: 'extra.extra-order-type', equals: 'trade' };
@@ -54,7 +85,7 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
@@ -62,8 +93,16 @@
       multiline: !!o.multiline,
       maxLines: o.maxLines,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }
@@ -212,7 +251,7 @@
           showWhen: MOVE, align: 'center'
         }),
         text('moveAmountWords', 'extra.extra-move-amount-words', 2, 252.0, 433.63, 112.0, {
-          showWhen: MOVE, align: 'center', fontSize: 8.5, minFontSize: 5.5
+          showWhen: MOVE, align: 'center'
         }),
         check('moveCurRub', 'extra.extra-move-currency', 'RUB', 2, 371.95, 433.63, MOVE),
         check('moveCurUsd', 'extra.extra-move-currency', 'USD', 2, 404.62, 433.63, MOVE),
@@ -241,7 +280,7 @@
           showWhen: { source: 'extra.extra-payout-amount-mode', equals: 'amount' }
         }),
         text('payoutAmountWords', 'extra.extra-payout-amount-words', 3, 268.0, 273.29, 130.0, {
-          align: 'center', fontSize: 8.5, minFontSize: 5.5,
+          align: 'center',
           showWhen: { source: 'extra.extra-payout-amount-mode', equals: 'amount' }
         }),
 

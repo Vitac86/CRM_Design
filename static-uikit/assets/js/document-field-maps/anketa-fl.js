@@ -16,10 +16,26 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.48;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 11;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
   var VALUE_LEFT = 324.4;
   var VALUE_WIDTH = 237.0;
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    citizenshipCountries: 12,        // 25.62 pt of room
+    financialGoalOtherDetails: 11.5, // 11.98 pt of room
+    fullName: 10.5,                  // 10.75 pt of room
+    purposeOtherDetails: 11.5,       // 11.85 pt of room
+    questionnaireDate: 12,           // 27.07 pt of room
+    signaturePrintedName: 12,        // 34.48 pt of room
+    taxResidencyCountries: 12,       // 25.59 pt of room
+  };
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
@@ -31,7 +47,7 @@
       baselineTop: baselineTop,
       width: width,
       font: o.font || 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
@@ -40,19 +56,30 @@
       maxLines: o.maxLines,
       maxHeight: o.maxHeight,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
   }
 
+  // A value cell is a printed box of a measured height, not a single rule, so
+  // every cell may use as many lines as its own box holds at the chosen size.
+  // Wrapping inside the cell is what the form was designed for and is always
+  // preferable to shrinking the text: a long address or issuing authority now
+  // runs onto the second line of its own row instead of being squeezed.
   function cell(id, source, page, top, bottom, options) {
     var o = options || {};
-    o.multiline = !!o.multiline;
-    if (o.multiline) {
-      o.maxHeight = o.maxHeight || (bottom - top - 2.0);
-      o.lineHeight = o.lineHeight || 10.8;
-    }
+    o.multiline = o.multiline !== false;
+    o.maxHeight = o.maxHeight || (bottom - top - 2.0);
+    o.lineHeightRatio = o.lineHeightRatio || 0.95;
     return text(id, source, page, VALUE_LEFT, top + 10.3, VALUE_WIDTH, o);
   }
 
