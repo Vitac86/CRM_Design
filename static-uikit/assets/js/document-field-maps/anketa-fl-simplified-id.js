@@ -70,6 +70,7 @@
       // Continuation regions and print-override permission are part of the
       // production schema; the helper must not drop them.
       flowRegions: o.flowRegions,
+      expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,

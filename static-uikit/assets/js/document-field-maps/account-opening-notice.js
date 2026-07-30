@@ -87,6 +87,7 @@
       // Continuation regions and print-override permission are part of the
       // production schema; the helper must not drop them.
       flowRegions: o.flowRegions,
+      expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
@@ -125,7 +126,19 @@
            0, 43.0, 139.46, 398.0, { required: true }),
 
       // ── 1. Информация о клиенте (from the subject card) ──────────────────
-      cell('clientName', 'field.client-full-name', 226.82, { required: true }),
+      cell('clientName', 'field.client-full-name', 226.82, {
+      overflowStrategy: 'expand-layout',
+      expansion: {
+        page: 0, insertionTop: 279.65,
+        rowHeight: 14, maxExtraRows: 2,
+        shiftFromTop: 279.65, shiftToTop: 807.44,
+        bottomReserve: 32.48,
+        lineStyle: 'underline', reviewStatus: 'approved',
+        line: {
+          left: 36.24, width: 531.24,
+          baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+        }
+      }, required: true }),
       // The label is "ИНН (для юридических лиц) / Номер документа,
       // удостоверяющего личность (для физических лиц)", which is exactly what
       // the normalised client-id-or-inn value already holds for each kind.

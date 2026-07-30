@@ -63,6 +63,7 @@
       // Continuation regions and print-override permission are part of the
       // production schema; the helper must not drop them.
       flowRegions: o.flowRegions,
+      expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
@@ -279,7 +280,34 @@
       cell('licensedActivities', 'extra.licensed-activities', 2, 211.70, 229.10, { optional: true }),
 
       cell('bankName', 'extra.bank-name', 2, 254.42, 271.85, { optional: true }),
-      cell('bankAddress', 'extra.bank-address', 2, 271.85, 289.25, { optional: true }),
+      cell('bankAddress', 'extra.bank-address', 2, 271.85, 289.25, {
+        // A long foreign bank address does not fit this 222.9 pt cell at a
+        // readable size. The анкета is a table, so the Word-like answer is a
+        // real blank row: the rows below move down and a new row is drawn with
+        // the same borders, column boundary and 0.48 pt rule weight as the row
+        // above it. Geometry measured from the printed table on page 3
+        // (row 272.09-289.01, column boundary 326.11, outer rules 63.74/560.62).
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          // 289.0 is the one clean cut here: the row's own vertical rules end
+          // at 289.01 and its bottom border sits just under them, so inserting
+          // above the border lets that border travel down and close the new
+          // row. The inserted row therefore needs only its verticals — they
+          // continue exactly where the printed ones stop, which is what a row
+          // inserted in Word looks like.
+          page: 2, insertionTop: 289.0,
+          rowHeight: 16.92, maxExtraRows: 2,
+          shiftFromTop: 289.0, shiftToTop: 838.0,
+          bottomReserve: 70.9,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.74, 64.7, 84.62, 85.58, 326.11, 559.66, 560.62],
+          line: {
+            left: 331.5, width: 222.9,
+            baselineOffset: 10.06, ruleOffset: 16.92, ruleThickness: 0.48
+          }
+        }, optional: true }),
       cell('bankInn', 'extra.bank-inn', 2, 289.25, 306.77, { optional: true }),
       cell('bankBicSwift', 'extra.bank-bic-swift', 2, 306.77, 324.17, { optional: true }),
       cell('bankCorrespondentAccount', 'extra.bank-correspondent-account', 2, 324.17, 341.57, { optional: true }),

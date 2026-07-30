@@ -76,6 +76,18 @@
 
       // "Настоящим ________, ________ (ФИО, ИНН), далее — Клиент..."
       text('clientFullName', 'subject.displayName', 139.80, 225.98, 124.90, {
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 240.25,
+          rowHeight: 14, maxExtraRows: 2,
+          shiftFromTop: 240.25, shiftToTop: 508.09,
+          bottomReserve: 331.83,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 85.1, width: 472.49,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
+          }
+        },
         required: true
       }),
       text('clientInn', 'subject.inn', 272.80, 225.98, 69.90, {

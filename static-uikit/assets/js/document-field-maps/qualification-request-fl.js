@@ -129,7 +129,19 @@
       // Criterion 4 — quarterly transaction value and matching evidence.
       text('quarterlyTransactionsValueMillions',
         'extra.extra-quarterly-transactions-value-millions', 0,
-        258.65, 665.26, 26.18, { optional: true, align: 'center' }),
+        258.65, 665.26, 26.18, {
+      overflowStrategy: 'expand-layout',
+      expansion: {
+        page: 0, insertionTop: 679.53,
+        rowHeight: 14, maxExtraRows: 1,
+        shiftFromTop: 679.53, shiftToTop: 726.18,
+        bottomReserve: 113.86,
+        lineStyle: 'underline', reviewStatus: 'approved',
+        line: {
+          left: 36.84, width: 518.88,
+          baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+        }
+      }, optional: true, align: 'center' }),
       evidence('quarterlyTransactionsEvidence',
         'extra.extra-supporting-docs-quarterly-transactions', 0, 624.00, 90.00),
 

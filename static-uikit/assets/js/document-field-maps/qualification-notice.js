@@ -60,6 +60,7 @@
       // Continuation regions and print-override permission are part of the
       // production schema; the helper must not drop them.
       flowRegions: o.flowRegions,
+      expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
@@ -101,8 +102,29 @@
       // No `initials` fallback here: this slot holds a legal entity as often as
       // a person, and "АО «Восток Майнинг Системс»" initials-ised becomes the
       // nonsense "АО «.М.С.". Shrink-to-fit handles the width instead.
+      // «Кому:______» — the printed blank ends at 533.6, leaving 124.9 pt after
+      // the label. A full legal company name needs a continuation row, which
+      // the header block has room for: «Адрес:» and everything below it move
+      // down together.
       text('recipientName', 'field.client-full-name', 403.5, 177.02, 124.9, {
-        required: true
+        required: true,
+        label: 'Получатель уведомления',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0,
+          insertionTop: 181.20,
+          rowHeight: 14,
+          maxExtraRows: 2,
+          shiftFromTop: 181.20,
+          shiftToTop: 830.0,
+          bottomReserve: 250.0,
+          lineStyle: 'underline',
+          reviewStatus: 'approved',
+          line: {
+            left: 120.0, width: 413.6,
+            baselineOffset: 10.5, ruleOffset: 12.4, ruleThickness: 0.48
+          }
+        }
       }),
       text('recipientAddress', 'field.client-postal-address', 407.7, 200.42, 117.9, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 21.0
@@ -110,8 +132,34 @@
 
       // "ООО «Инвестика» настоящим уведомляет, что ______" — the printed text
       // ends at 299.54 and the rule runs 297.05 +237.53.
+      // «ООО «Инвестика» настоящим уведомляет, что ____» — the printed lead-in
+      // ends at 299.5 and the blank runs to the right margin, 234 pt. A full
+      // legal company name does not fit that at a readable size.
+      //
+      // The line below it is only the caption «(Ф.И.О./наименование
+      // организации)», and the page has 287 pt of unused space at the foot, so
+      // the document can simply grow a row the way it would have in Word: the
+      // caption and everything under it move down and the name continues on a
+      // real ruled line across the full text measure.
       text('clientName', 'field.client-full-name', 300.0, 292.49, 234.0, {
-        required: true
+        required: true,
+        label: 'Ф.И.О. / наименование организации',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0,
+          insertionTop: 297.60,      // just under the printed line's descenders
+          rowHeight: 14,
+          maxExtraRows: 2,
+          shiftFromTop: 297.60,
+          shiftToTop: 830.0,
+          bottomReserve: 250.0,      // measured: content ends at 554.34
+          lineStyle: 'underline',
+          reviewStatus: 'approved',
+          line: {
+            left: 99.3, width: 435.7,
+            baselineOffset: 10.5, ruleOffset: 12.4, ruleThickness: 0.48
+          }
+        }
       }),
 
       // The recognition date sits on the 141.62 pt rule captioned "(дата)".
@@ -135,6 +183,18 @@
         showWhen: { source: 'subject.kind', equals: 'individual' }
       }),
       text('registerEntryOrgName', 'field.client-full-name', 232.0, 472.03, 89.0, {
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 486.3,
+          rowHeight: 14, maxExtraRows: 2,
+          shiftFromTop: 486.3, shiftToTop: 556.34,
+          bottomReserve: 283.58,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 63.8, width: 477.47,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
+          }
+        },
         required: true,
         showWhen: { source: 'subject.kind', equals: 'company' }
       }),

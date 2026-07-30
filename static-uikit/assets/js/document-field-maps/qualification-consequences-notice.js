@@ -62,6 +62,7 @@
       // Continuation regions and print-override permission are part of the
       // production schema; the helper must not drop them.
       flowRegions: o.flowRegions,
+      expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
@@ -97,6 +98,18 @@
       // "уведомляет Заявителя ______ (ФИО физического лица)" — a 74.54 pt rule,
       // so a full name usually shrinks or falls back to initials.
       text('applicantFullName', 'field.clientFullName', 331.0, 198.74, 72.0, {
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 213.01,
+          rowHeight: 14, maxExtraRows: 2,
+          shiftFromTop: 213.01, shiftToTop: 587.69,
+          bottomReserve: 252.35,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 56.54, width: 499.27,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+          }
+        },
         required: true, fallbacks: ['initials', 'surname']
       }),
 

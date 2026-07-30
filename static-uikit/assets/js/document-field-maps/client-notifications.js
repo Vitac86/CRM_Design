@@ -73,6 +73,19 @@
       {
         // Full-width vector rule following the printed registration-address label.
         id: 'registrationAddress',
+        // the only row page 9 has room for goes to the longest value on it
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 8, insertionTop: 339.1,
+          rowHeight: 14, maxExtraRows: 1,
+          shiftFromTop: 339.1, shiftToTop: 822.06,
+          bottomReserve: 17.86,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 55.22, width: 486.31,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+          }
+        },
         source: 'field.registrationAddress',
         page: 8, left: 56.66, baselineTop: 334.42, width: 483.55,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,

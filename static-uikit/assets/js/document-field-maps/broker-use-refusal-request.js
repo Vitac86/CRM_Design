@@ -43,6 +43,18 @@
       // the renderer still fails visibly if two lines at 6 pt are insufficient.
       {
         id: 'clientName',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 196.46,
+          rowHeight: 14, maxExtraRows: 2,
+          shiftFromTop: 196.46, shiftToTop: 516.05,
+          bottomReserve: 323.87,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 52.92, width: 492.7,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
+          }
+        },
         source: 'field.client-full-name',
         page: 0, left: 252.0, baselineTop: 185.3, width: 289.0,
         font: 'legalSerif', fontSize: SIZE_10, minFontSize: MIN,
@@ -84,6 +96,18 @@
       },
       {
         id: 'clientPrintedName',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 464.85,
+          rowHeight: 14, maxExtraRows: 1,
+          shiftFromTop: 464.85, shiftToTop: 516.05,
+          bottomReserve: 323.87,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 52.92, width: 492.7,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
+          }
+        },
         source: 'field.clientFullName', format: 'initials', fallbacks: ['surname'],
         page: 0, left: 195.5, baselineTop: 451.27, width: 77.5,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,

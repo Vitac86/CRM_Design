@@ -170,6 +170,17 @@
       return en ? 'North Star Investments Ltd.' : 'АО «Инвестиционный Банк»';
     }
     if (/kind|type/i.test(key)) return en ? 'Purchase' : 'Покупка';
+    // A city is a city and an authority basis is a document name — the long
+    // profiles must stretch them realistically, not replace them with prose.
+    if (/\bcity\b|город/i.test(key)) {
+      return en ? 'London' : (long ? 'Санкт-Петербург' : 'Москва');
+    }
+    if (/authority-?basis|basis|osnovanie/i.test(key)) {
+      return en ? 'the Articles of Association' : (long ? 'Устава общества' : 'Устава');
+    }
+    if (/issuer/i.test(key)) {
+      return en ? 'North Star Investments Ltd.' : 'ПАО «Газпром»';
+    }
     if (/address|place/i.test(key)) return en
       ? '27 King George the Fifth Avenue, London, United Kingdom, SW1A 2AA'
       : '125009, Россия, г. Москва, ул. Тверская, д. 14, кв. 38';
