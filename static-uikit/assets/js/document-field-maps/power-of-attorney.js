@@ -70,6 +70,7 @@
       // Continuation regions and print-override permission are part of the
       // production schema; the helper must not drop them.
       flowRegions: o.flowRegions,
+      expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
@@ -104,11 +105,36 @@
         required: true, fallbacks: ['trim'], showWhen: UL_ONLY
       }),
       text('ulOgrn', 'field.client-ogrn', 0, 320.0, 156.86, 51.0, {
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 159.74,
+          rowHeight: 14, maxExtraRows: 1,
+          shiftFromTop: 159.74, shiftToTop: 802.99,
+          bottomReserve: 37.05,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 56.54, width: 496.36,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+          }
+        },
         required: true, align: 'center', showWhen: UL_ONLY
       }),
       // 27.48 pt for a 10–13 digit OGRN/INN: a 10-digit INN needs 5.5 pt, so
       // this one slot is allowed below the usual 6 pt floor rather than failing.
       text('ulInn', 'subject.inn', 0, 403.5, 156.86, 27.2, {
+        // page 1 has 37 pt of reserve: one row each for the ОГРН and the ИНН
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 159.74,
+          rowHeight: 14, maxExtraRows: 1,
+          shiftFromTop: 159.74, shiftToTop: 802.99,
+          bottomReserve: 37.05,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 56.54, width: 496.36,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+          }
+        },
         required: true, align: 'center', showWhen: UL_ONLY
       }),
 
@@ -161,6 +187,19 @@
         required: true, fallbacks: ['initials', 'surname'], showWhen: FL_ONLY
       }),
       text('flPrincipalCitizenship', 'subject.citizenship', 2, 488.0, 125.78, 18.5, {
+        // page 3 has 32 pt of reserve: one row each for citizenship and the date
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 2, insertionTop: 128.66,
+          rowHeight: 14, maxExtraRows: 1,
+          shiftFromTop: 128.66, shiftToTop: 807.79,
+          bottomReserve: 32.13,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 70.22, width: 464.96,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+          }
+        },
         required: true, align: 'center', showWhen: FL_ONLY
       }),
       text('flPrincipalPassport', 'field.passportSeriesNumber', 2, 81.0, 143.90, 50.0, {
@@ -202,6 +241,18 @@
         showWhen: FL_ONLY
       }),
       text('flAttorneyIssueDate', 'extra.extra-attorney-issue-date', 2, 125.5, 234.50, 35.5, {
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 2, insertionTop: 237.38,
+          rowHeight: 14, maxExtraRows: 1,
+          shiftFromTop: 237.38, shiftToTop: 807.79,
+          bottomReserve: 32.13,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 70.22, width: 464.96,
+            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
+          }
+        },
         required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY
       }),
       text('flAttorneyAddress', 'extra.extra-attorney-address', 2, 354.0, 234.50, 126.0, {
