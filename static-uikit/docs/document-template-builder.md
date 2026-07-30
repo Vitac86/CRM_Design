@@ -135,10 +135,104 @@ Russian date parts/month names, initials, surname, uppercase, trim,
 `prefixNumber`, `prefixFrom`, and `dateYearLastDigit`. Fallbacks are ordered and
 can be moved up/down. No arbitrary formatter code or generic truncation exists.
 
-Fit analysis embeds the same fonts and calls `CRMDocumentEngine.textLayout`.
-Results distinguish normal, shrink, multiline, fallback, overflow, missing
-required value, and unsupported glyph. Actual font character sets are checked;
-errors include the character and Unicode code point.
+Fit analysis calls the production entry point,
+`CRMDocumentEngine.overlayRenderer.layoutField()`, with the same embedded fonts
+production uses. The builder does not have its own layout: what you see here is
+what the generated PDF will contain. Results distinguish normal, shrink,
+multiline, flow, fallback, overflow, missing required value, and unsupported
+glyph. Actual font character sets are checked; errors include the character and
+Unicode code point.
+
+### Readable size policy
+
+Dynamic text at 7 pt is not acceptably readable on a printed form, so the
+builder enforces the same two numbers production does:
+
+* **preferred size 12 pt** — the default for every new text field;
+* **minimum size 9 pt** — a hard floor.
+
+A new text field is created at 12 pt / 9 pt with a line height that suits 12 pt
+text, and wraps automatically when the region you drew is tall enough for more
+than one line. Wrapping onto another line is always preferable to shrinking.
+
+You cannot save a production minimum below 9 pt. Importing an older map that
+has one reports
+
+```
+Минимальный размер ниже допустимых 9 pt
+```
+
+and blocks production export until it is corrected. The floor applies only to
+text the engine draws — static legal text already printed in the base PDF is
+untouched.
+
+## Continuation lines
+
+One logical field, one source value, several explicitly mapped regions the
+value flows through in order. This is how a long address reaches an approved
+second line instead of being shrunk.
+
+Select a text field and use the **Строки продолжения** section:
+
+| Action | What it creates |
+| --- | --- |
+| `Добавить строку продолжения` | a text-only region, for a place the form already prints a rule or leaves an empty cell |
+| `Добавить полноценную строку продолжения` | the Word-like version: a baseline **and** its own visible rule |
+| `Добавить строку ниже` | a pure geometry suggestion — the next likely baseline, computed from the line height |
+
+Regions are listed in flow order as `Строка 1 · основная`, `Строка 2`, … Each
+one can be moved up or down, deleted, or edited by exact coordinates (page,
+left, baseline, width, lines, maximum size). Deleting a continuation never
+deletes the logical field. Selecting the field highlights all of its regions on
+the page and shows the value distributed across them exactly as the production
+engine assigned it.
+
+The text baseline and the rule are edited separately: `Линия: left`, `длина`,
+`top`, `толщина` and `отступ от baseline`. A new full line copies the weight of
+the nearest printed underline as its starting value, so it begins already
+matching the form.
+
+### Nothing unreviewed reaches a client
+
+A generated line is created with `reviewStatus: 'suggested'` and **production
+export stays blocked** until you open the page, check the position at high zoom
+and tick `Подтверждена визуально`. Validation reports it as
+`flow-region-unreviewed` until then. Replacing the base PDF marks every flow
+region for review again.
+
+Validation also checks that every region is inside its page, has a positive
+width, has leading sufficient for its font size, has a size cap at or above the
+floor, does not overlap another region of the same field, and does not cross a
+neighbouring dynamic field.
+
+### Rules, not underscores
+
+The rule is drawn as ordinary PDF vector page content. Never draw underscores
+as text characters, never use repeated `_` glyphs to imitate a rule, and never
+create a line at generation time that nobody has approved. The intended result
+is a document that looks as though the continuation line had been added to the
+Word form before it was exported.
+
+Use this priority when a value does not fit:
+
+1. an existing printed line in the authoritative PDF;
+2. an existing blank table row or approved empty cell;
+3. an explicitly mapped and visually approved generated continuation line;
+4. a field-specific overflow — only when none of the above is possible.
+
+### Migrating an existing map
+
+1. Open it; imported minimums below 9 pt are reported immediately.
+2. Raise the minimum to 9 and re-check the preferred size against the row.
+   `static-uikit/tools/qa/measure_field_room.py` reports the real room.
+3. Where the value can be longer than the slot, add continuation regions.
+4. Keep existing safe fallbacks; add one where a shorter rendering is legally
+   equivalent.
+5. Run the profiles again and confirm the field reports `flow` rather than
+   `overflow`.
+
+Known source-layout limitations across the 18 production maps are recorded in
+[docs/document-text-layout-audit.md](../../docs/document-text-layout-audit.md).
 
 ## Test profiles and payload editor
 
