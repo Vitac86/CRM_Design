@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<title>Document engine — layout QA</title>
+<link rel="icon" href="../assets/icons/favicon_blue.ico"/>
+<!--
+  Test runner for the production text-layout engine.
+
+  Development aid only — it is not linked from the CRM and ships no client data.
+  It exercises assets/js/document-engine/pdf-text-layout.js with the real
+  embedded PDF font, so a passing run means the production engine behaves.
+
+  Serve static-uikit over HTTP (fetch() cannot read file:// URLs), then open:
+
+      python -m http.server 8000        # run inside static-uikit/
+      http://localhost:8000/tools/document-layout-qa.html
+
+  Query parameters (used by tools/qa/run_qa.py):
+      ?auto=1     run once and write a JSON report into #out
+-->
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; max-width: 980px; }
+  h1 { font-size: 18px; }
+  #status { padding: 8px; border-radius: 4px; background: #f2f2f2; }
+  #out { display: none; }
+  .ok { background: #e8f6ec !important; }
+  .err { background: #fde8e8 !important; }
+  ol { padding-left: 22px; }
+  li.pass { color: #1c6b34; }
+  li.fail { color: #a11; font-weight: 600; }
+  li .detail { display: block; font-weight: 400; color: #555; font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<h1>Document engine — layout QA</h1>
+<p>Runs the production text-layout specs against the real embedded PDF font.</p>
+<p id="status">loading…</p>
+<ol id="results"></ol>
+<pre id="out"></pre>
+
+<script src="../assets/vendor/pdf-lib.min.js"></script>
+<script src="../assets/vendor/fontkit.umd.min.js"></script>
+<script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+<script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+<script src="specs/text-layout-spec.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var statusEl = document.getElementById('status');
+  var resultsEl = document.getElementById('results');
+  var outEl = document.getElementById('out');
+
+  // The specs must measure with the very font production embeds, not a mock.
+  function loadFont() {
+    return fetch('../assets/fonts/pdf/LiberationSerif-Regular.ttf')
+      .then(function (response) {
+        if (!response.ok) throw new Error('font HTTP ' + response.status);
+        return response.arrayBuffer();
+      })
+      .then(function (bytes) {
+        return PDFLib.PDFDocument.create().then(function (doc) {
+          doc.registerFontkit(window.fontkit);
+          return doc.embedFont(bytes, { subset: false });
+        });
+      });
+  }
+
+  loadFont().then(function (font) {
+    var results = window.CRMLayoutSpec.run(font);
+    var failed = results.filter(function (r) { return !r.ok; });
+
+    results.forEach(function (result) {
+      var li = document.createElement('li');
+      li.className = result.ok ? 'pass' : 'fail';
+      li.textContent = (result.ok ? 'PASS  ' : 'FAIL  ') + result.name;
+      if (result.detail) {
+        var span = document.createElement('span');
+        span.className = 'detail';
+        span.textContent = result.detail;
+        li.appendChild(span);
+      }
+      resultsEl.appendChild(li);
+    });
+
+    statusEl.textContent = (results.length - failed.length) + '/' + results.length +
+      ' specs passed';
+    statusEl.className = failed.length ? 'err' : 'ok';
+    outEl.textContent = 'JSON_START' + JSON.stringify({
+      total: results.length,
+      passed: results.length - failed.length,
+      results: results
+    }) + 'JSON_END';
+    document.title = failed.length ? 'FAILED' : 'DONE';
+  }).catch(function (error) {
+    statusEl.textContent = 'harness error: ' + (error && error.message ? error.message : error);
+    statusEl.className = 'err';
+    outEl.textContent = 'JSON_START' + JSON.stringify({
+      total: 0, passed: 0, harnessError: String(error && error.message || error)
+    }) + 'JSON_END';
+    document.title = 'FAILED';
+    console.error(error);
+  });
+}());
+</script>
+</body>
+</html>
