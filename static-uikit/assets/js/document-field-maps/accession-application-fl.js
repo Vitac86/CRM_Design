@@ -211,24 +211,63 @@
       check('marketDerivatives', 'check.market-derivatives', true, 0, 62.1, 516.19),
       check('marketCurrency', 'check.market-currency', true, 0, 62.1, 531.91),
       // Tariff values sit after the printed "Тарифный план:" label on the same
-      // line. The label ends at ~505.8 pt; the text block ends at ~557.6 pt.
+      // line. The label ends at ~505.8 pt and the text block at ~557.6 pt, so
+      // the slot itself is barely 51 pt — about ten Cyrillic characters at the
+      // 9 pt readability floor. «Базовый» fits, «Стандартный» does not.
+      //
+      // Each tariff row is followed by blank space across the whole column
+      // (measured 472.19–502.75, 512.99–522.79 and 533.03–545.00), so each one
+      // gets a reviewed continuation line spanning the full column width from
+      // the label's left edge, 437.7 pt, to the text block's right edge. That
+      // takes the usable length to roughly 35 characters without touching the
+      // market checkboxes above or the next printed label below.
       {
         id: 'tariffStock',
+        label: 'Тарифный план (фондовый рынок)',
         source: 'extra.tariff-stock', optional: true,
         page: 0, left: 506.8, baselineTop: 470.35, width: 50.8,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left',
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 0, left: 506.8, baselineTop: 470.35, width: 50.8, maxLines: 1 },
+          {
+            page: 0, left: 437.7, baselineTop: 481.00, width: 119.9, maxLines: 1,
+            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
+          }
+        ]
       },
       {
         id: 'tariffDerivatives',
+        label: 'Тарифный план (срочный рынок)',
         source: 'extra.tariff-derivatives', optional: true,
         page: 0, left: 506.5, baselineTop: 511.15, width: 51.1,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left',
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 0, left: 506.5, baselineTop: 511.15, width: 51.1, maxLines: 1 },
+          {
+            page: 0, left: 437.7, baselineTop: 520.60, width: 119.9, maxLines: 1,
+            maxFontSize: 9, generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.2
+          }
+        ]
       },
       {
         id: 'tariffCurrency',
+        label: 'Тарифный план (валютный рынок)',
         source: 'extra.tariff-currency', optional: true,
         page: 0, left: 506.5, baselineTop: 531.19, width: 51.1,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left',
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 0, left: 506.5, baselineTop: 531.19, width: 51.1, maxLines: 1 },
+          {
+            page: 0, left: 437.7, baselineTop: 541.50, width: 119.9, maxLines: 1,
+            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
+          }
+        ]
       },
 
       // ── §5 Соглашения ─────────────────────────────────────────────────────

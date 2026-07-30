@@ -2916,6 +2916,10 @@
   // ── Handle document selection ─────────────────────────────────────────────
 
   function selectDoc(doc, subject) {
+    // A print-only wording belongs to one generation of one document; picking
+    // another document must never carry it over.
+    clearPrintOverrides();
+
     // Highlight selected card
     document.querySelectorAll('.crm-docwiz-doc-card').forEach(function (c) {
       c.classList.toggle('crm-docwiz-doc-card-selected', c.getAttribute('data-doc-id') === doc.id);
@@ -3097,6 +3101,9 @@
       checkValues:  checkValues,
       fields:       buildFields(subject, extraValues),
       checks:       buildChecks(doc, checkValues, extraValues, subject),
+      // Print-only wording the operator supplied for this generation. Never
+      // written back to the subject; only fields whose map allows it are used.
+      printOverrides: printOverrides,
       pdfFilename:  doc.pdfOutputFilename || (doc.id + '.pdf')
     };
   }
@@ -3135,10 +3142,23 @@
     statusEl.className = 'crm-docwiz-pdf-status' + (kind ? (' is-' + kind) : '');
   }
 
+  // ── Print overrides ────────────────────────────────────────────────────────
+  //
+  // An operator-editable print representation for the current document only.
+  // The CRM record is never touched, and only fields whose map sets
+  // `allowPrintOverride: true` can have one — never a name, an identifier, a
+  // passport or tax number, or any other exact legal value.
+  var printOverrides = {};
+
+  function clearPrintOverrides() {
+    printOverrides = {};
+  }
+
   // Clear status and revoke every tracked Object URL so selecting another
   // document never leaks blobs from a previous generation.
   function resetPdfStatus() {
     setPdfStatus('');
+    clearOverflowReport();
     var box = document.getElementById('docwiz-pdf-downloads');
     if (!box) return;
     box.querySelectorAll('a[data-object-url]').forEach(function (a) {
@@ -3147,6 +3167,139 @@
     });
     box.innerHTML = '';
     box.hidden = true;
+  }
+
+  // ── Layout preflight result ───────────────────────────────────────────────
+
+  function clearOverflowReport() {
+    var box = document.getElementById('docwiz-pdf-overflow');
+    if (!box) return;
+    box.innerHTML = '';
+    box.hidden = true;
+    document.querySelectorAll('#docwiz-extra-fields .crm-input-overflow')
+      .forEach(function (el) { el.classList.remove('crm-input-overflow'); });
+  }
+
+  // The wizard input behind an `extra.*` source, so the manager can be sent
+  // straight to the value that needs correcting.
+  function inputForSource(source) {
+    if (!source || source.indexOf('extra.') !== 0) return null;
+    var key = source.slice(6);
+    return document.querySelector('#docwiz-extra-fields [data-field-key="' +
+      key.replace(/"/g, '\\"') + '"]');
+  }
+
+  function focusOverflowField(source) {
+    var input = inputForSource(source);
+    if (!input) return false;
+    document.querySelectorAll('#docwiz-extra-fields .crm-input-overflow')
+      .forEach(function (el) { el.classList.remove('crm-input-overflow'); });
+    input.classList.add('crm-input-overflow');
+    setActiveStep(2);
+    try { input.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    input.focus();
+    return true;
+  }
+
+  // Render one actionable entry per value the production engine could not
+  // print. Everything the manager needs to act is on screen: which document,
+  // which field, how long the value is, the readable minimum, how many approved
+  // lines the form provides and why it still does not fit.
+  function renderOverflowReport(error, doc, onRetry) {
+    var box = document.getElementById('docwiz-pdf-overflow');
+    if (!box) return;
+    box.innerHTML = '';
+
+    var head = document.createElement('p');
+    head.className = 'crm-docwiz-overflow-head';
+    head.textContent = 'Документ «' + (error.documentTitle || doc.title) +
+      '» не сформирован: значения не помещаются в отведённые места формы.';
+    box.appendChild(head);
+
+    (error.overflows || []).forEach(function (item) {
+      var entry = document.createElement('div');
+      entry.className = 'crm-docwiz-overflow-item';
+
+      var title = document.createElement('p');
+      title.className = 'crm-docwiz-overflow-field';
+      title.textContent = item.label || item.fieldId;
+      entry.appendChild(title);
+
+      var why = document.createElement('p');
+      why.className = 'crm-docwiz-overflow-why';
+      why.textContent = item.message;
+      entry.appendChild(why);
+
+      var meta = document.createElement('p');
+      meta.className = 'crm-docwiz-overflow-meta';
+      meta.textContent = 'Поле: ' + item.fieldId +
+        (item.valueLength != null ? ' · длина значения: ' + item.valueLength + ' симв.' : '') +
+        (item.minFontSize != null ? ' · минимальный кегль: ' + item.minFontSize + ' pt' : '') +
+        (item.lineCapacity != null ? ' · доступно строк: ' + item.lineCapacity : '');
+      entry.appendChild(meta);
+
+      if (item.editable && inputForSource(item.source)) {
+        // Operator-entered value: send them back to it, keeping everything
+        // else they have already filled in.
+        var fix = document.createElement('button');
+        fix.type = 'button';
+        fix.className = 'crm-docwiz-overflow-action';
+        fix.textContent = 'Перейти к полю и исправить значение';
+        fix.addEventListener('click', function () { focusOverflowField(item.source); });
+        entry.appendChild(fix);
+      } else if (item.allowPrintOverride) {
+        // Explicitly permitted by the field map: the manager may supply a
+        // shorter printed wording. The CRM value stays exactly as it is.
+        entry.appendChild(buildPrintOverrideControl(item, onRetry));
+      } else {
+        // CRM legal or identity data: never silently altered, and the manager
+        // is not asked to shorten it.
+        var note = document.createElement('p');
+        note.className = 'crm-docwiz-overflow-note';
+        note.textContent = 'Значение получено из карточки субъекта и не может ' +
+          'быть сокращено при печати. Обратитесь в поддержку — для этого поля ' +
+          'нужно расширить разметку документа.';
+        entry.appendChild(note);
+      }
+
+      box.appendChild(entry);
+    });
+
+    box.hidden = false;
+  }
+
+  function buildPrintOverrideControl(item, onRetry) {
+    var wrap = document.createElement('div');
+    wrap.className = 'crm-docwiz-overflow-override';
+
+    var label = document.createElement('label');
+    label.className = 'crm-docwiz-overflow-override-label';
+    label.textContent = 'Текст только для печати этого документа ' +
+      '(значение в карточке субъекта не меняется)';
+    var id = 'docwiz-override-' + item.fieldId;
+    label.setAttribute('for', id);
+    wrap.appendChild(label);
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.id = id;
+    input.className = 'crm-input';
+    input.value = printOverrides[item.fieldId] || item.value || '';
+    wrap.appendChild(input);
+
+    var apply = document.createElement('button');
+    apply.type = 'button';
+    apply.className = 'crm-docwiz-overflow-action';
+    apply.textContent = 'Применить и сформировать заново';
+    apply.addEventListener('click', function () {
+      var value = (input.value || '').trim();
+      if (!value) { input.focus(); return; }
+      printOverrides[item.fieldId] = value;
+      if (typeof onRetry === 'function') onRetry();
+    });
+    wrap.appendChild(apply);
+
+    return wrap;
   }
 
   // Render one compact download link per generated PDF. Uses the document's
@@ -3337,10 +3490,11 @@
       return Promise.reject(new Error('Карта полей документа не загружена.'));
     }
     return engine.overlayRenderer.render(template, {
-      subject:     payload.subject,
-      fields:      payload.fields,
-      extraValues: payload.extraValues,
-      checks:      payload.checks
+      subject:        payload.subject,
+      fields:         payload.fields,
+      extraValues:    payload.extraValues,
+      checks:         payload.checks,
+      printOverrides: payload.printOverrides || {}
     }, { validatePayload: true });
   }
 
@@ -3507,13 +3661,28 @@
         setPdfStatus('PDF сформирован: 1 файл. Файл не отправлялся.', 'ok');
       })
       .catch(function (err) {
-        console.error('PDF generation failed:', err);
-        setPdfStatus((err && err.message) ? err.message : 'Не удалось сформировать PDF.', 'error');
-        setActiveStep(2);
+        handleGenerationError(err, doc, function () { generateSinglePdf(doc, subject); });
       })
       .finally(function () {
         if (btn) { btn.disabled = false; btn.textContent = original || 'Сформировать PDF'; }
       });
+  }
+
+  // A layout overflow is not a generic failure: the preflight knows exactly
+  // which values could not be printed and why, so show that instead.
+  function handleGenerationError(err, doc, onRetry, fallbackMessage) {
+    console.error('PDF generation failed:', err);
+    if (err && err.name === 'DocumentOverflowError') {
+      setPdfStatus('Проверка размещения не пройдена — см. подробности ниже.', 'error');
+      renderOverflowReport(err, doc, onRetry);
+      setActiveStep(2);
+      var first = (err.overflows || [])[0];
+      if (first && first.editable) focusOverflowField(first.source);
+      return;
+    }
+    setPdfStatus((err && err.message) ? err.message :
+      (fallbackMessage || 'Не удалось сформировать PDF.'), 'error');
+    setActiveStep(2);
   }
 
   function generatePdfPackage(doc, subject) {
@@ -3582,9 +3751,8 @@
         setPdfStatus(head + ' Файлы не отправлялись.', 'ok');
       })
       .catch(function (err) {
-        console.error('PDF package generation failed:', err);
-        setPdfStatus((err && err.message) ? err.message : 'Не удалось сформировать PDF-комплект.', 'error');
-        setActiveStep(2);
+        handleGenerationError(err, doc, function () { generatePdfPackage(doc, subject); },
+          'Не удалось сформировать PDF-комплект.');
       })
       .finally(function () {
         if (btn) { btn.disabled = false; btn.textContent = original || 'Сформировать комплект PDF'; }
