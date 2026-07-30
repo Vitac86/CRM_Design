@@ -37,6 +37,7 @@
   var ns = global.CRMDocumentEngine = global.CRMDocumentEngine || {};
   var Layout = ns.textLayout;
   var Checkbox = ns.checkbox;
+  var Expander = ns.pageExpander;
 
   var Renderer = {};
 
@@ -281,7 +282,10 @@
     var raw = type === 'static' ? field.text
       : (override !== undefined ? override : resolve(field.source, payload));
 
-    var regions = Layout.regionsFor(field);
+    // `opts.regions` lets the page-expansion pass hand in the field's regions
+    // after inserted rows have been added and everything below an anchor has
+    // been moved down. Without it the field's own mapped geometry is used.
+    var regions = opts.regions || Layout.regionsFor(field);
     var size = field.fontSize != null ? Number(field.fontSize) : PREFERRED_DYNAMIC_FONT_SIZE;
     var minSize = field.minFontSize != null ? Number(field.minFontSize) : size;
 
@@ -389,11 +393,17 @@
     if (declared && declared.length < 2) {
       problems.push(id + ': flowRegions must list at least two regions');
     }
-    if (field.overflowStrategy && ['flow', 'shrink'].indexOf(field.overflowStrategy) === -1) {
+    if (field.overflowStrategy &&
+        ['flow', 'shrink', 'expand-layout'].indexOf(field.overflowStrategy) === -1) {
       problems.push(id + ': unknown overflowStrategy "' + field.overflowStrategy + '"');
     }
     if (field.overflowStrategy === 'flow' && !declared) {
       problems.push(id + ': overflowStrategy "flow" needs flowRegions');
+    }
+    if (field.overflowStrategy === 'expand-layout') {
+      validateExpansion(field, id, pages, problems);
+    } else if (field.expansion) {
+      problems.push(id + ': expansion declared without overflowStrategy "expand-layout"');
     }
 
     var seen = {};
@@ -465,6 +475,73 @@
         }
       }
     });
+  }
+
+  // A page-expansion definition has to say everything: no runtime guesswork is
+  // permitted about where a row opens, what may move, or how far.
+  function validateExpansion(field, id, pages, problems) {
+    var spec = field.expansion;
+    if (!spec) {
+      problems.push(id + ': overflowStrategy "expand-layout" needs an expansion block');
+      return;
+    }
+    var pageIndex = spec.page != null ? Number(spec.page) : Number(field.page);
+    if (!(pageIndex >= 0 && pageIndex < pages.length)) {
+      problems.push(id + ': expansion page ' + pageIndex + ' is outside the document');
+      return;
+    }
+    var size = pages[pageIndex].getSize();
+
+    [['insertionTop', spec.insertionTop], ['rowHeight', spec.rowHeight],
+     ['maxExtraRows', spec.maxExtraRows], ['shiftFromTop', spec.shiftFromTop],
+     ['shiftToTop', spec.shiftToTop], ['bottomReserve', spec.bottomReserve]]
+      .forEach(function (entry) {
+        if (!isFinite(Number(entry[1]))) {
+          problems.push(id + ': expansion.' + entry[0] + ' must be a number');
+        }
+      });
+    if (problems.length && problems[problems.length - 1].indexOf('expansion.') !== -1) return;
+
+    if (Number(spec.rowHeight) <= 0) problems.push(id + ': expansion.rowHeight must be positive');
+    if (Number(spec.maxExtraRows) < 1) problems.push(id + ': expansion.maxExtraRows must be at least 1');
+    if (Number(spec.bottomReserve) < Number(spec.rowHeight)) {
+      problems.push(id + ': expansion.bottomReserve is smaller than one row');
+    }
+    if (Number(spec.maxExtraRows) * Number(spec.rowHeight) > Number(spec.bottomReserve) + 1e-6) {
+      problems.push(id + ': expansion.maxExtraRows exceeds the declared bottomReserve');
+    }
+    if (Number(spec.shiftFromTop) > Number(spec.insertionTop) + 1e-6) {
+      problems.push(id + ': expansion.shiftFromTop must not be below the insertion point');
+    }
+    if (Number(spec.shiftToTop) <= Number(spec.shiftFromTop)) {
+      problems.push(id + ': expansion movable block is empty');
+    }
+    // `bottomReserve` is the measured free space beneath the lowest movable
+    // content — the most the block may travel. The movable block's own bottom
+    // boundary only has to stay on the page.
+    if (Number(spec.shiftToTop) > size.height + 0.5) {
+      problems.push(id + ': expansion movable block ends past the page bottom');
+    }
+    if (Number(spec.bottomReserve) > size.height) {
+      problems.push(id + ': expansion.bottomReserve is larger than the page');
+    }
+
+    var style = spec.lineStyle || 'underline';
+    if (['underline', 'table-row'].indexOf(style) === -1) {
+      problems.push(id + ': unknown expansion lineStyle "' + style + '"');
+    }
+    var line = spec.line || {};
+    if (!isFinite(Number(line.width)) || Number(line.width) <= 0) {
+      problems.push(id + ': expansion.line.width must be a positive number');
+    } else if (Number(line.left) < 0 || Number(line.left) + Number(line.width) > size.width + 0.5) {
+      problems.push(id + ': expansion.line extends past the page width');
+    }
+    if (style === 'underline' && !isFinite(Number(line.ruleThickness == null ? 0.36 : line.ruleThickness))) {
+      problems.push(id + ': expansion.line.ruleThickness must be a number');
+    }
+    if (spec.reviewStatus && spec.reviewStatus !== 'approved') {
+      problems.push(id + ': expansion rule is not visually approved');
+    }
   }
 
   // Validate one template definition against the loaded PDF. Returns an array
@@ -606,15 +683,91 @@
     });
   }
 
+  // ── Page-section expansion ─────────────────────────────────────────────────
+  //
+  // A permitted expandable value that will not fit its mapped regions asks the
+  // page for extra rows. How many is decided by the layout engine itself, not
+  // by an estimate: the layout is retried with one more inserted row at a time
+  // until it fits, which is exact and cannot disagree with what is drawn.
+  function expansionDemands(template, payload, fonts) {
+    var demands = [];
+
+    (template.fields || []).forEach(function (field) {
+      if ((field.type || 'text') === 'check') return;
+      var spec = Expander.expansionOf(field);
+      if (!spec) return;
+      var font = fonts[field.font || 'legalSerif'];
+      if (!font) return;
+
+      var base = Layout.regionsFor(field);
+      if (layoutField(field, payload, font, { regions: base }).drawn) {
+        demands.push({ field: field, rows: 0 });   // fits as printed
+        return;
+      }
+
+      var maximum = spec.maxExtraRows == null ? 1 : Number(spec.maxExtraRows);
+      for (var rows = 1; rows <= maximum; rows += 1) {
+        var candidate = base.concat(insertedRegions(field, rows, 0));
+        if (layoutField(field, payload, font, { regions: candidate }).drawn) {
+          demands.push({ field: field, rows: rows });
+          return;
+        }
+      }
+      // Even the maximum approved number of rows is not enough; the field-level
+      // overflow diagnostics will explain that.
+      demands.push({ field: field, rows: maximum, insufficient: true });
+    });
+
+    return demands;
+  }
+  Renderer.expansionDemands = expansionDemands;
+
+  function insertedRegions(field, rows, priorShift) {
+    var out = [];
+    for (var index = 0; index < rows; index += 1) {
+      out.push(Layout.normalizeRegion(
+        Expander.rowRegion(field, index, priorShift), field, index + 1));
+    }
+    return out;
+  }
+
+  // Effective regions for every field once the page plans are known: inserted
+  // rows are appended to their own field, and everything that sits below an
+  // anchor moves down by the plan's cumulative delta. Static page content is
+  // moved by the SAME plan, so the two can never drift apart.
+  function makeRegionsFor(plans, rowsByField) {
+    return function (field) {
+      var regions = Layout.regionsFor(field).map(function (region) {
+        var plan = plans[region.page];
+        var delta = Expander.shiftAt(plan, region.baselineTop);
+        if (!delta) return region;
+        var moved = {};
+        Object.keys(region).forEach(function (key) { moved[key] = region[key]; });
+        moved.baselineTop = region.baselineTop + delta;
+        if (moved.underlineTop != null) moved.underlineTop = region.underlineTop + delta;
+        return moved;
+      });
+      var inserted = rowsByField[field.id];
+      return inserted && inserted.length ? regions.concat(inserted) : regions;
+    };
+  }
+
+  // Where a checkbox — or any bare template coordinate — lands after expansion.
+  function shiftedTopFor(plans, page, top) {
+    return top + Expander.shiftAt(plans[page], top);
+  }
+  Renderer.shiftedTopFor = shiftedTopFor;
+
   // ── Preflight ──────────────────────────────────────────────────────────────
 
   // Lay out every text field of a template with the real embedded fonts.
   // Returns the plan the renderer will draw plus a complete list of values that
   // cannot be printed, each with enough detail for an actionable message.
-  function plan(template, payload, fonts) {
+  function plan(template, payload, fonts, options) {
+    var opts = options || {};
     var byField = {};
     var overflows = [];
-    var summary = { total: 0, atPreferred: 0, wrapped: 0, flowed: 0, shrunk: 0, fallback: 0 };
+    var summary = { total: 0, atPreferred: 0, wrapped: 0, flowed: 0, shrunk: 0, fallback: 0, expanded: 0 };
 
     (template.fields || []).forEach(function (field) {
       if ((field.type || 'text') === 'check') return;
@@ -630,7 +783,9 @@
         });
         return;
       }
-      var result = layoutField(field, payload, font);
+      var result = layoutField(field, payload, font, {
+        regions: opts.regionsFor ? opts.regionsFor(field) : null
+      });
       byField[field.id] = result;
 
       if (result.reason === 'overflow') {
@@ -721,13 +876,41 @@
       drawnRegions[line.regionIndex].push(line.lineIndex);
     });
 
-    // A reviewed continuation rule is drawn only under the lines that actually
-    // received text, so a short value never adds a stray line to the form.
+    // A reviewed continuation rule — or an inserted table row's borders — is
+    // drawn only where text actually landed, so a short value never adds a
+    // stray line to the form.
     Object.keys(drawnRegions).forEach(function (key) {
       var region = regions[Number(key)];
-      if (!region.drawUnderline) return;
-      drawUnderline(ctx, region, drawnRegions[key], fit.size);
+      if (region.drawUnderline) drawUnderline(ctx, region, drawnRegions[key], fit.size);
+      if (region.tableRow) drawTableRow(ctx, region);
     });
+  }
+
+  // A blank table row opened by page expansion: real vector borders matching
+  // the table it was inserted into, never underscore glyphs.
+  function drawTableRow(ctx, region) {
+    var spec = region.tableRow;
+    var page = ctx.pages[region.page];
+    var pageHeight = page.getSize().height;
+    var thickness = Number(spec.thickness || 0.36);
+    var top = pageHeight - Number(spec.top);
+    var bottom = pageHeight - (Number(spec.top) + Number(spec.height));
+    var left = Number(spec.left);
+    var right = left + Number(spec.width);
+    var borders = spec.borders || {};
+
+    function line(x1, y1, x2, y2) {
+      page.drawLine({
+        start: { x: x1, y: y1 }, end: { x: x2, y: y2 },
+        thickness: thickness, color: ctx.color
+      });
+    }
+
+    if (borders.top) line(left, top, right, top);
+    if (borders.bottom !== false) line(left, bottom, right, bottom);
+    if (borders.left !== false) line(left, top, left, bottom);
+    if (borders.right !== false) line(right, top, right, bottom);
+    (spec.columns || []).forEach(function (x) { line(Number(x), top, Number(x), bottom); });
   }
 
   // A Word-like continuation rule: ordinary PDF vector content, drawn with the
@@ -782,10 +965,15 @@
 
     var page = ctx.pages[field.page];
     var pageHeight = page.getSize().height;
+    // A mark below an expansion anchor moves with the row it belongs to, by the
+    // same plan that moved the printed checkbox underneath it.
+    var baselineTop = ctx.plans
+      ? shiftedTopFor(ctx.plans, field.page, field.baselineTop)
+      : field.baselineTop;
     Checkbox.mark(
       page,
       field.left,
-      pageHeight - field.baselineTop,
+      pageHeight - baselineTop,
       field.glyphSize || 8.5,
       {
         style: field.markStyle || 'check',
@@ -862,16 +1050,64 @@
             color: opts.color || PDFLib.rgb(0, 0, 0)
           };
 
+          // ── Page-section expansion ─────────────────────────────────────────
+          // Decide which permitted fields need extra rows, then build one plan
+          // per page. The plan drives the static content shift and the overlay
+          // shift alike.
+          var demands = expansionDemands(template, payload, fonts);
+          var plans = {};
+          var rowsByField = {};
+          var planErrors = [];
+          pages.forEach(function (pdfPage, index) {
+            var pagePlan = Expander.planPage(index, demands, pdfPage.getSize().height);
+            plans[index] = pagePlan;
+            pagePlan.rows.forEach(function (row) {
+              rowsByField[row.fieldId] = (rowsByField[row.fieldId] || []).concat(
+                Layout.normalizeRegion(row.region, { flowRegions: [1, 2] }, 1));
+            });
+            pagePlan.errors.forEach(function (error) { planErrors.push(error); });
+          });
+
           // ── Preflight ──────────────────────────────────────────────────────
-          // Lay every visible field out first, using the fonts actually
-          // embedded in this document. Nothing is drawn and no Blob exists
-          // until the whole document is known to be printable, so a failure
-          // reports every problem at once instead of dying on the first one.
-          var planned = plan(template, payload, fonts);
+          // Lay every visible field out with the fonts actually embedded in
+          // this document, and with the regions it will really have. Nothing is
+          // drawn and no Blob exists until the whole document is known to be
+          // printable, so a failure reports every problem at once instead of
+          // dying on the first one.
+          var regionsFor = makeRegionsFor(plans, rowsByField);
+          var planned = plan(template, payload, fonts, { regionsFor: regionsFor });
+
+          planErrors.forEach(function (error) {
+            var field = template.fields.filter(function (item) {
+              return item.id === error.fieldId;
+            })[0] || {};
+            planned.overflows.push({
+              documentId: template.id,
+              documentTitle: template.title || template.id,
+              fieldId: error.fieldId,
+              label: field.label || error.fieldId,
+              source: field.source || null,
+              reason: error.reason,
+              editable: !!field.source && field.source.indexOf('extra.') === 0,
+              message: 'страница не может быть расширена: ' + error.message
+            });
+          });
+
           if (planned.overflows.length) {
             throw OverflowError(template.id, template.title || template.id,
               planned.overflows);
           }
+
+          // Only now that the document is known to be printable is the page
+          // content actually rewritten.
+          var expandedPages = [];
+          pages.forEach(function (pdfPage, index) {
+            if (!plans[index].shifts.length) return;
+            Expander.shiftPageContent(pdfDoc, pdfPage, plans[index].shifts);
+            expandedPages.push(index);
+          });
+
+          ctx.plans = plans;
 
           template.fields.forEach(function (field) {
             if ((field.type || 'text') === 'check') drawCheckField(ctx, field);
