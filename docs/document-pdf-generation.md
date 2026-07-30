@@ -377,6 +377,145 @@ Long names, addresses, issuing authorities and contract numbers are **never
 silently clipped or truncated**. Empty optional values simply leave the printed
 line blank.
 
+## 6b. Dynamic page-section expansion
+
+Some values cannot fit however carefully the field is mapped, and some pages
+have no blank band to put a continuation line in. Rather than refusing the
+document, the generated file can grow the row it needs — the way the row would
+have been inserted in Word before the PDF was exported.
+
+**There is still exactly one authoritative PDF per document.** No
+`…-short.pdf` / `…-long.pdf`, no resident/non-resident variants, no
+company-name-length templates. The variation exists only inside the output
+Blob, and the committed template is never modified.
+
+### The two continuation mechanisms
+
+| | When | What moves |
+| --- | --- | --- |
+| **A. Existing empty space** — `flowRegions` | the form already leaves a printed rule or a blank cell | nothing; the text simply continues there |
+| **B. Inserted layout row** — `expansion` | there is no blank line, but the page has vertical reserve | the page section below the anchor moves down and a real row opens |
+
+Both are declarative. Use A wherever the form allows it; B only when it does
+not.
+
+### Which fields may expand
+
+Not many. The candidates are long client data:
+
+* full legal company name, and an abbreviated or foreign name where used;
+* legal, registration, residential, postal and foreign addresses;
+* a registration or passport issuing authority where ordinary realistic values
+  demonstrate a real need.
+
+Identifiers and normally short values — ИНН, КПП, ОГРН, passport series and
+number, account number, dates, citizenship, client code — should fit through
+correct field mapping and the 9 pt minimum. Audit them, but do not open a
+continuation area without evidence. `tools/qa/measure_slot_widths.py` compares
+every mapped width against the printed blank it sits in and is the first thing
+to run when a short value does not fit: the map may simply be wrong.
+
+Power-of-attorney is the exception that proves the rule. Its ИНН, ОГРН,
+citizenship and date slots are genuinely 20–54 pt wide, the map is correct, and
+the values are exact — so those four take an inserted row each, printing the
+complete value unbroken on the ruled line directly beneath its label. A 10-digit
+ИНН is never split.
+
+### The schema
+
+```js
+{
+  id: 'clientName',
+  source: 'field.client-full-name',
+  overflowStrategy: 'expand-layout',
+  expansion: {
+    page: 0,
+    insertionTop: 297.6,      // where a row opens
+    rowHeight: 14,            // one inserted row
+    maxExtraRows: 2,          // the most THIS field may insert
+    shiftFromTop: 297.6,      // top of the movable block
+    shiftToTop: 830.0,        // bottom of it — content below stays fixed
+    bottomReserve: 250.0,     // measured free space; the most the block may travel
+    lineStyle: 'underline',   // 'underline' | 'table-row'
+    reviewStatus: 'approved', // production refuses anything else
+    line: {
+      left: 99.3, width: 435.7,
+      baselineOffset: 10.5,   // text baseline inside the row
+      ruleOffset: 12.4,       // rule position inside the row
+      ruleThickness: 0.48     // matched to a printed rule nearby
+    }
+  }
+}
+```
+
+A `table-row` additionally takes `rowLeft`, `rowWidth`, `borders`, `columns`
+and optional `bottomSegments` / `topSegments`, so an inserted row reproduces
+the table it joins — including rules that break at column boundaries.
+
+Nothing is inferred at runtime. Every one of those numbers must be present, and
+validation rejects the field if any is missing.
+
+### How the page actually moves
+
+`pdf-page-expander.js` rewrites the page's own content stream. Word writes each
+drawing as a self-contained balanced `q … Q` block with an absolute text
+matrix, so a block is moved by wrapping it — and nothing else — in
+`q 1 0 0 1 0 dy cm … Q`. Every operator still appears exactly once.
+
+Text stays text, rules stay rules, images stay images. Nothing is rasterised,
+no page or section becomes a screenshot, and no legal block is whited out and
+redrawn.
+
+The alternative — embedding the page as a Form XObject and drawing it once per
+band with different clips — was implemented, measured and rejected: it renders
+correctly and pymupdf reads it correctly, but any extractor that ignores clip
+paths sees every operator once per band. On Appendix 1A that produced six
+occurrences of a phrase that appears twice, at 1.68× the file size. Rewriting
+the stream gives two occurrences at 0.98×, with the page's extracted text
+identical to the base character for character.
+
+Content that would straddle an insertion line cannot be split, so the expander
+reports it instead of guessing. `tools/qa/check_expansion_anchors.py` asks the
+production expander to try every declared anchor and scans nearby for a clean
+one; run it after changing any anchor.
+
+### One plan for static content and overlays
+
+```js
+{ page: 0, shifts: [ { fromTop: 297.6, toTop: 830, delta: 14 } ] }
+```
+
+The same plan moves the page content and every dynamic element below the
+anchor: text fields, checkbox marks, generated underlines, printed signature
+transcripts, further continuation regions and conditional fields. Field maps
+stay written in the template's own coordinates; the transformation is applied
+at render time, never baked into the map.
+
+Several expandable fields may share a page. Anchors are processed top to bottom,
+shifts accumulate, a later anchor's rows open below what an earlier one already
+opened, and a coordinate's total shift is the sum of every band containing it:
+
+```
+company name inserts 1 row   → +14 pt
+legal address inserts 2 rows → +28 pt
+content below the address    → +42 pt
+```
+
+### Reserve, and the footer
+
+Expansion is allowed only while `required shift ≤ bottomReserve`. `shiftToTop`
+bounds the movable block, so a page with a fixed footer keeps it fixed: top
+section fixed, middle section expandable, footer fixed. Signature blocks and
+footer spacing are never moved or compressed unless the map says so explicitly.
+When the reserve runs out the manager gets a field-specific error, not a
+generic failure.
+
+### When the value fits
+
+Nothing happens. No shift, no inserted row, no rule. The output matches the
+non-expanded baseline apart from the normal dynamic text — verified in QA by
+comparing the drawn vector rules against the base template.
+
 ## 6a. Preflight
 
 `render()` lays out every visible field — with the fonts actually embedded in

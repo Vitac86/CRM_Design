@@ -220,6 +220,70 @@ Use this priority when a value does not fit:
 3. an explicitly mapped and visually approved generated continuation line;
 4. a field-specific overflow — only when none of the above is possible.
 
+## Page-section expansion
+
+A continuation line needs somewhere to go. When the form has no blank line but
+the page has vertical reserve, the document can grow the row instead: content
+below an anchor moves down and a real row opens. There is still one
+authoritative PDF — nothing is duplicated on disk, and the variation exists
+only in the generated file.
+
+Only a few fields should ever be expandable: company names, addresses, and an
+issuing authority where ordinary values prove the need. Identifiers, dates and
+citizenship are expected to fit through correct mapping and the 9 pt minimum.
+Check the mapping first — `static-uikit/tools/qa/measure_slot_widths.py`
+compares every field against the printed blank it sits in.
+
+### Workflow
+
+1. Select the logical field.
+2. Press **Добавить расширяемую строку**. The field is marked layout-expandable
+   and a starting definition appears.
+3. Set the insertion anchor — where the row opens.
+4. Set the movable block: `Подвижный блок: от` … `до`. Everything below `до`
+   stays fixed, which is how a page with a footer keeps its footer.
+5. Set the bottom reserve — the measured free space under the lowest movable
+   content. It is the most the block may travel.
+6. Set the maximum number of rows this field may insert.
+7. Choose `Строка с подчёркиванием` or `Пустая строка таблицы`.
+8. Press **Взять толщину соседней линии** to copy the weight of a printed rule
+   nearby, then adjust the row's baseline and rule offsets.
+9. Read the shift preview: the inspector reports the movement at zero, one and
+   the maximum row count against the reserve.
+10. Look at the page. The canvas draws the insertion anchor, the end of the
+    movable block, and one preview rectangle per row that could open.
+11. Tick **Правило проверено визуально**.
+
+Until step 11, `reviewStatus` stays `suggested` and production export is
+blocked.
+
+### What blocks export
+
+* the movable block is undefined or empty;
+* the maximum expansion exceeds the declared reserve;
+* the movable block runs past the page bottom;
+* a required number is missing — nothing is inferred at runtime;
+* the inserted row's width or rule thickness is missing;
+* the rule has not been visually reviewed.
+
+An inserted row that would overlap another field on the page is reported as a
+warning, since that field may itself be moving.
+
+### Finding a workable anchor
+
+A page can only be split where no drawing block crosses the line.
+`static-uikit/tools/qa/check_expansion_anchors.py --suggest` asks the
+production expander to try every declared anchor and scans nearby for the
+closest one that works. Run it after moving an anchor; six anchors were dropped
+during this work because their pages had no clean cut within ±30 pt.
+
+### Round trip
+
+Expansion definitions survive builder JSON and production JS export unchanged,
+alongside flow regions, overflow strategy, sizes, line height, maximum lines and
+print-override permission. All 18 maps still round-trip semantically and no
+property is silently discarded.
+
 ### Migrating an existing map
 
 1. Open it; imported minimums below 9 pt are reported immediately.

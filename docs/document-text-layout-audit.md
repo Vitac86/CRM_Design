@@ -153,6 +153,98 @@ as printed.
 | Latin extractable | 125/137 |
 | Vector rules added (reviewed continuation lines) | 706 |
 
+## 5a. Reclassification after dynamic page expansion
+
+The first pass of this audit assumed that a value which does not fit needs
+either an existing blank line or nothing at all, and concluded that several
+documents — power-of-attorney above all — were blocked. That conclusion was
+withdrawn: pages have vertical reserve even when their bodies have no blank
+band, and a document can grow a row.
+
+Every remaining case was re-examined against six questions: is the mapped width
+wrong; is the test value realistic; is the field naturally expandable; is it an
+exact short identifier that should fit once mapped correctly; does the page have
+reserve; and would shifting the lower section preserve the legal structure.
+
+| Classification | Fields | Notes |
+| --- | --- | --- |
+| Mapping correction | 0 | `measure_slot_widths.py` found no field mapped materially narrower than its printed blank. The maps sit 2–4 pt inside each rule, which is the correct inset. |
+| Normal wrapping / existing continuation space | — | already solved in the previous phase (анкета cells, Appendix 1A continuation lines) |
+| Dynamic layout expansion | 13 | see below |
+| Fixture defect, not a layout problem | 3 | a "long" city was a 17-character sentence, likewise an authority basis and a security issuer |
+| Extreme stress only | 41 | fails only in the deliberately maximal profiles |
+| Genuine source limitation | 7 | fails with ordinary values and the page has no room left |
+
+### Fields given dynamic layout expansion
+
+All thirteen are names, addresses or exact values that the form's own blanks
+cannot hold. Every anchor was verified to sit on a clean cut with
+`check_expansion_anchors.py`.
+
+| Document | Field | Page | Anchor | Rows × height | Reserve | Style |
+| --- | --- | --- | --- | --- | --- | --- |
+| `qualification-notice` | `recipientName` | 1 | 181.20 | 2 × 14 | 250.0 | underline |
+| `qualification-notice` | `clientName` | 1 | 297.60 | 2 × 14 | 250.0 | underline |
+| `client-notifications` | `registrationAddress` | 9 | 339.10 | 1 × 14 | 17.86 | underline |
+| `broker-use-refusal-request` | `clientName` | 1 | 196.46 | 2 × 14 | 323.87 | underline |
+| `regulation-full-refusal-notice` | `clientName` | 1 | 203.30 | 2 × 14 | 259.79 | underline |
+| `regulation-partial-refusal-notice` | `clientName` | 1 | 183.14 | 2 × 14 | 122.24 | underline |
+| `account-opening-notice` | `clientName` | 1 | 279.65 | 2 × 14 | 32.48 | underline |
+| `qualification-request-fl` | `quarterlyTransactionsValueMillions` | 1 | 679.53 | 1 × 14 | 113.86 | underline |
+| `anketa-yul` | `bankAddress` | 3 | 289.00 | 2 × 16.92 | 70.9 | table-row |
+| `power-of-attorney` | `ulOgrn` | 1 | 159.74 | 1 × 14 | 37.05 | underline |
+| `power-of-attorney` | `ulInn` | 1 | 159.74 | 1 × 14 | 37.05 | underline |
+| `power-of-attorney` | `flPrincipalCitizenship` | 3 | 128.66 | 1 × 14 | 32.13 | underline |
+| `power-of-attorney` | `flAttorneyIssueDate` | 3 | 237.38 | 1 × 14 | 32.13 | underline |
+
+### Anchors that had to be dropped
+
+Six fields were given an expansion that the page could not honour: no insertion
+point within ±30 pt leaves every drawing block wholly on one side, so the
+content cannot be split there at all. They keep their previous behaviour and
+appear in the limitations below.
+
+`broker-use-refusal-request/clientPrintedName`, `code-word-request/clientFullName`,
+`qualification-consequences-notice/applicantFullName`,
+`qualification-notice/registerEntryOrgName`,
+`regulation-full-refusal-notice/clientPrintedName`,
+`regulation-partial-refusal-notice/clientPrintedName`.
+
+### Expansion capacity of every page
+
+Measured as the free space beneath the lowest content. Every one of the 77
+template pages has room for at least one 14 pt row; the tightest are
+`client-notifications` page 6 (18.98 pt) and page 9 (21.86 pt), and
+`power-of-attorney` pages 1–4 (36–41 pt, two rows each). Several pages have
+100 pt or more.
+
+## 5b. Power-of-attorney: withdrawn conclusion
+
+The previous audit recorded this document as not production-ready and needing a
+revised Word source. That was wrong on one point of fact: it looked for blank
+bands **inside the body** and found none, and stopped there. The pages have
+36–41 pt of unused space at the foot, which is two inserted rows each.
+
+Re-checked in order:
+
+* **Is the map correct?** Yes. The printed blanks really are 27.48 pt for a
+  10-digit ИНН, 54.36 pt for a 13-digit ОГРН, 20.40 pt for «Россия» and
+  37.44 pt for a date. The map is 2–4 pt inside each rule — the correct inset.
+* **Can the text start earlier or use the whole blank?** No; the blanks are
+  bounded by printed text on both sides.
+* **Does a formatter add characters?** No.
+* **Is there page reserve?** Yes — and that is the answer.
+
+Each of the four fields that failed on ordinary values now takes one inserted
+row. The short printed slot stays blank and the complete exact value prints
+unbroken on the ruled row immediately below its label, keeping it attached to
+the label it belongs to.
+
+Power-of-attorney ordinary-value failures: **12 → 4**. It stays in the registry.
+The four that remain (`ulAuthorityBasis`, `ulAttorneyName`, `ulAttorneyCitizenship`,
+`flAttorneyCitizenship`) sit on pages whose two rows are already committed to the
+ИНН, ОГРН, citizenship and date above.
+
 ## 6. Remaining source-layout limitations
 
 61 fields still cannot print their longest supported value at 9 pt. These are
