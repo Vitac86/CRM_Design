@@ -19,6 +19,9 @@
     this.viewer = options.viewer;
     this.svg = options.svg;
     this.getPayload = options.getPayload || function () { return null; };
+    // Region assignments from the production layout engine, when the last
+    // analysis run has produced them.
+    this.getAssignments = options.getAssignments || function () { return null; };
     this.onCoordinates = options.onCoordinates || function () {};
     this.onMessage = options.onMessage || function () {};
     this.interaction = null;
@@ -148,6 +151,14 @@
       var width = Math.max(4, Math.abs(b.left - a.left));
       var height = Math.max(4, Math.abs(b.top - a.top));
       var id = this.state.uniqueFieldId(interaction.tool === 'check' ? 'checkbox' : interaction.tool === 'static' ? 'static-text' : 'text-field');
+      // New text fields follow the readability policy: 12 pt preferred, 9 pt
+      // floor, and a leading that suits 12 pt text. A region tall enough for
+      // more than one line of that text wraps by default — an extra line is
+      // always better than smaller text.
+      var policy = ns.schema.policy();
+      var preferred = policy.preferredFontSize;
+      var defaultLeading = Number((preferred * 1.15).toFixed(2));
+      var fitsTwoLines = height >= defaultLeading * 2;
       var field = {
         id: id,
         type: interaction.tool === 'multiline' ? 'text' : interaction.tool,
@@ -157,16 +168,21 @@
         left: Number(left.toFixed(2)),
         top: Number(top.toFixed(2)),
         height: Number(height.toFixed(2)),
-        baselineTop: Number((top + (interaction.tool === 'check' ? Math.min(height, 8.5) * 0.78 : 9)).toFixed(2)),
+        baselineTop: Number((top + (interaction.tool === 'check'
+          ? Math.min(height, 8.5) * 0.78
+          : preferred * 0.891)).toFixed(2)),
         width: Number(width.toFixed(2)),
         font: 'legalSerif',
-        fontSize: 9,
-        minFontSize: 6,
+        fontSize: interaction.tool === 'check' ? undefined : preferred,
+        minFontSize: interaction.tool === 'check' ? undefined : policy.minFontSize,
         align: 'left',
-        multiline: interaction.tool === 'multiline',
-        lineHeight: interaction.tool === 'multiline' ? 10.35 : undefined,
-        maxHeight: interaction.tool === 'multiline' ? Number(height.toFixed(2)) : undefined,
-        maxLines: interaction.tool === 'multiline' ? Math.max(1, Math.floor(height / 10.35)) : undefined,
+        multiline: interaction.tool === 'multiline' ||
+          (interaction.tool === 'text' && fitsTwoLines),
+        lineHeight: interaction.tool === 'check' ? undefined : defaultLeading,
+        maxHeight: interaction.tool === 'multiline' || fitsTwoLines
+          ? Number(height.toFixed(2)) : undefined,
+        maxLines: interaction.tool === 'multiline' || fitsTwoLines
+          ? Math.max(1, Math.floor(height / defaultLeading)) : undefined,
         glyphSize: interaction.tool === 'check' ? 8.5 : undefined,
         boxSize: interaction.tool === 'check' ? Number(Math.min(width, height).toFixed(2)) : undefined,
         markStyle: interaction.tool === 'check' ? 'check' : undefined,
@@ -305,15 +321,74 @@
       var baseline = this.viewer.pdfToCss(field.left, field.baselineTop);
       var baselineEnd = this.viewer.pdfToCss(Number(field.left) + Number(field.width || 0), field.baselineTop);
       group.appendChild(svg('line', { x1: baseline.x, y1: baseline.y, x2: baselineEnd.x, y2: baselineEnd.y, class: 'dtb-baseline', 'data-field-id': field.id }));
+      // Continuation lines belong to this field: draw each of them, highlight
+      // them together whenever the field is selected, and show the value split
+      // across them exactly as the production engine assigned it.
+      var assignments = this.getAssignments ? this.getAssignments(field.id) : null;
+      var regions = ns.schema.flowRegions(field);
+      var isSelected = field.id === this.state.selectedFieldId;
+
+      regions.forEach(function (region, regionIndex) {
+        if (regionIndex === 0 || Number(region.page) !== this.state.pageIndex) return;
+        var start = this.viewer.pdfToCss(region.left, region.baselineTop);
+        var end = this.viewer.pdfToCss(Number(region.left) + Number(region.width || 0),
+          region.baselineTop);
+        group.appendChild(svg('line', {
+          x1: start.x, y1: start.y, x2: end.x, y2: end.y,
+          class: 'dtb-flow-baseline' +
+            (region.reviewStatus === 'suggested' ? ' is-suggested' : '') +
+            (isSelected ? ' is-selected' : ''),
+          'data-field-id': field.id
+        }));
+        if (region.drawUnderline) {
+          var offset = region.underlineOffset != null ? Number(region.underlineOffset) : 2;
+          var ruleTop = region.underlineTop != null
+            ? Number(region.underlineTop) : Number(region.baselineTop) + offset;
+          var ruleLeft = region.underlineLeft != null
+            ? Number(region.underlineLeft) : Number(region.left);
+          var ruleWidth = region.underlineWidth != null
+            ? Number(region.underlineWidth) : Number(region.width || 0);
+          var a = this.viewer.pdfToCss(ruleLeft, ruleTop);
+          var b = this.viewer.pdfToCss(ruleLeft + ruleWidth, ruleTop);
+          group.appendChild(svg('line', {
+            x1: a.x, y1: a.y, x2: b.x, y2: b.y,
+            class: 'dtb-flow-rule' +
+              (region.reviewStatus === 'suggested' ? ' is-suggested' : ''),
+            'data-field-id': field.id
+          }));
+        }
+        var caption = svg('text', {
+          x: start.x + 2, y: start.y - 2, class: 'dtb-flow-label',
+          'data-field-id': field.id
+        });
+        caption.textContent = 'Строка ' + (regionIndex + 1) +
+          (region.reviewStatus === 'suggested' ? ' · не подтверждена' : '');
+        group.appendChild(caption);
+      }, this);
+
       var payload = this.getPayload();
       var raw = type === 'static' ? field.text : payload && global.CRMDocumentEngine.overlayRenderer.resolve(field.source, payload);
       var formatted = ns.validation && ns.validation.format ? ns.validation.format(field.format, raw) : raw;
-      if (formatted) {
+      var size = Math.max(4, Number(field.fontSize || 12) * this.viewer.zoom);
+
+      if (assignments && assignments.length) {
+        assignments.forEach(function (line) {
+          if (Number(line.page) !== this.state.pageIndex) return;
+          var region = regions[line.regionIndex] || regions[0];
+          var at = this.viewer.pdfToCss(region.left, region.baselineTop);
+          var text = svg('text', {
+            x: at.x + 2, y: at.y, class: 'dtb-fast-text',
+            'font-size': size, 'data-field-id': field.id
+          });
+          text.textContent = line.text;
+          group.appendChild(text);
+        }, this);
+      } else if (formatted) {
         var text = svg('text', {
           x: rect.x + 2,
           y: baseline.y,
           class: 'dtb-fast-text',
-          'font-size': Math.max(4, Number(field.fontSize || 9) * this.viewer.zoom),
+          'font-size': size,
           'data-field-id': field.id
         });
         text.textContent = String(formatted).replace(/\s+/g, ' ');

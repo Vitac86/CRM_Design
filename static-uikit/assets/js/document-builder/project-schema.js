@@ -12,12 +12,36 @@
   };
 
   var FIELD_PRODUCTION_KEYS = [
-    'id', 'source', 'type', 'page', 'left', 'baselineTop', 'width', 'font',
-    'fontSize', 'minFontSize', 'align', 'multiline', 'lineHeight', 'maxHeight',
-    'maxLines', 'format', 'fallbacks', 'required', 'optional', 'baselineShift',
-    'showWhen', 'equals', 'invert', 'glyphSize', 'markStyle', 'offsetX',
-    'offsetY', 'boxSize', 'thickness', 'inset', 'text'
+    'id', 'label', 'source', 'type', 'page', 'left', 'baselineTop', 'width', 'font',
+    'fontSize', 'minFontSize', 'align', 'multiline', 'lineHeight', 'lineHeightRatio',
+    'maxHeight', 'maxLines', 'format', 'fallbacks', 'required', 'optional',
+    'baselineShift', 'showWhen', 'equals', 'invert', 'glyphSize', 'markStyle',
+    'offsetX', 'offsetY', 'boxSize', 'thickness', 'inset', 'text',
+    // Continuation regions and the properties that travel with them.
+    'flowRegions', 'overflowStrategy', 'allowPrintOverride', 'tokenBreak',
+    'firstLineIndent'
   ];
+
+  // Every property a continuation region may carry. Anything here must survive
+  // an import/export round trip untouched.
+  var FLOW_REGION_KEYS = [
+    'page', 'left', 'baselineTop', 'width', 'maxLines', 'lineHeight',
+    'lineHeightRatio', 'maxHeight', 'maxFontSize', 'align', 'baselineShift',
+    'firstLineIndent', 'drawUnderline', 'underlineLeft', 'underlineTop',
+    'underlineWidth', 'underlineThickness', 'underlineOffset', 'underlineColor',
+    'generated', 'reviewStatus'
+  ];
+
+  // Policy shared with the production engine — the builder must never let a
+  // user configure something production would refuse to draw.
+  function policy() {
+    var engine = global.CRMDocumentEngine;
+    var layout = engine && engine.textLayout;
+    return {
+      minFontSize: layout ? layout.MIN_DYNAMIC_FONT_SIZE : 9,
+      preferredFontSize: layout ? layout.PREFERRED_DYNAMIC_FONT_SIZE : 12
+    };
+  }
 
   var BUILDER_FIELD_KEYS = {
     top: true,
@@ -251,9 +275,58 @@
     return { project: clone(project), errors: [], warnings: checked.warnings };
   }
 
+  // Ordered regions a value flows through, mirroring the production engine's
+  // view of the same field. A field without `flowRegions` has exactly one
+  // implicit region built from its own geometry.
+  function flowRegions(field) {
+    if (!Array.isArray(field.flowRegions) || !field.flowRegions.length) {
+      return [{
+        page: field.page,
+        left: field.left,
+        baselineTop: field.baselineTop,
+        width: field.width,
+        maxLines: field.maxLines,
+        lineHeight: field.lineHeight,
+        implicit: true
+      }];
+    }
+    return clone(field.flowRegions);
+  }
+
+  // Build a continuation region below an existing one. The suggestion is never
+  // trusted: it is written with reviewStatus 'suggested' and production export
+  // stays blocked until a human has looked at it on the page.
+  function suggestContinuation(field, regions, options) {
+    var opts = options || {};
+    var last = regions[regions.length - 1] || field;
+    var size = Number(field.fontSize || policy().preferredFontSize);
+    var leading = Number(last.lineHeight || opts.lineHeight || size * 1.15);
+    var region = {
+      page: last.page != null ? last.page : field.page,
+      left: Number(last.left),
+      baselineTop: Number((Number(last.baselineTop) + leading).toFixed(2)),
+      width: Number(last.width),
+      maxLines: 1,
+      reviewStatus: 'suggested',
+      generated: !!opts.withUnderline
+    };
+    if (opts.withUnderline) {
+      region.drawUnderline = true;
+      region.underlineThickness = opts.underlineThickness != null
+        ? Number(opts.underlineThickness) : 0.36;
+      region.underlineOffset = opts.underlineOffset != null
+        ? Number(opts.underlineOffset) : Number((size * 0.176).toFixed(2));
+    }
+    return region;
+  }
+
   Schema.SCHEMA_VERSION = SCHEMA_VERSION;
   Schema.DEFAULT_FONTS = DEFAULT_FONTS;
   Schema.FIELD_PRODUCTION_KEYS = FIELD_PRODUCTION_KEYS;
+  Schema.FLOW_REGION_KEYS = FLOW_REGION_KEYS;
+  Schema.policy = policy;
+  Schema.flowRegions = flowRegions;
+  Schema.suggestContinuation = suggestContinuation;
   Schema.BUILDER_FIELD_KEYS = BUILDER_FIELD_KEYS;
   Schema.clone = clone;
   Schema.findNonSerializable = findNonSerializable;

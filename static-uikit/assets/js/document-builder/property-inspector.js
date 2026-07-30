@@ -202,7 +202,214 @@
     var formats = [{ value: '', label: 'Без форматтера' }].concat(Object.keys(global.CRMDocumentEngine.overlayRenderer.formatters).sort().map(function (name) { return { value: name, label: name }; }));
     this._addFieldControl(section, field, 'Форматтер', 'format', select(field.format || '', formats), function (value) { return value || undefined; });
     this.container.appendChild(section);
+    this._renderFlowRegions(field);
     this._renderFallbacks(field, formats);
+  };
+
+  // ── Continuation lines ─────────────────────────────────────────────────────
+  //
+  // One logical value, several explicitly mapped regions. The list below is the
+  // flow order: «Строка 1» is the field's own printed slot, everything after it
+  // is a continuation the value spills onto. Geometry is edited numerically
+  // here and by dragging on the page; the final fit always comes from the
+  // production engine.
+  Inspector.prototype._renderFlowRegions = function (field) {
+    var self = this;
+    var section = this._section('Строки продолжения');
+    var regions = ns.schema.flowRegions(field);
+    var implicit = regions.length === 1 && regions[0].implicit;
+
+    section.appendChild(element('p', 'dtb-inspector-hint',
+      implicit
+        ? 'У поля одна строка — его собственное место в форме. Добавьте строку ' +
+          'продолжения, чтобы длинное значение переносилось, а не уменьшалось.'
+        : 'Значение заполняет строки по порядку. Уменьшение кегля начинается ' +
+          'только после того, как закончились все строки.'));
+
+    if (!implicit) {
+      regions.forEach(function (region, index) {
+        section.appendChild(self._flowRegionRow(field, regions, region, index));
+      });
+    }
+
+    var actions = element('div', 'dtb-inspector-actions');
+
+    // A plain continuation: text only, for a place where the authoritative PDF
+    // already prints a rule or provides an empty cell.
+    var addPlain = element('button', 'dtb-button', 'Добавить строку продолжения');
+    addPlain.type = 'button';
+    addPlain.addEventListener('click', function () {
+      self._appendRegion(field, regions, { withUnderline: false });
+    });
+
+    // A full Word-like line: baseline plus its own visible rule, for a place
+    // where the form has blank space but no printed line to write on.
+    var addFull = element('button', 'dtb-button is-primary',
+      'Добавить полноценную строку продолжения');
+    addFull.type = 'button';
+    addFull.addEventListener('click', function () {
+      self._appendRegion(field, regions, {
+        withUnderline: true,
+        underlineThickness: self._nearbyUnderlineThickness(field)
+      });
+    });
+
+    // Pure geometry suggestion — the next likely baseline. It stays
+    // unconfirmed, and validation blocks production export until reviewed.
+    var addBelow = element('button', 'dtb-button', 'Добавить строку ниже');
+    addBelow.type = 'button';
+    addBelow.addEventListener('click', function () {
+      self._appendRegion(field, regions, { withUnderline: false, suggestionOnly: true });
+    });
+
+    [addPlain, addFull, addBelow].forEach(function (button) { actions.appendChild(button); });
+    section.appendChild(actions);
+    section.appendChild(element('small', 'dtb-inspector-hint',
+      'Предложенная геометрия не экспортируется, пока её не подтвердят: ' +
+      'откройте страницу, проверьте положение и отметьте «Подтверждена».'));
+    this.container.appendChild(section);
+  };
+
+  // Copy the weight of the nearest printed rule so a generated line starts out
+  // matching the form instead of guessing.
+  Inspector.prototype._nearbyUnderlineThickness = function (field) {
+    var regions = ns.schema.flowRegions(field);
+    for (var i = regions.length - 1; i >= 0; i -= 1) {
+      if (regions[i].underlineThickness != null) return Number(regions[i].underlineThickness);
+    }
+    var siblings = (this.state.project.fields || []).filter(function (other) {
+      return other.page === field.page && Array.isArray(other.flowRegions);
+    });
+    for (var j = 0; j < siblings.length; j += 1) {
+      var found = (siblings[j].flowRegions || []).filter(function (region) {
+        return region.underlineThickness != null;
+      })[0];
+      if (found) return Number(found.underlineThickness);
+    }
+    return 0.36;                       // measured weight of the Word underlines
+  };
+
+  Inspector.prototype._appendRegion = function (field, regions, options) {
+    var self = this;
+    var next = ns.schema.flowRegions(field);
+    if (next.length === 1 && next[0].implicit) {
+      delete next[0].implicit;         // materialise the field's own slot first
+    }
+    var region = ns.schema.suggestContinuation(field, next, options);
+    if (options.suggestionOnly) region.generated = false;
+    next.push(region);
+    self.state.updateField(field.id, {
+      flowRegions: next,
+      overflowStrategy: 'flow'
+    }, 'add continuation line');
+  };
+
+  Inspector.prototype._flowRegionRow = function (field, regions, region, index) {
+    var self = this;
+    var wrap = element('div', 'dtb-flow-region' +
+      (region.reviewStatus === 'suggested' ? ' is-suggested' : ''));
+
+    var head = element('div', 'dtb-flow-region-head');
+    head.appendChild(element('strong', '', 'Строка ' + (index + 1) +
+      (index === 0 ? ' · основная' : '')));
+    if (region.reviewStatus === 'suggested') {
+      head.appendChild(element('span', 'dtb-flow-region-badge', 'не подтверждена'));
+    }
+
+    function patch(changes) {
+      var next = ns.schema.flowRegions(field);
+      Object.keys(changes).forEach(function (key) {
+        if (changes[key] === undefined || changes[key] === '') delete next[index][key];
+        else next[index][key] = changes[key];
+      });
+      self.state.updateField(field.id, { flowRegions: next }, 'edit continuation line');
+    }
+
+    function move(delta) {
+      var next = ns.schema.flowRegions(field);
+      var target = index + delta;
+      if (target < 0 || target >= next.length) return;
+      var tmp = next[index]; next[index] = next[target]; next[target] = tmp;
+      self.state.updateField(field.id, { flowRegions: next }, 'reorder continuation lines');
+    }
+
+    // Removing a region must never remove the logical field with it.
+    function remove() {
+      var next = ns.schema.flowRegions(field);
+      next.splice(index, 1);
+      if (next.length <= 1) {
+        self.state.updateField(field.id, {
+          flowRegions: undefined, overflowStrategy: undefined
+        }, 'remove continuation line');
+        return;
+      }
+      self.state.updateField(field.id, { flowRegions: next }, 'remove continuation line');
+    }
+
+    [['↑', function () { move(-1); }], ['↓', function () { move(1); }],
+     ['×', remove]].forEach(function (action) {
+      var button = element('button', 'dtb-icon-button', action[0]);
+      button.type = 'button';
+      button.addEventListener('click', action[1]);
+      head.appendChild(button);
+    });
+    wrap.appendChild(head);
+
+    [['page', 'Стр.', 1], ['left', 'Left', 0.25], ['baselineTop', 'Baseline', 0.25],
+     ['width', 'Width', 0.25], ['maxLines', 'Строк', 1], ['maxFontSize', 'Макс. кегль', 0.25]]
+      .forEach(function (entry) {
+        var control = input('number', region[entry[0]] == null ? '' : region[entry[0]],
+          { step: entry[2] });
+        control.classList.add('dtb-control');
+        control.addEventListener('change', function () {
+          var changes = {};
+          changes[entry[0]] = control.value === '' ? undefined : Number(control.value);
+          patch(changes);
+        });
+        wrap.appendChild(row(entry[1], control));
+      });
+
+    var underline = input('checkbox', region.drawUnderline);
+    underline.classList.add('dtb-control');
+    underline.addEventListener('change', function () {
+      patch({
+        drawUnderline: underline.checked || undefined,
+        generated: underline.checked || undefined,
+        underlineThickness: underline.checked
+          ? self._nearbyUnderlineThickness(field) : undefined
+      });
+    });
+    wrap.appendChild(row('Рисовать линию', underline,
+      'Обычная векторная линия в содержимом страницы — не поле формы и не подчёркивания.'));
+
+    if (region.drawUnderline) {
+      [['underlineLeft', 'Линия: left'], ['underlineWidth', 'Линия: длина'],
+       ['underlineTop', 'Линия: top'], ['underlineThickness', 'Линия: толщина'],
+       ['underlineOffset', 'Линия: отступ от baseline']]
+        .forEach(function (entry) {
+          var control = input('number', region[entry[0]] == null ? '' : region[entry[0]],
+            { step: 0.05 });
+          control.classList.add('dtb-control');
+          control.addEventListener('change', function () {
+            var changes = {};
+            changes[entry[0]] = control.value === '' ? undefined : Number(control.value);
+            patch(changes);
+          });
+          wrap.appendChild(row(entry[1], control));
+        });
+    }
+
+    if (index > 0) {
+      var approved = input('checkbox', region.reviewStatus === 'approved');
+      approved.classList.add('dtb-control');
+      approved.addEventListener('change', function () {
+        patch({ reviewStatus: approved.checked ? 'approved' : 'suggested' });
+      });
+      wrap.appendChild(row('Подтверждена визуально', approved,
+        'Пока не отмечено, production-экспорт заблокирован.'));
+    }
+
+    return wrap;
   };
 
   Inspector.prototype._renderFallbacks = function (field, formats) {

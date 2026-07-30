@@ -82,6 +82,21 @@ textarea.dtb-control { resize: vertical; }
 .dtb-inspector-row input[type="checkbox"] { justify-self: start; }
 .dtb-fallback-item { display: flex; align-items: center; gap: 4px; margin: 3px 0; }
 .dtb-fallback-item code { flex: 1; }
+
+/* Continuation lines — the ordered regions one logical value flows through. */
+.dtb-flow-region { margin: 6px 0; padding: 6px 8px; border: 1px solid #d7dfec; border-radius: 5px; background: #fbfcfe; }
+.dtb-flow-region.is-suggested { border-color: #e0b45c; background: #fffaf0; }
+.dtb-flow-region-head { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+.dtb-flow-region-head strong { flex: 1; font-size: 12px; }
+.dtb-flow-region-badge { padding: 1px 6px; border-radius: 9px; background: #f4dcae; font-size: 10px; color: #7a5410; }
+
+/* Canvas: the continuation baselines and their generated rules. */
+.dtb-flow-baseline { stroke: #2f6fed; stroke-width: 1.2; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; pointer-events: none; }
+.dtb-flow-baseline.is-selected { stroke-width: 1.8; stroke-dasharray: none; }
+.dtb-flow-baseline.is-suggested { stroke: #d99b23; }
+.dtb-flow-rule { stroke: #23324d; stroke-width: 1; vector-effect: non-scaling-stroke; pointer-events: none; }
+.dtb-flow-rule.is-suggested { stroke: #d99b23; stroke-dasharray: 3 2; }
+.dtb-flow-label { fill: #2f6fed; font-size: 9px; pointer-events: none; }
 .dtb-icon-button { border: 1px solid #c5cfdb; border-radius: 3px; background: #fff; cursor: pointer; }
 .dtb-warning-text { color: var(--dtb-warn); font-size: 11px; }
 .dtb-empty-state { padding: 24px 10px; color: var(--dtb-muted); text-align: center; }

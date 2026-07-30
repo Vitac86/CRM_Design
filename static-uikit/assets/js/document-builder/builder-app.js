@@ -61,6 +61,15 @@
       viewer: this.viewer,
       svg: byId('dtb-overlay'),
       getPayload: function () { return self.getPayload(); },
+      // Region assignments from the production engine's own layout, so the
+      // canvas shows the text distributed exactly as it will be printed.
+      getAssignments: function (fieldId) {
+        if (!self.currentFit) return null;
+        var entry = (self.currentFit.fields || []).filter(function (item) {
+          return item.fieldId === fieldId;
+        })[0];
+        return entry && entry.result ? entry.result.assignments || null : null;
+      },
       onCoordinates: function (point) { self._showCoordinates(point); },
       onMessage: this.message.bind(this)
     });
@@ -350,7 +359,13 @@
     this._analysisTimer = global.setTimeout(function () {
       if (!self.state.project || !self.sourceInfo) return;
       ns.validation.analyzeProfile(self.state.project, self.state.profileId, self.state.payloadOverrides)
-        .then(function (result) { self.currentFit = result; self.renderCurrentFit(); })
+        .then(function (result) {
+          self.currentFit = result;
+          self.renderCurrentFit();
+          // Redraw the page so the canvas preview shows the freshly computed
+          // distribution across the continuation lines.
+          self.editor.render();
+        })
         .catch(function (error) { self.error(error); });
     }, 180);
   };

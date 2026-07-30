@@ -75,67 +75,66 @@
     return result;
   }
 
+  // The fit result always comes from the production engine — the builder must
+  // configure production behaviour, never approximate it with its own copy.
+  // Only the glyph-coverage check is builder-specific: production embeds a
+  // subset and would simply drop an unmapped character, so it is worth catching
+  // while the template is still being authored.
   function analyzeTextField(project, field, payload, profileId, font) {
-    if (!visible(field, payload)) return { status: 'hidden', label: 'Не показывается' };
     var renderer = global.CRMDocumentEngine.overlayRenderer;
-    var raw = (field.type || 'text') === 'static' ? field.text : renderer.resolve(field.source, payload);
-    if (raw == null || raw === '') {
-      return field.required
-        ? { status: 'missing', label: 'Нет обязательного значения', profileId: profileId }
-        : { status: 'empty', label: 'Пусто (допустимо)', profileId: profileId };
+    var result = renderer.layoutField(field, payload, font);
+
+    if (result.reason === 'hidden') return { status: 'hidden', label: 'Не показывается' };
+    if (result.reason === 'empty') {
+      return { status: 'empty', label: 'Пусто (допустимо)', profileId: profileId };
     }
-    var candidates = [field.format].concat(field.fallbacks || []);
-    var firstUnsupported = null;
-    var lastFit = null;
-    for (var index = 0; index < candidates.length; index += 1) {
-      var formatter = candidates[index];
-      var value = format(formatter, raw);
-      if (!value) continue;
-      var unsupported = unsupportedCharacters(font, value);
-      if (unsupported.length) {
-        if (!firstUnsupported) firstUnsupported = { value: value, unsupported: unsupported, formatter: formatter };
-        continue;
-      }
-      var start = Number(field.fontSize || 9);
-      var fit = global.CRMDocumentEngine.textLayout.fitText(font, value, {
-        size: start,
-        minSize: field.minFontSize != null ? Number(field.minFontSize) : start,
-        maxWidth: Number(field.width),
-        maxHeight: field.maxHeight == null ? undefined : Number(field.maxHeight),
-        maxLines: field.maxLines == null ? undefined : Number(field.maxLines),
-        multiline: !!field.multiline,
-        lineHeight: field.lineHeight == null ? undefined : Number(field.lineHeight)
-      });
-      lastFit = fit;
-      if (!fit.fits) continue;
-      var status = index > 0 ? 'fallback' :
-        (fit.lines.length > 1 ? 'multiline' : (fit.size < start - 0.001 ? 'shrink' : 'normal'));
+    if (result.reason === 'missing') {
+      return { status: 'missing', label: 'Нет обязательного значения', profileId: profileId };
+    }
+    if (result.reason === 'overflow') {
       return {
-        status: status,
-        label: status === 'fallback' ? 'Fallback: ' + (formatter || 'без форматтера') :
-          status === 'multiline' ? fit.lines.length + ' lines' :
-          status === 'shrink' ? fit.size + ' pt' : 'OK',
-        fontSize: fit.size,
-        lines: fit.lines.length,
-        formatter: formatter || null,
-        value: value,
+        status: 'overflow',
+        label: 'Не помещается',
+        message: renderer.overflowMessage(result.diagnostics),
+        requiredWidth: result.layout && result.layout.requiredWidth,
+        availableWidth: result.diagnostics.availableWidth,
+        lineCapacity: result.diagnostics.lineCapacity,
+        regionCount: result.diagnostics.regionCount,
+        value: result.diagnostics.value,
         profileId: profileId
       };
     }
-    if (firstUnsupported) {
+
+    var unsupported = unsupportedCharacters(font, result.value);
+    if (unsupported.length) {
       return {
         status: 'unsupported-glyph',
-        label: firstUnsupported.unsupported[0].character + ' ' + firstUnsupported.unsupported[0].unicode,
-        unsupported: firstUnsupported.unsupported,
-        value: firstUnsupported.value,
+        label: unsupported[0].character + ' ' + unsupported[0].unicode,
+        unsupported: unsupported,
+        value: result.value,
         profileId: profileId
       };
     }
+
+    var layout = result.layout;
+    var status = result.usedFallback ? 'fallback'
+      : layout.strategy === 'flow' ? 'flow'
+      : layout.lines.length > 1 ? 'multiline'
+      : layout.shrunk ? 'shrink' : 'normal';
     return {
-      status: 'overflow',
-      label: 'Не помещается',
-      requiredWidth: lastFit && lastFit.requiredWidth,
-      availableWidth: field.width,
+      status: status,
+      label: status === 'fallback' ? 'Fallback: ' + (result.formatter || 'без форматтера') :
+        status === 'flow' ? layout.usedRegions.length + ' строк продолжения' :
+        status === 'multiline' ? layout.lines.length + ' lines' :
+        status === 'shrink' ? layout.size + ' pt' : 'OK',
+      fontSize: layout.size,
+      lines: layout.lines.length,
+      regions: layout.usedRegions.length,
+      assignments: layout.lines.map(function (line) {
+        return { regionIndex: line.regionIndex, page: line.page, text: line.text };
+      }),
+      formatter: result.formatter,
+      value: result.value,
       profileId: profileId
     };
   }
@@ -163,6 +162,128 @@
         keys.forEach(function (key, index) { result[key] = fonts[index]; });
         return result;
       });
+  }
+
+  // ── Readability policy ─────────────────────────────────────────────────────
+  //
+  // The same rule production enforces, checked here so a project can never be
+  // exported with a configuration the renderer would reject. Legacy maps
+  // imported from before the policy land here and are flagged rather than
+  // quietly corrected — a human decides what each slot should really use.
+  function validateReadability(field, errors) {
+    var floor = ns.schema.policy().minFontSize;
+    if (field.minFontSize != null && Number(field.minFontSize) < floor) {
+      errors.push(item('error', 'min-font-size',
+        'Минимальный размер ниже допустимых ' + floor + ' pt', field));
+    }
+    if (field.fontSize != null && Number(field.fontSize) < floor) {
+      errors.push(item('error', 'font-size-floor',
+        'Начальный кегль ниже допустимых ' + floor + ' pt', field));
+    }
+  }
+
+  // ── Continuation regions ───────────────────────────────────────────────────
+
+  function validateFlowRegions(field, page, pageSizes, errors, warnings, project) {
+    var declared = field.flowRegions;
+    if (!Array.isArray(declared) || !declared.length) {
+      if (field.overflowStrategy === 'flow') {
+        errors.push(item('error', 'flow-regions',
+          'Стратегия «flow» требует строк продолжения.', field));
+      }
+      return;
+    }
+    if (declared.length < 2) {
+      errors.push(item('error', 'flow-regions',
+        'Строк продолжения должно быть минимум две (основная и продолжение).', field));
+    }
+
+    var fontSize = Number(field.fontSize || ns.schema.policy().preferredFontSize);
+    var boxes = [];
+
+    declared.forEach(function (region, index) {
+      var label = 'Строка ' + (index + 1);
+      if (!Number.isInteger(region.page) || region.page < 0 || region.page >= pageSizes.length) {
+        errors.push(item('error', 'flow-region-page',
+          label + ': некорректная страница.', field));
+        return;
+      }
+      var size = pageSizes[region.page];
+      if (!Number.isFinite(Number(region.width)) || Number(region.width) <= 0) {
+        errors.push(item('error', 'flow-region-width',
+          label + ': ширина должна быть положительной.', field));
+        return;
+      }
+      if (!Number.isFinite(Number(region.left)) || !Number.isFinite(Number(region.baselineTop))) {
+        errors.push(item('error', 'flow-region-coordinate',
+          label + ': координаты должны быть числами.', field));
+        return;
+      }
+      if (Number(region.left) < 0 || Number(region.left) + Number(region.width) > size.width + 0.5 ||
+          Number(region.baselineTop) < 0 || Number(region.baselineTop) > size.height) {
+        errors.push(item('error', 'flow-region-bounds',
+          label + ': выходит за границы страницы.', field));
+      }
+      if (region.lineHeightRatio == null && region.lineHeight != null &&
+          Number(region.maxLines) !== 1 && Number(region.lineHeight) < fontSize * 0.9) {
+        errors.push(item('error', 'flow-region-leading',
+          label + ': интерлиньяж мал для кегля ' + fontSize + ' pt.', field));
+      }
+      if (region.maxFontSize != null && Number(region.maxFontSize) < ns.schema.policy().minFontSize) {
+        errors.push(item('error', 'flow-region-max-size',
+          label + ': максимальный кегль ниже допустимых ' +
+          ns.schema.policy().minFontSize + ' pt.', field));
+      }
+      // A generated line invented by the builder must be looked at on the page
+      // before it can reach a client document.
+      if (region.generated && region.reviewStatus !== 'approved') {
+        errors.push(item('error', 'flow-region-unreviewed',
+          label + ': сгенерированная строка не подтверждена визуально — ' +
+          'production-экспорт заблокирован.', field));
+      }
+
+      // Ink box, not em box. Lines on a tight legal form routinely have em
+      // boxes that graze each other; what matters is whether the printed
+      // glyphs collide, so measure from cap height rather than the font's
+      // typographic ascent, and honour a region's own size cap.
+      var regionSize = region.maxFontSize != null
+        ? Math.min(fontSize, Number(region.maxFontSize)) : fontSize;
+      boxes.push({
+        label: label, page: region.page,
+        left: Number(region.left), right: Number(region.left) + Number(region.width),
+        top: Number(region.baselineTop) - regionSize * 0.7,
+        bottom: Number(region.baselineTop) + regionSize * 0.216
+      });
+    });
+
+    // Regions of one field must not sit on top of each other.
+    boxes.forEach(function (a, i) {
+      boxes.slice(i + 1).forEach(function (b) {
+        if (a.page !== b.page) return;
+        if (a.right <= b.left || b.right <= a.left) return;
+        if (a.bottom <= b.top || b.bottom <= a.top) return;
+        errors.push(item('error', 'flow-region-overlap',
+          a.label + ' и ' + b.label + ' перекрываются.', field));
+      });
+    });
+
+    // …nor cross another dynamic field that is drawn on the same page.
+    (project.fields || []).forEach(function (other) {
+      if (other === field || other.id === field.id) return;
+      if ((other.type || 'text') === 'check') return;
+      var otherTop = Number(other.baselineTop) - Number(other.fontSize || fontSize) * 0.7;
+      var otherBottom = Number(other.baselineTop) + Number(other.fontSize || fontSize) * 0.216;
+      var otherLeft = Number(other.left);
+      var otherRight = otherLeft + Number(other.width || 0);
+      boxes.forEach(function (box, index) {
+        if (index === 0) return;                 // the primary slot is the map's own
+        if (box.page !== other.page) return;
+        if (box.right <= otherLeft || otherRight <= box.left) return;
+        if (box.bottom <= otherTop || otherBottom <= box.top) return;
+        warnings.push(item('warning', 'flow-region-neighbour',
+          box.label + ' пересекается с полем ' + other.id + '.', field));
+      });
+    });
   }
 
   function structural(project, baseInfo, payload) {
@@ -279,6 +400,8 @@
       });
       if (field.font && !(project.fonts || {})[field.font]) errors.push(item('error', 'font', 'Неизвестный шрифт: ' + field.font + '.', field));
       if (field.minFontSize != null && Number(field.minFontSize) > Number(field.fontSize)) errors.push(item('error', 'font-size', 'Минимальный кегль больше начального.', field));
+      if (type !== 'check') validateReadability(field, errors);
+      if (type !== 'check') validateFlowRegions(field, page, pageSizes, errors, warnings, project);
       if (field.showWhen) {
         if (!ns.sourceCatalog.isValid(field.showWhen.source)) errors.push(item('error', 'show-when', 'Некорректный источник условия.', field));
         if (field.showWhen.invert != null || field.showWhen.expression != null) errors.push(item('error', 'show-when', 'Условие содержит неподдерживаемое выражение.', field));
@@ -335,7 +458,7 @@
   function runAll(project, overrides) {
     return loadProjectFonts(project).then(function (fonts) {
       var profiles = ns.fixtures.profiles.map(function (profile) { return analyzeProfile(project, profile.id, overrides, fonts); });
-      var counts = { normal: 0, shrink: 0, multiline: 0, fallback: 0, failures: 0, missing: 0, unsupportedGlyphs: 0 };
+      var counts = { normal: 0, shrink: 0, multiline: 0, flow: 0, fallback: 0, failures: 0, missing: 0, unsupportedGlyphs: 0 };
       profiles.forEach(function (profile) {
         profile.fields.forEach(function (entry) {
           var status = entry.result.status;

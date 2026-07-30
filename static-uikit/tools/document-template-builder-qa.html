@@ -101,6 +101,161 @@
         assert(ns.io.semanticEqual(map, exported), 'Round-trip failed: ' + map.id);
       });
     });
+    // ── Readability policy and continuation lines ─────────────────────────
+    add('New text fields default to 12 pt preferred and 9 pt minimum', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var before = app.state.project.fields.length;
+        app.editor._up({
+          pointerId: 1,
+          preventDefault: function () {}
+        });
+        // Draw a region tall enough for two 12 pt lines.
+        app.editor.interaction = {
+          kind: 'draw', tool: 'text',
+          start: { left: 60, top: 300 }, current: { left: 260, top: 340 }
+        };
+        app.editor._up({ pointerId: 1 });
+        var field = app.state.project.fields[app.state.project.fields.length - 1];
+        equal(app.state.project.fields.length, before + 1, 'field added');
+        equal(field.fontSize, 12, 'preferred size');
+        equal(field.minFontSize, 9, 'minimum size');
+        assert(field.lineHeight >= 12, 'line height suits 12 pt text: ' + field.lineHeight);
+        assert(field.multiline, 'a two-line region wraps by default');
+        app.state.deleteSelected();
+      });
+    });
+    add('A minimum below 9 pt is rejected with the required message', function () {
+      var project = cloneProject(app.state.project);
+      project.fields.push({
+        id: 'qa-below-floor', type: 'text', source: 'field.clientFullName',
+        page: 0, left: 60, top: 300, height: 12, baselineTop: 310, width: 120,
+        font: 'legalSerif', fontSize: 12, minFontSize: 6
+      });
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      var found = result.errors.filter(function (error) {
+        return error.code === 'min-font-size';
+      })[0];
+      assert(found, 'no min-font-size error raised');
+      equal(found.message, 'Минимальный размер ниже допустимых 9 pt');
+    });
+    add('Every imported production map already satisfies the 9 pt floor', function () {
+      var offenders = [];
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        (map.fields || []).forEach(function (field) {
+          if ((field.type || 'text') === 'check') return;
+          if (Number(field.minFontSize) < 9 || Number(field.fontSize) < 9) {
+            offenders.push(map.id + '/' + field.id);
+          }
+        });
+      });
+      equal(offenders.length, 0, 'below the floor: ' + offenders.slice(0, 5).join(', '));
+    });
+    add('Adding a continuation line builds ordered flow regions', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var field = app.state.project.fields.filter(function (item) {
+          return item.id === 'clientFullName';
+        })[0];
+        app.state.selectField(field.id);
+        var regions = ns.schema.flowRegions(field);
+        equal(regions.length, 1, 'starts with its own slot');
+        app.inspector.render();
+        var suggestion = ns.schema.suggestContinuation(field, regions, { withUnderline: true });
+        assert(suggestion.baselineTop > field.baselineTop, 'the next line sits below');
+        equal(suggestion.reviewStatus, 'suggested', 'never approved automatically');
+        equal(suggestion.drawUnderline, true, 'a full line carries its rule');
+        assert(suggestion.underlineThickness > 0, 'rule thickness suggested');
+      });
+    });
+    add('An unconfirmed generated line blocks production export', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) { return item.id === 'clientFullName'; })[0];
+      field.overflowStrategy = 'flow';
+      field.flowRegions = [
+        { page: 0, left: field.left, baselineTop: field.baselineTop, width: field.width, maxLines: 1 },
+        { page: 0, left: 56.6, baselineTop: 300, width: 400, maxLines: 1,
+          generated: true, drawUnderline: true, underlineThickness: 0.36,
+          reviewStatus: 'suggested' }
+      ];
+      var blocked = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(blocked.errors.some(function (error) {
+        return error.code === 'flow-region-unreviewed';
+      }), 'unconfirmed line did not block export');
+
+      field.flowRegions[1].reviewStatus = 'approved';
+      var allowed = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(!allowed.errors.some(function (error) {
+        return error.code === 'flow-region-unreviewed';
+      }), 'approved line still blocked');
+    });
+    add('Overlapping continuation lines are rejected', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) { return item.id === 'clientFullName'; })[0];
+      field.overflowStrategy = 'flow';
+      field.flowRegions = [
+        { page: 0, left: 60, baselineTop: 300, width: 200, maxLines: 1 },
+        { page: 0, left: 60, baselineTop: 301, width: 200, maxLines: 1,
+          reviewStatus: 'approved' }
+      ];
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'flow-region-overlap';
+      }), 'overlap not detected');
+    });
+    add('Continuation lines survive a builder JSON round trip', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var text = ns.io.exportProject(app.state.project);
+        var imported = ns.io.importProjectText(text).project;
+        assert(ns.io.semanticEqual(app.state.project, imported), 'project changed');
+        var source = app.state.project.fields.filter(function (item) {
+          return Array.isArray(item.flowRegions);
+        });
+        assert(source.length > 0, 'the fixture map has no continuation lines to test');
+        source.forEach(function (field) {
+          var round = imported.fields.filter(function (item) { return item.id === field.id; })[0];
+          assert(ns.io.semanticEqual(round.flowRegions, field.flowRegions),
+            'flowRegions changed for ' + field.id);
+          equal(round.overflowStrategy, field.overflowStrategy, 'strategy changed');
+        });
+      });
+    });
+    add('Continuation lines survive a production JS round trip', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['accession-application-fl'];
+      var project = ns.schema.fromProduction(map, app.catalog.filter(function (entry) {
+        return entry.overlayTemplateId === 'accession-application-fl';
+      })[0]);
+      var exported = ns.schema.toProduction(project);
+      var withFlow = (map.fields || []).filter(function (field) {
+        return Array.isArray(field.flowRegions);
+      });
+      assert(withFlow.length >= 3, 'expected continuation lines in the fixture map');
+      withFlow.forEach(function (field) {
+        var round = exported.fields.filter(function (item) { return item.id === field.id; })[0];
+        assert(ns.io.semanticEqual(round.flowRegions, field.flowRegions),
+          'flowRegions changed for ' + field.id);
+      });
+    });
+    add('Deleting a continuation line keeps the logical field', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var before = app.state.project.fields.length;
+        var field = app.state.project.fields.filter(function (item) {
+          return item.id === 'registrationAddress';
+        })[0];
+        assert(Array.isArray(field.flowRegions), 'fixture field has no continuation');
+        app.state.updateField(field.id, { flowRegions: undefined, overflowStrategy: undefined },
+          'qa remove continuation');
+        var after = app.state.project.fields.filter(function (item) {
+          return item.id === 'registrationAddress';
+        })[0];
+        assert(after, 'the field was removed with its continuation line');
+        equal(app.state.project.fields.length, before, 'field count changed');
+      });
+    });
+
     add('Replacement PDF comparison works', function () {
       return app.openExisting('accession-application-fl').then(function () {
         return makePdf(app.sourceInfo.pages.map(function (page) { return { width: page.width, height: page.height }; }));
