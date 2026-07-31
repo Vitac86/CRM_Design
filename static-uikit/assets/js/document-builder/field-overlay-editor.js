@@ -444,6 +444,8 @@
     var spec = field.expansion;
     var pageWidth = (this.viewer.pages[this.state.pageIndex] || {}).width || 595.32;
     var pending = spec.reviewStatus !== 'approved';
+    var page = spec.page != null ? Number(spec.page) : Number(field.page);
+    var pageLayout = (this.state.project.pageLayout || {})[page] || null;
     var self = this;
 
     function horizontal(top, className) {
@@ -458,7 +460,18 @@
     }
 
     horizontal(Number(spec.insertionTop), 'dtb-expansion-anchor');
-    horizontal(Number(spec.shiftToTop), 'dtb-expansion-block-end');
+    horizontal(Number(pageLayout ? pageLayout.shiftToTop : spec.shiftToTop),
+      'dtb-expansion-block-end');
+    if (pageLayout) {
+      horizontal(Number(pageLayout.fixedHeaderUntil || 0), 'dtb-expansion-block-end');
+      if (pageLayout.fixedFooterFrom != null) {
+        horizontal(Number(pageLayout.fixedFooterFrom), 'dtb-expansion-block-end');
+      }
+      if (pageLayout.crossPageFlow) {
+        horizontal(Number(pageLayout.crossPageFlow.sourceFromTop), 'dtb-expansion-anchor');
+        horizontal(Number(pageLayout.crossPageFlow.sourceToTop), 'dtb-expansion-block-end');
+      }
+    }
 
     // The rows that could open, previewed at their maximum count.
     var rows = Number(spec.maxExtraRows || 1);
@@ -481,8 +494,15 @@
       x: caption.x + 2, y: caption.y - 3, class: 'dtb-expansion-label',
       'data-field-id': field.id
     });
+    var budget = pageLayout
+      ? ns.schema.pageBudgetOf(Object.assign({}, pageLayout, {
+          pageHeight: (this.viewer.pages[page] || {}).height || 841.92
+        })).total
+      : (spec.bottomReserve || 0);
     label.textContent = 'Расширение: до ' + rows + '×' + height + ' pt' +
-      ' (запас ' + (spec.bottomReserve || 0) + ' pt)' +
+      ' (запас ' + budget + ' pt)' +
+      (pageLayout && pageLayout.crossPageFlow
+        ? ' · целый блок → стр. ' + (Number(pageLayout.crossPageFlow.targetPage) + 1) : '') +
       (pending ? ' · не подтверждено' : '');
     group.appendChild(label);
   };

@@ -454,7 +454,9 @@
       Object.assign({}, layout, { pageHeight: pageSize.height }));
     section.appendChild(element('p', 'dtb-inspector-hint',
       'Запас страницы: ' + budget.bottomCapacity + ' pt внизу + ' +
-      budget.recoverable + ' pt из просветов = ' + budget.total + ' pt. ' +
+      budget.recoverable + ' pt из просветов + ' +
+      (budget.flowRecoverable || 0) + ' pt из переноса целого блока = ' +
+      budget.total + ' pt. ' +
       'Поля страницы: ' + ((layout.anchors || []).join(', ') || '—') + '.'));
 
     // Reviewed whitespace recovery, one row per zone.
@@ -509,6 +511,92 @@
       'Уплотнять можно только просвет между двумя целыми блоками и только ' +
       'выше первой точки вставки. Межстрочный интервал внутри абзаца, кегль и ' +
       'вертикальный масштаб не трогаются.'));
+
+    // Last-resort reviewed movement of one complete trailing operator block to
+    // the already-continuing next page. Every boundary stays explicit; an
+    // incomplete or unreviewed rule is rejected by both builder and production.
+    var flow = layout.crossPageFlow;
+    if (flow) {
+      section.appendChild(element('p', 'dtb-inspector-hint',
+        'Перенос между страницами включается только после исчерпания нижнего ' +
+        'запаса и проверенных просветов. Нумерация страниц в схеме начинается с 0.'));
+      var flowRows = [
+        ['targetPage', 'Целевая страница', 1],
+        ['sourceFromTop', 'Исходный блок: от', 0.25],
+        ['sourceToTop', 'Исходный блок: до', 0.25],
+        ['sourceContentTop', 'Верх содержимого', 0.25],
+        ['retainedBodyBottom', 'Низ оставшегося блока', 0.25],
+        ['targetInsertionTop', 'Вставка на целевой странице', 0.25],
+        ['targetShiftFromTop', 'Целевой блок: от', 0.25],
+        ['targetShiftToTop', 'Целевой блок: до', 0.25],
+        ['targetShift', 'Сдвиг целевого блока', 0.25],
+        ['maxCumulativeShift', 'Максимальный сдвиг', 0.25],
+        ['maxCascadeDepth', 'Глубина каскада', 1]
+      ];
+      flowRows.forEach(function (entry) {
+        var control = input('number', flow[entry[0]] == null ? '' : flow[entry[0]],
+          { step: entry[2] });
+        control.classList.add('dtb-control');
+        control.addEventListener('change', function () {
+          var next = ns.schema.clone(layout);
+          next.crossPageFlow[entry[0]] = control.value === ''
+            ? undefined : Number(control.value);
+          commit(next);
+        });
+        section.appendChild(row(entry[1], control));
+      });
+      var flowNote = input('text', flow.note || '');
+      flowNote.classList.add('dtb-control');
+      flowNote.addEventListener('change', function () {
+        var next = ns.schema.clone(layout);
+        next.crossPageFlow.note = flowNote.value;
+        commit(next);
+      });
+      section.appendChild(row('Описание целого блока', flowNote));
+      var flowApproved = input('checkbox', flow.reviewStatus === 'approved');
+      flowApproved.classList.add('dtb-control');
+      flowApproved.addEventListener('change', function () {
+        var next = ns.schema.clone(layout);
+        next.crossPageFlow.reviewStatus = flowApproved.checked
+          ? 'approved' : 'suggested';
+        commit(next);
+      });
+      section.appendChild(row('Перенос проверен', flowApproved,
+        'Проверьте границы полного q…Q-блока, порядок чтения, целевую страницу ' +
+        'и положение подписей, печатей и колонтитулов.'));
+      var removeFlow = element('button', 'dtb-button is-danger',
+        'Убрать перенос между страницами');
+      removeFlow.type = 'button';
+      removeFlow.addEventListener('click', function () {
+        var next = ns.schema.clone(layout);
+        delete next.crossPageFlow;
+        commit(next);
+      });
+      section.appendChild(removeFlow);
+    } else {
+      var addFlow = element('button', 'dtb-button', 'Добавить перенос между страницами');
+      addFlow.type = 'button';
+      addFlow.addEventListener('click', function () {
+        var next = ns.schema.clone(layout);
+        next.crossPageFlow = {
+          targetPage: Math.min(index + 1, (project.pageGeometry || []).length - 1),
+          sourceFromTop: Number(layout.bodyBottom || 0),
+          sourceToTop: Number(layout.shiftToTop || pageSize.height),
+          sourceContentTop: Number(layout.bodyBottom || 0),
+          retainedBodyBottom: Number(layout.bodyBottom || 0),
+          targetInsertionTop: 0,
+          targetShiftFromTop: 0,
+          targetShiftToTop: pageSize.height,
+          targetShift: 0,
+          maxCumulativeShift: 0,
+          maxCascadeDepth: 1,
+          reviewStatus: 'suggested',
+          note: ''
+        };
+        commit(next);
+      });
+      section.appendChild(addFlow);
+    }
 
     this.container.appendChild(section);
   };

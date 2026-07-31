@@ -48,6 +48,21 @@ ORDINARY = (
 )
 LONG = ("ru-resident-long", "ru-company-long",
         "en-nonresident-long", "en-company-long")
+PROFILE_KIND = {
+    "ru-resident-short": "individual",
+    "ru-resident-normal": "individual",
+    "ru-resident-long": "individual",
+    "ru-company-normal": "company",
+    "ru-company-long": "company",
+    "en-nonresident-normal": "individual",
+    "en-nonresident-long": "individual",
+    "en-company-normal": "company",
+    "en-company-long": "company",
+    "mixed-ru-en": "individual",
+    "missing-optional": "individual",
+    "maximum-checkboxes": "individual",
+    "minimum-required": "individual",
+}
 
 # Reviewed classification of every ordinary-value failure found on the
 # 387af77 baseline. Each entry is (classification, note).
@@ -83,6 +98,20 @@ CLASSIFICATION = {
         "contains «authority»; the field holds the document a representative "
         "acts under («Устава»). The map also used only the second of the two "
         "printed rules — 39.50 pt on the first line, 99.36 pt on the second."),
+    # These two appeared after scenario-aware allocation exposed the real
+    # foreign-individual demand. The reviewed cross-page rule resolves both;
+    # the arithmetic is in docs/document-text-layout-audit.md §5b.
+    ("power-of-attorney", "flAttorneyIssuedBy"): (
+        "resolved by reviewed cross-page flow",
+        "The individual доверенность has 44.42 pt for inserted rows — 29.79 pt "
+        "above its page number plus 14.63 pt of top margin down to 1.5 cm. A "
+        "доверенность given by a foreign individual needs six 11 pt rows: "
+        "citizenship twice, both issuing authorities, the registration address "
+        "and the date. Four fit locally; a complete trailing power moves to "
+        "page 4 and funds the other two."),
+    ("power-of-attorney", "flAttorneyIssueDate"): (
+        "resolved by reviewed cross-page flow",
+        "The sixth row of the same page. See flAttorneyIssuedBy."),
     ("qualification-notice", "registerEntryOrgName"): (
         "suitable for a larger complete operator-block cut",
         "An ordinary company name needs 107.78 pt at 9 pt in an 89 pt blank. "
@@ -129,15 +158,25 @@ def regions_of(field):
              "width": field.get("width")}]
 
 
-def collect(report):
+def collect(report, maps):
     """Every layout overflow, keyed by (doc, field), split by profile class."""
     out = collections.defaultdict(lambda: {"ordinary": {}, "long": {}})
     for entry in report:
+        # The Cartesian regression deliberately feeds every profile to every
+        # map, including a company payload to individual-only questionnaires.
+        # Keep those robustness probes in the regression report, but never call
+        # them a release failure for a subject variant production cannot expose.
+        applies_to = (maps.get(entry["doc"], {}).get("appliesTo") or
+                      ["individual", "company"])
+        if PROFILE_KIND.get(entry["profile"]) not in applies_to:
+            continue
         if not entry.get("overflow"):
             continue
         for item in entry.get("overflows", []):
-            if item.get("reason") in ("missing", "font", "no-reserve",
-                                      "reserve-exceeded", "block-too-small"):
+            # `missing` is a payload question and `font`/`no-reserve` are
+            # configuration ones. A page that could not be expanded far enough
+            # is a layout failure like any other and belongs in this matrix.
+            if item.get("reason") in ("missing", "font", "no-reserve"):
                 continue
             bucket = "ordinary" if entry["profile"] in ORDINARY else "long"
             out[(entry["doc"], item["fieldId"])][bucket][entry["profile"]] = item
@@ -220,7 +259,7 @@ def main() -> int:
 
     report = load(args.report)
     maps = load(args.maps)
-    failures = collect(report)
+    failures = collect(report, maps)
     cache = {}
 
     ordinary = {key: value["ordinary"] for key, value in failures.items()

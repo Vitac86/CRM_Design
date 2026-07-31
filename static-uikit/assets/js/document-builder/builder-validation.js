@@ -354,6 +354,92 @@
         }
       });
 
+      var flow = entry.crossPageFlow;
+      if (flow) {
+        var flowAt = at + '.crossPageFlow';
+        var required = [
+          'targetPage', 'sourceFromTop', 'sourceToTop', 'sourceContentTop',
+          'retainedBodyBottom', 'targetInsertionTop', 'targetShiftFromTop',
+          'targetShiftToTop', 'targetShift', 'maxCumulativeShift',
+          'maxCascadeDepth'
+        ];
+        required.forEach(function (name) {
+          if (!Number.isFinite(Number(flow[name]))) {
+            errors.push(item('error', 'cross-page-incomplete',
+              flowAt + ': не задан ' + name + '.', null, flowAt));
+          }
+        });
+        var target = Number(flow.targetPage);
+        if (!Number.isInteger(target) || target !== index + 1 || target >= pageSizes.length) {
+          errors.push(item('error', 'cross-page-target',
+            flowAt + ': целевой должна быть непосредственно следующая страница.',
+            null, flowAt));
+        }
+        if (Number(flow.sourceFromTop) >= Number(flow.sourceToTop)) {
+          errors.push(item('error', 'cross-page-source-block',
+            flowAt + ': границы переносимого блока не образуют полный диапазон.',
+            null, flowAt));
+        }
+        if (Number(flow.sourceFromTop) < 0 ||
+            Number(flow.sourceToTop) > pageSizes[index].height + 0.5) {
+          errors.push(item('error', 'cross-page-source-bounds',
+            flowAt + ': переносимый блок выходит за исходную страницу.', null, flowAt));
+        }
+        if (Number(flow.sourceContentTop) < Number(flow.sourceFromTop) - 1e-6 ||
+            Number(flow.sourceContentTop) > Number(flow.sourceToTop) + 1e-6) {
+          errors.push(item('error', 'cross-page-source-block',
+            flowAt + ': верх содержимого находится вне переносимого блока.',
+            null, flowAt));
+        }
+        if (Number(flow.retainedBodyBottom) < 0 ||
+            Number(flow.retainedBodyBottom) > Number(flow.sourceFromTop) + 0.5 ||
+            Number(flow.retainedBodyBottom) >= Number(entry.bodyBottom) - 1e-6) {
+          errors.push(item('error', 'cross-page-recovery',
+            flowAt + ': перенос не освобождает место на исходной странице.',
+            null, flowAt));
+        }
+        if (Number(flow.targetShift) <= 0 ||
+            Number(flow.targetShift) > Number(flow.maxCumulativeShift) + 1e-6) {
+          errors.push(item('error', 'cross-page-shift',
+            flowAt + ': сдвиг следующей страницы превышает проверенный максимум.',
+            null, flowAt));
+        }
+        if (Number.isInteger(target) && target >= 0 && target < pageSizes.length) {
+          if (Number(flow.targetShiftFromTop) < 0 ||
+              Number(flow.targetShiftFromTop) >= Number(flow.targetShiftToTop) ||
+              Number(flow.targetShiftToTop) > pageSizes[target].height + 0.5) {
+            errors.push(item('error', 'cross-page-target-bounds',
+              flowAt + ': подвижный блок следующей страницы выходит за лист.',
+              null, flowAt));
+          }
+          if (Number(flow.targetInsertionTop) < Number(flow.targetShiftFromTop) - 1e-6 ||
+              Number(flow.targetInsertionTop) > Number(flow.targetShiftToTop) + 1e-6) {
+            errors.push(item('error', 'cross-page-target-bounds',
+              flowAt + ': точка вставки находится вне подвижного блока следующей страницы.',
+              null, flowAt));
+          }
+          if (layout[target] && layout[target].crossPageFlow) {
+            errors.push(item('error', 'cross-page-cascade',
+              flowAt + ': каскадный перенос через несколько страниц запрещён.',
+              null, flowAt));
+          }
+        }
+        if (Number(flow.maxCascadeDepth) !== 1) {
+          errors.push(item('error', 'cross-page-cascade',
+            flowAt + ': разрешён только один явно проверенный переход между страницами.',
+            null, flowAt));
+        }
+        if (flow.reviewStatus !== 'approved') {
+          errors.push(item('error', 'cross-page-unreviewed',
+            flowAt + ': перенос целого блока не подтверждён визуально — ' +
+            'production-экспорт заблокирован.', null, flowAt));
+        }
+        if (!String(flow.note || '').trim()) {
+          errors.push(item('error', 'cross-page-note',
+            flowAt + ': добавьте описание проверенного целого блока.', null, flowAt));
+        }
+      }
+
       var budget = ns.schema.pageBudgetOf(
         Object.assign({}, entry, { pageHeight: size.height }));
       (entry.anchors || []).forEach(function (fieldId) {

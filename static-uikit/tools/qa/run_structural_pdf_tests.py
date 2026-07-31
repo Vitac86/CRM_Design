@@ -64,10 +64,16 @@ RENDER = r"""
     if (Object.prototype.hasOwnProperty.call(target, key)) target[key] = overrides[path];
   });
   const notes = [];
+  let flowPages = [];
   let blob;
   try {
     blob = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
-      onExpansion: function (l) { l.forEach(function (n) { notes.push(n); }); }
+      onExpansion: function (l) { l.forEach(function (n) { notes.push(n); }); },
+      onPlan: function (d) {
+        flowPages = Object.keys(d.plans).filter(function (page) {
+          return !!d.plans[page].pageFlow;
+        }).map(Number);
+      }
     });
   } catch (e) {
     return JSON.stringify({ error: e.name, message: String(e.message).slice(0, 200) });
@@ -75,7 +81,8 @@ RENDER = r"""
   const u8 = new Uint8Array(await blob.arrayBuffer());
   let s = ''; const c = 0x8000;
   for (let i = 0; i < u8.length; i += c) s += String.fromCharCode.apply(null, u8.subarray(i, i + c));
-  return JSON.stringify({ pdf: btoa(s), notes: notes, pages: t.expectedPages,
+  return JSON.stringify({ pdf: btoa(s), notes: notes, flowPages: flowPages,
+                          pages: t.expectedPages,
                           url: t.templateUrl });
 }(DOC, PROFILE, OVERRIDES))
 """
@@ -141,7 +148,8 @@ class Checks:
         return 1 if failed else 0
 
 
-def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages):
+def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
+            cross_page=False):
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
     where = f"{doc_id} [{label}]"
@@ -158,6 +166,61 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages):
 
     base_reader = pypdf.PdfReader(template_path)
     gen_reader = pypdf.PdfReader(_io.BytesIO(pdf_bytes))
+
+    # A cross-page rule intentionally changes which page owns a static block,
+    # so the absolute operator guarantee is document-wide: every original
+    # operator/string occurs exactly once across the same fixed page set.
+    base_stream_all = b"\n".join(page_streams(base_reader, i)
+                                  for i in range(base.page_count))
+    gen_stream_all = b"\n".join(page_streams(gen_reader, i)
+                                 for i in range(generated.page_count))
+    base_show_all = show_text_counter(base_stream_all)
+    gen_show_all = show_text_counter(gen_stream_all)
+    lost_all = base_show_all - gen_show_all
+    duplicate_all = collections.Counter(
+        {k: gen_show_all[k] - base_show_all[k] for k in base_show_all
+         if gen_show_all[k] > base_show_all[k]})
+    checks.check(f"{where}: every original show-text operator survives",
+                 not lost_all, f"{sum(lost_all.values())} lost")
+    checks.check(f"{where}: no original show-text operator is duplicated",
+                 not duplicate_all, f"{sum(duplicate_all.values())} duplicated")
+    base_ops_all = operator_counter(base_stream_all)
+    gen_ops_all = operator_counter(gen_stream_all)
+    missing_all = {op: base_ops_all[op] - gen_ops_all[op]
+                   for op in base_ops_all if gen_ops_all[op] < base_ops_all[op]}
+    checks.check(f"{where}: no original operator is lost", not missing_all,
+                 json.dumps({k.decode(): v for k, v in missing_all.items()}))
+    added_q_all = gen_ops_all[b"q"] - base_ops_all[b"q"]
+    added_qq_all = gen_ops_all[b"Q"] - base_ops_all[b"Q"]
+    checks.check(f"{where}: the rewrite adds balanced q/Q only",
+                 added_q_all == added_qq_all and added_q_all >= 0,
+                 f"+{added_q_all} q / +{added_qq_all} Q")
+
+    base_text_all = "\n".join(page.get_text() for page in base)
+    gen_text_all = "\n".join(page.get_text() for page in generated)
+    missing_words_all = words(base_text_all) - words(gen_text_all)
+    checks.check(f"{where}: static text complete across pages (pymupdf)",
+                 not missing_words_all,
+                 f"{sum(missing_words_all.values())} missing")
+    repeated_words_all = sum(
+        max(0, words(gen_text_all)[word] - words(base_text_all)[word])
+        for word in words(base_text_all))
+    checks.check(f"{where}: no wholesale duplication across pages (pymupdf)",
+                 repeated_words_all < max(4, len(words(base_text_all)) // 4),
+                 f"{repeated_words_all} of {len(words(base_text_all))}")
+    naive_base_all = words("\n".join(page.extract_text() or ""
+                                      for page in base_reader.pages))
+    naive_gen_all = words("\n".join(page.extract_text() or ""
+                                     for page in gen_reader.pages))
+    checks.check(f"{where}: static text complete across pages (pypdf)",
+                 not (naive_base_all - naive_gen_all),
+                 f"{sum((naive_base_all - naive_gen_all).values())} missing")
+    naive_repeated_all = sum(
+        max(0, naive_gen_all[word] - naive_base_all[word])
+        for word in naive_base_all)
+    checks.check(f"{where}: no duplication across pages (pypdf)",
+                 naive_repeated_all < max(4, len(naive_base_all) // 4),
+                 f"{naive_repeated_all} of {len(naive_base_all)}")
 
     smallest = None
     for index in range(base.page_count):
@@ -178,51 +241,58 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages):
         duplicated = collections.Counter(
             {k: gen_show[k] - base_show[k] for k in base_show
              if gen_show[k] > base_show[k]})
-        checks.check(f"{at}: every original show-text operator survives",
-                     not lost, f"{sum(lost.values())} lost, e.g. {list(lost)[:2]}")
-        checks.check(f"{at}: no original show-text operator is duplicated",
-                     not duplicated,
-                     f"{sum(duplicated.values())} duplicated, e.g. {list(duplicated)[:2]}")
+        if not cross_page:
+            checks.check(f"{at}: every original show-text operator survives",
+                         not lost, f"{sum(lost.values())} lost, e.g. {list(lost)[:2]}")
+            checks.check(f"{at}: no original show-text operator is duplicated",
+                         not duplicated,
+                         f"{sum(duplicated.values())} duplicated, e.g. {list(duplicated)[:2]}")
 
         base_ops = operator_counter(base_stream)
         gen_ops = operator_counter(gen_stream)
         missing_ops = {op: base_ops[op] - gen_ops[op]
                        for op in base_ops if gen_ops[op] < base_ops[op]}
-        checks.check(f"{at}: no original operator is lost", not missing_ops,
-                     json.dumps({k.decode(): v for k, v in missing_ops.items()}))
+        if not cross_page:
+            checks.check(f"{at}: no original operator is lost", not missing_ops,
+                         json.dumps({k.decode(): v for k, v in missing_ops.items()}))
         # A moved block is wrapped in exactly `q … cm … Q`, so the only balanced
         # pairs the rewrite may add are those.
         added_q = gen_ops[b"q"] - base_ops[b"q"]
         added_qq = gen_ops[b"Q"] - base_ops[b"Q"]
-        checks.check(f"{at}: the rewrite adds balanced q/Q only",
-                     added_q == added_qq and added_q >= 0,
-                     f"+{added_q} q / +{added_qq} Q")
+        if not cross_page:
+            checks.check(f"{at}: the rewrite adds balanced q/Q only",
+                         added_q == added_qq and added_q >= 0,
+                         f"+{added_q} q / +{added_qq} Q")
 
         # ── The static legal text, read by both parsers ───────────────────────
         base_words = words(base_page.get_text())
         gen_words = words(page.get_text())
         missing = base_words - gen_words
-        checks.check(f"{at}: static text complete (pymupdf)", not missing,
-                     f"{sum(missing.values())} missing, e.g. {list(missing)[:3]}")
+        if not cross_page:
+            checks.check(f"{at}: static text complete (pymupdf)", not missing,
+                         f"{sum(missing.values())} missing, e.g. {list(missing)[:3]}")
         repeated = collections.Counter(
             {w: gen_words[w] - base_words[w] for w in base_words
              if gen_words[w] > base_words[w]})
         # A dynamic value may legitimately repeat a word the form prints, so
         # only a wholesale duplication of the page is a failure here.
-        checks.check(f"{at}: no wholesale duplication (pymupdf)",
-                     sum(repeated.values()) < max(4, len(base_words) // 4),
-                     f"{sum(repeated.values())} of {len(base_words)}")
+        if not cross_page:
+            checks.check(f"{at}: no wholesale duplication (pymupdf)",
+                         sum(repeated.values()) < max(4, len(base_words) // 4),
+                         f"{sum(repeated.values())} of {len(base_words)}")
 
         naive_base = words(base_reader.pages[index].extract_text() or "")
         naive_gen = words(gen_reader.pages[index].extract_text() or "")
         naive_missing = naive_base - naive_gen
-        checks.check(f"{at}: static text complete (pypdf)", not naive_missing,
-                     f"{sum(naive_missing.values())} missing, e.g. "
-                     f"{list(naive_missing)[:3]}")
+        if not cross_page:
+            checks.check(f"{at}: static text complete (pypdf)", not naive_missing,
+                         f"{sum(naive_missing.values())} missing, e.g. "
+                         f"{list(naive_missing)[:3]}")
         naive_repeated = sum(max(0, naive_gen[w] - naive_base[w]) for w in naive_base)
-        checks.check(f"{at}: no duplication for a clip-blind extractor (pypdf)",
-                     naive_repeated < max(4, len(naive_base) // 4),
-                     f"{naive_repeated} of {len(naive_base)}")
+        if not cross_page:
+            checks.check(f"{at}: no duplication for a clip-blind extractor (pypdf)",
+                         naive_repeated < max(4, len(naive_base) // 4),
+                         f"{naive_repeated} of {len(naive_base)}")
 
         # ── Our own text: readable, on the page, in both scripts ──────────────
         for block in page.get_text("rawdict")["blocks"]:
@@ -279,7 +349,7 @@ def main() -> int:
                 template_path = os.path.join(
                     TEMPLATES, os.path.basename(payload["url"]))
                 size = inspect(checks, doc_id, label, pdf, template_path,
-                               payload["pages"])
+                               payload["pages"], bool(payload.get("flowPages")))
                 if size is not None:
                     smallest_overall = size if smallest_overall is None \
                         else min(smallest_overall, size)

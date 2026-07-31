@@ -36,7 +36,14 @@
   // carried through export/import untouched.
   var PAGE_LAYOUT_KEYS = [
     'fixedHeaderUntil', 'bodyBottom', 'fixedFooterFrom', 'shiftToTop',
-    'bottomClearance', 'compaction', 'anchors'
+    'bottomClearance', 'compaction', 'crossPageFlow', 'anchors'
+  ];
+
+  var CROSS_PAGE_FLOW_KEYS = [
+    'targetPage', 'sourceFromTop', 'sourceToTop', 'sourceContentTop',
+    'retainedBodyBottom', 'targetInsertionTop', 'targetShiftFromTop',
+    'targetShiftToTop', 'targetShift', 'maxCumulativeShift',
+    'maxCascadeDepth', 'reviewStatus', 'note'
   ];
 
   // One reviewed whitespace recovery: the gap between two complete blocks, and
@@ -54,10 +61,14 @@
     var recoverable = (layout.compaction || []).reduce(function (sum, zone) {
       return sum + Math.max(0, Number(zone.originalGap) - Number(zone.minGap));
     }, 0);
+    var flowRecoverable = layout.crossPageFlow
+      ? Math.max(0, Number(layout.bodyBottom) -
+          Number(layout.crossPageFlow.retainedBodyBottom)) : 0;
     return {
       bottomCapacity: Math.round(bottom * 100) / 100,
       recoverable: Math.round(recoverable * 100) / 100,
-      total: Math.round((bottom + recoverable) * 100) / 100
+      flowRecoverable: Math.round(flowRecoverable * 100) / 100,
+      total: Math.round((bottom + recoverable + flowRecoverable) * 100) / 100
     };
   }
 
@@ -434,6 +445,7 @@
   Schema.suggestPageLayout = suggestPageLayout;
   Schema.PAGE_LAYOUT_KEYS = PAGE_LAYOUT_KEYS;
   Schema.COMPACTION_KEYS = COMPACTION_KEYS;
+  Schema.CROSS_PAGE_FLOW_KEYS = CROSS_PAGE_FLOW_KEYS;
   Schema.pageBudgetOf = pageBudgetOf;
   Schema.policy = policy;
   Schema.flowRegions = flowRegions;

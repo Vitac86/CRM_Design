@@ -374,13 +374,12 @@ def main() -> int:
                      scenarios["ru-resident-normal"]["pages"][0]["total"] == 0 and
                      scenarios["ru-resident-normal"]["pages"][1]["total"] == 0,
                      json.dumps(scenarios["ru-resident-normal"]["pages"]))
-        # Every scenario is paid for, except the one documented limitation: the
-        # individual variant cannot give a foreign attorney all six rows.
-        checks.check("only the documented scenario overruns its page budget",
+        # Every ordinary scenario is paid for. The foreign-individual page uses
+        # its reviewed cross-page capacity for the fifth and sixth rows.
+        checks.check("every ordinary scenario fits its reviewed page budget",
                      all(page["errors"] == 0
-                         for name, s in scenarios.items()
-                         for page in s["pages"]
-                         if name != "en-nonresident-normal"),
+                         for s in scenarios.values()
+                         for page in s["pages"]),
                      json.dumps({k: [p["errors"] for p in v["pages"]]
                                  for k, v in scenarios.items()}))
 
@@ -414,12 +413,9 @@ def main() -> int:
             pdf, _notes = engine.render("power-of-attorney", profile, {})
             rendered[profile] = fitz.open(stream=pdf, filetype="pdf")
 
-        # The individual variant of this form has room for four inserted rows.
-        # A доверенность given by a foreign individual needs six — citizenship
-        # twice, both issuing authorities, the registration address and the
-        # date — so two of them are refused, by name, with the reason. That is
-        # the documented limitation of the source form, and it must stay a
-        # precise refusal rather than becoming a silent overprint.
+        # A foreign individual needs six rows. Local reserve pays for four; the
+        # reviewed cross-page rule moves the two final lines of a complete power
+        # before their existing continuation on page 4, preserving four pages.
         foreign = browser.eval(
             """
             (async function () {
@@ -433,11 +429,45 @@ def main() -> int:
             }())
             """, await_promise=True)
         limited = json.loads(foreign)
-        checks.check("a foreign individual's доверенность refuses by field, not silently",
-                     not limited["ok"] and limited["rows"] == 4 and
-                     limited["fields"] == ["flAttorneyIssuedBy", "flAttorneyIssueDate"] and
-                     set(limited["reasons"]) == {"reserve-exceeded"},
+        checks.check("a foreign individual's доверенность uses reviewed cross-page flow",
+                     limited["ok"] and limited["rows"] == 6 and
+                     not limited["fields"] and not limited["reasons"],
                      foreign)
+        invalid_flow = browser.eval(
+            """
+            (async function () {
+              const original = CRMDocumentEngine.fieldMaps['power-of-attorney'];
+              const broken = Object.assign({}, original, {
+                pageLayout: JSON.parse(JSON.stringify(original.pageLayout))
+              });
+              broken.pageLayout[0].crossPageFlow.targetPage = 2;
+              const project = CRMDocumentBuilder.schema.fromProduction(original, null);
+              const payload = CRMDocumentBuilder.fixtures.payloadFor('ru-company-long', project);
+              try {
+                await CRMDocumentEngine.overlayRenderer.preflight(broken, payload);
+                return JSON.stringify({ rejected: false });
+              } catch (error) {
+                return JSON.stringify({ rejected: true, message: String(error.message) });
+              }
+            }())
+            """, await_promise=True)
+        invalid = json.loads(invalid_flow)
+        checks.check("cross-page flow cannot skip the following page",
+                     invalid["rejected"] and
+                     "immediately following page" in invalid.get("message", ""),
+                     invalid_flow)
+        foreign_pdf, _foreign_notes = engine.render(
+            "power-of-attorney", "en-nonresident-normal", {})
+        foreign_doc = fitz.open(stream=foreign_pdf, filetype="pdf")
+        moved_phrase = "поручения на операции с денежными"
+        checks.check("the moved trailing block occurs on page 4 exactly once",
+                     moved_phrase not in foreign_doc[2].get_text() and
+                     foreign_doc[3].get_text().count(moved_phrase) == 1,
+                     json.dumps([foreign_doc[i].get_text().count(moved_phrase)
+                                 for i in range(4)]))
+        checks.check("cross-page flow preserves the four authoritative pages",
+                     foreign_doc.page_count == poa_base.page_count == 4,
+                     str(foreign_doc.page_count))
 
         checks.check("the legal-entity page recovers white space when it must",
                      0 < title_0 - anchor_y(rendered["ru-company-normal"], 0, "Доверенность") <= 21.35 + 0.02,

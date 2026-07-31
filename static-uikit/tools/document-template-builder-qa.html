@@ -411,7 +411,57 @@
       assert(!Object.prototype.hasOwnProperty.call(back.productionProperties, 'pageLayout'),
              'the page budget is a project property, not an opaque passenger');
     });
+    add('Reviewed cross-page flow is editable, validated and round-trips', function () {
+      return app.openExisting('power-of-attorney').then(function () {
+        app.state.selectField('ulOgrn');
+        var flow = app.state.project.pageLayout[0].crossPageFlow;
+        assert(flow && flow.reviewStatus === 'approved',
+               'the production cross-page rule was not imported');
+        var inspector = frame.document.getElementById('dtb-inspector');
+        var text = inspector.textContent;
+        assert(/Перенос между страницами/.test(text) &&
+               /Исходный блок/.test(text) && /Целевая страница/.test(text),
+               'the cross-page boundaries are not editable in the inspector');
+
+        var project = cloneProject(app.state.project);
+        project.pageLayout[0].crossPageFlow.reviewStatus = 'suggested';
+        var unreviewed = ns.validation.structural(project, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', project));
+        assert(unreviewed.errors.some(function (error) {
+          return error.code === 'cross-page-unreviewed';
+        }), 'an unreviewed cross-page move did not block export');
+
+        delete project.pageLayout[0].crossPageFlow.sourceFromTop;
+        var incomplete = ns.validation.structural(project, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', project));
+        assert(incomplete.errors.some(function (error) {
+          return error.code === 'cross-page-incomplete';
+        }), 'incomplete operator-block boundaries were accepted');
+
+        var skippedPage = cloneProject(app.state.project);
+        skippedPage.pageLayout[0].crossPageFlow.targetPage = 2;
+        var invalidTarget = ns.validation.structural(skippedPage, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', skippedPage));
+        assert(invalidTarget.errors.some(function (error) {
+          return error.code === 'cross-page-target';
+        }), 'a transfer that skips the following page was accepted');
+
+        var undocumented = cloneProject(app.state.project);
+        undocumented.pageLayout[0].crossPageFlow.note = '';
+        var missingNote = ns.validation.structural(undocumented, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', undocumented));
+        assert(missingNote.errors.some(function (error) {
+          return error.code === 'cross-page-note';
+        }), 'an undocumented cross-page move was accepted');
+
+        var exported = ns.schema.toProduction(app.state.project);
+        var back = ns.schema.fromProduction(exported, null);
+        assert(ns.io.semanticEqual(back.pageLayout[0].crossPageFlow, flow),
+               'cross-page flow changed in production round trip');
+      }).then(function () { return app.openExisting('qualification-notice'); });
+    });
     add('Every production map round-trips its page budget', function () {
+      var flowCount = 0;
       app.catalog.forEach(function (entry) {
         var template = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
         var project = ns.schema.fromProduction(template, entry);
@@ -420,6 +470,7 @@
                'page budget lost for ' + template.id);
         if (template.pageLayout) {
           Object.keys(template.pageLayout).forEach(function (page) {
+            if (template.pageLayout[page].crossPageFlow) flowCount += 1;
             (template.pageLayout[page].anchors || []).forEach(function (id) {
               assert((back.fields || []).some(function (f) { return f.id === id; }),
                      template.id + ': anchor ' + id + ' lost');
@@ -427,6 +478,7 @@
           });
         }
       });
+      equal(flowCount, 3, 'not every reviewed production cross-page rule was audited');
     });
     add('An incomplete expansion is rejected rather than guessed', function () {
       var project = cloneProject(app.state.project);

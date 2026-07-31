@@ -55,12 +55,20 @@ RENDER = r"""
     target[key] = overrides[path];
   });
   const notes = [];
+  let flowPages = [];
   const blob = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
-    onExpansion: function (l) { l.forEach(function (n) { notes.push(n); }); } });
+    onExpansion: function (l) { l.forEach(function (n) { notes.push(n); }); },
+    onPlan: function (d) {
+      flowPages = Object.keys(d.plans).filter(function (page) {
+        return !!d.plans[page].pageFlow;
+      }).map(Number);
+    }
+  });
   const u8 = new Uint8Array(await blob.arrayBuffer());
   let s = ''; const c = 0x8000;
   for (let i = 0; i < u8.length; i += c) s += String.fromCharCode.apply(null, u8.subarray(i, i + c));
-  return JSON.stringify({ pdf: btoa(s), notes: notes, url: t.templateUrl });
+  return JSON.stringify({ pdf: btoa(s), notes: notes, flowPages: flowPages,
+                          url: t.templateUrl });
 }(DOC, PROFILE, OVERRIDES))
 """
 
@@ -84,6 +92,8 @@ CASES = [
      {"extra.bank-address": EN_ADDRESS}),
     ("consequences notice, long name", "qualification-consequences-notice",
      "ru-resident-long", {}),
+    ("cross-page legal block transfer", "client-notifications",
+     "en-nonresident-long", {}),
 ]
 
 
@@ -138,7 +148,14 @@ def generated_rules(page, base_page):
     left/right/weight shape does not occur in the template at all is ours.
     """
     shapes = collections.Counter(r[1:] for r in rules(base_page))
-    return sorted(r for r in rules(page) if not shapes[r[1:]])
+    out = []
+    for rule in rules(page):
+        shape = rule[1:]
+        if shapes[shape]:
+            shapes[shape] -= 1
+        else:
+            out.append(rule)
+    return sorted(out)
 
 
 def verticals(page):
@@ -337,8 +354,13 @@ def main() -> int:
                     fh.write(pdf)
             template_path = os.path.join(TEMPLATES, os.path.basename(payload["url"]))
             inspect(checks, label, doc_id, pdf, template_path, payload["notes"])
+            if label == "cross-page legal block transfer":
+                checks.check(f"{label}: reviewed transfer activates",
+                             bool(payload["flowPages"]), str(payload["flowPages"]))
             rows = sum(note["rows"] for note in payload["notes"])
-            print(f"{label:34s} {doc_id:34s} {rows} inserted row(s)", flush=True)
+            flow = f", cross-page from {payload['flowPages']}" if payload["flowPages"] else ""
+            print(f"{label:34s} {doc_id:34s} {rows} inserted row(s){flow}",
+                  flush=True)
         checks.check("no console errors", not browser.console,
                      "; ".join(browser.console[:3]))
     finally:
