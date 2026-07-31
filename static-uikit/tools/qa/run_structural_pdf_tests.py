@@ -5,8 +5,11 @@
 
 The page expander rewrites a page's own content stream to move content down. The
 guarantee that has to hold is narrow and absolute: **every original operator
-still appears exactly once**. Nothing removed, nothing duplicated, nothing
-rasterised, no page added, and the text still extractable as text.
+outside an approved Word-flow replacement range still appears exactly once**.
+Nothing else is removed, duplicated or rasterised, no page is added, and the
+text remains extractable as text. Approved ranges are proved by their frozen
+template/range SHA-256 values before this test subtracts them from the expected
+source stream.
 
 pymupdf and pypdf are used together on purpose. They disagree about clip paths
 and about how much of a page a Form XObject contributes, and that disagreement
@@ -24,6 +27,7 @@ from __future__ import annotations
 import argparse
 import base64
 import collections
+import hashlib
 import io as _io
 import json
 import os
@@ -33,6 +37,7 @@ import zlib
 
 import fitz  # pymupdf
 import pypdf
+from pypdf.generic import DecodedStreamObject, NameObject
 
 from headless_browser import STATIC_UIKIT, Chrome, Server
 
@@ -65,8 +70,25 @@ RENDER = r"""
   });
   const notes = [];
   let flowPages = [];
+  let reviewedRanges = [];
+  const reviewedFontSizes = {};
   let blob;
   try {
+    const preflight = await CRMDocumentEngine.overlayRenderer.preflight(t, payload);
+    reviewedRanges = preflight.reviewedRanges || [];
+    CRMDocumentEngine.overlayRenderer.activeReviewedRangePages(t, payload)
+      .forEach(function (group) {
+        const sizes = [];
+        group.blocks.forEach(function (block) {
+          [block.fontSize, block.minFontSize].forEach(function (size) {
+            if (Number(size) > 0) sizes.push(Number(size));
+          });
+          (block.runs || []).forEach(function (run) {
+            if (Number(run.fontSize) > 0) sizes.push(Number(run.fontSize));
+          });
+        });
+        reviewedFontSizes[group.page] = Array.from(new Set(sizes));
+      });
     blob = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
       onExpansion: function (l) { l.forEach(function (n) { notes.push(n); }); },
       onPlan: function (d) {
@@ -82,6 +104,8 @@ RENDER = r"""
   let s = ''; const c = 0x8000;
   for (let i = 0; i < u8.length; i += c) s += String.fromCharCode.apply(null, u8.subarray(i, i + c));
   return JSON.stringify({ pdf: btoa(s), notes: notes, flowPages: flowPages,
+                          reviewedRanges: reviewedRanges,
+                          reviewedFontSizes: reviewedFontSizes,
                           pages: t.expectedPages,
                           url: t.templateUrl });
 }(DOC, PROFILE, OVERRIDES))
@@ -130,6 +154,71 @@ def words(text):
     return collections.Counter(w for w in text.split() if len(w) > 2)
 
 
+def reviewed_ranges_by_page(reviewed, page_count):
+    """Validate preflight metadata and return zero-based page -> byte ranges."""
+    result = collections.defaultdict(list)
+    for entry in reviewed or []:
+        page = int(entry["page"])
+        if page < 0 or page >= page_count:
+            raise AssertionError(f"reviewed range page {page} is outside the PDF")
+        inspection = entry.get("inspection") or {}
+        for item in inspection.get("ranges") or []:
+            start, end = int(item["startByte"]), int(item["endByte"])
+            if start < 0 or end <= start:
+                raise AssertionError(
+                    f"invalid byte range for {item.get('id')}: {start}:{end}")
+            result[page].append({
+                "id": item.get("id"),
+                "start": start,
+                "end": end,
+                "sha256": item.get("sha256"),
+            })
+    for ranges in result.values():
+        ranges.sort(key=lambda item: (item["start"], item["end"]))
+        for previous, current in zip(ranges, ranges[1:]):
+            if current["start"] < previous["end"]:
+                raise AssertionError(
+                    f"reviewed ranges {previous['id']} and {current['id']} overlap")
+    return dict(result)
+
+
+def stream_outside_reviewed_ranges(stream, ranges):
+    """Remove only hash-proved ranges from a decoded source content stream."""
+    pieces, cursor = [], 0
+    for item in ranges:
+        start, end = item["start"], item["end"]
+        if end > len(stream):
+            raise AssertionError(
+                f"reviewed range {item['id']} ends at {end}, stream has {len(stream)} bytes")
+        actual = hashlib.sha256(stream[start:end]).hexdigest()
+        if actual != item["sha256"]:
+            raise AssertionError(
+                f"reviewed range {item['id']} has {actual}, expected {item['sha256']}; "
+                "browser and pypdf decoded-stream offsets disagree")
+        pieces.append(stream[cursor:start])
+        cursor = end
+    pieces.append(stream[cursor:])
+    return b"".join(pieces)
+
+
+def comparison_pdf(template_path, ranges_by_page):
+    """Build an in-memory source PDF containing only protected source bytes."""
+    reader = pypdf.PdfReader(template_path)
+    writer = pypdf.PdfWriter()
+    for index, page in enumerate(reader.pages):
+        writer.add_page(page)
+        if index not in ranges_by_page:
+            continue
+        stream = stream_outside_reviewed_ranges(
+            page_streams(reader, index), ranges_by_page[index])
+        replacement = DecodedStreamObject()
+        replacement.set_data(stream)
+        writer.pages[index][NameObject("/Contents")] = writer._add_object(replacement)
+    output = _io.BytesIO()
+    writer.write(output)
+    return output.getvalue()
+
+
 class Checks:
     def __init__(self):
         self.results = []
@@ -149,10 +238,16 @@ class Checks:
 
 
 def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
-            cross_page=False):
+            cross_page=False, reviewed=None, reviewed_font_sizes=None):
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
     where = f"{doc_id} [{label}]"
+
+    ranges_by_page = reviewed_ranges_by_page(reviewed, base.page_count)
+    comparison_bytes = comparison_pdf(template_path, ranges_by_page) \
+        if ranges_by_page else None
+    protected = fitz.open(stream=comparison_bytes, filetype="pdf") \
+        if comparison_bytes else base
 
     checks.check(f"{where}: page count unchanged",
                  generated.page_count == base.page_count == expected_pages,
@@ -166,12 +261,19 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
 
     base_reader = pypdf.PdfReader(template_path)
     gen_reader = pypdf.PdfReader(_io.BytesIO(pdf_bytes))
+    protected_reader = pypdf.PdfReader(_io.BytesIO(comparison_bytes)) \
+        if comparison_bytes else base_reader
+
+    checks.check(f"{where}: approved ranges are hash-proved before comparison",
+                 all(item.get("sha256") for entry in (reviewed or [])
+                     for item in (entry.get("inspection") or {}).get("ranges", [])),
+                 f"{sum(len(items) for items in ranges_by_page.values())} ranges")
 
     # A cross-page rule intentionally changes which page owns a static block,
     # so the absolute operator guarantee is document-wide: every original
     # operator/string occurs exactly once across the same fixed page set.
-    base_stream_all = b"\n".join(page_streams(base_reader, i)
-                                  for i in range(base.page_count))
+    base_stream_all = b"\n".join(page_streams(protected_reader, i)
+                                  for i in range(protected.page_count))
     gen_stream_all = b"\n".join(page_streams(gen_reader, i)
                                  for i in range(generated.page_count))
     base_show_all = show_text_counter(base_stream_all)
@@ -180,15 +282,15 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
     duplicate_all = collections.Counter(
         {k: gen_show_all[k] - base_show_all[k] for k in base_show_all
          if gen_show_all[k] > base_show_all[k]})
-    checks.check(f"{where}: every original show-text operator survives",
+    checks.check(f"{where}: every protected show-text operator survives",
                  not lost_all, f"{sum(lost_all.values())} lost")
-    checks.check(f"{where}: no original show-text operator is duplicated",
+    checks.check(f"{where}: no protected show-text operator is duplicated",
                  not duplicate_all, f"{sum(duplicate_all.values())} duplicated")
     base_ops_all = operator_counter(base_stream_all)
     gen_ops_all = operator_counter(gen_stream_all)
     missing_all = {op: base_ops_all[op] - gen_ops_all[op]
                    for op in base_ops_all if gen_ops_all[op] < base_ops_all[op]}
-    checks.check(f"{where}: no original operator is lost", not missing_all,
+    checks.check(f"{where}: no protected operator is lost", not missing_all,
                  json.dumps({k.decode(): v for k, v in missing_all.items()}))
     added_q_all = gen_ops_all[b"q"] - base_ops_all[b"q"]
     added_qq_all = gen_ops_all[b"Q"] - base_ops_all[b"Q"]
@@ -196,7 +298,7 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                  added_q_all == added_qq_all and added_q_all >= 0,
                  f"+{added_q_all} q / +{added_qq_all} Q")
 
-    base_text_all = "\n".join(page.get_text() for page in base)
+    base_text_all = "\n".join(page.get_text() for page in protected)
     gen_text_all = "\n".join(page.get_text() for page in generated)
     missing_words_all = words(base_text_all) - words(gen_text_all)
     checks.check(f"{where}: static text complete across pages (pymupdf)",
@@ -209,7 +311,7 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                  repeated_words_all < max(4, len(words(base_text_all)) // 4),
                  f"{repeated_words_all} of {len(words(base_text_all))}")
     naive_base_all = words("\n".join(page.extract_text() or ""
-                                      for page in base_reader.pages))
+                                      for page in protected_reader.pages))
     naive_gen_all = words("\n".join(page.extract_text() or ""
                                      for page in gen_reader.pages))
     checks.check(f"{where}: static text complete across pages (pypdf)",
@@ -223,8 +325,14 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                  f"{naive_repeated_all} of {len(naive_base_all)}")
 
     smallest = None
+    unapproved_small = []
+    font_sizes_by_page = {
+        int(page): [float(size) for size in sizes]
+        for page, sizes in (reviewed_font_sizes or {}).items()
+    }
     for index in range(base.page_count):
         page, base_page = generated[index], base[index]
+        protected_page = protected[index]
         at = f"{where} p{index}"
 
         # ── Nothing rasterised, nothing lost from the page's own drawing ──────
@@ -233,7 +341,7 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                      f"{len(page.get_images(full=True))} vs "
                      f"{len(base_page.get_images(full=True))}")
 
-        base_stream = page_streams(base_reader, index)
+        base_stream = page_streams(protected_reader, index)
         gen_stream = page_streams(gen_reader, index)
         base_show = show_text_counter(base_stream)
         gen_show = show_text_counter(gen_stream)
@@ -242,9 +350,9 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
             {k: gen_show[k] - base_show[k] for k in base_show
              if gen_show[k] > base_show[k]})
         if not cross_page:
-            checks.check(f"{at}: every original show-text operator survives",
+            checks.check(f"{at}: every protected show-text operator survives",
                          not lost, f"{sum(lost.values())} lost, e.g. {list(lost)[:2]}")
-            checks.check(f"{at}: no original show-text operator is duplicated",
+            checks.check(f"{at}: no protected show-text operator is duplicated",
                          not duplicated,
                          f"{sum(duplicated.values())} duplicated, e.g. {list(duplicated)[:2]}")
 
@@ -253,7 +361,7 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
         missing_ops = {op: base_ops[op] - gen_ops[op]
                        for op in base_ops if gen_ops[op] < base_ops[op]}
         if not cross_page:
-            checks.check(f"{at}: no original operator is lost", not missing_ops,
+            checks.check(f"{at}: no protected operator is lost", not missing_ops,
                          json.dumps({k.decode(): v for k, v in missing_ops.items()}))
         # A moved block is wrapped in exactly `q … cm … Q`, so the only balanced
         # pairs the rewrite may add are those.
@@ -265,7 +373,7 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                          f"+{added_q} q / +{added_qq} Q")
 
         # ── The static legal text, read by both parsers ───────────────────────
-        base_words = words(base_page.get_text())
+        base_words = words(protected_page.get_text())
         gen_words = words(page.get_text())
         missing = base_words - gen_words
         if not cross_page:
@@ -281,7 +389,7 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                          sum(repeated.values()) < max(4, len(base_words) // 4),
                          f"{sum(repeated.values())} of {len(base_words)}")
 
-        naive_base = words(base_reader.pages[index].extract_text() or "")
+        naive_base = words(protected_reader.pages[index].extract_text() or "")
         naive_gen = words(gen_reader.pages[index].extract_text() or "")
         naive_missing = naive_base - naive_gen
         if not cross_page:
@@ -304,14 +412,24 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
                     if not text.strip():
                         continue
                     smallest = span["size"] if smallest is None else min(smallest, span["size"])
+                    if span["size"] < MIN_DYNAMIC_FONT_SIZE - 1e-6:
+                        approved = any(
+                            abs(span["size"] - size) <= 0.05
+                            for size in font_sizes_by_page.get(index, []))
+                        if not approved:
+                            unapproved_small.append(
+                                (index, span["size"], text[:30]))
                     if not page.rect.contains(fitz.Rect(span["bbox"])):
                         checks.check(f"{at}: drawn text stays on the page", False,
                                      text[:30])
 
-    checks.check(f"{where}: no dynamic text below {MIN_DYNAMIC_FONT_SIZE:g} pt",
-                 smallest is None or smallest >= MIN_DYNAMIC_FONT_SIZE - 1e-6,
-                 str(smallest))
+    checks.check(
+        f"{where}: no unapproved dynamic text below {MIN_DYNAMIC_FONT_SIZE:g} pt",
+        not unapproved_small,
+        repr(unapproved_small[:3]))
     generated.close()
+    if protected is not base:
+        protected.close()
     base.close()
     return smallest
 
@@ -349,7 +467,9 @@ def main() -> int:
                 template_path = os.path.join(
                     TEMPLATES, os.path.basename(payload["url"]))
                 size = inspect(checks, doc_id, label, pdf, template_path,
-                               payload["pages"], bool(payload.get("flowPages")))
+                               payload["pages"], bool(payload.get("flowPages")),
+                               payload.get("reviewedRanges"),
+                               payload.get("reviewedFontSizes"))
                 if size is not None:
                     smallest_overall = size if smallest_overall is None \
                         else min(smallest_overall, size)
