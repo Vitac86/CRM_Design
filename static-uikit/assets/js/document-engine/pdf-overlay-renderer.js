@@ -378,9 +378,90 @@
 
   var TEXT_TYPES = { text: 1, static: 1 };
 
+  // The page-level expansion budget: measured once per page, shared by every
+  // anchor on it. Checked against the real page so a map cannot promise room
+  // the paper does not have.
+  function validatePageLayout(template, pages, problems) {
+    var layout = template.pageLayout;
+    if (!layout) return;
+    Object.keys(layout).forEach(function (key) {
+      var index = Number(key);
+      var where = 'pageLayout[' + key + ']';
+      if (!(index >= 0 && index < pages.length)) {
+        problems.push(where + ': page is outside the document');
+        return;
+      }
+      var entry = layout[key] || {};
+      var height = pages[index].getSize().height;
+
+      ['bodyBottom', 'shiftToTop'].forEach(function (name) {
+        if (!isFinite(Number(entry[name]))) {
+          problems.push(where + '.' + name + ' must be a number');
+        }
+      });
+      if (problems.length && problems[problems.length - 1].indexOf(where) === 0) return;
+
+      var footer = entry.fixedFooterFrom != null ? Number(entry.fixedFooterFrom) : height;
+      if (footer > height + 0.5) {
+        problems.push(where + '.fixedFooterFrom is past the page bottom');
+      }
+      if (Number(entry.bodyBottom) > footer + 1e-6) {
+        problems.push(where + ': the movable body overlaps the fixed footer');
+      }
+      if (Number(entry.shiftToTop) > footer - 1e-6 && entry.fixedFooterFrom != null) {
+        problems.push(where + ': shiftToTop reaches the fixed footer — a page ' +
+          'number must never move');
+      }
+      if (Number(entry.shiftToTop) > height + 0.5) {
+        problems.push(where + ': shiftToTop is past the page bottom');
+      }
+      var clearance = entry.bottomClearance != null ? Number(entry.bottomClearance) : 4;
+      if (!isFinite(clearance) || clearance < 0) {
+        problems.push(where + '.bottomClearance must be zero or more');
+      }
+
+      (entry.compaction || []).forEach(function (zone, i) {
+        var at = where + '.compaction[' + i + ']';
+        ['top', 'originalGap', 'minGap'].forEach(function (name) {
+          if (!isFinite(Number(zone[name]))) problems.push(at + '.' + name + ' must be a number');
+        });
+        if (Number(zone.minGap) > Number(zone.originalGap) + 1e-6) {
+          problems.push(at + ': minGap is larger than the gap it compacts');
+        }
+        if (Number(zone.minGap) < 0) problems.push(at + ': minGap must be zero or more');
+        if (zone.reviewStatus !== 'approved') {
+          problems.push(at + ': whitespace compaction is not visually approved');
+        }
+      });
+
+      var budget = Expander.pageBudget(entry, [], height);
+      (entry.anchors || []).forEach(function (fieldId) {
+        var field = (template.fields || []).filter(function (f) { return f.id === fieldId; })[0];
+        if (!field) {
+          problems.push(where + '.anchors: no field "' + fieldId + '"');
+          return;
+        }
+        var spec = Expander.expansionOf(field);
+        if (!spec) {
+          problems.push(where + '.anchors: "' + fieldId + '" has no expansion');
+          return;
+        }
+        var page = spec.page != null ? Number(spec.page) : Number(field.page);
+        if (page !== index) {
+          problems.push(where + '.anchors: "' + fieldId + '" expands page ' + page);
+        }
+        if (Number(spec.rowHeight) > budget.total + 1e-6) {
+          problems.push(where + ': "' + fieldId + '" needs ' + spec.rowHeight +
+            ' pt for one row, the page budget is ' + budget.total + ' pt');
+        }
+      });
+    });
+  }
+  Renderer.validatePageLayout = validatePageLayout;
+
   // Validate every region a text field draws into: the implicit one built from
   // the field's own geometry, plus each declared continuation region.
-  function validateRegions(field, id, pages, problems) {
+  function validateRegions(template, field, id, pages, problems) {
     var regions;
     try {
       regions = Layout.regionsFor(field);
@@ -401,7 +482,7 @@
       problems.push(id + ': overflowStrategy "flow" needs flowRegions');
     }
     if (field.overflowStrategy === 'expand-layout') {
-      validateExpansion(field, id, pages, problems);
+      validateExpansion(template, field, id, pages, problems);
     } else if (field.expansion) {
       problems.push(id + ': expansion declared without overflowStrategy "expand-layout"');
     }
@@ -479,7 +560,7 @@
 
   // A page-expansion definition has to say everything: no runtime guesswork is
   // permitted about where a row opens, what may move, or how far.
-  function validateExpansion(field, id, pages, problems) {
+  function validateExpansion(template, field, id, pages, problems) {
     var spec = field.expansion;
     if (!spec) {
       problems.push(id + ': overflowStrategy "expand-layout" needs an expansion block');
@@ -492,38 +573,58 @@
     }
     var size = pages[pageIndex].getSize();
 
-    [['insertionTop', spec.insertionTop], ['rowHeight', spec.rowHeight],
-     ['maxExtraRows', spec.maxExtraRows], ['shiftFromTop', spec.shiftFromTop],
-     ['shiftToTop', spec.shiftToTop], ['bottomReserve', spec.bottomReserve]]
-      .forEach(function (entry) {
-        if (!isFinite(Number(entry[1]))) {
-          problems.push(id + ': expansion.' + entry[0] + ' must be a number');
-        }
-      });
+    // The page budget may live on the page (`template.pageLayout`) or, for a
+    // map authored before it existed, on the anchor itself. Exactly one of them
+    // has to be there.
+    var pageLayout = (template && template.pageLayout || {})[pageIndex];
+    var required = [['insertionTop', spec.insertionTop], ['rowHeight', spec.rowHeight],
+                    ['maxExtraRows', spec.maxExtraRows], ['shiftFromTop', spec.shiftFromTop]];
+    if (!pageLayout) {
+      required.push(['shiftToTop', spec.shiftToTop]);
+      required.push(['bottomReserve', spec.bottomReserve]);
+    }
+    required.forEach(function (entry) {
+      if (!isFinite(Number(entry[1]))) {
+        problems.push(id + ': expansion.' + entry[0] + ' must be a number');
+      }
+    });
     if (problems.length && problems[problems.length - 1].indexOf('expansion.') !== -1) return;
 
     if (Number(spec.rowHeight) <= 0) problems.push(id + ': expansion.rowHeight must be positive');
     if (Number(spec.maxExtraRows) < 1) problems.push(id + ': expansion.maxExtraRows must be at least 1');
-    if (Number(spec.bottomReserve) < Number(spec.rowHeight)) {
-      problems.push(id + ': expansion.bottomReserve is smaller than one row');
-    }
-    if (Number(spec.maxExtraRows) * Number(spec.rowHeight) > Number(spec.bottomReserve) + 1e-6) {
-      problems.push(id + ': expansion.maxExtraRows exceeds the declared bottomReserve');
-    }
     if (Number(spec.shiftFromTop) > Number(spec.insertionTop) + 1e-6) {
       problems.push(id + ': expansion.shiftFromTop must not be below the insertion point');
     }
-    if (Number(spec.shiftToTop) <= Number(spec.shiftFromTop)) {
-      problems.push(id + ': expansion movable block is empty');
-    }
-    // `bottomReserve` is the measured free space beneath the lowest movable
-    // content — the most the block may travel. The movable block's own bottom
-    // boundary only has to stay on the page.
-    if (Number(spec.shiftToTop) > size.height + 0.5) {
-      problems.push(id + ': expansion movable block ends past the page bottom');
-    }
-    if (Number(spec.bottomReserve) > size.height) {
-      problems.push(id + ': expansion.bottomReserve is larger than the page');
+
+    if (pageLayout) {
+      if ((pageLayout.anchors || []).indexOf(id) === -1) {
+        problems.push(id + ': is not listed in pageLayout[' + pageIndex + '].anchors');
+      }
+      if (spec.bottomReserve != null) {
+        problems.push(id + ': expansion.bottomReserve duplicates the page budget — ' +
+          'the reserve of a page is declared once, in pageLayout[' + pageIndex + ']');
+      }
+      if (pageLayout.fixedFooterFrom != null &&
+          Number(pageLayout.shiftToTop) >= Number(pageLayout.fixedFooterFrom) - 1e-6) {
+        problems.push(id + ': the movable block reaches the fixed footer of page ' +
+          pageIndex);
+      }
+    } else {
+      if (Number(spec.shiftToTop) <= Number(spec.shiftFromTop)) {
+        problems.push(id + ': expansion movable block is empty');
+      }
+      // `bottomReserve` is the measured free space beneath the lowest movable
+      // content — the most the block may travel. The movable block's own bottom
+      // boundary only has to stay on the page.
+      if (Number(spec.shiftToTop) > size.height + 0.5) {
+        problems.push(id + ': expansion movable block ends past the page bottom');
+      }
+      if (Number(spec.bottomReserve) < Number(spec.rowHeight)) {
+        problems.push(id + ': expansion.bottomReserve is smaller than one row');
+      }
+      if (Number(spec.bottomReserve) > size.height) {
+        problems.push(id + ': expansion.bottomReserve is larger than the page');
+      }
     }
 
     var style = spec.lineStyle || 'underline';
@@ -552,6 +653,8 @@
     var fields = template.fields || [];
 
     if (!fields.length) problems.push('template has no field definitions');
+
+    validatePageLayout(template, pages, problems);
 
     fields.forEach(function (f, i) {
       var id = f.id || ('#' + i);
@@ -612,7 +715,7 @@
         if (type === 'static' && f.text == null) {
           problems.push(id + ': static field has no text');
         }
-        validateRegions(f, id, pages, problems);
+        validateRegions(template, f, id, pages, problems);
       }
 
       if (type === 'check' && !f.source) {
@@ -689,6 +792,12 @@
   // page for extra rows. How many is decided by the layout engine itself, not
   // by an estimate: the layout is retried with one more inserted row at a time
   // until it fits, which is exact and cannot disagree with what is drawn.
+  //
+  // Only a value that is actually going to be printed may ask. A field switched
+  // off by `showWhen`, an empty optional value and a missing required value are
+  // not layout problems and must cost the page nothing — the power of attorney
+  // carries a legal-entity variant and an individual one in the same four-page
+  // file, and a document must never pay for the variant it is not printing.
   function expansionDemands(template, payload, fonts) {
     var demands = [];
 
@@ -700,8 +809,15 @@
       if (!font) return;
 
       var base = Layout.regionsFor(field);
-      if (layoutField(field, payload, font, { regions: base }).drawn) {
-        demands.push({ field: field, rows: 0 });   // fits as printed
+      var asPrinted = layoutField(field, payload, font, { regions: base });
+      if (asPrinted.drawn || asPrinted.reason !== 'overflow') {
+        // Fits as printed, or is not part of this document at all.
+        demands.push({
+          field: field,
+          rows: 0,
+          inactive: !asPrinted.drawn,
+          reason: asPrinted.drawn ? 'fits' : asPrinted.reason
+        });
         return;
       }
 
@@ -1073,8 +1189,10 @@
           var plans = {};
           var rowsByField = {};
           var planErrors = [];
+          var pageLayout = template.pageLayout || {};
           pages.forEach(function (pdfPage, index) {
-            var pagePlan = Expander.planPage(index, demands, pdfPage.getSize().height);
+            var pagePlan = Expander.planPage(index, demands, pdfPage.getSize().height,
+                                             pageLayout[index]);
             plans[index] = pagePlan;
             pagePlan.rows.forEach(function (row) {
               rowsByField[row.fieldId] = (rowsByField[row.fieldId] || []).concat(
@@ -1128,16 +1246,17 @@
           if (typeof opts.onExpansion === 'function') {
             var notes = [];
             Object.keys(plans).forEach(function (index) {
-              plans[index].shifts.forEach(function (shift) {
+              (plans[index].consumption || []).forEach(function (entry) {
                 var field = template.fields.filter(function (item) {
-                  return item.id === shift.fieldId;
+                  return item.id === entry.fieldId;
                 })[0] || {};
                 notes.push({
                   page: Number(index),
-                  fieldId: shift.fieldId,
-                  label: field.label || shift.fieldId,
-                  rows: Math.round(shift.delta / (((field.expansion || {}).rowHeight) || 14)),
-                  delta: shift.delta
+                  fieldId: entry.fieldId,
+                  label: field.label || entry.fieldId,
+                  rows: entry.rows,
+                  delta: entry.delta,
+                  remaining: entry.remaining
                 });
               });
             });

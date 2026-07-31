@@ -36,12 +36,29 @@ PROBE = r"""
 
 
 def anchors(browser):
+    """Every declared cut: an anchor's insertion point, and every compaction
+    zone, because recovered white space moves the page just as a row does."""
     raw = browser.eval(
         "JSON.stringify(Object.keys(window.CRMDocumentEngine.fieldMaps).reduce("
         "function (out, id) {"
-        "  (window.CRMDocumentEngine.fieldMaps[id].fields || []).forEach(function (f) {"
-        "    if (f.expansion) out.push({ doc: id, field: f.id, e: f.expansion });"
-        "  }); return out; }, []))"
+        "  var t = window.CRMDocumentEngine.fieldMaps[id];"
+        "  var layout = t.pageLayout || {};"
+        "  (t.fields || []).forEach(function (f) {"
+        "    if (!f.expansion) return;"
+        "    var page = f.expansion.page != null ? f.expansion.page : f.page;"
+        "    var l = layout[page] || {};"
+        "    out.push({ doc: id, field: f.id, page: page,"
+        "      top: f.expansion.insertionTop, delta: f.expansion.rowHeight,"
+        "      toTop: l.shiftToTop != null ? l.shiftToTop : f.expansion.shiftToTop });"
+        "  });"
+        "  Object.keys(layout).forEach(function (page) {"
+        "    (layout[page].compaction || []).forEach(function (zone, i) {"
+        "      out.push({ doc: id, field: 'compaction[' + i + ']', page: Number(page),"
+        "        top: zone.top, delta: -(zone.originalGap - zone.minGap),"
+        "        toTop: layout[page].shiftToTop });"
+        "    });"
+        "  });"
+        "  return out; }, []))"
     )
     return json.loads(raw)
 
@@ -68,11 +85,10 @@ def main() -> int:
     try:
         browser.goto(server.base + "/tools/document-map-audit.html")
         for entry in anchors(browser):
-            spec = entry["e"]
-            page = int(spec.get("page", 0))
-            declared = float(spec["insertionTop"])
-            to_top = float(spec["shiftToTop"])
-            delta = float(spec["rowHeight"])
+            page = int(entry["page"])
+            declared = float(entry["top"])
+            to_top = float(entry["toTop"])
+            delta = float(entry["delta"])
             ok = probe(browser, entry["doc"], page, [declared], to_top, delta)
             if ok:
                 print(f"OK    {entry['doc']:34s} {entry['field']:34s} "
