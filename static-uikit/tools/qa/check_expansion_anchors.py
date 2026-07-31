@@ -17,7 +17,7 @@ import sys
 from headless_browser import Chrome, Server
 
 PROBE = r"""
-(async function (docId, page, tops, toTop, delta) {
+(async function (docId, page, tops, toTop, delta, moveTopLevelPaths) {
   const t = CRMDocumentEngine.fieldMaps[docId];
   const url = t.templateUrl.replace('../', '../');
   const bytes = await (await fetch(url)).arrayBuffer();
@@ -26,12 +26,13 @@ PROBE = r"""
     const doc = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
     try {
       const r = CRMDocumentEngine.pageExpander.shiftPageContent(
-        doc, doc.getPages()[page], [{ fromTop: top, toTop: toTop, delta: delta }]);
+        doc, doc.getPages()[page], [{ fromTop: top, toTop: toTop, delta: delta,
+          moveTopLevelPaths: moveTopLevelPaths }]);
       out.push([top, r.moved]);
     } catch (e) { /* straddles */ }
   }
   return JSON.stringify(out);
-}(DOC, PAGE, TOPS, TO_TOP, DELTA))
+}(DOC, PAGE, TOPS, TO_TOP, DELTA, MOVE_PATHS))
 """
 
 
@@ -49,7 +50,8 @@ def anchors(browser):
         "    var l = layout[page] || {};"
         "    out.push({ doc: id, field: f.id, page: page,"
         "      top: f.expansion.insertionTop, delta: f.expansion.rowHeight,"
-        "      toTop: l.shiftToTop != null ? l.shiftToTop : f.expansion.shiftToTop });"
+        "      toTop: l.shiftToTop != null ? l.shiftToTop : f.expansion.shiftToTop,"
+        "      moveTopLevelPaths: f.expansion.lineStyle === 'table-row' });"
         "  });"
         "  Object.keys(layout).forEach(function (page) {"
         "    (layout[page].compaction || []).forEach(function (zone, i) {"
@@ -71,13 +73,14 @@ def anchors(browser):
     return json.loads(raw)
 
 
-def probe(browser, doc, page, tops, to_top, delta):
+def probe(browser, doc, page, tops, to_top, delta, move_paths=False):
     script = (PROBE
               .replace("DOC", json.dumps(doc))
               .replace("PAGE", str(page))
               .replace("TOPS", json.dumps(tops))
               .replace("TO_TOP", str(to_top))
-              .replace("DELTA", str(delta)))
+              .replace("DELTA", str(delta))
+              .replace("MOVE_PATHS", "true" if move_paths else "false"))
     return json.loads(browser.eval(script, await_promise=True))
 
 
@@ -97,7 +100,9 @@ def main() -> int:
             declared = float(entry["top"])
             to_top = float(entry["toTop"])
             delta = float(entry["delta"])
-            ok = probe(browser, entry["doc"], page, [declared], to_top, delta)
+            move_paths = bool(entry.get("moveTopLevelPaths"))
+            ok = probe(browser, entry["doc"], page, [declared], to_top,
+                       delta, move_paths)
             if ok:
                 print(f"OK    {entry['doc']:34s} {entry['field']:34s} "
                       f"p{page} @{declared} ({ok[0][1]} blocks move)")
@@ -109,7 +114,8 @@ def main() -> int:
                 continue
             candidates = [round(declared + step * 0.25, 2)
                           for step in range(int(-args.span * 4), int(args.span * 4) + 1)]
-            clean = probe(browser, entry["doc"], page, candidates, to_top, delta)
+            clean = probe(browser, entry["doc"], page, candidates, to_top,
+                          delta, move_paths)
             if not clean:
                 print(f"      no clean cut within ±{args.span} pt")
                 continue

@@ -183,6 +183,10 @@
         align: 'center',
         format: 'dateRu'
       }),
+      // Issuing authority is a value cell in the questionnaire table.  The
+      // source row is 13.44 pt high (border tops 490.15 -> 503.59), with 0.48 pt
+      // rules.  Continue every source vertical at its measured centre; the
+      // horizontal border at 503.59 moves down and closes the expanded cell.
       cell('passportIssuedBy', 'field.client-passport-issued-by', 0, 490.39, 503.83, {
         required: true,
         overflowStrategy: 'expand-layout',
@@ -190,12 +194,12 @@
           page: 0, insertionTop: 503.59, shiftFromTop: 503.59,
           rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 9.5,
           lineStyle: 'table-row', reviewStatus: 'approved',
-          rowLeft: 63.50, rowWidth: 504.34,
+          rowLeft: 63.74, rowWidth: 503.86,
           borders: { left: false, right: false, top: false, bottom: false },
-          columns: [63.50, 64.46, 84.38, 85.34, 318.79, 566.38, 567.36],
+          columns: [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60],
           line: {
             left: VALUE_LEFT, width: VALUE_WIDTH,
-            baselineOffset: 10.3, ruleOffset: 13.44, ruleThickness: 0.48
+            baselineOffset: 10.54, ruleOffset: 13.44, ruleThickness: 0.48
           }
         }
       }),
@@ -258,9 +262,9 @@
       //
       // The анкета is a table, so the Word-like answer is a real inserted row.
       // Geometry measured from the printed table on page 2: cells are 12.96 pt
-      // tall with a 0.48 pt border, a 13.44 pt pitch; the verticals sit at
-      // 63.50/64.46/84.38/85.34, the column boundary at 318.79 and the right
-      // edge at 566.38/567.36.
+      // tall with a 0.48 pt border and a 13.44 pt pitch.  Rule centre-lines are
+      // 63.74/64.70/84.62/85.58, the value boundary is 319.03, and the double
+      // right edge is 566.63/567.60.
       //
       // 318.65 is the one clean cut: the row's own verticals end there and its
       // bottom border sits just under them, so inserting above the border lets
@@ -276,12 +280,12 @@
           rowHeight: 13.44, maxExtraRows: 2,
           maxFontSize: 9.5,
           lineStyle: 'table-row', reviewStatus: 'approved',
-          rowLeft: 63.50, rowWidth: 504.34,
+          rowLeft: 63.74, rowWidth: 503.86,
           borders: { left: false, right: false, top: false, bottom: false },
-          columns: [63.50, 64.46, 84.38, 85.34, 318.79, 566.38, 567.36],
+          columns: [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60],
           line: {
             left: VALUE_LEFT, width: VALUE_WIDTH,
-            baselineOffset: 10.3, ruleOffset: 13.44, ruleThickness: 0.48
+            baselineOffset: 10.54, ruleOffset: 13.44, ruleThickness: 0.48
           }
         }
       }),

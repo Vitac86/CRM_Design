@@ -66,18 +66,26 @@
     },
 
     fields: [
+      // clientName belongs to the first value row of the ruled client table.
+      // Source border tops are 162.14 -> 182.54 (20.40 pt); the 0.48 pt
+      // verticals are centred at 56.76 / 248.21 / 545.86.  Extending at the
+      // top of the existing bottom border preserves the table and keeps the
+      // following contract row attached, unlike a standalone underline.
       {
         id: 'clientName',
         overflowStrategy: 'expand-layout',
         expansion: {
-          page: 0, insertionTop: 183.14,
-          rowHeight: 14, maxExtraRows: 2,
-          shiftFromTop: 183.14, shiftToTop: 717.68,
+          page: 0, insertionTop: 182.54,
+          rowHeight: 20.40, maxExtraRows: 2,
+          shiftFromTop: 182.54, shiftToTop: 717.68,
           bottomReserve: 122.24,
-          lineStyle: 'underline', reviewStatus: 'approved',
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 56.76, rowWidth: 489.10,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [56.76, 248.21, 545.86],
           line: {
-            left: 56.16, width: 505.03,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
+            left: 252.0, width: 289.0,
+            baselineOffset: 9.70, ruleOffset: 20.40, ruleThickness: 0.48
           }
         },
         source: 'field.client-full-name',

@@ -287,6 +287,10 @@
         align: 'center',
         format: 'dateRu'
       }),
+      // Licence authority is a value cell in the ruled questionnaire table.
+      // The source pitch is 17.40 pt (border tops 176.54 -> 193.94); the
+      // continuation extends the seven measured vertical centre-lines while
+      // the existing 0.48 pt bottom border moves down to close the cell.
       cell('licenceAuthority', 'extra.licence-authority', 2, 176.78, 194.18, {
         optional: true,
         overflowStrategy: 'expand-layout',
@@ -294,12 +298,12 @@
           page: 2, insertionTop: 193.94, shiftFromTop: 193.94,
           rowHeight: 17.4, maxExtraRows: 1, maxFontSize: 11,
           lineStyle: 'table-row', reviewStatus: 'approved',
-          rowLeft: 63.50, rowWidth: 497.36,
+          rowLeft: 63.74, rowWidth: 496.88,
           borders: { left: false, right: false, top: false, bottom: false },
-          columns: [63.50, 64.46, 84.38, 85.34, 325.87, 559.42, 560.38],
+          columns: [63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62],
           line: {
             left: VALUE_LEFT, width: VALUE_WIDTH,
-            baselineOffset: 10.3, ruleOffset: 17.4, ruleThickness: 0.48
+            baselineOffset: 10.54, ruleOffset: 17.4, ruleThickness: 0.48
           }
         }
       }),
@@ -310,28 +314,28 @@
       cell('bankAddress', 'extra.bank-address', 2, 271.85, 289.25, {
         // A long foreign bank address does not fit this 222.9 pt cell at a
         // readable size. The анкета is a table, so the Word-like answer is a
-        // real blank row: the rows below move down and a new row is drawn with
-        // the same borders, column boundary and 0.48 pt rule weight as the row
-        // above it. Geometry measured from the printed table on page 3
-        // (row 272.09-289.01, column boundary 326.11, outer rules 63.74/560.62).
+        // real blank row: the rows below move down and the cell is extended
+        // with the same 17.40 pt pitch, seven vertical centre-lines and 0.48 pt
+        // rule weight as the source row (border tops 271.61 -> 289.01; value
+        // boundary 326.11; outer rule centres 63.74/560.62).
         overflowStrategy: 'expand-layout',
         expansion: {
-          // 289.0 is the one clean cut here: the row's own vertical rules end
+          // 289.01 is the clean cut here: the row's own vertical rules end
           // at 289.01 and its bottom border sits just under them, so inserting
           // above the border lets that border travel down and close the new
           // row. The inserted row therefore needs only its verticals — they
           // continue exactly where the printed ones stop, which is what a row
           // inserted in Word looks like.
-          page: 2, insertionTop: 289.0,
-          rowHeight: 16.92, maxExtraRows: 2,
-          shiftFromTop: 289.0,
+          page: 2, insertionTop: 289.01,
+          rowHeight: 17.40, maxExtraRows: 2,
+          shiftFromTop: 289.01,
           lineStyle: 'table-row', reviewStatus: 'approved',
           rowLeft: 63.74, rowWidth: 496.88,
           borders: { left: false, right: false, top: false, bottom: false },
           columns: [63.74, 64.7, 84.62, 85.58, 326.11, 559.66, 560.62],
           line: {
             left: 331.5, width: 222.9,
-            baselineOffset: 10.06, ruleOffset: 16.92, ruleThickness: 0.48
+            baselineOffset: 10.54, ruleOffset: 17.40, ruleThickness: 0.48
           }
         }, optional: true }),
       cell('bankInn', 'extra.bank-inn', 2, 289.25, 306.77, { optional: true }),

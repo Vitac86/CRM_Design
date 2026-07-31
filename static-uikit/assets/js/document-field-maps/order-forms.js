@@ -129,8 +129,9 @@
   //   python static-uikit/tools/qa/measure_page_layout.py --doc order-forms
   //
   // The client block of the trade order is a table: the «Наименование» row runs
-  // 208.10–228.02 with a 0.48 pt border under it, a 20.40 pt pitch, verticals at
-  // 56.54/57.02, 247.97/248.45 and 545.64/546.12. A full legal company name
+  // border tops 207.62–228.02 with a 0.48 pt rule and a 20.40 pt pitch.  The
+  // three vertical rule centre-lines are 56.78 / 248.21 / 545.88. A full legal
+  // company name
   // needs more than the one line the cell holds, and a company name is not
   // something a manager may shorten.
   //
@@ -142,12 +143,12 @@
     page: 0, insertionTop: 228.02, shiftFromTop: 228.02,
     rowHeight: 20.40, maxExtraRows: 2, maxFontSize: 10.5,
     lineStyle: 'table-row', reviewStatus: 'approved',
-    rowLeft: 56.54, rowWidth: 489.58,
+    rowLeft: 56.78, rowWidth: 489.10,
     borders: { left: false, right: false, top: false, bottom: false },
-    columns: [56.54, 57.02, 247.97, 248.45, 545.64, 546.12],
+    columns: [56.78, 248.21, 545.88],
     line: {
       left: 249.55, width: 293.18,
-      baselineOffset: 9.72,        // 217.82 − 208.10, the printed row's own
+      baselineOffset: 10.20,       // 217.82 − 207.62, the printed row's own
       ruleOffset: 20.40, ruleThickness: 0.48
     }
   };

@@ -39,20 +39,26 @@
 
     fields: [
       // Client-information table. The value cells are 297.17 pt wide. A long
-      // client name/account may wrap to two lines inside the original row;
-      // the renderer still fails visibly if two lines at 6 pt are insufficient.
+      // client name may wrap inside the row and extend it; it must never become
+      // an unrelated full-width underline.  In the committed PDF this row runs
+      // from border top 175.58 to bottom-border top 195.86 (20.28 pt), using
+      // 0.48 pt rules centred at 56.76 / 248.21 / 545.86.  Inserting exactly at
+      // 195.86 moves the existing bottom border and the remaining table rows.
       {
         id: 'clientName',
         overflowStrategy: 'expand-layout',
         expansion: {
-          page: 0, insertionTop: 196.46,
-          rowHeight: 14, maxExtraRows: 2,
-          shiftFromTop: 196.46, shiftToTop: 516.05,
+          page: 0, insertionTop: 195.86,
+          rowHeight: 20.28, maxExtraRows: 2,
+          shiftFromTop: 195.86, shiftToTop: 516.05,
           bottomReserve: 323.87,
-          lineStyle: 'underline', reviewStatus: 'approved',
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 56.76, rowWidth: 489.10,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [56.76, 248.21, 545.86],
           line: {
-            left: 52.92, width: 492.7,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.36
+            left: 252.0, width: 289.0,
+            baselineOffset: 9.72, ruleOffset: 20.28, ruleThickness: 0.48
           }
         },
         source: 'field.client-full-name',

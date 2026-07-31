@@ -92,7 +92,9 @@
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
       label: o.label,
-      showWhen: o.showWhen
+      showWhen: o.showWhen,
+      layoutMode: o.layoutMode,
+      flowBlockId: o.flowBlockId
     };
   }
 
@@ -109,9 +111,69 @@
     expectedPages: 2,
     appliesTo: ['individual', 'company'],
 
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 807.44,
+        fixedFooterFrom: null,
+        shiftToTop: 807.44,
+        bottomClearance: 2.0,
+        compaction: [],
+        anchors: ['account-opening-broker-introduction', 'clientName']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
+
+    wordFlowBlocks: [
+      {
+        id: 'account-opening-broker-introduction',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 41.40, baselineTop: 126.74, width: 523.58,
+          initialLineCount: 4
+        },
+        font: 'legalSerif', fontSize: 11.04, minFontSize: 11.04,
+        fontSizeLocked: true, lineHeight: 12.72,
+        alignment: 'justify', justifyMinRatio: 0.55,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 177.86, shiftFromTop: 177.86,
+          rowHeight: 12.72, maxExtraRows: 1, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 24, lastBlock: 31,
+          expectedBlockCount: 8, expectedPageBlockCount: 126,
+          expectedSha256: '8cd5a73729ce0a18cea885681440b8acc2bc51c69c75a6c392111e6ddeb72749',
+          expectedTemplateSha256: 'd46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Общество с ограниченной ответственностью "Инвестика", ' +
+          'в лице ________, действующего на основании Доверенности № , ' +
+          'настоящим извещает Клиента о заключении Договора о брокерском ' +
+          'обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)',
+        runs: [
+          {
+            type: 'static',
+            text: 'Общество с ограниченной ответственностью "Инвестика", в лице '
+          },
+          {
+            type: 'fieldRef', fieldId: 'brokerRepresentative',
+            decoration: {
+              underline: true, minWidth: 398.00, thickness: 0.48, offset: 1.20
+            }
+          },
+          {
+            type: 'static',
+            text: ', действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)'
+          }
+        ]
+      }
+    ],
 
     fields: [
       // ── Header ───────────────────────────────────────────────────────────
@@ -123,22 +185,34 @@
       // "…в лице ____________________________________, действующего на
       // основании Доверенности № , …" — a 401.5 pt rule on the next line.
       text('brokerRepresentative', 'extra.extra-authorized-signer',
-           0, 43.0, 139.46, 398.0, { required: true }),
+           0, 43.0, 139.46, 398.0, {
+             required: true,
+             layoutMode: 'flow-reference',
+             flowBlockId: 'account-opening-broker-introduction'
+           }),
 
       // ── 1. Информация о клиенте (from the subject card) ──────────────────
+      // This is the right-hand cell of the first ruled table row, not an
+      // independent underlined blank.  The committed PDF measures the row from
+      // the top of its 0.48 pt border at 215.54 to the top of its bottom border
+      // at 229.82 (14.28 pt).  Extending at 229.82 keeps the continuation joined
+      // to clientName and moves the following identification row as one table.
+      // Source vertical-rule centres: 36.00 / 324.07 / 567.72 pt.
       cell('clientName', 'field.client-full-name', 226.82, {
-      overflowStrategy: 'expand-layout',
-      expansion: {
-        page: 0, insertionTop: 279.65,
-        rowHeight: 14, maxExtraRows: 2,
-        shiftFromTop: 279.65, shiftToTop: 807.44,
-        bottomReserve: 32.48,
-        lineStyle: 'underline', reviewStatus: 'approved',
-        line: {
-          left: 36.24, width: 531.24,
-          baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-        }
-      }, required: true }),
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 229.82,
+          rowHeight: 14.28, maxExtraRows: 2,
+          shiftFromTop: 229.82, shiftToTop: 807.44,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 36.00, rowWidth: 531.72,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [36.00, 324.07, 567.72],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 11.28, ruleOffset: 14.28, ruleThickness: 0.48
+          }
+        }, required: true }),
       // The label is "ИНН (для юридических лиц) / Номер документа,
       // удостоверяющего личность (для физических лиц)", which is exactly what
       // the normalised client-id-or-inn value already holds for each kind.

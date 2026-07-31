@@ -22,6 +22,10 @@
  "stressOnlyFailures": [
   {
    "documentId": "accession-application-fl",
+   "fieldId": "accession-application-fl-identity"
+  },
+  {
+   "documentId": "accession-application-fl",
    "fieldId": "clientEmail"
   },
   {
@@ -81,14 +85,6 @@
    "fieldId": "otherInformation"
   },
   {
-   "documentId": "power-of-attorney",
-   "fieldId": "flAttorneyName"
-  },
-  {
-   "documentId": "qualification-request-fl",
-   "fieldId": "contractNumber"
-  },
-  {
    "documentId": "qualification-request-fl",
    "fieldId": "signatureName"
   },
@@ -116,6 +112,6 @@
  "counts": {
   "ordinary": 0,
   "realisticLong": 0,
-  "stressOnly": 23
+  "stressOnly": 22
  }
 }
