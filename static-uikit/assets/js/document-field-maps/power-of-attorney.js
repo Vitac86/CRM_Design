@@ -172,7 +172,8 @@
             note: 'между подзаголовком варианта и строкой «г. ___ (дата прописью)»'
           }
         ],
-        anchors: ['ulOgrn', 'ulInn', 'ulAttorneyCitizenship']
+        anchors: ['ulOgrn', 'ulInn', 'ulAttorneyCitizenship',
+                  'ulAttorneyIssuedBy']
       },
       // ФЛ page 3. Body 57.13–761.98, page number «3» at 794.77.
       //
@@ -287,9 +288,16 @@
       text('ulAttorneyPassport', 'extra.extra-attorney-passport', 0, 70.5, 247.49, 84.0, {
         required: true, showWhen: UL_ONLY
       }),
+      // Two printed lines of 112 pt hold an ordinary «ОВД …»; a full Russian
+      // «Отделение по вопросам миграции …» does not, and an issuing authority
+      // is one of the values the business expects to be expandable. It is last
+      // in the page order, so it takes a row only out of what the ОГРН, the ИНН
+      // and the citizenship left behind.
       text('ulAttorneyIssuedBy', 'extra.extra-attorney-issued-by', 0, 211.0, 247.49, 112.0, {
         required: true, multiline: true, maxLines: 2, lineHeight: 11.0,
-        fontSize: 10.5, showWhen: UL_ONLY
+        fontSize: 10.5, showWhen: UL_ONLY,
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(0, 250.49, UL_LINE)
       }),
       text('ulAttorneyAddress', 'extra.extra-attorney-address', 0, 123.5, 265.61, 143.0, {
         required: true, multiline: true, maxLines: 2, lineHeight: 11.0,

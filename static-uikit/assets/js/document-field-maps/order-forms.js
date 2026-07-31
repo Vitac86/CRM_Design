@@ -124,11 +124,43 @@
     return f;
   }
 
-  // Client block, identical on all three forms; only the column differs.
-  function clientBlock(prefix, page, left, width, tops, when) {
+  // ── A generated table row, measured from this form ────────────────────────
+  //
+  //   python static-uikit/tools/qa/measure_page_layout.py --doc order-forms
+  //
+  // The client block of the trade order is a table: the «Наименование» row runs
+  // 208.10–228.02 with a 0.48 pt border under it, a 20.40 pt pitch, verticals at
+  // 56.54/57.02, 247.97/248.45 and 545.64/546.12. A full legal company name
+  // needs more than the one line the cell holds, and a company name is not
+  // something a manager may shorten.
+  //
+  // 228.02 is the clean cut: the row's verticals stop there and its bottom
+  // border sits just under them, so inserting above the border lets that border
+  // travel down and close the new row — the inserted row draws only the
+  // verticals, continuing exactly where the printed ones stop.
+  var TRADE_NAME_ROW = {
+    page: 0, insertionTop: 228.02, shiftFromTop: 228.02,
+    rowHeight: 20.40, maxExtraRows: 2, maxFontSize: 10.5,
+    lineStyle: 'table-row', reviewStatus: 'approved',
+    rowLeft: 56.54, rowWidth: 489.58,
+    borders: { left: false, right: false, top: false, bottom: false },
+    columns: [56.54, 57.02, 247.97, 248.45, 545.64, 546.12],
+    line: {
+      left: 249.55, width: 293.18,
+      baselineOffset: 9.72,        // 217.82 − 208.10, the printed row's own
+      ruleOffset: 20.40, ruleThickness: 0.48
+    }
+  };
+
+  // Client block, identical on all three forms; only the column differs. Only
+  // the trade form's name cell can grow: it is the one whose page has the
+  // reserve and whose row boundary offers a clean cut.
+  function clientBlock(prefix, page, left, width, tops, when, nameExpansion) {
     return [
       text(prefix + 'ClientName', 'field.client-full-name', page, left, tops[0], width,
-           { required: true, showWhen: when }),
+           { required: true, showWhen: when,
+             overflowStrategy: nameExpansion ? 'expand-layout' : undefined,
+             expansion: nameExpansion }),
       text(prefix + 'ContractNumberDate', 'extra.extra-contract-number-date',
            page, left, tops[1], width, { required: true, showWhen: when }),
       text(prefix + 'BrokerageAccount', 'extra.extra-brokerage-account',
@@ -158,6 +190,20 @@
     expectedPages: 4,
     appliesTo: ['individual', 'company'],
 
+    // Page 1 of the trade order: the table ends at 773.64 on an 842.04 pt page.
+    // Keeping a 25 pt margin leaves 43.28 pt — two inserted 20.40 pt rows.
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 773.64,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 25.0,
+        compaction: [],
+        anchors: ['tradeClientName']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -165,7 +211,8 @@
     fields: [].concat(
       // ═══════════ FORM 1 — «Поручение на совершение сделки» (pages 1–2) ═══
       submissionBlock('trade', 0, 81.26, 96.02, 112.58, 135.26, 249.55, 293.18, TRADE),
-      clientBlock('trade', 0, 249.55, 293.18, [217.82, 238.22, 257.81], TRADE),
+      clientBlock('trade', 0, 249.55, 293.18, [217.82, 238.22, 257.81], TRADE,
+                  TRADE_NAME_ROW),
       [
         // «Вид сделки»: ☐ Покупка ☐ Продажа ☐ Иной вид сделки ____
         check('tradeKindBuy', 'extra.extra-trade-kind', 'buy', 0, 255.65, 325.25, TRADE),

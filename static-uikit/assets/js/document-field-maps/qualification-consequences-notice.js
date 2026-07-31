@@ -42,6 +42,29 @@
     applicantFullName: 12,           // 33.01 pt of room
   };
 
+  // ── Geometry of a generated continuation row, measured from this form ──────
+  //
+  //   python static-uikit/tools/qa/measure_page_layout.py --row   //       qualification-consequences-notice 0 198.74 331 72
+  //
+  // 9.96 pt body at an 11.52 pt line pitch, ink height 11.03 pt, rules 0.48 pt
+  // thick and 1.08 pt below their baseline.
+  function expansion(insertionTop) {
+    return {
+      page: 0,
+      insertionTop: insertionTop,
+      shiftFromTop: insertionTop,
+      rowHeight: 11.5,
+      maxExtraRows: 2,
+      maxFontSize: 9.5,
+      lineStyle: 'underline',
+      reviewStatus: 'approved',
+      line: {
+        left: 63.62, width: 481.31,          // the paragraph measure, 63.62 → 544.93
+        baselineOffset: 8.9, ruleOffset: 9.98, ruleThickness: 0.48
+      }
+    };
+  }
+
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
     return {
@@ -78,6 +101,20 @@
     expectedPages: 1,
     appliesTo: ['individual'],
 
+    // Content ends at 585.69 on an 841.92 pt page. Keeping the form's own
+    // 56.7 pt bottom margin still leaves 199.53 pt — seventeen of its rows.
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 585.69,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 56.7,
+        compaction: [],
+        anchors: ['applicantFullName']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -97,8 +134,20 @@
 
       // "уведомляет Заявителя ______ (ФИО физического лица)" — a 74.54 pt rule,
       // so a full name usually shrinks or falls back to initials.
+      //
+      // A long double surname exhausts even the initials fallback, and this was
+      // one of six anchors previously reported as having no clean cut. It has
+      // one: 210.49 is immediately below the *complete* two-line sentence
+      // «Настоящим ООО «Инвестика» уведомляет Заявителя ____ (ФИО физического
+      // лица) о последствиях признания Вас квалифицированным инвестором:», and
+      // above the numbered list that follows. The row therefore continues a
+      // finished sentence instead of splitting one, and the page has 256 pt of
+      // reserve to give it.
       text('applicantFullName', 'field.clientFullName', 331.0, 198.74, 72.0, {
-        required: true, fallbacks: ['initials', 'surname']
+        required: true, fallbacks: ['initials', 'surname'],
+        label: 'Ф.И.О. заявителя',
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(210.49)
       }),
 
       // "ОЗНАКОМЛЕН: Клиент ____ / ____" — the first rule is the handwritten
