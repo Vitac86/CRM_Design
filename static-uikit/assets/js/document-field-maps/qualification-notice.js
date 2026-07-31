@@ -36,6 +36,40 @@
   var BODY = 12;          // preferred dynamic size for this form
   var MIN = 9;             // hard readability floor — never draw smaller
 
+  // ── Geometry of a generated continuation row, measured from this form ──────
+  //
+  //   python static-uikit/tools/qa/measure_page_layout.py --row qualification-notice 0 472.03
+  //
+  // The body is 9.96 pt Times at an 11.52 pt line pitch; ink height at that
+  // size is 11.03 pt and the printed rules are 0.48 pt thick, 1.08 pt below
+  // their baseline. 11.5 pt is the form's own row, and what a row added in Word
+  // would have been.
+  var ROW_HEIGHT = 11.5;
+  var ROW_MAX_SIZE = 9.5;          // the size the form itself is set in
+  var ROW_BASELINE = 8.9;          // ascent at 9.5 pt is 8.46
+  var ROW_RULE = 9.98;             // baseline + the measured 1.08 pt
+  var ROW_RULE_THICKNESS = 0.48;
+
+  function expansion(insertionTop, line, maxExtraRows) {
+    return {
+      page: 0,
+      insertionTop: insertionTop,
+      shiftFromTop: insertionTop,
+      rowHeight: ROW_HEIGHT,
+      maxExtraRows: maxExtraRows,
+      maxFontSize: ROW_MAX_SIZE,
+      lineStyle: 'underline',
+      reviewStatus: 'approved',
+      line: {
+        left: line.left,
+        width: line.width,
+        baselineOffset: ROW_BASELINE,
+        ruleOffset: ROW_RULE,
+        ruleThickness: ROW_RULE_THICKNESS
+      }
+    };
+  }
+
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
     return {
@@ -91,6 +125,22 @@
     expectedPages: 1,
     appliesTo: ['individual', 'company'],
 
+    // One page, one budget. Content ends at 554.34 pt on an 841.92 pt page;
+    // keeping the form's own 56.7 pt bottom margin still leaves 230.88 pt,
+    // which is twenty of this form's rows. Nothing here is tight — the reason
+    // an anchor was previously refused was the cut, not the room.
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 554.34,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 56.7,
+        compaction: [],
+        anchors: ['recipientName', 'clientName', 'registerEntryOrgName']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -110,21 +160,7 @@
         required: true,
         label: 'Получатель уведомления',
         overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0,
-          insertionTop: 181.20,
-          rowHeight: 14,
-          maxExtraRows: 2,
-          shiftFromTop: 181.20,
-          shiftToTop: 830.0,
-          bottomReserve: 250.0,
-          lineStyle: 'underline',
-          reviewStatus: 'approved',
-          line: {
-            left: 120.0, width: 413.6,
-            baselineOffset: 10.5, ruleOffset: 12.4, ruleThickness: 0.48
-          }
-        }
+        expansion: expansion(181.20, { left: 120.0, width: 413.6 }, 2)
       }),
       text('recipientAddress', 'field.client-postal-address', 407.7, 200.42, 117.9, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 21.0
@@ -145,21 +181,8 @@
         required: true,
         label: 'Ф.И.О. / наименование организации',
         overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0,
-          insertionTop: 297.60,      // just under the printed line's descenders
-          rowHeight: 14,
-          maxExtraRows: 2,
-          shiftFromTop: 297.60,
-          shiftToTop: 830.0,
-          bottomReserve: 250.0,      // measured: content ends at 554.34
-          lineStyle: 'underline',
-          reviewStatus: 'approved',
-          line: {
-            left: 99.3, width: 435.7,
-            baselineOffset: 10.5, ruleOffset: 12.4, ruleThickness: 0.48
-          }
-        }
+        // 297.60 is just under the printed line's descenders.
+        expansion: expansion(297.60, { left: 99.3, width: 435.7 }, 2)
       }),
 
       // The recognition date sits on the 141.62 pt rule captioned "(дата)".
@@ -182,8 +205,23 @@
         required: true, format: 'initials', fallbacks: ['surname'],
         showWhen: { source: 'subject.kind', equals: 'individual' }
       }),
+      // An ordinary company name needs 107.78 pt at the 9 pt floor in an 89 pt
+      // blank, so the legal-entity branch of this line always needed a row.
+      //
+      // The previous phase recorded this anchor as having no clean cut within
+      // ±30 pt. That was measured with a shift band that ended at the page's
+      // own content bottom, which cuts the trailing block in half and makes
+      // every candidate straddle. Against the real movable band the cut at
+      // 484.95 is clean and moves 13 complete blocks — it sits immediately
+      // under the whole printed sentence «Дата внесения записи о ____
+      // (Ф.И.О./ наименование организации) в реестр лиц, признанных
+      // квалифицированными инвесторами ____ (дата).», so the continuation row
+      // follows the complete legal sentence instead of splitting it.
       text('registerEntryOrgName', 'field.client-full-name', 232.0, 472.03, 89.0, {
         required: true,
+        label: 'Наименование организации в записи реестра',
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(484.95, { left: 99.3, width: 435.7 }, 2),
         showWhen: { source: 'subject.kind', equals: 'company' }
       }),
 

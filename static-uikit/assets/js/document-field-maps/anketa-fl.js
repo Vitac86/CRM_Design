@@ -107,6 +107,22 @@
     expectedPages: 4,
     appliesTo: ['individual'],
 
+    // The bank block sits on page 2. The table's last row ends at 777.10 with
+    // its border at 777.58, and the page carries no footer, so 841.92 − 777.58
+    // = 64.34 pt is free below it. Keeping a 30 pt margin still leaves 34.34 pt
+    // — two inserted 13.44 pt rows.
+    pageLayout: {
+      1: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 777.58,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        anchors: ['bankAddress']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -212,7 +228,39 @@
       cell('email', 'subject.email', 1, 251.66, 266.69, { required: true }),
 
       cell('bankName', 'extra.bank-name', 1, 292.13, 305.45, { optional: true }),
-      cell('bankAddress', 'extra.bank-address', 1, 305.45, 318.89, { optional: true }),
+      // A foreign bank address is an ordinary value for a nonresident and does
+      // not fit this 237 pt cell at a readable size: «27 King George the Fifth
+      // Avenue, London, United Kingdom, SW1A 2AA» needs 267.71 pt at 9 pt.
+      //
+      // The анкета is a table, so the Word-like answer is a real inserted row.
+      // Geometry measured from the printed table on page 2: cells are 12.96 pt
+      // tall with a 0.48 pt border, a 13.44 pt pitch; the verticals sit at
+      // 63.50/64.46/84.38/85.34, the column boundary at 318.79 and the right
+      // edge at 566.38/567.36.
+      //
+      // 318.65 is the one clean cut: the row's own verticals end there and its
+      // bottom border sits just under them, so inserting above the border lets
+      // that border travel down and close the new row. The inserted row
+      // therefore needs only its verticals, continuing exactly where the
+      // printed ones stop — which is what a row inserted in Word looks like.
+      cell('bankAddress', 'extra.bank-address', 1, 305.45, 318.89, {
+        optional: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 1, insertionTop: 318.65,
+          shiftFromTop: 318.65,
+          rowHeight: 13.44, maxExtraRows: 2,
+          maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.50, rowWidth: 504.34,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.50, 64.46, 84.38, 85.34, 318.79, 566.38, 567.36],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.3, ruleOffset: 13.44, ruleThickness: 0.48
+          }
+        }
+      }),
       cell('bankInn', 'extra.bank-inn', 1, 318.89, 332.33, { optional: true }),
       cell('bankBicSwift', 'extra.bank-bic-swift', 1, 332.33, 345.77, { optional: true }),
       cell('bankCorrespondentAccount', 'extra.bank-correspondent-account', 1, 345.77, 359.21, { optional: true }),
