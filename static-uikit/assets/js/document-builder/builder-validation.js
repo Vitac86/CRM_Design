@@ -291,6 +291,109 @@
   // Blocks export when anything about growing the page is undefined, unsafe or
   // unreviewed. Production refuses the same configurations; this just says so
   // while the template is still being authored.
+  // The page budget: measured once per page, shared by every anchor on it.
+  // Production refuses a page that promises room the paper does not have; this
+  // says so while the template is still being authored.
+  function validatePageLayout(project, pageSizes, errors, warnings) {
+    var layout = project.pageLayout || {};
+    Object.keys(layout).forEach(function (key) {
+      var index = Number(key);
+      var at = 'pageLayout[' + key + ']';
+      if (!Number.isInteger(index) || index < 0 || index >= pageSizes.length) {
+        errors.push(item('error', 'page-layout-page',
+          at + ': такой страницы нет в документе.', null, at));
+        return;
+      }
+      var entry = layout[key] || {};
+      var size = pageSizes[index];
+
+      ['bodyBottom', 'shiftToTop'].forEach(function (name) {
+        if (!Number.isFinite(Number(entry[name]))) {
+          errors.push(item('error', 'page-layout-incomplete',
+            at + ': не задан ' + name + '.', null, at));
+        }
+      });
+      var footer = entry.fixedFooterFrom != null
+        ? Number(entry.fixedFooterFrom) : size.height;
+      if (Number(entry.bodyBottom) > footer + 1e-6) {
+        errors.push(item('error', 'page-layout-body',
+          at + ': подвижная часть страницы заходит на фиксированный колонтитул.',
+          null, at));
+      }
+      if (entry.fixedFooterFrom != null && Number(entry.shiftToTop) > footer - 1e-6) {
+        errors.push(item('error', 'page-layout-footer',
+          at + ': подвижный блок доходит до колонтитула — номер страницы ' +
+          'двигать нельзя.', null, at));
+      }
+      if (Number(entry.shiftToTop) > size.height + 0.5) {
+        errors.push(item('error', 'page-layout-bounds',
+          at + ': подвижный блок выходит за нижнюю границу страницы.', null, at));
+      }
+
+      (entry.compaction || []).forEach(function (zone, i) {
+        var zoneAt = at + '.compaction[' + i + ']';
+        ['top', 'originalGap', 'minGap'].forEach(function (name) {
+          if (!Number.isFinite(Number(zone[name]))) {
+            errors.push(item('error', 'compaction-incomplete',
+              zoneAt + ': не задан ' + name + '.', null, zoneAt));
+          }
+        });
+        if (Number(zone.minGap) > Number(zone.originalGap) + 1e-6) {
+          errors.push(item('error', 'compaction-minimum',
+            zoneAt + ': минимальный просвет больше исходного.', null, zoneAt));
+        }
+        if (Number(zone.minGap) < 0) {
+          errors.push(item('error', 'compaction-minimum',
+            zoneAt + ': минимальный просвет не может быть отрицательным.',
+            null, zoneAt));
+        }
+        if (zone.reviewStatus !== 'approved') {
+          errors.push(item('error', 'compaction-unreviewed',
+            zoneAt + ': уплотнение просвета не подтверждено визуально — ' +
+            'production-экспорт заблокирован.', null, zoneAt));
+        }
+      });
+
+      var budget = ns.schema.pageBudgetOf(
+        Object.assign({}, entry, { pageHeight: size.height }));
+      (entry.anchors || []).forEach(function (fieldId) {
+        var field = (project.fields || []).filter(function (f) {
+          return f.id === fieldId;
+        })[0];
+        if (!field) {
+          errors.push(item('error', 'page-layout-anchor',
+            at + '.anchors: нет поля «' + fieldId + '».', null, at));
+          return;
+        }
+        if (!field.expansion) {
+          errors.push(item('error', 'page-layout-anchor',
+            at + '.anchors: у поля «' + fieldId + '» нет расширения.', null, at));
+          return;
+        }
+        var page = field.expansion.page != null
+          ? Number(field.expansion.page) : Number(field.page);
+        if (page !== index) {
+          errors.push(item('error', 'page-layout-anchor',
+            at + '.anchors: поле «' + fieldId + '» расширяет страницу ' + page + '.',
+            null, at));
+        }
+        if (Number(field.expansion.rowHeight) > budget.total + 1e-6) {
+          errors.push(item('error', 'page-layout-reserve',
+            at + ': одной строке поля «' + fieldId + '» нужно ' +
+            field.expansion.rowHeight + ' pt, запас страницы — ' +
+            budget.total + ' pt.', null, at));
+        }
+        (entry.compaction || []).forEach(function (zone) {
+          if (Number(zone.top) > Number(field.expansion.insertionTop) + 1e-6) {
+            warnings.push(item('warning', 'compaction-below-anchor',
+              at + ': зона уплотнения ' + zone.top + ' pt ниже точки вставки ' +
+              'поля «' + fieldId + '» — она не будет использована.', null, at));
+          }
+        });
+      });
+    });
+  }
+
   function validateExpansion(field, pageSizes, errors, warnings, project) {
     var spec = field.expansion;
     if (!spec) {
@@ -313,8 +416,9 @@
     }
     var size = pageSizes[page];
 
-    var numbers = ['insertionTop', 'rowHeight', 'maxExtraRows', 'shiftFromTop',
-                   'shiftToTop', 'bottomReserve'];
+    var pageLayout = (project.pageLayout || {})[page];
+    var numbers = ['insertionTop', 'rowHeight', 'maxExtraRows', 'shiftFromTop'];
+    if (!pageLayout) numbers = numbers.concat(['shiftToTop', 'bottomReserve']);
     var missing = numbers.filter(function (key) {
       return !Number.isFinite(Number(spec[key]));
     });
@@ -326,7 +430,10 @@
 
     var rows = Number(spec.maxExtraRows);
     var height = Number(spec.rowHeight);
-    var reserve = Number(spec.bottomReserve);
+    var budget = pageLayout
+      ? ns.schema.pageBudgetOf(Object.assign({}, pageLayout, { pageHeight: size.height }))
+      : { total: Number(spec.bottomReserve) };
+    var reserve = budget.total;
 
     if (height <= 0) {
       errors.push(item('error', 'expansion-row-height',
@@ -337,21 +444,46 @@
         'Максимум вставляемых строк должен быть не меньше одной.', field));
     }
     if (rows * height > reserve + 1e-6) {
-      errors.push(item('error', 'expansion-reserve',
-        'Максимальное расширение (' + Math.round(rows * height * 100) / 100 +
-        ' pt) больше запаса внизу страницы (' + reserve + ' pt).', field));
+      // With a page budget this is not a fault: the anchors below simply get
+      // whatever this one leaves. Without one it is the only limit there is.
+      (pageLayout ? warnings : errors).push(
+        item(pageLayout ? 'warning' : 'error', 'expansion-reserve',
+          'Максимальное расширение (' + Math.round(rows * height * 100) / 100 +
+          ' pt) больше запаса страницы (' + reserve + ' pt).', field));
     }
     if (Number(spec.shiftFromTop) > Number(spec.insertionTop) + 1e-6) {
       errors.push(item('error', 'expansion-block',
         'Начало подвижного блока ниже точки вставки.', field));
     }
-    if (Number(spec.shiftToTop) <= Number(spec.shiftFromTop)) {
-      errors.push(item('error', 'expansion-block',
-        'Подвижный блок страницы не задан.', field));
-    }
-    if (Number(spec.shiftToTop) > size.height + 0.5) {
-      errors.push(item('error', 'expansion-bounds',
-        'Подвижный блок выходит за нижнюю границу страницы.', field));
+    if (pageLayout) {
+      if (spec.bottomReserve != null) {
+        errors.push(item('error', 'expansion-reserve-duplicated',
+          'Запас страницы задаётся один раз в pageLayout — уберите ' +
+          'bottomReserve у поля.', field));
+      }
+      if ((pageLayout.anchors || []).indexOf(field.id) === -1) {
+        errors.push(item('error', 'expansion-not-anchored',
+          'Поле не перечислено в pageLayout[' + page + '].anchors.', field));
+      }
+      if (Number(spec.insertionTop) < Number(pageLayout.fixedHeaderUntil || 0) - 1e-6) {
+        errors.push(item('error', 'expansion-fixed-header',
+          'Точка вставки выше фиксированной шапки страницы.', field));
+      }
+      if (pageLayout.fixedFooterFrom != null &&
+          Number(spec.insertionTop) + rows * height >
+            Number(pageLayout.fixedFooterFrom) + 1e-6) {
+        errors.push(item('error', 'expansion-fixed-footer',
+          'Вставляемые строки заходят на фиксированный колонтитул.', field));
+      }
+    } else {
+      if (Number(spec.shiftToTop) <= Number(spec.shiftFromTop)) {
+        errors.push(item('error', 'expansion-block',
+          'Подвижный блок страницы не задан.', field));
+      }
+      if (Number(spec.shiftToTop) > size.height + 0.5) {
+        errors.push(item('error', 'expansion-bounds',
+          'Подвижный блок выходит за нижнюю границу страницы.', field));
+      }
     }
 
     var line = spec.line || {};
@@ -466,6 +598,8 @@
         warnings.push(item('warning', 'hash-mismatch', 'SHA-256 PDF отличается от сохранённого в проекте. Требуется повторная проверка.'));
       }
     }
+
+    validatePageLayout(project, pageSizes, errors, warnings);
 
     (project.fields || []).forEach(function (field, index) {
       var id = field.id || ('#' + index);

@@ -31,6 +31,36 @@
     'bottomSegments', 'topSegments'
   ];
 
+  // The budget a page shares between all of its anchors. Measured from the
+  // authoritative PDF with tools/qa/measure_page_layout.py, stated once, and
+  // carried through export/import untouched.
+  var PAGE_LAYOUT_KEYS = [
+    'fixedHeaderUntil', 'bodyBottom', 'fixedFooterFrom', 'shiftToTop',
+    'bottomClearance', 'compaction', 'anchors'
+  ];
+
+  // One reviewed whitespace recovery: the gap between two complete blocks, and
+  // the smallest a human agreed it may become.
+  var COMPACTION_KEYS = ['top', 'originalGap', 'minGap', 'reviewStatus', 'note'];
+
+  // What a page can give, given its budget. The same arithmetic the production
+  // planner uses, so the builder cannot promise room production would refuse.
+  function pageBudgetOf(layout) {
+    if (!layout) return null;
+    var clearance = layout.bottomClearance != null ? Number(layout.bottomClearance) : 4;
+    var footer = layout.fixedFooterFrom != null
+      ? Number(layout.fixedFooterFrom) : Number(layout.pageHeight || 0);
+    var bottom = Math.max(0, footer - clearance - Number(layout.bodyBottom));
+    var recoverable = (layout.compaction || []).reduce(function (sum, zone) {
+      return sum + Math.max(0, Number(zone.originalGap) - Number(zone.minGap));
+    }, 0);
+    return {
+      bottomCapacity: Math.round(bottom * 100) / 100,
+      recoverable: Math.round(recoverable * 100) / 100,
+      total: Math.round((bottom + recoverable) * 100) / 100
+    };
+  }
+
   // Every property a continuation region may carry. Anything here must survive
   // an import/export round trip untouched.
   var FLOW_REGION_KEYS = [
@@ -77,6 +107,7 @@
     sourcePdfSha256: true,
     sourcePdf: true,
     pageGeometry: true,
+    pageLayout: true,
     fonts: true,
     fields: true,
     wizard: true,
@@ -165,6 +196,7 @@
       sourcePdfSha256: data.sourcePdfSha256 || '',
       sourcePdf: { name: data.sourcePdfName || '', committed: false },
       pageGeometry: [],
+      pageLayout: {},
       fonts: clone(DEFAULT_FONTS),
       fields: [],
       wizard: { fields: [], checkFields: [], companyFields: [] },
@@ -204,6 +236,9 @@
       expectedPages: template.expectedPages
     });
     project.fonts = clone(template.fonts || DEFAULT_FONTS);
+    // The page budget is a first-class part of the project, not an opaque
+    // production property: the builder edits it and validates against it.
+    project.pageLayout = clone(template.pageLayout || {});
     project.fields = (template.fields || []).map(addBuilderGeometry);
     project.wizard = wizardFromRegistry(entry);
     project.sourcePdf.committed = true;
@@ -213,7 +248,8 @@
     project.qa.visualReviewPassed = true;
     project.productionProperties = {};
     Object.keys(template).forEach(function (key) {
-      if (['id', 'title', 'templateUrl', 'outputFilename', 'expectedPages', 'appliesTo', 'fonts', 'fields'].indexOf(key) === -1) {
+      if (['id', 'title', 'templateUrl', 'outputFilename', 'expectedPages',
+           'appliesTo', 'fonts', 'fields', 'pageLayout'].indexOf(key) === -1) {
         project.productionProperties[key] = clone(template[key]);
       }
     });
@@ -242,6 +278,11 @@
     template.expectedPages = Number(project.expectedPages);
     template.appliesTo = clone(project.appliesTo || []);
     template.fonts = clone(project.fonts || {});
+    if (project.pageLayout && Object.keys(project.pageLayout).length) {
+      template.pageLayout = clone(project.pageLayout);
+    } else {
+      delete template.pageLayout;
+    }
     template.fields = (project.fields || [])
       .filter(function (field) { return !field.explanatory; })
       .map(cleanProductionField);
@@ -339,15 +380,12 @@
     var rowHeight = Number(opts.rowHeight || Math.round(size * 1.15 * 100) / 100);
     var insertionTop = Number(opts.insertionTop != null
       ? opts.insertionTop : Number(field.baselineTop) + size * 0.3);
-    return {
+    var spec = {
       page: Number(field.page),
       insertionTop: Math.round(insertionTop * 100) / 100,
       rowHeight: rowHeight,
       maxExtraRows: Number(opts.maxExtraRows || 1),
       shiftFromTop: Math.round(insertionTop * 100) / 100,
-      shiftToTop: Number(opts.shiftToTop != null
-        ? opts.shiftToTop : Math.round((pageSize.height - 2) * 100) / 100),
-      bottomReserve: Number(opts.bottomReserve || rowHeight),
       lineStyle: opts.lineStyle || 'underline',
       reviewStatus: 'suggested',
       line: {
@@ -358,6 +396,33 @@
         ruleThickness: Number(opts.ruleThickness || 0.36)
       }
     };
+    // A page that already declares its budget owns the reserve and the movable
+    // block; repeating them on the anchor is what the page budget replaced.
+    if (!opts.pageLayout) {
+      spec.shiftToTop = Number(opts.shiftToTop != null
+        ? opts.shiftToTop : Math.round((pageSize.height - 2) * 100) / 100);
+      spec.bottomReserve = Number(opts.bottomReserve || rowHeight);
+    }
+    return spec;
+  }
+
+  // A starting page budget, from what the builder can see of the page. Every
+  // number is a suggestion to be replaced by a measurement — compaction zones
+  // start empty, because recovering white space is a reviewed decision.
+  function suggestPageLayout(pageIndex, pageSize, options) {
+    var opts = options || {};
+    return {
+      fixedHeaderUntil: Number(opts.fixedHeaderUntil || 0),
+      bodyBottom: Number(opts.bodyBottom != null
+        ? opts.bodyBottom : Math.round((pageSize.height * 0.9) * 100) / 100),
+      fixedFooterFrom: opts.fixedFooterFrom != null
+        ? Number(opts.fixedFooterFrom) : null,
+      shiftToTop: Number(opts.shiftToTop != null
+        ? opts.shiftToTop : Math.round((pageSize.height - 12) * 100) / 100),
+      bottomClearance: Number(opts.bottomClearance != null ? opts.bottomClearance : 4),
+      compaction: [],
+      anchors: clone(opts.anchors || [])
+    };
   }
 
   Schema.SCHEMA_VERSION = SCHEMA_VERSION;
@@ -366,6 +431,10 @@
   Schema.FLOW_REGION_KEYS = FLOW_REGION_KEYS;
   Schema.EXPANSION_KEYS = EXPANSION_KEYS;
   Schema.suggestExpansion = suggestExpansion;
+  Schema.suggestPageLayout = suggestPageLayout;
+  Schema.PAGE_LAYOUT_KEYS = PAGE_LAYOUT_KEYS;
+  Schema.COMPACTION_KEYS = COMPACTION_KEYS;
+  Schema.pageBudgetOf = pageBudgetOf;
   Schema.policy = policy;
   Schema.flowRegions = flowRegions;
   Schema.suggestContinuation = suggestContinuation;

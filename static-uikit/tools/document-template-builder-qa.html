@@ -288,18 +288,145 @@
         return error.code === 'expansion-unreviewed';
       }), 'approved expansion still blocked');
     });
-    add('An expansion larger than the page reserve is rejected', function () {
+    add('The inspector edits the page budget where it belongs', function () {
+      return app.openExisting('power-of-attorney').then(function () {
+        app.state.selectField('ulOgrn');
+        var inspector = frame.document.getElementById('dtb-inspector');
+        var titles = Array.prototype.map.call(
+          inspector.querySelectorAll('.dtb-inspector-section h3'),
+          function (node) { return node.textContent; });
+        assert(titles.some(function (t) { return /Запас страницы/.test(t); }),
+               'no page-budget section for an anchor field');
+        assert(titles.some(function (t) { return /Расширение страницы/.test(t); }),
+               'no expansion section for an anchor field');
+        var hints = Array.prototype.map.call(
+          inspector.querySelectorAll('.dtb-inspector-hint'),
+          function (node) { return node.textContent; }).join(' ');
+        assert(/0 строк/.test(hints) && /максимум/.test(hints),
+               'no zero/one/maximum row preview');
+        assert(/Ещё на этой странице/.test(hints),
+               'no cumulative preview for the other anchors of the page');
+        assert(/из просветов/.test(hints),
+               'the recoverable white space is not shown');
+
+        // Editing it goes to the page, not to the field.
+        var before = app.state.project.pageLayout[0].bottomClearance;
+        app.state.update({
+          pageLayout: Object.assign({}, app.state.project.pageLayout, {
+            0: Object.assign({}, app.state.project.pageLayout[0],
+                             { bottomClearance: before + 1 })
+          })
+        }, 'qa page budget');
+        equal(app.state.project.pageLayout[0].bottomClearance, before + 1,
+              'page budget did not change');
+        assert(app.state.field('ulOgrn').expansion.bottomReserve === undefined,
+               'the anchor grew a reserve of its own');
+        app.state.undo();
+        equal(app.state.project.pageLayout[0].bottomClearance, before,
+              'undo did not restore the page budget');
+      }).then(function () { return app.openExisting('qualification-notice'); });
+    });
+    add('A row taller than the whole page budget is rejected', function () {
       var project = cloneProject(app.state.project);
-      var field = project.fields.filter(function (item) { return item.id === 'recognitionDate'; })[0];
-      field.overflowStrategy = 'expand-layout';
-      field.expansion = ns.schema.suggestExpansion(field, { width: 595.32, height: 841.92 },
-        { bottomReserve: 10, maxExtraRows: 3, rowHeight: 14 });
-      field.expansion.reviewStatus = 'approved';
+      // Leave the page just under one row of room.
+      project.pageLayout[0].bottomClearance =
+        841.92 - project.pageLayout[0].bodyBottom - 10;
       var result = ns.validation.structural(project, app.sourceInfo,
         ns.fixtures.payloadFor('ru-resident-normal', project));
       assert(result.errors.some(function (error) {
-        return error.code === 'expansion-reserve';
-      }), 'oversized expansion not rejected');
+        return error.code === 'page-layout-reserve';
+      }), 'a row the page cannot pay for was accepted');
+    });
+    add('A page budget is stated once, not per field', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) {
+        return item.id === 'clientName';
+      })[0];
+      field.expansion.bottomReserve = 250;
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-reserve-duplicated';
+      }), 'a per-field reserve shadowed the page budget');
+    });
+    add('An anchor missing from the page budget is rejected', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].anchors = project.pageLayout[0].anchors.filter(
+        function (id) { return id !== 'clientName'; });
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-not-anchored';
+      }), 'an unlisted anchor was accepted');
+    });
+    add('A movable block reaching the fixed footer is rejected', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].fixedFooterFrom = 700;
+      project.pageLayout[0].shiftToTop = 780;
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'page-layout-footer';
+      }), 'a page number would have moved');
+    });
+    add('An unreviewed compaction zone blocks production export', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].compaction = [
+        { top: 100, originalGap: 20, minGap: 8, reviewStatus: 'suggested' }
+      ];
+      var blocked = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(blocked.errors.some(function (error) {
+        return error.code === 'compaction-unreviewed';
+      }), 'unreviewed whitespace recovery did not block export');
+      project.pageLayout[0].compaction[0].reviewStatus = 'approved';
+      var allowed = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(!allowed.errors.some(function (error) {
+        return error.code === 'compaction-unreviewed';
+      }), 'approved whitespace recovery still blocked');
+    });
+    add('A compaction minimum larger than its gap is rejected', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].compaction = [
+        { top: 100, originalGap: 8, minGap: 20, reviewStatus: 'approved' }
+      ];
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'compaction-minimum';
+      }), 'an impossible compaction minimum was accepted');
+    });
+    add('The page budget survives export, import and production export', function () {
+      var text = ns.io.exportProject(app.state.project);
+      var imported = ns.io.importProjectText(text).project;
+      assert(ns.io.semanticEqual(imported.pageLayout, app.state.project.pageLayout),
+             'builder JSON lost the page budget');
+      var production = ns.schema.toProduction(app.state.project);
+      assert(ns.io.semanticEqual(production.pageLayout, app.state.project.pageLayout),
+             'production export lost the page budget');
+      var back = ns.schema.fromProduction(production, null);
+      assert(ns.io.semanticEqual(back.pageLayout, app.state.project.pageLayout),
+             'reimport lost the page budget');
+      assert(!Object.prototype.hasOwnProperty.call(back.productionProperties, 'pageLayout'),
+             'the page budget is a project property, not an opaque passenger');
+    });
+    add('Every production map round-trips its page budget', function () {
+      app.catalog.forEach(function (entry) {
+        var template = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(template, entry);
+        var back = ns.schema.toProduction(project, template.templateUrl);
+        assert(ns.io.semanticEqual(back.pageLayout || null, template.pageLayout || null),
+               'page budget lost for ' + template.id);
+        if (template.pageLayout) {
+          Object.keys(template.pageLayout).forEach(function (page) {
+            (template.pageLayout[page].anchors || []).forEach(function (id) {
+              assert((back.fields || []).some(function (f) { return f.id === id; }),
+                     template.id + ': anchor ' + id + ' lost');
+            });
+          });
+        }
+      });
     });
     add('An incomplete expansion is rejected rather than guessed', function () {
       var project = cloneProject(app.state.project);

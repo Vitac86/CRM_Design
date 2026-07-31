@@ -41,6 +41,10 @@ textarea.dtb-control { resize: vertical; }
 .dtb-control:focus { outline: 2px solid rgba(30,92,168,.2); border-color: var(--dtb-blue); }
 .dtb-help, .dtb-inspector-hint { margin: 5px 0; color: var(--dtb-muted); font-size: 10px; }
 .dtb-inline-checks { display: flex; gap: 14px; margin: 7px 0; }
+/* One reviewed whitespace-compaction zone: cut, gap, minimum and its review. */
+.dtb-inspector-subrow { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 6px; align-items: end; margin: 7px 0; padding: 6px; border: 1px solid #dde3ec; border-radius: 4px; background: #f8fafc; }
+.dtb-inspector-subrow > .dtb-inspector-row { margin: 0; }
+.dtb-inspector-subrow > .dtb-button { grid-column: 1 / -1; }
 .dtb-hash { overflow-wrap: anywhere; margin: 7px 0; padding: 6px; border-radius: 4px; background: #f4f6f9; color: var(--dtb-muted); font: 9px/1.35 ui-monospace, monospace; }
 .dtb-page-list, .dtb-field-list { display: grid; gap: 4px; }
 .dtb-page-item, .dtb-field-item { display: grid; gap: 1px; width: 100%; border: 1px solid transparent; border-radius: 4px; padding: 6px; color: #29364a; background: #f5f7fa; font: inherit; text-align: left; cursor: pointer; }

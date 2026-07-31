@@ -70,6 +70,16 @@
     this.emit('model');
   };
 
+  // A change to the project itself rather than to one field — the page budget
+  // is the first of these, and it belongs to the page, not to any anchor on it.
+  BuilderState.prototype.update = function (patch, label) {
+    var self = this;
+    this.commit(label || 'edit project', function (project) {
+      Object.keys(patch).forEach(function (key) { project[key] = patch[key]; });
+      return self;
+    });
+  };
+
   BuilderState.prototype.undo = function () {
     if (!this.history.length || !this.project) return false;
     this.future.push({ project: this.snapshot(), selectedFieldId: this.selectedFieldId });

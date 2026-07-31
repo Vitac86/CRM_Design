@@ -204,6 +204,7 @@
     this.container.appendChild(section);
     this._renderFlowRegions(field);
     this._renderExpansion(field);
+    this._renderPageBudget(field);
     this._renderFallbacks(field, formats);
   };
 
@@ -263,12 +264,22 @@
         'заблокирован.'));
     }
 
-    // The movable block, the anchor and the reserve.
-    [['page', 'Страница', 1], ['insertionTop', 'Точка вставки', 0.25],
-     ['rowHeight', 'Высота строки', 0.25], ['maxExtraRows', 'Максимум строк', 1],
-     ['shiftFromTop', 'Подвижный блок: от', 0.25],
-     ['shiftToTop', 'Подвижный блок: до', 0.25],
-     ['bottomReserve', 'Запас внизу страницы', 0.25]]
+    // The movable block and the anchor. The reserve of the page is edited in
+    // its own section, once, and only appears here when the page has no budget
+    // — a map written before the page budget existed.
+    var pageLayout = (this.state.project.pageLayout || {})[
+      spec.page != null ? Number(spec.page) : Number(field.page)];
+    var anchorRows = [
+      ['page', 'Страница', 1], ['insertionTop', 'Точка вставки', 0.25],
+      ['rowHeight', 'Высота строки', 0.25], ['maxExtraRows', 'Максимум строк', 1],
+      ['maxFontSize', 'Максимальный кегль строки', 0.25],
+      ['shiftFromTop', 'Подвижный блок: от', 0.25]
+    ];
+    if (!pageLayout) {
+      anchorRows.push(['shiftToTop', 'Подвижный блок: до', 0.25]);
+      anchorRows.push(['bottomReserve', 'Запас внизу страницы', 0.25]);
+    }
+    anchorRows
       .forEach(function (entry) {
         var control = input('number', spec[entry[0]] == null ? '' : spec[entry[0]],
           { step: entry[2] });
@@ -314,13 +325,39 @@
     });
     section.appendChild(match);
 
-    // How far the page would move at zero, one and the maximum row count.
+    // How far the page would move at zero, one and the maximum row count, and
+    // what the other anchors on the same page have already spoken for.
     var rows = Number(spec.maxExtraRows || 1);
     var height = Number(spec.rowHeight || 14);
+    var budget = pageLayout
+      ? ns.schema.pageBudgetOf(Object.assign({}, pageLayout,
+          { pageHeight: pageSize.height }))
+      : { total: Number(spec.bottomReserve || 0), recoverable: 0 };
     section.appendChild(element('p', 'dtb-inspector-hint',
       'Сдвиг: 0 строк — 0 pt · 1 строка — ' + height + ' pt · максимум (' +
       rows + ') — ' + Math.round(rows * height * 100) / 100 + ' pt из ' +
-      (spec.bottomReserve || 0) + ' pt запаса.'));
+      budget.total + ' pt запаса страницы' +
+      (budget.recoverable ? ' (в том числе ' + budget.recoverable +
+        ' pt из просветов)' : '') + '.'));
+    if (pageLayout) {
+      var others = (pageLayout.anchors || []).filter(function (id) {
+        return id !== field.id;
+      });
+      var claimed = others.reduce(function (sum, id) {
+        var other = (self.state.project.fields || []).filter(function (f) {
+          return f.id === id;
+        })[0];
+        var e = other && other.expansion;
+        return sum + (e ? Number(e.maxExtraRows || 1) * Number(e.rowHeight || 0) : 0);
+      }, 0);
+      section.appendChild(element('p', 'dtb-inspector-hint',
+        others.length
+          ? 'Ещё на этой странице: ' + others.join(', ') + ' — до ' +
+            Math.round(claimed * 100) / 100 + ' pt. Совместно с этим полем — до ' +
+            Math.round((claimed + rows * height) * 100) / 100 + ' pt из ' +
+            budget.total + ' pt.'
+          : 'Других расширяемых полей на этой странице нет.'));
+    }
 
     var approved = input('checkbox', spec.reviewStatus === 'approved');
     approved.classList.add('dtb-control');
@@ -339,6 +376,139 @@
       }, 'remove layout expansion');
     });
     section.appendChild(remove);
+
+    this.container.appendChild(section);
+  };
+
+  // ── The budget the whole page shares ───────────────────────────────────────
+  //
+  // A page has one amount of room. It is measured from the authoritative PDF
+  // with tools/qa/measure_page_layout.py and stated once here, so two anchors
+  // on the same page cannot each believe they own it.
+  Inspector.prototype._renderPageBudget = function (field) {
+    var self = this;
+    var project = this.state.project;
+    var spec = field.expansion;
+    if (!spec) return;
+    var index = spec.page != null ? Number(spec.page) : Number(field.page);
+    var pageSize = (project.pageGeometry || [])[index] ||
+      { width: 595.32, height: 841.92 };
+    var section = this._section('Запас страницы ' + (index + 1));
+    var layout = (project.pageLayout || {})[index];
+
+    function commit(next) {
+      var pageLayout = ns.schema.clone(project.pageLayout || {});
+      if (next === undefined) delete pageLayout[index];
+      else pageLayout[index] = next;
+      self.state.update({ pageLayout: pageLayout }, 'edit page budget');
+    }
+
+    if (!layout) {
+      section.appendChild(element('p', 'dtb-inspector-hint',
+        'У страницы нет общего запаса: каждое поле объявляет свой. Общий ' +
+        'запас задаётся один раз и делится между всеми полями страницы по ' +
+        'порядку сверху вниз.'));
+      var add = element('button', 'dtb-button is-primary', 'Задать запас страницы');
+      add.type = 'button';
+      add.addEventListener('click', function () {
+        var suggested = ns.schema.suggestPageLayout(index, pageSize, {
+          anchors: (project.fields || []).filter(function (f) {
+            var e = f.expansion;
+            return e && (e.page != null ? Number(e.page) : Number(f.page)) === index;
+          }).map(function (f) { return f.id; })
+        });
+        commit(suggested);
+      });
+      section.appendChild(add);
+      this.container.appendChild(section);
+      return;
+    }
+
+    function patch(changes) {
+      var next = ns.schema.clone(layout);
+      Object.keys(changes).forEach(function (key) {
+        if (changes[key] === undefined || changes[key] === '') delete next[key];
+        else next[key] = changes[key];
+      });
+      commit(next);
+    }
+
+    [['fixedHeaderUntil', 'Фиксированная шапка до'],
+     ['bodyBottom', 'Низ подвижного текста'],
+     ['fixedFooterFrom', 'Фиксированный колонтитул от'],
+     ['shiftToTop', 'Подвижный блок: до'],
+     ['bottomClearance', 'Просвет до колонтитула']]
+      .forEach(function (entry) {
+        var control = input('number', layout[entry[0]] == null ? '' : layout[entry[0]],
+          { step: 0.25 });
+        control.classList.add('dtb-control');
+        control.addEventListener('change', function () {
+          var changes = {};
+          changes[entry[0]] = control.value === '' ? undefined : Number(control.value);
+          patch(changes);
+        });
+        section.appendChild(row(entry[1], control));
+      });
+
+    var budget = ns.schema.pageBudgetOf(
+      Object.assign({}, layout, { pageHeight: pageSize.height }));
+    section.appendChild(element('p', 'dtb-inspector-hint',
+      'Запас страницы: ' + budget.bottomCapacity + ' pt внизу + ' +
+      budget.recoverable + ' pt из просветов = ' + budget.total + ' pt. ' +
+      'Поля страницы: ' + ((layout.anchors || []).join(', ') || '—') + '.'));
+
+    // Reviewed whitespace recovery, one row per zone.
+    (layout.compaction || []).forEach(function (zone, i) {
+      var line = element('div', 'dtb-inspector-subrow');
+      [['top', 'срез'], ['originalGap', 'просвет'], ['minGap', 'минимум']]
+        .forEach(function (entry) {
+          var control = input('number', zone[entry[0]] == null ? '' : zone[entry[0]],
+            { step: 0.25 });
+          control.classList.add('dtb-control');
+          control.addEventListener('change', function () {
+            var next = ns.schema.clone(layout);
+            next.compaction[i][entry[0]] = control.value === ''
+              ? undefined : Number(control.value);
+            commit(next);
+          });
+          line.appendChild(row(entry[1], control));
+        });
+      var ok = input('checkbox', zone.reviewStatus === 'approved');
+      ok.classList.add('dtb-control');
+      ok.addEventListener('change', function () {
+        var next = ns.schema.clone(layout);
+        next.compaction[i].reviewStatus = ok.checked ? 'approved' : 'suggested';
+        commit(next);
+      });
+      line.appendChild(row('проверено', ok,
+        'Посмотрите на странице, что уменьшенный просвет не выглядит ошибкой ' +
+        'вёрстки и не сближает два блока сверх приличного.'));
+      var drop = element('button', 'dtb-button is-danger', 'Убрать зону');
+      drop.type = 'button';
+      drop.addEventListener('click', function () {
+        var next = ns.schema.clone(layout);
+        next.compaction.splice(i, 1);
+        commit(next);
+      });
+      line.appendChild(drop);
+      section.appendChild(line);
+    });
+
+    var addZone = element('button', 'dtb-button', 'Добавить зону уплотнения');
+    addZone.type = 'button';
+    addZone.addEventListener('click', function () {
+      var next = ns.schema.clone(layout);
+      next.compaction = (next.compaction || []).concat([{
+        top: Number(layout.fixedHeaderUntil || 0),
+        originalGap: 0, minGap: 0, reviewStatus: 'suggested', note: ''
+      }]);
+      commit(next);
+    });
+    section.appendChild(addZone);
+    section.appendChild(element('p', 'dtb-inspector-hint',
+      'Уплотнять можно только просвет между двумя целыми блоками и только ' +
+      'выше первой точки вставки. Межстрочный интервал внутри абзаца, кегль и ' +
+      'вертикальный масштаб не трогаются.'));
 
     this.container.appendChild(section);
   };
