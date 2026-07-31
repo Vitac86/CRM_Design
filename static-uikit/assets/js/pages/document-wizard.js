@@ -1782,9 +1782,7 @@
           key: 'extra-attorney-issue-date',
           label: 'Поверенный — дата выдачи паспорта',
           type: 'date',
-          required: true,
-          // The legal-entity variant reserves only 4.56 pt after «дата выдачи».
-          showWhen: { source: 'subject.kind', equals: 'individual' }
+          required: true
         },
         {
           key: 'extra-attorney-address',
@@ -3177,6 +3175,19 @@
   // name, drop part of an address or pick a smaller font.
   var expansionNotes = [];
 
+  // Layout internals are useful to document developers, but field IDs, font
+  // limits and shift counts are not manager-facing information.  They are
+  // exposed only after an explicit opt-in (`?document-debug=1` or the matching
+  // global flag) and never appear in the normal workflow.
+  function documentDebugEnabled() {
+    if (window.CRM_DOCUMENT_DEBUG === true) return true;
+    try {
+      return new URLSearchParams(window.location.search).get('document-debug') === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
   function noteExpansion(doc, notes) {
     expansionNotes = (notes || []).map(function (note) {
       return { documentTitle: doc.title, label: note.label, rows: note.rows };
@@ -3199,18 +3210,26 @@
 
     var head = document.createElement('p');
     head.className = 'crm-docwiz-expansion-head';
-    head.textContent = 'Длинное значение будет перенесено на дополнительную строку документа.';
+    head.textContent = 'Длинные реквизиты будут автоматически перенесены с сохранением структуры документа.';
     box.appendChild(head);
 
-    var list = document.createElement('ul');
-    list.className = 'crm-docwiz-expansion-list';
-    expansionNotes.forEach(function (note) {
-      var item = document.createElement('li');
-      item.textContent = note.label + ' — ' + note.rows + ' ' +
-        rowsWord(note.rows) + ' в «' + note.documentTitle + '»';
-      list.appendChild(item);
-    });
-    box.appendChild(list);
+    if (documentDebugEnabled()) {
+      var details = document.createElement('details');
+      details.className = 'crm-docwiz-expansion-debug';
+      var summary = document.createElement('summary');
+      summary.textContent = 'Технические сведения';
+      details.appendChild(summary);
+      var list = document.createElement('ul');
+      list.className = 'crm-docwiz-expansion-list';
+      expansionNotes.forEach(function (note) {
+        var item = document.createElement('li');
+        item.textContent = note.label + ' — ' + note.rows + ' ' +
+          rowsWord(note.rows) + ' в «' + note.documentTitle + '»';
+        list.appendChild(item);
+      });
+      details.appendChild(list);
+      box.appendChild(details);
+    }
     box.hidden = false;
   }
 
@@ -3255,9 +3274,8 @@
   }
 
   // Render one actionable entry per value the production engine could not
-  // print. Everything the manager needs to act is on screen: which document,
-  // which field, how long the value is, the readable minimum, how many approved
-  // lines the form provides and why it still does not fit.
+  // print. Normal users see only business-facing guidance. Exact field IDs,
+  // font limits and line capacities are available in explicit debug mode.
   function renderOverflowReport(error, doc, onRetry) {
     var box = document.getElementById('docwiz-pdf-overflow');
     if (!box) return;
@@ -3275,21 +3293,33 @@
 
       var title = document.createElement('p');
       title.className = 'crm-docwiz-overflow-field';
-      title.textContent = item.label || item.fieldId;
+      title.textContent = item.label && item.label !== item.fieldId
+        ? item.label : 'Значение документа';
       entry.appendChild(title);
 
       var why = document.createElement('p');
       why.className = 'crm-docwiz-overflow-why';
-      why.textContent = item.message;
+      why.textContent = item.editable
+        ? 'Значение слишком длинное для утверждённой области формы. Проверьте введённые данные.'
+        : 'Значение не помещается в утверждённую область формы.';
       entry.appendChild(why);
 
-      var meta = document.createElement('p');
-      meta.className = 'crm-docwiz-overflow-meta';
-      meta.textContent = 'Поле: ' + item.fieldId +
-        (item.valueLength != null ? ' · длина значения: ' + item.valueLength + ' симв.' : '') +
-        (item.minFontSize != null ? ' · минимальный кегль: ' + item.minFontSize + ' pt' : '') +
-        (item.lineCapacity != null ? ' · доступно строк: ' + item.lineCapacity : '');
-      entry.appendChild(meta);
+      if (documentDebugEnabled()) {
+        var debug = document.createElement('details');
+        debug.className = 'crm-docwiz-overflow-debug';
+        var debugSummary = document.createElement('summary');
+        debugSummary.textContent = 'Технические сведения';
+        debug.appendChild(debugSummary);
+        var meta = document.createElement('p');
+        meta.className = 'crm-docwiz-overflow-meta';
+        meta.textContent = 'Поле: ' + item.fieldId +
+          (item.valueLength != null ? ' · длина значения: ' + item.valueLength + ' симв.' : '') +
+          (item.minFontSize != null ? ' · минимальный кегль: ' + item.minFontSize + ' pt' : '') +
+          (item.lineCapacity != null ? ' · доступно строк: ' + item.lineCapacity : '') +
+          (item.message ? ' · ' + item.message : '');
+        debug.appendChild(meta);
+        entry.appendChild(debug);
+      }
 
       if (item.editable && inputForSource(item.source)) {
         // Operator-entered value: send them back to it, keeping everything

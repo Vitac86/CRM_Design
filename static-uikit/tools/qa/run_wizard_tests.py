@@ -49,8 +49,9 @@ class Checks:
         return 1 if self.failed else 0
 
 
-def open_wizard(browser, server, subject):
-    browser.goto(f"{server.base}/pages/document-wizard.html?subject={subject}")
+def open_wizard(browser, server, subject, debug=False):
+    suffix = "&document-debug=1" if debug else ""
+    browser.goto(f"{server.base}/pages/document-wizard.html?subject={subject}{suffix}")
     browser.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
 
 
@@ -150,6 +151,7 @@ def generate(browser, timeout_ms=60000):
             var status = document.getElementById('docwiz-pdf-status');
             var box = document.getElementById('docwiz-pdf-downloads');
             var overflow = document.getElementById('docwiz-pdf-overflow');
+            var expansion = document.getElementById('docwiz-pdf-expansion');
             var text = status ? status.textContent : '';
             var done = /сформирован/.test(text) || status.classList.contains('is-error');
             if (done || Date.now() - started > __TIMEOUT__) {
@@ -158,6 +160,13 @@ def generate(browser, timeout_ms=60000):
                 kind: status ? status.className : '',
                 downloads: box ? box.querySelectorAll('a[data-object-url]').length : 0,
                 overflowShown: !!(overflow && !overflow.hidden),
+                overflowText: overflow ? overflow.textContent : '',
+                overflowDebug: overflow ? overflow.querySelectorAll(
+                  'details.crm-docwiz-overflow-debug').length : 0,
+                expansionShown: !!(expansion && !expansion.hidden),
+                expansionText: expansion ? expansion.textContent : '',
+                expansionDebug: expansion ? expansion.querySelectorAll(
+                  'details.crm-docwiz-expansion-debug').length : 0,
                 overflowFields: overflow ? Array.prototype.map.call(
                   overflow.querySelectorAll('.crm-docwiz-overflow-field'),
                   function (el) { return el.textContent; }) : [],
@@ -199,6 +208,13 @@ def main() -> int:
                          json.dumps(result, ensure_ascii=False))
             checks.check("no overflow panel for a supported long value",
                          not result["overflowShown"], str(result["overflowFields"]))
+            if result["expansionShown"]:
+                checks.check(
+                    "manager expansion notice is generic",
+                    "Длинные реквизиты будут автоматически перенесены" in
+                    result["expansionText"] and result["expansionDebug"] == 0,
+                    json.dumps(result, ensure_ascii=False),
+                )
 
             # ── Entered values survive the preflight ────────────────────────
             after = browser.eval(
@@ -277,6 +293,14 @@ def main() -> int:
                 checks.check("unresolved overflow shows the actionable panel",
                              result["overflowShown"] and bool(result["overflowFields"]),
                              json.dumps(result, ensure_ascii=False))
+                technical = ("Поле:", "минимальный кегль", "доступно строк",
+                             "newCodeWord")
+                checks.check(
+                    "normal manager overflow hides layout internals",
+                    result["overflowDebug"] == 0 and
+                    not any(token in result["overflowText"] for token in technical),
+                    result["overflowText"],
+                )
                 checks.check("no PDF is offered for an unprintable document",
                              result["downloads"] == 0,
                              json.dumps(result, ensure_ascii=False))
@@ -301,6 +325,22 @@ def main() -> int:
                 checks.check("correcting the value generates the document",
                              fixed["downloads"] == 1 and not fixed["overflowShown"],
                              json.dumps(fixed, ensure_ascii=False))
+
+                # Explicit developer mode keeps the same manager guidance but
+                # adds a collapsed technical section for diagnostics.
+                open_wizard(browser, server, INDIVIDUAL, debug=True)
+                if click_document(browser, "code-word-request"):
+                    fill_extra_fields(browser, value_map={
+                        word_key: "ОченьДлинноеКодовоеСловоКотороеТочноНеПоместитсяВСтроку"
+                    }, long_text="Тест")
+                    debug_result = generate(browser)
+                    checks.check(
+                        "explicit debug mode exposes collapsed technical details",
+                        debug_result["overflowShown"] and
+                        debug_result["overflowDebug"] > 0 and
+                        "Поле:" in debug_result["overflowText"],
+                        json.dumps(debug_result, ensure_ascii=False),
+                    )
 
         # ── Back / reselect ─────────────────────────────────────────────────
         open_wizard(browser, server, COMPANY)
