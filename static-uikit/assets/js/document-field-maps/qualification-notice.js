@@ -87,6 +87,9 @@
       optional: !!o.optional,
       multiline: !!o.multiline,
       maxLines: o.maxLines,
+      // A printed cell of measured height. Dropping this made the
+      // field unbounded, and a long value ran over the text below it.
+      maxHeight: o.maxHeight,
       lineHeight: o.lineHeight,
       lineHeightRatio: o.lineHeightRatio,
       format: o.format,
@@ -162,8 +165,11 @@
         overflowStrategy: 'expand-layout',
         expansion: expansion(181.20, { left: 120.0, width: 413.6 }, 2)
       }),
+      // 36.97 pt of clear space below the baseline before the title block, so
+      // this 117.9 pt rule holds four lines at the floor — enough for a full
+      // foreign postal address without touching the page.
       text('recipientAddress', 'field.client-postal-address', 407.7, 200.42, 117.9, {
-        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 21.0
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 34.0
       }),
 
       // "ООО «Инвестика» настоящим уведомляет, что ______" — the printed text
