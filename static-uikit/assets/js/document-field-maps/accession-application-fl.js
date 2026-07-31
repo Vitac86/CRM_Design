@@ -57,6 +57,18 @@
     expectedPages: 3,
     appliesTo: ['individual'],
 
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 793.94,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        anchors: ['clientFullName']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -70,7 +82,17 @@
         source: 'field.clientFullName',
         page: 0, left: 114.0, baselineTop: 99.26, width: 203.9,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 101.7, shiftFromTop: 101.7,
+          rowHeight: 10.5, maxExtraRows: 1, maxFontSize: 9,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 56.6, width: 501.0,
+            baselineOffset: 8.2, ruleOffset: 9.4, ruleThickness: 0.36
+          }
+        }
       },
       {
         id: 'passportSeries',

@@ -194,7 +194,22 @@
             note: 'между подзаголовком варианта и строкой «г. ___ (дата прописью)»'
           }
         ],
-        anchors: ['ulOgrn', 'ulInn', 'ulAttorneyCitizenship',
+        // The final complete power (ten lines, 581.02–754.68) may move before
+        // the already-continuing list on page 2.  The target body moves by ten
+        // source pitches; its signature block stays complete on page 2 and the
+        // page number remains fixed.
+        crossPageFlow: {
+          targetPage: 1,
+          sourceFromTop: 575.72, sourceToTop: 783.0,
+          sourceContentTop: 580.87, retainedBodyBottom: 575.71,
+          targetInsertionTop: 58.17,
+          targetShiftFromTop: 56.0, targetShiftToTop: 783.0,
+          targetShift: 181.2, maxCumulativeShift: 181.2,
+          maxCascadeDepth: 1, reviewStatus: 'approved',
+          note: 'последнее полное полномочие страницы 1 переносится перед перечнем страницы 2'
+        },
+        anchors: ['ulCity', 'ulOgrn', 'ulInn', 'ulExecutiveName',
+                  'ulAttorneyName', 'ulAttorneyCitizenship',
                   'ulAttorneyIssuedBy', 'ulAttorneyAddress']
       },
       // ФЛ page 3. Body 57.13–761.98, page number «3» at 794.77.
@@ -224,6 +239,20 @@
             note: 'верхнее поле страницы физического лица, 2.0 → 1.5 см'
           }
         ],
+        // Page 3 ends with the first two lines of a power that continues on
+        // page 4. Move those four complete drawing blocks before their existing
+        // continuation, then shift page 4 by two line pitches. No paragraph,
+        // signature, footer or page number is split or moved to another page.
+        crossPageFlow: {
+          targetPage: 3,
+          sourceFromTop: 725.9, sourceToTop: 788.0,
+          sourceContentTop: 731.02, retainedBodyBottom: 725.86,
+          targetInsertionTop: 55.92,
+          targetShiftFromTop: 55.9, targetShiftToTop: 788.0,
+          targetShift: 36.24, maxCumulativeShift: 36.24,
+          maxCascadeDepth: 1, reviewStatus: 'approved',
+          note: 'две начальные строки продолжающегося полномочия переносятся на страницу 4'
+        },
         anchors: ['flPrincipalCitizenship', 'flPrincipalIssuedBy',
                   'flPrincipalAddress', 'flAttorneyCitizenship',
                   'flAttorneyIssuedBy', 'flAttorneyIssueDate']
@@ -236,17 +265,17 @@
       // run of 56 pt. «Москва» fits; «Санкт-Петербург» is 66.31 pt at 9 pt and
       // does not.
       //
-      // NO continuation row is configured here, and that is a decision rather
-      // than an omission. The only clean cut under this line is 136.89, which
-      // falls between the date rule (136.34–136.82) and its own caption
-      // «(дата прописью)» (137.94): a row opened there would tear that caption
-      // away from the rule it labels. The next clean cut is below the caption,
-      // which would put the city two lines away from «г.» with someone else's
-      // caption in between. Neither reads as the form. A city longer than
-      // «Москва» therefore remains a realistic-long limitation of this variant,
-      // recorded in docs/document-text-layout-audit.md.
+      // The date rule and its caption are separate complete blocks. Opening the
+      // city continuation at the clean 135.30 cut moves both down together, so
+      // the caption remains attached to its rule while «Санкт-Петербург» keeps
+      // its printed hyphen and continues directly under «г. ____________».
       text('ulCity', 'extra.extra-poa-city', 0, 165.86, 135.26, 56.0, {
-        required: true, align: 'center', showWhen: UL_ONLY
+        required: true, align: 'center', showWhen: UL_ONLY,
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(0, 135.3, {
+          left: 165.86, width: 56.0,
+          rowHeight: 12, maxFontSize: 9, baselineOffset: 9.4
+        })
       }),
       text('ulDateInWords', 'extra.extra-poa-date-words', 0, 258.0, 135.26, 174.0, {
         required: true, align: 'center', showWhen: UL_ONLY
@@ -273,7 +302,9 @@
 
       // «в лице ______, действующего на основании ______»
       text('ulExecutiveName', 'field.client-rep-full-name', 0, 258.0, 193.10, 81.0, {
-        required: true, fallbacks: ['initials', 'surname'], showWhen: UL_ONLY
+        required: true, fallbacks: ['initials', 'surname'], showWhen: UL_ONLY,
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(0, 196.0, UL_ROW)
       }),
       // «…действующего на основании ____» wraps in the source: the blank ends
       // the first line after 39.50 pt (492.58–532.08) and continues at the
@@ -300,7 +331,9 @@
         flowRegions: [
           { page: 0, left: 383.0, baselineTop: 211.22, width: 107.0 },
           { page: 0, left: 58.0, baselineTop: 229.34, width: 96.0 }
-        ]
+        ],
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(0, 232.0, UL_ROW)
       }),
       // «имеющего паспорт гражданина ____, серии» — 30.72 pt printed, bounded
       // by text on both sides, and no printed rule continues it. «Россия» fits;

@@ -28,6 +28,28 @@
     expectedPages: 10,
     appliesTo: ['individual', 'company'],
 
+    pageLayout: {
+      8: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 820.06,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        crossPageFlow: {
+          targetPage: 9,
+          sourceFromTop: 759.6, sourceToTop: 830.0,
+          sourceContentTop: 764.46, retainedBodyBottom: 759.56,
+          targetInsertionTop: 74.03,
+          targetShiftFromTop: 72.7, targetShiftToTop: 800.0,
+          targetShift: 53.76, maxCumulativeShift: 53.76,
+          maxCascadeDepth: 1, reviewStatus: 'approved',
+          note: 'последний полный пункт страницы 9 переносится перед продолжением уведомления'
+        },
+        anchors: ['clientFullName', 'passportIssuedBy', 'registrationAddress']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -39,7 +61,17 @@
         source: 'field.clientFullName',
         page: 8, left: 143.33, baselineTop: 264.07, width: 263.99,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 8, insertionTop: 280.0, shiftFromTop: 280.0,
+          rowHeight: 12.5, maxExtraRows: 1, maxFontSize: 11,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 55.22, width: 484.99,
+            baselineOffset: 9.8, ruleOffset: 11.4, ruleThickness: 0.48
+          }
+        }
       },
       {
         id: 'passportSeries',
@@ -61,7 +93,17 @@
         source: 'field.passportIssuedBy',
         page: 8, left: 56.66, baselineTop: 297.70, width: 483.55,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 8, insertionTop: 302.0, shiftFromTop: 302.0,
+          rowHeight: 12.5, maxExtraRows: 1, maxFontSize: 11,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 55.22, width: 484.99,
+            baselineOffset: 9.8, ruleOffset: 11.4, ruleThickness: 0.48
+          }
+        }
       },
       {
         id: 'passportIssueDate',
@@ -78,11 +120,10 @@
         expansion: {
           page: 8, insertionTop: 339.1,
           rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 339.1, shiftToTop: 822.06,
-          bottomReserve: 17.86,
+          shiftFromTop: 339.1,
           lineStyle: 'underline', reviewStatus: 'approved',
           line: {
-            left: 55.22, width: 486.31,
+            left: 55.22, width: 484.99,
             baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
           }
         },

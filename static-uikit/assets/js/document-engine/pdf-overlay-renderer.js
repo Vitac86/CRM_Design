@@ -434,6 +434,67 @@
         }
       });
 
+      var flow = entry.crossPageFlow;
+      if (flow) {
+        var flowAt = where + '.crossPageFlow';
+        ['targetPage', 'sourceFromTop', 'sourceToTop', 'sourceContentTop',
+         'retainedBodyBottom', 'targetInsertionTop', 'targetShiftFromTop',
+         'targetShiftToTop', 'targetShift', 'maxCumulativeShift',
+         'maxCascadeDepth'].forEach(function (name) {
+          if (!isFinite(Number(flow[name]))) {
+            problems.push(flowAt + '.' + name + ' must be a number');
+          }
+        });
+        var targetPage = Number(flow.targetPage);
+        if (!Number.isInteger(targetPage) || targetPage !== index + 1 ||
+            targetPage >= pages.length) {
+          problems.push(flowAt + '.targetPage must name the immediately following page');
+        }
+        if (Number(flow.sourceFromTop) >= Number(flow.sourceToTop)) {
+          problems.push(flowAt + ': source block is empty');
+        }
+        if (Number(flow.sourceFromTop) < 0 || Number(flow.sourceToTop) > height + 0.5) {
+          problems.push(flowAt + ': source block is outside the source page');
+        }
+        if (Number(flow.sourceContentTop) < Number(flow.sourceFromTop) - 1e-6 ||
+            Number(flow.sourceContentTop) > Number(flow.sourceToTop) + 1e-6) {
+          problems.push(flowAt + '.sourceContentTop is outside the source block');
+        }
+        if (Number(flow.retainedBodyBottom) < 0 ||
+            Number(flow.retainedBodyBottom) > Number(flow.sourceFromTop) + 0.5 ||
+            Number(flow.retainedBodyBottom) >= Number(entry.bodyBottom) - 1e-6) {
+          problems.push(flowAt + ': the moved block does not recover page room');
+        }
+        if (Number.isInteger(targetPage) && targetPage >= 0 && targetPage < pages.length) {
+          var targetHeight = pages[targetPage].getSize().height;
+          if (Number(flow.targetShiftFromTop) < 0 ||
+              Number(flow.targetShiftFromTop) >= Number(flow.targetShiftToTop) ||
+              Number(flow.targetShiftToTop) > targetHeight + 0.5) {
+            problems.push(flowAt + ': target movable block is outside the target page');
+          }
+          if (Number(flow.targetInsertionTop) < Number(flow.targetShiftFromTop) - 1e-6 ||
+              Number(flow.targetInsertionTop) > Number(flow.targetShiftToTop) + 1e-6) {
+            problems.push(flowAt + ': target insertion is outside its movable block');
+          }
+          if (layout[targetPage] && layout[targetPage].crossPageFlow) {
+            problems.push(flowAt + ': cascading cross-page flow is not allowed');
+          }
+        }
+        if (Number(flow.targetShift) <= 0 ||
+            Number(flow.targetShift) > Number(flow.maxCumulativeShift) + 1e-6) {
+          problems.push(flowAt + ': target shift exceeds its reviewed maximum');
+        }
+        if (Number(flow.maxCascadeDepth) !== 1) {
+          problems.push(flowAt + ': only one reviewed page boundary may be crossed');
+        }
+        if (flow.reviewStatus !== 'approved') {
+          problems.push(flowAt + ': cross-page flow is not visually approved');
+        }
+        if (!String(flow.note || '').trim()) {
+          problems.push(flowAt + ': cross-page flow needs a review note');
+        }
+      }
+
       var budget = Expander.pageBudget(entry, [], height);
       (entry.anchors || []).forEach(function (fieldId) {
         var field = (template.fields || []).filter(function (f) { return f.id === fieldId; })[0];
@@ -1143,6 +1204,23 @@
       pagePlan.errors.forEach(function (error) { planErrors.push(error); });
     });
 
+    // A source page activates its reviewed flow only after local reserve and
+    // compaction are exhausted.  The following page's complete movable body is
+    // shifted by the same plan used for its dynamic overlays.
+    Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
+      .forEach(function (index) {
+        var flow = plans[index].pageFlow;
+        if (!flow) return;
+        var target = plans[Number(flow.targetPage)];
+        target.shifts.unshift({
+          kind: 'cross-page-target',
+          fromTop: Number(flow.targetShiftFromTop),
+          toTop: Number(flow.targetShiftToTop),
+          delta: Number(flow.targetShift),
+          sourcePage: index
+        });
+      });
+
     var regionsFor = makeRegionsFor(plans, rowsByField);
     var planned = plan(template, payload, fonts, { regionsFor: regionsFor });
 
@@ -1219,6 +1297,8 @@
             return row.fieldId + '@' + row.region.rowTop;
           }).join(',') +
           ' recovered=' + (page.recovered || 0) +
+          ' flow=' + (page.pageFlow
+            ? page.pageFlow.targetPage + ':' + (page.flowRecovered || 0) : '') +
           ' err=' + page.errors.map(function (e) {
             return e.fieldId + ':' + e.reason;
           }).join(','));
@@ -1363,10 +1443,29 @@
       }
 
       // Only now that the document is known to be printable is the page
-      // content actually rewritten.
+      // content actually rewritten.  A reviewed cross-page block is removed
+      // before either page is shifted, then placed on the following page after
+      // its original body moved.  This keeps every original operator exactly
+      // once and makes target-page overlays follow the same transformation.
+      var transfers = [];
+      Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
+        .forEach(function (index) {
+          var flow = plans[index].pageFlow;
+          if (!flow) return;
+          transfers.push({
+            sourcePage: pages[index],
+            targetPage: pages[Number(flow.targetPage)],
+            flow: flow,
+            content: Expander.takePageContent(pdfDoc, pages[index], flow)
+          });
+        });
       pages.forEach(function (pdfPage, index) {
         if (!plans[index].shifts.length) return;
         Expander.shiftPageContent(pdfDoc, pdfPage, plans[index].shifts);
+      });
+      transfers.forEach(function (transfer) {
+        Expander.placePageContent(pdfDoc, transfer.sourcePage, transfer.targetPage,
+                                  transfer.flow, transfer.content);
       });
 
       ctx.plans = plans;

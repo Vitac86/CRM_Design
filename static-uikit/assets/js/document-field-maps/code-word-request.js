@@ -58,6 +58,18 @@
     expectedPages: 1,
     appliesTo: ['individual', 'company'],
 
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 506.09,
+        fixedFooterFrom: null,
+        shiftToTop: 800.0,
+        bottomClearance: 40.0,
+        compaction: [],
+        anchors: ['clientFullName']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -76,7 +88,17 @@
 
       // "Настоящим ________, ________ (ФИО, ИНН), далее — Клиент..."
       text('clientFullName', 'subject.displayName', 139.80, 225.98, 124.90, {
-        required: true
+        required: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 238.75, shiftFromTop: 238.75,
+          rowHeight: 13, maxExtraRows: 1, maxFontSize: 10,
+          lineStyle: 'underline', reviewStatus: 'approved',
+          line: {
+            left: 85.1, width: 472.5,
+            baselineOffset: 10.0, ruleOffset: 11.2, ruleThickness: 0.36
+          }
+        }
       }),
       text('clientInn', 'subject.inn', 272.80, 225.98, 69.90, {
         align: 'center', required: true

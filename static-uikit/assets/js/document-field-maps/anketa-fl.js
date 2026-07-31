@@ -112,6 +112,15 @@
     // = 64.34 pt is free below it. Keeping a 30 pt margin still leaves 34.34 pt
     // — two inserted 13.44 pt rows.
     pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 781.42,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        anchors: ['passportIssuedBy']
+      },
       1: {
         fixedHeaderUntil: 0,
         bodyBottom: 777.58,
@@ -174,7 +183,22 @@
         align: 'center',
         format: 'dateRu'
       }),
-      cell('passportIssuedBy', 'field.client-passport-issued-by', 0, 490.39, 503.83, { required: true }),
+      cell('passportIssuedBy', 'field.client-passport-issued-by', 0, 490.39, 503.83, {
+        required: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 503.59, shiftFromTop: 503.59,
+          rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.50, rowWidth: 504.34,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.50, 64.46, 84.38, 85.34, 318.79, 566.38, 567.36],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.3, ruleOffset: 13.44, ruleThickness: 0.48
+          }
+        }
+      }),
       cell('passportDepartmentCode', 'field.client-passport-dept-code', 0, 503.83, 517.27, {
         required: true,
         align: 'center'

@@ -108,6 +108,18 @@
     expectedPages: 5,
     appliesTo: ['company'],
 
+    pageLayout: {
+      2: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 767.02,
+        fixedFooterFrom: null,
+        shiftToTop: 838.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        anchors: ['licenceAuthority', 'bankAddress']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
@@ -275,7 +287,22 @@
         align: 'center',
         format: 'dateRu'
       }),
-      cell('licenceAuthority', 'extra.licence-authority', 2, 176.78, 194.18, { optional: true }),
+      cell('licenceAuthority', 'extra.licence-authority', 2, 176.78, 194.18, {
+        optional: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 2, insertionTop: 193.94, shiftFromTop: 193.94,
+          rowHeight: 17.4, maxExtraRows: 1, maxFontSize: 11,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.50, rowWidth: 497.36,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.50, 64.46, 84.38, 85.34, 325.87, 559.42, 560.38],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.3, ruleOffset: 17.4, ruleThickness: 0.48
+          }
+        }
+      }),
       cell('licenceExpiry', 'extra.licence-expiry', 2, 194.18, 211.70, { optional: true }),
       cell('licensedActivities', 'extra.licensed-activities', 2, 211.70, 229.10, { optional: true }),
 
@@ -297,8 +324,7 @@
           // inserted in Word looks like.
           page: 2, insertionTop: 289.0,
           rowHeight: 16.92, maxExtraRows: 2,
-          shiftFromTop: 289.0, shiftToTop: 838.0,
-          bottomReserve: 70.9,
+          shiftFromTop: 289.0,
           lineStyle: 'table-row', reviewStatus: 'approved',
           rowLeft: 63.74, rowWidth: 496.88,
           borders: { left: false, right: false, top: false, bottom: false },
