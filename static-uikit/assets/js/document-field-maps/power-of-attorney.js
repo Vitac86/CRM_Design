@@ -46,59 +46,9 @@
   var UL_ONLY = { source: 'subject.kind', equals: 'company' };
   var FL_ONLY = { source: 'subject.kind', equals: 'individual' };
 
-  // ── Geometry of a generated continuation row, measured from this form ──────
-  //
-  //   python static-uikit/tools/qa/measure_page_layout.py --row power-of-attorney 0 156.86
-  //
-  // Both variants are set in 10.56 pt Times at an 18.12 pt line pitch. Ink
-  // height at that size is 11.69 pt and every printed rule is 0.48 pt thick and
-  // sits 1.20 pt below its baseline. 12.0 pt is therefore the shortest row that
-  // holds a line of this form's own text without its descenders touching the
-  // rule or the row below — and 2 pt shorter than the generic row that used to
-  // be assumed, which is the difference between two inserted rows and three on
-  // a page with 33 pt of reserve.
-  var ROW_RULE_THICKNESS = 0.48;   // measured on every printed rule
-  var ROW_RULE_BELOW_BASELINE = 1.2;
-
-  // The two variants need a different number of rows on their first page, and
-  // their pages do not have the same room, so each gets the shortest row that
-  // still holds a readable line — measured, not assumed.
-  //
-  //   ЮЛ, page 1: three rows at most, and 38.01 pt to pay for them. 12.0 pt
-  //     holds the form's own 10.56 pt line: ink 11.69 pt, rule 1.20 pt below
-  //     the baseline.
-  //   ФЛ, page 3: four rows in the foreign-attorney case, and 44.42 pt once the
-  //     top margin is drawn on. 11.0 pt therefore carries 9.5 pt text — ink
-  //     10.52 pt, still well above the 9 pt floor, and slightly smaller than
-  //     the form's own body, which is the price of the fourth row.
-  var UL_ROW = {
-    left: 56.54, width: 478.35,    // the justified measure, 56.54 → 534.89
-    rowHeight: 12, maxFontSize: 10.5, baselineOffset: 9.4
-  };
-  var FL_ROW = {
-    left: 70.22, width: 464.96,    // 70.22 → 535.18
-    rowHeight: 11, maxFontSize: 9.5, baselineOffset: 8.5
-  };
-
-  function expansion(page, insertionTop, style) {
-    return {
-      page: page,
-      insertionTop: insertionTop,
-      shiftFromTop: insertionTop,
-      rowHeight: style.rowHeight,
-      maxExtraRows: 1,
-      maxFontSize: style.maxFontSize,
-      lineStyle: 'underline',
-      reviewStatus: 'approved',
-      line: {
-        left: style.left,
-        width: style.width,
-        baselineOffset: style.baselineOffset,
-        ruleOffset: Math.round((style.baselineOffset + ROW_RULE_BELOW_BASELINE) * 100) / 100,
-        ruleThickness: ROW_RULE_THICKNESS
-      }
-    };
-  }
+  // Reviewed paragraph flow below uses the source's measured 10.56 pt face,
+  // 18.12 pt pitch and 0.48 pt rules. Legacy fields elsewhere in this map keep
+  // the ordinary 12→9 pt fixed-region policy.
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
@@ -132,7 +82,10 @@
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
       label: o.label,
-      showWhen: o.showWhen
+      showWhen: o.showWhen,
+      layoutMode: o.layoutMode,
+      flowBlockId: o.flowBlockId,
+      allowMultipleFlowReferences: o.allowMultipleFlowReferences
     };
   }
 
@@ -145,7 +98,8 @@
     appliesTo: ['individual', 'company'],
 
     fonts: {
-      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
+      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf',
+      legalSerifItalic: '../assets/fonts/pdf/LiberationSerif-Italic.ttf'
     },
 
     // ── What each page may give a generated row ──────────────────────────────
@@ -208,9 +162,7 @@
           maxCascadeDepth: 1, reviewStatus: 'approved',
           note: 'последнее полное полномочие страницы 1 переносится перед перечнем страницы 2'
         },
-        anchors: ['ulCity', 'ulOgrn', 'ulInn', 'ulExecutiveName',
-                  'ulAttorneyName', 'ulAttorneyCitizenship',
-                  'ulAttorneyIssuedBy', 'ulAttorneyAddress']
+        anchors: ['power-of-attorney-ul-intro']
       },
       // ФЛ page 3. Body 57.13–761.98, page number «3» at 794.77.
       //
@@ -253,11 +205,265 @@
           maxCascadeDepth: 1, reviewStatus: 'approved',
           note: 'две начальные строки продолжающегося полномочия переносятся на страницу 4'
         },
-        anchors: ['flPrincipalCitizenship', 'flPrincipalIssuedBy',
-                  'flPrincipalAddress', 'flAttorneyCitizenship',
-                  'flAttorneyIssuedBy', 'flAttorneyIssueDate']
+        anchors: ['power-of-attorney-fl-intro']
       }
     },
+
+    // ── Reviewed Word-like replacement blocks ──────────────────────────────
+    // Static legal wording and the existing business fields share one line-
+    // breaking pass at the source's measured Times-compatible size. The exact
+    // q…Q ranges are frozen against the authoritative PDF; only those blocks
+    // are suppressed in generated output and every other source operator stays
+    // byte-for-byte present once.
+    wordFlowBlocks: [
+      {
+        id: 'power-of-attorney-ul-date',
+        type: 'wordFlowBlock',
+        page: 0,
+        showWhen: UL_ONLY,
+        frame: { left: 157.34, baselineTop: 135.26, width: 316.4, initialLineCount: 2 },
+        font: 'legalSerif', fontSize: 9.48, minFontSize: 9.48,
+        fontSizeLocked: true, lineHeight: 9.84, alignment: 'left',
+        sourceReplacement: {
+          firstBlock: 22, lastBlock: 31,
+          expectedBlockCount: 10,
+          expectedSha256: 'bf9392e9b388f595236845fe2537eed1405e3f02993cbf998993cb7544609ccd',
+          expectedTemplateSha256: 'a7bcaf8dc97cf1a368b8a22d024c9d9f44e5fb3cef42dc64d56890d03a62a801',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'г. ____________ (дата прописью)',
+        runs: [
+          { type: 'static', text: 'г. ' },
+          {
+            type: 'fieldRef', fieldId: 'ulCity', keepTogether: true,
+            decoration: { underline: true, minWidth: 56, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'spacer', width: 32.67 },
+          {
+            type: 'fieldRef', fieldId: 'ulDateInWords',
+            decoration: { underline: true, minWidth: 174, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'lineBreak' },
+          { type: 'spacer', width: 171.5 },
+          { type: 'static', text: '(дата прописью)', font: 'legalSerifItalic', fontSize: 8.04 }
+        ]
+      },
+      {
+        id: 'power-of-attorney-ul-intro',
+        type: 'wordFlowBlock',
+        page: 0,
+        showWhen: UL_ONLY,
+        frame: { left: 56.54, baselineTop: 156.86, width: 478.35, initialLineCount: 8 },
+        font: 'legalSerif', fontSize: 10.56, minFontSize: 10.56,
+        fontSizeLocked: true, lineHeight: 18.12, alignment: 'justify',
+        justifyMinRatio: 0.55,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 286.2, shiftFromTop: 286.2,
+          rowHeight: 18.12, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 32, lastBlock: 113,
+          expectedBlockCount: 82,
+          expectedSha256: '77806e87d7311e603578a81f84812df0e6e08b166fa39e2102ad579867dd5a3b',
+          expectedTemplateSha256: 'a7bcaf8dc97cf1a368b8a22d024c9d9f44e5fb3cef42dc64d56890d03a62a801',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: '__________, ОГРН ________, ИНН ____, (полное наименование) ' +
+          'далее именуемое «Доверитель», в лице ________, действующего на основании ________, ' +
+          'настоящей доверенностью уполномочивает гр. ________, далее именуемого «Поверенный», ' +
+          'имеющего паспорт гражданина ________, серии № ________, выданный ________, ' +
+          'дата выдачи _, проживающего по адресу (регистрации) ________, ' +
+          'совершать следующие действия:',
+        runs: [
+          {
+            type: 'fieldRef', fieldId: 'ulCompanyName',
+            decoration: { underline: true, minWidth: 223, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', ОГРН ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'ulOgrn', keepTogether: true,
+            decoration: { underline: true, minWidth: 51, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', ИНН ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'ulInn', keepTogether: true,
+            decoration: { underline: true, minWidth: 27.2, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ',' },
+          { type: 'lineBreak' },
+          { type: 'static', text: '(полное наименование)', font: 'legalSerifItalic' },
+          { type: 'lineBreak' },
+          { type: 'static', text: 'далее именуемое «Доверитель», в лице ' },
+          {
+            type: 'fieldRef', fieldId: 'ulExecutiveName',
+            decoration: { underline: true, minWidth: 81, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', действующего на основании ' },
+          {
+            type: 'fieldRef', fieldId: 'ulAuthorityBasis',
+            decoration: { underline: true, minWidth: 138.86, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', настоящей доверенностью уполномочивает гр. ' },
+          {
+            type: 'fieldRef', fieldId: 'ulAttorneyName',
+            decoration: { underline: true, minWidth: 107, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', далее именуемого «Поверенный», имеющего паспорт гражданина ' },
+          {
+            type: 'fieldRef', fieldId: 'ulAttorneyCitizenship',
+            decoration: { underline: true, minWidth: 28, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', серии № ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'ulAttorneyPassport', keepTogether: true,
+            decoration: { underline: true, minWidth: 84, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', выданный ' },
+          {
+            type: 'fieldRef', fieldId: 'ulAttorneyIssuedBy',
+            decoration: { underline: true, minWidth: 112, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', дата выдачи ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'ulAttorneyIssueDate', keepTogether: true,
+            decoration: { underline: true, minWidth: 40, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', проживающего по адресу (регистрации) ' },
+          {
+            type: 'fieldRef', fieldId: 'ulAttorneyAddress',
+            decoration: { underline: true, minWidth: 143, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', совершать следующие действия:' }
+        ]
+      },
+      {
+        id: 'power-of-attorney-fl-date',
+        type: 'wordFlowBlock',
+        page: 2,
+        showWhen: FL_ONLY,
+        frame: { left: 133.94, baselineTop: 89.54, width: 339.8, initialLineCount: 2 },
+        font: 'legalSerif', fontSize: 10.56, minFontSize: 10.56,
+        fontSizeLocked: true, lineHeight: 18.12, alignment: 'left',
+        sourceReplacement: {
+          firstBlock: 10, lastBlock: 19,
+          expectedBlockCount: 10,
+          expectedSha256: '08b1d054b8d2d59ba901d346a9a57316f53d6d23d4729496b2c6b7a65ca5f663',
+          expectedTemplateSha256: 'a7bcaf8dc97cf1a368b8a22d024c9d9f44e5fb3cef42dc64d56890d03a62a801',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'г. Москва ____________ (дата прописью)',
+        runs: [
+          { type: 'static', text: 'г. Москва' },
+          { type: 'spacer', width: 68.2 },
+          {
+            type: 'fieldRef', fieldId: 'flDateInWords',
+            decoration: { underline: true, minWidth: 220, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'lineBreak' },
+          { type: 'spacer', width: 191.3 },
+          { type: 'static', text: '(дата прописью)', font: 'legalSerifItalic' }
+        ]
+      },
+      {
+        id: 'power-of-attorney-fl-intro',
+        type: 'wordFlowBlock',
+        page: 2,
+        showWhen: FL_ONLY,
+        frame: { left: 70.22, baselineTop: 125.78, width: 464.96, initialLineCount: 8 },
+        font: 'legalSerif', fontSize: 10.56, minFontSize: 10.56,
+        fontSizeLocked: true, lineHeight: 18.12, alignment: 'justify',
+        justifyMinRatio: 0.55,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 2, insertionTop: 255.0, shiftFromTop: 255.0,
+          rowHeight: 18.12, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 20, lastBlock: 117,
+          expectedBlockCount: 98,
+          expectedSha256: 'f6e745726adc410803c87a47b1bf86abb340707e4cb52e145d750b5b909b4198',
+          expectedTemplateSha256: 'a7bcaf8dc97cf1a368b8a22d024c9d9f44e5fb3cef42dc64d56890d03a62a801',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Я, Гр. ________, далее именуемый «Доверитель», паспорт гражданина ____, ' +
+          'серии №______: выданный ________, дата выдачи ________, проживающий по адресу ' +
+          '(регистрации): ________ настоящей доверенностью уполномочиваю гр. ________,далее ' +
+          'именуемого «Поверенный», паспорт гражданина ____, серии____№________, ' +
+          'выданный________, дата выдачи____, проживающего по адресу (регистрации): ________, ' +
+          'совершать следующие действия:',
+        runs: [
+          { type: 'static', text: 'Я, Гр. ' },
+          {
+            type: 'fieldRef', fieldId: 'flPrincipalName', useRawValue: true,
+            decoration: { underline: true, minWidth: 101, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', далее именуемый «Доверитель», паспорт гражданина ' },
+          {
+            type: 'fieldRef', fieldId: 'flPrincipalCitizenship',
+            decoration: { underline: true, minWidth: 18.5, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', серии № ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'flPrincipalPassport', keepTogether: true,
+            decoration: { underline: true, minWidth: 50, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ': выданный ' },
+          {
+            type: 'fieldRef', fieldId: 'flPrincipalIssuedBy',
+            decoration: { underline: true, minWidth: 50.2, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', дата выдачи ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'flPrincipalIssueDate', keepTogether: true,
+            decoration: { underline: true, minWidth: 63, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', проживающий по адресу (регистрации): ' },
+          {
+            type: 'fieldRef', fieldId: 'flPrincipalAddress',
+            decoration: { underline: true, minWidth: 126, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ' настоящей доверенностью уполномочиваю гр. ' },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneyName', useRawValue: true,
+            decoration: { underline: true, minWidth: 47, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ',далее именуемого «Поверенный», паспорт гражданина ' },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneyCitizenship',
+            decoration: { underline: true, minWidth: 28, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', серии ' },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneySeries', keepTogether: true,
+            decoration: { underline: true, minWidth: 18, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ' № ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneyNumber', keepTogether: true,
+            decoration: { underline: true, minWidth: 65, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', выданный ' },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneyIssuedBy',
+            decoration: { underline: true, minWidth: 84, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', дата выдачи ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneyIssueDate', keepTogether: true,
+            decoration: { underline: true, minWidth: 35.5, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', проживающего по адресу (регистрации): ' },
+          {
+            type: 'fieldRef', fieldId: 'flAttorneyAddress',
+            decoration: { underline: true, minWidth: 126, thickness: 0.48, offset: 1.2 }
+          },
+          { type: 'static', text: ', совершать следующие действия:' }
+        ]
+      }
+    ],
 
     fields: [
       // ══════════ ЮЛ variant — pages 1–2 ══════════
@@ -271,40 +477,35 @@
       // its printed hyphen and continues directly under «г. ____________».
       text('ulCity', 'extra.extra-poa-city', 0, 165.86, 135.26, 56.0, {
         required: true, align: 'center', showWhen: UL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 135.3, {
-          left: 165.86, width: 56.0,
-          rowHeight: 12, maxFontSize: 9, baselineOffset: 9.4
-        })
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-date'
       }),
       text('ulDateInWords', 'extra.extra-poa-date-words', 0, 258.0, 135.26, 174.0, {
-        required: true, align: 'center', showWhen: UL_ONLY
+        required: true, align: 'center', showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-date'
       }),
 
       // «__________, ОГРН ______, ИНН ____,» + caption «(полное наименование)»
       text('ulCompanyName', 'field.client-full-legal-name', 0, 58.0, 156.86, 223.0, {
-        required: true, fallbacks: ['trim'], showWhen: UL_ONLY
+        required: true, fallbacks: ['trim'], showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // The printed blank is 54.36 pt; a 13-digit ОГРН needs 58.50 pt at the
       // 9 pt floor. Exact identifiers are never split or abbreviated, so the
       // complete number prints on a continuation row under its own label.
       text('ulOgrn', 'field.client-ogrn', 0, 320.0, 156.86, 51.0, {
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 159.74, UL_ROW),
-        required: true, align: 'center', showWhen: UL_ONLY
+        required: true, align: 'center', showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // 27.48 pt printed for a 10-digit ИНН, which needs 45.00 pt at 9 pt.
       text('ulInn', 'subject.inn', 0, 403.5, 156.86, 27.2, {
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 159.74, UL_ROW),
-        required: true, align: 'center', showWhen: UL_ONLY
+        required: true, align: 'center', showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
 
       // «в лице ______, действующего на основании ______»
       text('ulExecutiveName', 'field.client-rep-full-name', 0, 258.0, 193.10, 81.0, {
         required: true, fallbacks: ['initials', 'surname'], showWhen: UL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 196.0, UL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // «…действующего на основании ____» wraps in the source: the blank ends
       // the first line after 39.50 pt (492.58–532.08) and continues at the
@@ -314,10 +515,7 @@
       // room where the form gives 138.86 pt.
       text('ulAuthorityBasis', 'field.client-rep-authority', 0, 493.5, 193.10, 37.0, {
         required: true, showWhen: UL_ONLY,
-        flowRegions: [
-          { page: 0, left: 493.5, baselineTop: 193.10, width: 37.0 },
-          { page: 0, left: 58.0, baselineTop: 211.22, width: 96.0 }
-        ]
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
 
       // «уполномочивает гр. ______» — the поверенный, who is not in the CRM.
@@ -328,25 +526,20 @@
       // preferred size and the page is not touched at all.
       text('ulAttorneyName', 'extra.extra-attorney-name', 0, 383.0, 211.22, 107.0, {
         required: true, showWhen: UL_ONLY,
-        flowRegions: [
-          { page: 0, left: 383.0, baselineTop: 211.22, width: 107.0 },
-          { page: 0, left: 58.0, baselineTop: 229.34, width: 96.0 }
-        ],
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 232.0, UL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // «имеющего паспорт гражданина ____, серии» — 30.72 pt printed, bounded
       // by text on both sides, and no printed rule continues it. «Россия» fits;
       // «United Kingdom» needs 60.75 pt at 9 pt and takes a continuation row.
       text('ulAttorneyCitizenship', 'extra.extra-attorney-citizenship',
            0, 462.0, 229.34, 28.0, {
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 232.0, UL_ROW),
-        required: true, align: 'center', showWhen: UL_ONLY
+        required: true, align: 'center', showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // «серии» has no rule of its own, so series and number share this one.
       text('ulAttorneyPassport', 'extra.extra-attorney-passport', 0, 70.5, 247.49, 84.0, {
-        required: true, showWhen: UL_ONLY
+        required: true, showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // Two printed lines of 112 pt hold an ordinary «ОВД …»; a full Russian
       // «Отделение по вопросам миграции …» does not, and an issuing authority
@@ -359,16 +552,21 @@
       text('ulAttorneyIssuedBy', 'extra.extra-attorney-issued-by', 0, 211.0, 247.49, 112.0, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 8.5,
         fontSize: 10.5, showWhen: UL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 250.49, UL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
+      }),
+      // The authoritative sentence includes «дата выдачи». The old fixed map
+      // could not use its 4.56 pt gap; paragraph flow can now print the same
+      // existing wizard value without changing that business key.
+      text('ulAttorneyIssueDate', 'extra.extra-attorney-issue-date', 0, 324.19, 247.49, 40.0, {
+        required: true, format: 'dateRu', showWhen: UL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
       // Likewise 8.71 pt: «совершать следующие действия:» begins on the next
       // printed line. An address of any length needs the continuation row.
       text('ulAttorneyAddress', 'extra.extra-attorney-address', 0, 123.5, 265.61, 143.0, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 8.5,
         fontSize: 10.5, showWhen: UL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(0, 268.61, UL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-ul-intro'
       }),
 
       // Page 2 signature block: «____ / ____ /» under the captions
@@ -384,20 +582,22 @@
       // ══════════ ФЛ variant — pages 3–4 ══════════
       // «г. Москва» is printed, so only the date is filled on that line.
       text('flDateInWords', 'extra.extra-poa-date-words', 2, 249.0, 89.54, 220.0, {
-        required: true, align: 'center', showWhen: FL_ONLY
+        required: true, align: 'center', showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-date'
       }),
 
       text('flPrincipalName', 'field.clientFullName', 2, 104.5, 125.78, 101.0, {
-        required: true, fallbacks: ['initials', 'surname'], showWhen: FL_ONLY
+        required: true, fallbacks: ['initials', 'surname'], showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       // 20.40 pt printed. Even «Россия» needs 26.45 pt at the 9 pt floor.
       text('flPrincipalCitizenship', 'subject.citizenship', 2, 488.0, 125.78, 18.5, {
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(2, 128.66, FL_ROW),
-        required: true, align: 'center', showWhen: FL_ONLY
+        required: true, align: 'center', showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       text('flPrincipalPassport', 'field.passportSeriesNumber', 2, 81.0, 143.90, 50.0, {
-        required: true, showWhen: FL_ONLY
+        required: true, showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       // The individual variant reserves only 50.2 pt between «выданный» and the
       // following comma — the legal-entity variant gives 114.5 pt for the same
@@ -412,11 +612,11 @@
       text('flPrincipalIssuedBy', 'field.client-passport-issued-by', 2, 189.5, 143.90, 50.2, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 26.0,
         showWhen: FL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(2, 146.78, FL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       text('flPrincipalIssueDate', 'field.client-passport-issue-date', 2, 320.5, 143.90, 63.0, {
-        required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY
+        required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       // «(регистрации):» ends its line; the rule sits on the line below.
       // «(регистрации):» ends its line; the rule sits on the line below, and
@@ -425,8 +625,7 @@
       text('flPrincipalAddress', 'field.client-registration-address', 2, 71.5, 180.14, 126.0, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 8.5,
         showWhen: FL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(2, 183.14, FL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
 
       // «уполномочиваю гр. ____ ,далее» reserves 47 pt and the sentence has no
@@ -434,43 +633,48 @@
       // than wrapping a full name into the printed text below it.
       text('flAttorneyName', 'extra.extra-attorney-name', 2, 436.0, 180.14, 47.0, {
         required: true, format: 'initials', fallbacks: ['surname'],
-        showWhen: FL_ONLY
+        showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       // 29.76 pt printed: «Россия» (26.45 pt at 9 pt) fits, «United Kingdom»
       // (60.75 pt) does not — the reason this one fails for a foreign attorney
       // and not for a Russian one.
       text('flAttorneyCitizenship', 'extra.extra-attorney-citizenship',
            2, 243.0, 216.38, 28.0, {
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(2, 219.0, FL_ROW),
-        required: true, align: 'center', showWhen: FL_ONLY
+        required: true, align: 'center', showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       text('flAttorneySeries', 'extra.extra-attorney-passport-series',
-           2, 307.5, 216.38, 18.0, { required: true, align: 'center', showWhen: FL_ONLY }),
+           2, 307.5, 216.38, 18.0, {
+        required: true, align: 'center', showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
+      }),
       text('flAttorneyNumber', 'extra.extra-attorney-passport-number',
-           2, 338.0, 216.38, 65.0, { required: true, showWhen: FL_ONLY }),
+           2, 338.0, 216.38, 65.0, {
+        required: true, showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
+      }),
       // 8.71 pt to the comma that ends the clause: one line of 84 pt, which
       // even «ГУ МВД России по г. Москве» overruns. Its row opens at the same
       // point as the citizenship above it, so the two stack in reading order.
       text('flAttorneyIssuedBy', 'extra.extra-attorney-issued-by', 2, 461.0, 216.38, 84.0, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 8.5,
         showWhen: FL_ONLY,
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(2, 219.0, FL_ROW)
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       // «дата выдачи ____,» — the printed rule is 37.44 pt and a ten-character
       // date needs 40.50 pt at the 9 pt floor. Three points short, and a date
       // is not something that may be shortened.
       text('flAttorneyIssueDate', 'extra.extra-attorney-issue-date', 2, 125.5, 234.50, 35.5, {
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(2, 237.38, FL_ROW),
-        required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY
+        required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
       // 26.74 pt before «изменять/расторгать…», so three lines of 126 pt —
       // enough for a Russian or a foreign address without touching the page.
       text('flAttorneyAddress', 'extra.extra-attorney-address', 2, 354.0, 234.50, 126.0, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 26.0,
-        showWhen: FL_ONLY
+        showWhen: FL_ONLY,
+        layoutMode: 'flow-reference', flowBlockId: 'power-of-attorney-fl-intro'
       }),
 
       // Page 4 «Доверитель ____ / ____ /» — подпись rule stays empty.

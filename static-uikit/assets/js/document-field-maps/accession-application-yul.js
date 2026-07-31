@@ -49,6 +49,81 @@
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
 
+    // Page 1 has 41.86 pt of reviewed reserve below its last body line. The
+    // applicant block may use it only in complete 9.72 pt source-line steps;
+    // no label/value pair controls layout independently.
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 794.06,
+        fixedFooterFrom: 841.92,
+        shiftToTop: 835.92,
+        bottomClearance: 6,
+        anchors: ['accession-application-yul-applicant']
+      }
+    },
+
+    wordFlowBlocks: [
+      {
+        id: 'accession-application-yul-applicant',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: { left: 56.64, baselineTop: 101.78, width: 472.88, initialLineCount: 8 },
+        font: 'legalSerif', fontSize: 8.52, minFontSize: 8.52,
+        fontSizeLocked: true, lineHeight: 9.72, alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 171.4, shiftFromTop: 171.4,
+          rowHeight: 9.72, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 21, lastBlock: 54,
+          expectedBlockCount: 34,
+          expectedSha256: 'f9f18c98003454f232f074af6ff45ad5650b9f68aaa584a357bc8e468958f7a2',
+          expectedTemplateSha256: '1b3365ce9ed177fb5069ae67ab70d8e5bc6556bbcb160544a439a2db2be9067d',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Полное наименование юридического лица: ' +
+          'Полное или сокращенное наименование на иностранном языке (для клиента-нерезидента): ' +
+          'Государственный регистрационный номер (ОГРН для клиента - резидента РФ/ номер и дата ' +
+          'регистрации (при наличии), орган регистрации для клиента – нерезидента РФ): ' +
+          'Адрес регистрации/местонахождение (страна, индекс, регион, населенный пункт, индекс, ' +
+          'улица, дом, корпус/строение, литера, офис): ФИО и должность подписанта: ' +
+          'Документ, подтверждающий полномочия:',
+        runs: [
+          { type: 'static', text: 'Полное наименование юридического лица: ' },
+          { type: 'fieldRef', fieldId: 'companyFullLegalName' },
+          { type: 'paragraphBreak' },
+          {
+            type: 'static',
+            text: 'Полное или сокращенное наименование на иностранном языке (для клиента-нерезидента): '
+          },
+          { type: 'fieldRef', fieldId: 'companyForeignName' },
+          { type: 'paragraphBreak' },
+          {
+            type: 'static',
+            text: 'Государственный регистрационный номер (ОГРН для клиента - резидента РФ/ ' +
+              'номер и дата регистрации (при наличии), орган регистрации для клиента – нерезидента РФ): '
+          },
+          { type: 'fieldRef', fieldId: 'companyOgrn', keepTogether: true },
+          { type: 'paragraphBreak' },
+          {
+            type: 'static',
+            text: 'Адрес регистрации/местонахождение (страна, индекс, регион, населенный пункт, ' +
+              'индекс, улица, дом, корпус/строение, литера, офис): '
+          },
+          { type: 'fieldRef', fieldId: 'companyLegalAddress' },
+          { type: 'paragraphBreak' },
+          { type: 'static', text: 'ФИО и должность подписанта: ' },
+          { type: 'fieldRef', fieldId: 'representativeSignerLine' },
+          { type: 'paragraphBreak' },
+          { type: 'static', text: 'Документ, подтверждающий полномочия: ' },
+          { type: 'fieldRef', fieldId: 'representativeAuthority' }
+        ]
+      }
+    ],
+
     fields: [
       // ── Page 1 — applicant details ─────────────────────────────────────
       // These labels have no underscore glyphs. Each left edge is the measured
@@ -59,7 +134,17 @@
         source: 'field.client-full-legal-name',
         page: 0, left: 218.0, baselineTop: 101.78, width: 311.0,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-yul-applicant'
+      },
+
+      {
+        id: 'companyForeignName',
+        source: 'field.client-english-name', optional: true,
+        page: 0, left: 389.0, baselineTop: 111.50, width: 140.0,
+        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
+        align: 'left',
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-yul-applicant'
       },
 
       // "Наименование на иностранном языке" is explicitly for a
@@ -71,14 +156,16 @@
         source: 'field.client-ogrn',
         page: 0, left: 224.0, baselineTop: 131.18, width: 305.0,
         font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-yul-applicant'
       },
       {
         id: 'companyLegalAddress',
         source: 'field.client-legal-address',
         page: 0, left: 84.5, baselineTop: 150.74, width: 444.5,
         font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-yul-applicant'
       },
       {
         // One source slot asks for both values. buildFields supplies the
@@ -88,14 +175,16 @@
         source: 'field.representativeSignerLine',
         page: 0, left: 174.0, baselineTop: 160.46, width: 355.0,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-yul-applicant'
       },
       {
         id: 'representativeAuthority',
         source: 'field.representativeAuthority',
         page: 0, left: 215.0, baselineTop: 170.18, width: 314.0,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-yul-applicant'
       },
 
       // ── §1 Joining the agreements ──────────────────────────────────
