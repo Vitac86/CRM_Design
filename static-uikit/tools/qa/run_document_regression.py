@@ -70,6 +70,21 @@ def vector_lines(page):
     )
 
 
+def rule_shapes(page):
+    """Every painted vector by its horizontal shape and weight.
+
+    Page expansion moves printed rules down the page on purpose, so comparing
+    absolute positions would report every moved rule as a lost one. What must
+    never change is that each rule still exists, at its own width and weight:
+    this counts them by shape, so a rule that moved is still found and a rule
+    that was painted over, dropped or duplicated is not.
+    """
+    return collections.Counter(
+        (round(d["rect"].x0, 1), round(d["rect"].x1, 1), round(d["rect"].height, 2))
+        for d in page.get_drawings()
+    )
+
+
 def inspect(pdf_bytes, template_path, expected_pages):
     """Structural verdict for one generated document."""
     problems = []
@@ -107,11 +122,11 @@ def inspect(pdf_bytes, template_path, expected_pages):
 
         # The base template's own content must survive untouched: every printed
         # rule is still there, and any added line is a reviewed continuation.
-        base_rules = set(vector_lines(base[index]))
-        generated_rules = set(vector_lines(page))
-        removed = base_rules - generated_rules
+        removed = rule_shapes(base[index]) - rule_shapes(page)
         if removed:
-            problems.append(f"page {index}: {len(removed)} base vector rule(s) lost")
+            problems.append(
+                f"page {index}: {sum(removed.values())} base vector rule(s) lost "
+                f"— {list(removed)[:3]}")
 
     return {
         "problems": problems,
@@ -120,7 +135,7 @@ def inspect(pdf_bytes, template_path, expected_pages):
         "latin": latin,
         "pages": generated.page_count,
         "addedRules": sum(
-            len(set(vector_lines(generated[i])) - set(vector_lines(base[i])))
+            sum((rule_shapes(generated[i]) - rule_shapes(base[i])).values())
             for i in range(min(generated.page_count, base.page_count))
         ),
     }

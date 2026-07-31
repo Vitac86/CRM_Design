@@ -131,6 +131,12 @@
     if (/ogrn/i.test(key)) return '1217700011256';
     if (/passport.*series|series/i.test(key)) return en ? 'AB' : '4510';
     if (/passport.*number/i.test(key)) return en ? 'AB-7789' : '234567';
+    // A passport slot that names neither the series nor the number holds both —
+    // unless it names what about the passport it wants, such as who issued it.
+    if (/passport|udostoverenie/i.test(key) &&
+        !/issued|issuer|authority|date|code|name|kind|type|address/i.test(key)) {
+      return en ? 'AB AB-7789' : '4510 234567';
+    }
     if (/percent|share-?of|percentage/i.test(key)) return '100 %';
     if (/tariff/i.test(key)) return long ? 'Стандартный' : 'Базовый';
     if (/website|site|url/i.test(key)) return 'https://example.test';
@@ -157,9 +163,16 @@
     }
     if (/phone/i.test(key)) return en ? '+44 20 7946 0958' : '+7 (903) 215-44-89';
     if (/citizenship/i.test(key)) return en ? 'United Kingdom' : 'Россия';
-    if (/country|residence/i.test(key)) {
+    // «countries» and «residency» are as common in these maps as the singular.
+    if (/countr(y|ies)|residenc[ey]/i.test(key)) {
       return en ? 'United Kingdom of Great Britain and Northern Ireland'
         : 'Российская Федерация';
+    }
+    // The issuer of a security is a company, not the authority that issued a
+    // document — and this has to be tested before the issuing-authority rule,
+    // which matches «issuer» too.
+    if (/issuer|emitent/i.test(key)) {
+      return en ? 'North Star Investments Ltd.' : 'ПАО «Газпром»';
     }
     // The document a representative acts under — «Устава», «Доверенности № …».
     // This has to be tested before the issuing-authority rule below, because a
@@ -180,6 +193,13 @@
       return en ? 'North Star Investments Ltd.' : 'АО «Инвестиционный Банк»';
     }
     if (/kind|type/i.test(key)) return en ? 'Purchase' : 'Покупка';
+    // A position is a job title. It matches the personal-name rule below, which
+    // would otherwise put a double surname in a «должность» slot.
+    if (/position|dolzhnost|job-?title/i.test(key)) {
+      return en
+        ? (long ? 'Chief Executive Officer' : 'Director')
+        : (long ? 'Генеральный директор' : 'Директор');
+    }
     // A city is a city and an authority basis is a document name — the long
     // profiles must stretch them realistically, not replace them with prose.
     if (/\bcity\b|город/i.test(key)) {
@@ -187,9 +207,6 @@
     }
     if (/authority-?basis|basis|osnovanie/i.test(key)) {
       return en ? 'the Articles of Association' : (long ? 'Устава общества' : 'Устава');
-    }
-    if (/issuer/i.test(key)) {
-      return en ? 'North Star Investments Ltd.' : 'ПАО «Газпром»';
     }
     // A place of birth is a settlement and a country, never a street address —
     // and `birth-place` matches the address rule below, which is how a 65 pt
