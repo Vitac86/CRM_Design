@@ -97,6 +97,11 @@
       this.container.appendChild(element('div', 'dtb-empty-state', 'Выберите поле на странице или в списке.'));
       return;
     }
+    var identifierLocked = !!(ns.identifierProtection &&
+      ns.identifierProtection.isFieldProtected(this.state.project, field.id));
+    var referenceLocked = !!(ns.schema.isWordFlowReferenced &&
+      ns.schema.isWordFlowReferenced(this.state.project, field.id));
+    var fieldIdLocked = identifierLocked || referenceLocked;
     var heading = element('div', 'dtb-inspector-heading');
     heading.appendChild(element('h2', '', field.id));
     var badge = element('span', 'dtb-type-badge', field.type || 'text');
@@ -109,6 +114,9 @@
     var copySettings = element('button', 'dtb-button', 'Копировать настройки');
     var pasteSettings = element('button', 'dtb-button', 'Вставить настройки');
     duplicate.type = remove.type = copySettings.type = pasteSettings.type = 'button';
+    remove.disabled = fieldIdLocked;
+    if (identifierLocked) remove.title = ns.identifierProtection.WARNING;
+    else if (referenceLocked) remove.title = 'Поле используется Word-flow блоком; сначала удалите ссылку на поле.';
     duplicate.addEventListener('click', this.state.duplicateSelected.bind(this.state));
     remove.addEventListener('click', this.state.deleteSelected.bind(this.state));
     copySettings.addEventListener('click', function () { this.state.copySettings(); this.onMessage('Настройки поля скопированы.'); }.bind(this));
@@ -117,14 +125,29 @@
     this.container.appendChild(actions);
 
     var common = this._section('Поле');
-    this._addFieldControl(common, field, 'ID', 'id', input('text', field.id), String);
+    var idControl = input('text', field.id, { readOnly: fieldIdLocked });
+    idControl.dataset.identifierRole = 'field-id';
+    this._addFieldControl(common, field, 'ID', 'id', idControl, String);
     this._addFieldControl(common, field, 'Тип', 'type', select(field.type || 'text', [
       { value: 'text', label: 'Текст' }, { value: 'static', label: 'Статический overlay' }, { value: 'check', label: 'Checkbox' }
     ]), String);
     if ((field.type || 'text') === 'static') this._addFieldControl(common, field, 'Текст', 'text', input('text', field.text || ''), String);
     else {
-      this._addFieldControl(common, field, 'Источник', 'source', input('text', field.source || '', { list: 'dtb-source-options' }), String, 'Можно ввести raw path; он будет проверен.');
-      this._renderSourceBrowser(common, field);
+      var sourceControl = input('text', field.source || '', {
+        list: 'dtb-source-options', readOnly: identifierLocked
+      });
+      sourceControl.dataset.identifierRole = 'field-source';
+      this._addFieldControl(common, field, 'Источник', 'source', sourceControl, String,
+        identifierLocked ? 'Production source path доступен только для чтения.' :
+          'Можно ввести raw path; он будет проверен.');
+      this._renderSourceBrowser(common, field, identifierLocked);
+    }
+    if (identifierLocked) {
+      common.appendChild(element('p', 'dtb-identifier-warning',
+        ns.identifierProtection.WARNING));
+    } else if (referenceLocked) {
+      common.appendChild(element('p', 'dtb-identifier-warning',
+        'Поле используется Word-flow блоком; сначала удалите ссылку на поле.'));
     }
     this._addFieldControl(common, field, 'Страница (0…)', 'page', input('number', field.page, { min: 0, step: 1 }), Number);
     this._addFieldControl(common, field, 'Заблокировано', 'locked', input('checkbox', field.locked), Boolean);
@@ -133,6 +156,8 @@
     ]), String);
     this._addFieldControl(common, field, 'Примечание к якорю', 'anchorNote', input('text', field.anchorNote || ''), String);
     this.container.appendChild(common);
+
+    this._renderWordFlowReference(field);
 
     var geometry = this._section('Геометрия · PDF points');
     [['left', 'Left'], ['top', 'Top'], ['width', 'Width'], ['height', 'Height'], ['baselineTop', 'Baseline top'], ['baselineShift', 'Baseline shift']]
@@ -154,13 +179,53 @@
     return section;
   };
 
-  Inspector.prototype._renderSourceBrowser = function (section, field) {
+  Inspector.prototype._renderWordFlowReference = function (field) {
+    var self = this;
+    var section = this._section('Word-flow reference');
+    var blocks = this.state.project.wordFlowBlocks || [];
+    var owners = ns.schema.wordFlowOwners
+      ? ns.schema.wordFlowOwners(this.state.project, field.id) : [];
+    var configured = Array.isArray(field.flowBlockId)
+      ? field.flowBlockId[0] : field.flowBlockId;
+    var selectedId = owners[0] || configured || '';
+    var choices = [{ value: '', label: 'Независимое overlay-поле' }];
+    blocks.forEach(function (block) {
+      choices.push({ value: block.id, label: block.id });
+    });
+    if (selectedId && !blocks.some(function (block) { return block.id === selectedId; })) {
+      choices.push({ value: selectedId, label: selectedId + ' · отсутствует' });
+    }
+    var control = select(selectedId, choices);
+    control.classList.add('dtb-control');
+    control.dataset.identifierRole = 'flow-block-id';
+    control.addEventListener('change', function () {
+      self.state.assignFieldToWordFlow(field.id, control.value || null);
+    });
+    section.appendChild(row('Режим / блок', control,
+      'Ссылка использует существующие ID и source; нового business-поля не создаётся.'));
+    if (owners.length) {
+      var open = element('button', 'dtb-button', 'Открыть Word-flow блок');
+      open.type = 'button';
+      open.addEventListener('click', function () {
+        self.state.selectWordFlowBlock(owners[0]);
+      });
+      section.appendChild(open);
+    } else if (!blocks.length) {
+      section.appendChild(element('p', 'dtb-inspector-hint',
+        'Сначала создайте Word-flow блок в левой панели.'));
+    }
+    this.container.appendChild(section);
+  };
+
+  Inspector.prototype._renderSourceBrowser = function (section, field, readOnly) {
     var self = this;
     var search = input('search', '', { placeholder: 'Поиск источника…' });
     var tree = document.createElement('select');
     tree.size = 6;
     search.classList.add('dtb-control');
     tree.classList.add('dtb-control');
+    tree.disabled = !!readOnly;
+    if (readOnly) tree.title = ns.identifierProtection.WARNING;
     function fill() {
       var query = search.value.toLowerCase();
       var grouped = {};
@@ -934,6 +999,9 @@
       return;
     }
     var control = found.control;
+    var keyLocked = !!(ns.identifierProtection &&
+      ns.identifierProtection.isWizardKeyProtected(
+        this.state.project, found.group, control.key));
     function update(name, value) {
       self.state.commit('edit wizard control', function (project) {
         var target = project.wizard[found.group][found.index];
@@ -959,10 +1027,19 @@
     ].forEach(function (definition) {
       var widget = definition[2];
       if (definition[1] === 'options') widget.value = (control.options || []).map(function (option) { return typeof option === 'string' ? option : option.value + '|' + option.label; }).join('\n');
+      if (definition[1] === 'key') {
+        widget.readOnly = keyLocked;
+        widget.dataset.identifierRole = 'wizard-key';
+        if (keyLocked) widget.title = ns.identifierProtection.WARNING;
+      }
       widget.classList.add('dtb-control');
       widget.addEventListener('change', function () { update(definition[1], definition[3](widget.type === 'checkbox' ? widget.checked : widget.value)); });
       section.appendChild(row(definition[0], widget));
     });
+    if (keyLocked) {
+      section.appendChild(element('p', 'dtb-identifier-warning',
+        ns.identifierProtection.WARNING));
+    }
     var condSource = input('text', control.showWhen && control.showWhen.source || '', { list: 'dtb-source-options' });
     var condEquals = input('text', control.showWhen && control.showWhen.equals != null ? String(control.showWhen.equals) : '');
     condSource.addEventListener('change', function () { update('showWhen', condSource.value ? { source: condSource.value, equals: parseScalar(condEquals.value) } : undefined); });

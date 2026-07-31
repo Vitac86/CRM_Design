@@ -51,6 +51,7 @@
         <section class="dtb-panel-section">
           <h2>Project</h2>
           <label class="dtb-label">Template ID<input class="dtb-control" id="dtb-meta-id" type="text"/></label>
+          <p class="dtb-identifier-warning" id="dtb-meta-id-warning" hidden>Идентификатор существующей переменной используется production-формами и не может быть изменён.</p>
           <label class="dtb-label">Название<input class="dtb-control" id="dtb-meta-title" type="text"/></label>
           <label class="dtb-label">Описание<textarea class="dtb-control" id="dtb-meta-description" rows="2"></textarea></label>
           <label class="dtb-label">Категория<input class="dtb-control" id="dtb-meta-category" type="text"/></label>
@@ -80,6 +81,13 @@
           <h2>Fields <span class="dtb-count" id="dtb-field-count">0</span></h2>
           <input class="dtb-control" id="dtb-field-filter" type="search" placeholder="ID или source"/>
           <div id="dtb-field-list" class="dtb-field-list"></div>
+        </section>
+
+        <section class="dtb-panel-section dtb-word-flow-section">
+          <h2>Word-flow blocks <span class="dtb-count" id="dtb-word-flow-count">0</span></h2>
+          <p class="dtb-help">Static wording и ссылки на существующие business fields переносятся как один Word-подобный блок. ID и source полей не изменяются.</p>
+          <button class="dtb-button dtb-full" type="button" id="dtb-create-word-flow">Создать Word-подобный блок заполнения</button>
+          <div id="dtb-word-flow-list" class="dtb-word-flow-list"></div>
         </section>
       </aside>
 
@@ -124,6 +132,7 @@
 
       <aside class="dtb-right-panel" aria-label="Настройки поля">
         <div id="dtb-inspector" class="dtb-inspector"></div>
+        <div id="dtb-word-flow-editor" class="dtb-inspector" hidden></div>
       </aside>
     </div>
 
@@ -159,6 +168,7 @@
 
   <div class="dtb-toast" id="dtb-toast" hidden role="status"></div>
   <datalist id="dtb-source-options"></datalist>
+  <datalist id="dtb-word-flow-field-options"></datalist>
   <input id="dtb-new-pdf-input" type="file" accept="application/pdf,.pdf" hidden/>
   <input id="dtb-replace-pdf-input" type="file" accept="application/pdf,.pdf" hidden/>
   <input id="dtb-project-input" type="file" accept="application/json,.json,.builder.json" hidden/>
@@ -190,6 +200,7 @@
   <script src="../assets/js/document-field-maps/regulation-partial-refusal-notice.js"></script>
   <script src="../assets/js/pages/document-wizard.js"></script>
   <script src="../assets/js/document-builder/project-schema.js"></script>
+  <script src="../assets/js/document-builder/identifier-protection.js"></script>
   <script src="../assets/js/document-builder/builder-state.js"></script>
   <script src="../assets/js/document-builder/source-catalog.js"></script>
   <script src="../assets/js/document-builder/test-fixtures.js"></script>
@@ -198,6 +209,7 @@
   <script src="../assets/js/document-builder/pdf-viewer.js"></script>
   <script src="../assets/js/document-builder/field-overlay-editor.js"></script>
   <script src="../assets/js/document-builder/property-inspector.js"></script>
+  <script src="../assets/js/document-builder/word-flow-editor.js"></script>
   <script src="../assets/js/document-builder/builder-app.js"></script>
 </body>
 </html>

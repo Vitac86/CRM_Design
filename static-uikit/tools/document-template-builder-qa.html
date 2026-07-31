@@ -43,6 +43,24 @@
       });
     }
     function currentField() { return app.state.field(); }
+    function expansionOwners(project) {
+      return (project.fields || []).concat(project.wordFlowBlocks || []).filter(function (owner) {
+        return !!owner.expansion;
+      });
+    }
+    function layoutOwner(project, id) {
+      return (project.fields || []).concat(project.wordFlowBlocks || []).find(function (owner) {
+        return owner.id === id;
+      });
+    }
+    function identifierError(fn) {
+      var caught = null;
+      try { fn(); } catch (error) { caught = error; }
+      assert(caught, 'Identifier protection error expected');
+      equal(caught.name, 'IdentifierProtectionError');
+      equal(caught.message, ns.identifierProtection.WARNING);
+      return caught;
+    }
 
     add('Builder opens through HTTP', function () { assert(/^https?:$/.test(frame.location.protocol)); assert(app.ready); });
     add('file:// blocker has the required message', function () { equal(ns.constants.protocolMessage, 'Конструктор должен быть открыт через локальный HTTP-сервер.'); });
@@ -73,13 +91,92 @@
     add('Field resize works from keyboard', function () { var before = currentField().width; frame.document.body.dispatchEvent(new frame.KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true, bubbles: true })); equal(currentField().width, before + 0.25); });
     add('Text baseline editing works', function () { var field = currentField(); var before = field.baselineTop; app.state.updateField(field.id, { baselineTop: before + 0.25 }, 'qa baseline'); equal(currentField().baselineTop, before + 0.25); });
     add('Checkbox editing works', function () { var check = app.state.project.fields.find(function (field) { return field.type === 'check'; }); assert(check); app.state.selectField(check.id); app.state.updateField(check.id, { markStyle: 'cross', boxSize: 7.5 }, 'qa checkbox'); equal(currentField().markStyle, 'cross'); });
-    add('Source selection works', function () { var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'check'; }); app.state.selectField(field.id); app.state.updateField(field.id, { source: 'subject.displayName' }, 'qa source'); equal(currentField().source, 'subject.displayName'); });
-    add('showWhen editing works', function () { app.state.updateField(currentField().id, { showWhen: { source: 'subject.kind', equals: 'individual' } }, 'qa condition'); equal(currentField().showWhen.equals, 'individual'); });
+    add('Existing field IDs and sources are frozen and read-only', function () {
+      var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'static' && item.source; });
+      var originalId = field.id;
+      var originalSource = field.source;
+      var beforeCount = app.state.project.fields.length;
+      app.state.selectField(originalId);
+      var idControl = frame.document.querySelector('[data-identifier-role="field-id"]');
+      var sourceControl = frame.document.querySelector('[data-identifier-role="field-source"]');
+      assert(idControl && idControl.readOnly, 'existing field ID must be read-only');
+      assert(sourceControl && sourceControl.readOnly, 'existing field source must be read-only');
+      assert(Array.from(frame.document.querySelectorAll('#dtb-inspector .dtb-identifier-warning')).some(function (node) {
+        return node.textContent.trim() === ns.identifierProtection.WARNING;
+      }), 'exact identifier warning is missing');
+      equal(app.state.updateField(originalId, { id: originalId + '-renamed' }, 'qa forbidden id'), false);
+      assert(app.state.field(originalId), 'original field ID must survive a rejected rename');
+      equal(app.state.updateField(originalId, { source: originalSource + '.renamed' }, 'qa forbidden source'), false);
+      equal(app.state.field(originalId).source, originalSource);
+      app.state.selectField(originalId);
+      equal(app.state.deleteSelected(), false);
+      equal(app.state.project.fields.length, beforeCount);
+    });
+    add('Template, wizard and check keys are frozen and read-only', function () {
+      var project = app.state.project;
+      var originalTemplateId = project.templateId;
+      var templateControl = frame.document.querySelector('#dtb-meta-id');
+      assert(templateControl.readOnly, 'existing template ID must be read-only');
+      equal(frame.document.querySelector('#dtb-meta-id-warning').textContent.trim(), ns.identifierProtection.WARNING);
+      equal(app.state.update({ templateId: originalTemplateId + '-renamed' }, 'qa forbidden template id'), false);
+      equal(app.state.project.templateId, originalTemplateId);
+
+      [['fields', 'extra.'], ['checkFields', 'check.']].forEach(function (definition) {
+        var group = definition[0];
+        var prefix = definition[1];
+        var match = null;
+        (app.state.project.wizard[group] || []).some(function (control, index) {
+          var field = app.state.project.fields.find(function (item) { return item.source === prefix + control.key; });
+          if (!field) return false;
+          match = { control: control, index: index, field: field };
+          return true;
+        });
+        assert(match, 'mapped ' + group + ' control expected');
+        app.state.selectField(match.field.id);
+        var keyControl = frame.document.querySelector('[data-identifier-role="wizard-key"]');
+        assert(keyControl && keyControl.readOnly, group + ' key must be read-only');
+        var originalKey = match.control.key;
+        var changed = app.state.commit('qa forbidden ' + group + ' key', function (candidate) {
+          candidate.wizard[group][match.index].key = originalKey + '-renamed';
+        });
+        equal(changed, false);
+        equal(app.state.project.wizard[group][match.index].key, originalKey);
+      });
+    });
+    add('New field identifiers remain editable', function () {
+      var seed = ns.schema.clone(app.state.project.fields.find(function (field) {
+        return (field.type || 'text') !== 'check' && (field.type || 'text') !== 'static';
+      }));
+      var originalSelection = seed.id;
+      seed.id = app.state.uniqueFieldId('qa-added-field');
+      seed.source = 'subject.displayName';
+      equal(app.state.addField(seed), true);
+      var renamed = seed.id + '-renamed';
+      equal(app.state.updateField(seed.id, { id: renamed }, 'qa rename new id'), true);
+      equal(app.state.updateField(renamed, { source: 'subject.email' }, 'qa change new source'), true);
+      equal(app.state.field(renamed).source, 'subject.email');
+      var entry = app.catalog.find(function (item) { return item.overlayTemplateId === app.state.project.templateId; });
+      var productionRoundTrip = ns.schema.fromProduction(ns.schema.toProduction(app.state.project), entry);
+      var reloaded = new ns.BuilderState();
+      reloaded.setProject(productionRoundTrip);
+      assert(reloaded.field(renamed), 'new field must survive production import');
+      assert(!ns.identifierProtection.isFieldProtected(reloaded.project, renamed),
+        'an additive field must not become a frozen production identifier');
+      app.state.selectField(renamed);
+      equal(app.state.deleteSelected(), true);
+      assert(!app.state.field(renamed));
+      app.state.selectField(originalSelection);
+    });
+    add('showWhen editing works', function () { var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'static'; }); app.state.selectField(field.id); app.state.updateField(field.id, { showWhen: { source: 'subject.kind', equals: 'individual' } }, 'qa condition'); equal(currentField().showWhen.equals, 'individual'); });
     add('Russian test data renders', function () { app.state.profileId = 'ru-resident-normal'; app.state.payloadOverrides = {}; return app.openExisting('accession-application-fl').then(function () { app.state.profileId = 'ru-resident-normal'; return app.generatePreview(); }).then(function (result) { assert(result.blob.size > 1000); }); });
     add('English test data renders', function () { app.state.profileId = 'en-nonresident-normal'; app.state.payloadOverrides = {}; return app.generatePreview().then(function (result) { assert(result.blob.size > 1000); }); });
     add('Long values use production fit logic', function () { return ns.validation.analyzeProfile(app.state.project, 'ru-resident-long', {}).then(function (fit) { assert(fit.fields.length === app.state.project.fields.length); assert(frame.CRMDocumentEngine.textLayout.fitText); }); });
     add('Unsupported glyph produces a clear error', function () {
-      var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'check' && item.source; });
+      var payload = ns.fixtures.payloadFor('ru-resident-normal', app.state.project, {});
+      var field = app.state.project.fields.find(function (item) {
+        return (item.type || 'text') !== 'check' && item.source &&
+          item.layoutMode !== 'flow-reference' && ns.validation.visible(item, payload);
+      });
       var overrides = {}; overrides[field.source] = '测试';
       return ns.validation.analyzeProfile(app.state.project, 'ru-resident-normal', overrides).then(function (fit) {
         var result = fit.fields.find(function (entry) { return entry.fieldId === field.id; }).result;
@@ -92,6 +189,26 @@
     add('Preview has zero widgets', function () { equal(app.previewInspection.widgets, 0); });
     add('Stale Blob URLs are revoked', function () { var old = app.previewUrl; return app.generatePreview().then(function () { assert(app.revokedUrls.indexOf(old) !== -1); }); });
     add('Builder JSON export/import round-trips', function () { var text = ns.io.exportProject(app.state.project); var imported = ns.io.importProjectText(text).project; assert(ns.io.semanticEqual(app.state.project, imported)); });
+    add('Tampered identifiers are rejected by validation and every export path', function () {
+      var tampered = ns.schema.clone(app.state.project);
+      var protectedField = tampered.identifierProtection.fields.find(function (field) { return field.source !== null; });
+      tampered.fields.find(function (field) { return field.id === protectedField.id; }).source += '.renamed';
+      identifierError(function () { ns.io.exportProject(tampered); });
+      identifierError(function () { ns.schema.toProduction(tampered); });
+      identifierError(function () { ns.io.registryFragment(tampered); });
+      identifierError(function () { ns.io.exportFixtures(tampered); });
+      identifierError(function () { ns.io.exportQa(tampered, null, null); });
+      assert(ns.validation.structural(tampered).errors.some(function (error) {
+        return error.code === 'protected-field-source';
+      }), 'structural validation must expose the protected source error');
+      var legacy = ns.schema.clone(app.state.project);
+      delete legacy.identifierProtection;
+      ns.identifierProtection.attach(legacy);
+      assert(legacy.identifierProtection, 'known legacy project must receive the runtime baseline');
+      var legacyTamper = ns.schema.clone(tampered);
+      delete legacyTamper.identifierProtection;
+      identifierError(function () { ns.identifierProtection.attach(legacyTamper); });
+    });
     add('Production JS export is deterministic', function () { var a = ns.io.productionJs(app.state.project); var b = ns.io.productionJs(app.state.project); equal(a, b); assert(!/function\s*\(/.test(a.replace(/\(function \(global\)/, ''))); });
     add('Existing-map semantic round-trip succeeds for 18 maps', function () {
       app.catalog.forEach(function (entry) {
@@ -100,6 +217,199 @@
         var exported = ns.schema.toProduction(project);
         assert(ns.io.semanticEqual(map, exported), 'Round-trip failed: ' + map.id);
       });
+    });
+    add('All 18 identifier sets survive Builder JSON and production round-trips', function () {
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var before = ns.identifierProtection.currentProjectIdentifiers(project);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var after = ns.identifierProtection.currentProjectIdentifiers(imported);
+        assert(ns.io.semanticEqual(before, after), 'Builder JSON changed identifiers: ' + map.id);
+        var production = ns.schema.toProduction(imported);
+        project.identifierProtection.fields.forEach(function (required) {
+          var actual = production.fields.find(function (field) { return field.id === required.id; });
+          assert(actual, 'Production round-trip removed field: ' + map.id + '/' + required.id);
+          equal(actual.source == null ? null : String(actual.source), required.source,
+            'Production round-trip changed source: ' + map.id + '/' + required.id);
+        });
+      });
+    });
+    // ── Reviewed Word-like blocks ────────────────────────────────────────
+    add('Word-flow blocks are first-class and round-trip every production map', function () {
+      var blockCount = 0;
+      var referenceCount = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        blockCount += (map.wordFlowBlocks || []).length;
+        referenceCount += (map.fields || []).filter(function (field) {
+          return field.layoutMode === 'flow-reference';
+        }).length;
+        assert(ns.io.semanticEqual(project.wordFlowBlocks, map.wordFlowBlocks || []),
+          'first-class import changed blocks: ' + map.id);
+        assert(!Object.prototype.hasOwnProperty.call(project.productionProperties, 'wordFlowBlocks'),
+          'blocks remained opaque: ' + map.id);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        assert(ns.io.semanticEqual(imported.wordFlowBlocks, project.wordFlowBlocks),
+          'Builder JSON changed blocks: ' + map.id);
+        var production = ns.schema.toProduction(imported);
+        assert(ns.io.semanticEqual(production.wordFlowBlocks || [], map.wordFlowBlocks || []),
+          'production export changed blocks: ' + map.id);
+        (production.wordFlowBlocks || []).forEach(function (block) {
+          assert(block.fontSizeLocked, map.id + '/' + block.id + ': font is not locked');
+          equal(Number(block.minFontSize), Number(block.fontSize),
+            map.id + '/' + block.id + ': locked size changed');
+        });
+      });
+      assert(blockCount > 0, 'no production Word-flow blocks discovered');
+      assert(referenceCount > 0, 'no flow-reference fields discovered');
+    });
+    add('Legacy opaque Word-flow metadata migrates into the Builder schema', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['power-of-attorney'];
+      var entry = app.catalog.find(function (item) { return item.overlayTemplateId === map.id; });
+      var legacy = ns.schema.fromProduction(map, entry);
+      legacy.productionProperties.wordFlowBlocks = ns.schema.clone(legacy.wordFlowBlocks);
+      delete legacy.wordFlowBlocks;
+      var migrated = ns.io.importProjectText(JSON.stringify(legacy)).project;
+      assert(ns.io.semanticEqual(migrated.wordFlowBlocks, map.wordFlowBlocks),
+        'legacy Word-flow metadata was lost');
+      assert(!Object.prototype.hasOwnProperty.call(migrated.productionProperties, 'wordFlowBlocks'),
+        'legacy metadata was not promoted');
+    });
+    add('Word-flow editor exposes frame, typography, expansion, range and run controls', function () {
+      return app.openExisting('power-of-attorney').then(function () {
+        var block = app.state.project.wordFlowBlocks.find(function (candidate) {
+          return !!candidate.expansion;
+        }) || app.state.project.wordFlowBlocks[0];
+        assert(block, 'power-of-attorney Word-flow block expected');
+        app.state.selectWordFlowBlock(block.id);
+        var editor = frame.document.getElementById('dtb-word-flow-editor');
+        assert(!editor.hidden, 'Word-flow editor is hidden');
+        assert(frame.document.getElementById('dtb-inspector').hidden,
+          'field inspector must yield to block editor');
+        ['id', 'frame-left', 'frame-baselineTop', 'frame-width',
+          'fontSize', 'fontSizeLocked', 'lineHeight', 'paragraphSpacingAfter',
+          'sourceReplacement-firstBlock', 'sourceReplacement-lastBlock',
+          'sourceReplacement-expectedSha256', 'sourceReplacement-expectedTemplateSha256']
+          .forEach(function (name) {
+            assert(editor.querySelector('[data-word-flow-control="' + name + '"]'),
+              'missing Word-flow control: ' + name);
+          });
+        var addTypes = Array.from(editor.querySelector('[data-word-flow-control="add-run-type"]').options)
+          .map(function (option) { return option.value; });
+        ['static', 'fieldRef', 'space', 'lineBreak', 'paragraphBreak', 'spacer']
+          .forEach(function (type) { assert(addTypes.indexOf(type) !== -1, 'missing run type: ' + type); });
+        assert(frame.document.querySelector('#dtb-word-flow-field-options option[value="ulCity"]'),
+          'existing field ID search is not populated');
+        assert(frame.document.querySelector('[data-word-flow-block-id="' + block.id + '"]'),
+          'block list/canvas selection target is missing');
+
+        var originalBlockId = block.id;
+        var renamedId = originalBlockId + '-qa-rename';
+        var referenced = block.runs.find(function (run) { return run.type === 'fieldRef'; });
+        equal(app.state.updateWordFlowBlock(originalBlockId, { id: renamedId },
+          'qa rename Word-flow block'), true);
+        assert(app.state.wordFlowBlock(renamedId), 'renamed Word-flow block was lost');
+        assert(app.state.project.pageLayout[block.page].anchors.indexOf(renamedId) !== -1,
+          'page-budget anchor did not follow the block rename');
+        assert(app.state.project.pageLayout[block.page].anchors.indexOf(originalBlockId) === -1,
+          'stale page-budget anchor survived the block rename');
+        var referencedField = app.state.field(referenced.fieldId);
+        assert((Array.isArray(referencedField.flowBlockId) ? referencedField.flowBlockId :
+          [referencedField.flowBlockId]).indexOf(renamedId) !== -1,
+          'field flowBlockId did not follow the block rename');
+        app.state.undo();
+        assert(app.state.wordFlowBlock(originalBlockId), 'undo did not restore the block ID');
+        app.state.selectWordFlowBlock(originalBlockId);
+        equal(app.state.deleteSelectedWordFlowBlock(), true);
+        assert(app.state.project.pageLayout[block.page].anchors.indexOf(originalBlockId) === -1,
+          'deleting a block left a stale page-budget anchor');
+        assert(!ns.schema.isWordFlowReferenced(app.state.project, referenced.fieldId),
+          'deleting a block left its field reference active');
+        app.state.undo();
+        assert(app.state.wordFlowBlock(originalBlockId), 'undo did not restore the deleted block');
+        app.state.selectWordFlowBlock(originalBlockId);
+      });
+    });
+    add('Styled-run editing links existing fields without renaming business identifiers', function () {
+      var originalProtection = ns.schema.clone(app.state.project.identifierProtection);
+      var seed = ns.schema.clone(app.state.project.fields.find(function (field) {
+        return field.layoutMode !== 'flow-reference' && (field.type || 'text') !== 'check';
+      }));
+      seed.id = app.state.uniqueFieldId('qa-word-flow-field');
+      seed.source = 'subject.displayName';
+      delete seed.layoutMode; delete seed.flowBlockId;
+      equal(app.state.addField(seed), true);
+      var blockId = app.state.uniqueWordFlowBlockId('qa-word-flow-block');
+      var block = ns.schema.suggestWordFlowBlock(app.state.project, seed.page, blockId);
+      block.sourceStaticText = 'Префикс значение.';
+      block.runs = [
+        { type: 'static', text: 'Префикс ' },
+        { type: 'space' },
+        { type: 'fieldRef', fieldId: seed.id, keepTogether: true,
+          decoration: { underline: true, minWidth: 40, thickness: 0.36, offset: 1.2 } },
+        { type: 'lineBreak' },
+        { type: 'paragraphBreak' },
+        { type: 'spacer', width: 12 },
+        { type: 'static', text: 'значение.' }
+      ];
+      equal(app.state.addWordFlowBlock(block), true);
+      var linked = app.state.field(seed.id);
+      equal(linked.layoutMode, 'flow-reference');
+      equal(linked.flowBlockId, blockId);
+      equal(app.state.updateField(seed.id, { id: seed.id + '-renamed' }, 'qa forbidden ref rename'), false);
+      equal(app.state.updateField(seed.id, { source: 'subject.email' }, 'qa editable new source'), true);
+      equal(app.state.field(seed.id).source, 'subject.email');
+      app.state.selectField(seed.id);
+      equal(app.state.deleteSelected(), false);
+      assert(ns.io.semanticEqual(app.state.project.identifierProtection, originalProtection),
+        'Word-flow edit changed identifier protection metadata');
+      var builderRound = ns.io.importProjectText(ns.io.exportProject(app.state.project)).project;
+      assert(ns.io.semanticEqual(builderRound.wordFlowBlocks, app.state.project.wordFlowBlocks),
+        'styled runs changed in Builder JSON');
+      var entry = app.catalog.find(function (item) { return item.overlayTemplateId === app.state.project.templateId; });
+      var productionRound = ns.schema.fromProduction(ns.schema.toProduction(app.state.project), entry);
+      assert(ns.io.semanticEqual(productionRound.wordFlowBlocks, app.state.project.wordFlowBlocks),
+        'styled runs changed in production round-trip');
+      app.state.selectWordFlowBlock(blockId);
+      equal(app.state.deleteSelectedWordFlowBlock(), true);
+      assert(!app.state.field(seed.id).layoutMode, 'deleted block left a flow-reference marker');
+      equal(app.state.updateField(seed.id, { id: seed.id + '-renamed' }, 'qa rename unlinked field'), true);
+      app.state.selectField(seed.id + '-renamed');
+      equal(app.state.deleteSelected(), true);
+      return app.openExisting('accession-application-fl');
+    });
+    add('Word-flow validation rejects unlocked, missing and double-rendered references', function () {
+      var base = cloneProject(app.state.project);
+      var block = base.wordFlowBlocks[0];
+      assert(block, 'validation fixture has no Word-flow block');
+      var unlocked = cloneProject(base);
+      unlocked.wordFlowBlocks[0].fontSizeLocked = false;
+      var unlockedResult = ns.validation.structural(unlocked, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', unlocked));
+      assert(unlockedResult.errors.some(function (error) {
+        return error.code === 'word-flow' && /lock/.test(error.message);
+      }), 'unlocked source font was accepted');
+
+      var missing = cloneProject(base);
+      var missingRun = missing.wordFlowBlocks[0].runs.find(function (run) { return run.type === 'fieldRef'; });
+      missingRun.fieldId = 'qa-missing-field';
+      var missingResult = ns.validation.structural(missing, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', missing));
+      assert(missingResult.errors.some(function (error) {
+        return error.code === 'word-flow' && /missing field/.test(error.message);
+      }), 'missing fieldRef was accepted');
+
+      var doubled = cloneProject(base);
+      var fieldId = doubled.wordFlowBlocks[0].runs.find(function (run) { return run.type === 'fieldRef'; }).fieldId;
+      var doubledField = doubled.fields.find(function (field) { return field.id === fieldId; });
+      delete doubledField.layoutMode; delete doubledField.flowBlockId;
+      var doubledResult = ns.validation.structural(doubled, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', doubled));
+      assert(doubledResult.errors.some(function (error) {
+        return error.code === 'word-flow' && /independently/.test(error.message);
+      }), 'double rendering was accepted');
     });
     // ── Readability policy and continuation lines ─────────────────────────
     add('New text fields default to 12 pt preferred and 9 pt minimum', function () {
@@ -144,7 +454,7 @@
       app.catalog.forEach(function (entry) {
         var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
         (map.fields || []).forEach(function (field) {
-          if ((field.type || 'text') === 'check') return;
+          if ((field.type || 'text') === 'check' || field.layoutMode === 'flow-reference') return;
           if (Number(field.minFontSize) < 9 || Number(field.fontSize) < 9) {
             offenders.push(map.id + '/' + field.id);
           }
@@ -155,7 +465,7 @@
     add('Adding a continuation line builds ordered flow regions', function () {
       return app.openExisting('accession-application-fl').then(function () {
         var field = app.state.project.fields.filter(function (item) {
-          return item.id === 'clientFullName';
+          return (item.type || 'text') !== 'check' && item.layoutMode !== 'flow-reference';
         })[0];
         app.state.selectField(field.id);
         var regions = ns.schema.flowRegions(field);
@@ -170,7 +480,9 @@
     });
     add('An unconfirmed generated line blocks production export', function () {
       var project = cloneProject(app.state.project);
-      var field = project.fields.filter(function (item) { return item.id === 'clientFullName'; })[0];
+      var field = project.fields.filter(function (item) {
+        return (item.type || 'text') !== 'check' && item.layoutMode !== 'flow-reference';
+      })[0];
       field.overflowStrategy = 'flow';
       field.flowRegions = [
         { page: 0, left: field.left, baselineTop: field.baselineTop, width: field.width, maxLines: 1 },
@@ -193,7 +505,9 @@
     });
     add('Overlapping continuation lines are rejected', function () {
       var project = cloneProject(app.state.project);
-      var field = project.fields.filter(function (item) { return item.id === 'clientFullName'; })[0];
+      var field = project.fields.filter(function (item) {
+        return (item.type || 'text') !== 'check' && item.layoutMode !== 'flow-reference';
+      })[0];
       field.overflowStrategy = 'flow';
       field.flowRegions = [
         { page: 0, left: 60, baselineTop: 300, width: 200, maxLines: 1 },
@@ -243,7 +557,7 @@
       return app.openExisting('accession-application-fl').then(function () {
         var before = app.state.project.fields.length;
         var field = app.state.project.fields.filter(function (item) {
-          return item.id === 'registrationAddress';
+          return Array.isArray(item.flowRegions);
         })[0];
         assert(Array.isArray(field.flowRegions), 'fixture field has no continuation');
         app.state.updateField(field.id, { flowRegions: undefined, overflowStrategy: undefined },
@@ -272,16 +586,15 @@
     });
     add('An unreviewed expansion blocks production export', function () {
       var project = cloneProject(app.state.project);
-      var field = project.fields.filter(function (item) { return item.id === 'recognitionDate'; })[0];
-      field.overflowStrategy = 'expand-layout';
-      field.expansion = ns.schema.suggestExpansion(field, { width: 595.32, height: 841.92 },
-        { bottomReserve: 100 });
+      var owner = expansionOwners(project)[0];
+      assert(owner, 'the fixture map has no expansion to test');
+      owner.expansion.reviewStatus = 'suggested';
       var blocked = ns.validation.structural(project, app.sourceInfo,
         ns.fixtures.payloadFor('ru-resident-normal', project));
       assert(blocked.errors.some(function (error) {
         return error.code === 'expansion-unreviewed';
       }), 'unreviewed expansion did not block export');
-      field.expansion.reviewStatus = 'approved';
+      owner.expansion.reviewStatus = 'approved';
       var allowed = ns.validation.structural(project, app.sourceInfo,
         ns.fixtures.payloadFor('ru-resident-normal', project));
       assert(!allowed.errors.some(function (error) {
@@ -290,23 +603,23 @@
     });
     add('The inspector edits the page budget where it belongs', function () {
       return app.openExisting('power-of-attorney').then(function () {
-        app.state.selectField('ulOgrn');
-        var inspector = frame.document.getElementById('dtb-inspector');
+        app.state.selectWordFlowBlock('power-of-attorney-ul-intro');
+        var inspector = frame.document.getElementById('dtb-word-flow-editor');
         var titles = Array.prototype.map.call(
           inspector.querySelectorAll('.dtb-inspector-section h3'),
           function (node) { return node.textContent; });
         assert(titles.some(function (t) { return /Запас страницы/.test(t); }),
                'no page-budget section for an anchor field');
-        assert(titles.some(function (t) { return /Расширение страницы/.test(t); }),
+        assert(titles.some(function (t) { return /Расширение/.test(t); }),
                'no expansion section for an anchor field');
         var hints = Array.prototype.map.call(
           inspector.querySelectorAll('.dtb-inspector-hint'),
           function (node) { return node.textContent; }).join(' ');
         assert(/0 строк/.test(hints) && /максимум/.test(hints),
                'no zero/one/maximum row preview');
-        assert(/Ещё на этой странице/.test(hints),
-               'no cumulative preview for the other anchors of the page');
-        assert(/из просветов/.test(hints),
+        assert(/Доступно/.test(hints),
+               'the shared page capacity is not shown');
+        assert(/просветы/.test(hints),
                'the recoverable white space is not shown');
 
         // Editing it goes to the page, not to the field.
@@ -319,7 +632,7 @@
         }, 'qa page budget');
         equal(app.state.project.pageLayout[0].bottomClearance, before + 1,
               'page budget did not change');
-        assert(app.state.field('ulOgrn').expansion.bottomReserve === undefined,
+        assert(app.state.wordFlowBlock('power-of-attorney-ul-intro').expansion.bottomReserve === undefined,
                'the anchor grew a reserve of its own');
         app.state.undo();
         equal(app.state.project.pageLayout[0].bottomClearance, before,
@@ -339,10 +652,10 @@
     });
     add('A page budget is stated once, not per field', function () {
       var project = cloneProject(app.state.project);
-      var field = project.fields.filter(function (item) {
-        return item.id === 'clientName';
-      })[0];
-      field.expansion.bottomReserve = 250;
+      var anchorId = project.pageLayout[0].anchors[0];
+      var owner = layoutOwner(project, anchorId);
+      assert(owner && owner.expansion, 'page anchor has no expansion');
+      owner.expansion.bottomReserve = 250;
       var result = ns.validation.structural(project, app.sourceInfo,
         ns.fixtures.payloadFor('ru-resident-normal', project));
       assert(result.errors.some(function (error) {
@@ -351,8 +664,9 @@
     });
     add('An anchor missing from the page budget is rejected', function () {
       var project = cloneProject(app.state.project);
+      var anchorId = project.pageLayout[0].anchors[0];
       project.pageLayout[0].anchors = project.pageLayout[0].anchors.filter(
-        function (id) { return id !== 'clientName'; });
+        function (id) { return id !== anchorId; });
       var result = ns.validation.structural(project, app.sourceInfo,
         ns.fixtures.payloadFor('ru-resident-normal', project));
       assert(result.errors.some(function (error) {
@@ -413,11 +727,11 @@
     });
     add('Reviewed cross-page flow is editable, validated and round-trips', function () {
       return app.openExisting('power-of-attorney').then(function () {
-        app.state.selectField('ulOgrn');
+        app.state.selectWordFlowBlock('power-of-attorney-ul-intro');
         var flow = app.state.project.pageLayout[0].crossPageFlow;
         assert(flow && flow.reviewStatus === 'approved',
                'the production cross-page rule was not imported');
-        var inspector = frame.document.getElementById('dtb-inspector');
+        var inspector = frame.document.getElementById('dtb-word-flow-editor');
         var text = inspector.textContent;
         assert(/Перенос между страницами/.test(text) &&
                /Исходный блок/.test(text) && /Целевая страница/.test(text),
@@ -472,7 +786,8 @@
           Object.keys(template.pageLayout).forEach(function (page) {
             if (template.pageLayout[page].crossPageFlow) flowCount += 1;
             (template.pageLayout[page].anchors || []).forEach(function (id) {
-              assert((back.fields || []).some(function (f) { return f.id === id; }),
+              assert((back.fields || []).some(function (f) { return f.id === id; }) ||
+                     (back.wordFlowBlocks || []).some(function (block) { return block.id === id; }),
                      template.id + ': anchor ' + id + ' lost');
             });
           });
@@ -482,9 +797,10 @@
     });
     add('An incomplete expansion is rejected rather than guessed', function () {
       var project = cloneProject(app.state.project);
-      var field = project.fields.filter(function (item) { return item.id === 'recognitionDate'; })[0];
-      field.overflowStrategy = 'expand-layout';
-      field.expansion = { page: 0, insertionTop: 400, reviewStatus: 'approved' };
+      var owner = expansionOwners(project)[0];
+      assert(owner, 'the fixture map has no expansion to test');
+      owner.overflowStrategy = 'expand-layout';
+      owner.expansion = { page: 0, insertionTop: 400, reviewStatus: 'approved' };
       var result = ns.validation.structural(project, app.sourceInfo,
         ns.fixtures.payloadFor('ru-resident-normal', project));
       assert(result.errors.some(function (error) {
@@ -496,12 +812,13 @@
         var text = ns.io.exportProject(app.state.project);
         var imported = ns.io.importProjectText(text).project;
         assert(ns.io.semanticEqual(app.state.project, imported), 'project changed');
-        var source = app.state.project.fields.filter(function (item) { return item.expansion; });
+        var source = expansionOwners(app.state.project);
         assert(source.length > 0, 'the fixture map has no expansion to test');
-        source.forEach(function (field) {
-          var round = imported.fields.filter(function (item) { return item.id === field.id; })[0];
-          assert(ns.io.semanticEqual(round.expansion, field.expansion),
-            'expansion changed for ' + field.id);
+        source.forEach(function (owner) {
+          var round = layoutOwner(imported, owner.id);
+          assert(round, 'expansion owner was lost: ' + owner.id);
+          assert(ns.io.semanticEqual(round.expansion, owner.expansion),
+            'expansion changed for ' + owner.id);
           equal(round.overflowStrategy, 'expand-layout', 'strategy changed');
         });
       });
@@ -519,6 +836,16 @@
           assert(ns.io.semanticEqual(round.expansion, field.expansion),
             'expansion changed for ' + map.id + '/' + field.id);
         });
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (!block.expansion) return;
+          expandable += 1;
+          var round = (exported.wordFlowBlocks || []).filter(function (item) {
+            return item.id === block.id;
+          })[0];
+          assert(round, 'Word-flow expansion owner was lost: ' + map.id + '/' + block.id);
+          assert(ns.io.semanticEqual(round.expansion, block.expansion),
+            'expansion changed for ' + map.id + '/' + block.id);
+        });
       });
       assert(expandable >= 10, 'expected expandable fields across the maps: ' + expandable);
     });
@@ -529,6 +856,11 @@
         (map.fields || []).forEach(function (field) {
           if (field.expansion && field.expansion.reviewStatus !== 'approved') {
             pending.push(map.id + '/' + field.id);
+          }
+        });
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (block.expansion && block.expansion.reviewStatus !== 'approved') {
+            pending.push(map.id + '/' + block.id);
           }
         });
       });

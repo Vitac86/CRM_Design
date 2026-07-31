@@ -48,6 +48,7 @@
   }
 
   function registryFragment(project) {
+    if (ns.identifierProtection) ns.identifierProtection.assertPreserved(project);
     return {
       id: project.templateId,
       title: project.title,
@@ -63,6 +64,7 @@
   }
 
   function qaReport(project, validation, batch) {
+    if (ns.identifierProtection) ns.identifierProtection.assertPreserved(project);
     return {
       schemaVersion: 1,
       templateId: project.templateId,
@@ -96,8 +98,14 @@
   IO.qaReport = qaReport;
   IO.importProjectText = importProjectText;
   IO.semanticEqual = function (a, b) { return semantic(a) === semantic(b); };
-  IO.exportProject = function (project) { return stableStringify(project); };
-  IO.exportFixtures = function (project) { return stableStringify(ns.fixtures.exportData(project)); };
+  IO.exportProject = function (project) {
+    if (ns.identifierProtection) ns.identifierProtection.assertPreserved(project);
+    return stableStringify(project);
+  };
+  IO.exportFixtures = function (project) {
+    if (ns.identifierProtection) ns.identifierProtection.assertPreserved(project);
+    return stableStringify(ns.fixtures.exportData(project));
+  };
   IO.exportRegistry = function (project) { return stableStringify(registryFragment(project)); };
   IO.exportQa = function (project, validation, batch) { return stableStringify(qaReport(project, validation, batch)); };
   ns.io = IO;

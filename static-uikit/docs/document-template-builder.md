@@ -53,6 +53,24 @@ telemetry, analytics, CDN, external font, external API, or backend PDF service.
 All 18 production overlay maps are available. `anketa-isbyul` remains hidden,
 and static `transfer-requisites` is not exposed.
 
+Template coverage is closed by `tools/qa/check_full_template_audit.py`. The
+checked-in JSON/Markdown matrices cover all 22 PDFs and 77 pages, preserve the
+621 original field ID/source pairs as a compatibility floor, and require every
+additive runtime field to receive a section and layout classification. The same
+gate refuses source-PDF byte or SHA-256 changes.
+
+Existing production identifiers are deliberately read-only. The template ID,
+every imported field ID and source path, and every imported wizard-control key
+keep the values used by the production forms. The inspector shows the reason:
+
+> Идентификатор существующей переменной используется production-формами и не может быть изменён.
+
+New fields and controls remain editable. Once a new field is referenced by a
+Word-flow block its ID is also locked until that reference is removed; its
+source path stays editable because it is not part of the imported compatibility
+floor. Import, undo/redo, direct state mutation, and every export path enforce
+the same rule rather than relying only on disabled inputs.
+
 ## New-template workflow
 
 1. Click **Новый шаблон**.
@@ -166,6 +184,41 @@ and blocks production export until it is corrected. The floor applies only to
 text the engine draws — static legal text already printed in the base PDF is
 untouched.
 
+## Word-flow blocks
+
+Use a Word-flow block when a source paragraph contains interleaved legal text,
+filled values, spaces, and paragraph structure that must reflow as one unit.
+This is different from a continuation line: a continuation line distributes
+one field value across independent form rows, while a Word-flow block lays out
+an ordered run stream inside one reviewed rectangular frame.
+
+Choose **Создать Word-подобный блок заполнения** in the left panel, then edit:
+
+- the page and frame (`left`, `baselineTop`, `width`, initial line count);
+- source font, locked size/minimum, leading, paragraph spacing, alignment,
+  justification threshold, first-line indent, and hanging indent;
+- static-text, existing-field-reference, space, line-break, paragraph-break,
+  and spacer runs, including bold/italic/underline decoration where applicable;
+- optional reviewed expansion, its page budget, anchors, compaction zones, and
+  cross-page settings;
+- the reviewed source replacement range, expected block/page counts, source
+  SHA-256, template SHA-256, and the original static text.
+
+A field-reference run selects an existing business field ID; it does not create
+a replacement source variable. The Builder marks that field with
+`layoutMode: 'flow-reference'` and the block's `flowBlockId`, so the value is
+rendered only in the run stream and cannot also appear as an independent
+overlay. Removing or moving the run synchronizes those markers. Validation
+rejects missing or duplicated references, cross-block ownership, an independent
+double render, an unlocked source font size, unreviewed source ranges, stale
+hashes, and expansion rules that exceed the page budget.
+
+The canvas shows the block frame and its referenced fields; the inspector can
+jump between either side of the relationship. Run all synthetic profiles and
+inspect the generated PDF before approving the replacement and expansion
+metadata. Source text and hashes are evidence, not editable shortcuts around
+the committed PDF.
+
 ## Continuation lines
 
 One logical field, one source value, several explicitly mapped regions the
@@ -177,7 +230,7 @@ Select a text field and use the **Строки продолжения** section:
 | Action | What it creates |
 | --- | --- |
 | `Добавить строку продолжения` | a text-only region, for a place the form already prints a rule or leaves an empty cell |
-| `Добавить полноценную строку продолжения` | the Word-like version: a baseline **and** its own visible rule |
+| `Добавить полноценную строку продолжения` | a form-row version: a baseline **and** its own visible rule (not paragraph Word flow) |
 | `Добавить строку ниже` | a pure geometry suggestion — the next likely baseline, computed from the line height |
 
 Regions are listed in flow order as `Строка 1 · основная`, `Строка 2`, … Each
@@ -440,8 +493,13 @@ is no `eval` or `new Function`. Future migrations pass through
 `project-schema.js:migrate()`.
 
 The project contains metadata, template URL/hash/page geometry, fonts, fields,
-wizard controls, fixtures, QA state, and replacement review. Builder-only field
-geometry/review properties are omitted from production output.
+first-class `wordFlowBlocks`, wizard controls, fixtures, QA state, and
+replacement review. Word-flow runs, typography, frame, spacing, expansion, and
+source-replacement metadata survive Builder JSON and production-map round trips.
+Referenced fields retain `layoutMode` and `flowBlockId`; unrelated Builder-only
+field geometry/review properties are omitted from production output. Import
+migrates an older opaque `productionProperties.wordFlowBlocks` value into the
+first-class collection without changing its data.
 
 **Сохранить черновик** writes only project JSON to `localStorage`, keyed by
 template ID, after an overwrite warning. Payload overrides and generated PDFs
@@ -465,11 +523,12 @@ Approved, and Published. Automatic validation never marks visual review passed.
 
 ## Declarative compatibility audit
 
-The 18 evaluated maps contain 621 fields. Before this builder, seven fields used
-inline functions: contract number/date prefixes in three refusal documents and
-the final year digit in `code-word-request`. They were migrated without behavior
-change to named renderer formatters `prefixNumber`, `prefixFrom`, and
-`dateYearLastDigit`.
+The immutable compatibility floor across the 18 evaluated maps contains 621
+field ID/source pairs; classified additive fields may raise the current total.
+Before this builder, seven fields used inline functions: contract number/date
+prefixes in three refusal documents and the final year digit in
+`code-word-request`. They were migrated without behavior change to named
+renderer formatters `prefixNumber`, `prefixFrom`, and `dateYearLastDigit`.
 
 After migration, all 18 maps contain only JSON-compatible primitives, arrays,
 and plain objects. No inline condition functions, computed map values without a
@@ -484,7 +543,7 @@ until the behavior is replaced or explicitly preserved outside this schema.
 ## QA
 
 Serve the directory and open
-`tools/document-template-builder-qa.html`. It runs the 34 builder checks against
+`tools/document-template-builder-qa.html`. It runs the 68 builder checks against
 the actual PDF.js worker and production renderer. Also run the established
 document harness and the repository structural validation before integration.
 

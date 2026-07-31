@@ -11,6 +11,7 @@
     this.viewer = null;
     this.editor = null;
     this.inspector = null;
+    this.wordFlowEditor = null;
     this.catalog = [];
     this.catalogAudit = null;
     this.sourceInfo = null;
@@ -77,6 +78,16 @@
       state: this.state,
       container: byId('dtb-inspector'),
       sourceDatalist: byId('dtb-source-options'),
+      onMessage: this.message.bind(this)
+    });
+    this.wordFlowEditor = new ns.WordFlowEditor({
+      state: this.state,
+      container: byId('dtb-word-flow-editor'),
+      inspectorContainer: byId('dtb-inspector'),
+      listContainer: byId('dtb-word-flow-list'),
+      count: byId('dtb-word-flow-count'),
+      createButton: byId('dtb-create-word-flow'),
+      fieldDatalist: byId('dtb-word-flow-field-options'),
       onMessage: this.message.bind(this)
     });
     this.state.subscribe(function (reason) { self.render(reason); });
@@ -268,10 +279,17 @@
 
   TemplateBuilderApp.prototype.render = function (reason) {
     if (!this.state.project) return;
+    if (reason === 'identifier-protection' && this.state.lastIdentifierViolation) {
+      this.message(this.state.lastIdentifierViolation.message, true);
+    }
+    if (reason === 'word-flow-protection' && this.state.lastWordFlowViolation) {
+      this.message(this.state.lastWordFlowViolation.message, true);
+    }
     this.renderMetadata();
     this.renderFieldList();
     this.inspector && this.inspector.setSources(ns.sourceCatalog.collect(global.CRMDocumentEngine, this.state.project));
     this.inspector && this.inspector.render();
+    this.wordFlowEditor && this.wordFlowEditor.render();
     this.renderPayload();
     document.querySelectorAll('[data-tool]').forEach(function (button) { button.classList.toggle('is-active', button.dataset.tool === this.state.tool); }, this);
     byId('dtb-undo').disabled = !this.state.history.length;
@@ -285,7 +303,14 @@
 
   TemplateBuilderApp.prototype.renderMetadata = function () {
     var project = this.state.project;
-    byId('dtb-meta-id').value = project.templateId || '';
+    var templateId = byId('dtb-meta-id');
+    var identifierLocked = !!(ns.identifierProtection &&
+      ns.identifierProtection.isTemplateProtected(project));
+    templateId.value = project.templateId || '';
+    templateId.readOnly = identifierLocked;
+    templateId.title = identifierLocked ? ns.identifierProtection.WARNING : '';
+    var identifierWarning = byId('dtb-meta-id-warning');
+    if (identifierWarning) identifierWarning.hidden = !identifierLocked;
     byId('dtb-meta-title').value = project.title || '';
     byId('dtb-meta-description').value = project.description || '';
     byId('dtb-meta-category').value = project.category || '';
@@ -609,7 +634,7 @@
       self.state.batchResults = batch;
       self.renderBatch();
       var c = batch.counts;
-      byId('dtb-validation-summary').textContent = 'normal ' + c.normal + ' · shrink ' + c.shrink + ' · multiline ' + c.multiline + ' · fallback ' + c.fallback + ' · failures ' + c.failures + ' · missing ' + c.missing + ' · glyph ' + c.unsupportedGlyphs;
+      byId('dtb-validation-summary').textContent = 'normal ' + c.normal + ' · Word-flow ' + c.wordFlow + ' · shrink ' + c.shrink + ' · multiline ' + c.multiline + ' · fallback ' + c.fallback + ' · failures ' + c.failures + ' · missing ' + c.missing + ' · glyph ' + c.unsupportedGlyphs;
       return batch;
     }).catch(function (error) { self.error(error); throw error; });
   };

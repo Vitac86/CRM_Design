@@ -1,0 +1,4427 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "static-uikit/tools/qa/check_identifier_manifest.py --write",
+  "counts": {
+    "maps": 18,
+    "fields": 621,
+    "registryDocuments": 22,
+    "overlayBindings": 18,
+    "wizardKeys": 297,
+    "checkKeys": 59,
+    "formatterNames": 13
+  },
+  "maps": [
+    {
+      "id": "accession-application-fl",
+      "fields": [
+        {
+          "id": "accessionBrokerage",
+          "source": "check.accession-brokerage"
+        },
+        {
+          "id": "accessionDepository",
+          "source": "check.accession-depository"
+        },
+        {
+          "id": "agreementEsign",
+          "source": "check.agreement-esignature"
+        },
+        {
+          "id": "agreementQuik",
+          "source": "check.agreement-quik"
+        },
+        {
+          "id": "clientEmail",
+          "source": "subject.email"
+        },
+        {
+          "id": "clientFullName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "clientPhone",
+          "source": "subject.phone"
+        },
+        {
+          "id": "depoNominee",
+          "source": "extra.depo-account-type"
+        },
+        {
+          "id": "depoOperator",
+          "source": "check.depo-operator"
+        },
+        {
+          "id": "depoOwner",
+          "source": "extra.depo-account-type"
+        },
+        {
+          "id": "depoTrustee",
+          "source": "extra.depo-account-type"
+        },
+        {
+          "id": "marketCurrency",
+          "source": "check.market-currency"
+        },
+        {
+          "id": "marketDerivatives",
+          "source": "check.market-derivatives"
+        },
+        {
+          "id": "marketStock",
+          "source": "check.market-stock"
+        },
+        {
+          "id": "passportIssueDay",
+          "source": "field.passportIssueDate"
+        },
+        {
+          "id": "passportIssueMonthYear",
+          "source": "field.passportIssueDate"
+        },
+        {
+          "id": "passportIssuedBy",
+          "source": "field.passportIssuedBy"
+        },
+        {
+          "id": "passportNumber",
+          "source": "field.passportNumber"
+        },
+        {
+          "id": "passportSeries",
+          "source": "field.passportSeries"
+        },
+        {
+          "id": "payoutBankDetails",
+          "source": "extra.income-payout"
+        },
+        {
+          "id": "payoutBrokerAccount",
+          "source": "extra.income-payout"
+        },
+        {
+          "id": "registrationAddress",
+          "source": "field.registrationAddress"
+        },
+        {
+          "id": "reportEmail",
+          "source": "subject.email"
+        },
+        {
+          "id": "reportsEdo",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "reportsEmail",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "reportsOffice",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "reportsPost",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "signDay",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "signMonth",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "signYear",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "signatureName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "tariffCurrency",
+          "source": "extra.tariff-currency"
+        },
+        {
+          "id": "tariffDerivatives",
+          "source": "extra.tariff-derivatives"
+        },
+        {
+          "id": "tariffStock",
+          "source": "extra.tariff-stock"
+        },
+        {
+          "id": "tradingDepoNominee",
+          "source": "extra.trading-depo-account-type"
+        },
+        {
+          "id": "tradingDepoOwner",
+          "source": "extra.trading-depo-account-type"
+        },
+        {
+          "id": "tradingDepoTrustee",
+          "source": "extra.trading-depo-account-type"
+        }
+      ]
+    },
+    {
+      "id": "accession-application-yul",
+      "fields": [
+        {
+          "id": "accessionBrokerage",
+          "source": "check.accession-brokerage"
+        },
+        {
+          "id": "accessionDepository",
+          "source": "check.accession-depository"
+        },
+        {
+          "id": "agreementEsign",
+          "source": "check.agreement-esignature"
+        },
+        {
+          "id": "agreementQuik",
+          "source": "check.agreement-quik"
+        },
+        {
+          "id": "clientEmail",
+          "source": "subject.email"
+        },
+        {
+          "id": "clientPhone",
+          "source": "subject.phone"
+        },
+        {
+          "id": "companyFullLegalName",
+          "source": "field.client-full-legal-name"
+        },
+        {
+          "id": "companyLegalAddress",
+          "source": "field.client-legal-address"
+        },
+        {
+          "id": "companyOgrn",
+          "source": "field.client-ogrn"
+        },
+        {
+          "id": "depoNominee",
+          "source": "extra.depo-account-type"
+        },
+        {
+          "id": "depoOperator",
+          "source": "check.depo-operator"
+        },
+        {
+          "id": "depoOwner",
+          "source": "extra.depo-account-type"
+        },
+        {
+          "id": "depoTrustee",
+          "source": "extra.depo-account-type"
+        },
+        {
+          "id": "marketCurrency",
+          "source": "check.market-currency"
+        },
+        {
+          "id": "marketDerivatives",
+          "source": "check.market-derivatives"
+        },
+        {
+          "id": "marketStock",
+          "source": "check.market-stock"
+        },
+        {
+          "id": "payoutBankDetails",
+          "source": "extra.income-payout"
+        },
+        {
+          "id": "payoutBrokerAccount",
+          "source": "extra.income-payout"
+        },
+        {
+          "id": "reportEmail",
+          "source": "subject.email"
+        },
+        {
+          "id": "reportsEdo",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "reportsEmail",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "reportsOffice",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "reportsPost",
+          "source": "extra.report-delivery"
+        },
+        {
+          "id": "representativeAuthority",
+          "source": "field.representativeAuthority"
+        },
+        {
+          "id": "representativeSignerLine",
+          "source": "field.representativeSignerLine"
+        },
+        {
+          "id": "signDay",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "signMonth",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "signYear",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "signatureName",
+          "source": "field.representativeFullName"
+        },
+        {
+          "id": "tariffCurrency",
+          "source": "extra.tariff-currency"
+        },
+        {
+          "id": "tariffDerivatives",
+          "source": "extra.tariff-derivatives"
+        },
+        {
+          "id": "tariffStock",
+          "source": "extra.tariff-stock"
+        },
+        {
+          "id": "tradingDepoNominee",
+          "source": "extra.trading-depo-account-type"
+        },
+        {
+          "id": "tradingDepoOwner",
+          "source": "extra.trading-depo-account-type"
+        },
+        {
+          "id": "tradingDepoTrustee",
+          "source": "extra.trading-depo-account-type"
+        }
+      ]
+    },
+    {
+      "id": "account-opening-notice",
+      "fields": [
+        {
+          "id": "brokerRepresentative",
+          "source": "extra.extra-authorized-signer"
+        },
+        {
+          "id": "brokerageContractDate",
+          "source": "extra.extra-brokerage-contract-date"
+        },
+        {
+          "id": "brokerageContractNumber",
+          "source": "extra.extra-brokerage-contract"
+        },
+        {
+          "id": "clientCode",
+          "source": "field.client-code"
+        },
+        {
+          "id": "clientIdOrInn",
+          "source": "field.client-id-or-inn"
+        },
+        {
+          "id": "clientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "currencyMarketAccount",
+          "source": "extra.extra-currency-market-account"
+        },
+        {
+          "id": "depoAccount",
+          "source": "extra.extra-depo-account"
+        },
+        {
+          "id": "depositaryContractDate",
+          "source": "extra.extra-depository-contract-date"
+        },
+        {
+          "id": "depositaryContractNumber",
+          "source": "extra.extra-depository-contract"
+        },
+        {
+          "id": "derivativesMarketAccount",
+          "source": "extra.extra-futures-market-account"
+        },
+        {
+          "id": "formationDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "paymentPurposeCurrency",
+          "source": "extra.extra-brokerage-contract"
+        },
+        {
+          "id": "paymentPurposeDerivatives",
+          "source": "extra.extra-brokerage-contract"
+        },
+        {
+          "id": "paymentPurposeStock",
+          "source": "extra.extra-brokerage-contract"
+        },
+        {
+          "id": "stockMarketAccount",
+          "source": "extra.extra-stock-market-account"
+        }
+      ]
+    },
+    {
+      "id": "anketa-fl",
+      "fields": [
+        {
+          "id": "bankAdditionalDetails",
+          "source": "extra.bank-additional-details"
+        },
+        {
+          "id": "bankAddress",
+          "source": "extra.bank-address"
+        },
+        {
+          "id": "bankBicSwift",
+          "source": "extra.bank-bic-swift"
+        },
+        {
+          "id": "bankCorrespondentAccount",
+          "source": "extra.bank-correspondent-account"
+        },
+        {
+          "id": "bankInn",
+          "source": "extra.bank-inn"
+        },
+        {
+          "id": "bankName",
+          "source": "extra.bank-name"
+        },
+        {
+          "id": "bankSettlementAccount",
+          "source": "extra.bank-settlement-account"
+        },
+        {
+          "id": "beneficialOwnerBasis",
+          "source": "extra.beneficial-owner-basis"
+        },
+        {
+          "id": "beneficialOwnerName",
+          "source": "extra.beneficial-owner-name"
+        },
+        {
+          "id": "beneficiaryBasisDetails",
+          "source": "extra.beneficiary-basis-details"
+        },
+        {
+          "id": "beneficiaryName",
+          "source": "extra.beneficiary-name"
+        },
+        {
+          "id": "birthDate",
+          "source": "field.client-birth-date"
+        },
+        {
+          "id": "birthPlace",
+          "source": "field.client-birth-place"
+        },
+        {
+          "id": "businessReputation",
+          "source": "extra.extra-business-reputation"
+        },
+        {
+          "id": "citizenshipCountries",
+          "source": "field.client-citizenship"
+        },
+        {
+          "id": "citizenshipOther",
+          "source": "check.citizenship-other"
+        },
+        {
+          "id": "citizenshipRussia",
+          "source": "check.citizenship-rf"
+        },
+        {
+          "id": "email",
+          "source": "subject.email"
+        },
+        {
+          "id": "financialGoalIncome",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "financialGoalOther",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "financialGoalOtherDetails",
+          "source": "extra.financial-goal-other"
+        },
+        {
+          "id": "financialGoalPreservation",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "financialGoalRiskControl",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "foreignTaxpayerNo",
+          "source": "check.fatca-no"
+        },
+        {
+          "id": "foreignTaxpayerYes",
+          "source": "check.fatca-yes"
+        },
+        {
+          "id": "foreignTrustOwnerNo",
+          "source": "extra.foreign-trust-owner-status"
+        },
+        {
+          "id": "foreignTrustOwnerYes",
+          "source": "extra.foreign-trust-owner-status"
+        },
+        {
+          "id": "foreignTrustProtectorNo",
+          "source": "extra.foreign-trust-protector-status"
+        },
+        {
+          "id": "foreignTrustProtectorYes",
+          "source": "extra.foreign-trust-protector-status"
+        },
+        {
+          "id": "fullName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "identityDocumentType",
+          "source": "field.client-id-type"
+        },
+        {
+          "id": "inn",
+          "source": "field.client-inn"
+        },
+        {
+          "id": "landlinePhone",
+          "source": "extra.landline-phone"
+        },
+        {
+          "id": "migrationDocumentSeriesNumber",
+          "source": "extra.migration-document-series-number"
+        },
+        {
+          "id": "migrationStayEndDate",
+          "source": "extra.migration-stay-end-date"
+        },
+        {
+          "id": "migrationStayStartDate",
+          "source": "extra.migration-stay-start-date"
+        },
+        {
+          "id": "mobilePhone",
+          "source": "subject.phone"
+        },
+        {
+          "id": "modeChange",
+          "source": "check.anketa-mode-change"
+        },
+        {
+          "id": "modeFirst",
+          "source": "check.anketa-mode-first"
+        },
+        {
+          "id": "otherInformation",
+          "source": "extra.extra-other-info"
+        },
+        {
+          "id": "passportDepartmentCode",
+          "source": "field.client-passport-dept-code"
+        },
+        {
+          "id": "passportIssueDate",
+          "source": "field.client-passport-issue-date"
+        },
+        {
+          "id": "passportIssuedBy",
+          "source": "field.client-passport-issued-by"
+        },
+        {
+          "id": "passportNumber",
+          "source": "field.client-passport-number"
+        },
+        {
+          "id": "passportSeries",
+          "source": "field.client-passport-series"
+        },
+        {
+          "id": "pepForeign",
+          "source": "check.pep-foreign"
+        },
+        {
+          "id": "pepInternational",
+          "source": "check.pep-international"
+        },
+        {
+          "id": "pepPositionEmployer",
+          "source": "extra.pep-position-employer"
+        },
+        {
+          "id": "pepRelation",
+          "source": "extra.extra-pep-relation"
+        },
+        {
+          "id": "pepRussian",
+          "source": "check.pep-russian"
+        },
+        {
+          "id": "postalAddress",
+          "source": "field.client-postal-address"
+        },
+        {
+          "id": "purposeBrokerage",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeConversion",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeOther",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeOtherDetails",
+          "source": "extra.business-purpose-other"
+        },
+        {
+          "id": "purposeTrustManagement",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "questionnaireDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "registrationAddress",
+          "source": "field.client-registration-address"
+        },
+        {
+          "id": "representativeAuthorityDetails",
+          "source": "extra.representative-authority-details"
+        },
+        {
+          "id": "representativeName",
+          "source": "extra.representative-name"
+        },
+        {
+          "id": "roleBeneficialOwner",
+          "source": "check.anketa-role-beneficial-owner"
+        },
+        {
+          "id": "roleBeneficiary",
+          "source": "check.anketa-role-beneficiary"
+        },
+        {
+          "id": "roleClient",
+          "source": "check.anketa-role-client"
+        },
+        {
+          "id": "roleRepresentative",
+          "source": "check.anketa-role-representative"
+        },
+        {
+          "id": "signaturePrintedName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "snils",
+          "source": "field.client-snils"
+        },
+        {
+          "id": "solvencyBankruptcyPresent",
+          "source": "extra.financial-solvency"
+        },
+        {
+          "id": "solvencyNoBankruptcy",
+          "source": "extra.financial-solvency"
+        },
+        {
+          "id": "taxResidencyCountries",
+          "source": "extra.tax-residency-countries"
+        },
+        {
+          "id": "taxResidentOther",
+          "source": "check.tax-resident-rf-no"
+        },
+        {
+          "id": "taxResidentRussia",
+          "source": "check.tax-resident-rf-yes"
+        },
+        {
+          "id": "usAddress",
+          "source": "check.fatca-us-address"
+        },
+        {
+          "id": "usAttorney",
+          "source": "check.fatca-us-attorney"
+        },
+        {
+          "id": "usBirthCountry",
+          "source": "check.fatca-us-birth-country"
+        },
+        {
+          "id": "usCitizen",
+          "source": "check.fatca-us-citizen"
+        },
+        {
+          "id": "usMailingInstructions",
+          "source": "check.fatca-us-mailing-address"
+        },
+        {
+          "id": "usPaymentInstructions",
+          "source": "check.fatca-us-payment-instructions"
+        },
+        {
+          "id": "usPermanentResident",
+          "source": "check.fatca-us-permanent-resident"
+        },
+        {
+          "id": "usPhone",
+          "source": "check.fatca-us-phone"
+        }
+      ]
+    },
+    {
+      "id": "anketa-fl-simplified-id",
+      "fields": [
+        {
+          "id": "bankAdditional",
+          "source": "extra.extra-bank-additional"
+        },
+        {
+          "id": "bankAddress",
+          "source": "extra.extra-bank-address"
+        },
+        {
+          "id": "bankBic",
+          "source": "extra.extra-bank-bic"
+        },
+        {
+          "id": "bankCorrespondentAccount",
+          "source": "extra.extra-bank-corr-account"
+        },
+        {
+          "id": "bankInn",
+          "source": "extra.extra-bank-inn"
+        },
+        {
+          "id": "bankName",
+          "source": "extra.extra-bank-name"
+        },
+        {
+          "id": "bankSettlementAccount",
+          "source": "extra.extra-bank-account"
+        },
+        {
+          "id": "birthDate",
+          "source": "field.client-birth-date"
+        },
+        {
+          "id": "clientFullName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "email",
+          "source": "subject.email"
+        },
+        {
+          "id": "idDepartmentCode",
+          "source": "field.client-passport-dept-code"
+        },
+        {
+          "id": "idDocumentName",
+          "source": "field.client-id-type"
+        },
+        {
+          "id": "idIssueDate",
+          "source": "field.client-passport-issue-date"
+        },
+        {
+          "id": "idIssuedBy",
+          "source": "field.client-passport-issued-by"
+        },
+        {
+          "id": "idSeriesNumber",
+          "source": "field.passportSeriesNumber"
+        },
+        {
+          "id": "inn",
+          "source": "subject.inn"
+        },
+        {
+          "id": "kinshipDegree",
+          "source": "extra.extra-kinship-degree"
+        },
+        {
+          "id": "landlinePhone",
+          "source": "extra.extra-landline-phone"
+        },
+        {
+          "id": "medicalPolicy",
+          "source": "extra.extra-medical-policy"
+        },
+        {
+          "id": "mobilePhone",
+          "source": "subject.phone"
+        },
+        {
+          "id": "otherInformation",
+          "source": "extra.extra-other-information"
+        },
+        {
+          "id": "pdlDetails",
+          "source": "extra.extra-pdl-details"
+        },
+        {
+          "id": "pdlForeign",
+          "source": "extra.extra-pdl-status"
+        },
+        {
+          "id": "pdlInternational",
+          "source": "extra.extra-pdl-status"
+        },
+        {
+          "id": "pdlRussian",
+          "source": "extra.extra-pdl-status"
+        },
+        {
+          "id": "questionnaireDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "registrationAddress",
+          "source": "field.client-registration-address"
+        },
+        {
+          "id": "signatureName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "snils",
+          "source": "field.client-snils"
+        }
+      ]
+    },
+    {
+      "id": "anketa-ip-sz",
+      "fields": [
+        {
+          "id": "bankAdditional",
+          "source": "extra.extra-bank-additional"
+        },
+        {
+          "id": "bankAddress",
+          "source": "extra.extra-bank-address"
+        },
+        {
+          "id": "bankBic",
+          "source": "extra.extra-bank-bic"
+        },
+        {
+          "id": "bankCorrAccount",
+          "source": "extra.extra-bank-corr-account"
+        },
+        {
+          "id": "bankInn",
+          "source": "extra.extra-bank-inn"
+        },
+        {
+          "id": "bankName",
+          "source": "extra.extra-bank-name"
+        },
+        {
+          "id": "bankSettlementAccount",
+          "source": "extra.extra-bank-account"
+        },
+        {
+          "id": "beneficialOwnerBasis",
+          "source": "extra.extra-beneficial-owner-basis"
+        },
+        {
+          "id": "beneficialOwnerName",
+          "source": "extra.extra-beneficial-owner"
+        },
+        {
+          "id": "beneficiaryBasis",
+          "source": "extra.extra-beneficiary-basis"
+        },
+        {
+          "id": "beneficiaryName",
+          "source": "extra.extra-beneficiary-name"
+        },
+        {
+          "id": "birthDate",
+          "source": "field.client-birth-date"
+        },
+        {
+          "id": "birthPlace",
+          "source": "field.client-birth-place"
+        },
+        {
+          "id": "citizenship",
+          "source": "field.client-citizenship"
+        },
+        {
+          "id": "citizenshipCountries",
+          "source": "extra.extra-citizenship-countries"
+        },
+        {
+          "id": "citizenshipOther",
+          "source": "extra.extra-citizenship-kind"
+        },
+        {
+          "id": "citizenshipRf",
+          "source": "extra.extra-citizenship-kind"
+        },
+        {
+          "id": "clientFullName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "email",
+          "source": "subject.email"
+        },
+        {
+          "id": "fatcaAddress",
+          "source": "check.fatca-us-address"
+        },
+        {
+          "id": "fatcaAttorney",
+          "source": "check.fatca-us-attorney"
+        },
+        {
+          "id": "fatcaBirthCountry",
+          "source": "check.fatca-us-birth-country"
+        },
+        {
+          "id": "fatcaCitizen",
+          "source": "check.fatca-us-citizen"
+        },
+        {
+          "id": "fatcaGreencard",
+          "source": "check.fatca-us-greencard"
+        },
+        {
+          "id": "fatcaMailingAddress",
+          "source": "check.fatca-us-mailing-address"
+        },
+        {
+          "id": "fatcaPaymentInstructions",
+          "source": "check.fatca-us-payment-instructions"
+        },
+        {
+          "id": "fatcaPhone",
+          "source": "check.fatca-us-phone"
+        },
+        {
+          "id": "financialPositionNo",
+          "source": "extra.extra-financial-position"
+        },
+        {
+          "id": "financialPositionYes",
+          "source": "extra.extra-financial-position"
+        },
+        {
+          "id": "foreignTaxpayerNo",
+          "source": "extra.extra-foreign-taxpayer"
+        },
+        {
+          "id": "foreignTaxpayerYes",
+          "source": "extra.extra-foreign-taxpayer"
+        },
+        {
+          "id": "goalIncome",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "goalOther",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "goalPreservation",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "goalRiskControl",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "idDepartmentCode",
+          "source": "field.client-passport-dept-code"
+        },
+        {
+          "id": "idDocumentName",
+          "source": "field.client-id-type"
+        },
+        {
+          "id": "idIssueDate",
+          "source": "field.client-passport-issue-date"
+        },
+        {
+          "id": "idIssuedBy",
+          "source": "field.client-passport-issued-by"
+        },
+        {
+          "id": "idSeriesNumber",
+          "source": "field.passportSeriesNumber"
+        },
+        {
+          "id": "inn",
+          "source": "subject.inn"
+        },
+        {
+          "id": "ipCertificate",
+          "source": "extra.extra-ip-certificate"
+        },
+        {
+          "id": "ipRegistrationAuthority",
+          "source": "extra.extra-ip-registration-authority"
+        },
+        {
+          "id": "ipRegistrationDate",
+          "source": "extra.extra-ip-registration-date"
+        },
+        {
+          "id": "ipRegistrationPlace",
+          "source": "extra.extra-ip-registration-place"
+        },
+        {
+          "id": "landlinePhone",
+          "source": "extra.extra-landline-phone"
+        },
+        {
+          "id": "licenceActivities",
+          "source": "extra.extra-licence-activities"
+        },
+        {
+          "id": "licenceAuthority",
+          "source": "extra.extra-licence-authority"
+        },
+        {
+          "id": "licenceNumberDate",
+          "source": "extra.extra-licence-number-date"
+        },
+        {
+          "id": "licenceValidity",
+          "source": "extra.extra-licence-validity"
+        },
+        {
+          "id": "licensingNone",
+          "source": "extra.extra-licensing"
+        },
+        {
+          "id": "licensingYes",
+          "source": "extra.extra-licensing"
+        },
+        {
+          "id": "mobilePhone",
+          "source": "subject.phone"
+        },
+        {
+          "id": "modeChange",
+          "source": "extra.extra-questionnaire-mode"
+        },
+        {
+          "id": "modeFirst",
+          "source": "extra.extra-questionnaire-mode"
+        },
+        {
+          "id": "ogrnip",
+          "source": "extra.extra-ogrnip"
+        },
+        {
+          "id": "okved",
+          "source": "extra.extra-okved"
+        },
+        {
+          "id": "otherInformation",
+          "source": "extra.extra-other-info"
+        },
+        {
+          "id": "pdlForeign",
+          "source": "extra.extra-pdl-status"
+        },
+        {
+          "id": "pdlInternational",
+          "source": "extra.extra-pdl-status"
+        },
+        {
+          "id": "pdlRelation",
+          "source": "extra.extra-pdl-relation"
+        },
+        {
+          "id": "pdlRussian",
+          "source": "extra.extra-pdl-status"
+        },
+        {
+          "id": "postalAddress",
+          "source": "field.client-postal-address"
+        },
+        {
+          "id": "practiceDocumentAuthority",
+          "source": "extra.extra-practice-document-authority"
+        },
+        {
+          "id": "practiceDocumentDate",
+          "source": "extra.extra-practice-document-date"
+        },
+        {
+          "id": "practiceDocumentName",
+          "source": "extra.extra-practice-document"
+        },
+        {
+          "id": "practiceDocumentNumber",
+          "source": "extra.extra-practice-document-number"
+        },
+        {
+          "id": "protectorStatusNo",
+          "source": "extra.extra-protector-status"
+        },
+        {
+          "id": "protectorStatusYes",
+          "source": "extra.extra-protector-status"
+        },
+        {
+          "id": "purposeBrokerage",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeConversion",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeOther",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeTrust",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "questionnaireDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "registrationAddress",
+          "source": "field.client-registration-address"
+        },
+        {
+          "id": "representativeBasis",
+          "source": "extra.extra-representative-basis"
+        },
+        {
+          "id": "representativeName",
+          "source": "field.client-rep-full-name"
+        },
+        {
+          "id": "residencePermitFrom",
+          "source": "extra.extra-residence-permit-from"
+        },
+        {
+          "id": "residencePermitSeriesNumber",
+          "source": "extra.extra-residence-permit-number"
+        },
+        {
+          "id": "residencePermitTo",
+          "source": "extra.extra-residence-permit-to"
+        },
+        {
+          "id": "roleBeneficiary",
+          "source": "extra.extra-questionnaire-role"
+        },
+        {
+          "id": "roleRepresentative",
+          "source": "extra.extra-questionnaire-role"
+        },
+        {
+          "id": "signaturePrintedName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "snils",
+          "source": "field.client-snils"
+        },
+        {
+          "id": "statusEntrepreneur",
+          "source": "extra.extra-ipsz-status"
+        },
+        {
+          "id": "statusPrivatePractice",
+          "source": "extra.extra-ipsz-status"
+        },
+        {
+          "id": "taxResidencyCountries",
+          "source": "extra.extra-tax-residency-countries"
+        },
+        {
+          "id": "taxResidencyOther",
+          "source": "extra.extra-tax-residency"
+        },
+        {
+          "id": "taxResidencyRf",
+          "source": "extra.extra-tax-residency"
+        },
+        {
+          "id": "trusteeStatusNo",
+          "source": "extra.extra-trustee-status"
+        },
+        {
+          "id": "trusteeStatusYes",
+          "source": "extra.extra-trustee-status"
+        },
+        {
+          "id": "website",
+          "source": "extra.extra-website"
+        }
+      ]
+    },
+    {
+      "id": "anketa-yul",
+      "fields": [
+        {
+          "id": "bankAddress",
+          "source": "extra.bank-address"
+        },
+        {
+          "id": "bankBicSwift",
+          "source": "extra.bank-bic-swift"
+        },
+        {
+          "id": "bankCorrespondentAccount",
+          "source": "extra.bank-correspondent-account"
+        },
+        {
+          "id": "bankInn",
+          "source": "extra.bank-inn"
+        },
+        {
+          "id": "bankName",
+          "source": "extra.bank-name"
+        },
+        {
+          "id": "bankSettlementAccount",
+          "source": "extra.bank-settlement-account"
+        },
+        {
+          "id": "beneficialOwnerBasis",
+          "source": "extra.beneficial-owner-basis"
+        },
+        {
+          "id": "beneficialOwnerName",
+          "source": "extra.beneficial-owner-name"
+        },
+        {
+          "id": "beneficiaryBasisDetails",
+          "source": "extra.beneficiary-basis-details"
+        },
+        {
+          "id": "beneficiaryName",
+          "source": "extra.beneficiary-name"
+        },
+        {
+          "id": "charterCapital",
+          "source": "field.client-charter-capital"
+        },
+        {
+          "id": "controllingPersons",
+          "source": "extra.extra-controlling-persons"
+        },
+        {
+          "id": "correspondentBankDetails",
+          "source": "extra.correspondent-bank-details"
+        },
+        {
+          "id": "creditOrganisationBic",
+          "source": "extra.credit-organisation-bic"
+        },
+        {
+          "id": "egrulAddress",
+          "source": "field.client-legal-address"
+        },
+        {
+          "id": "email",
+          "source": "subject.email"
+        },
+        {
+          "id": "executiveAuthority",
+          "source": "field.client-rep-authority"
+        },
+        {
+          "id": "executiveBodyAddress",
+          "source": "extra.executive-body-address"
+        },
+        {
+          "id": "executiveName",
+          "source": "field.client-rep-full-name"
+        },
+        {
+          "id": "executivePosition",
+          "source": "field.client-rep-position"
+        },
+        {
+          "id": "financialDocsAnnualAccounts",
+          "source": "check.financial-docs-annual-accounts"
+        },
+        {
+          "id": "financialDocsAuditReport",
+          "source": "check.financial-docs-audit-report"
+        },
+        {
+          "id": "financialGoalIncome",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "financialGoalOther",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "financialGoalOtherDetails",
+          "source": "extra.financial-goal-other"
+        },
+        {
+          "id": "financialGoalPreservation",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "financialGoalRiskControl",
+          "source": "extra.extra-financial-goal"
+        },
+        {
+          "id": "foreignBranchAccreditationNumber",
+          "source": "extra.foreign-branch-accreditation-number"
+        },
+        {
+          "id": "foreignName",
+          "source": "field.client-english-name"
+        },
+        {
+          "id": "foreignRegistrationNumber",
+          "source": "extra.foreign-registration-number"
+        },
+        {
+          "id": "foreignTaxIdentifier",
+          "source": "extra.foreign-tax-identifier"
+        },
+        {
+          "id": "foreignTaxpayerNo",
+          "source": "check.fatca-no"
+        },
+        {
+          "id": "foreignTaxpayerYes",
+          "source": "check.fatca-yes"
+        },
+        {
+          "id": "foreignTrustOwnerNo",
+          "source": "extra.foreign-trust-owner-status"
+        },
+        {
+          "id": "foreignTrustOwnerYes",
+          "source": "extra.foreign-trust-owner-status"
+        },
+        {
+          "id": "foreignTrustProtectorNo",
+          "source": "extra.foreign-trust-protector-status"
+        },
+        {
+          "id": "foreignTrustProtectorYes",
+          "source": "extra.foreign-trust-protector-status"
+        },
+        {
+          "id": "fullLegalName",
+          "source": "field.client-full-legal-name"
+        },
+        {
+          "id": "fundsBorrowed",
+          "source": "check.funds-borrowed"
+        },
+        {
+          "id": "fundsOther",
+          "source": "check.funds-other"
+        },
+        {
+          "id": "fundsOtherDetails",
+          "source": "extra.source-of-funds-other"
+        },
+        {
+          "id": "kpp",
+          "source": "field.client-kpp"
+        },
+        {
+          "id": "landlinePhone",
+          "source": "extra.landline-phone"
+        },
+        {
+          "id": "legalForm",
+          "source": "field.client-legal-form"
+        },
+        {
+          "id": "licenceAuthority",
+          "source": "extra.licence-authority"
+        },
+        {
+          "id": "licenceExpiry",
+          "source": "extra.licence-expiry"
+        },
+        {
+          "id": "licenceIssueDate",
+          "source": "extra.licence-issue-date"
+        },
+        {
+          "id": "licenceNumber",
+          "source": "extra.licence-number"
+        },
+        {
+          "id": "licensedActivities",
+          "source": "extra.licensed-activities"
+        },
+        {
+          "id": "licensedActivityNo",
+          "source": "check.licensed-activity-no"
+        },
+        {
+          "id": "licensedActivityYes",
+          "source": "check.licensed-activity-yes"
+        },
+        {
+          "id": "managementComposition",
+          "source": "extra.management-composition"
+        },
+        {
+          "id": "managementStructure",
+          "source": "extra.extra-management-structure"
+        },
+        {
+          "id": "mobilePhone",
+          "source": "subject.phone"
+        },
+        {
+          "id": "modeChange",
+          "source": "check.anketa-mode-change"
+        },
+        {
+          "id": "modeFirst",
+          "source": "check.anketa-mode-first"
+        },
+        {
+          "id": "nonresidentRepresentationAddress",
+          "source": "extra.nonresident-representation-address"
+        },
+        {
+          "id": "nonresidentRepresentativeResidence",
+          "source": "extra.nonresident-representative-residence"
+        },
+        {
+          "id": "ogrn",
+          "source": "field.client-ogrn"
+        },
+        {
+          "id": "okpo",
+          "source": "extra.extra-okpo"
+        },
+        {
+          "id": "okved",
+          "source": "extra.extra-okved"
+        },
+        {
+          "id": "otherInformation",
+          "source": "extra.extra-other-info"
+        },
+        {
+          "id": "postalAddress",
+          "source": "field.client-postal-address"
+        },
+        {
+          "id": "pre2002RegistrationAuthority",
+          "source": "extra.pre2002-registration-authority"
+        },
+        {
+          "id": "pre2002RegistrationDate",
+          "source": "extra.pre2002-registration-date"
+        },
+        {
+          "id": "pre2002RegistrationDocument",
+          "source": "extra.pre2002-registration-document"
+        },
+        {
+          "id": "pre2002RegistrationNumber",
+          "source": "extra.pre2002-registration-number"
+        },
+        {
+          "id": "purposeBrokerage",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeConversion",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeOther",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "purposeOtherDetails",
+          "source": "extra.business-purpose-other"
+        },
+        {
+          "id": "purposeTrustManagement",
+          "source": "extra.extra-business-purpose"
+        },
+        {
+          "id": "questionnaireDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "representativeAuthorityDetails",
+          "source": "extra.representative-authority-details"
+        },
+        {
+          "id": "representativeName",
+          "source": "extra.representative-name"
+        },
+        {
+          "id": "reputationClientReviews",
+          "source": "check.reputation-client-reviews"
+        },
+        {
+          "id": "reputationFinancialReviews",
+          "source": "check.reputation-financial-reviews"
+        },
+        {
+          "id": "reputationOther",
+          "source": "check.reputation-other"
+        },
+        {
+          "id": "reputationOtherDetails",
+          "source": "extra.reputation-other-details"
+        },
+        {
+          "id": "residentInn",
+          "source": "field.client-inn"
+        },
+        {
+          "id": "roleBeneficiary",
+          "source": "check.anketa-role-beneficiary"
+        },
+        {
+          "id": "roleClient",
+          "source": "check.anketa-role-client"
+        },
+        {
+          "id": "roleRepresentative",
+          "source": "check.anketa-role-representative"
+        },
+        {
+          "id": "shareholdersNamesInn",
+          "source": "extra.shareholders-names-inn"
+        },
+        {
+          "id": "shareholdersPercentages",
+          "source": "extra.shareholders-percentages"
+        },
+        {
+          "id": "shortName",
+          "source": "field.client-short-name"
+        },
+        {
+          "id": "signatoryPosition",
+          "source": "field.client-rep-position"
+        },
+        {
+          "id": "stateRegistrationAuthority",
+          "source": "field.client-registration-authority"
+        },
+        {
+          "id": "stateRegistrationDate",
+          "source": "field.client-registration-date"
+        },
+        {
+          "id": "stateRegistrationPlace",
+          "source": "field.client-legal-address"
+        },
+        {
+          "id": "strategicCompanyNo",
+          "source": "check.strategic-company-no"
+        },
+        {
+          "id": "strategicCompanyYes",
+          "source": "check.strategic-company-yes"
+        },
+        {
+          "id": "taxRegistrationDate",
+          "source": "extra.tax-registration-date"
+        },
+        {
+          "id": "taxResidenceCountry",
+          "source": "extra.tax-residency-countries"
+        },
+        {
+          "id": "taxResidentOther",
+          "source": "check.tax-resident-rf-no"
+        },
+        {
+          "id": "taxResidentRussia",
+          "source": "check.tax-resident-rf-yes"
+        },
+        {
+          "id": "usBeneficialOwners",
+          "source": "check.fatca-us-beneficial-owners"
+        },
+        {
+          "id": "usPaymentInstructions",
+          "source": "check.fatca-us-payment-instructions"
+        },
+        {
+          "id": "usPhone",
+          "source": "check.fatca-us-phone"
+        },
+        {
+          "id": "usRegistrationAddress",
+          "source": "check.fatca-us-registration-address"
+        },
+        {
+          "id": "usSignatory",
+          "source": "check.fatca-us-signatory"
+        },
+        {
+          "id": "usTaxResidence",
+          "source": "check.fatca-us-tax-residence"
+        },
+        {
+          "id": "website",
+          "source": "field.client-website"
+        }
+      ]
+    },
+    {
+      "id": "broker-use-refusal-request",
+      "fields": [
+        {
+          "id": "accountPortfolio",
+          "source": "field.extra-account-portfolio"
+        },
+        {
+          "id": "clientDateDay",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientDateMonth",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientDateYear",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "clientPrintedName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "clientRepresentativeRole",
+          "source": "field.representativeRole"
+        },
+        {
+          "id": "contractDate",
+          "source": "field.extra-contract-date"
+        },
+        {
+          "id": "contractNumber",
+          "source": "field.extra-contract-number"
+        }
+      ]
+    },
+    {
+      "id": "client-notifications",
+      "fields": [
+        {
+          "id": "clientFullName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "documentDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "passportIssueDate",
+          "source": "field.passportIssueDate"
+        },
+        {
+          "id": "passportIssuedBy",
+          "source": "field.passportIssuedBy"
+        },
+        {
+          "id": "passportNumber",
+          "source": "field.passportNumber"
+        },
+        {
+          "id": "passportSeries",
+          "source": "field.passportSeries"
+        },
+        {
+          "id": "registrationAddress",
+          "source": "field.registrationAddress"
+        },
+        {
+          "id": "signatureName",
+          "source": "field.clientFullName"
+        }
+      ]
+    },
+    {
+      "id": "code-word-request",
+      "fields": [
+        {
+          "id": "clientFullName",
+          "source": "subject.displayName"
+        },
+        {
+          "id": "clientInn",
+          "source": "subject.inn"
+        },
+        {
+          "id": "documentDateDay",
+          "source": "extra.extra-document-date"
+        },
+        {
+          "id": "documentDateMonth",
+          "source": "extra.extra-document-date"
+        },
+        {
+          "id": "documentDateYearLastDigit",
+          "source": "extra.extra-document-date"
+        },
+        {
+          "id": "newCodeWord",
+          "source": "extra.extra-new-code-word"
+        },
+        {
+          "id": "signatureName",
+          "source": "field.clientFullName"
+        }
+      ]
+    },
+    {
+      "id": "order-forms",
+      "fields": [
+        {
+          "id": "bankBic",
+          "source": "extra.extra-bank-bic"
+        },
+        {
+          "id": "bankCorrAccount",
+          "source": "extra.extra-bank-corr-account"
+        },
+        {
+          "id": "bankCorrName",
+          "source": "extra.extra-bank-corr-name"
+        },
+        {
+          "id": "bankCorrSwift",
+          "source": "extra.extra-bank-corr-swift"
+        },
+        {
+          "id": "bankName",
+          "source": "extra.extra-bank-name"
+        },
+        {
+          "id": "bankOther",
+          "source": "extra.extra-bank-other"
+        },
+        {
+          "id": "bankPersonalAccount",
+          "source": "extra.extra-bank-personal-account"
+        },
+        {
+          "id": "bankRecipient",
+          "source": "extra.extra-bank-recipient"
+        },
+        {
+          "id": "bankRecipientAccount",
+          "source": "extra.extra-bank-account"
+        },
+        {
+          "id": "bankRecipientInn",
+          "source": "extra.extra-bank-inn"
+        },
+        {
+          "id": "counterparty",
+          "source": "extra.extra-counterparty"
+        },
+        {
+          "id": "derivativeAmount",
+          "source": "extra.extra-derivative-amount"
+        },
+        {
+          "id": "derivativeExpiry",
+          "source": "extra.extra-derivative-expiry"
+        },
+        {
+          "id": "derivativeKind",
+          "source": "extra.extra-derivative-kind"
+        },
+        {
+          "id": "derivativeName",
+          "source": "extra.extra-derivative-name"
+        },
+        {
+          "id": "derivativePremium",
+          "source": "extra.extra-derivative-premium"
+        },
+        {
+          "id": "derivativeQuantity",
+          "source": "extra.extra-derivative-quantity"
+        },
+        {
+          "id": "derivativeStrike",
+          "source": "extra.extra-derivative-strike"
+        },
+        {
+          "id": "fxAmount",
+          "source": "extra.extra-fx-amount"
+        },
+        {
+          "id": "fxInstrument",
+          "source": "extra.extra-fx-instrument"
+        },
+        {
+          "id": "fxLots",
+          "source": "extra.extra-fx-lots"
+        },
+        {
+          "id": "fxRate",
+          "source": "extra.extra-fx-rate"
+        },
+        {
+          "id": "fxSwapNo",
+          "source": "extra.extra-fx-swap-ccp"
+        },
+        {
+          "id": "fxSwapYes",
+          "source": "extra.extra-fx-swap-ccp"
+        },
+        {
+          "id": "marketCurrency",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "marketDerivatives",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "marketOtc",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "marketStock",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "moveAmountFigures",
+          "source": "extra.extra-move-amount"
+        },
+        {
+          "id": "moveAmountWords",
+          "source": "extra.extra-move-amount-words"
+        },
+        {
+          "id": "moveBrokerageAccount",
+          "source": "extra.extra-brokerage-account"
+        },
+        {
+          "id": "moveCancellation",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "moveClientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "moveContractNumberDate",
+          "source": "extra.extra-contract-number-date"
+        },
+        {
+          "id": "moveCurCny",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurEur",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurOther",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurRub",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurUsd",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveFromCurrency",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "moveFromDerivatives",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "moveFromOtc",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "moveFromStock",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "moveOrderNumberDate",
+          "source": "extra.extra-order-number-date"
+        },
+        {
+          "id": "movePrimary",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "moveToCurrency",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "moveToDerivatives",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "moveToOtc",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "moveToStock",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "orderKindConditional",
+          "source": "extra.extra-order-kind"
+        },
+        {
+          "id": "orderKindConditionalText",
+          "source": "extra.extra-order-kind-conditional"
+        },
+        {
+          "id": "orderKindLimit",
+          "source": "extra.extra-order-kind"
+        },
+        {
+          "id": "orderKindMarket",
+          "source": "extra.extra-order-kind"
+        },
+        {
+          "id": "orderValidity",
+          "source": "extra.extra-order-validity"
+        },
+        {
+          "id": "otherInformation",
+          "source": "extra.extra-order-other-info"
+        },
+        {
+          "id": "payoutAmount",
+          "source": "extra.extra-payout-amount"
+        },
+        {
+          "id": "payoutAmountWords",
+          "source": "extra.extra-payout-amount-words"
+        },
+        {
+          "id": "payoutBrokerageAccount",
+          "source": "extra.extra-brokerage-account"
+        },
+        {
+          "id": "payoutCancellation",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "payoutClientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "payoutContractNumberDate",
+          "source": "extra.extra-contract-number-date"
+        },
+        {
+          "id": "payoutCurCny",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurEur",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurOther",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurRub",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurUsd",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutFixedAmount",
+          "source": "extra.extra-payout-amount-mode"
+        },
+        {
+          "id": "payoutFromCurrency",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payoutFromDerivatives",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payoutFromOtc",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payoutFromStock",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payoutOrderNumberDate",
+          "source": "extra.extra-order-number-date"
+        },
+        {
+          "id": "payoutPrimary",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "payoutWholeBalance",
+          "source": "extra.extra-payout-amount-mode"
+        },
+        {
+          "id": "repoNo",
+          "source": "extra.extra-repo-ccp"
+        },
+        {
+          "id": "repoYes",
+          "source": "extra.extra-repo-ccp"
+        },
+        {
+          "id": "securityIssuer",
+          "source": "extra.extra-security-issuer"
+        },
+        {
+          "id": "securityPrice",
+          "source": "extra.extra-security-price"
+        },
+        {
+          "id": "securityQuantity",
+          "source": "extra.extra-security-quantity"
+        },
+        {
+          "id": "securityType",
+          "source": "extra.extra-security-type"
+        },
+        {
+          "id": "settlementPeriod",
+          "source": "extra.extra-settlement-period"
+        },
+        {
+          "id": "tradeAmount",
+          "source": "extra.extra-trade-amount"
+        },
+        {
+          "id": "tradeBrokerageAccount",
+          "source": "extra.extra-brokerage-account"
+        },
+        {
+          "id": "tradeCancellation",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "tradeClientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "tradeContractNumberDate",
+          "source": "extra.extra-contract-number-date"
+        },
+        {
+          "id": "tradeKindBuy",
+          "source": "extra.extra-trade-kind"
+        },
+        {
+          "id": "tradeKindOther",
+          "source": "extra.extra-trade-kind"
+        },
+        {
+          "id": "tradeKindOtherText",
+          "source": "extra.extra-trade-kind-other"
+        },
+        {
+          "id": "tradeKindSell",
+          "source": "extra.extra-trade-kind"
+        },
+        {
+          "id": "tradeOrderNumberDate",
+          "source": "extra.extra-order-number-date"
+        },
+        {
+          "id": "tradePrimary",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "uncoveredPositionAck",
+          "source": "check.order-uncovered-ack"
+        }
+      ]
+    },
+    {
+      "id": "power-of-attorney",
+      "fields": [
+        {
+          "id": "flAttorneyAddress",
+          "source": "extra.extra-attorney-address"
+        },
+        {
+          "id": "flAttorneyCitizenship",
+          "source": "extra.extra-attorney-citizenship"
+        },
+        {
+          "id": "flAttorneyIssueDate",
+          "source": "extra.extra-attorney-issue-date"
+        },
+        {
+          "id": "flAttorneyIssuedBy",
+          "source": "extra.extra-attorney-issued-by"
+        },
+        {
+          "id": "flAttorneyName",
+          "source": "extra.extra-attorney-name"
+        },
+        {
+          "id": "flAttorneyNumber",
+          "source": "extra.extra-attorney-passport-number"
+        },
+        {
+          "id": "flAttorneySeries",
+          "source": "extra.extra-attorney-passport-series"
+        },
+        {
+          "id": "flDateInWords",
+          "source": "extra.extra-poa-date-words"
+        },
+        {
+          "id": "flPrincipalAddress",
+          "source": "field.client-registration-address"
+        },
+        {
+          "id": "flPrincipalCitizenship",
+          "source": "subject.citizenship"
+        },
+        {
+          "id": "flPrincipalIssueDate",
+          "source": "field.client-passport-issue-date"
+        },
+        {
+          "id": "flPrincipalIssuedBy",
+          "source": "field.client-passport-issued-by"
+        },
+        {
+          "id": "flPrincipalName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "flPrincipalPassport",
+          "source": "field.passportSeriesNumber"
+        },
+        {
+          "id": "flSignerName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "ulAttorneyAddress",
+          "source": "extra.extra-attorney-address"
+        },
+        {
+          "id": "ulAttorneyCitizenship",
+          "source": "extra.extra-attorney-citizenship"
+        },
+        {
+          "id": "ulAttorneyIssuedBy",
+          "source": "extra.extra-attorney-issued-by"
+        },
+        {
+          "id": "ulAttorneyName",
+          "source": "extra.extra-attorney-name"
+        },
+        {
+          "id": "ulAttorneyPassport",
+          "source": "extra.extra-attorney-passport"
+        },
+        {
+          "id": "ulAuthorityBasis",
+          "source": "field.client-rep-authority"
+        },
+        {
+          "id": "ulCity",
+          "source": "extra.extra-poa-city"
+        },
+        {
+          "id": "ulCompanyName",
+          "source": "field.client-full-legal-name"
+        },
+        {
+          "id": "ulCompanyShortName",
+          "source": "field.client-short-name"
+        },
+        {
+          "id": "ulDateInWords",
+          "source": "extra.extra-poa-date-words"
+        },
+        {
+          "id": "ulExecutiveName",
+          "source": "field.client-rep-full-name"
+        },
+        {
+          "id": "ulInn",
+          "source": "subject.inn"
+        },
+        {
+          "id": "ulOgrn",
+          "source": "field.client-ogrn"
+        },
+        {
+          "id": "ulSignerName",
+          "source": "field.client-rep-full-name"
+        }
+      ]
+    },
+    {
+      "id": "qualification-consequences-notice",
+      "fields": [
+        {
+          "id": "acknowledgementName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "applicantFullName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "noticeDateDay",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "noticeDateMonth",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "noticeDateYear",
+          "source": "field.documentDateRu"
+        }
+      ]
+    },
+    {
+      "id": "qualification-notice",
+      "fields": [
+        {
+          "id": "clientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "otherInstruments",
+          "source": "extra.extra-qualification-instruments-other"
+        },
+        {
+          "id": "recipientAddress",
+          "source": "field.client-postal-address"
+        },
+        {
+          "id": "recipientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "recognitionDate",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "registerEntryOrgName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "registerEntryPersonName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "scopeAllTypes",
+          "source": "extra.extra-qualification-scope"
+        },
+        {
+          "id": "scopeOther",
+          "source": "extra.extra-qualification-scope"
+        }
+      ]
+    },
+    {
+      "id": "qualification-request-fl",
+      "fields": [
+        {
+          "id": "assetsCashAndDeposits",
+          "source": "check.qualification-assets-cash-deposits"
+        },
+        {
+          "id": "assetsEvidence",
+          "source": "extra.extra-supporting-docs-assets"
+        },
+        {
+          "id": "assetsPreciousMetals",
+          "source": "check.qualification-assets-precious-metals"
+        },
+        {
+          "id": "assetsSecurities",
+          "source": "check.qualification-assets-securities"
+        },
+        {
+          "id": "assetsValueMillions",
+          "source": "extra.extra-assets-value-millions"
+        },
+        {
+          "id": "bankApprovedPositionEvidence",
+          "source": "extra.extra-supporting-docs-bank-approved-position"
+        },
+        {
+          "id": "clientFullName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "contractDate",
+          "source": "extra.extra-contract-date"
+        },
+        {
+          "id": "contractNumber",
+          "source": "extra.extra-contract-number"
+        },
+        {
+          "id": "deliveryAddress",
+          "source": "extra.extra-delivery-address"
+        },
+        {
+          "id": "deliveryAtOffice",
+          "source": "extra.extra-delivery-method"
+        },
+        {
+          "id": "deliveryByAddress",
+          "source": "extra.extra-delivery-method"
+        },
+        {
+          "id": "educationCertificate",
+          "source": "extra.extra-education-basis"
+        },
+        {
+          "id": "educationEvidence",
+          "source": "extra.extra-supporting-docs-education"
+        },
+        {
+          "id": "educationHigher",
+          "source": "extra.extra-education-basis"
+        },
+        {
+          "id": "qualifiedRegistryEvidence",
+          "source": "extra.extra-supporting-docs-qualified-registry"
+        },
+        {
+          "id": "quarterlyTransactionsEvidence",
+          "source": "extra.extra-supporting-docs-quarterly-transactions"
+        },
+        {
+          "id": "quarterlyTransactionsValueMillions",
+          "source": "extra.extra-quarterly-transactions-value-millions"
+        },
+        {
+          "id": "scopeAll",
+          "source": "extra.extra-qualification-scope"
+        },
+        {
+          "id": "scopeOther",
+          "source": "extra.extra-qualification-scope"
+        },
+        {
+          "id": "scopeOtherText",
+          "source": "extra.extra-qualification-instruments-other"
+        },
+        {
+          "id": "securitiesEvidence",
+          "source": "extra.extra-supporting-docs-securities-holdings"
+        },
+        {
+          "id": "securitiesValueMillions",
+          "source": "extra.extra-securities-value-millions"
+        },
+        {
+          "id": "signatureName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "workExperienceEvidence",
+          "source": "extra.extra-supporting-docs-work-experience"
+        },
+        {
+          "id": "workExperienceOtherThreeYears",
+          "source": "extra.extra-work-experience-basis"
+        },
+        {
+          "id": "workExperienceQualifiedTwoYears",
+          "source": "extra.extra-work-experience-basis"
+        }
+      ]
+    },
+    {
+      "id": "qualification-request-yul",
+      "fields": [
+        {
+          "id": "companyFullLegalName",
+          "source": "subject.fullLegalName"
+        },
+        {
+          "id": "contractDate",
+          "source": "extra.extra-contract-date"
+        },
+        {
+          "id": "contractNumber",
+          "source": "extra.extra-contract-number"
+        },
+        {
+          "id": "deliveryAddress",
+          "source": "extra.extra-delivery-address"
+        },
+        {
+          "id": "deliveryAtOffice",
+          "source": "extra.extra-delivery-method"
+        },
+        {
+          "id": "deliveryByAddress",
+          "source": "extra.extra-delivery-method"
+        },
+        {
+          "id": "documentDateDay",
+          "source": "extra.extra-document-date"
+        },
+        {
+          "id": "documentDateMonth",
+          "source": "extra.extra-document-date"
+        },
+        {
+          "id": "documentDateYear",
+          "source": "extra.extra-document-date"
+        },
+        {
+          "id": "representativeName",
+          "source": "field.representativeFullName"
+        },
+        {
+          "id": "supportingDocument1",
+          "source": "extra.extra-supporting-docs-1"
+        },
+        {
+          "id": "supportingDocument2",
+          "source": "extra.extra-supporting-docs-2"
+        },
+        {
+          "id": "supportingDocument3",
+          "source": "extra.extra-supporting-docs-3"
+        },
+        {
+          "id": "supportingDocument4",
+          "source": "extra.extra-supporting-docs-4"
+        },
+        {
+          "id": "supportingDocument5",
+          "source": "extra.extra-supporting-docs-5"
+        }
+      ]
+    },
+    {
+      "id": "regulation-full-refusal-notice",
+      "fields": [
+        {
+          "id": "accountPortfolio",
+          "source": "field.extra-account-portfolio"
+        },
+        {
+          "id": "clientDateDay",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientDateMonth",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientDateYear",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "clientPrintedName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "clientRepresentativeRole",
+          "source": "field.representativeRole"
+        },
+        {
+          "id": "contractDate",
+          "source": "field.extra-contract-date"
+        },
+        {
+          "id": "contractNumber",
+          "source": "field.extra-contract-number"
+        },
+        {
+          "id": "refuseBrokerageServices",
+          "source": "check.full-refusal-brokerage"
+        },
+        {
+          "id": "refuseDepositaryServices",
+          "source": "check.full-refusal-depository"
+        }
+      ]
+    },
+    {
+      "id": "regulation-partial-refusal-notice",
+      "fields": [
+        {
+          "id": "accountPortfolio",
+          "source": "field.extra-account-portfolio"
+        },
+        {
+          "id": "clientDateDay",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientDateMonth",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientDateYear",
+          "source": "field.documentDateRu"
+        },
+        {
+          "id": "clientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "clientPrintedName",
+          "source": "field.clientFullName"
+        },
+        {
+          "id": "clientRepresentativeRole",
+          "source": "field.representativeRole"
+        },
+        {
+          "id": "contractDate",
+          "source": "field.extra-contract-date"
+        },
+        {
+          "id": "contractNumber",
+          "source": "field.extra-contract-number"
+        },
+        {
+          "id": "currencyPortfolio",
+          "source": "field.extra-currency-portfolio"
+        },
+        {
+          "id": "derivativesPortfolio",
+          "source": "field.extra-derivatives-portfolio"
+        },
+        {
+          "id": "refuseCurrencyMarket",
+          "source": "check.partial-refusal-currency"
+        },
+        {
+          "id": "refuseDerivativesMarket",
+          "source": "check.partial-refusal-derivatives"
+        },
+        {
+          "id": "refuseStockMarket",
+          "source": "check.partial-refusal-stock"
+        },
+        {
+          "id": "stockPortfolio",
+          "source": "field.extra-stock-portfolio"
+        },
+        {
+          "id": "terminateEsignatureAgreement",
+          "source": "check.partial-refusal-esignature"
+        },
+        {
+          "id": "terminateQuikAgreement",
+          "source": "check.partial-refusal-quik"
+        }
+      ]
+    }
+  ],
+  "registryDocumentIds": [
+    "accession-application-fl",
+    "accession-application-yul",
+    "account-closure",
+    "account-opening-notice",
+    "anketa-fl",
+    "anketa-fl-simplified-id",
+    "anketa-ip-sz",
+    "anketa-yul",
+    "broker-use-refusal-request",
+    "brokerage-key-information",
+    "brokerage-starter-package",
+    "client-notifications",
+    "code-word-request",
+    "order-forms",
+    "power-of-attorney",
+    "qualification-consequences-notice",
+    "qualification-notice",
+    "qualification-request-fl",
+    "qualification-request-yul",
+    "regulation-full-refusal-notice",
+    "regulation-partial-refusal-notice",
+    "risks-declaration"
+  ],
+  "overlayBindings": [
+    {
+      "documentId": "accession-application-fl",
+      "overlayTemplateId": "accession-application-fl"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "overlayTemplateId": "accession-application-yul"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "overlayTemplateId": "account-opening-notice"
+    },
+    {
+      "documentId": "anketa-fl",
+      "overlayTemplateId": "anketa-fl"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "overlayTemplateId": "anketa-fl-simplified-id"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "overlayTemplateId": "anketa-ip-sz"
+    },
+    {
+      "documentId": "anketa-yul",
+      "overlayTemplateId": "anketa-yul"
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "overlayTemplateId": "broker-use-refusal-request"
+    },
+    {
+      "documentId": "client-notifications",
+      "overlayTemplateId": "client-notifications"
+    },
+    {
+      "documentId": "code-word-request",
+      "overlayTemplateId": "code-word-request"
+    },
+    {
+      "documentId": "order-forms",
+      "overlayTemplateId": "order-forms"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "overlayTemplateId": "power-of-attorney"
+    },
+    {
+      "documentId": "qualification-consequences-notice",
+      "overlayTemplateId": "qualification-consequences-notice"
+    },
+    {
+      "documentId": "qualification-notice",
+      "overlayTemplateId": "qualification-notice"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "overlayTemplateId": "qualification-request-fl"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "overlayTemplateId": "qualification-request-yul"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "overlayTemplateId": "regulation-full-refusal-notice"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "overlayTemplateId": "regulation-partial-refusal-notice"
+    }
+  ],
+  "wizardKeys": [
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "depo-account-type"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "income-payout"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "report-delivery"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "tariff-currency"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "tariff-derivatives"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "tariff-stock"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "trading-depo-account-type"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "depo-account-type"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "income-payout"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "report-delivery"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "tariff-currency"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "tariff-derivatives"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "tariff-stock"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "trading-depo-account-type"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-authorized-signer"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-brokerage-contract"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-brokerage-contract-date"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-currency-market-account"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-depo-account"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-depository-contract"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-depository-contract-date"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-futures-market-account"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "group": "fields",
+      "key": "extra-stock-market-account"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-additional-details"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-address"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-bic-swift"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-correspondent-account"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-inn"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-name"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "bank-settlement-account"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "beneficial-owner-basis"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "beneficial-owner-name"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "beneficiary-basis-details"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "beneficiary-name"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "business-purpose-other"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-business-purpose"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-business-reputation"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-financial-goal"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-foreign-taxpayer"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-other-info"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-pep-relation"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-questionnaire-mode"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-questionnaire-role"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "extra-tax-residency"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "financial-goal-other"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "financial-solvency"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "foreign-trust-owner-status"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "foreign-trust-protector-status"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "landline-phone"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "migration-document-series-number"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "migration-stay-end-date"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "migration-stay-start-date"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "pep-position-employer"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "representative-authority-details"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "representative-name"
+    },
+    {
+      "documentId": "anketa-fl",
+      "group": "fields",
+      "key": "tax-residency-countries"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-account"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-additional"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-address"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-bic"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-corr-account"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-inn"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-bank-name"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-kinship-degree"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-landline-phone"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-medical-policy"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-other-information"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-pdl-details"
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "group": "fields",
+      "key": "extra-pdl-status"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-account"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-additional"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-address"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-bic"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-corr-account"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-inn"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-bank-name"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-beneficial-owner"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-beneficial-owner-basis"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-beneficiary-basis"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-beneficiary-name"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-business-purpose"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-citizenship-countries"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-citizenship-kind"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-financial-goal"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-financial-position"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-foreign-taxpayer"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-ip-certificate"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-ip-registration-authority"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-ip-registration-date"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-ip-registration-place"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-ipsz-status"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-landline-phone"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-licence-activities"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-licence-authority"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-licence-number-date"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-licence-validity"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-licensing"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-ogrnip"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-okved"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-other-info"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-pdl-relation"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-pdl-status"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-practice-document"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-practice-document-authority"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-practice-document-date"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-practice-document-number"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-protector-status"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-questionnaire-mode"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-questionnaire-role"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-representative-basis"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-residence-permit-from"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-residence-permit-number"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-residence-permit-to"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-tax-residency"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-tax-residency-countries"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-trustee-status"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "group": "fields",
+      "key": "extra-website"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "bank-address"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "bank-bic-swift"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "bank-correspondent-account"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "bank-inn"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "bank-name"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "bank-settlement-account"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "beneficial-owner-basis"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "beneficial-owner-name"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "beneficiary-basis-details"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "beneficiary-name"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "business-purpose-other"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "correspondent-bank-details"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "credit-organisation-bic"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "executive-body-address"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-business-purpose"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-controlling-persons"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-financial-goal"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-foreign-taxpayer"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-licensed-activity"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-management-structure"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-okpo"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-okved"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-other-info"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-questionnaire-mode"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-questionnaire-role"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-strategic-company"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "extra-tax-residency"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "financial-goal-other"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "foreign-branch-accreditation-number"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "foreign-registration-number"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "foreign-tax-identifier"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "foreign-trust-owner-status"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "foreign-trust-protector-status"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "landline-phone"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "licence-authority"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "licence-expiry"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "licence-issue-date"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "licence-number"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "licensed-activities"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "management-composition"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "nonresident-representation-address"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "nonresident-representative-residence"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "pre2002-registration-authority"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "pre2002-registration-date"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "pre2002-registration-document"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "pre2002-registration-number"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "representative-authority-details"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "representative-name"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "reputation-other-details"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "shareholders-names-inn"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "shareholders-percentages"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "source-of-funds-other"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "tax-registration-date"
+    },
+    {
+      "documentId": "anketa-yul",
+      "group": "fields",
+      "key": "tax-residency-countries"
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "group": "companyFields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "group": "fields",
+      "key": "extra-account-portfolio"
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "brokerage-starter-package",
+      "group": "companyFields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "brokerage-starter-package",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "code-word-request",
+      "group": "companyFields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "code-word-request",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "code-word-request",
+      "group": "fields",
+      "key": "extra-new-code-word"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-account"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-bic"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-corr-account"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-corr-name"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-corr-swift"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-inn"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-name"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-other"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-personal-account"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-bank-recipient"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-brokerage-account"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-contract-number-date"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-counterparty"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-amount"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-expiry"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-kind"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-name"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-premium"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-quantity"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-derivative-strike"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-fx-amount"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-fx-instrument"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-fx-lots"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-fx-rate"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-fx-swap-ccp"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-move-amount"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-move-amount-words"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-move-currency"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-move-from"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-move-to"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-kind"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-kind-conditional"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-market"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-number-date"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-other-info"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-type"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-validity"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-payout-amount"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-payout-amount-mode"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-payout-amount-words"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-payout-currency"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-payout-from"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-repo-ccp"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-security-issuer"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-security-price"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-security-quantity"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-security-type"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-settlement-period"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-submission-kind"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-trade-amount"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-trade-kind"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-trade-kind-other"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-address"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-citizenship"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-issue-date"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-issued-by"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-name"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-passport"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-passport-number"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-attorney-passport-series"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-poa-city"
+    },
+    {
+      "documentId": "power-of-attorney",
+      "group": "fields",
+      "key": "extra-poa-date-words"
+    },
+    {
+      "documentId": "qualification-consequences-notice",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "qualification-notice",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "qualification-notice",
+      "group": "fields",
+      "key": "extra-qualification-instruments-other"
+    },
+    {
+      "documentId": "qualification-notice",
+      "group": "fields",
+      "key": "extra-qualification-scope"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-assets-value-millions"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-delivery-address"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-delivery-method"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-education-basis"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-qualification-instruments-other"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-qualification-scope"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-quarterly-transactions-value-millions"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-securities-value-millions"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-assets"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-bank-approved-position"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-education"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-qualified-registry"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-quarterly-transactions"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-securities-holdings"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-supporting-docs-work-experience"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "group": "fields",
+      "key": "extra-work-experience-basis"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "companyFields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-delivery-address"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-delivery-method"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-supporting-docs-1"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-supporting-docs-2"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-supporting-docs-3"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-supporting-docs-4"
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "group": "fields",
+      "key": "extra-supporting-docs-5"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "group": "companyFields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "group": "fields",
+      "key": "extra-account-portfolio"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "companyFields",
+      "key": "extra-representative-id"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-account-portfolio"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-currency-portfolio"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-derivatives-portfolio"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-document-date"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "group": "fields",
+      "key": "extra-stock-portfolio"
+    }
+  ],
+  "checkKeys": [
+    {
+      "documentId": "accession-application-fl",
+      "key": "accession-brokerage"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "accession-depository"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "agreement-esignature"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "agreement-quik"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "depo-operator"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "market-currency"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "market-derivatives"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "key": "market-stock"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "accession-brokerage"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "accession-depository"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "agreement-esignature"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "agreement-quik"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "depo-operator"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "market-currency"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "market-derivatives"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "key": "market-stock"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-address"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-attorney"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-birth-country"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-citizen"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-mailing-address"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-payment-instructions"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-permanent-resident"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "fatca-us-phone"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "pep-foreign"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "pep-international"
+    },
+    {
+      "documentId": "anketa-fl",
+      "key": "pep-russian"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-address"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-attorney"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-birth-country"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-citizen"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-greencard"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-mailing-address"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-payment-instructions"
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "key": "fatca-us-phone"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "fatca-us-beneficial-owners"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "fatca-us-payment-instructions"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "fatca-us-phone"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "fatca-us-registration-address"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "fatca-us-signatory"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "fatca-us-tax-residence"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "financial-docs-annual-accounts"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "financial-docs-audit-report"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "funds-borrowed"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "funds-other"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "reputation-client-reviews"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "reputation-financial-reviews"
+    },
+    {
+      "documentId": "anketa-yul",
+      "key": "reputation-other"
+    },
+    {
+      "documentId": "order-forms",
+      "key": "order-uncovered-ack"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "key": "qualification-assets-cash-deposits"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "key": "qualification-assets-precious-metals"
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "key": "qualification-assets-securities"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "key": "full-refusal-brokerage"
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "key": "full-refusal-depository"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "key": "partial-refusal-currency"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "key": "partial-refusal-derivatives"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "key": "partial-refusal-esignature"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "key": "partial-refusal-quik"
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "key": "partial-refusal-stock"
+    }
+  ],
+  "formatterNames": [
+    "dateDay",
+    "dateMonthGenitive",
+    "dateMonthYearGenitive",
+    "dateMonthYearShort",
+    "dateRu",
+    "dateYear2",
+    "dateYearLastDigit",
+    "initials",
+    "monthOnly",
+    "prefixFrom",
+    "prefixNumber",
+    "surname",
+    "trim"
+  ]
+}

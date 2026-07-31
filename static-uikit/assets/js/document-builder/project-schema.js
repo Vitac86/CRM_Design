@@ -19,7 +19,10 @@
     'offsetX', 'offsetY', 'boxSize', 'thickness', 'inset', 'text',
     // Continuation regions and the properties that travel with them.
     'flowRegions', 'overflowStrategy', 'allowPrintOverride', 'tokenBreak',
-    'firstLineIndent', 'expansion'
+    'firstLineIndent', 'expansion',
+    // A Word-flow block consumes the same business field by reference. These
+    // are production properties, never replacement variable names.
+    'layoutMode', 'flowBlockId', 'allowMultipleFlowReferences'
   ];
 
   // Everything a page-expansion definition may carry. Nothing here may be lost
@@ -119,13 +122,15 @@
     sourcePdf: true,
     pageGeometry: true,
     pageLayout: true,
+    wordFlowBlocks: true,
     fonts: true,
     fields: true,
     wizard: true,
     fixtures: true,
     qa: true,
     productionProperties: true,
-    replacementReview: true
+    replacementReview: true,
+    identifierProtection: true
   };
 
   function clone(value, seen) {
@@ -208,6 +213,7 @@
       sourcePdf: { name: data.sourcePdfName || '', committed: false },
       pageGeometry: [],
       pageLayout: {},
+      wordFlowBlocks: [],
       fonts: clone(DEFAULT_FONTS),
       fields: [],
       wizard: { fields: [], checkFields: [], companyFields: [] },
@@ -250,8 +256,13 @@
     // The page budget is a first-class part of the project, not an opaque
     // production property: the builder edits it and validates against it.
     project.pageLayout = clone(template.pageLayout || {});
+    project.wordFlowBlocks = clone(template.wordFlowBlocks || []);
     project.fields = (template.fields || []).map(addBuilderGeometry);
     project.wizard = wizardFromRegistry(entry);
+    if (ns.identifierProtection) {
+      project.identifierProtection = ns.identifierProtection.runtimeBaseline(project) ||
+        ns.identifierProtection.capture(template, project.wizard, entry);
+    }
     project.sourcePdf.committed = true;
     project.sourcePdf.name = String(template.templateUrl || '').split('/').pop() || '';
     project.qa.status = 'Published';
@@ -260,7 +271,7 @@
     project.productionProperties = {};
     Object.keys(template).forEach(function (key) {
       if (['id', 'title', 'templateUrl', 'outputFilename', 'expectedPages',
-           'appliesTo', 'fonts', 'fields', 'pageLayout'].indexOf(key) === -1) {
+           'appliesTo', 'fonts', 'fields', 'pageLayout', 'wordFlowBlocks'].indexOf(key) === -1) {
         project.productionProperties[key] = clone(template[key]);
       }
     });
@@ -281,6 +292,7 @@
   }
 
   function toProduction(project, templateUrlOverride) {
+    if (ns.identifierProtection) ns.identifierProtection.assertPreserved(project);
     var template = clone(project.productionProperties || {});
     template.id = project.templateId;
     template.title = project.title;
@@ -293,6 +305,11 @@
       template.pageLayout = clone(project.pageLayout);
     } else {
       delete template.pageLayout;
+    }
+    if (project.wordFlowBlocks && project.wordFlowBlocks.length) {
+      template.wordFlowBlocks = clone(project.wordFlowBlocks);
+    } else {
+      delete template.wordFlowBlocks;
     }
     template.fields = (project.fields || [])
       .filter(function (field) { return !field.explanatory; })
@@ -317,8 +334,16 @@
       errors.push({ path: 'templateId', message: 'Не указан ID шаблона.' });
     }
     if (!Array.isArray(project.fields)) errors.push({ path: 'fields', message: 'fields должен быть массивом.' });
+    if (project.wordFlowBlocks != null && !Array.isArray(project.wordFlowBlocks)) {
+      errors.push({ path: 'wordFlowBlocks', message: 'wordFlowBlocks должен быть массивом.' });
+    }
     if (!project.wizard || typeof project.wizard !== 'object') {
       errors.push({ path: 'wizard', message: 'Не задан раздел wizard.' });
+    }
+    if (project.identifierProtection && ns.identifierProtection) {
+      ns.identifierProtection.validate(project).forEach(function (problem) {
+        errors.push({ path: problem.path, message: problem.message });
+      });
     }
     findNonSerializable(project).forEach(function (finding) {
       errors.push({ path: finding.path, message: 'Неподдерживаемое значение: ' + finding.kind + '.' });
@@ -333,7 +358,15 @@
     var checked = validateImported(project);
     if (checked.errors.length) return { project: null, errors: checked.errors, warnings: checked.warnings };
     // Future schema migrations are intentionally routed through this function.
-    return { project: clone(project), errors: [], warnings: checked.warnings };
+    var migrated = clone(project);
+    migrated.productionProperties = migrated.productionProperties || {};
+    if (!Array.isArray(migrated.wordFlowBlocks) &&
+        Array.isArray(migrated.productionProperties.wordFlowBlocks)) {
+      migrated.wordFlowBlocks = clone(migrated.productionProperties.wordFlowBlocks);
+    }
+    if (!Array.isArray(migrated.wordFlowBlocks)) migrated.wordFlowBlocks = [];
+    delete migrated.productionProperties.wordFlowBlocks;
+    return { project: migrated, errors: [], warnings: checked.warnings };
   }
 
   // Ordered regions a value flows through, mirroring the production engine's
@@ -436,6 +469,104 @@
     };
   }
 
+  var WORD_FLOW_RUN_TYPES = {
+    'static': true,
+    fieldRef: true,
+    space: true,
+    lineBreak: true,
+    paragraphBreak: true,
+    spacer: true
+  };
+
+  function wordFlowOwners(project, fieldId) {
+    var owners = [];
+    (project && project.wordFlowBlocks || []).forEach(function (block) {
+      var used = (block.runs || []).some(function (run) {
+        return run.type === 'fieldRef' && run.fieldId === fieldId;
+      });
+      if (used && owners.indexOf(block.id) === -1) owners.push(block.id);
+    });
+    return owners;
+  }
+
+  function isWordFlowReferenced(project, fieldId) {
+    return wordFlowOwners(project, fieldId).length > 0;
+  }
+
+  // Keep the layout marker and block ownership derived from the styled runs.
+  // IDs and sources stay on the original field objects; a fieldRef never
+  // creates a second business variable.
+  function syncWordFlowReferences(project) {
+    (project.fields || []).forEach(function (field) {
+      var owners = wordFlowOwners(project, field.id);
+      if (owners.length) {
+        field.layoutMode = 'flow-reference';
+        field.flowBlockId = owners.length === 1 ? owners[0] : owners;
+      } else if (field.layoutMode === 'flow-reference') {
+        delete field.layoutMode;
+        delete field.flowBlockId;
+      }
+    });
+    return project;
+  }
+
+  // Referenced field IDs are structural links. Generic state mutations may
+  // alter layout around them, but cannot make a pre-existing reference point
+  // at a renamed or deleted field.
+  function referencedFieldMutationProblems(before, after) {
+    var required = {};
+    (before && before.wordFlowBlocks || []).forEach(function (block) {
+      (block.runs || []).forEach(function (run) {
+        if (run.type === 'fieldRef' && run.fieldId) required[run.fieldId] = true;
+      });
+    });
+    var current = {};
+    (after && after.fields || []).forEach(function (field) { current[field.id] = true; });
+    return Object.keys(required).filter(function (fieldId) { return !current[fieldId]; }).map(function (fieldId) {
+      return {
+        code: 'word-flow-field-id',
+        fieldId: fieldId,
+        path: 'fields.' + fieldId + '.id',
+        message: 'Поле используется Word-flow блоком; сначала удалите ссылку на поле.'
+      };
+    });
+  }
+
+  function suggestWordFlowBlock(project, pageIndex, id) {
+    var page = Number(pageIndex || 0);
+    var geometry = (project && project.pageGeometry || [])[page] || {};
+    var width = Number(geometry.width || 595.32);
+    var fontSize = 10.56;
+    return {
+      id: id || 'word-flow-block',
+      type: 'wordFlowBlock',
+      page: page,
+      frame: {
+        left: 56.7,
+        baselineTop: 100,
+        width: Number(Math.max(40, width - 113.4).toFixed(2)),
+        initialLineCount: 1
+      },
+      font: 'legalSerif',
+      fontSize: fontSize,
+      minFontSize: fontSize,
+      fontSizeLocked: true,
+      lineHeight: 12,
+      paragraphSpacingAfter: 0,
+      alignment: 'left',
+      sourceReplacement: {
+        firstBlock: 1,
+        lastBlock: 1,
+        expectedBlockCount: 1,
+        expectedSha256: '',
+        expectedTemplateSha256: '',
+        reviewStatus: 'suggested'
+      },
+      sourceStaticText: '',
+      runs: [{ type: 'static', text: '' }]
+    };
+  }
+
   Schema.SCHEMA_VERSION = SCHEMA_VERSION;
   Schema.DEFAULT_FONTS = DEFAULT_FONTS;
   Schema.FIELD_PRODUCTION_KEYS = FIELD_PRODUCTION_KEYS;
@@ -443,6 +574,12 @@
   Schema.EXPANSION_KEYS = EXPANSION_KEYS;
   Schema.suggestExpansion = suggestExpansion;
   Schema.suggestPageLayout = suggestPageLayout;
+  Schema.WORD_FLOW_RUN_TYPES = WORD_FLOW_RUN_TYPES;
+  Schema.wordFlowOwners = wordFlowOwners;
+  Schema.isWordFlowReferenced = isWordFlowReferenced;
+  Schema.syncWordFlowReferences = syncWordFlowReferences;
+  Schema.referencedFieldMutationProblems = referencedFieldMutationProblems;
+  Schema.suggestWordFlowBlock = suggestWordFlowBlock;
   Schema.PAGE_LAYOUT_KEYS = PAGE_LAYOUT_KEYS;
   Schema.COMPACTION_KEYS = COMPACTION_KEYS;
   Schema.CROSS_PAGE_FLOW_KEYS = CROSS_PAGE_FLOW_KEYS;

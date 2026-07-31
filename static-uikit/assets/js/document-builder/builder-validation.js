@@ -182,6 +182,61 @@
     }
   }
 
+  function validateWordFlowBlocks(project, pageSizes, knownFormats, errors) {
+    var renderer = global.CRMDocumentEngine.overlayRenderer;
+    var blocks = project.wordFlowBlocks || [];
+    if (!Array.isArray(blocks)) {
+      errors.push(item('error', 'word-flow-schema',
+        'wordFlowBlocks должен быть массивом.', null, 'wordFlowBlocks'));
+      return;
+    }
+    blocks.forEach(function (block, blockIndex) {
+      if (!Array.isArray(block.runs)) {
+        errors.push(item('error', 'word-flow-runs',
+          'Word-flow block требует массив styled runs.', null,
+          'wordFlowBlocks.' + blockIndex + '.runs'));
+        return;
+      }
+      block.runs.forEach(function (run, runIndex) {
+        if (!ns.schema.WORD_FLOW_RUN_TYPES[run.type]) {
+          errors.push(item('error', 'word-flow-run-type',
+            'Неподдерживаемый Word-flow run type: ' + run.type + '.', null,
+            'wordFlowBlocks.' + blockIndex + '.runs.' + runIndex));
+        }
+        if (run.type === 'fieldRef' && run.format && !knownFormats[run.format]) {
+          errors.push(item('error', 'word-flow-formatter',
+            'Неизвестный форматтер Word-flow run: ' + run.format + '.', null,
+            'wordFlowBlocks.' + blockIndex + '.runs.' + runIndex + '.format'));
+        }
+      });
+    });
+
+    if (!renderer || typeof renderer.validateWordFlowBlocks !== 'function') return;
+    var pageCount = Math.max(Number(project.expectedPages || 0), pageSizes.length, 1);
+    var pages = [];
+    for (var pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
+      (function (size) {
+        pages.push({
+          getSize: function () {
+            return {
+              width: Number(size && size.width || 595.32),
+              height: Number(size && size.height || 841.92)
+            };
+          }
+        });
+      }(pageSizes[pageIndex]));
+    }
+    var productionProblems = [];
+    try {
+      renderer.validateWordFlowBlocks(project, pages, productionProblems);
+    } catch (error) {
+      productionProblems.push('Word-flow validation failed: ' + error.message);
+    }
+    productionProblems.forEach(function (message) {
+      errors.push(item('error', 'word-flow', message, null, 'wordFlowBlocks'));
+    });
+  }
+
   // ── Continuation regions ───────────────────────────────────────────────────
 
   function validateFlowRegions(field, page, pageSizes, errors, warnings, project) {
@@ -442,38 +497,40 @@
 
       var budget = ns.schema.pageBudgetOf(
         Object.assign({}, entry, { pageHeight: size.height }));
-      (entry.anchors || []).forEach(function (fieldId) {
-        var field = (project.fields || []).filter(function (f) {
-          return f.id === fieldId;
+      (entry.anchors || []).forEach(function (anchorId) {
+        var anchor = (project.fields || []).filter(function (field) {
+          return field.id === anchorId;
+        })[0] || (project.wordFlowBlocks || []).filter(function (block) {
+          return block.id === anchorId;
         })[0];
-        if (!field) {
+        if (!anchor) {
           errors.push(item('error', 'page-layout-anchor',
-            at + '.anchors: нет поля «' + fieldId + '».', null, at));
+            at + '.anchors: нет поля или Word-flow блока «' + anchorId + '».', null, at));
           return;
         }
-        if (!field.expansion) {
+        if (!anchor.expansion) {
           errors.push(item('error', 'page-layout-anchor',
-            at + '.anchors: у поля «' + fieldId + '» нет расширения.', null, at));
+            at + '.anchors: у якоря «' + anchorId + '» нет расширения.', null, at));
           return;
         }
-        var page = field.expansion.page != null
-          ? Number(field.expansion.page) : Number(field.page);
+        var page = anchor.expansion.page != null
+          ? Number(anchor.expansion.page) : Number(anchor.page);
         if (page !== index) {
           errors.push(item('error', 'page-layout-anchor',
-            at + '.anchors: поле «' + fieldId + '» расширяет страницу ' + page + '.',
+            at + '.anchors: якорь «' + anchorId + '» расширяет страницу ' + page + '.',
             null, at));
         }
-        if (Number(field.expansion.rowHeight) > budget.total + 1e-6) {
+        if (Number(anchor.expansion.rowHeight) > budget.total + 1e-6) {
           errors.push(item('error', 'page-layout-reserve',
-            at + ': одной строке поля «' + fieldId + '» нужно ' +
-            field.expansion.rowHeight + ' pt, запас страницы — ' +
+            at + ': одной строке якоря «' + anchorId + '» нужно ' +
+            anchor.expansion.rowHeight + ' pt, запас страницы — ' +
             budget.total + ' pt.', null, at));
         }
         (entry.compaction || []).forEach(function (zone) {
-          if (Number(zone.top) > Number(field.expansion.insertionTop) + 1e-6) {
+          if (Number(zone.top) > Number(anchor.expansion.insertionTop) + 1e-6) {
             warnings.push(item('warning', 'compaction-below-anchor',
               at + ': зона уплотнения ' + zone.top + ' pt ниже точки вставки ' +
-              'поля «' + fieldId + '» — она не будет использована.', null, at));
+              'якоря «' + anchorId + '» — она не будет использована.', null, at));
           }
         });
       });
@@ -572,16 +629,20 @@
       }
     }
 
+    var lineStyle = spec.lineStyle || 'underline';
     var line = spec.line || {};
-    if (!Number.isFinite(Number(line.width)) || Number(line.width) <= 0) {
-      errors.push(item('error', 'expansion-line',
-        'У вставляемой строки не задана ширина.', field));
-    } else if (Number(line.left) < 0 ||
-               Number(line.left) + Number(line.width) > size.width + 0.5) {
-      errors.push(item('error', 'expansion-line',
-        'Вставляемая строка выходит за границы страницы.', field));
+    if (lineStyle !== 'none') {
+      if (!Number.isFinite(Number(line.width)) || Number(line.width) <= 0) {
+        errors.push(item('error', 'expansion-line',
+          'У вставляемой строки не задана ширина.', field));
+      } else if (Number(line.left) < 0 ||
+                 Number(line.left) + Number(line.width) > size.width + 0.5) {
+        errors.push(item('error', 'expansion-line',
+          'Вставляемая строка выходит за границы страницы.', field));
+      }
     }
-    if (!Number.isFinite(Number(line.ruleThickness))) {
+    if (lineStyle === 'underline' &&
+        !Number.isFinite(Number(line.ruleThickness))) {
       errors.push(item('error', 'expansion-line',
         'Не задана толщина линии вставляемой строки.', field));
     }
@@ -623,6 +684,16 @@
     var wizard = project.wizard || { fields: [], checkFields: [], companyFields: [] };
     var extraProviders = {};
     var checkProviders = {};
+    if (ns.identifierProtection) {
+      ns.identifierProtection.validate(project).forEach(function (problem) {
+        var protectedField = problem.fieldId && (project.fields || []).find(function (field) {
+          return field.id === problem.fieldId;
+        });
+        errors.push(item('error', problem.code, problem.message,
+          protectedField || null, problem.path));
+      });
+    }
+    validateWordFlowBlocks(project, pageSizes, knownFormats, errors);
     (wizard.fields || []).concat(wizard.companyFields || []).forEach(function (field) { extraProviders[field.key] = field; });
     (wizard.checkFields || []).forEach(function (field) { checkProviders[field.key] = field; });
     var usedWizard = {};
@@ -687,6 +758,13 @@
 
     validatePageLayout(project, pageSizes, errors, warnings);
 
+    // A Word-flow block is a page-layout anchor in exactly the same sense as a
+    // legacy field. Give its expansion the Builder's granular diagnostics as
+    // well as the production renderer's canonical Word-flow validation.
+    (project.wordFlowBlocks || []).forEach(function (block) {
+      validateExpansion(block, pageSizes, errors, warnings, project);
+    });
+
     (project.fields || []).forEach(function (field, index) {
       var id = field.id || ('#' + index);
       if (!field.id) errors.push(item('error', 'field-id', 'У поля нет ID.', field, 'fields.' + index + '.id'));
@@ -729,9 +807,12 @@
       });
       if (field.font && !(project.fonts || {})[field.font]) errors.push(item('error', 'font', 'Неизвестный шрифт: ' + field.font + '.', field));
       if (field.minFontSize != null && Number(field.minFontSize) > Number(field.fontSize)) errors.push(item('error', 'font-size', 'Минимальный кегль больше начального.', field));
-      if (type !== 'check') validateReadability(field, errors);
-      if (type !== 'check') validateFlowRegions(field, page, pageSizes, errors, warnings, project);
-      if (type !== 'check') validateExpansion(field, pageSizes, errors, warnings, project);
+      if (type !== 'check' && field.layoutMode !== 'flow-reference') validateReadability(field, errors);
+      if (type !== 'check' && field.layoutMode !== 'flow-reference') validateFlowRegions(field, page, pageSizes, errors, warnings, project);
+      if (type !== 'check' && field.layoutMode !== 'flow-reference') validateExpansion(field, pageSizes, errors, warnings, project);
+      if (field.layoutMode && field.layoutMode !== 'flow-reference') {
+        errors.push(item('error', 'layout-mode', 'Неизвестный layoutMode: ' + field.layoutMode + '.', field));
+      }
       if (field.showWhen) {
         if (!ns.sourceCatalog.isValid(field.showWhen.source)) errors.push(item('error', 'show-when', 'Некорректный источник условия.', field));
         if (field.showWhen.invert != null || field.showWhen.expression != null) errors.push(item('error', 'show-when', 'Условие содержит неподдерживаемое выражение.', field));
@@ -776,10 +857,42 @@
 
   function analyzeProfile(project, profileId, overrides, fonts) {
     var payload = ns.fixtures.payloadFor(profileId, project, overrides);
+    var renderer = global.CRMDocumentEngine.overlayRenderer;
+    var productionPlan = renderer.plan(project, payload, fonts);
     return {
       profileId: profileId,
       payload: payload,
       fields: (project.fields || []).map(function (field) {
+        if (field.layoutMode === 'flow-reference') {
+          var owners = Array.isArray(field.flowBlockId) ? field.flowBlockId : [field.flowBlockId];
+          var blockResult = productionPlan.byBlock[owners[0]];
+          if (!blockResult) {
+            return { fieldId: field.id, page: field.page, result: {
+              status: 'error', label: 'Word-flow block отсутствует', profileId: profileId
+            } };
+          }
+          if (blockResult.reason === 'hidden') {
+            return { fieldId: field.id, page: field.page, result: {
+              status: 'hidden', label: 'Word-flow скрыт условием', profileId: profileId
+            } };
+          }
+          if (!blockResult.drawn) {
+            return { fieldId: field.id, page: field.page, result: {
+              status: blockResult.reason === 'missing' ? 'missing' : 'overflow',
+              label: blockResult.message || ('Word-flow: ' + blockResult.reason),
+              profileId: profileId
+            } };
+          }
+          return { fieldId: field.id, page: field.page, result: {
+            status: 'word-flow',
+            label: blockResult.layout.lines.length + ' lines · locked ' +
+              blockResult.layout.size + ' pt',
+            fontSize: blockResult.layout.size,
+            lines: blockResult.layout.lines.length,
+            flowBlockId: owners[0],
+            profileId: profileId
+          } };
+        }
         return { fieldId: field.id, page: field.page, result: analyzeField(project, field, payload, profileId, fonts) };
       })
     };
@@ -788,11 +901,12 @@
   function runAll(project, overrides) {
     return loadProjectFonts(project).then(function (fonts) {
       var profiles = ns.fixtures.profiles.map(function (profile) { return analyzeProfile(project, profile.id, overrides, fonts); });
-      var counts = { normal: 0, shrink: 0, multiline: 0, flow: 0, fallback: 0, failures: 0, missing: 0, unsupportedGlyphs: 0 };
+      var counts = { normal: 0, shrink: 0, multiline: 0, flow: 0, wordFlow: 0, fallback: 0, failures: 0, missing: 0, unsupportedGlyphs: 0 };
       profiles.forEach(function (profile) {
         profile.fields.forEach(function (entry) {
           var status = entry.result.status;
           if (counts[status] != null) counts[status] += 1;
+          if (status === 'word-flow') counts.wordFlow += 1;
           if (status === 'overflow' || status === 'error') counts.failures += 1;
           if (status === 'missing') counts.missing += 1;
           if (status === 'unsupported-glyph') counts.unsupportedGlyphs += 1;

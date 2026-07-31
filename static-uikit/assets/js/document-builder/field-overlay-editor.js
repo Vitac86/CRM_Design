@@ -85,6 +85,13 @@
 
   OverlayEditor.prototype._down = function (event) {
     if (event.button !== 0 || this.state.tool === 'pan') return;
+    var blockNode = event.target.closest('[data-word-flow-block-id]');
+    var blockId = blockNode && blockNode.getAttribute('data-word-flow-block-id');
+    if (blockId) {
+      this.state.selectWordFlowBlock(blockId);
+      event.preventDefault();
+      return;
+    }
     var fieldNode = event.target.closest('[data-field-id]');
     var fieldId = fieldNode && fieldNode.getAttribute('data-field-id');
     var role = event.target.getAttribute('data-handle');
@@ -274,6 +281,11 @@
     var background = svg('rect', { x: 0, y: 0, width: '100%', height: '100%', fill: 'transparent', class: 'dtb-overlay-hit' });
     this.svg.appendChild(background);
     if (this.state.outlinesVisible) {
+      (this.state.project.wordFlowBlocks || []).filter(function (block) {
+        return Number(block.page) === self.state.pageIndex;
+      }).forEach(function (block) {
+        self._renderWordFlowBlock(block);
+      });
       (this.state.project.fields || []).filter(function (field) { return field.page === self.state.pageIndex; }).forEach(function (field) {
         self._renderField(field);
       });
@@ -295,6 +307,43 @@
     }
   };
 
+  OverlayEditor.prototype._renderWordFlowBlock = function (block) {
+    var frame = block.frame || {};
+    var size = Number(block.fontSize || 10);
+    var leading = Number(block.lineHeight || size * 1.15);
+    var lines = Math.max(1, Number(block.initialLineCount || frame.initialLineCount || 1));
+    var top = Number(frame.baselineTop || 0) - size;
+    var height = Math.max(leading, lines * leading);
+    var rect = this.viewer.rectToCss(Number(frame.left || 0), top,
+      Number(frame.width || 0), height);
+    var replacement = block.sourceReplacement || block.originalContentRange || {};
+    var pending = replacement.reviewStatus !== 'approved' ||
+      block.expansion && block.expansion.reviewStatus !== 'approved';
+    var group = svg('g', {
+      'data-word-flow-block-id': block.id,
+      tabindex: '0',
+      role: 'button',
+      'aria-label': 'Word-flow ' + block.id
+    });
+    group.appendChild(svg('rect', {
+      x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+      class: 'dtb-word-flow-frame' +
+        (block.id === this.state.selectedWordFlowBlockId ? ' is-selected' : '') +
+        (pending ? ' needs-review' : ''),
+      'data-word-flow-block-id': block.id
+    }));
+    var label = svg('text', {
+      x: rect.x + 3,
+      y: Math.max(10, rect.y - 3),
+      class: 'dtb-word-flow-label',
+      'data-word-flow-block-id': block.id
+    });
+    label.textContent = block.id + ' · ' + lines + ' lines' +
+      (pending ? ' · review' : '');
+    group.appendChild(label);
+    this.svg.appendChild(group);
+  };
+
   OverlayEditor.prototype._renderField = function (sourceField) {
     var field = ns.schema.clone(sourceField);
     if (this.interaction && this.interaction.fieldId === field.id && this.interaction.preview) {
@@ -308,6 +357,7 @@
     var rect = this.viewer.rectToCss(field.left, field.top, width, height);
     var group = svg('g', {
       class: 'dtb-field ' + (type === 'check' ? 'is-check' : 'is-text') +
+        (field.layoutMode === 'flow-reference' ? ' is-flow-reference' : '') +
         (field.id === this.state.selectedFieldId ? ' is-selected' : '') +
         (field.locked ? ' is-locked' : '') +
         (field.reviewStatus === 'required' ? ' needs-review' : ''),
@@ -376,6 +426,7 @@
       var payload = this.getPayload();
       var raw = type === 'static' ? field.text : payload && global.CRMDocumentEngine.overlayRenderer.resolve(field.source, payload);
       var formatted = ns.validation && ns.validation.format ? ns.validation.format(field.format, raw) : raw;
+      if (field.layoutMode === 'flow-reference') formatted = '';
       var size = Math.max(4, Number(field.fontSize || 12) * this.viewer.zoom);
 
       if (assignments && assignments.length) {
