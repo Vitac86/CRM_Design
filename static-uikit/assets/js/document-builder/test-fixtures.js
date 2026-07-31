@@ -161,6 +161,16 @@
       return en ? 'United Kingdom of Great Britain and Northern Ireland'
         : 'Российская Федерация';
     }
+    // The document a representative acts under — «Устава», «Доверенности № …».
+    // This has to be tested before the issuing-authority rule below, because a
+    // key such as `client-rep-authority` matches both and only this one is
+    // right: feeding it «ГУ МВД России по г. Москве» invents an overflow on a
+    // slot that never holds an issuing authority.
+    if (/authority-?basis|rep(resentative)?-?authority|\bbasis\b|osnovanie/i.test(key)) {
+      return en
+        ? (long ? 'the Articles of Association' : 'the Articles of Association')
+        : (long ? 'Устава общества' : 'Устава');
+    }
     if (/authority|issued|issuer/i.test(key)) {
       return en
         ? (long ? 'Department of Immigration and Citizenship Services of the United Kingdom' : 'United Kingdom Passport Office')
@@ -180,6 +190,14 @@
     }
     if (/issuer/i.test(key)) {
       return en ? 'North Star Investments Ltd.' : 'ПАО «Газпром»';
+    }
+    // A place of birth is a settlement and a country, never a street address —
+    // and `birth-place` matches the address rule below, which is how a 65 pt
+    // street address ended up in a place-of-birth cell.
+    if (/birth-?place|place-?of-?birth|mesto-?rozhdeniya/i.test(key)) {
+      return en
+        ? (long ? 'Kingston upon Thames, United Kingdom' : 'London, United Kingdom')
+        : (long ? 'город Санкт-Петербург, Российская Федерация' : 'г. Москва');
     }
     if (/address|place/i.test(key)) return en
       ? '27 King George the Fifth Avenue, London, United Kingdom, SW1A 2AA'
