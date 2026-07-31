@@ -266,15 +266,18 @@ def main() -> int:
                      f"{a_long.page_count} / {a_short.page_count}")
 
         # ── Insufficient reserve is a field-specific error ───────────────────
+        # The budget belongs to the page, so this is where it has to be taken
+        # away: the anchors keep their own maxExtraRows and simply cannot be
+        # paid for.
         blocked = browser.eval(
             """
             (async function () {
               const t = JSON.parse(JSON.stringify(
                 CRMDocumentEngine.fieldMaps['qualification-notice'],
                 function (k, v) { return typeof v === 'function' ? undefined : v; }));
-              t.fields.forEach(function (f) {
-                if (f.expansion) { f.expansion.bottomReserve = 15; f.expansion.maxExtraRows = 1; }
-              });
+              // Room for exactly one 11.5 pt row: the configuration stays
+              // valid, and the second anchor that needs one cannot be paid for.
+              t.pageLayout[0].bottomClearance = 841.92 - t.pageLayout[0].bodyBottom - 11.5;
               const project = CRMDocumentBuilder.schema.fromProduction(
                 CRMDocumentEngine.fieldMaps['qualification-notice'], null);
               const payload = CRMDocumentBuilder.fixtures.payloadFor('ru-resident-normal', project);
@@ -283,7 +286,7 @@ def main() -> int:
                 await CRMDocumentEngine.overlayRenderer.render(t, payload);
                 return JSON.stringify({ ok: true });
               } catch (e) {
-                return JSON.stringify({ ok: false, name: e.name,
+                return JSON.stringify({ ok: false, name: e.name, message: e.message,
                   fields: (e.overflows || []).map(function (o) { return o.fieldId; }),
                   reasons: (e.overflows || []).map(function (o) { return o.reason; }) });
               }
@@ -291,9 +294,196 @@ def main() -> int:
             """ % json.dumps(LONGER_NAME, ensure_ascii=False),
             await_promise=True)
         verdict = json.loads(blocked)
-        checks.check("too little reserve produces a field-specific error",
-                     not verdict["ok"] and verdict.get("fields"),
+        checks.check("too little page budget produces a field-specific error",
+                     not verdict["ok"] and verdict.get("fields") and
+                     "reserve-exceeded" in verdict.get("reasons", []),
                      json.dumps(verdict, ensure_ascii=False))
+
+        # A page budget is stated once. A field that also states its own reserve
+        # is a configuration error, not a silent second opinion.
+        duplicated = browser.eval(
+            """
+            (async function () {
+              const t = JSON.parse(JSON.stringify(
+                CRMDocumentEngine.fieldMaps['qualification-notice'],
+                function (k, v) { return typeof v === 'function' ? undefined : v; }));
+              t.fields.forEach(function (f) {
+                if (f.expansion) f.expansion.bottomReserve = 250;
+              });
+              const project = CRMDocumentBuilder.schema.fromProduction(
+                CRMDocumentEngine.fieldMaps['qualification-notice'], null);
+              const payload = CRMDocumentBuilder.fixtures.payloadFor('ru-resident-normal', project);
+              try {
+                await CRMDocumentEngine.overlayRenderer.render(t, payload);
+                return 'accepted';
+              } catch (e) { return e.message; }
+            }())
+            """, await_promise=True)
+        checks.check("a per-field reserve may not shadow the page budget",
+                     "bottomReserve" in duplicated, duplicated)
+
+        # ── Only the scenario being printed may spend the page ───────────────
+        #
+        # The power of attorney holds a legal-entity доверенность on pages 1–2
+        # and an individual one on pages 3–4 of the same file. A document must
+        # pay for the variant it prints and nothing else, or the variant it does
+        # not print silently eats the reserve the other one needs.
+        plans = browser.eval(
+            """
+            (async function () {
+              const t = CRMDocumentEngine.fieldMaps['power-of-attorney'];
+              const project = CRMDocumentBuilder.schema.fromProduction(t, null);
+              const bytes = await (await fetch(t.templateUrl)).arrayBuffer();
+              const doc = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
+              doc.registerFontkit(fontkit);
+              const fb = await (await fetch(t.fonts.legalSerif)).arrayBuffer();
+              const fonts = { legalSerif: await doc.embedFont(fb, { subset: true }) };
+              const out = {};
+              ['ru-company-normal', 'en-company-normal',
+               'ru-resident-normal', 'en-nonresident-normal'].forEach(function (id) {
+                const payload = CRMDocumentBuilder.fixtures.payloadFor(id, project);
+                const demands = CRMDocumentEngine.overlayRenderer
+                  .expansionDemands(t, payload, fonts);
+                out[id] = {
+                  rows: demands.reduce(function (m, d) { m[d.field.id] = d.rows; return m; }, {}),
+                  inactive: demands.filter(function (d) { return d.inactive; })
+                    .map(function (d) { return d.field.id; }),
+                  pages: doc.getPages().map(function (p, i) {
+                    const plan = CRMDocumentEngine.pageExpander.planPage(
+                      i, demands, p.getSize().height, (t.pageLayout || {})[i]);
+                    return { total: plan.totalDelta, recovered: plan.recovered,
+                             errors: plan.errors.length,
+                             consumption: plan.consumption };
+                  })
+                };
+              });
+              return JSON.stringify(out);
+            }())
+            """, await_promise=True)
+        scenarios = json.loads(plans)
+
+        checks.check("a hidden showWhen field asks for no rows",
+                     all(s["rows"][f] == 0
+                         for s in scenarios.values() for f in s["inactive"]),
+                     json.dumps({k: v["inactive"] for k, v in scenarios.items()}))
+        checks.check("the legal-entity variant leaves the individual pages alone",
+                     scenarios["ru-company-normal"]["pages"][2]["total"] == 0 and
+                     scenarios["ru-company-normal"]["pages"][3]["total"] == 0,
+                     json.dumps(scenarios["ru-company-normal"]["pages"]))
+        checks.check("the individual variant leaves the legal-entity pages alone",
+                     scenarios["ru-resident-normal"]["pages"][0]["total"] == 0 and
+                     scenarios["ru-resident-normal"]["pages"][1]["total"] == 0,
+                     json.dumps(scenarios["ru-resident-normal"]["pages"]))
+        checks.check("no scenario overruns its page budget",
+                     all(page["errors"] == 0
+                         for s in scenarios.values() for page in s["pages"]),
+                     json.dumps({k: [p["errors"] for p in v["pages"]]
+                                 for k, v in scenarios.items()}))
+
+        # Capacity an anchor does not need stays available to the ones below it.
+        ru_company = scenarios["ru-company-normal"]["pages"][0]["consumption"]
+        en_company = scenarios["en-company-normal"]["pages"][0]["consumption"]
+        checks.check("unused capacity is left to the anchors below",
+                     len(ru_company) == 2 and len(en_company) == 3 and
+                     en_company[-1]["remaining"] >= 0,
+                     json.dumps([ru_company, en_company], ensure_ascii=False))
+        checks.check("the plan accounts for the budget anchor by anchor",
+                     all(e["cumulative"] == round(sum(x["delta"] for x in en_company[:i + 1]), 2)
+                         for i, e in enumerate(en_company)),
+                     json.dumps(en_company, ensure_ascii=False))
+        checks.check("anchors are allocated top to bottom, deterministically",
+                     [e["fieldId"] for e in en_company] ==
+                     ["ulOgrn", "ulInn", "ulAttorneyCitizenship"],
+                     json.dumps([e["fieldId"] for e in en_company]))
+
+        # ── Reviewed white space is recovered only when it is needed ─────────
+        poa_base = fitz.open(os.path.join(TEMPLATES, "power-of-attorney.pdf"))
+        title_0 = anchor_y(poa_base, 0, "Доверенность")
+        title_2 = anchor_y(poa_base, 2, "Доверенность")
+        number_tops = [anchor_y(poa_base, p, str(p + 1)) for p in range(4)]
+
+        rendered = {}
+        for profile in ("ru-company-normal", "en-company-normal",
+                        "ru-resident-normal", "en-nonresident-normal"):
+            pdf, _notes = engine.render("power-of-attorney", profile, {})
+            rendered[profile] = fitz.open(stream=pdf, filetype="pdf")
+
+        checks.check("two rows fit without compacting anything",
+                     anchor_y(rendered["ru-company-normal"], 0, "Доверенность") == title_0,
+                     f"{anchor_y(rendered['ru-company-normal'], 0, 'Доверенность')} vs {title_0}")
+        checks.check("a third row recovers reviewed header white space, not more",
+                     0 < title_0 - anchor_y(rendered["en-company-normal"], 0, "Доверенность") <= 5.71 + 0.02,
+                     f"{anchor_y(rendered['en-company-normal'], 0, 'Доверенность')} vs {title_0}")
+        checks.check("the individual page keeps its full top margin for two rows",
+                     anchor_y(rendered["ru-resident-normal"], 2, "Доверенность") == title_2,
+                     str(anchor_y(rendered["ru-resident-normal"], 2, "Доверенность")))
+        checks.check("a third row draws on the approved top margin, not past it",
+                     0 < title_2 - anchor_y(rendered["en-nonresident-normal"], 2, "Доверенность") <= 9.13 + 0.02,
+                     f"{anchor_y(rendered['en-nonresident-normal'], 2, 'Доверенность')} vs {title_2}")
+
+        # ── A page number never moves ────────────────────────────────────────
+        for profile, document in rendered.items():
+            checks.check(f"{profile}: every page number stays where it was printed",
+                         [anchor_y(document, p, str(p + 1)) for p in range(4)] == number_tops,
+                         f"{[anchor_y(document, p, str(p + 1)) for p in range(4)]} vs {number_tops}")
+
+        # ── An empty optional value costs the page nothing ───────────────────
+        empty_rows = browser.eval(
+            """
+            (async function () {
+              const t = CRMDocumentEngine.fieldMaps['anketa-fl'];
+              const project = CRMDocumentBuilder.schema.fromProduction(t, null);
+              const payload = CRMDocumentBuilder.fixtures.payloadFor('en-nonresident-normal', project);
+              delete payload.extraValues['bank-address'];
+              const bytes = await (await fetch(t.templateUrl)).arrayBuffer();
+              const doc = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
+              doc.registerFontkit(fontkit);
+              const fb = await (await fetch(t.fonts.legalSerif)).arrayBuffer();
+              const fonts = { legalSerif: await doc.embedFont(fb, { subset: true }) };
+              const demands = CRMDocumentEngine.overlayRenderer
+                .expansionDemands(t, payload, fonts);
+              return JSON.stringify(demands.map(function (d) {
+                return { id: d.field.id, rows: d.rows, reason: d.reason }; }));
+            }())
+            """, await_promise=True)
+        checks.check("an empty optional value asks for no rows",
+                     all(d["rows"] == 0 for d in json.loads(empty_rows)), empty_rows)
+
+        # ── A mutually exclusive pair shares one physical reserve ────────────
+        person, _ = engine.render("qualification-notice", "ru-resident-normal", {})
+        company, notes_company = engine.render("qualification-notice", "ru-company-normal", {})
+        p_doc = fitz.open(stream=person, filetype="pdf")
+        c_doc = fitz.open(stream=company, filetype="pdf")
+        checks.check("the individual branch of an either/or line takes no row",
+                     anchor_y(p_doc, 0, "в реестр лиц") ==
+                     anchor_y(base, 0, "в реестр лиц"),
+                     f"{anchor_y(p_doc, 0, 'в реестр лиц')} vs "
+                     f"{anchor_y(base, 0, 'в реестр лиц')}")
+        checks.check("the legal-entity branch of the same line gets one",
+                     any(n["fieldId"] == "registerEntryOrgName" for n in notes_company),
+                     json.dumps(notes_company, ensure_ascii=False))
+        checks.check("an either/or row moves only what is below it",
+                     anchor_y(c_doc, 0, "в реестр лиц") ==
+                     anchor_y(base, 0, "в реестр лиц"),
+                     f"{anchor_y(c_doc, 0, 'в реестр лиц')} vs "
+                     f"{anchor_y(base, 0, 'в реестр лиц')}")
+
+        # ── Zero rows leaves the form exactly as printed ─────────────────────
+        untouched, untouched_notes = engine.render(
+            "power-of-attorney", "ru-company-normal", {
+                "field.client-ogrn": "12177", "subject.inn": "7701",
+                "extra.extra-attorney-citizenship": "РФ"})
+        u_doc = fitz.open(stream=untouched, filetype="pdf")
+        checks.check("nothing to expand leaves every page where it was printed",
+                     not untouched_notes and
+                     [round(anchor_y(u_doc, 0, s) or 0, 2) for s in
+                      ("Доверенность", "Регламентом/Договором;")] ==
+                     [round(anchor_y(poa_base, 0, s) or 0, 2) for s in
+                      ("Доверенность", "Регламентом/Договором;")],
+                     json.dumps(untouched_notes, ensure_ascii=False))
+        checks.check("nothing to expand draws no continuation rule",
+                     len(rules_on(u_doc, 0)) == len(rules_on(poa_base, 0)),
+                     f"{len(rules_on(u_doc, 0))} vs {len(rules_on(poa_base, 0))}")
 
         # ── No dynamic text below 9 pt anywhere in an expanded page ──────────
         smallest = None
