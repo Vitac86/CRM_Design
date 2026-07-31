@@ -428,6 +428,479 @@
   }
   Layout.layoutValue = layoutValue;
 
+  // ── Word-flow blocks: styled static and dynamic runs ──────────────────────
+  //
+  // A fixed overlay lays out one value inside one or more boxes.  A Word-flow
+  // block is deliberately different: static legal wording and referenced
+  // values enter the SAME greedy line-breaking pass.  This function is the
+  // only place where those lines are assigned; the PDF renderer merely draws
+  // the returned x/baseline coordinates.
+  //
+  // `runs` are already resolved by the caller, so the pure layout engine does
+  // not know about a CRM payload.  A field reference is represented as:
+  //
+  //   { type: 'fieldRef', fieldId: 'ulInn', text: '7701234567',
+  //     keepTogether: true, decoration: { underline: true, minWidth: 55 } }
+  //
+  // Supported controls are `space`, `lineBreak`, `paragraphBreak` and a
+  // reviewed fixed-width `spacer` (the latter is useful for two independent
+  // blanks on a date line).  No underscore glyph, synthetic hyphen or slash is
+  // ever introduced.
+
+  var FLOW_ATTACH_TO_PREVIOUS = /^[,.;:!?%)\]}»”’]+$/;
+
+  function flowFont(fonts, key) {
+    if (typeof fonts === 'function') return fonts(key);
+    return fonts && fonts[key];
+  }
+
+  function collapseFlowText(value) {
+    return String(value == null ? '' : value)
+      .replace(/[\u00a0\u2007\u202f]/g, ' ')
+      .replace(/\r\n?/g, '\n');
+  }
+
+  function copyOwn(source) {
+    var out = {};
+    Object.keys(source || {}).forEach(function (key) { out[key] = source[key]; });
+    return out;
+  }
+
+  function wordAtoms(fonts, run, spec, pendingSpace) {
+    var type = run.type || 'static';
+    var fontKey = run.font || spec.font;
+    var font = flowFont(fonts, fontKey);
+    var size = Number(run.fontSize != null ? run.fontSize : spec.fontSize);
+    if (!font) throw new Error('word-flow font "' + fontKey + '" is not loaded');
+    if (!isFinite(size) || size <= 0) throw new Error('word-flow font size must be positive');
+
+    var sourceFieldId = type === 'fieldRef'
+      ? (run.fieldId || run.sourceFieldId || null) : null;
+    var text = collapseFlowText(run.text);
+    var pieces = [];
+    var lineParts = text.split('\n');
+
+    lineParts.forEach(function (part, lineIndex) {
+      if (lineIndex) {
+        pieces.push({ control: 'lineBreak' });
+        pendingSpace.value = false;
+      }
+
+      var leading = /^\s/.test(part);
+      var trailing = /\s$/.test(part);
+      var normal = part.replace(/[ \t\f\v]+/g, ' ').trim();
+      if (!normal) {
+        if (leading || trailing || part) pendingSpace.value = true;
+        return;
+      }
+
+      var words = run.keepTogether ? [normal] : normal.split(' ');
+      var indices = [];
+      words.forEach(function (word, wordIndex) {
+        var spaceBefore = pendingSpace.value || leading || wordIndex > 0;
+        var textWidth = widthOf(font, word, size);
+        var atom = {
+          type: type,
+          text: word,
+          font: fontKey,
+          fontSize: size,
+          textWidth: textWidth,
+          slotWidth: textWidth,
+          spaceBefore: spaceBefore,
+          sourceFieldId: sourceFieldId,
+          decoration: run.decoration ? copyOwn(run.decoration) : null,
+          emergencyBreak: !!run.emergencyBreak || run.tokenBreak === 'anywhere',
+          keepTogether: !!run.keepTogether,
+          keepWithNext: false,
+          attachPrevious: FLOW_ATTACH_TO_PREVIOUS.test(word),
+          runIndex: run._runIndex
+        };
+        indices.push(pieces.length);
+        pieces.push(atom);
+        pendingSpace.value = false;
+        leading = false;
+      });
+
+      // A minimum blank width belongs to the dynamic run, not its punctuation.
+      // Reserve any unused part after the final fragment.  If the value wraps,
+      // that remainder follows the last fragment just as a Word underline does.
+      if (type === 'fieldRef' && indices.length && run.decoration &&
+          isFinite(Number(run.decoration.minWidth))) {
+        var actual = 0;
+        indices.forEach(function (index, i) {
+          var atom = pieces[index];
+          if (i) actual += widthOf(font, ' ', size);
+          actual += atom.textWidth;
+        });
+        var extra = Math.max(0, Number(run.decoration.minWidth) - actual);
+        pieces[indices[indices.length - 1]].slotWidth += extra;
+      }
+
+      if (indices.length && run.keepWithNext) {
+        pieces[indices[indices.length - 1]].keepWithNext = true;
+      }
+      pendingSpace.value = trailing;
+    });
+
+    return pieces;
+  }
+
+  function prepareWordFlow(fonts, runs, spec) {
+    var paragraphs = [[]];
+    var pendingSpace = { value: false };
+
+    (runs || []).forEach(function (original, runIndex) {
+      var run = copyOwn(original || {});
+      run._runIndex = runIndex;
+      var type = run.type || 'static';
+      if (type === 'paragraphBreak') {
+        paragraphs.push([]);
+        pendingSpace.value = false;
+        return;
+      }
+      if (type === 'lineBreak' || type === 'hardLineBreak') {
+        paragraphs[paragraphs.length - 1].push({ control: 'lineBreak' });
+        pendingSpace.value = false;
+        return;
+      }
+      if (type === 'space') {
+        pendingSpace.value = true;
+        return;
+      }
+      if (type === 'spacer') {
+        paragraphs[paragraphs.length - 1].push({
+          type: 'spacer', text: '', font: run.font || spec.font,
+          fontSize: Number(run.fontSize != null ? run.fontSize : spec.fontSize),
+          textWidth: 0, slotWidth: Math.max(0, Number(run.width) || 0),
+          spaceBefore: pendingSpace.value, sourceFieldId: null,
+          decoration: null, emergencyBreak: false, keepTogether: true,
+          keepWithNext: !!run.keepWithNext, attachPrevious: false,
+          runIndex: runIndex
+        });
+        pendingSpace.value = false;
+        return;
+      }
+      if (type !== 'static' && type !== 'fieldRef') {
+        throw new Error('unsupported word-flow run type "' + type + '"');
+      }
+      var atoms = wordAtoms(fonts, run, spec, pendingSpace);
+      Array.prototype.push.apply(paragraphs[paragraphs.length - 1], atoms);
+    });
+
+    // A trailing paragraph break is layout metadata, not an empty printed line.
+    while (paragraphs.length > 1 && !paragraphs[paragraphs.length - 1].length) {
+      paragraphs.pop();
+    }
+    return paragraphs;
+  }
+
+  function groupsForWordFlow(items) {
+    var groups = [];
+    items.forEach(function (atom) {
+      if (atom.control) {
+        groups.push(atom);
+        return;
+      }
+      var previous = groups.length ? groups[groups.length - 1] : null;
+      if (atom.attachPrevious && previous && !previous.control) {
+        previous.atoms.push(atom);
+        return;
+      }
+      var group = { atoms: [atom] };
+      if (previous && !previous.control &&
+          previous.atoms[previous.atoms.length - 1].keepWithNext) {
+        previous.atoms.push(atom);
+      } else {
+        groups.push(group);
+      }
+    });
+    return groups;
+  }
+
+  function atomSpaceWidth(fonts, atom) {
+    var font = flowFont(fonts, atom.font);
+    return widthOf(font, ' ', atom.fontSize);
+  }
+
+  function groupWidth(fonts, group, ignoreLeadingSpace) {
+    var total = 0;
+    group.atoms.forEach(function (atom, index) {
+      if (atom.spaceBefore && !(ignoreLeadingSpace && index === 0)) {
+        total += atomSpaceWidth(fonts, atom);
+      }
+      total += atom.slotWidth;
+    });
+    return total;
+  }
+
+  function splitEmergencyAtom(fonts, atom, maxWidth) {
+    if (!atom.emergencyBreak || atom.keepTogether || atom.text.length < 2) return null;
+    var font = flowFont(fonts, atom.font);
+    var chunks = [];
+    var rest = atom.text;
+    while (rest) {
+      var chunk = '';
+      var used = 0;
+      for (var i = 0; i < rest.length; i += 1) {
+        var candidate = chunk + rest.charAt(i);
+        var candidateWidth = widthOf(font, candidate, atom.fontSize);
+        if (chunk && candidateWidth > maxWidth + 1e-6) break;
+        chunk = candidate;
+        used = i + 1;
+      }
+      if (!chunk || used === rest.length && chunks.length === 0) return null;
+      var next = copyOwn(atom);
+      next.text = chunk;
+      next.textWidth = widthOf(font, chunk, atom.fontSize);
+      next.slotWidth = next.textWidth;
+      next.spaceBefore = chunks.length ? false : atom.spaceBefore;
+      chunks.push({ atoms: [next] });
+      rest = rest.slice(used);
+    }
+    return chunks;
+  }
+
+  function plainLineText(groups) {
+    var out = '';
+    groups.forEach(function (group) {
+      group.atoms.forEach(function (atom) {
+        if (atom.type === 'spacer') return;
+        if (atom.spaceBefore && out) out += ' ';
+        out += atom.text;
+      });
+    });
+    return out;
+  }
+
+  // Public deterministic styled-run layout.  This never shrinks: a reviewed
+  // Word-flow block normally sets `fontSizeLocked: true`, and validation also
+  // enforces minFontSize === fontSize for that mode.
+  function layoutRuns(fonts, runs, input) {
+    var spec = input || {};
+    var frame = spec.frame || {};
+    var fontSize = Number(spec.fontSize);
+    var lineHeight = Number(spec.lineHeight);
+    var width = Number(frame.width);
+    var left = Number(frame.left);
+    var baselineTop = Number(frame.baselineTop != null ? frame.baselineTop : frame.top);
+    if (!isFinite(fontSize) || fontSize <= 0) throw new Error('word-flow fontSize must be positive');
+    if (!isFinite(lineHeight) || lineHeight <= 0) throw new Error('word-flow lineHeight must be positive');
+    if (!isFinite(width) || width <= 0 || !isFinite(left) || !isFinite(baselineTop)) {
+      throw new Error('word-flow frame needs numeric left, baselineTop and width');
+    }
+    if (spec.fontSizeLocked && spec.minFontSize != null &&
+        Number(spec.minFontSize) !== fontSize) {
+      throw new Error('locked word-flow minFontSize must equal fontSize');
+    }
+
+    var initialLineCount = Math.max(1, Number(spec.initialLineCount) || 1);
+    var maxAdditionalLines = Math.max(0, Number(spec.maxAdditionalLines) || 0);
+    var maxLines = initialLineCount + maxAdditionalLines;
+    var paragraphSpacing = Math.max(0, Number(spec.paragraphSpacingAfter) || 0);
+    var alignment = spec.alignment || spec.align || 'left';
+    var firstLineIndent = Number(spec.firstLineIndent) || 0;
+    var hangingIndent = Number(spec.hangingIndent) || 0;
+    var prepared;
+    try {
+      prepared = prepareWordFlow(fonts, runs, spec);
+    } catch (error) {
+      return { fits: false, reason: 'configuration', message: error.message, lines: [] };
+    }
+
+    var rawLines = [];
+    var overflow = null;
+
+    prepared.forEach(function (paragraph, paragraphIndex) {
+      if (overflow) return;
+      var sequence = groupsForWordFlow(paragraph);
+      var current = [];
+      var lineInParagraph = 0;
+
+      function metrics() {
+        var indent = lineInParagraph === 0 ? firstLineIndent : hangingIndent;
+        return { left: left + indent, width: width - indent };
+      }
+
+      function pushLine(forced) {
+        if (!current.length) return;
+        var m = metrics();
+        rawLines.push({
+          paragraphIndex: paragraphIndex,
+          lineInParagraph: lineInParagraph,
+          forced: !!forced,
+          groups: current,
+          left: m.left,
+          availableWidth: m.width,
+          text: plainLineText(current)
+        });
+        current = [];
+        lineInParagraph += 1;
+        if (rawLines.length > maxLines) {
+          overflow = { reason: 'no-space', paragraphIndex: paragraphIndex };
+        }
+      }
+
+      for (var index = 0; index < sequence.length && !overflow; index += 1) {
+        var group = sequence[index];
+        if (group.control === 'lineBreak') {
+          pushLine(true);
+          continue;
+        }
+
+        var m = metrics();
+        var candidate = current.concat([group]);
+        var candidateWidth = 0;
+        candidate.forEach(function (entry, entryIndex) {
+          candidateWidth += groupWidth(fonts, entry, entryIndex === 0);
+        });
+        if (candidateWidth <= m.width + 1e-6) {
+          current.push(group);
+          continue;
+        }
+
+        if (current.length) {
+          pushLine(false);
+          index -= 1;
+          continue;
+        }
+
+        var split = group.atoms.length === 1
+          ? splitEmergencyAtom(fonts, group.atoms[0], m.width) : null;
+        if (split && split.length) {
+          sequence.splice.apply(sequence, [index, 1].concat(split));
+          index -= 1;
+          continue;
+        }
+        var culprit = group.atoms.filter(function (atom) { return atom.sourceFieldId; })[0];
+        overflow = {
+          reason: 'unbreakable-token',
+          fieldId: culprit ? culprit.sourceFieldId : null,
+          token: culprit ? culprit.text : plainLineText([group]),
+          availableWidth: m.width,
+          requiredWidth: groupWidth(fonts, group, true)
+        };
+      }
+      if (!overflow) pushLine(false);
+    });
+
+    if (overflow) {
+      return {
+        fits: false,
+        reason: overflow.reason,
+        fieldId: overflow.fieldId || null,
+        token: overflow.token || null,
+        availableWidth: overflow.availableWidth || width,
+        requiredWidth: overflow.requiredWidth || null,
+        lineCapacity: maxLines,
+        lines: rawLines,
+        size: fontSize,
+        fontSizeLocked: !!spec.fontSizeLocked
+      };
+    }
+
+    // Produce final x assignments only after every line is known, because
+    // justification depends on whether this is the paragraph's final line.
+    var lines = rawLines.map(function (line, lineIndex) {
+      var isFinal = lineIndex === rawLines.length - 1 ||
+        rawLines[lineIndex + 1].paragraphIndex !== line.paragraphIndex;
+      var contentWidth = 0;
+      var spaces = 0;
+      line.groups.forEach(function (group, groupIndex) {
+        group.atoms.forEach(function (atom, atomIndex) {
+          if (atom.spaceBefore && !(groupIndex === 0 && atomIndex === 0)) spaces += 1;
+        });
+        contentWidth += groupWidth(fonts, group, groupIndex === 0);
+      });
+      var justify = alignment === 'justify' && !isFinal && !line.forced && spaces > 0 &&
+        contentWidth / line.availableWidth >= Number(spec.justifyMinRatio || 0.45);
+      var extraSpace = justify ? (line.availableWidth - contentWidth) / spaces : 0;
+      var dx = 0;
+      if (!justify && alignment === 'center') dx = (line.availableWidth - contentWidth) / 2;
+      if (!justify && alignment === 'right') dx = line.availableWidth - contentWidth;
+      var x = line.left + Math.max(0, dx);
+      var assignments = [];
+      line.groups.forEach(function (group, groupIndex) {
+        group.atoms.forEach(function (atom, atomIndex) {
+          if (atom.spaceBefore && !(groupIndex === 0 && atomIndex === 0)) {
+            x += atomSpaceWidth(fonts, atom) + extraSpace;
+          }
+          assignments.push({
+            type: atom.type,
+            text: atom.text,
+            sourceFieldId: atom.sourceFieldId,
+            x: x,
+            width: atom.slotWidth,
+            textWidth: atom.textWidth,
+            font: atom.font,
+            fontSize: atom.fontSize,
+            decoration: atom.decoration ? copyOwn(atom.decoration) : null,
+            runIndex: atom.runIndex
+          });
+          x += atom.slotWidth;
+        });
+      });
+      var priorParagraphs = line.paragraphIndex;
+      return {
+        baselineTop: baselineTop + lineIndex * lineHeight + priorParagraphs * paragraphSpacing,
+        paragraphIndex: line.paragraphIndex,
+        lineInParagraph: line.lineInParagraph,
+        finalInParagraph: isFinal,
+        forcedBreak: line.forced,
+        text: line.text,
+        width: contentWidth,
+        runs: assignments
+      };
+    });
+
+    var additionalLines = Math.max(0, lines.length - initialLineCount);
+    var paragraphCount = lines.reduce(function (seen, line) {
+      seen[line.paragraphIndex] = true; return seen;
+    }, {});
+    var usedHeight = lines.length * lineHeight +
+      Math.max(0, Object.keys(paragraphCount).length - 1) * paragraphSpacing;
+    return {
+      fits: true,
+      strategy: 'word-flow',
+      size: fontSize,
+      minSize: spec.fontSizeLocked ? fontSize : Number(spec.minFontSize || fontSize),
+      fontSizeLocked: !!spec.fontSizeLocked,
+      lines: lines,
+      usedHeight: usedHeight,
+      initialHeight: initialLineCount * lineHeight,
+      additionalLines: additionalLines,
+      additionalHeight: additionalLines * lineHeight,
+      lineHeight: lineHeight,
+      alignment: alignment
+    };
+  }
+  Layout.layoutRuns = layoutRuns;
+
+  // Static-token QA deliberately treats printed blank underscores as geometry:
+  // migrated blocks replace them with vector underline decoration.  Every
+  // other word and punctuation token must remain in the same sequence.
+  function staticTextOfRuns(runs) {
+    var out = '';
+    (runs || []).forEach(function (run) {
+      var type = run.type || 'static';
+      if (type === 'static') out += String(run.text || '');
+      else if (type === 'space') out += ' ';
+      else if (type === 'lineBreak' || type === 'hardLineBreak' ||
+               type === 'paragraphBreak') out += '\n';
+    });
+    return out;
+  }
+  Layout.staticTextOfRuns = staticTextOfRuns;
+
+  function staticTokenSequence(text) {
+    return String(text || '')
+      .replace(/_+/g, ' ')
+      .replace(/[\u00a0\u2007\u202f]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .match(/[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu) || [];
+  }
+  Layout.staticTokenSequence = staticTokenSequence;
+
   // True when the layout used a region whose declared maximum size is smaller
   // than the size being tried.
   function exceedsRegionCap(attempt, regions, size) {

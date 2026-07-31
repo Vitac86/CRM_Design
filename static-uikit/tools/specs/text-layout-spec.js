@@ -503,6 +503,181 @@
       });
     });
 
+    // ── Styled-run Word flow ────────────────────────────────────────────────
+
+    function wordFlow(runs, over) {
+      var spec = {
+        frame: { left: 56.54, baselineTop: 156.86, width: 300 },
+        font: 'legalSerif', fontSize: 10.56, minFontSize: 10.56,
+        fontSizeLocked: true, lineHeight: 18.12,
+        initialLineCount: 2, maxAdditionalLines: 8,
+        alignment: 'left'
+      };
+      Object.keys(over || {}).forEach(function (key) {
+        if (key === 'frame') {
+          Object.keys(over.frame).forEach(function (frameKey) {
+            spec.frame[frameKey] = over.frame[frameKey];
+          });
+        } else spec[key] = over[key];
+      });
+      return Layout.layoutRuns({ legalSerif: font }, runs, spec);
+    }
+
+    t('Word flow puts static wording and referenced values through one pass', function () {
+      var result = wordFlow([
+        { type: 'fieldRef', fieldId: 'company', text: 'ООО «Ромашка»' },
+        { type: 'static', text: ', ОГРН ', keepWithNext: true },
+        { type: 'fieldRef', fieldId: 'ogrn', text: '1217700011256', keepTogether: true },
+        { type: 'static', text: ', ИНН ', keepWithNext: true },
+        { type: 'fieldRef', fieldId: 'inn', text: '7701234567', keepTogether: true }
+      ], { frame: { width: 500 }, initialLineCount: 1 });
+      assert(result.fits, 'should fit');
+      assertEqual(result.lines.length, 1, 'one natural line');
+      assertEqual(result.lines[0].text,
+        'ООО «Ромашка», ОГРН 1217700011256, ИНН 7701234567', 'logical text');
+      assert(result.lines[0].runs.some(function (run) {
+        return run.sourceFieldId === 'inn';
+      }), 'assignment retains field ownership');
+    });
+
+    t('Word flow keeps punctuation attached while wrapping across run boundaries', function () {
+      var result = wordFlow([
+        { type: 'fieldRef', fieldId: 'company', text: 'Международные инвестиционные технологии' },
+        { type: 'static', text: ', ОГРН ', keepWithNext: true },
+        { type: 'fieldRef', fieldId: 'ogrn', text: '1217700011256', keepTogether: true },
+        { type: 'static', text: ', далее именуемое «Доверитель»' }
+      ], { frame: { width: 155 }, initialLineCount: 2, maxAdditionalLines: 6 });
+      assert(result.fits, 'should fit');
+      result.lines.forEach(function (line) {
+        assert(!/^[,.;:!?]/.test(line.text), 'orphan punctuation: ' + line.text);
+      });
+      assert(result.lines.some(function (line) {
+        return /ОГРН 1217700011256/.test(line.text);
+      }), 'short label stays with exact token');
+    });
+
+    t('Word flow locks the measured source font size and never shrinks', function () {
+      var result = wordFlow([
+        { type: 'static', text: 'Длинный юридический текст ' },
+        { type: 'fieldRef', fieldId: 'name', text: 'Александров-Смирнов Константин Владиславович' }
+      ], { frame: { width: 110 }, initialLineCount: 1, maxAdditionalLines: 8 });
+      assert(result.fits, 'extra complete lines should suffice');
+      assertEqual(result.size, 10.56, 'measured size');
+      assertEqual(result.minSize, 10.56, 'locked minimum');
+      assertEqual(result.fontSizeLocked, true, 'lock reported');
+      result.lines.forEach(function (line) {
+        line.runs.forEach(function (run) { assertEqual(run.fontSize, 10.56, 'run size'); });
+      });
+    });
+
+    t('Word flow rejects a locked block whose minimum differs from its size', function () {
+      var message = '';
+      try {
+        wordFlow([{ type: 'static', text: 'Текст' }], { minFontSize: 9 });
+      } catch (error) { message = error.message; }
+      assert(message.indexOf('must equal fontSize') >= 0, 'configuration must fail');
+    });
+
+    t('Word flow moves an exact INN as one token instead of splitting digits', function () {
+      var label = 'ИНН ';
+      var token = '7701234567';
+      var tokenWidth = font.widthOfTextAtSize(token, 10.56);
+      var result = wordFlow([
+        { type: 'static', text: 'Очень длинное наименование, ' },
+        { type: 'static', text: label, keepWithNext: true },
+        { type: 'fieldRef', fieldId: 'inn', text: token, keepTogether: true }
+      ], { frame: { width: tokenWidth + font.widthOfTextAtSize(label, 10.56) + 2 },
+        initialLineCount: 2 });
+      assert(result.fits, 'should fit on a following line');
+      var carrying = result.lines.filter(function (line) { return line.text.indexOf(token) >= 0; });
+      assertEqual(carrying.length, 1, 'identifier occurs on one line');
+      assertEqual(carrying[0].text, label.trim() + ' ' + token, 'label travels with token');
+    });
+
+    t('Word-flow underline follows text and preserves a reviewed minimum blank width', function () {
+      var minWidth = 80;
+      var result = wordFlow([
+        { type: 'static', text: 'г. ' },
+        { type: 'fieldRef', fieldId: 'city', text: 'Москва',
+          decoration: { underline: true, minWidth: minWidth, thickness: 0.48, offset: 1.2 } }
+      ], { frame: { width: 300 }, initialLineCount: 1 });
+      assert(result.fits, 'should fit');
+      var city = result.lines[0].runs.filter(function (run) {
+        return run.sourceFieldId === 'city';
+      })[0];
+      assert(city.width >= minWidth - 1e-6, 'minimum blank retained');
+      assertEqual(city.decoration.thickness, 0.48, 'source rule thickness');
+      assert(city.textWidth < city.width, 'short value leaves blank rule after it');
+    });
+
+    t('Word flow wraps Russian and English names only at existing spaces', function () {
+      [
+        'Александров-Смирнов Константин Владиславович',
+        "Christopher Alexander O'Connor Montgomery-Wellington"
+      ].forEach(function (value) {
+        var result = wordFlow([
+          { type: 'fieldRef', fieldId: 'name', text: value }
+        ], { frame: { width: 130 }, initialLineCount: 1, maxAdditionalLines: 5 });
+        assert(result.fits, 'name should wrap');
+        var actual = result.lines.map(function (line) { return line.text; }).join(' ');
+        assertEqual(actual, value, 'characters preserved');
+        assert(actual.indexOf(' -') === -1, 'no invented hyphen');
+      });
+    });
+
+    t('Word flow reports an abnormal no-space value unless emergency wrap is explicit', function () {
+      var value = 'ЭТОСИНТЕТИЧЕСКАЯСТРОКАБЕЗЕДИНОГОПРОБЕЛА';
+      var refused = wordFlow([
+        { type: 'fieldRef', fieldId: 'address', text: value }
+      ], { frame: { width: 60 }, initialLineCount: 1, maxAdditionalLines: 8 });
+      assert(!refused.fits, 'default must report');
+      assertEqual(refused.reason, 'unbreakable-token', 'reason');
+      assertEqual(refused.fieldId, 'address', 'field-specific');
+
+      var allowed = wordFlow([
+        { type: 'fieldRef', fieldId: 'address', text: value, emergencyBreak: true }
+      ], { frame: { width: 60 }, initialLineCount: 1, maxAdditionalLines: 8 });
+      assert(allowed.fits, 'reviewed emergency wrapping may fit');
+      assertEqual(allowed.lines.map(function (line) { return line.text; }).join(''), value,
+        'no character lost or invented');
+    });
+
+    t('Word flow reports complete-line expansion deterministically', function () {
+      var runs = [{ type: 'static', text: 'Раз два три четыре пять шесть семь восемь девять десять' }];
+      var a = wordFlow(runs, { frame: { width: 80 }, initialLineCount: 2, maxAdditionalLines: 8 });
+      var b = wordFlow(runs, { frame: { width: 80 }, initialLineCount: 2, maxAdditionalLines: 8 });
+      assert(a.fits, 'should fit');
+      assertEqual(a.additionalHeight, a.additionalLines * 18.12, 'whole line increments');
+      assertEqual(JSON.stringify(a), JSON.stringify(b), 'deterministic assignments');
+    });
+
+    t('Word flow preserves explicit hard and paragraph breaks', function () {
+      var result = wordFlow([
+        { type: 'static', text: 'Первая строка' },
+        { type: 'lineBreak' },
+        { type: 'static', text: 'Вторая строка' },
+        { type: 'paragraphBreak' },
+        { type: 'static', text: 'Новый абзац' }
+      ], { frame: { width: 300 }, initialLineCount: 3, paragraphSpacingAfter: 4 });
+      assert(result.fits, 'should fit');
+      assertEqual(result.lines.map(function (line) { return line.text; }).join('|'),
+        'Первая строка|Вторая строка|Новый абзац', 'breaks');
+      assertClose(result.lines[2].baselineTop - result.lines[1].baselineTop, 22.12, 1e-6,
+        'paragraph spacing added after a complete line');
+    });
+
+    t('static token QA ignores blank underscores but preserves legal punctuation', function () {
+      var source = Layout.staticTokenSequence('ООО ________, ОГРН ________.');
+      var rebuilt = Layout.staticTokenSequence(Layout.staticTextOfRuns([
+        { type: 'static', text: 'ООО ' },
+        { type: 'fieldRef', fieldId: 'name', text: '' },
+        { type: 'static', text: ', ОГРН ' },
+        { type: 'fieldRef', fieldId: 'ogrn', text: '' },
+        { type: 'static', text: '.' }
+      ]));
+      assertEqual(JSON.stringify(rebuilt), JSON.stringify(source), 'static tokens equivalent');
+    });
+
     // ── Overflow diagnostics ────────────────────────────────────────────────
 
     t('final overflow reports actionable diagnostics', function () {
