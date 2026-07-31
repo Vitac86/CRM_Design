@@ -46,6 +46,52 @@
   var UL_ONLY = { source: 'subject.kind', equals: 'company' };
   var FL_ONLY = { source: 'subject.kind', equals: 'individual' };
 
+  // ── Geometry of a generated continuation row, measured from this form ──────
+  //
+  //   python static-uikit/tools/qa/measure_page_layout.py --row power-of-attorney 0 156.86
+  //
+  // Both variants are set in 10.56 pt Times at an 18.12 pt line pitch. Ink
+  // height at that size is 11.69 pt and every printed rule is 0.48 pt thick and
+  // sits 1.20 pt below its baseline. 12.0 pt is therefore the shortest row that
+  // holds a line of this form's own text without its descenders touching the
+  // rule or the row below — and 2 pt shorter than the generic row that used to
+  // be assumed, which is the difference between two inserted rows and three on
+  // a page with 33 pt of reserve.
+  var ROW_HEIGHT = 12;
+  var ROW_MAX_SIZE = 10.5;         // the size the form itself is set in
+  var ROW_BASELINE = 9.4;          // ascent at 10.5 pt is 9.36
+  var ROW_RULE = 10.6;             // baseline + the measured 1.20 pt
+  var ROW_RULE_THICKNESS = 0.48;   // measured on every printed rule
+
+  // The justified text measure of each variant, measured from its own rules.
+  var UL_LINE = { left: 56.54, width: 478.35 };    // 56.54 → 534.89
+  var FL_LINE = { left: 70.22, width: 464.96 };    // 70.22 → 535.18
+
+  function row(line) {
+    return {
+      rowHeight: ROW_HEIGHT,
+      maxExtraRows: 1,
+      maxFontSize: ROW_MAX_SIZE,
+      lineStyle: 'underline',
+      reviewStatus: 'approved',
+      line: {
+        left: line.left,
+        width: line.width,
+        baselineOffset: ROW_BASELINE,
+        ruleOffset: ROW_RULE,
+        ruleThickness: ROW_RULE_THICKNESS
+      }
+    };
+  }
+
+  function expansion(page, insertionTop, line) {
+    var spec = row(line);
+    spec.page = page;
+    spec.insertionTop = insertionTop;
+    spec.shiftFromTop = insertionTop;
+    return spec;
+  }
+
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
     return {
@@ -91,8 +137,86 @@
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
 
+    // ── What each page may give a generated row ──────────────────────────────
+    //
+    //   python static-uikit/tools/qa/measure_page_layout.py --doc power-of-attorney
+    //
+    // The room a page has is a property of the page, not of any one field, so
+    // it is stated once here and shared by every anchor on it. Only the variant
+    // being printed draws on it: a доверенность for a legal entity spends
+    // nothing on page 3.
+    //
+    // The page number is the fixed footer of every page and never moves. The
+    // previous configuration let the movable band run past it, so an expanded
+    // page carried its number 28 pt further down the sheet.
+    pageLayout: {
+      // ЮЛ page 1. Body 63.85–756.96, page number «1» at 789.97.
+      //   bottom capacity 789.97 − 6.00 − 756.96 = 27.01 pt
+      //   two reviewed header gaps give 11.00 pt more
+      //   → 38.01 pt, three 12 pt rows
+      0: {
+        fixedHeaderUntil: 74.87,
+        bodyBottom: 756.96,
+        fixedFooterFrom: 789.97,
+        shiftToTop: 783.0,
+        bottomClearance: 6.0,
+        compaction: [
+          {
+            top: 87.33, originalGap: 13.71, minGap: 8.0,
+            reviewStatus: 'approved',
+            note: 'между шапкой приложения и заголовком «Доверенность»'
+          },
+          {
+            top: 125.56, originalGap: 13.29, minGap: 8.0,
+            reviewStatus: 'approved',
+            note: 'между подзаголовком варианта и строкой «г. ___ (дата прописью)»'
+          }
+        ],
+        anchors: ['ulOgrn', 'ulInn', 'ulAttorneyCitizenship']
+      },
+      // ФЛ page 3. Body 57.13–761.98, page number «3» at 794.77.
+      //
+      // This page is one continuous justified block from 116 pt to 762 pt at a
+      // uniform 18.12 pt pitch — there is no gap between two complete blocks
+      // anywhere in it, so nothing may be recovered from the body. What it does
+      // have is a 57.13 pt top margin; 48.0 pt is still a proper margin and the
+      // 9.13 pt it releases is what makes the third row possible.
+      //   bottom capacity 794.77 − 4.00 − 761.98 = 28.79 pt
+      //   top margin 57.13 → 48.00 = 9.13 pt
+      //   → 37.92 pt, three 12 pt rows
+      2: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 761.98,
+        fixedFooterFrom: 794.77,
+        shiftToTop: 788.0,
+        bottomClearance: 4.0,
+        compaction: [
+          {
+            top: 55.88, originalGap: 57.13, minGap: 48.0,
+            reviewStatus: 'approved',
+            note: 'верхнее поле страницы физического лица'
+          }
+        ],
+        anchors: ['flPrincipalCitizenship', 'flAttorneyCitizenship',
+                  'flAttorneyIssueDate']
+      }
+    },
+
     fields: [
       // ══════════ ЮЛ variant — pages 1–2 ══════════
+      // The place of issue sits inside «г. ____________», a printed underscore
+      // run of 56 pt. «Москва» fits; «Санкт-Петербург» is 66.31 pt at 9 pt and
+      // does not.
+      //
+      // NO continuation row is configured here, and that is a decision rather
+      // than an omission. The only clean cut under this line is 136.89, which
+      // falls between the date rule (136.34–136.82) and its own caption
+      // «(дата прописью)» (137.94): a row opened there would tear that caption
+      // away from the rule it labels. The next clean cut is below the caption,
+      // which would put the city two lines away from «г.» with someone else's
+      // caption in between. Neither reads as the form. A city longer than
+      // «Москва» therefore remains a realistic-long limitation of this variant,
+      // recorded in docs/document-text-layout-audit.md.
       text('ulCity', 'extra.extra-poa-city', 0, 165.86, 135.26, 56.0, {
         required: true, align: 'center', showWhen: UL_ONLY
       }),
@@ -104,37 +228,18 @@
       text('ulCompanyName', 'field.client-full-legal-name', 0, 58.0, 156.86, 223.0, {
         required: true, fallbacks: ['trim'], showWhen: UL_ONLY
       }),
+      // The printed blank is 54.36 pt; a 13-digit ОГРН needs 58.50 pt at the
+      // 9 pt floor. Exact identifiers are never split or abbreviated, so the
+      // complete number prints on a continuation row under its own label.
       text('ulOgrn', 'field.client-ogrn', 0, 320.0, 156.86, 51.0, {
         overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 159.74,
-          rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 159.74, shiftToTop: 802.99,
-          bottomReserve: 37.05,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 56.54, width: 496.36,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-          }
-        },
+        expansion: expansion(0, 159.74, UL_LINE),
         required: true, align: 'center', showWhen: UL_ONLY
       }),
-      // 27.48 pt for a 10–13 digit OGRN/INN: a 10-digit INN needs 5.5 pt, so
-      // this one slot is allowed below the usual 6 pt floor rather than failing.
+      // 27.48 pt printed for a 10-digit ИНН, which needs 45.00 pt at 9 pt.
       text('ulInn', 'subject.inn', 0, 403.5, 156.86, 27.2, {
-        // page 1 has 37 pt of reserve: one row each for the ОГРН and the ИНН
         overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 159.74,
-          rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 159.74, shiftToTop: 802.99,
-          bottomReserve: 37.05,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 56.54, width: 496.36,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-          }
-        },
+        expansion: expansion(0, 159.74, UL_LINE),
         required: true, align: 'center', showWhen: UL_ONLY
       }),
 
@@ -142,18 +247,42 @@
       text('ulExecutiveName', 'field.client-rep-full-name', 0, 258.0, 193.10, 81.0, {
         required: true, fallbacks: ['initials', 'surname'], showWhen: UL_ONLY
       }),
-      // The basis wraps onto the next line, where the rule is 99.36 pt wide;
-      // the 39.50 pt tail of the first line is left empty.
-      text('ulAuthorityBasis', 'field.client-rep-authority', 0, 58.0, 211.22, 96.0, {
-        required: true, showWhen: UL_ONLY
+      // «…действующего на основании ____» wraps in the source: the blank ends
+      // the first line after 39.50 pt (492.58–532.08) and continues at the
+      // start of the next on a 99.36 pt rule (56.54–155.90), before
+      // «, настоящей доверенностью уполномочивает гр.». Both printed rules
+      // belong to this one value; mapping only the second reported 96 pt of
+      // room where the form gives 138.86 pt.
+      text('ulAuthorityBasis', 'field.client-rep-authority', 0, 493.5, 193.10, 37.0, {
+        required: true, showWhen: UL_ONLY,
+        flowRegions: [
+          { page: 0, left: 493.5, baselineTop: 193.10, width: 37.0 },
+          { page: 0, left: 58.0, baselineTop: 211.22, width: 96.0 }
+        ]
       }),
 
       // «уполномочивает гр. ______» — the поверенный, who is not in the CRM.
+      // The same wrap: 109.94 pt (381.43–491.37) then 99.36 pt (56.54–155.90)
+      // on the next line before «, далее именуемого «Поверенный»».
+      // «Соколов Алексей Михайлович» needs 117.99 pt at 9 pt and 157.32 pt at
+      // 12 pt, so with both rules mapped an ordinary Russian name prints at the
+      // preferred size and the page is not touched at all.
       text('ulAttorneyName', 'extra.extra-attorney-name', 0, 383.0, 211.22, 107.0, {
-        required: true, showWhen: UL_ONLY
+        required: true, showWhen: UL_ONLY,
+        flowRegions: [
+          { page: 0, left: 383.0, baselineTop: 211.22, width: 107.0 },
+          { page: 0, left: 58.0, baselineTop: 229.34, width: 96.0 }
+        ]
       }),
+      // «имеющего паспорт гражданина ____, серии» — 30.72 pt printed, bounded
+      // by text on both sides, and no printed rule continues it. «Россия» fits;
+      // «United Kingdom» needs 60.75 pt at 9 pt and takes a continuation row.
       text('ulAttorneyCitizenship', 'extra.extra-attorney-citizenship',
-           0, 462.0, 229.34, 28.0, { required: true, align: 'center', showWhen: UL_ONLY }),
+           0, 462.0, 229.34, 28.0, {
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(0, 232.0, UL_LINE),
+        required: true, align: 'center', showWhen: UL_ONLY
+      }),
       // «серии» has no rule of its own, so series and number share this one.
       text('ulAttorneyPassport', 'extra.extra-attorney-passport', 0, 70.5, 247.49, 84.0, {
         required: true, showWhen: UL_ONLY
@@ -186,20 +315,10 @@
       text('flPrincipalName', 'field.clientFullName', 2, 104.5, 125.78, 101.0, {
         required: true, fallbacks: ['initials', 'surname'], showWhen: FL_ONLY
       }),
+      // 20.40 pt printed. Even «Россия» needs 26.45 pt at the 9 pt floor.
       text('flPrincipalCitizenship', 'subject.citizenship', 2, 488.0, 125.78, 18.5, {
-        // page 3 has 32 pt of reserve: one row each for citizenship and the date
         overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 2, insertionTop: 128.66,
-          rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 128.66, shiftToTop: 807.79,
-          bottomReserve: 32.13,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 70.22, width: 464.96,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-          }
-        },
+        expansion: expansion(2, 128.66, FL_LINE),
         required: true, align: 'center', showWhen: FL_ONLY
       }),
       text('flPrincipalPassport', 'field.passportSeriesNumber', 2, 81.0, 143.90, 50.0, {
@@ -230,8 +349,15 @@
         required: true, format: 'initials', fallbacks: ['surname'],
         showWhen: FL_ONLY
       }),
+      // 29.76 pt printed: «Россия» (26.45 pt at 9 pt) fits, «United Kingdom»
+      // (60.75 pt) does not — the reason this one fails for a foreign attorney
+      // and not for a Russian one.
       text('flAttorneyCitizenship', 'extra.extra-attorney-citizenship',
-           2, 243.0, 216.38, 28.0, { required: true, align: 'center', showWhen: FL_ONLY }),
+           2, 243.0, 216.38, 28.0, {
+        overflowStrategy: 'expand-layout',
+        expansion: expansion(2, 219.0, FL_LINE),
+        required: true, align: 'center', showWhen: FL_ONLY
+      }),
       text('flAttorneySeries', 'extra.extra-attorney-passport-series',
            2, 307.5, 216.38, 18.0, { required: true, align: 'center', showWhen: FL_ONLY }),
       text('flAttorneyNumber', 'extra.extra-attorney-passport-number',
@@ -240,19 +366,12 @@
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 18.0,
         showWhen: FL_ONLY
       }),
+      // «дата выдачи ____,» — the printed rule is 37.44 pt and a ten-character
+      // date needs 40.50 pt at the 9 pt floor. Three points short, and a date
+      // is not something that may be shortened.
       text('flAttorneyIssueDate', 'extra.extra-attorney-issue-date', 2, 125.5, 234.50, 35.5, {
         overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 2, insertionTop: 237.38,
-          rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 237.38, shiftToTop: 807.79,
-          bottomReserve: 32.13,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 70.22, width: 464.96,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-          }
-        },
+        expansion: expansion(2, 237.38, FL_LINE),
         required: true, format: 'dateRu', align: 'center', showWhen: FL_ONLY
       }),
       text('flAttorneyAddress', 'extra.extra-attorney-address', 2, 354.0, 234.50, 126.0, {
