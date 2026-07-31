@@ -236,6 +236,11 @@
         ? cond.equals.indexOf(value) !== -1
         : value === cond.equals;
     }
+    if (Object.prototype.hasOwnProperty.call(cond, 'notEquals')) {
+      return Array.isArray(cond.notEquals)
+        ? cond.notEquals.indexOf(value) === -1
+        : value !== cond.notEquals;
+    }
     return !!value;
   }
 
@@ -357,6 +362,263 @@
     };
   }
   Renderer.layoutField = layoutField;
+
+  // ── Word-flow block resolution and layout ─────────────────────────────────
+
+  function fieldsById(template) {
+    var out = {};
+    (template.fields || []).forEach(function (field) { out[field.id] = field; });
+    return out;
+  }
+
+  function isFlowReference(field) {
+    return field && field.layoutMode === 'flow-reference';
+  }
+  Renderer.isFlowReference = isFlowReference;
+
+  function cloneRun(run) {
+    var out = {};
+    Object.keys(run || {}).forEach(function (key) {
+      var value = run[key];
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        var nested = {};
+        Object.keys(value).forEach(function (name) { nested[name] = value[name]; });
+        out[key] = nested;
+      } else out[key] = value;
+    });
+    return out;
+  }
+
+  // Resolve existing business fields into text-bearing layout runs.  Field IDs,
+  // sources and production formatters remain on the field definitions; the
+  // block only references them and therefore cannot silently fork the business
+  // schema. `useRawValue` is an explicit layout choice for a full name whose
+  // legacy fixed signature slot still uses initials.
+  function resolveWordFlowRuns(template, block, payload) {
+    var index = fieldsById(template);
+    var resolved = [];
+    var missing = [];
+    var values = {};
+
+    (block.runs || []).forEach(function (sourceRun) {
+      var run = cloneRun(sourceRun);
+      if (run.type !== 'fieldRef') {
+        resolved.push(run);
+        return;
+      }
+      var field = index[run.fieldId];
+      if (!field) {
+        missing.push({ fieldId: run.fieldId, reason: 'missing-reference' });
+        return;
+      }
+      if (!isVisible(field, payload)) {
+        // Mutually exclusive existing fields may share one reviewed paragraph.
+        // An inactive reference is zero-width and undecorated: it neither asks
+        // for a business value nor leaves a blank underline in the active
+        // branch, and it is deliberately absent from the rendered-value set.
+        run.text = '';
+        run.sourceFieldId = field.id;
+        run.inactive = true;
+        delete run.decoration;
+        run.font = run.font || block.font || field.font || 'legalSerif';
+        run.fontSize = run.fontSize != null ? run.fontSize : block.fontSize;
+        resolved.push(run);
+        return;
+      }
+      var override = printOverrideFor(field, payload);
+      var raw = override !== undefined ? override : resolve(field.source, payload);
+      var value;
+      if (run.useRawValue) value = raw == null ? '' : String(raw);
+      else if (Object.prototype.hasOwnProperty.call(run, 'format')) {
+        value = formatValue({ format: run.format }, raw);
+      } else value = formatValue(field, raw);
+
+      if (!value && field.required && !field.optional) {
+        missing.push({
+          fieldId: field.id,
+          label: field.label || field.id,
+          source: field.source,
+          reason: 'missing'
+        });
+      }
+      run.text = value || '';
+      run.sourceFieldId = field.id;
+      run.font = run.font || block.font || field.font || 'legalSerif';
+      run.fontSize = run.fontSize != null ? run.fontSize : block.fontSize;
+      values[field.id] = run.text;
+      resolved.push(run);
+    });
+
+    return { runs: resolved, missing: missing, values: values };
+  }
+  Renderer.resolveWordFlowRuns = resolveWordFlowRuns;
+
+  function layoutWordFlowBlock(template, block, payload, fonts) {
+    if (!isVisible(block, payload)) {
+      return { drawn: false, reason: 'hidden', blockId: block.id };
+    }
+    var prepared = resolveWordFlowRuns(template, block, payload);
+    if (prepared.missing.length) {
+      return {
+        drawn: false,
+        reason: prepared.missing[0].reason,
+        blockId: block.id,
+        missing: prepared.missing,
+        runs: prepared.runs,
+        values: prepared.values
+      };
+    }
+    var frame = block.frame || {};
+    var expansion = block.expansion || {};
+    var layout;
+    try {
+      layout = Layout.layoutRuns(fonts, prepared.runs, {
+        frame: frame,
+        font: block.font || 'legalSerif',
+        fontSize: Number(block.fontSize),
+        minFontSize: block.minFontSize != null ? Number(block.minFontSize) : Number(block.fontSize),
+        fontSizeLocked: !!block.fontSizeLocked,
+        lineHeight: Number(block.lineHeight),
+        paragraphSpacingAfter: Number(block.paragraphSpacingAfter || 0),
+        alignment: block.alignment || block.align || 'left',
+        firstLineIndent: Number(block.firstLineIndent || 0),
+        hangingIndent: Number(block.hangingIndent || 0),
+        justifyMinRatio: block.justifyMinRatio,
+        initialLineCount: Number(block.initialLineCount || frame.initialLineCount || 1),
+        maxAdditionalLines: Number(block.maxAdditionalLines != null
+          ? block.maxAdditionalLines : expansion.maxExtraRows || 0)
+      });
+    } catch (error) {
+      return {
+        drawn: false, reason: 'configuration', blockId: block.id,
+        message: error.message, runs: prepared.runs, values: prepared.values
+      };
+    }
+    if (!layout.fits) {
+      return {
+        drawn: false,
+        reason: 'overflow',
+        blockId: block.id,
+        fieldId: layout.fieldId || null,
+        layout: layout,
+        runs: prepared.runs,
+        values: prepared.values
+      };
+    }
+    return {
+      drawn: true,
+      blockId: block.id,
+      layout: layout,
+      runs: prepared.runs,
+      values: prepared.values
+    };
+  }
+  Renderer.layoutWordFlowBlock = layoutWordFlowBlock;
+
+  function planWordFlowBlocks(template, payload, fonts) {
+    var byBlock = {};
+    var overflows = [];
+    (template.wordFlowBlocks || []).forEach(function (block) {
+      var result = layoutWordFlowBlock(template, block, payload, fonts);
+      byBlock[block.id] = result;
+      if (result.drawn || result.reason === 'hidden') return;
+      if (result.reason === 'missing' || result.reason === 'missing-reference') {
+        (result.missing || [{ fieldId: block.id, reason: result.reason }]).forEach(function (item) {
+          overflows.push({
+            documentId: template.id,
+            documentTitle: template.title || template.id,
+            blockId: block.id,
+            fieldId: item.fieldId || block.id,
+            label: item.label || block.label || item.fieldId || block.id,
+            source: item.source || null,
+            reason: item.reason,
+            editable: !!item.source && item.source.indexOf('extra.') === 0,
+            message: item.reason === 'missing-reference'
+              ? 'в блоке отсутствует ссылка на существующее поле'
+              : 'обязательное значение отсутствует'
+          });
+        });
+        return;
+      }
+      var field = result.fieldId && fieldsById(template)[result.fieldId];
+      overflows.push({
+        documentId: template.id,
+        documentTitle: template.title || template.id,
+        blockId: block.id,
+        fieldId: result.fieldId || block.id,
+        label: field && (field.label || field.id) || block.label || block.id,
+        source: field && field.source || null,
+        reason: result.layout && result.layout.reason || result.reason,
+        editable: !!(field && field.source && field.source.indexOf('extra.') === 0),
+        message: result.layout && result.layout.reason === 'unbreakable-token'
+          ? 'неразрывное значение не помещается в Word-подобный блок'
+          : (result.message || 'Word-подобный блок не помещается в проверенные границы')
+      });
+    });
+    return { byBlock: byBlock, overflows: overflows };
+  }
+  Renderer.planWordFlowBlocks = planWordFlowBlocks;
+
+  function reviewedRangeForBlock(block) {
+    var source = block.sourceReplacement || block.originalContentRange;
+    if (!source) return null;
+    return {
+      id: block.id,
+      firstBlock: Number(source.firstBlock),
+      lastBlock: Number(source.lastBlock),
+      expectedBlockCount: Number(source.expectedBlockCount),
+      expectedPageBlockCount: source.expectedPageBlockCount == null
+        ? null : Number(source.expectedPageBlockCount),
+      expectedSha256: source.expectedSha256,
+      expectedTemplateSha256: source.expectedTemplateSha256,
+      reviewStatus: source.reviewStatus
+    };
+  }
+
+  // Only the visible variant is replaced. A combined template such as the
+  // Power of Attorney retains the authoritative blank wording on the inactive
+  // pages and suppresses the reviewed ranges for the selected variant only.
+  function activeReviewedRangePages(template, payload) {
+    var byPage = {};
+    (template.wordFlowBlocks || []).forEach(function (block) {
+      if (!isVisible(block, payload)) return;
+      var range = reviewedRangeForBlock(block);
+      if (!range) return;
+      var page = Number(block.page);
+      byPage[page] = byPage[page] || { page: page, blocks: [], ranges: [] };
+      byPage[page].blocks.push(block);
+      byPage[page].ranges.push(range);
+    });
+    return Object.keys(byPage).map(Number).sort(function (a, b) { return a - b; })
+      .map(function (page) { return byPage[page]; });
+  }
+  Renderer.activeReviewedRangePages = activeReviewedRangePages;
+
+  function inspectActiveReviewedRanges(context, template, payload) {
+    var groups = activeReviewedRangePages(template, payload);
+    return Promise.all(groups.map(function (group) {
+      return Expander.inspectReviewedRanges(
+        context.pdfDoc, context.pages[group.page], group.ranges,
+        { templateBytes: context.templateBytes }
+      ).then(function (inspection) {
+        return { page: group.page, blocks: group.blocks, inspection: inspection };
+      });
+    }));
+  }
+  Renderer.inspectActiveReviewedRanges = inspectActiveReviewedRanges;
+
+  function suppressActiveReviewedRanges(context, template, payload) {
+    var groups = activeReviewedRangePages(template, payload);
+    return Promise.all(groups.map(function (group) {
+      return Expander.suppressReviewedRanges(
+        context.pdfDoc, context.pages[group.page], group.ranges,
+        { templateBytes: context.templateBytes }
+      ).then(function (suppression) {
+        return { page: group.page, blocks: group.blocks, suppression: suppression };
+      });
+    }));
+  }
+  Renderer.suppressActiveReviewedRanges = suppressActiveReviewedRanges;
 
   // Human-readable reason, reused by the renderer error and the wizard UI.
   function overflowMessage(diagnostics) {
@@ -497,7 +759,8 @@
 
       var budget = Expander.pageBudget(entry, [], height);
       (entry.anchors || []).forEach(function (fieldId) {
-        var field = (template.fields || []).filter(function (f) { return f.id === fieldId; })[0];
+        var field = (template.fields || []).concat(template.wordFlowBlocks || [])
+          .filter(function (f) { return f.id === fieldId; })[0];
         if (!field) {
           problems.push(where + '.anchors: no field "' + fieldId + '"');
           return;
@@ -689,14 +952,16 @@
     }
 
     var style = spec.lineStyle || 'underline';
-    if (['underline', 'table-row'].indexOf(style) === -1) {
+    if (['underline', 'table-row', 'none'].indexOf(style) === -1) {
       problems.push(id + ': unknown expansion lineStyle "' + style + '"');
     }
     var line = spec.line || {};
-    if (!isFinite(Number(line.width)) || Number(line.width) <= 0) {
-      problems.push(id + ': expansion.line.width must be a positive number');
-    } else if (Number(line.left) < 0 || Number(line.left) + Number(line.width) > size.width + 0.5) {
-      problems.push(id + ': expansion.line extends past the page width');
+    if (style !== 'none') {
+      if (!isFinite(Number(line.width)) || Number(line.width) <= 0) {
+        problems.push(id + ': expansion.line.width must be a positive number');
+      } else if (Number(line.left) < 0 || Number(line.left) + Number(line.width) > size.width + 0.5) {
+        problems.push(id + ': expansion.line extends past the page width');
+      }
     }
     if (style === 'underline' && !isFinite(Number(line.ruleThickness == null ? 0.36 : line.ruleThickness))) {
       problems.push(id + ': expansion.line.ruleThickness must be a number');
@@ -705,6 +970,149 @@
       problems.push(id + ': expansion rule is not visually approved');
     }
   }
+
+  function validateWordFlowBlocks(template, pages, problems) {
+    var fields = fieldsById(template);
+    var seenBlocks = {};
+    var referenced = {};
+    var ranges = {};
+
+    (template.wordFlowBlocks || []).forEach(function (block, index) {
+      var id = block.id || ('wordFlowBlocks[' + index + ']');
+      var where = 'wordFlowBlocks[' + index + ']';
+      if (seenBlocks[id] || fields[id]) problems.push(where + ': duplicate id "' + id + '"');
+      seenBlocks[id] = true;
+      if (block.type !== 'wordFlowBlock') {
+        problems.push(id + ': type must be "wordFlowBlock"');
+      }
+      if (!Number.isInteger(Number(block.page)) || block.page < 0 || block.page >= pages.length) {
+        problems.push(id + ': invalid page index ' + block.page);
+        return;
+      }
+      var size = pages[block.page].getSize();
+      var frame = block.frame || {};
+      ['left', 'baselineTop', 'width'].forEach(function (name) {
+        if (!isFinite(Number(frame[name]))) problems.push(id + '.frame.' + name + ' must be a number');
+      });
+      if (Number(frame.width) <= 0 || Number(frame.left) < 0 ||
+          Number(frame.left) + Number(frame.width) > size.width + 0.5) {
+        problems.push(id + ': frame extends past the page width');
+      }
+      if (Number(frame.baselineTop) < 0 || Number(frame.baselineTop) > size.height) {
+        problems.push(id + ': frame baseline is outside the page');
+      }
+      if (!(Number(block.fontSize) > 0) || !(Number(block.lineHeight) > 0)) {
+        problems.push(id + ': fontSize and lineHeight must be positive');
+      }
+      if (!block.fontSizeLocked || Number(block.minFontSize) !== Number(block.fontSize)) {
+        problems.push(id + ': reviewed Word flow must lock minFontSize to fontSize');
+      }
+      if (block.font && !(template.fonts || {})[block.font] && !DEFAULT_FONT_KEYS[block.font]) {
+        problems.push(id + ': unknown font "' + block.font + '"');
+      }
+      if (!Number.isInteger(Number(block.initialLineCount || frame.initialLineCount)) ||
+          Number(block.initialLineCount || frame.initialLineCount) < 1) {
+        problems.push(id + ': initialLineCount must be at least 1');
+      }
+
+      var replacement = block.sourceReplacement || block.originalContentRange;
+      if (!replacement) {
+        problems.push(id + ': reviewed sourceReplacement is required');
+      } else {
+        var first = Number(replacement.firstBlock);
+        var last = Number(replacement.lastBlock);
+        if (!Number.isInteger(first) || !Number.isInteger(last) || first < 1 || last < first) {
+          problems.push(id + ': sourceReplacement needs a valid firstBlock/lastBlock range');
+        }
+        var expectedCount = Number(replacement.expectedBlockCount);
+        if (!Number.isInteger(expectedCount) || expectedCount < 1 ||
+            expectedCount !== last - first + 1) {
+          problems.push(id + ': sourceReplacement.expectedBlockCount must equal the reviewed ordinal span');
+        }
+        if (!/^[0-9a-f]{64}$/i.test(String(replacement.expectedSha256 || ''))) {
+          problems.push(id + ': sourceReplacement.expectedSha256 must freeze the reviewed operator bytes');
+        }
+        if (!/^[0-9a-f]{64}$/i.test(String(replacement.expectedTemplateSha256 || ''))) {
+          problems.push(id + ': sourceReplacement.expectedTemplateSha256 must freeze the authoritative PDF');
+        }
+        if (replacement.expectedPageBlockCount != null &&
+            (!Number.isInteger(Number(replacement.expectedPageBlockCount)) ||
+             Number(replacement.expectedPageBlockCount) < 1)) {
+          problems.push(id + ': sourceReplacement.expectedPageBlockCount must be a positive integer');
+        }
+        if (replacement.reviewStatus !== 'approved') {
+          problems.push(id + ': sourceReplacement is not visually approved');
+        }
+        var pageRanges = ranges[block.page] = ranges[block.page] || [];
+        pageRanges.forEach(function (other) {
+          if (first <= other.last && last >= other.first) {
+            problems.push(id + ': sourceReplacement overlaps "' + other.id + '"');
+          }
+        });
+        pageRanges.push({ id: id, first: first, last: last });
+      }
+
+      var blockRefs = {};
+      (block.runs || []).forEach(function (run, runIndex) {
+        if (run.type !== 'fieldRef') return;
+        var field = fields[run.fieldId];
+        if (!field) {
+          problems.push(id + '.runs[' + runIndex + ']: missing field "' + run.fieldId + '"');
+          return;
+        }
+        if (blockRefs[field.id] && !run.allowDuplicate) {
+          problems.push(id + ': field "' + field.id + '" is referenced more than once');
+        }
+        blockRefs[field.id] = true;
+        if (referenced[field.id] && referenced[field.id] !== id &&
+            !field.allowMultipleFlowReferences) {
+          problems.push(id + ': field "' + field.id + '" is already referenced by "' +
+            referenced[field.id] + '"');
+        }
+        referenced[field.id] = id;
+        if (!isFlowReference(field)) {
+          problems.push(id + ': field "' + field.id + '" would be rendered independently too');
+        }
+        var owners = Array.isArray(field.flowBlockId) ? field.flowBlockId : [field.flowBlockId];
+        if (owners.indexOf(id) === -1) {
+          problems.push(id + ': field "' + field.id + '" does not name this flowBlockId');
+        }
+        if (run.keepTogether && run.emergencyBreak) {
+          problems.push(id + '.runs[' + runIndex + ']: keepTogether conflicts with emergencyBreak');
+        }
+        if (run.decoration && run.decoration.underline) {
+          var thickness = run.decoration.thickness == null
+            ? DEFAULT_UNDERLINE_THICKNESS : Number(run.decoration.thickness);
+          if (!(thickness > 0 && thickness <= 3)) {
+            problems.push(id + '.runs[' + runIndex + ']: invalid underline thickness');
+          }
+        }
+      });
+
+      if (block.sourceStaticText != null) {
+        var expected = Layout.staticTokenSequence(block.sourceStaticText);
+        var actual = Layout.staticTokenSequence(Layout.staticTextOfRuns(block.runs || []));
+        if (expected.join('\u0001') !== actual.join('\u0001')) {
+          problems.push(id + ': configured static token sequence differs from the source block');
+        }
+      } else {
+        problems.push(id + ': sourceStaticText is required for legal-text equivalence QA');
+      }
+
+      if (block.overflowStrategy === 'expand-layout') {
+        validateExpansion(template, block, id, pages, problems);
+      } else if (block.expansion) {
+        problems.push(id + ': expansion requires overflowStrategy "expand-layout"');
+      }
+    });
+
+    (template.fields || []).forEach(function (field) {
+      if (isFlowReference(field) && !referenced[field.id]) {
+        problems.push(field.id + ': flow-reference is not consumed by a Word-flow block');
+      }
+    });
+  }
+  Renderer.validateWordFlowBlocks = validateWordFlowBlocks;
 
   // Validate one template definition against the loaded PDF. Returns an array
   // of human-readable problems; empty means the map is usable.
@@ -716,6 +1124,7 @@
     if (!fields.length) problems.push('template has no field definitions');
 
     validatePageLayout(template, pages, problems);
+    validateWordFlowBlocks(template, pages, problems);
 
     fields.forEach(function (f, i) {
       var id = f.id || ('#' + i);
@@ -859,11 +1268,12 @@
   // not layout problems and must cost the page nothing — the power of attorney
   // carries a legal-entity variant and an individual one in the same four-page
   // file, and a document must never pay for the variant it is not printing.
-  function expansionDemands(template, payload, fonts) {
+  function expansionDemands(template, payload, fonts, wordFlowPlan) {
     var demands = [];
 
     (template.fields || []).forEach(function (field) {
       if ((field.type || 'text') === 'check') return;
+      if (isFlowReference(field)) return;
       var spec = Expander.expansionOf(field);
       if (!spec) return;
       var font = fonts[field.font || 'legalSerif'];
@@ -893,6 +1303,27 @@
       // Even the maximum approved number of rows is not enough; the field-level
       // overflow diagnostics will explain that.
       demands.push({ field: field, rows: maximum, insufficient: true });
+    });
+
+    // A Word-flow block expands as one paragraph, never as one row per field.
+    // Its layout has already been decided with the locked source font; the page
+    // planner receives only the number of complete source-pitch lines needed.
+    (template.wordFlowBlocks || []).forEach(function (block) {
+      var spec = Expander.expansionOf(block);
+      if (!spec) return;
+      var result = wordFlowPlan && wordFlowPlan.byBlock[block.id];
+      if (!result || !result.drawn) {
+        demands.push({
+          field: block, rows: 0, wordFlow: true, inactive: true,
+          reason: result ? result.reason : 'absent'
+        });
+        return;
+      }
+      demands.push({
+        field: block,
+        rows: result.layout.additionalLines,
+        wordFlow: true
+      });
     });
 
     return demands;
@@ -944,10 +1375,20 @@
     var opts = options || {};
     var byField = {};
     var overflows = [];
-    var summary = { total: 0, atPreferred: 0, wrapped: 0, flowed: 0, shrunk: 0, fallback: 0, expanded: 0 };
+    var summary = { total: 0, atPreferred: 0, wrapped: 0, flowed: 0, shrunk: 0,
+      fallback: 0, expanded: 0, wordFlowBlocks: 0 };
+    var wordFlow = opts.wordFlowPlan || planWordFlowBlocks(template, payload, fonts);
 
     (template.fields || []).forEach(function (field) {
       if ((field.type || 'text') === 'check') return;
+      if (isFlowReference(field)) {
+        byField[field.id] = {
+          drawn: false,
+          reason: 'flow-reference',
+          flowBlockId: field.flowBlockId || null
+        };
+        return;
+      }
       var font = fonts[field.font || 'legalSerif'];
       if (!font) {
         overflows.push({
@@ -1006,7 +1447,22 @@
       }
     });
 
-    return { byField: byField, overflows: overflows, summary: summary };
+    wordFlow.overflows.forEach(function (entry) { overflows.push(entry); });
+    Object.keys(wordFlow.byBlock).forEach(function (id) {
+      var result = wordFlow.byBlock[id];
+      if (!result.drawn) return;
+      summary.wordFlowBlocks += 1;
+      summary.total += Object.keys(result.values || {}).length;
+      summary.atPreferred += Object.keys(result.values || {}).length;
+      if (result.layout.additionalLines) summary.expanded += 1;
+    });
+
+    return {
+      byField: byField,
+      byBlock: wordFlow.byBlock,
+      overflows: overflows,
+      summary: summary
+    };
   }
   Renderer.plan = plan;
 
@@ -1062,6 +1518,78 @@
       if (region.tableRow) drawTableRow(ctx, region);
     });
   }
+
+  // Draw exactly the fragments assigned by Layout.layoutRuns.  No width
+  // measurement or line-break decision is repeated here.
+  function drawWordFlowBlock(ctx, block, planned) {
+    if (!planned || !planned.drawn) return;
+    var page = ctx.pages[block.page];
+    var pageHeight = page.getSize().height;
+
+    function sourceShiftAt(top) {
+      var plan = ctx.plans && ctx.plans[block.page];
+      if (!plan) return 0;
+      return (plan.shifts || []).reduce(function (total, shift) {
+        // This block consumes its own additional lines; applying that same
+        // shift to those lines would double-expand it. Compaction and earlier
+        // anchors still move the replacement exactly as they moved the source.
+        if (shift.fieldId === block.id) return total;
+        if (top < shift.fromTop - 1e-6 || top > shift.toTop + 1e-6) return total;
+        return total + Number(shift.delta);
+      }, 0);
+    }
+
+    planned.layout.lines.forEach(function (line) {
+      var baselineY = pageHeight - (line.baselineTop + sourceShiftAt(line.baselineTop));
+      line.runs.forEach(function (run) {
+        if (run.type !== 'spacer' && run.text) {
+          page.drawText(run.text, {
+            x: run.x,
+            y: baselineY,
+            size: run.fontSize,
+            font: ctx.fonts[run.font || block.font || 'legalSerif'],
+            color: ctx.color
+          });
+        }
+        var decoration = run.decoration;
+        if (!decoration || !decoration.underline || !(run.width > 0)) return;
+        var offset = decoration.offset != null
+          ? Number(decoration.offset) : DEFAULT_UNDERLINE_OFFSET;
+        var thickness = decoration.thickness != null
+          ? Number(decoration.thickness) : DEFAULT_UNDERLINE_THICKNESS;
+        var color = decoration.color
+          ? global.PDFLib.rgb(decoration.color[0], decoration.color[1], decoration.color[2])
+          : ctx.color;
+        page.drawLine({
+          start: { x: run.x, y: baselineY - offset },
+          end: { x: run.x + run.width, y: baselineY - offset },
+          thickness: thickness,
+          color: color
+        });
+      });
+    });
+  }
+  Renderer.drawWordFlowBlock = drawWordFlowBlock;
+
+  function insertReviewedWordFlowBlocks(ctx, template, decided, reviewedPages) {
+    (reviewedPages || []).forEach(function (reviewedPage) {
+      reviewedPage.blocks.forEach(function (block) {
+        var planned = decided.planned.byBlock[block.id];
+        if (!planned || !planned.drawn) {
+          throw FieldError(ctx.documentId, block.id,
+            'active reviewed Word-flow block has no drawable layout');
+        }
+        var operators = Expander.capturePageOperators(
+          ctx.pdfDoc, ctx.pages[block.page], function () {
+            drawWordFlowBlock(ctx, block, planned);
+          }
+        );
+        Expander.replaceReviewedRangeContent(
+          ctx.pdfDoc, ctx.pages[block.page], block.id, operators);
+      });
+    });
+  }
+  Renderer.insertReviewedWordFlowBlocks = insertReviewedWordFlowBlocks;
 
   // A blank table row opened by page expansion: real vector borders matching
   // the table it was inserted into, never underscore glyphs.
@@ -1188,7 +1716,8 @@
   // a preflight that succeeds cannot be followed by a generation that fails —
   // there is no second implementation to disagree with.
   function decide(template, payload, pages, fonts) {
-    var demands = expansionDemands(template, payload, fonts);
+    var wordFlowPlan = planWordFlowBlocks(template, payload, fonts);
+    var demands = expansionDemands(template, payload, fonts, wordFlowPlan);
     var plans = {};
     var rowsByField = {};
     var planErrors = [];
@@ -1222,10 +1751,13 @@
       });
 
     var regionsFor = makeRegionsFor(plans, rowsByField);
-    var planned = plan(template, payload, fonts, { regionsFor: regionsFor });
+    var planned = plan(template, payload, fonts, {
+      regionsFor: regionsFor,
+      wordFlowPlan: wordFlowPlan
+    });
 
     planErrors.forEach(function (error) {
-      var field = (template.fields || []).filter(function (item) {
+      var field = (template.fields || []).concat(template.wordFlowBlocks || []).filter(function (item) {
         return item.id === error.fieldId;
       })[0] || {};
       // A field the page could not pay for also fails to lay out, so it would
@@ -1314,6 +1846,18 @@
           return line.regionIndex + ':' + line.lineIndex + ':' + line.text;
         }).join('|'));
     });
+    Object.keys(planned.byBlock || {}).sort().forEach(function (id) {
+      var result = planned.byBlock[id];
+      if (!result.drawn) {
+        parts.push('word:' + id + '=' + (result.reason || 'skipped'));
+        return;
+      }
+      parts.push('word:' + id + '@' + result.layout.size + ' locked=' +
+        result.layout.fontSizeLocked + ' add=' + result.layout.additionalLines + ' ' +
+        result.layout.lines.map(function (line) {
+          return line.paragraphIndex + ':' + line.lineInParagraph + ':' + line.text;
+        }).join('|'));
+    });
     return parts.join('\n');
   }
   Renderer.fingerprintOf = fingerprintOf;
@@ -1328,6 +1872,7 @@
   function open(template, options) {
     var opts = options || {};
     var PDFLib = global.PDFLib;
+    var templateBytes = null;
     if (!PDFLib) return Promise.reject(new Error('PDF-модуль (pdf-lib) не загружен.'));
 
     var templateUrl;
@@ -1347,6 +1892,10 @@
         return res.arrayBuffer();
       })
       .then(function (buf) {
+        // Keep an immutable copy of the fetched authoritative file. pdf-lib's
+        // parsed document is not a proof of which source bytes produced it;
+        // reviewed operator ranges validate against this exact fetch instead.
+        templateBytes = new Uint8Array(buf.slice(0));
         return PDFLib.PDFDocument.load(buf, { ignoreEncryption: true });
       })
       .then(function (pdfDoc) {
@@ -1373,7 +1922,12 @@
         }
 
         return embedFonts(pdfDoc, template.fonts || {}).then(function (fonts) {
-          return { pdfDoc: pdfDoc, pages: pages, fonts: fonts };
+          return {
+            pdfDoc: pdfDoc,
+            pages: pages,
+            fonts: fonts,
+            templateBytes: templateBytes
+          };
         });
       });
   }
@@ -1392,13 +1946,19 @@
       validatePayload: opts.validatePayload, payload: payload
     }).then(function (context) {
       var decided = decide(template, payload, context.pages, context.fonts);
-      return {
-        ok: !decided.planned.overflows.length,
-        fingerprint: decided.fingerprint,
-        overflows: decided.planned.overflows,
-        expansion: decided.notes,
-        summary: decided.planned.summary
-      };
+      return inspectActiveReviewedRanges(context, template, payload)
+        .then(function (reviewed) {
+          return {
+            ok: !decided.planned.overflows.length,
+            fingerprint: decided.fingerprint,
+            overflows: decided.planned.overflows,
+            expansion: decided.notes,
+            summary: decided.planned.summary,
+            reviewedRanges: reviewed.map(function (entry) {
+              return { page: entry.page, inspection: entry.inspection };
+            })
+          };
+        });
     });
   }
   Renderer.preflight = preflight;
@@ -1420,6 +1980,7 @@
       var pages = context.pages;
       var ctx = {
         documentId: template.id,
+        pdfDoc: pdfDoc,
         pages: pages,
         fonts: context.fonts,
         payload: payload,
@@ -1442,49 +2003,60 @@
           decided.planned.overflows);
       }
 
-      // Only now that the document is known to be printable is the page
-      // content actually rewritten.  A reviewed cross-page block is removed
-      // before either page is shifted, then placed on the following page after
-      // its original body moved.  This keeps every original operator exactly
-      // once and makes target-page overlays follow the same transformation.
-      var transfers = [];
-      Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
-        .forEach(function (index) {
-          var flow = plans[index].pageFlow;
-          if (!flow) return;
-          transfers.push({
-            sourcePage: pages[index],
-            targetPage: pages[Number(flow.targetPage)],
-            flow: flow,
-            content: Expander.takePageContent(pdfDoc, pages[index], flow)
+      // Only now that the document is known to be printable is page content
+      // mutated. Exact reviewed ranges are suppressed first, while their
+      // original ordinals and template proof still apply. Static source shifts
+      // then operate on the remaining original blocks. Finally the high-level
+      // styled-run drawing is captured and inserted at each marker rather than
+      // being left as a duplicate appended content stream.
+      return suppressActiveReviewedRanges(context, template, payload)
+        .then(function (reviewedPages) {
+          if (typeof opts.onReviewedRanges === 'function') {
+            opts.onReviewedRanges(reviewedPages.map(function (entry) {
+              return { page: entry.page, suppression: entry.suppression };
+            }));
+          }
+
+          var transfers = [];
+          Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
+            .forEach(function (index) {
+              var flow = plans[index].pageFlow;
+              if (!flow) return;
+              transfers.push({
+                sourcePage: pages[index],
+                targetPage: pages[Number(flow.targetPage)],
+                flow: flow,
+                content: Expander.takePageContent(pdfDoc, pages[index], flow)
+              });
+            });
+          pages.forEach(function (pdfPage, index) {
+            if (!plans[index].shifts.length) return;
+            Expander.shiftPageContent(pdfDoc, pdfPage, plans[index].shifts);
+          });
+          transfers.forEach(function (transfer) {
+            Expander.placePageContent(pdfDoc, transfer.sourcePage, transfer.targetPage,
+                                      transfer.flow, transfer.content);
+          });
+
+          ctx.plans = plans;
+          insertReviewedWordFlowBlocks(ctx, template, decided, reviewedPages);
+
+          // What the manager is told about: rows were added, nothing to decide.
+          if (typeof opts.onExpansion === 'function' && decided.notes.length) {
+            opts.onExpansion(decided.notes);
+          }
+
+          (template.fields || []).forEach(function (field) {
+            if ((field.type || 'text') === 'check') drawCheckField(ctx, field);
+            else drawTextField(ctx, field, decided.planned.byField[field.id]);
+          });
+
+          // No AcroForm is created, so nothing needs flattening: the values are
+          // already ordinary page content.
+          return pdfDoc.save().then(function (bytes) {
+            return new Blob([bytes], { type: 'application/pdf' });
           });
         });
-      pages.forEach(function (pdfPage, index) {
-        if (!plans[index].shifts.length) return;
-        Expander.shiftPageContent(pdfDoc, pdfPage, plans[index].shifts);
-      });
-      transfers.forEach(function (transfer) {
-        Expander.placePageContent(pdfDoc, transfer.sourcePage, transfer.targetPage,
-                                  transfer.flow, transfer.content);
-      });
-
-      ctx.plans = plans;
-
-      // What the manager is told about: rows were added, nothing to decide.
-      if (typeof opts.onExpansion === 'function' && decided.notes.length) {
-        opts.onExpansion(decided.notes);
-      }
-
-      template.fields.forEach(function (field) {
-        if ((field.type || 'text') === 'check') drawCheckField(ctx, field);
-        else drawTextField(ctx, field, decided.planned.byField[field.id]);
-      });
-
-      // No AcroForm is created, so nothing needs flattening: the values are
-      // already ordinary page content.
-      return pdfDoc.save().then(function (bytes) {
-        return new Blob([bytes], { type: 'application/pdf' });
-      });
     });
   }
   Renderer.render = render;
