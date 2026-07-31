@@ -1247,7 +1247,11 @@
     var keys = Object.keys(fontSpec);
     return Promise.all(keys.map(function (key) {
       return loadFontBytes(fontSpec[key]).then(function (bytes) {
-        return pdfDoc.embedFont(bytes, { subset: true });
+        // fontkit may mutate its input while building the first subset. Keep
+        // the cached download immutable and give every render a fresh buffer;
+        // otherwise the first PDF in a browser session differs from all later
+        // PDFs despite identical template, map and payload.
+        return pdfDoc.embedFont(bytes.slice(0), { subset: true });
       });
     })).then(function (embedded) {
       var map = {};
@@ -1896,7 +1900,15 @@
         // parsed document is not a proof of which source bytes produced it;
         // reviewed operator ranges validate against this exact fetch instead.
         templateBytes = new Uint8Array(buf.slice(0));
-        return PDFLib.PDFDocument.load(buf, { ignoreEncryption: true });
+        // Loading must not stamp the wall-clock time into /ModDate. Besides
+        // changing metadata the manager never asked us to change, the default
+        // makes two otherwise identical renders differ when they straddle a
+        // clock-second boundary. Preserve the authoritative metadata so the
+        // same template, map and payload produce byte-identical output.
+        return PDFLib.PDFDocument.load(buf, {
+          ignoreEncryption: true,
+          updateMetadata: false
+        });
       })
       .then(function (pdfDoc) {
         if (global.fontkit) {

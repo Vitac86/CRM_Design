@@ -7,14 +7,16 @@ Every production map is rendered with every synthetic RU/EN profile through the
 production engine, and each generated file is inspected with pymupdf against the
 rules the business set:
 
-  - no dynamic text below the 9 pt readability floor;
+  - no legacy dynamic text below the 9 pt readability floor (reviewed Word-flow
+    runs may use their exact, locked source size);
   - no clipping — every drawn line stays inside the region it was assigned;
   - no appended page, and the page count matches the map;
   - no AcroForm and no widget annotations;
   - Cyrillic and Latin remain extractable;
-  - the base template's own content is untouched (nothing removed, and the only
-    vector lines added are the reviewed continuation rules);
+  - the base template's protected content is untouched outside exact,
+    hash-reviewed Word-flow replacement ranges;
   - checkbox marks are unchanged in size.
+  - repeated generation is byte-for-byte deterministic.
 
 Overflows are reported per document and field so the audit report can separate a
 source-layout limitation from an implementation defect.
@@ -32,6 +34,7 @@ import sys
 import fitz  # pymupdf
 
 from headless_browser import STATIC_UIKIT, Chrome, Server
+from run_structural_pdf_tests import comparison_pdf, reviewed_ranges_by_page
 
 TEMPLATES = os.path.join(STATIC_UIKIT, "assets", "document-pdf-templates")
 
@@ -46,6 +49,54 @@ PROFILES = [
     "en-nonresident-long", "en-company-normal", "en-company-long",
     "mixed-ru-en", "missing-optional", "maximum-checkboxes", "minimum-required",
 ]
+
+RENDER = r"""
+(async function (docId, profileId) {
+  const t = CRMDocumentEngine.fieldMaps[docId];
+  const project = CRMDocumentBuilder.schema.fromProduction(t, null);
+  const payload = CRMDocumentBuilder.fixtures.payloadFor(profileId, project);
+  let reviewedRanges = [];
+  const reviewedFontSizes = {};
+  CRMDocumentEngine.overlayRenderer.activeReviewedRangePages(t, payload)
+    .forEach(function (group) {
+      const sizes = [];
+      group.blocks.forEach(function (block) {
+        [block.fontSize, block.minFontSize].forEach(function (size) {
+          if (Number(size) > 0) sizes.push(Number(size));
+        });
+        (block.runs || []).forEach(function (run) {
+          if (Number(run.fontSize) > 0) sizes.push(Number(run.fontSize));
+        });
+      });
+      reviewedFontSizes[group.page] = Array.from(new Set(sizes));
+    });
+  try {
+    const first = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
+      onReviewedRanges: function (entries) {
+        reviewedRanges = entries.map(function (entry) {
+          return { page: entry.page, inspection: entry.suppression };
+        });
+      }
+    });
+    const second = await CRMDocumentEngine.overlayRenderer.render(t, payload);
+    const a = new Uint8Array(await first.arrayBuffer());
+    const b = new Uint8Array(await second.arrayBuffer());
+    let deterministic = a.length === b.length;
+    for (let i = 0; deterministic && i < a.length; i += 1) {
+      if (a[i] !== b[i]) deterministic = false;
+    }
+    let s = ''; const c = 0x8000;
+    for (let i = 0; i < a.length; i += c) {
+      s += String.fromCharCode.apply(null, a.subarray(i, i + c));
+    }
+    return JSON.stringify({ pdf: btoa(s), deterministic: deterministic,
+      reviewedRanges: reviewedRanges, reviewedFontSizes: reviewedFontSizes });
+  } catch (error) {
+    return JSON.stringify({ error: true, message: error.message,
+      overflows: error.overflows || [] });
+  }
+}(DOC, PROFILE))
+"""
 
 
 def overlay_spans(page):
@@ -85,11 +136,36 @@ def rule_shapes(page):
     )
 
 
-def inspect(pdf_bytes, template_path, expected_pages):
+def painted_image_counter(document):
+    """Images actually painted, independent of unused page resource entries."""
+    result = collections.Counter()
+    for page in document:
+        for image in page.get_image_info(hashes=True):
+            digest = image.get("digest") or b""
+            result[(bytes(digest), int(image.get("width") or 0),
+                    int(image.get("height") or 0), int(image.get("bpc") or 0),
+                    str(image.get("cs-name") or image.get("colorspace") or ""))] += 1
+    return result
+
+
+def inspect(pdf_bytes, template_path, expected_pages, reviewed=None,
+            reviewed_font_sizes=None, deterministic=True):
     """Structural verdict for one generated document."""
     problems = []
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
+    ranges_by_page = reviewed_ranges_by_page(reviewed, base.page_count)
+    protected_bytes = comparison_pdf(template_path, ranges_by_page) \
+        if ranges_by_page else None
+    protected = fitz.open(stream=protected_bytes, filetype="pdf") \
+        if protected_bytes else base
+    approved_sizes = {
+        int(page): [float(size) for size in sizes]
+        for page, sizes in (reviewed_font_sizes or {}).items()
+    }
+
+    if not deterministic:
+        problems.append("repeated generation is not byte-for-byte deterministic")
 
     if generated.page_count != base.page_count:
         problems.append(f"page count {generated.page_count} != base {base.page_count}")
@@ -101,6 +177,11 @@ def inspect(pdf_bytes, template_path, expected_pages):
     widgets = sum(1 for page in generated for _ in page.widgets())
     if widgets:
         problems.append(f"{widgets} widget annotation(s)")
+    generated_annotations = sum(len(list(page.annots())) for page in generated)
+    base_annotations = sum(len(list(page.annots())) for page in base)
+    if generated_annotations != base_annotations:
+        problems.append(
+            f"annotations {generated_annotations} != base {base_annotations}")
 
     smallest = None
     cyrillic = latin = False
@@ -110,7 +191,10 @@ def inspect(pdf_bytes, template_path, expected_pages):
         for size, text, _bbox in spans:
             if smallest is None or size < smallest:
                 smallest = size
-            if size < MIN_DYNAMIC_FONT_SIZE - 1e-6:
+            source_locked = any(
+                abs(size - approved) <= 0.05
+                for approved in approved_sizes.get(index, []))
+            if size < MIN_DYNAMIC_FONT_SIZE - 1e-6 and not source_locked:
                 problems.append(
                     f"page {index}: dynamic text at {size} pt — «{text[:28]}»")
             if any("Ѐ" <= ch <= "ӿ" for ch in text):
@@ -120,15 +204,24 @@ def inspect(pdf_bytes, template_path, expected_pages):
             if not page.rect.contains(fitz.Rect(_bbox)):
                 problems.append(f"page {index}: drawn text outside the page — «{text[:24]}»")
 
-        # The base template's own content must survive untouched: every printed
-        # rule is still there, and any added line is a reviewed continuation.
-        removed = rule_shapes(base[index]) - rule_shapes(page)
+        # Every vector outside an exact reviewed replacement survives. The
+        # comparison source has only those SHA-proved ranges removed.
+        removed = rule_shapes(protected[index]) - rule_shapes(page)
         if removed:
             problems.append(
-                f"page {index}: {sum(removed.values())} base vector rule(s) lost "
+                f"page {index}: {sum(removed.values())} protected vector rule(s) lost "
                 f"— {list(removed)[:3]}")
 
-    return {
+    generated_images = painted_image_counter(generated)
+    base_images = painted_image_counter(base)
+    if generated_images != base_images:
+        missing_images = base_images - generated_images
+        added_images = generated_images - base_images
+        problems.append(
+            f"painted images changed: {sum(missing_images.values())} missing / "
+            f"{sum(added_images.values())} added")
+
+    result = {
         "problems": problems,
         "smallestDynamicSize": smallest,
         "cyrillic": cyrillic,
@@ -139,6 +232,11 @@ def inspect(pdf_bytes, template_path, expected_pages):
             for i in range(min(generated.page_count, base.page_count))
         ),
     }
+    generated.close()
+    if protected is not base:
+        protected.close()
+    base.close()
+    return result
 
 
 def main() -> int:
@@ -168,26 +266,27 @@ def main() -> int:
             template_path = os.path.join(TEMPLATES,
                                          os.path.basename(maps[doc_id]["url"]))
             for profile in profiles:
-                browser.goto(f"{server.base}/tools/document-map-audit.html"
-                             f"?render={doc_id}&profile={profile}")
-                browser.wait_for_title()
-                raw = browser.eval("document.getElementById('out').textContent") or ""
                 entry = {"doc": doc_id, "profile": profile}
-                if raw.startswith("BASE64_START"):
-                    pdf = base64.b64decode(raw[len("BASE64_START"):-len("BASE64_END")])
+                script = (RENDER
+                          .replace("DOC", json.dumps(doc_id))
+                          .replace("PROFILE", json.dumps(profile)))
+                payload = json.loads(browser.eval(script, await_promise=True))
+                if not payload.get("error"):
+                    pdf = base64.b64decode(payload["pdf"])
                     if args.keep:
                         with open(os.path.join(args.keep,
                                                f"{doc_id}--{profile}.pdf"), "wb") as fh:
                             fh.write(pdf)
-                    entry.update(inspect(pdf, template_path, maps[doc_id]["pages"]))
+                    entry.update(inspect(
+                        pdf, template_path, maps[doc_id]["pages"],
+                        payload.get("reviewedRanges"),
+                        payload.get("reviewedFontSizes"),
+                        payload.get("deterministic", False)))
                     entry["ok"] = not entry["problems"]
-                elif raw.startswith("ERROR_START"):
-                    payload = json.loads(raw[len("ERROR_START"):-len("ERROR_END")])
+                else:
                     entry.update({"ok": False, "overflow": True,
                                   "message": payload.get("message"),
                                   "overflows": payload.get("overflows") or []})
-                else:
-                    entry.update({"ok": False, "message": "harness produced no output"})
                 report.append(entry)
             done = sum(1 for e in report if e["doc"] == doc_id and e.get("ok"))
             print(f"{doc_id:36s} {done}/{len(profiles)}", flush=True)
