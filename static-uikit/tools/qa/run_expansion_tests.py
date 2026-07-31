@@ -485,6 +485,89 @@ def main() -> int:
                      len(rules_on(u_doc, 0)) == len(rules_on(poa_base, 0)),
                      f"{len(rules_on(u_doc, 0))} vs {len(rules_on(poa_base, 0))}")
 
+        # ── Preflight and final render decide the same layout ────────────────
+        #
+        # The wizard tells a manager what will happen before the document is
+        # generated. That promise is only worth anything if the two cannot
+        # disagree: they run the same decision pass, and the fingerprint of what
+        # it decided is compared here for every document and every profile.
+        agreement = browser.eval(
+            """
+            (async function () {
+              const ids = Object.keys(CRMDocumentEngine.fieldMaps).sort();
+              const profiles = ['ru-resident-normal', 'ru-company-normal',
+                                'en-nonresident-normal', 'en-company-normal',
+                                'ru-resident-long', 'ru-company-long'];
+              const out = { compared: 0, mismatches: [], preflightOnly: [],
+                            renderOnly: [] };
+              for (const id of ids) {
+                const t = CRMDocumentEngine.fieldMaps[id];
+                const project = CRMDocumentBuilder.schema.fromProduction(t, null);
+                for (const profile of profiles) {
+                  const payload = CRMDocumentBuilder.fixtures.payloadFor(profile, project);
+                  let pre = null, preError = null;
+                  try { pre = await CRMDocumentEngine.overlayRenderer.preflight(t, payload); }
+                  catch (e) { preError = e.name; }
+                  let drew = null, renderError = null;
+                  try {
+                    await CRMDocumentEngine.overlayRenderer.render(t, payload, {
+                      onPlan: function (decided) { drew = decided.fingerprint; }
+                    });
+                  } catch (e) { renderError = e.name; }
+                  // A configuration fault stops both; a value that does not
+                  // fit is reported by the preflight and thrown by the render.
+                  if (preError || renderError) {
+                    if (!preError !== !renderError && !(pre && !pre.ok)) {
+                      out.mismatches.push(id + '/' + profile + ' preflight=' +
+                        preError + ' render=' + renderError);
+                    }
+                  }
+                  if (pre && pre.ok && renderError) {
+                    out.preflightOnly.push(id + '/' + profile);
+                  }
+                  if (pre && !pre.ok && !renderError) {
+                    out.renderOnly.push(id + '/' + profile);
+                  }
+                  if (pre && drew) {
+                    out.compared += 1;
+                    if (pre.fingerprint !== drew) {
+                      out.mismatches.push(id + '/' + profile + ' fingerprint');
+                    }
+                  }
+                }
+              }
+              return JSON.stringify(out);
+            }())
+            """, await_promise=True)
+        verdict = json.loads(agreement)
+        checks.check("preflight and final render decide the same layout",
+                     verdict["compared"] > 90 and not verdict["mismatches"],
+                     json.dumps(verdict, ensure_ascii=False)[:400])
+        checks.check("a successful preflight is never a failed generation",
+                     not verdict["preflightOnly"],
+                     json.dumps(verdict["preflightOnly"], ensure_ascii=False))
+        checks.check("a refused preflight is never a silent success",
+                     not verdict["renderOnly"],
+                     json.dumps(verdict["renderOnly"], ensure_ascii=False))
+
+        # The same payload twice gives the same plan, character for character.
+        stable = browser.eval(
+            """
+            (async function () {
+              const t = CRMDocumentEngine.fieldMaps['power-of-attorney'];
+              const project = CRMDocumentBuilder.schema.fromProduction(t, null);
+              const payload = CRMDocumentBuilder.fixtures.payloadFor('en-nonresident-normal', project);
+              const a = await CRMDocumentEngine.overlayRenderer.preflight(t, payload);
+              const b = await CRMDocumentEngine.overlayRenderer.preflight(t, payload);
+              return JSON.stringify({ same: a.fingerprint === b.fingerprint,
+                                      rows: a.expansion.length, ok: a.ok });
+            }())
+            """, await_promise=True)
+        repeatable = json.loads(stable)
+        checks.check("the layout plan is deterministic for the same payload",
+                     repeatable["same"] and repeatable["ok"] and repeatable["rows"] == 3,
+                     stable)
+
         # ── No dynamic text below 9 pt anywhere in an expanded page ──────────
         smallest = None
         for _key, (document, _n, _p) in outputs.items():

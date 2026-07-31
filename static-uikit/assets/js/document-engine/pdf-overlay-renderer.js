@@ -1118,14 +1118,128 @@
     );
   }
 
+
+  // ── The one decision pass ──────────────────────────────────────────────────
+  //
+  // Everything between "here is a payload" and "draw it": which fields need
+  // extra rows, what each page's plan is, and where every line of every value
+  // lands. The Document Wizard's preflight and the final render call THIS, so
+  // a preflight that succeeds cannot be followed by a generation that fails —
+  // there is no second implementation to disagree with.
+  function decide(template, payload, pages, fonts) {
+    var demands = expansionDemands(template, payload, fonts);
+    var plans = {};
+    var rowsByField = {};
+    var planErrors = [];
+    var pageLayout = template.pageLayout || {};
+    pages.forEach(function (pdfPage, index) {
+      var pagePlan = Expander.planPage(index, demands, pdfPage.getSize().height,
+                                       pageLayout[index]);
+      plans[index] = pagePlan;
+      pagePlan.rows.forEach(function (row) {
+        rowsByField[row.fieldId] = (rowsByField[row.fieldId] || []).concat(
+          Layout.normalizeRegion(row.region, { flowRegions: [1, 2] }, 1));
+      });
+      pagePlan.errors.forEach(function (error) { planErrors.push(error); });
+    });
+
+    var regionsFor = makeRegionsFor(plans, rowsByField);
+    var planned = plan(template, payload, fonts, { regionsFor: regionsFor });
+
+    planErrors.forEach(function (error) {
+      var field = (template.fields || []).filter(function (item) {
+        return item.id === error.fieldId;
+      })[0] || {};
+      planned.overflows.push({
+        documentId: template.id,
+        documentTitle: template.title || template.id,
+        fieldId: error.fieldId,
+        label: field.label || error.fieldId,
+        source: field.source || null,
+        reason: error.reason,
+        editable: !!field.source && field.source.indexOf('extra.') === 0,
+        message: 'страница не может быть расширена: ' + error.message
+      });
+    });
+
+    return {
+      demands: demands,
+      plans: plans,
+      rowsByField: rowsByField,
+      planned: planned,
+      notes: expansionNotes(template, plans),
+      fingerprint: fingerprintOf(template, plans, planned)
+    };
+  }
+  Renderer.decide = decide;
+
+  // What the manager is told about: rows were added, nothing to decide.
+  function expansionNotes(template, plans) {
+    var notes = [];
+    Object.keys(plans).forEach(function (index) {
+      (plans[index].consumption || []).forEach(function (entry) {
+        var field = (template.fields || []).filter(function (item) {
+          return item.id === entry.fieldId;
+        })[0] || {};
+        notes.push({
+          page: Number(index),
+          fieldId: entry.fieldId,
+          label: field.label || entry.fieldId,
+          rows: entry.rows,
+          delta: entry.delta,
+          remaining: entry.remaining
+        });
+      });
+    });
+    return notes;
+  }
+
+  // A deterministic, human-readable summary of the layout that was decided:
+  // every page shift, every inserted row, and every line of every value with
+  // the size and region it landed in. Identical input gives an identical
+  // string, so QA can prove the preflight and the final render agreed.
+  function fingerprintOf(template, plans, planned) {
+    var parts = ['doc=' + template.id];
+    Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
+      .forEach(function (index) {
+        var page = plans[index];
+        if (!page.shifts.length && !page.errors.length) return;
+        parts.push('p' + index +
+          ' shift=' + page.shifts.map(function (shift) {
+            return (shift.fieldId || shift.kind) + '@' + shift.fromTop +
+              ':' + shift.delta;
+          }).join(',') +
+          ' rows=' + page.rows.map(function (row) {
+            return row.fieldId + '@' + row.region.rowTop;
+          }).join(',') +
+          ' recovered=' + (page.recovered || 0) +
+          ' err=' + page.errors.map(function (e) {
+            return e.fieldId + ':' + e.reason;
+          }).join(','));
+      });
+    Object.keys(planned.byField).sort().forEach(function (id) {
+      var result = planned.byField[id];
+      if (!result.drawn) {
+        parts.push(id + '=' + (result.reason || 'skipped'));
+        return;
+      }
+      parts.push(id + '@' + result.layout.size + ' ' +
+        result.layout.lines.map(function (line) {
+          return line.regionIndex + ':' + line.lineIndex + ':' + line.text;
+        }).join('|'));
+    });
+    return parts.join('\n');
+  }
+  Renderer.fingerprintOf = fingerprintOf;
+
   // ── Public API ─────────────────────────────────────────────────────────────
 
-  // Render a template with a payload and resolve to a PDF Blob.
+  // Load the committed template, check the map against it and embed the fonts.
   //
-  // template: {
-  //   id, templateUrl, expectedPages, fonts: { key: url }, fields: [...]
-  // }
-  function render(template, payload, options) {
+  // Both `render` and `preflight` start here, so the document a preflight
+  // reasons about is the one that would be generated, measured with the same
+  // embedded faces.
+  function open(template, options) {
     var opts = options || {};
     var PDFLib = global.PDFLib;
     if (!PDFLib) return Promise.reject(new Error('PDF-модуль (pdf-lib) не загружен.'));
@@ -1163,7 +1277,8 @@
             template.expectedPages + ' стр., в файле ' + pages.length + '.');
         }
 
-        var problems = validateTemplate(template, pages, opts.validatePayload ? payload : null);
+        var problems = validateTemplate(template, pages,
+          opts.validatePayload ? opts.payload : null);
         if (problems.length) {
           console.error('Document template "' + template.id + '" configuration problems:',
             problems);
@@ -1172,109 +1287,100 @@
         }
 
         return embedFonts(pdfDoc, template.fonts || {}).then(function (fonts) {
-          var ctx = {
-            documentId: template.id,
-            pages: pages,
-            fonts: fonts,
-            payload: payload,
-            // Black unless the source document intentionally uses another colour.
-            color: opts.color || PDFLib.rgb(0, 0, 0)
-          };
-
-          // ── Page-section expansion ─────────────────────────────────────────
-          // Decide which permitted fields need extra rows, then build one plan
-          // per page. The plan drives the static content shift and the overlay
-          // shift alike.
-          var demands = expansionDemands(template, payload, fonts);
-          var plans = {};
-          var rowsByField = {};
-          var planErrors = [];
-          var pageLayout = template.pageLayout || {};
-          pages.forEach(function (pdfPage, index) {
-            var pagePlan = Expander.planPage(index, demands, pdfPage.getSize().height,
-                                             pageLayout[index]);
-            plans[index] = pagePlan;
-            pagePlan.rows.forEach(function (row) {
-              rowsByField[row.fieldId] = (rowsByField[row.fieldId] || []).concat(
-                Layout.normalizeRegion(row.region, { flowRegions: [1, 2] }, 1));
-            });
-            pagePlan.errors.forEach(function (error) { planErrors.push(error); });
-          });
-
-          // ── Preflight ──────────────────────────────────────────────────────
-          // Lay every visible field out with the fonts actually embedded in
-          // this document, and with the regions it will really have. Nothing is
-          // drawn and no Blob exists until the whole document is known to be
-          // printable, so a failure reports every problem at once instead of
-          // dying on the first one.
-          var regionsFor = makeRegionsFor(plans, rowsByField);
-          var planned = plan(template, payload, fonts, { regionsFor: regionsFor });
-
-          planErrors.forEach(function (error) {
-            var field = template.fields.filter(function (item) {
-              return item.id === error.fieldId;
-            })[0] || {};
-            planned.overflows.push({
-              documentId: template.id,
-              documentTitle: template.title || template.id,
-              fieldId: error.fieldId,
-              label: field.label || error.fieldId,
-              source: field.source || null,
-              reason: error.reason,
-              editable: !!field.source && field.source.indexOf('extra.') === 0,
-              message: 'страница не может быть расширена: ' + error.message
-            });
-          });
-
-          if (planned.overflows.length) {
-            throw OverflowError(template.id, template.title || template.id,
-              planned.overflows);
-          }
-
-          // Only now that the document is known to be printable is the page
-          // content actually rewritten.
-          var expandedPages = [];
-          pages.forEach(function (pdfPage, index) {
-            if (!plans[index].shifts.length) return;
-            Expander.shiftPageContent(pdfDoc, pdfPage, plans[index].shifts);
-            expandedPages.push(index);
-          });
-
-          ctx.plans = plans;
-
-          // What the manager is told about: rows were added, nothing to decide.
-          if (typeof opts.onExpansion === 'function') {
-            var notes = [];
-            Object.keys(plans).forEach(function (index) {
-              (plans[index].consumption || []).forEach(function (entry) {
-                var field = template.fields.filter(function (item) {
-                  return item.id === entry.fieldId;
-                })[0] || {};
-                notes.push({
-                  page: Number(index),
-                  fieldId: entry.fieldId,
-                  label: field.label || entry.fieldId,
-                  rows: entry.rows,
-                  delta: entry.delta,
-                  remaining: entry.remaining
-                });
-              });
-            });
-            if (notes.length) opts.onExpansion(notes);
-          }
-
-          template.fields.forEach(function (field) {
-            if ((field.type || 'text') === 'check') drawCheckField(ctx, field);
-            else drawTextField(ctx, field, planned.byField[field.id]);
-          });
-
-          // No AcroForm is created, so nothing needs flattening: the values are
-          // already ordinary page content.
-          return pdfDoc.save().then(function (bytes) {
-            return new Blob([bytes], { type: 'application/pdf' });
-          });
+          return { pdfDoc: pdfDoc, pages: pages, fonts: fonts };
         });
       });
+  }
+  Renderer.open = open;
+
+  // Decide the layout for a payload without drawing anything.
+  //
+  // The wizard's preflight and QA use this; it loads the same file, embeds the
+  // same fonts and runs the same decision pass as `render`, so a preflight that
+  // succeeds cannot be followed by a generation that fails for the same
+  // payload. `fingerprint` is a deterministic summary of the layout decided,
+  // which is what QA compares against the one the render actually drew.
+  function preflight(template, payload, options) {
+    var opts = options || {};
+    return open(template, {
+      validatePayload: opts.validatePayload, payload: payload
+    }).then(function (context) {
+      var decided = decide(template, payload, context.pages, context.fonts);
+      return {
+        ok: !decided.planned.overflows.length,
+        fingerprint: decided.fingerprint,
+        overflows: decided.planned.overflows,
+        expansion: decided.notes,
+        summary: decided.planned.summary
+      };
+    });
+  }
+  Renderer.preflight = preflight;
+
+  // Render a template with a payload and resolve to a PDF Blob.
+  //
+  // template: {
+  //   id, templateUrl, expectedPages, fonts: { key: url }, fields: [...]
+  // }
+  function render(template, payload, options) {
+    var opts = options || {};
+    var PDFLib = global.PDFLib;
+    if (!PDFLib) return Promise.reject(new Error('PDF-модуль (pdf-lib) не загружен.'));
+
+    return open(template, {
+      validatePayload: opts.validatePayload, payload: payload
+    }).then(function (context) {
+      var pdfDoc = context.pdfDoc;
+      var pages = context.pages;
+      var ctx = {
+        documentId: template.id,
+        pages: pages,
+        fonts: context.fonts,
+        payload: payload,
+        // Black unless the source document intentionally uses another colour.
+        color: opts.color || PDFLib.rgb(0, 0, 0)
+      };
+
+      // ── Preflight ──────────────────────────────────────────────────────────
+      // One decision pass, shared with Renderer.preflight: which fields need
+      // extra rows, what each page's plan is, and where every line of every
+      // value lands. Nothing is drawn and no Blob exists until the whole
+      // document is known to be printable, so a failure reports every problem
+      // at once instead of dying on the first one.
+      var decided = decide(template, payload, pages, context.fonts);
+      var plans = decided.plans;
+      if (typeof opts.onPlan === 'function') opts.onPlan(decided);
+
+      if (decided.planned.overflows.length) {
+        throw OverflowError(template.id, template.title || template.id,
+          decided.planned.overflows);
+      }
+
+      // Only now that the document is known to be printable is the page
+      // content actually rewritten.
+      pages.forEach(function (pdfPage, index) {
+        if (!plans[index].shifts.length) return;
+        Expander.shiftPageContent(pdfDoc, pdfPage, plans[index].shifts);
+      });
+
+      ctx.plans = plans;
+
+      // What the manager is told about: rows were added, nothing to decide.
+      if (typeof opts.onExpansion === 'function' && decided.notes.length) {
+        opts.onExpansion(decided.notes);
+      }
+
+      template.fields.forEach(function (field) {
+        if ((field.type || 'text') === 'check') drawCheckField(ctx, field);
+        else drawTextField(ctx, field, decided.planned.byField[field.id]);
+      });
+
+      // No AcroForm is created, so nothing needs flattening: the values are
+      // already ordinary page content.
+      return pdfDoc.save().then(function (bytes) {
+        return new Blob([bytes], { type: 'application/pdf' });
+      });
+    });
   }
   Renderer.render = render;
 
