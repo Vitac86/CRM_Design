@@ -416,12 +416,18 @@ every mapped width against the printed blank it sits in and is the first thing
 to run when a short value does not fit: the map may simply be wrong.
 
 Power-of-attorney is the exception that proves the rule. Its ИНН, ОГРН,
-citizenship and date slots are genuinely 20–54 pt wide, the map is correct, and
-the values are exact — so those four take an inserted row each, printing the
+citizenship, authority and date slots are genuinely 20–54 pt wide, the map is
+correct, and the values are exact — so each takes an inserted row, printing the
 complete value unbroken on the ruled line directly beneath its label. A 10-digit
 ИНН is never split.
 
-### The schema
+It is also the form that exhausts its local page reserve. A foreign-individual
+variant needs six rows where the page itself funds four. Its reviewed
+`crossPageFlow` transfers a complete trailing power to the following page and
+recovers the remaining room; all six exact values then print at or above 9 pt.
+See `docs/document-text-layout-audit.md` §5b for the measured boundaries.
+
+### The schema — the field's row
 
 ```js
 {
@@ -431,17 +437,16 @@ complete value unbroken on the ruled line directly beneath its label. A 10-digit
   expansion: {
     page: 0,
     insertionTop: 297.6,      // where a row opens
-    rowHeight: 14,            // one inserted row
-    maxExtraRows: 2,          // the most THIS field may insert
     shiftFromTop: 297.6,      // top of the movable block
-    shiftToTop: 830.0,        // bottom of it — content below stays fixed
-    bottomReserve: 250.0,     // measured free space; the most the block may travel
+    rowHeight: 11.5,          // measured from the form, NOT a standard 14
+    maxExtraRows: 2,          // the most THIS field may insert
+    maxFontSize: 9.5,         // the size the form itself is set in
     lineStyle: 'underline',   // 'underline' | 'table-row'
     reviewStatus: 'approved', // production refuses anything else
     line: {
       left: 99.3, width: 435.7,
-      baselineOffset: 10.5,   // text baseline inside the row
-      ruleOffset: 12.4,       // rule position inside the row
+      baselineOffset: 8.9,    // text baseline inside the row
+      ruleOffset: 9.98,       // baseline + the measured rule offset
       ruleThickness: 0.48     // matched to a printed rule nearby
     }
   }
@@ -454,6 +459,103 @@ the table it joins — including rules that break at column boundaries.
 
 Nothing is inferred at runtime. Every one of those numbers must be present, and
 validation rejects the field if any is missing.
+
+### The schema — the page's budget
+
+A page has one amount of room, not one per field. It is stated once, on the
+template, and every anchor on that page shares it:
+
+```js
+pageLayout: {
+  0: {
+    fixedHeaderUntil: 0,        // nothing above this ever moves
+    bodyBottom: 756.96,         // lowest movable content, measured
+    fixedFooterFrom: 789.97,    // the page number. Never moves, ever.
+    shiftToTop: 783.0,          // bottom of the movable band; excludes the footer
+    bottomClearance: 6.0,       // white space kept between the two
+    compaction: [               // reviewed gaps between two COMPLETE blocks
+      { top: 62.60, originalGap: 63.85, minGap: 42.5,
+        reviewStatus: 'approved', note: 'верхнее поле, 2.25 → 1.5 см' }
+    ],
+    anchors: ['ulOgrn', 'ulInn', 'ulAttorneyCitizenship']
+  }
+}
+```
+
+```
+bottomCapacity = fixedFooterFrom - bottomClearance - bodyBottom
+recoverable    = sum over compaction zones of (originalGap - minGap)
+budget         = bottomCapacity + recoverable
+```
+
+If those two sources are insufficient, an approved `crossPageFlow` may add one
+more measured term:
+
+```js
+crossPageFlow: {
+  targetPage: 3,
+  sourceFromTop: 725.90, sourceToTop: 788.00,
+  sourceContentTop: 731.02, retainedBodyBottom: 725.86,
+  targetInsertionTop: 55.92,
+  targetShiftFromTop: 55.90, targetShiftToTop: 788.00,
+  targetShift: 36.24, maxCumulativeShift: 36.24,
+  maxCascadeDepth: 1,
+  reviewStatus: 'approved'
+}
+```
+
+The source band must contain only complete balanced drawing blocks. The engine
+removes those original operator bytes from the source page once, merges any
+required page resources without name collisions, and prepends the same bytes to
+the target page under a translation matrix. It then moves the target page's
+existing content by the declared amount. No block is copied, reconstructed or
+rasterised. Cascading beyond one following page and unreviewed rules are
+rejected.
+
+`measure_page_layout.py` produces every one of those numbers from the committed
+PDF, including detecting the fixed footer: a trailing block separated from the
+body by several line pitches and narrower than 120 pt is a page number, and a
+page number never moves.
+
+A field may not also state a `bottomReserve` of its own beside a page budget —
+that is the duplication the page budget replaced, and validation rejects it. A
+map written before the page budget existed keeps working: its anchors all
+described the same page, so the smallest of their reserves is that page's
+budget.
+
+### Recovering reviewed white space
+
+A compaction zone names the gap between two **complete** blocks, the minimum a
+human approved for it, and therefore how much it may release. It is spent
+lazily, in declaration order, and only as far as the inserted rows actually
+need — a document that expands by nothing never compacts anything.
+
+A page's own top margin is a compaction zone whose upper block is the sheet
+edge. That is how the доверенность pays for its rows: 2.25 cm → 1.5 cm on the
+legal-entity page, 2.0 cm → 1.5 cm on the individual one.
+
+What may never be recovered: line height inside a paragraph, the font size, the
+vertical scale of anything, an individual table cell without a row rule, or a
+gap below the first insertion point — the planner refuses that last one, because
+recovering it would move the anchor's own row.
+
+### Only the scenario being printed pays
+
+Rows are asked for by values that are really going to be drawn. A field switched
+off by `showWhen`, an empty optional value and a missing required value cost the
+page nothing. This matters most where one file carries two documents: the
+доверенность holds a legal-entity variant on pages 1–2 and an individual one on
+pages 3–4, and a доверенность for a company must spend nothing on page 3.
+
+Anchors are then allocated top to bottom against the one budget, so capacity an
+anchor does not use is left to the ones below it, and the plan reports where the
+room went:
+
+```
+ulOgrn                 1 row × 12 pt   cumulative 12   remaining 49.36
+ulInn                  1 row × 12 pt   cumulative 24   remaining 37.36
+ulAttorneyCitizenship  1 row × 12 pt   cumulative 36   remaining 25.36
+```
 
 ### How the page actually moves
 
@@ -503,12 +605,13 @@ content below the address    → +42 pt
 
 ### Reserve, and the footer
 
-Expansion is allowed only while `required shift ≤ bottomReserve`. `shiftToTop`
-bounds the movable block, so a page with a fixed footer keeps it fixed: top
-section fixed, middle section expandable, footer fixed. Signature blocks and
-footer spacing are never moved or compressed unless the map says so explicitly.
-When the reserve runs out the manager gets a field-specific error, not a
-generic failure.
+Expansion is allowed only while `cumulative shift ≤ page budget`. `shiftToTop`
+bounds the movable block and may not reach `fixedFooterFrom`, so a page with a
+fixed footer keeps it fixed: top section fixed, middle section expandable,
+footer fixed. Signature blocks and footer spacing are never moved or compressed
+unless the map says so explicitly. When the budget runs out the field that could
+not be paid for gets a field-specific error naming it and the reason — and only
+that field: the anchors already granted rows keep them.
 
 ### When the value fits
 
@@ -518,10 +621,23 @@ comparing the drawn vector rules against the base template.
 
 ## 6a. Preflight
 
-`render()` lays out every visible field — with the fonts actually embedded in
-that document — *before* it draws anything. If any value cannot be printed it
-throws a `DocumentOverflowError` carrying every diagnostic at once, and no Blob
-is produced for a document that cannot be printed.
+Loading the committed template, checking the map against it and embedding the
+fonts is `Renderer.open`. Deciding which fields need rows, what each page's plan
+is and where every line of every value lands is `Renderer.decide`.
+
+`Renderer.preflight` runs both and stops. `render` runs both and draws. There is
+no second implementation of the decision for them to disagree over, so a
+preflight that succeeds cannot be followed by a generation that fails for the
+same payload.
+
+`decide` also returns a **fingerprint**: a deterministic, readable summary of
+every page shift, every inserted row and every line of every value with the size
+and region it landed in. `render` hands it to `onPlan`, and
+`run_expansion_tests.py` compares the two over 18 maps × 6 profiles.
+
+If any value cannot be printed, `render` throws a `DocumentOverflowError`
+carrying every diagnostic at once, and no Blob is produced for a document that
+cannot be printed.
 
 Each diagnostic carries the document, the user-facing label, the field id, the
 length of the value, the minimum size, the number of approved lines available
@@ -580,7 +696,17 @@ issuing authority, long registration address, missing optional values, all
 checkboxes on, all off. All fixture data is obviously fictional; **never commit
 generated PDFs containing real personal data.**
 
-For every page of every migrated document, confirm at 100 % zoom:
+`run_visual_geometry_tests.py --keep out/` writes the synthetic examples this
+checklist is meant to be applied to: no expansion, one inserted row, the maximum
+approved rows, two anchors on one page, both доверенность variants, a company
+name in a table, an address in a table row and an activated cross-page transfer.
+The same run also *measures* the
+claims below that can be measured — rule weight and measure, text sitting on the
+rule with its descenders clear, one pitch per anchor, no rule without text, and
+no printed glyph covered.
+
+For every page of every migrated document, confirm at high zoom, at normal
+viewing scale and at print scale:
 
 - [ ] dynamic text looks manually typed into the original form
 - [ ] page count unchanged; no page added or lost
@@ -591,6 +717,9 @@ For every page of every migrated document, confirm at 100 % zoom:
 - [ ] the original blank underline is still visible beneath inserted text
 - [ ] no blue fields, borders, focus rectangles, labels or form styling
 - [ ] no appended data/confirmation sheet
+- [ ] an inserted row looks like a row the form printed itself
+- [ ] page numbers, headers and footers are where the template put them
+- [ ] no unexplained empty row
 
 Test the output in the Chrome/Edge viewer, the Firefox viewer, and Adobe Reader
 where available.
@@ -660,16 +789,34 @@ does not fit, the document map is the thing to fix.
    is legally equivalent (a numeric date for a spelled-out month, for example).
 6. Decouple `glyphSize` on checkboxes from the body-size constant — a checkbox
    mark is geometry over a printed box, not dynamic text.
-7. Re-run `tools/qa/run_document_regression.py` and check the report.
+7. Bound every multiline cell with the `maxHeight`
+   `measure_field_room.py` reports for it. A cell with no bound is not
+   generous — it is unbounded, and a long value runs through whatever the form
+   prints below it.
+8. Where a page needs inserted rows, measure it once with
+   `measure_page_layout.py` and give the template a `pageLayout` entry rather
+   than a `bottomReserve` per field.
+9. Take the row height from `measure_page_layout.py --row`, not from habit.
+10. Re-run `tools/qa/run_document_regression.py`,
+    `check_expansion_anchors.py`, `run_structural_pdf_tests.py` and
+    `run_visual_geometry_tests.py`, and check the reports.
 
 ## 14. QA entry points
 
 | Command | What it proves |
 | --- | --- |
-| `python static-uikit/tools/qa/run_layout_specs.py` | the layout engine, against the real embedded font |
-| `python static-uikit/tools/qa/run_document_regression.py` | every map × every RU/EN profile, plus PDF structure |
-| `python static-uikit/tools/qa/run_wizard_tests.py` | the Document Wizard end to end |
-| `python static-uikit/tools/qa/run_builder_qa.py` | the Template Builder |
+| `run_layout_specs.py` | the layout engine, against the real embedded font |
+| `run_document_regression.py` | every map × every RU/EN profile, plus PDF structure |
+| `run_expansion_tests.py` | page budgets, scenario allocation, white-space recovery, preflight/render agreement |
+| `run_structural_pdf_tests.py` | every original operator exactly once, read by pymupdf *and* pypdf |
+| `run_visual_geometry_tests.py` | what a generated row looks like, measured; writes the QA examples with `--keep` |
+| `run_wizard_tests.py` | the Document Wizard end to end |
+| `run_builder_qa.py` | the Template Builder |
+| `check_expansion_anchors.py` | every anchor and compaction zone sits on a clean operator cut |
+| `measure_page_layout.py` | a page's reserve, its fixed footer, its block gaps and its row geometry |
+| `audit_ordinary_failures.py` | the failure matrix, split into ordinary / realistic-long / stress |
+
+All under `static-uikit/tools/qa/`.
 
 There is no Node on the target workstation, so these drive Chrome over the
 DevTools protocol. The same pages open by hand in any browser over

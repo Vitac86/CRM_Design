@@ -1,14 +1,16 @@
 # Text-layout audit — 18 production maps, 621 fields
 
-Measured on 2026-07-30 against the committed base templates, with the
-production layout engine and the real embedded font.
+Measured against the committed base templates, with the production layout engine
+and the real embedded font.
 
 Reproduce with:
 
 ```bash
-python static-uikit/tools/qa/dump_field_maps.py --out maps.json
-python static-uikit/tools/qa/measure_field_room.py --maps maps.json
+python static-uikit/tools/qa/dump_field_maps.py --out static-uikit/tools/qa/maps.json
+python static-uikit/tools/qa/measure_field_room.py --maps static-uikit/tools/qa/maps.json
+python static-uikit/tools/qa/measure_page_layout.py
 python static-uikit/tools/qa/run_document_regression.py
+python static-uikit/tools/qa/audit_ordinary_failures.py
 ```
 
 ## 1. Scope
@@ -70,16 +72,6 @@ Never dropping below the size already in production matters: those sizes are
 proven on paper, and the measurement is conservative (it uses the font's
 typographic ascent, not its cap height).
 
-Vertical room per field, measured from the committed templates:
-
-| Room available | Fields |
-| --- | --- |
-| ≥ 12 pt | 152 |
-| 11–12 pt | 169 |
-| 10–11 pt | 45 |
-| 9–10 pt | 21 |
-| < 9 pt | 10 |
-
 ### Documents that keep a smaller preferred size, and why
 
 | Document | Preferred | Reason (measured) |
@@ -91,53 +83,211 @@ Vertical room per field, measured from the committed templates:
 
 A further **92 individual rows** carry a measured exception below their
 document's preferred size. Each records its measurement in a comment beside the
-value, in a `ROW_SIZE` table or as a named constant. The tightest:
+value, in a `ROW_SIZE` table or as a named constant.
 
-| Field | Room | Preferred | Note |
+## 4. A cell may only use the room it has
+
+A multiline cell is bounded by `maxHeight`, measured with
+`measure_field_room.py` as the clear space beneath its baseline inside its own
+horizontal band. A cell with no bound is not generous — it is unbounded, and a
+long value runs straight through whatever the form prints below it.
+
+Two maps built their fields from a named list of properties that omitted
+`maxHeight`, so six cells were unbounded and four of them really did overprint:
+
+| Field | Clear space | Lines at 9 pt |
+| --- | --- | --- |
+| `power-of-attorney/ulAttorneyIssuedBy` | 8.71 pt | 1 |
+| `power-of-attorney/ulAttorneyAddress` | 8.71 pt | 1 |
+| `power-of-attorney/flPrincipalAddress` | 8.71 pt | 1 |
+| `power-of-attorney/flAttorneyIssuedBy` | 8.71 pt | 1 |
+| `power-of-attorney/flPrincipalIssuedBy` | 26.83 pt | 3 |
+| `power-of-attorney/flAttorneyAddress` | 26.74 pt | 3 |
+| `qualification-notice/recipientAddress` | 36.97 pt | 4 |
+
+`run_visual_geometry_tests.py` now fails if any drawn glyph covers a printed one.
+
+## 5. Where a document grows a row
+
+A value that does not fit its printed blank is not necessarily unprintable: a
+page has vertical reserve even when its body has no blank band, and the
+generated document can grow a row the way Word would have. Thirty-three anchors,
+four compaction zones and three cross-page transfers do so. All 43 source,
+target, anchor and compaction boundaries are verified to sit on a clean operator
+cut with `check_expansion_anchors.py`.
+
+### The budget belongs to the page
+
+A page has one amount of room, not one per field. `template.pageLayout[n]`
+states it once, measured with `measure_page_layout.py`:
+
+```
+bottomCapacity = fixedFooterFrom - bottomClearance - bodyBottom
+recoverable    = sum over compaction zones of (originalGap - minGap)
+budget         = bottomCapacity + recoverable
+```
+
+For an approved cross-page rule, the page can additionally recover the band
+between `retainedBodyBottom` and `bodyBottom`. That capacity is available only
+after bottom reserve and reviewed compaction are exhausted, and only when the
+whole declared source block can be transferred to the immediately following
+page.
+
+Every active anchor draws on that budget in top-to-bottom order, so capacity an
+anchor does not need is left to the ones below it. Only the scenario being
+printed spends anything: a field switched off by `showWhen`, an empty optional
+value and a missing required value all cost zero. Compaction is applied lazily
+and only as far as the rows actually need, so a document that expands by nothing
+is the form exactly as printed.
+
+The fixed footer never moves. `shiftToTop` is bounded by the page's measured
+`fixedFooterFrom`, and a configuration that reaches it is refused.
+
+| Page | Budget | Bottom | Recoverable white space |
 | --- | --- | --- | --- |
-| `order-forms/securityPrice` | 0.76 pt | 10 pt | kept at the size already in production |
-| `accession-application-yul/tariffDerivatives` | 7.60 pt | 9 pt | policy floor |
-| `accession-application-fl/tariffStock`, `tariffDerivatives`, `tariffCurrency` | 8.89 pt | 9 pt | policy floor |
-| `accession-application-yul/companyOgrn`, `companyLegalAddress` | 8.98 pt | 9 pt | policy floor |
+| `power-of-attorney` p1 (ЮЛ) | 61.36 | 27.01 | top margin 2.25→1.5 cm (21.35) + two header gaps (13.00) |
+| `power-of-attorney` p3 (ФЛ) | 44.42 | 29.79 | top margin 2.0→1.5 cm (14.63) |
+| `qualification-notice` p1 | 230.88 | 230.88 | — |
+| `qualification-consequences-notice` p1 | 199.53 | 199.53 | — |
+| `order-forms` p1 | 43.28 | 43.28 | — |
+| `anketa-fl` p2 | 34.34 | 34.34 | — |
 
-Ten rows have less than 9 pt of measured room and are printed at 9 pt anyway,
-because the floor is absolute. They are the rows listed above.
+### Rows are the form's own, not a standard 14 pt
 
-## 4. Capacity added
+Measured per document with `measure_page_layout.py --row`:
 
-| Change | Where |
-| --- | --- |
-| Value cells use their whole measured box | all four анкеты — 160 cells |
-| Fixed-height cells derive leading from the size | 23 fields across 8 documents |
-| Reviewed Word-like continuation lines | 6 (below) |
-| Safe formatter fallback added | `accession-application-fl/passportIssueMonthYear` |
+| Document | Body | Pitch | Ink | Rule below baseline | Weight | Generated row |
+| --- | --- | --- | --- | --- | --- | --- |
+| `power-of-attorney` | 10.56 pt | 18.12 | 11.69 | 1.20 | 0.48 | 12.0 (ЮЛ) / 11.0 (ФЛ) |
+| `qualification-notice` | 9.96 pt | 11.52 | 11.03 | 1.08 | 0.48 | 11.5 |
+| `qualification-consequences-notice` | 9.96 pt | 11.52 | 11.03 | 1.08 | 0.48 | 11.5 |
+| `anketa-fl` p2 (table) | 9.48 pt | 13.44 | 10.50 | border | 0.48 | 13.44 |
+| `order-forms` p1 (table) | 9.00 pt | 20.40 | 9.96 | border | 0.48 | 20.40 |
 
-### Generated continuation lines
+The ФЛ доверенность uses an 11.0 pt row carrying 9.5 pt text rather than the
+12.0 pt row of its own body: that page needs a fourth row and 44.42 pt is what
+it has. The text stays well above the 9 pt floor.
 
-Each is a baseline plus a visible rule, drawn as ordinary vector page content
-and matching the form's own underlines — 0.36 pt thick, 1.5 pt below the
-baseline, measured at 1200 dpi from the printed rules on the same page.
+### Every anchor
 
-| Document | Field | Page | Baseline | Left | Width | Thickness | Max size | Reference underline | Review |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `accession-application-fl` | `registrationAddress` | 0 | 148.70 | 56.6 | 501.0 | 0.36 | 9.5 | identity paragraph rules, p0 | approved |
-| `accession-application-fl` | `passportIssuedBy` | 0 | 157.70 | 56.6 | 501.0 | 0.36 | 9.5 | identity paragraph rules, p0 | approved |
-| `accession-application-fl` | `signatureName` | 1 | 778.00 | 400.3 | 46.7 | 0.36 | 9.5 | signature parentheses, p1 | approved |
-| `accession-application-fl` | `tariffStock` | 0 | 481.00 | 437.7 | 119.9 | 0.36 | 9.5 | tariff column rules, p0 | approved |
-| `accession-application-fl` | `tariffDerivatives` | 0 | 520.60 | 437.7 | 119.9 | 0.36 | 9 | tariff column rules, p0 | approved |
-| `accession-application-fl` | `tariffCurrency` | 0 | 541.50 | 437.7 | 119.9 | 0.36 | 9.5 | tariff column rules, p0 | approved |
+| Document | Field | Page | Anchor | Max rows × height | Style |
+| --- | --- | --- | --- | --- | --- |
+| `qualification-notice` | `recipientName` | 1 | 181.20 | 2 × 11.5 | underline |
+| `qualification-notice` | `clientName` | 1 | 297.60 | 2 × 11.5 | underline |
+| `qualification-notice` | `registerEntryOrgName` | 1 | 484.95 | 2 × 11.5 | underline |
+| `qualification-consequences-notice` | `applicantFullName` | 1 | 210.49 | 2 × 11.5 | underline |
+| `accession-application-fl` | `clientFullName` | 1 | 101.70 | 1 × 10.5 | underline |
+| `anketa-fl` | `passportIssuedBy` | 1 | 503.59 | 1 × 13.44 | table-row |
+| `anketa-yul` | `licenceAuthority` | 3 | 193.94 | 1 × 17.4 | table-row |
+| `client-notifications` | `clientFullName` | 9 | 280.00 | 1 × 12.5 | underline |
+| `client-notifications` | `passportIssuedBy` | 9 | 302.00 | 1 × 12.5 | underline |
+| `client-notifications` | `registrationAddress` | 9 | 339.10 | 1 × 14 | underline |
+| `code-word-request` | `clientFullName` | 1 | 238.75 | 1 × 13 | underline |
+| `broker-use-refusal-request` | `clientName` | 1 | 196.46 | 2 × 14 | underline |
+| `regulation-full-refusal-notice` | `clientName` | 1 | 203.30 | 2 × 14 | underline |
+| `regulation-partial-refusal-notice` | `clientName` | 1 | 183.14 | 2 × 14 | underline |
+| `account-opening-notice` | `clientName` | 1 | 279.65 | 2 × 14 | underline |
+| `qualification-request-fl` | `quarterlyTransactionsValueMillions` | 1 | 679.53 | 1 × 14 | underline |
+| `anketa-yul` | `bankAddress` | 3 | 289.00 | 2 × 16.92 | table-row |
+| `anketa-fl` | `bankAddress` | 2 | 318.65 | 2 × 13.44 | table-row |
+| `order-forms` | `tradeClientName` | 1 | 228.02 | 2 × 20.40 | table-row |
+| `power-of-attorney` | `ulOgrn` | 1 | 159.74 | 1 × 12 | underline |
+| `power-of-attorney` | `ulInn` | 1 | 159.74 | 1 × 12 | underline |
+| `power-of-attorney` | `ulCity` | 1 | 135.30 | 1 × 12 | underline |
+| `power-of-attorney` | `ulExecutiveName` | 1 | 196.00 | 1 × 12 | underline |
+| `power-of-attorney` | `ulAttorneyName` | 1 | 232.00 | 1 × 12 | underline |
+| `power-of-attorney` | `ulAttorneyCitizenship` | 1 | 232.00 | 1 × 12 | underline |
+| `power-of-attorney` | `ulAttorneyIssuedBy` | 1 | 250.49 | 1 × 12 | underline |
+| `power-of-attorney` | `ulAttorneyAddress` | 1 | 268.61 | 1 × 12 | underline |
+| `power-of-attorney` | `flPrincipalCitizenship` | 3 | 128.66 | 1 × 11 | underline |
+| `power-of-attorney` | `flPrincipalIssuedBy` | 3 | 146.78 | 1 × 11 | underline |
+| `power-of-attorney` | `flPrincipalAddress` | 3 | 183.14 | 1 × 11 | underline |
+| `power-of-attorney` | `flAttorneyCitizenship` | 3 | 219.00 | 1 × 11 | underline |
+| `power-of-attorney` | `flAttorneyIssuedBy` | 3 | 219.00 | 1 × 11 | underline |
+| `power-of-attorney` | `flAttorneyIssueDate` | 3 | 237.38 | 1 × 11 | underline |
 
-Blank bands they occupy, from `measure_field_room.py --gaps`: 140.22–159.95
-(identity paragraph), 472.19–502.75 / 512.99–522.79 / 533.03–545.00 (tariff
-column), 773.31–800.00 (below the signature block).
+Each generated row is a baseline plus a visible rule, drawn as ordinary vector
+page content at the weight the form uses on that page. No rule is drawn where no
+text landed, so a short value leaves the form exactly as printed.
 
-Verified against the base template: **no vector rule is added when a
-continuation region receives no text**, so a short value leaves the form exactly
-as printed.
+### Anchors deliberately not configured
 
-## 5. Structural QA of generated PDFs
+The printed name in the signature block of
+`broker-use-refusal-request`, `regulation-full-refusal-notice` and
+`regulation-partial-refusal-notice` sits inside one drawing block together with
+the signature rule and the caption; nothing within 50 pt below it leaves every
+block wholly on one side.
 
-234 document × profile combinations, 137 rendered:
+All five other candidates an earlier phase recorded as impossible are now
+configured. `qualification-notice/registerEntryOrgName` and
+`qualification-consequences-notice/applicantFullName` needed the probe to use
+the real movable band. `power-of-attorney/ulCity`,
+`code-word-request/clientFullName` and
+`accession-application-fl/clientFullName` use the nearest complete cut that
+keeps the label and its own printed answer together. The exact cuts are part of
+the 43-boundary check above.
+
+## 5a. Power of attorney
+
+This document carries a доверенность from a legal entity on pages 1–2 and one
+from an individual on pages 3–4 of the same file, and it is the tightest form in
+the set. Four separate things were wrong with it.
+
+**It paid for the variant it was not printing.** Every generated доверенность
+moved 28 pt of the other variant's pages for nothing, and spent reserve the
+printed variant needed, because a field switched off by `showWhen` was asking
+for rows. Fixed in the engine, not in the map.
+
+**Its page numbers moved.** The movable band ran past the footer, so an expanded
+доверенность carried its page number 28 pt down the sheet.
+
+**Four of its cells had no height** — see §4.
+
+**Two printed rules were unmapped.** «…действующего на основании ___» and
+«уполномочивает гр. ___» both wrap in the source: the blank ends one line and
+continues at the start of the next before the sentence resumes. The map declared
+only the second rule of each pair, reporting 96 pt and 107 pt of room where the
+form gives 138.86 pt and 206.36 pt.
+
+Ordinary-value result, by subject:
+
+| Subject | Rows needed | Budget | Result |
+| --- | --- | --- | --- |
+| Russian legal entity | 4 × 12 = 48 | 61.36 | passes |
+| Foreign legal entity | 5 × 12 = 60 | 61.36 | passes |
+| Russian individual | 4 × 11 = 44 | 44.42 | passes |
+| Foreign individual | 6 × 11 = 66 | 44.42 + 36.24 cross-page | **passes** |
+
+## 5b. Reviewed cross-page flow
+
+A доверенность given by a **foreign individual** needs six continuation rows on
+page 3: citizenship for the principal and for the attorney, both issuing
+authorities, the registration address and the date of issue. The page has
+44.42 pt — 29.79 pt above its page number plus 14.63 pt of top margin taken down
+to 1.5 cm — which is four rows of 11 pt.
+
+The approved solution uses the existing source wording and page count. A
+complete balanced block containing the final two lines of an enumerated power is
+removed from page 3's content stream and inserted before its continuation on
+page 4. The existing page-4 content moves down 36.24 pt, freeing the remaining
+two rows on page 3. Page 4 has ample measured reserve.
+
+The legal-entity half has a second reviewed rule: when a realistic-long company
+scenario exhausts page 1, the final complete ten-line power moves to page 2 and
+the existing page-2 body moves 181.20 pt. Client notifications has the third
+rule, moving its final complete page-9 paragraph to page 10 and shifting the
+existing target body 53.76 pt.
+
+Each rule names an explicit source band, retained body bottom, target insertion,
+target movable band, exact shift, one-page cascade limit and approval status.
+Production and the Builder reject missing, unreviewed or multi-page cascades.
+Source/target resources are merged only when same-named resources refer to the
+same object. The original operator bytes are transferred exactly once; they are
+not copied, clipped into bands, rasterised or reconstructed.
+
+## 6. Structural QA of generated PDFs
+
+234 document × profile combinations, 177 rendered:
 
 | Check | Result |
 | --- | --- |
@@ -149,304 +299,42 @@ as printed.
 | AcroForm fields | 0 |
 | Widget annotations | 0 |
 | Base template vector rules lost | 0 |
-| Cyrillic extractable | 126/137 (the rest are Latin-only profiles) |
-| Latin extractable | 125/137 |
-| Vector rules added (reviewed continuation lines) | 706 |
+| Cyrillic / Latin extractable | yes, both |
 
-## 5a. Reclassification after dynamic page expansion
+`run_structural_pdf_tests.py` adds 1624 checks over every document as printed
+and fully expanded, with pymupdf and pypdf together: every original show-text
+operator survives exactly once document-wide, no original operator is lost, the
+added `q … cm … Q` wrappers remain balanced, the static text is complete under
+both parsers, and nothing is rasterised. Document-wide ownership is intentional
+for the three cross-page rules; the same original operator never remains on both
+pages.
 
-The first pass of this audit assumed that a value which does not fit needs
-either an existing blank line or nothing at all, and concluded that several
-documents — power-of-attorney above all — were blocked. That conclusion was
-withdrawn: pages have vertical reserve even when their bodies have no blank
-band, and a document can grow a row.
+`run_visual_geometry_tests.py` adds 247 checks on what a generated row looks
+like — weight, measure, the text sitting on the rule with its descenders clear,
+one pitch per anchor, no rule without text, inserted verticals on printed
+columns, no printed glyph covered, and an explicitly activated cross-page case.
 
-Every remaining case was re-examined against six questions: is the mapped width
-wrong; is the test value realistic; is the field naturally expandable; is it an
-exact short identifier that should fit once mapped correctly; does the page have
-reserve; and would shifting the lower section preserve the legal structure.
+## 7. Overflow by profile class
 
-| Classification | Fields | Notes |
+| Class | Fields | Release gate |
 | --- | --- | --- |
-| Mapping correction | 0 | `measure_slot_widths.py` found no field mapped materially narrower than its printed blank. The maps sit 2–4 pt inside each rule, which is the correct inset. |
-| Normal wrapping / existing continuation space | — | already solved in the previous phase (анкета cells, Appendix 1A continuation lines) |
-| Dynamic layout expansion | 13 | see below |
-| Fixture defect, not a layout problem | 3 | a "long" city was a 17-character sentence, likewise an authority basis and a security issuer |
-| Extreme stress only | 41 | fails only in the deliberately maximal profiles |
-| Genuine source limitation | 7 | fails with ordinary values and the page has no room left |
+| ordinary | **0** | pass |
+| realistic-long only | **0** for supported subject variants and configured realistic fields | pass |
+| stress only | 23 | not a gate |
+| only in a subject the document does not apply to | 2 | not a gate |
 
-### Fields given dynamic layout expansion
+The release rerun resolves the earlier long-name, company-name, address, city
+and issuing-authority failures through the measured anchors listed above. The
+three short printed-name signature slots use their existing initials/surname
+fallbacks; deliberately oversized double-surname fixtures remain stress tests,
+not realistic-long fields.
 
-All thirteen are names, addresses or exact values that the form's own blanks
-cannot hold. Every anchor was verified to sit on a clean cut with
-`check_expansion_anchors.py`.
+### Stress-only
 
-| Document | Field | Page | Anchor | Rows × height | Reserve | Style |
-| --- | --- | --- | --- | --- | --- | --- |
-| `qualification-notice` | `recipientName` | 1 | 181.20 | 2 × 14 | 250.0 | underline |
-| `qualification-notice` | `clientName` | 1 | 297.60 | 2 × 14 | 250.0 | underline |
-| `client-notifications` | `registrationAddress` | 9 | 339.10 | 1 × 14 | 17.86 | underline |
-| `broker-use-refusal-request` | `clientName` | 1 | 196.46 | 2 × 14 | 323.87 | underline |
-| `regulation-full-refusal-notice` | `clientName` | 1 | 203.30 | 2 × 14 | 259.79 | underline |
-| `regulation-partial-refusal-notice` | `clientName` | 1 | 183.14 | 2 × 14 | 122.24 | underline |
-| `account-opening-notice` | `clientName` | 1 | 279.65 | 2 × 14 | 32.48 | underline |
-| `qualification-request-fl` | `quarterlyTransactionsValueMillions` | 1 | 679.53 | 1 × 14 | 113.86 | underline |
-| `anketa-yul` | `bankAddress` | 3 | 289.00 | 2 × 16.92 | 70.9 | table-row |
-| `power-of-attorney` | `ulOgrn` | 1 | 159.74 | 1 × 14 | 37.05 | underline |
-| `power-of-attorney` | `ulInn` | 1 | 159.74 | 1 × 14 | 37.05 | underline |
-| `power-of-attorney` | `flPrincipalCitizenship` | 3 | 128.66 | 1 × 14 | 32.13 | underline |
-| `power-of-attorney` | `flAttorneyIssueDate` | 3 | 237.38 | 1 × 14 | 32.13 | underline |
-
-### Anchors that had to be dropped
-
-Six fields were given an expansion that the page could not honour: no insertion
-point within ±30 pt leaves every drawing block wholly on one side, so the
-content cannot be split there at all. They keep their previous behaviour and
-appear in the limitations below.
-
-`broker-use-refusal-request/clientPrintedName`, `code-word-request/clientFullName`,
-`qualification-consequences-notice/applicantFullName`,
-`qualification-notice/registerEntryOrgName`,
-`regulation-full-refusal-notice/clientPrintedName`,
-`regulation-partial-refusal-notice/clientPrintedName`.
-
-### Expansion capacity of every page
-
-Measured as the free space beneath the lowest content. Every one of the 77
-template pages has room for at least one 14 pt row; the tightest are
-`client-notifications` page 6 (18.98 pt) and page 9 (21.86 pt), and
-`power-of-attorney` pages 1–4 (36–41 pt, two rows each). Several pages have
-100 pt or more.
-
-## 5b. Power-of-attorney: withdrawn conclusion
-
-The previous audit recorded this document as not production-ready and needing a
-revised Word source. That was wrong on one point of fact: it looked for blank
-bands **inside the body** and found none, and stopped there. The pages have
-36–41 pt of unused space at the foot, which is two inserted rows each.
-
-Re-checked in order:
-
-* **Is the map correct?** Yes. The printed blanks really are 27.48 pt for a
-  10-digit ИНН, 54.36 pt for a 13-digit ОГРН, 20.40 pt for «Россия» and
-  37.44 pt for a date. The map is 2–4 pt inside each rule — the correct inset.
-* **Can the text start earlier or use the whole blank?** No; the blanks are
-  bounded by printed text on both sides.
-* **Does a formatter add characters?** No.
-* **Is there page reserve?** Yes — and that is the answer.
-
-Each of the four fields that failed on ordinary values now takes one inserted
-row. The short printed slot stays blank and the complete exact value prints
-unbroken on the ruled row immediately below its label, keeping it attached to
-the label it belongs to.
-
-Power-of-attorney ordinary-value failures: **12 → 4**. It stays in the registry.
-The four that remain (`ulAuthorityBasis`, `ulAttorneyName`, `ulAttorneyCitizenship`,
-`flAttorneyCitizenship`) sit on pages whose two rows are already committed to the
-ИНН, ОГРН, citizenship and date above.
-
-## 6. Remaining source-layout limitations
-
-61 fields still cannot print their longest supported value at 9 pt. These are
-**not** silent failures: the wizard names the field, the value length, the
-available lines and the reason, and refuses to emit a document rather than
-printing something unreadable.
-
-For 43 of them the problem appears only in the deliberately extreme "long"
-profiles. **18 field/value combinations fail with ordinary values**, and 12 of
-those are in one document.
-
-### `power-of-attorney` — the source form needs wider blanks
-
-This is the significant finding. The ФЛ and ЮЛ доверенность are dense justified
-prose with inline blanks of 18–51 pt and 18.1 pt line spacing. There is **no
-blank band anywhere in the body** — `measure_field_room.py --gaps` over the full
-page height returns only the header gaps and the bottom margin — so there is
-nowhere to place a reviewed continuation line, and priority 3 of the
-continuation policy does not apply.
-
-Fields that cannot hold ordinary values at 9 pt:
-
-| Field | Slot | Ordinary value that does not fit |
-| --- | --- | --- |
-| `flPrincipalCitizenship` | 18.5 pt | «Россия» (6 characters) |
-| `ulInn` | 27.2 pt | a 10-digit ИНН |
-| `ulOgrn` | 51.0 pt | a 13-digit ОГРН |
-| `flAttorneyIssueDate` | 35.5 pt | a 10-character date |
-| `ulCity`, `ulAuthorityBasis`, `ulAttorneyName`, `ulExecutiveName`, `flAttorneyCitizenship`, `ulAttorneyCitizenship` | 17–47 pt | ordinary names, cities and grounds |
-
-Before this change these were drawn at 4.5–5.5 pt, which is precisely the
-unreadable output the business decision rejects. **Under the 9 pt policy this
-document is not production-ready**: the source Word form needs wider blanks and
-the base template must be regenerated.
-
-That regeneration is blocked for an unrelated reason — Word's PDF export hangs
-on this workstation, so `tools/docx-to-pdf.ps1` cannot rebuild any base template
-here. See the Office export issue before planning this work.
-
-### Everything else — long-profile-only limitations
-
-The tables below list every remaining field. "Ordinary values too = yes" marks
-the ones that fail in day-to-day use rather than only under the extreme
-fixtures; those are the ones worth widening a form for.
-
-* **no space left** — the value needs more lines than the form provides at 9 pt.
-* **unbreakable token** — one word is wider than every approved line and has no
-  separator to break at. Splitting it would mean inventing hyphenation.
-
-#### `accession-application-fl`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientEmail` | 62 chars | 1 | 1 | no space left | no |
-| `clientFullName` | 89 chars | 1 | 1 | no space left | no |
-| `signatureName` | 26 chars | 2 | 2 | unbreakable token | no |
-
-#### `accession-application-yul`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientEmail` | 62 chars | 1 | 1 | no space left | no |
-
-#### `account-opening-notice`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientName` | 89 chars | 1 | 1 | no space left | no |
-| `paymentPurposeCurrency` | 27 chars | 1 | 1 | no space left | no |
-| `paymentPurposeDerivatives` | 27 chars | 1 | 1 | no space left | no |
-| `paymentPurposeStock` | 27 chars | 1 | 1 | no space left | no |
-
-#### `anketa-fl`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `bankAddress` | 65 chars | 1 | 1 | no space left | **yes** |
-| `birthPlace` | 65 chars | 1 | 1 | no space left | **yes** |
-| `fullName` | 89 chars | 1 | 1 | no space left | no |
-| `otherInformation` | 75 chars | 1 | 1 | no space left | no |
-| `passportIssuedBy` | 79 chars | 1 | 1 | no space left | no |
-
-#### `anketa-fl-simplified-id`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientFullName` | 89 chars | 1 | 1 | no space left | no |
-| `pdlDetails` | 75 chars | 1 | 1 | no space left | no |
-
-#### `anketa-yul`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `bankAddress` | 65 chars | 1 | 1 | no space left | **yes** |
-| `email` | 62 chars | 1 | 1 | no space left | no |
-| `licenceAuthority` | 79 chars | 1 | 1 | no space left | no |
-| `licensedActivities` | 75 chars | 1 | 1 | no space left | no |
-| `managementStructure` | 75 chars | 1 | 1 | no space left | no |
-| `otherInformation` | 75 chars | 1 | 1 | no space left | no |
-| `signatoryPosition` | 41 chars | 1 | 1 | no space left | no |
-| `taxResidenceCountry` | 75 chars | 1 | 1 | no space left | no |
-
-#### `broker-use-refusal-request`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientName` | 89 chars | 1 | 1 | no space left | no |
-| `clientPrintedName` | 24 chars | 1 | 1 | no space left | no |
-| `contractNumber` | 47 chars | 1 | 1 | no space left | no |
-
-#### `client-notifications`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientFullName` | 89 chars | 1 | 1 | no space left | no |
-| `passportIssuedBy` | 145 chars | 1 | 1 | no space left | no |
-| `registrationAddress` | 172 chars | 1 | 1 | no space left | no |
-
-#### `code-word-request`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientFullName` | 89 chars | 1 | 1 | no space left | no |
-
-#### `order-forms`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `otherInformation` | 75 chars | 1 | 1 | no space left | no |
-| `securityIssuer` | 79 chars | 1 | 1 | no space left | no |
-| `tradeClientName` | 89 chars | 1 | 1 | no space left | no |
-
-#### `power-of-attorney`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `flAttorneyCitizenship` | 14 chars | 1 | 1 | no space left | **yes** |
-| `flAttorneyIssueDate` | 10 chars | 1 | 1 | no space left | **yes** |
-| `flAttorneyName` | 24 chars | 1 | 1 | unbreakable token | no |
-| `flPrincipalCitizenship` | 14 chars | 1 | 1 | unbreakable token | **yes** |
-| `flPrincipalIssuedBy` | 79 chars | 200 | 1 | unbreakable token | no |
-| `ulAttorneyCitizenship` | 14 chars | 1 | 1 | no space left | **yes** |
-| `ulAttorneyIssuedBy` | 79 chars | 2 | 1 | no space left | no |
-| `ulAttorneyName` | 41 chars | 1 | 1 | no space left | **yes** |
-| `ulAttorneyPassport` | 75 chars | 1 | 1 | no space left | no |
-| `ulAuthorityBasis` | 79 chars | 1 | 1 | no space left | **yes** |
-| `ulCity` | 75 chars | 1 | 1 | no space left | **yes** |
-| `ulExecutiveName` | 41 chars | 1 | 1 | no space left | no |
-| `ulInn` | 10 chars | 1 | 1 | unbreakable token | **yes** |
-| `ulOgrn` | 13 chars | 1 | 1 | unbreakable token | **yes** |
-
-#### `qualification-consequences-notice`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `applicantFullName` | 46 chars | 1 | 1 | no space left | no |
-
-#### `qualification-notice`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientName` | 89 chars | 1 | 1 | no space left | no |
-| `recipientName` | 89 chars | 1 | 1 | no space left | no |
-| `registerEntryOrgName` | 89 chars | 1 | 1 | no space left | **yes** |
-
-#### `qualification-request-fl`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `contractNumber` | 27 chars | 1 | 1 | no space left | no |
-| `quarterlyTransactionsValueMillions` | 16 chars | 1 | 1 | no space left | **yes** |
-| `signatureName` | 24 chars | 1 | 1 | no space left | no |
-
-#### `qualification-request-yul`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `supportingDocument1` | 75 chars | 1 | 1 | no space left | no |
-
-#### `regulation-full-refusal-notice`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientName` | 89 chars | 1 | 1 | no space left | no |
-| `clientPrintedName` | 24 chars | 1 | 1 | no space left | no |
-| `contractNumber` | 47 chars | 1 | 1 | no space left | no |
-
-#### `regulation-partial-refusal-notice`
-
-| Field | Longest value | Lines | Regions | Reason | Ordinary values too |
-| --- | --- | --- | --- | --- | --- |
-| `clientName` | 89 chars | 1 | 1 | no space left | no |
-| `clientPrintedName` | 24 chars | 1 | 1 | no space left | no |
-| `contractNumber` | 47 chars | 1 | 1 | no space left | no |
-
-## 7. Fields with no value in some profiles
-
-22 fields report a missing required value under the `missing-optional` and
-`minimum-required` fixture profiles - 16 of them in `anketa-ip-sz`, which marks
-fields required that those profiles strip. That is a payload question, not a
-layout one, and `run_document_regression.py` reports it separately so it cannot
-be mistaken for an overflow.
+23 fields fail only in the deliberately maximal profiles — 62-character e-mail
+addresses, 47-character contract numbers and 75-character synthetic sentences in
+free-text cells. They are not a release gate, and no artificial input limit has
+been imposed on exact legal values to make them pass.
 
 ## 8. Print overrides
 

@@ -91,7 +91,7 @@ without an overlay map cannot appear even by accident.
 
 | # | Source file | Document ID | Client type | Pages | PDF tpl | In wizard | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 20 | УВЕДОМЛЕНИЯ.pdf | `client-notifications` | оба | 10 | ✅ | ✅ | ◐ static |
+| 20 | УВЕДОМЛЕНИЯ.pdf | `client-notifications` | оба | 10 | ✅ | ✅ | ✅ migrated |
 | 21 | Ключевая_информация_о_договоре_….pdf | `brokerage-key-information` | оба | 3 | ✅ | ✅ | ◐ static |
 
 ## Totals
@@ -106,6 +106,14 @@ without an overlay map cannot appear even by accident.
 **Every dynamic source document is migrated.** All 18 generate through the real
 Document Wizard and have passed structural, visual and browser QA. Nothing is
 left template-only, map-only or registry-only.
+
+Final layout verification on **2026-07-31** covers 18 maps × 13 profiles:
+177/234 combinations render, with the other combinations returning explicit
+field overflow rather than clipping. Release classification is **0 ordinary,
+0 supported realistic-long and 23 stress-only fields**. Structural generation
+passes 1624/1624 checks, visual geometry 247/247, expansion 67/67, Wizard 20/20
+and Template Builder 59/59; the smallest dynamic text is 9.0 pt. All 43 reviewed
+anchor/compaction/cross-page boundaries are clean.
 
 The only documents not offered are the two intentional cases below:
 `anketa-isbyul` (no CRM subject model) and `transfer-requisites` (a broker
@@ -197,6 +205,12 @@ The file holds **two** powers of attorney — «от юридического л
 and «от физического лица» (pages 3–4). The variant matching the subject is
 filled and the other verified byte-for-byte blank. Page sizes are mixed
 (595.56 × 842.04 and 595.32 × 841.92) and are preserved.
+
+Both variants now pass ordinary and supported realistic-long fixtures. When
+local reserve is exhausted, reviewed one-page flow moves a complete trailing
+power from page 1 to page 2 or the final two lines of a power from page 3 to
+page 4. The authoritative four-page PDF, fixed wording and page count do not
+change; original content-stream operators are transferred exactly once.
 
 **The powers are not selectable:** zero checkbox glyphs anywhere in the
 document, no "other powers" line, no validity blank and no substitution option

@@ -234,68 +234,160 @@ citizenship are expected to fit through correct mapping and the 9 pt minimum.
 Check the mapping first — `static-uikit/tools/qa/measure_slot_widths.py`
 compares every field against the printed blank it sits in.
 
+### The budget belongs to the page, not to the field
+
+A page has one amount of room. **Запас страницы** states it once and every
+anchor on that page shares it, in top-to-bottom order, so capacity one anchor
+does not use is left to the ones below it:
+
+| Control | What it is |
+| --- | --- |
+| Фиксированная шапка до | nothing above this ever moves |
+| Низ подвижного текста | the lowest movable content, measured |
+| Фиксированный колонтитул от | the page number. It never moves. |
+| Подвижный блок: до | the bottom of the movable band; it may not reach the footer |
+| Просвет до колонтитула | the white space kept between the two |
+| Зона уплотнения | a reviewed gap between two **complete** blocks, and the smallest it may become |
+
+```
+запас = (колонтитул − просвет − низ текста) + Σ (просвет − минимум)
+```
+
+`static-uikit/tools/qa/measure_page_layout.py --doc <id>` produces every one of
+those numbers from the committed PDF, including finding the fixed footer, the
+blank bands between complete blocks and the page's own line pitch. Take them
+from it rather than from the canvas.
+
+A page's own top margin is a compaction zone whose upper block is the sheet
+edge. Compaction is applied lazily: a document that expands by nothing never
+compacts anything.
+
+### Reviewed cross-page flow
+
+When bottom reserve and approved compaction still cannot fund the active rows,
+**Перенос полного блока на следующую страницу** can transfer one complete
+balanced source block to the immediately following page. The page inspector
+edits the same production properties: source band and first content top,
+retained source-body bottom, target page and insertion top, target movable band,
+exact/max target shift, one-page cascade limit, review note and approval.
+
+The canvas marks the fixed header/footer plus the transfer's source band and
+shows the target page number. This is a reviewed operator-level transformation,
+not text re-entry: the original block is removed from its source content stream
+once and inserted on the target once. The Builder does not infer bands or offer
+automatic legal-text reflow.
+
 ### Workflow
 
-1. Select the logical field.
-2. Press **Добавить расширяемую строку**. The field is marked layout-expandable
+1. Measure the page: `measure_page_layout.py --doc <id>` for the reserve and the
+   block gaps, `--row <id> <page> <baseline> [left width]` for the row geometry.
+2. Select the logical field.
+3. Press **Добавить расширяемую строку**. The field is marked layout-expandable
    and a starting definition appears.
-3. Set the insertion anchor — where the row opens.
-4. Set the movable block: `Подвижный блок: от` … `до`. Everything below `до`
-   stays fixed, which is how a page with a footer keeps its footer.
-5. Set the bottom reserve — the measured free space under the lowest movable
-   content. It is the most the block may travel.
-6. Set the maximum number of rows this field may insert.
-7. Choose `Строка с подчёркиванием` or `Пустая строка таблицы`.
-8. Press **Взять толщину соседней линии** to copy the weight of a printed rule
-   nearby, then adjust the row's baseline and rule offsets.
-9. Read the shift preview: the inspector reports the movement at zero, one and
-   the maximum row count against the reserve.
-10. Look at the page. The canvas draws the insertion anchor, the end of the
+4. Set the insertion anchor — where the row opens.
+5. In **Запас страницы**, press **Задать запас страницы** if the page has none
+   yet, and enter the measured numbers. Add a compaction zone only where a real
+   gap separates two complete blocks, and tick its own review box.
+6. Set the row height to the one the form uses — *not* a standard 14 pt — and
+   the maximum row size to the size the form itself is set in.
+7. Set the maximum number of rows this field may insert.
+8. Choose `Строка с подчёркиванием` or `Пустая строка таблицы`.
+9. Press **Взять толщину соседней линии** to copy the weight of a printed rule
+   nearby, then set the row's baseline and rule offsets from the measurement.
+10. Read the previews: the movement at zero, one and the maximum row count
+    against the page budget, how much of that budget comes from recovered white
+    space, and what the other anchors on the page have already spoken for.
+11. Look at the page. The canvas draws the insertion anchor, the end of the
     movable block, and one preview rectangle per row that could open.
-11. Tick **Правило проверено визуально**.
+12. Tick **Правило проверено визуально**.
 
-Until step 11, `reviewStatus` stays `suggested` and production export is
+Until step 12, `reviewStatus` stays `suggested` and production export is
 blocked.
 
 ### What blocks export
 
-* the movable block is undefined or empty;
-* the maximum expansion exceeds the declared reserve;
-* the movable block runs past the page bottom;
-* a required number is missing — nothing is inferred at runtime;
-* the inserted row's width or rule thickness is missing;
-* the rule has not been visually reviewed.
+Of the page budget:
+
+* `bodyBottom` or `shiftToTop` missing;
+* the movable body overlapping the fixed footer;
+* the movable block reaching the fixed footer — a page number must not move;
+* the movable block running past the page bottom;
+* a compaction zone with no minimum, an impossible one, or one nobody has
+  looked at;
+* a page whose budget cannot pay for even one row of an anchor it lists;
+* an anchor listed that does not exist, has no expansion, or expands another
+  page.
+
+Of a cross-page rule:
+
+* any source, retained-body, target-band, insertion or shift number missing;
+* a target other than the immediately following page;
+* a target band outside that page or an insertion outside the band;
+* a requested shift above its declared maximum;
+* a cascade depth other than one;
+* missing review note or approval.
+
+Of the anchor:
+
+* a required number missing — nothing is inferred at runtime;
+* a `bottomReserve` of its own beside a page budget — the reserve of a page is
+  stated once;
+* the field not listed in that page's anchors;
+* an insertion point above the fixed header, or rows that would reach the
+  fixed footer;
+* the inserted row's width or rule thickness missing;
+* the rule not visually reviewed;
+* a minimum font size below 9 pt anywhere in the document.
 
 An inserted row that would overlap another field on the page is reported as a
-warning, since that field may itself be moving.
+warning, since that field may itself be moving; so is a compaction zone below
+the first insertion point, which the planner will not use.
 
 ### Finding a workable anchor
 
 A page can only be split where no drawing block crosses the line.
 `static-uikit/tools/qa/check_expansion_anchors.py --suggest` asks the
-production expander to try every declared anchor and scans nearby for the
-closest one that works. Run it after moving an anchor; six anchors were dropped
-during this work because their pages had no clean cut within ±30 pt.
+production expander to try every declared anchor **and every compaction zone**,
+and scans nearby for the closest cut that works. Run it after moving either.
+
+Two things to know before concluding that a page has no clean cut:
+
+* probe against the **real movable band**, not the page's content bottom. A band
+  that ends where the content ends cuts the trailing block in half, and then
+  every candidate straddles. Two anchors were wrongly rejected that way.
+* a clean cut in the wrong place is still no. Three candidates were refused
+  because the only available cut separates a label from what it labels — a date
+  rule from its own caption, a client's name from «следующее кодовое слово:»,
+  «выдан» from the blank it introduces.
 
 ### Round trip
 
-Expansion definitions survive builder JSON and production JS export unchanged,
-alongside flow regions, overflow strategy, sizes, line height, maximum lines and
-print-override permission. All 18 maps still round-trip semantically and no
-property is silently discarded.
+Expansion definitions and the page budget survive builder JSON and production JS
+export unchanged, alongside flow regions, overflow strategy, sizes, line height,
+maximum lines and print-override permission. `pageLayout` is a first-class
+project property, not an opaque passenger in `productionProperties`. All 18 maps
+still round-trip semantically, budget and anchors included, and no property is
+silently discarded. The three production `crossPageFlow` rules also round-trip
+exactly; editing one to incomplete or unreviewed blocks export.
 
 ### Migrating an existing map
 
 1. Open it; imported minimums below 9 pt are reported immediately.
 2. Raise the minimum to 9 and re-check the preferred size against the row.
    `static-uikit/tools/qa/measure_field_room.py` reports the real room.
-3. Where the value can be longer than the slot, add continuation regions.
-4. Keep existing safe fallbacks; add one where a shorter rendering is legally
+3. Bound every multiline cell with the height `measure_field_room.py` reports
+   for it. A cell with no bound is unbounded, and a long value runs through
+   whatever the form prints below it.
+4. Where the value can be longer than the slot, add continuation regions.
+5. Keep existing safe fallbacks; add one where a shorter rendering is legally
    equivalent.
-5. Run the profiles again and confirm the field reports `flow` rather than
+6. Where the page needs inserted rows, give it a page budget rather than a
+   reserve per field; the builder will refuse the second one.
+7. Run the profiles again and confirm the field reports `flow` rather than
    `overflow`.
 
-Known source-layout limitations across the 18 production maps are recorded in
+The release overflow classification and remaining non-blocking stress cases
+across the 18 production maps are recorded in
 [docs/document-text-layout-audit.md](../../docs/document-text-layout-audit.md).
 
 ## Test profiles and payload editor

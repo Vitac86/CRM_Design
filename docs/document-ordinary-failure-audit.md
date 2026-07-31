@@ -1,8 +1,9 @@
 # The seven ordinary-value failures — measured, classified, resolved
 
 Reproduced on the `387af77` baseline against the committed templates with the
-production engine and the real embedded font. Machine-readable companion:
-`static-uikit/tools/qa/ordinary-failures.json`.
+production engine and the real embedded font. The exact measured baseline is
+`static-uikit/tools/qa/ordinary-failures-baseline.json`; the current rerunnable
+release status is `static-uikit/tools/qa/ordinary-failures.json`.
 
 ```bash
 python static-uikit/tools/qa/dump_field_maps.py --out static-uikit/tools/qa/maps.json
@@ -22,6 +23,27 @@ python static-uikit/tools/qa/measure_page_layout.py --doc power-of-attorney
 18 maps × 13 profiles = 234 combinations. On the baseline: **7 ordinary
 failures**, 14 realistic-long-only, 27 stress-only, 0 structural problems,
 smallest generated size 9.0 pt.
+
+Final release rerun: **0 ordinary failures, 0 supported realistic-long
+failures, 23 stress-only fields, 0 structural problems**, and a smallest
+generated size of 9.0 pt. The seven baseline failures were resolved as follows:
+
+| Original field | Resolution |
+| --- | --- |
+| `anketa-fl/bankAddress` | measured inserted table row |
+| `anketa-fl/birthPlace` | fixture now supplies a place, not a street address |
+| `power-of-attorney/flAttorneyCitizenship` | measured inserted row; the six-row foreign scenario is funded by reviewed cross-page flow |
+| `power-of-attorney/ulAttorneyCitizenship` | measured inserted row |
+| `power-of-attorney/ulAttorneyName` | both printed continuation rules mapped; measured row remains available for realistic-long data |
+| `power-of-attorney/ulAuthorityBasis` | fixture corrected to the authority document and both printed rules mapped |
+| `qualification-notice/registerEntryOrgName` | clean 484.95 pt complete-block cut and 11.5 pt row |
+
+None of the seven was caused by maximum preallocation or the generic 14 pt row
+height. Scenario-aware allocation and measured row heights fixed real defects
+found during the reproduction, but the two emergent foreign-individual rows
+required the reviewed page-3-to-page-4 transfer documented in
+`document-text-layout-audit.md` §5b. There are no remaining genuine physical
+limitations for ordinary or supported realistic-long CRM values.
 
 ## 2. The matrix
 
