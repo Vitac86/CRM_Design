@@ -143,6 +143,9 @@
     if (/policy|polis/i.test(key)) return '1234 5678 9012 3456';
     if (/lots|quantity/i.test(key)) return long ? '1 000 000' : '150';
     if (/rate|price|nkd/i.test(key)) return long ? '1 234,5678' : '98,45';
+    // Fields whose printed label already says "млн руб." hold a compact
+    // number of millions, not a full currency amount with kopecks.
+    if (/millions/i.test(key)) return long ? '9 999' : '150';
     if (/amount|capital|income|turnover|assets|sum|value|premium|strike/i.test(key)) {
       return long ? '9 999 999 999,99' : '150 000,00';
     }

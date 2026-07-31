@@ -69,9 +69,133 @@
     expectedPages: 2,
     appliesTo: ['company'],
 
-    fonts: {
-      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 783.33,
+        fixedFooterFrom: null,
+        shiftToTop: 820.0,
+        bottomClearance: 20.0,
+        compaction: [],
+        anchors: ['qualification-request-yul-opening']
+      },
+      1: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 319.97,
+        fixedFooterFrom: null,
+        shiftToTop: 800.0,
+        bottomClearance: 56.70,
+        compaction: [],
+        anchors: ['qualification-request-yul-delivery-address']
+      }
     },
+
+    fonts: {
+      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf',
+      legalSerifItalic: '../assets/fonts/pdf/LiberationSerif-Italic.ttf'
+    },
+
+    wordFlowBlocks: [
+      {
+        id: 'qualification-request-yul-opening',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 85.10, baselineTop: 217.22, width: 470.26,
+          initialLineCount: 7
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 297.00, shiftFromTop: 297.00,
+          rowHeight: 11.52, maxExtraRows: 3, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 77, lastBlock: 125,
+          expectedBlockCount: 49, expectedPageBlockCount: 211,
+          expectedSha256: '700bfa0dd4888332a13c53c0878b236448048cf658e60e80f0c27d15def0c1f7',
+          expectedTemplateSha256: '9cff0dc94bbb155d6a4aadffa036d482b29f8a8cf1fbb63652cefe7ffc0ddeb8',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Прошу признать ________, Полное наименование организации ' +
+          'Договор № ________ от ________ квалифицированным инвестором в ' +
+          'отношении всех видов ценных бумаг и (или) производных финансовых ' +
+          'инструментов, предназначенных для квалифицированных инвесторов;',
+        runs: [
+          { type: 'static', text: 'Прошу признать ' },
+          {
+            type: 'fieldRef', fieldId: 'companyFullLegalName',
+            decoration: {
+              underline: true, minWidth: 425.23, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', ' },
+          { type: 'lineBreak' },
+          {
+            type: 'static', text: 'Полное наименование организации',
+            font: 'legalSerifItalic'
+          },
+          { type: 'lineBreak' },
+          { type: 'static', text: 'Договор № ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'contractNumber', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 123.26, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ' от ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'contractDate', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 87.62, thickness: 0.48, offset: 1.20
+            }
+          },
+          {
+            type: 'static',
+            text: ' квалифицированным инвестором в отношении всех видов ценных бумаг и (или) производных финансовых инструментов, предназначенных для квалифицированных инвесторов;'
+          }
+        ]
+      },
+      {
+        id: 'qualification-request-yul-delivery-address',
+        type: 'wordFlowBlock',
+        page: 1,
+        showWhen: { source: 'extra.extra-delivery-method', equals: 'address' },
+        frame: {
+          left: 110.66, baselineTop: 123.98, width: 386.00,
+          initialLineCount: 1
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 1, insertionTop: 135.70, shiftFromTop: 135.70,
+          rowHeight: 11.52, maxExtraRows: 5, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 31, lastBlock: 37,
+          expectedBlockCount: 7, expectedPageBlockCount: 106,
+          expectedSha256: 'b750a4dc49612793011be35b746ce78b1ed4d82373069127f17ac3e02507dc17',
+          expectedTemplateSha256: '9cff0dc94bbb155d6a4aadffa036d482b29f8a8cf1fbb63652cefe7ffc0ddeb8',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'по адресу: ________',
+        runs: [
+          { type: 'static', text: 'по адресу: ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'deliveryAddress',
+            decoration: {
+              underline: true, minWidth: 341.11, thickness: 0.48, offset: 1.20
+            }
+          }
+        ]
+      }
+    ],
 
     fields: [
       // Page 1 — applicant date: «__» ________ 20__ г.
@@ -87,13 +211,16 @@
 
       // The full legal name is typed on the source's single long rule.
       text('companyFullLegalName', 'subject.fullLegalName', 0, 127.70, 228.70, 425.23, {
-        required: true
+        required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-request-yul-opening'
       }),
       text('contractNumber', 'extra.extra-contract-number', 0, 132.02, 262.90, 123.26, {
-        required: true
+        required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-request-yul-opening'
       }),
       text('contractDate', 'extra.extra-contract-date', 0, 269.69, 262.90, 87.62, {
-        format: 'dateRu', align: 'center', required: true
+        format: 'dateRu', align: 'center', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-request-yul-opening'
       }),
 
       // Right-hand table column: one supporting-document cell per source
@@ -120,7 +247,9 @@
       check('deliveryAtOffice', 'extra.extra-delivery-method', 'office', 1, 99.26, 147.50),
       text('deliveryAddress', 'extra.extra-delivery-address', 1, 153.86, 123.30, 341.11, {
         optional: true,
-        showWhen: { source: 'extra.extra-delivery-method', equals: 'address' }
+        showWhen: { source: 'extra.extra-delivery-method', equals: 'address' },
+        layoutMode: 'flow-reference',
+        flowBlockId: 'qualification-request-yul-delivery-address'
       }),
       // The handwritten signature rule (351.31..446.49) remains blank. Only
       // the selected representative's printed name is drawn after the slash.

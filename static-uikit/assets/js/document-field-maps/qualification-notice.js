@@ -36,40 +36,6 @@
   var BODY = 12;          // preferred dynamic size for this form
   var MIN = 9;             // hard readability floor — never draw smaller
 
-  // ── Geometry of a generated continuation row, measured from this form ──────
-  //
-  //   python static-uikit/tools/qa/measure_page_layout.py --row qualification-notice 0 472.03
-  //
-  // The body is 9.96 pt Times at an 11.52 pt line pitch; ink height at that
-  // size is 11.03 pt and the printed rules are 0.48 pt thick, 1.08 pt below
-  // their baseline. 11.5 pt is the form's own row, and what a row added in Word
-  // would have been.
-  var ROW_HEIGHT = 11.5;
-  var ROW_MAX_SIZE = 9.5;          // the size the form itself is set in
-  var ROW_BASELINE = 8.9;          // ascent at 9.5 pt is 8.46
-  var ROW_RULE = 9.98;             // baseline + the measured 1.08 pt
-  var ROW_RULE_THICKNESS = 0.48;
-
-  function expansion(insertionTop, line, maxExtraRows) {
-    return {
-      page: 0,
-      insertionTop: insertionTop,
-      shiftFromTop: insertionTop,
-      rowHeight: ROW_HEIGHT,
-      maxExtraRows: maxExtraRows,
-      maxFontSize: ROW_MAX_SIZE,
-      lineStyle: 'underline',
-      reviewStatus: 'approved',
-      line: {
-        left: line.left,
-        width: line.width,
-        baselineOffset: ROW_BASELINE,
-        ruleOffset: ROW_RULE,
-        ruleThickness: ROW_RULE_THICKNESS
-      }
-    };
-  }
-
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
     return {
@@ -102,7 +68,10 @@
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
       label: o.label,
-      showWhen: o.showWhen
+      showWhen: o.showWhen,
+      layoutMode: o.layoutMode,
+      flowBlockId: o.flowBlockId,
+      allowMultipleFlowReferences: o.allowMultipleFlowReferences
     };
   }
 
@@ -140,13 +109,170 @@
         shiftToTop: 830.0,
         bottomClearance: 56.7,
         compaction: [],
-        anchors: ['recipientName', 'clientName', 'registerEntryOrgName']
+        anchors: [
+          'qualification-notice-recipient',
+          'qualification-notice-recognition',
+          'qualification-notice-register-entry'
+        ]
       }
     },
 
     fonts: {
-      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
+      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf',
+      legalSerifItalic: '../assets/fonts/pdf/LiberationSerif-Italic.ttf'
     },
+
+    wordFlowBlocks: [
+      {
+        id: 'qualification-notice-recipient',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 120.00, baselineTop: 177.02, width: 413.60,
+          initialLineCount: 2
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        paragraphSpacingAfter: 11.88, alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 212.20, shiftFromTop: 212.20,
+          rowHeight: 11.52, maxExtraRows: 6, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 47, lastBlock: 54,
+          expectedBlockCount: 8, expectedPageBlockCount: 197,
+          expectedSha256: '9278984594894804d710c1ee65321a27e8a7589070b18c080358ce0330b52fa3',
+          expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Кому:_________________________ Адрес:________________________',
+        runs: [
+          { type: 'spacer', width: 259.51 },
+          { type: 'static', text: 'Кому:', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'recipientName',
+            decoration: {
+              underline: true, minWidth: 124.90, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'paragraphBreak' },
+          { type: 'spacer', width: 259.51 },
+          { type: 'static', text: 'Адрес:', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'recipientAddress',
+            decoration: {
+              underline: true, minWidth: 117.90, thickness: 0.48, offset: 1.20
+            }
+          }
+        ]
+      },
+      {
+        id: 'qualification-notice-recognition',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 99.26, baselineTop: 292.49, width: 435.89,
+          initialLineCount: 6
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 367.00, shiftFromTop: 367.00,
+          rowHeight: 11.52, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 70, lastBlock: 108,
+          expectedBlockCount: 39, expectedPageBlockCount: 197,
+          expectedSha256: '911bca3c3dbfba4b0eb3da118a939f0419c06cdf0a953ba122c6f7d54a284a3f',
+          expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'ООО «Инвестика» настоящим уведомляет, что ________ ' +
+          '(Ф.И.О./ наименование организации) ________ признано ' +
+          'квалифицированным инвестором в отношении следующих видов: (дата)',
+        runs: [
+          { type: 'static', text: 'ООО «Инвестика» настоящим уведомляет, что ' },
+          {
+            type: 'fieldRef', fieldId: 'clientName',
+            decoration: {
+              underline: true, minWidth: 234.00, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'lineBreak' },
+          { type: 'spacer', width: 237.05 },
+          {
+            type: 'static', text: '(Ф.И.О./ наименование организации)',
+            font: 'legalSerifItalic'
+          },
+          { type: 'lineBreak' },
+          {
+            type: 'fieldRef', fieldId: 'recognitionDate', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 138.00, thickness: 0.48, offset: 1.20
+            }
+          },
+          {
+            type: 'static',
+            text: ' признано квалифицированным инвестором в отношении следующих видов:'
+          },
+          { type: 'lineBreak' },
+          { type: 'spacer', width: 35.40 },
+          { type: 'static', text: '(дата)', font: 'legalSerifItalic' }
+        ]
+      },
+      {
+        id: 'qualification-notice-register-entry',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 99.26, baselineTop: 472.03, width: 435.89,
+          initialLineCount: 2
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 484.95, shiftFromTop: 484.95,
+          rowHeight: 11.52, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 162, lastBlock: 186,
+          expectedBlockCount: 25, expectedPageBlockCount: 197,
+          expectedSha256: '37bf1e68072ba1f496388cb777af3ada8924357076977a861a9dd2157dd6726f',
+          expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Дата внесения записи о ________ ' +
+          '(Ф.И.О./ наименование организации) в реестр лиц, признанных ' +
+          'квалифицированными инвесторами (дата).',
+        runs: [
+          { type: 'static', text: 'Дата внесения записи о ' },
+          {
+            type: 'fieldRef', fieldId: 'registerEntryPersonName',
+            decoration: {
+              underline: true, minWidth: 89.00, thickness: 0.48, offset: 1.08
+            }
+          },
+          {
+            type: 'fieldRef', fieldId: 'registerEntryOrgName',
+            decoration: {
+              underline: true, minWidth: 89.00, thickness: 0.48, offset: 1.08
+            }
+          },
+          {
+            type: 'static',
+            text: ' (Ф.И.О./ наименование организации) в реестр лиц, признанных квалифицированными инвесторами (дата).'
+          }
+        ]
+      }
+    ],
 
     fields: [
       // "Кому:____" / "Адрес:____" — underscore runs measured at 403.5 +124.9
@@ -162,14 +288,15 @@
       text('recipientName', 'field.client-full-name', 403.5, 177.02, 124.9, {
         required: true,
         label: 'Получатель уведомления',
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(181.20, { left: 120.0, width: 413.6 }, 2)
+        layoutMode: 'flow-reference',
+        flowBlockId: 'qualification-notice-recipient'
       }),
       // 36.97 pt of clear space below the baseline before the title block, so
       // this 117.9 pt rule holds four lines at the floor — enough for a full
       // foreign postal address without touching the page.
       text('recipientAddress', 'field.client-postal-address', 407.7, 200.42, 117.9, {
-        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 34.0
+        required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 34.0,
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-notice-recipient'
       }),
 
       // "ООО «Инвестика» настоящим уведомляет, что ______" — the printed text
@@ -186,14 +313,14 @@
       text('clientName', 'field.client-full-name', 300.0, 292.49, 234.0, {
         required: true,
         label: 'Ф.И.О. / наименование организации',
-        overflowStrategy: 'expand-layout',
-        // 297.60 is just under the printed line's descenders.
-        expansion: expansion(297.60, { left: 99.3, width: 435.7 }, 2)
+        layoutMode: 'flow-reference',
+        flowBlockId: 'qualification-notice-recognition'
       }),
 
       // The recognition date sits on the 141.62 pt rule captioned "(дата)".
       text('recognitionDate', 'field.documentDateRu', 101.0, 333.10, 138.0, {
-        required: true, format: 'dateRu', align: 'center'
+        required: true, format: 'dateRu', align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-notice-recognition'
       }),
 
       // "иное ______" — free text, drawn only when that branch is chosen.
@@ -209,7 +336,8 @@
       // shortened to initials, a legal entity may not.
       text('registerEntryPersonName', 'field.client-full-name', 232.0, 472.03, 89.0, {
         required: true, format: 'initials', fallbacks: ['surname'],
-        showWhen: { source: 'subject.kind', equals: 'individual' }
+        showWhen: { source: 'subject.kind', equals: 'individual' },
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-notice-register-entry'
       }),
       // An ordinary company name needs 107.78 pt at the 9 pt floor in an 89 pt
       // blank, so the legal-entity branch of this line always needed a row.
@@ -226,9 +354,8 @@
       text('registerEntryOrgName', 'field.client-full-name', 232.0, 472.03, 89.0, {
         required: true,
         label: 'Наименование организации в записи реестра',
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(484.95, { left: 99.3, width: 435.7 }, 2),
-        showWhen: { source: 'subject.kind', equals: 'company' }
+        showWhen: { source: 'subject.kind', equals: 'company' },
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-notice-register-entry'
       }),
 
       // Mutually exclusive scope marks (Wingdings boxes in the base template).

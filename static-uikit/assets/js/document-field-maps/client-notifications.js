@@ -46,13 +46,91 @@
           maxCascadeDepth: 1, reviewStatus: 'approved',
           note: 'последний полный пункт страницы 9 переносится перед продолжением уведомления'
         },
-        anchors: ['clientFullName', 'passportIssuedBy', 'registrationAddress']
+        anchors: ['client-notifications-identity']
       }
     },
 
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
+
+    wordFlowBlocks: [
+      {
+        id: 'client-notifications-identity',
+        type: 'wordFlowBlock',
+        page: 8,
+        frame: {
+          left: 56.66, baselineTop: 264.07, width: 484.77,
+          initialLineCount: 6
+        },
+        font: 'legalSerif', fontSize: 11.04, minFontSize: 11.04,
+        fontSizeLocked: true, lineHeight: 13.44,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 8, insertionTop: 339.10, shiftFromTop: 339.10,
+          rowHeight: 13.44, maxExtraRows: 2, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 13, lastBlock: 29,
+          expectedBlockCount: 17, expectedPageBlockCount: 120,
+          expectedSha256: '530e584829608ae7dd8a12579519d7e73c3d7c33c92c1750f237e2d6e07a46ce',
+          expectedTemplateSha256: '8f5a922c9b2140fc8724bc9365de073ac10a1c48a5f44b55b78e319d2b501657',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Настоящим я, ________, паспорт серии ____ ' +
+          '№__________, выдан ________ дата выдачи ________, ' +
+          'проживающий(ая) по адресу (регистрации): ________',
+        runs: [
+          { type: 'static', text: 'Настоящим я, ' },
+          {
+            type: 'fieldRef', fieldId: 'clientFullName',
+            decoration: {
+              underline: true, minWidth: 263.99, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', паспорт серии ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportSeries', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 30.12, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ' №', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportNumber', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 55.20, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', выдан ' },
+          {
+            type: 'fieldRef', fieldId: 'passportIssuedBy',
+            decoration: {
+              underline: true, minWidth: 483.55, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ' дата выдачи ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportIssueDate', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 99.10, thickness: 0.48, offset: 1.20
+            }
+          },
+          {
+            type: 'static',
+            text: ', проживающий(ая) по адресу (регистрации): '
+          },
+          {
+            type: 'fieldRef', fieldId: 'registrationAddress',
+            decoration: {
+              underline: true, minWidth: 483.55, thickness: 0.48, offset: 1.20
+            }
+          }
+        ]
+      }
+    ],
 
     fields: [
       // Page 9: "Настоящим я, ________, паспорт серии ___ №____, выдан ..."
@@ -62,30 +140,23 @@
         page: 8, left: 143.33, baselineTop: 264.07, width: 263.99,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'left', required: true,
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 8, insertionTop: 280.0, shiftFromTop: 280.0,
-          rowHeight: 12.5, maxExtraRows: 1, maxFontSize: 11,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 55.22, width: 484.99,
-            baselineOffset: 9.8, ruleOffset: 11.4, ruleThickness: 0.48
-          }
-        }
+        layoutMode: 'flow-reference', flowBlockId: 'client-notifications-identity'
       },
       {
         id: 'passportSeries',
         source: 'field.passportSeries',
         page: 8, left: 511.24, baselineTop: 264.07, width: 30.12,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'center', required: true
+        align: 'center', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'client-notifications-identity'
       },
       {
         id: 'passportNumber',
         source: 'field.passportNumber',
         page: 8, left: 67.20, baselineTop: 277.51, width: 55.20,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'center', required: true
+        align: 'center', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'client-notifications-identity'
       },
       {
         // Full-width vector rule immediately below "выдан".
@@ -94,43 +165,24 @@
         page: 8, left: 56.66, baselineTop: 297.70, width: 483.55,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'left', required: true,
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 8, insertionTop: 302.0, shiftFromTop: 302.0,
-          rowHeight: 12.5, maxExtraRows: 1, maxFontSize: 11,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 55.22, width: 484.99,
-            baselineOffset: 9.8, ruleOffset: 11.4, ruleThickness: 0.48
-          }
-        }
+        layoutMode: 'flow-reference', flowBlockId: 'client-notifications-identity'
       },
       {
         id: 'passportIssueDate',
         source: 'field.passportIssueDate', format: 'dateRu',
         page: 8, left: 116.40, baselineTop: 314.74, width: 99.10,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'center', required: true
+        align: 'center', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'client-notifications-identity'
       },
       {
         // Full-width vector rule following the printed registration-address label.
         id: 'registrationAddress',
-        // the only row page 9 has room for goes to the longest value on it
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 8, insertionTop: 339.1,
-          rowHeight: 14, maxExtraRows: 1,
-          shiftFromTop: 339.1,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 55.22, width: 484.99,
-            baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-          }
-        },
         source: 'field.registrationAddress',
         page: 8, left: 56.66, baselineTop: 334.42, width: 483.55,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', required: true
+        align: 'left', required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'client-notifications-identity'
       },
 
       // Page 10: left half is the printed-name line; right half stays blank for

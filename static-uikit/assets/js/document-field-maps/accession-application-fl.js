@@ -63,15 +63,98 @@
         bodyBottom: 793.94,
         fixedFooterFrom: null,
         shiftToTop: 830.0,
-        bottomClearance: 30.0,
+        bottomClearance: 28.0,
         compaction: [],
-        anchors: ['clientFullName']
+        anchors: ['accession-application-fl-identity']
       }
     },
 
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
+
+    wordFlowBlocks: [
+      {
+        id: 'accession-application-fl-identity',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 56.60, baselineTop: 99.26, width: 501.00,
+          initialLineCount: 3
+        },
+        font: 'legalSerif', fontSize: 8.52, minFontSize: 8.52,
+        fontSizeLocked: true, lineHeight: 19.56,
+        alignment: 'justify', justifyMinRatio: 0.55,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 159.95, shiftFromTop: 159.95,
+          rowHeight: 19.56, maxExtraRows: 1, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 18, lastBlock: 24,
+          expectedBlockCount: 7, expectedPageBlockCount: 264,
+          expectedSha256: '74ffbd7c30383ad6868a9b4be4633569c12691e86e3da529b15ad9b0814f6c25',
+          expectedTemplateSha256: '8fec088402d46b6a9251e92ceee15f4a7cdc74b12684f7be339194d04904c1e6',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Настоящим, ________, паспорт серии ____, № ________, ' +
+          'выдан ________, дата выдачи «__» ________г., проживающий(ая) по ' +
+          'адресу (регистрации): ________.',
+        runs: [
+          { type: 'static', text: 'Настоящим, ' },
+          {
+            type: 'fieldRef', fieldId: 'clientFullName',
+            decoration: {
+              underline: true, minWidth: 203.90, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', паспорт серии ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportSeries', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 29.80, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', № ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportNumber', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 46.70, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', выдан ' },
+          {
+            type: 'fieldRef', fieldId: 'passportIssuedBy',
+            decoration: {
+              underline: true, minWidth: 352.60, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', дата выдачи «', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportIssueDay', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 12.60, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: '» ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'passportIssueMonthYear', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 37.50, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: 'г., проживающий(ая) по адресу (регистрации): ' },
+          {
+            type: 'fieldRef', fieldId: 'registrationAddress',
+            decoration: {
+              underline: true, minWidth: 339.90, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: '.' }
+        ]
+      }
+    ],
 
     fields: [
       // ── Page 1 — identity line ────────────────────────────────────────────
@@ -83,28 +166,22 @@
         page: 0, left: 114.0, baselineTop: 99.26, width: 203.9,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
         align: 'left', required: true,
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 101.7, shiftFromTop: 101.7,
-          rowHeight: 10.5, maxExtraRows: 1, maxFontSize: 9,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 56.6, width: 501.0,
-            baselineOffset: 8.2, ruleOffset: 9.4, ruleThickness: 0.36
-          }
-        }
+        layoutMode: 'flow-reference',
+        flowBlockId: 'accession-application-fl-identity'
       },
       {
         id: 'passportSeries',
         source: 'field.passportSeries',
         page: 0, left: 409.0, baselineTop: 99.26, width: 29.8,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-fl-identity'
       },
       {
         id: 'passportNumber',
         source: 'field.passportNumber',
         page: 0, left: 475.3, baselineTop: 99.26, width: 46.7,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-fl-identity'
       },
       // ── Continuation lines for the identity paragraph ─────────────────────
       // The paragraph is justified prose with fixed blanks, so a long issuing
@@ -133,17 +210,8 @@
         source: 'field.passportIssuedBy',
         page: 0, left: 56.6, baselineTop: 118.82, width: 352.6,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left',
-        overflowStrategy: 'flow',
-        flowRegions: [
-          { page: 0, left: 56.6, baselineTop: 118.82, width: 352.6, maxLines: 1 },
-          {
-            page: 0, left: 56.6, baselineTop: 157.70, width: 501.0, maxLines: 1,
-            // The §1 heading starts at 159.95, so this rule is pulled a little
-            // closer to its baseline than the first one to keep clear air.
-            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.2
-          }
-        ]
+        layoutMode: 'flow-reference',
+        flowBlockId: 'accession-application-fl-identity'
       },
       // The printed date reads:  дата выдачи «___» _________г.
       // Measured glyph geometry of that line (tools/probe-pdf-coords.py):
@@ -163,7 +231,8 @@
         id: 'passportIssueDay',
         source: 'field.passportIssueDate', format: 'dateDay',
         page: 0, left: 487.0, baselineTop: 118.82, width: 12.6,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-fl-identity'
       },
       {
         // A genitive month plus the year needs up to 51 pt at 8.52 pt and far
@@ -175,7 +244,8 @@
         source: 'field.passportIssueDate', format: 'dateMonthYearGenitive',
         fallbacks: ['dateMonthYearShort'],
         page: 0, left: 513.7, baselineTop: 118.82, width: 37.5,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'accession-application-fl-identity'
       },
       // The address closes the identity sentence, so its continuation takes the
       // first of the two reviewed lines — directly under the line it continues.
@@ -185,15 +255,8 @@
         source: 'field.registrationAddress',
         page: 0, left: 217.7, baselineTop: 138.38, width: 339.9,
         font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'left',
-        overflowStrategy: 'flow',
-        flowRegions: [
-          { page: 0, left: 217.7, baselineTop: 138.38, width: 339.9, maxLines: 1 },
-          {
-            page: 0, left: 56.6, baselineTop: 148.70, width: 501.0, maxLines: 1,
-            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
-          }
-        ]
+        layoutMode: 'flow-reference',
+        flowBlockId: 'accession-application-fl-identity'
       },
 
       // ── §1 Присоединение ──────────────────────────────────────────────────

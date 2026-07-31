@@ -42,29 +42,6 @@
     applicantFullName: 12,           // 33.01 pt of room
   };
 
-  // ── Geometry of a generated continuation row, measured from this form ──────
-  //
-  //   python static-uikit/tools/qa/measure_page_layout.py --row   //       qualification-consequences-notice 0 198.74 331 72
-  //
-  // 9.96 pt body at an 11.52 pt line pitch, ink height 11.03 pt, rules 0.48 pt
-  // thick and 1.08 pt below their baseline.
-  function expansion(insertionTop) {
-    return {
-      page: 0,
-      insertionTop: insertionTop,
-      shiftFromTop: insertionTop,
-      rowHeight: 11.5,
-      maxExtraRows: 2,
-      maxFontSize: 9.5,
-      lineStyle: 'underline',
-      reviewStatus: 'approved',
-      line: {
-        left: 63.62, width: 481.31,          // the paragraph measure, 63.62 → 544.93
-        baselineOffset: 8.9, ruleOffset: 9.98, ruleThickness: 0.48
-      }
-    };
-  }
-
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
     return {
@@ -87,6 +64,8 @@
       flowRegions: o.flowRegions,
       expansion: o.expansion,
       overflowStrategy: o.overflowStrategy,
+      layoutMode: o.layoutMode,
+      flowBlockId: o.flowBlockId,
       allowPrintOverride: o.allowPrintOverride,
       tokenBreak: o.tokenBreak,
       label: o.label,
@@ -111,13 +90,62 @@
         shiftToTop: 830.0,
         bottomClearance: 56.7,
         compaction: [],
-        anchors: ['applicantFullName']
+        anchors: ['qualification-consequences-applicant']
       }
     },
 
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
+
+    // The applicant blank is part of the notification sentence, not an
+    // independent form row.  The exact reviewed source operators are replaced
+    // by one locked-size paragraph; the numbered consequences below move only
+    // in complete 11.52 pt source-line increments.
+    wordFlowBlocks: [
+      {
+        id: 'qualification-consequences-applicant',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 63.62, baselineTop: 198.74, width: 481.31,
+          initialLineCount: 2
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'justify', justifyMinRatio: 0.55,
+        firstLineIndent: 14.16,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 210.49, shiftFromTop: 210.49,
+          rowHeight: 11.52, maxExtraRows: 2, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 38, lastBlock: 38,
+          expectedBlockCount: 1, expectedPageBlockCount: 87,
+          expectedSha256: 'c2244833ddc4c0a02ef884e1e965a607811a18d7961712c1aa4fd51435dbea19',
+          expectedTemplateSha256: '471b08285a154b04cf4d1702852171f2ed4e0b3fc7478084be5058899d8836b0',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Настоящим ООО «Инвестика» уведомляет Заявителя ' +
+          '________ (ФИО физического лица) о последствиях признания Вас ' +
+          'квалифицированным инвестором:',
+        runs: [
+          { type: 'static', text: 'Настоящим ООО «Инвестика» уведомляет Заявителя ' },
+          {
+            type: 'fieldRef', fieldId: 'applicantFullName',
+            decoration: {
+              underline: true, minWidth: 72, thickness: 0.48, offset: 1.08
+            }
+          },
+          {
+            type: 'static',
+            text: ' (ФИО физического лица) о последствиях признания Вас квалифицированным инвестором:'
+          }
+        ]
+      }
+    ],
 
     fields: [
       // «__» ________ 20__ — the quotes span 303.43..325.48, the month rule is
@@ -146,8 +174,8 @@
       text('applicantFullName', 'field.clientFullName', 331.0, 198.74, 72.0, {
         required: true, fallbacks: ['initials', 'surname'],
         label: 'Ф.И.О. заявителя',
-        overflowStrategy: 'expand-layout',
-        expansion: expansion(210.49)
+        layoutMode: 'flow-reference',
+        flowBlockId: 'qualification-consequences-applicant'
       }),
 
       // "ОЗНАКОМЛЕН: Клиент ____ / ____" — the first rule is the handwritten

@@ -66,13 +66,68 @@
         shiftToTop: 800.0,
         bottomClearance: 40.0,
         compaction: [],
-        anchors: ['clientFullName']
+        anchors: ['code-word-client-introduction']
       }
     },
 
     fonts: {
-      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
+      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf',
+      legalSerifItalic: '../assets/fonts/pdf/LiberationSerif-Italic.ttf'
     },
+
+    wordFlowBlocks: [
+      {
+        id: 'code-word-client-introduction',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 85.10, baselineTop: 225.98, width: 472.50,
+          initialLineCount: 2
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 238.75, shiftFromTop: 238.75,
+          rowHeight: 11.52, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 41, lastBlock: 52,
+          expectedBlockCount: 12, expectedPageBlockCount: 117,
+          expectedSha256: '82543c051eeed0cb5da3f179266d2283963ed8f571bef3c8a4467016b389a43e',
+          expectedTemplateSha256: 'e1be6148975c0884b133b770f42353acbf374fcfc5deee7ba1dd4452dc346500',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Настоящим __________, ________ (ФИО, ИНН), ' +
+          'далее – Клиент, устанавливает следующее кодовое слово:',
+        runs: [
+          { type: 'static', text: 'Настоящим ' },
+          {
+            type: 'fieldRef', fieldId: 'clientFullName',
+            decoration: {
+              underline: true, minWidth: 124.90, thickness: 0.36, offset: 1.20
+            }
+          },
+          { type: 'static', text: ', ' },
+          {
+            type: 'fieldRef', fieldId: 'clientInn', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 69.90, thickness: 0.36, offset: 1.20
+            }
+          },
+          {
+            type: 'static', text: ' (ФИО, ИНН)',
+            font: 'legalSerifItalic', fontSize: 9.00
+          },
+          {
+            type: 'static',
+            text: ', далее – Клиент, устанавливает следующее кодовое слово:'
+          }
+        ]
+      }
+    ],
 
     fields: [
       // "от «__» _____________202__ г."
@@ -89,19 +144,13 @@
       // "Настоящим ________, ________ (ФИО, ИНН), далее — Клиент..."
       text('clientFullName', 'subject.displayName', 139.80, 225.98, 124.90, {
         required: true,
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 238.75, shiftFromTop: 238.75,
-          rowHeight: 13, maxExtraRows: 1, maxFontSize: 10,
-          lineStyle: 'underline', reviewStatus: 'approved',
-          line: {
-            left: 85.1, width: 472.5,
-            baselineOffset: 10.0, ruleOffset: 11.2, ruleThickness: 0.36
-          }
-        }
+        layoutMode: 'flow-reference',
+        flowBlockId: 'code-word-client-introduction'
       }),
       text('clientInn', 'subject.inn', 272.80, 225.98, 69.90, {
-        align: 'center', required: true
+        align: 'center', required: true,
+        layoutMode: 'flow-reference',
+        flowBlockId: 'code-word-client-introduction'
       }),
 
       // Empty bordered code-word cell, measured from its 223.80..405.60 and

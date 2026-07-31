@@ -83,20 +83,145 @@
     expectedPages: 3,
     appliesTo: ['individual'],
 
-    fonts: {
-      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 726.18,
+        fixedFooterFrom: null,
+        shiftToTop: 726.18,
+        bottomClearance: 1.88,
+        compaction: [],
+        anchors: ['qualification-request-fl-opening']
+      },
+      1: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 782.80,
+        fixedFooterFrom: null,
+        shiftToTop: 820.0,
+        bottomClearance: 20.0,
+        compaction: [],
+        anchors: ['qualification-request-fl-delivery-address']
+      }
     },
+
+    fonts: {
+      legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf',
+      legalSerifItalic: '../assets/fonts/pdf/LiberationSerif-Italic.ttf'
+    },
+
+    wordFlowBlocks: [
+      {
+        id: 'qualification-request-fl-opening',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 49.56, baselineTop: 127.34, width: 505.80,
+          initialLineCount: 4
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 174.50, shiftFromTop: 174.50,
+          rowHeight: 11.52, maxExtraRows: 4, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 44, lastBlock: 77,
+          expectedBlockCount: 34, expectedPageBlockCount: 153,
+          expectedSha256: 'f8c800a3abbf76b06ad18478cf8c07f7ff728101cd022251f86e31ba961ec767',
+          expectedTemplateSha256: '6478113b5d1d7abede7ccb9acea043a9b08c70c0b392cbdce25aa84c00020efc',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Прошу признать, ________ (ФИО физического лица) ' +
+          'Договор № _____________ от ________ квалифицированным инвестором ' +
+          'в отношении следующих видов:',
+        runs: [
+          { type: 'static', text: 'Прошу признать, ' },
+          {
+            type: 'fieldRef', fieldId: 'clientFullName',
+            decoration: {
+              underline: true, minWidth: 430.00, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'lineBreak' },
+          {
+            type: 'static', text: '(ФИО физического лица)',
+            font: 'legalSerifItalic'
+          },
+          { type: 'lineBreak' },
+          { type: 'static', text: 'Договор № ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'contractNumber', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 68.00, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: ' от ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'contractDate', keepTogether: true,
+            decoration: {
+              underline: true, minWidth: 95.04, thickness: 0.48, offset: 1.20
+            }
+          },
+          {
+            type: 'static',
+            text: ' квалифицированным инвестором в отношении следующих видов:'
+          }
+        ]
+      },
+      {
+        id: 'qualification-request-fl-delivery-address',
+        type: 'wordFlowBlock',
+        page: 1,
+        showWhen: { source: 'extra.extra-delivery-method', equals: 'address' },
+        frame: {
+          left: 67.94, baselineTop: 619.90, width: 377.50,
+          initialLineCount: 1
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'left',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 1, insertionTop: 631.80, shiftFromTop: 631.80,
+          rowHeight: 11.52, maxExtraRows: 3, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 174, lastBlock: 180,
+          expectedBlockCount: 7, expectedPageBlockCount: 248,
+          expectedSha256: '7dcc826610f79badec8cac3b5664a560185b4efd3e3c0c648f784c2204b3aa06',
+          expectedTemplateSha256: '6478113b5d1d7abede7ccb9acea043a9b08c70c0b392cbdce25aa84c00020efc',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'по адресу: ________',
+        runs: [
+          { type: 'static', text: 'по адресу: ', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'deliveryAddress',
+            decoration: {
+              underline: true, minWidth: 331.03, thickness: 0.48, offset: 1.20
+            }
+          }
+        ]
+      }
+    ],
 
     fields: [
       // Page 1 — applicant and contract. There is intentionally no applicant date.
       text('clientFullName', 'field.clientFullName', 0, 123.02, 127.34, 430.00, {
-        required: true
+        required: true,
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-request-fl-opening'
       }),
       text('contractNumber', 'extra.extra-contract-number', 0, 99.50, 151.22, 68.00, {
-        required: true, align: 'center'
+        required: true, align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-request-fl-opening'
       }),
       text('contractDate', 'extra.extra-contract-date', 0, 181.73, 151.22, 95.04, {
-        required: true, format: 'dateRu', align: 'center'
+        required: true, format: 'dateRu', align: 'center',
+        layoutMode: 'flow-reference', flowBlockId: 'qualification-request-fl-opening'
       }),
 
       // Instrument scope — the two source boxes are mutually exclusive.
@@ -130,18 +255,7 @@
       text('quarterlyTransactionsValueMillions',
         'extra.extra-quarterly-transactions-value-millions', 0,
         258.65, 665.26, 26.18, {
-      overflowStrategy: 'expand-layout',
-      expansion: {
-        page: 0, insertionTop: 679.53,
-        rowHeight: 14, maxExtraRows: 1,
-        shiftFromTop: 679.53, shiftToTop: 726.18,
-        bottomReserve: 113.86,
-        lineStyle: 'underline', reviewStatus: 'approved',
-        line: {
-          left: 36.84, width: 518.88,
-          baselineOffset: 10.5, ruleOffset: 12.6, ruleThickness: 0.48
-        }
-      }, optional: true, align: 'center' }),
+      optional: true, align: 'center' }),
       evidence('quarterlyTransactionsEvidence',
         'extra.extra-supporting-docs-quarterly-transactions', 0, 624.00, 90.00),
 
@@ -178,7 +292,9 @@
       text('deliveryAddress', 'extra.extra-delivery-address', 1,
         111.14, 619.90, 331.03, {
           required: true,
-          showWhen: { source: 'extra.extra-delivery-method', equals: 'address' }
+          showWhen: { source: 'extra.extra-delivery-method', equals: 'address' },
+          layoutMode: 'flow-reference',
+          flowBlockId: 'qualification-request-fl-delivery-address'
         }),
       // Handwritten signature stays blank; only the printed client name is drawn.
       text('signatureName', 'field.clientFullName', 1, 409.06, 694.90, 79.92, {
