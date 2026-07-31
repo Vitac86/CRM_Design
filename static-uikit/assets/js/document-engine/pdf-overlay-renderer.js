@@ -1150,6 +1150,12 @@
       var field = (template.fields || []).filter(function (item) {
         return item.id === error.fieldId;
       })[0] || {};
+      // A field the page could not pay for also fails to lay out, so it would
+      // otherwise be reported twice. The page's reason is the specific one and
+      // the manager needs exactly one entry per value.
+      planned.overflows = planned.overflows.filter(function (entry) {
+        return entry.fieldId !== error.fieldId;
+      });
       planned.overflows.push({
         documentId: template.id,
         documentTitle: template.title || template.id,
