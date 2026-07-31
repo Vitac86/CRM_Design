@@ -41,6 +41,7 @@ OVERLAY_FONT_HINT = "Liberation"
 
 ASCENT = 0.891
 DESCENT = 0.21631
+ASCENT = 0.891
 
 RENDER = r"""
 (async function (docId, profileId, overrides) {
@@ -56,18 +57,84 @@ RENDER = r"""
   });
   const notes = [];
   let flowPages = [];
+  const expansionStyles = {};
+  (t.fields || []).concat(t.wordFlowBlocks || []).forEach(function (anchor) {
+    if (anchor.expansion) expansionStyles[anchor.id] = anchor.expansion.lineStyle || 'underline';
+  });
+  const activeWordFlow = [];
+  CRMDocumentEngine.overlayRenderer.activeReviewedRangePages(t, payload)
+    .forEach(function (group) {
+      group.blocks.forEach(function (block) {
+        activeWordFlow.push({
+          id: block.id, page: block.page, frame: block.frame,
+          fontSize: block.fontSize, lineHeight: block.lineHeight,
+          initialLineCount: block.initialLineCount || block.frame.initialLineCount,
+          expectedSizes: [block.fontSize].concat((block.runs || []).map(function (run) {
+            return run.fontSize;
+          }).filter(function (size) { return Number(size) > 0; }))
+        });
+      });
+    });
+  // The layout engine is the single source of truth for where a line lands, so
+  // QA compares the drawn PDF against the assignments it actually produced
+  // instead of re-deriving a grid. Paragraph spacing and reflowed lines make a
+  // re-derived grid disagree with a correct render.
+  const flowLayout = {};
   const blob = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
     onExpansion: function (l) { l.forEach(function (n) { notes.push(n); }); },
     onPlan: function (d) {
       flowPages = Object.keys(d.plans).filter(function (page) {
         return !!d.plans[page].pageFlow;
       }).map(Number);
+      Object.keys((d.planned && d.planned.byBlock) || {}).forEach(function (id) {
+        const result = d.planned.byBlock[id];
+        if (!result || !result.drawn || !result.layout) return;
+        const block = (t.wordFlowBlocks || []).filter(function (item) {
+          return item.id === id;
+        })[0];
+        const plan = block ? (d.plans || {})[block.page] : null;
+        // A reviewed block is drawn where the page shifts put it — the same
+        // contract the renderer applies, minus the block's own added lines,
+        // which it consumes itself. QA has to predict the same point to tell a
+        // correctly moved underline from a stray rule.
+        function shiftAt(top) {
+          if (!plan) return 0;
+          return (plan.shifts || []).reduce(function (total, shift) {
+            if (shift.fieldId === id) return total;
+            if (top < shift.fromTop - 1e-6 || top > shift.toTop + 1e-6) return total;
+            return total + Number(shift.delta);
+          }, 0);
+        }
+        flowLayout[id] = {
+          baselines: (result.layout.lines || []).map(function (line) {
+            return line.baselineTop + shiftAt(line.baselineTop);
+          }),
+          decorations: (result.layout.lines || []).reduce(function (all, line) {
+            const y = line.baselineTop + shiftAt(line.baselineTop);
+            (line.runs || []).forEach(function (run) {
+              if (!run.decoration || !run.decoration.underline || !(run.width > 0)) return;
+              all.push({
+                baseline: y, left: run.x, width: run.width,
+                offset: Number(run.decoration.offset != null ? run.decoration.offset : 2)
+              });
+            });
+            return all;
+          }, [])
+        };
+      });
     }
   });
   const u8 = new Uint8Array(await blob.arrayBuffer());
   let s = ''; const c = 0x8000;
   for (let i = 0; i < u8.length; i += c) s += String.fromCharCode.apply(null, u8.subarray(i, i + c));
+  activeWordFlow.forEach(function (block) {
+    const assigned = flowLayout[block.id];
+    block.baselines = assigned ? assigned.baselines : [];
+    block.decorations = assigned ? assigned.decorations : [];
+  });
   return JSON.stringify({ pdf: btoa(s), notes: notes, flowPages: flowPages,
+                          expansionStyles: expansionStyles,
+                          activeWordFlow: activeWordFlow,
                           url: t.templateUrl });
 }(DOC, PROFILE, OVERRIDES))
 """
@@ -77,11 +144,11 @@ EN_ADDRESS = ("27 King George the Fifth Avenue, London, United Kingdom, SW1A 2AA
 
 # name, doc, profile, overrides, what the example is for
 CASES = [
-    ("no expansion", "qualification-notice", "ru-resident-normal",
+    ("one Word-flow line", "qualification-notice", "ru-resident-normal",
      {"field.client-full-name": "Иванов И.И."}),
-    ("one inserted row", "qualification-notice", "ru-company-normal",
+    ("two Word-flow lines", "qualification-notice", "ru-company-normal",
      {"field.client-full-name": "АО «Международные инвестиционные технологии»"}),
-    ("maximum approved rows", "qualification-notice", "ru-company-normal",
+    ("several Word-flow lines", "qualification-notice", "ru-company-normal",
      {"field.client-full-name": RU_COMPANY}),
     ("two anchors on one page", "power-of-attorney", "en-company-normal", {}),
     ("power of attorney, ЮЛ", "power-of-attorney", "ru-company-normal", {}),
@@ -169,11 +236,13 @@ def verticals(page):
 
 
 def column_positions(page):
-    """Every x a vertical rule occupies, both edges of a doubled border."""
+    """Centre-line of every vertical rule, including each doubled border."""
     out = set()
     for x0, x1, _y0, _y1 in verticals(page):
-        out.add(round(x0, 1))
-        out.add(round(x1, 1))
+        # Source rules are filled 0.48 pt rectangles while generated rules are
+        # stroked paths with zero-width geometry. Comparing their left edges
+        # made a correctly centred continuation look displaced by half a rule.
+        out.add(round((x0 + x1) / 2, 1))
     return out
 
 
@@ -218,18 +287,89 @@ def printed_glyphs(page):
     return out
 
 
-def inspect(checks, label, doc_id, pdf_bytes, template_path, notes):
+def flow_baselines(block):
+    """The baselines the layout engine assigned this block, in order.
+
+    Paragraph spacing and reflowed lines mean a block's baselines are not a
+    plain `top + n * lineHeight` grid, so QA reads the assignments the engine
+    produced rather than guessing a second grid that would disagree with a
+    correct render.
+    """
+    return [float(value) for value in block.get("baselines") or []]
+
+
+def flow_bounds(block):
+    """The ink box of a reviewed block: first ascent down to last descent.
+
+    Reviewed blocks sit directly under one another on a filled form, so this box
+    has to follow the real baselines. Padding it by a whole line makes it overlap
+    the block below, and then one paragraph's size is reported against its
+    neighbour's lock.
+    """
+    frame = block.get("frame") or {}
+    baselines = flow_baselines(block)
+    sizes = [float(size) for size in block.get("expectedSizes") or []]
+    size = max(sizes + [float(block.get("fontSize") or 0)])
+    left = float(frame.get("left") or 0)
+    if not baselines:
+        return fitz.Rect(left - 0.5, 0, left + float(frame.get("width") or 0) + 0.5, 0)
+    return fitz.Rect(left - 0.5, baselines[0] - ASCENT * size - 0.5,
+                     left + float(frame.get("width") or 0) + 0.5,
+                     baselines[-1] + max(DESCENT * size, 3.0))
+
+
+def assign_spans(page_blocks, drawn_text):
+    """Give every drawn span to exactly one reviewed block.
+
+    Two reviewed blocks can be a single line apart, so a span is attributed by
+    the assigned baseline it actually sits on, not by box intersection.
+    """
+    grids = [flow_baselines(block) for block in page_blocks]
+    frames = [flow_bounds(block) for block in page_blocks]
+    assigned = [[] for _ in page_blocks]
+    for bbox, size, text in drawn_text:
+        baseline = bbox[3] - DESCENT * size
+        best, best_gap = None, None
+        for index, grid in enumerate(grids):
+            if not grid or bbox[0] > frames[index].x1 or bbox[2] < frames[index].x0:
+                continue
+            gap = min(abs(baseline - line) for line in grid)
+            if best_gap is None or gap < best_gap:
+                best, best_gap = index, gap
+        if best is not None and best_gap <= 3.0:
+            assigned[best].append((bbox, size, text))
+    return assigned
+
+
+def decoration_rules(block):
+    """Every underline rule this block's assignments call for: (top, left, right)."""
+    out = []
+    for item in block.get("decorations") or []:
+        top = float(item.get("baseline") or 0) + float(item.get("offset") or 0)
+        left = float(item.get("left") or 0)
+        out.append((top, left, left + float(item.get("width") or 0)))
+    return out
+
+
+def inspect(checks, label, doc_id, pdf_bytes, template_path, notes,
+            word_flow_blocks, expansion_styles):
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
-    pages = {note["page"] for note in notes}
+    pages = {note["page"] for note in notes} | {
+        int(block["page"]) for block in word_flow_blocks
+    }
 
-    if not notes:
-        for index in range(base.page_count):
-            checks.check(f"{label}: p{index} draws no rule the form did not print",
-                         not generated_rules(generated[index], base[index]),
-                         str(generated_rules(generated[index], base[index])[:2]))
-        generated.close(); base.close()
-        return
+    # A page that neither expanded nor carries a reviewed block must come out of
+    # the engine untouched. Pages that do are inspected in full below: a Word
+    # flow draws inline underline decorations on its own blanks even when the
+    # paragraph needed no extra line, and that is the form being filled, not a
+    # stray rule.
+    for index in range(base.page_count):
+        if index in pages:
+            continue
+        untouched = generated_rules(generated[index], base[index])
+        checks.check(f"{label}: p{index} draws no rule the form did not print",
+                     not untouched, str(untouched[:2]))
 
     for index in sorted(pages):
         page, base_page = generated[index], base[index]
@@ -237,10 +377,32 @@ def inspect(checks, label, doc_id, pdf_bytes, template_path, notes):
         added = generated_rules(page, base_page)
         printed = rules(base_page)
         drawn_text = overlay_spans(page)
-        checks.check(f"{at}: an inserted row draws a rule",
-                     added or column_positions(page) != column_positions(base_page)
-                     or len(verticals(page)) > len(verticals(base_page)),
-                     f"{len(added)} added")
+        page_notes = [note for note in notes if int(note["page"]) == index]
+        row_notes = [note for note in page_notes
+                     if expansion_styles.get(note["fieldId"], "underline") != "none"]
+        page_blocks = [block for block in word_flow_blocks
+                       if int(block["page"]) == index]
+        block_bounds = [flow_bounds(block) for block in page_blocks]
+
+        # Every rule this engine drew has to be one of two reviewed things: the
+        # rule of a continuation row, or the underline decoration of an inline
+        # blank, drawn on the exact baseline the layout engine assigned it.
+        # Anything else is a stray vector on a legal form.
+        if not row_notes:
+            expected = [rule for block in page_blocks
+                        for rule in decoration_rules(block)]
+            stray = [rule for rule in added
+                     if not any(abs(rule[0] - top) <= 1.0
+                                and abs(rule[1] - left) <= 1.0
+                                and abs(rule[2] - right) <= 1.0
+                                for top, left, right in expected)]
+            checks.check(f"{at}: every drawn rule sits on an assigned underline",
+                         not stray, str(stray[:2]))
+        if row_notes:
+            checks.check(f"{at}: an inserted table row extends source rules",
+                         added or column_positions(page) != column_positions(base_page)
+                         or len(verticals(page)) > len(verticals(base_page)),
+                         f"{len(added)} added")
 
         # The weight the form itself uses on this page.
         weights = collections.Counter(rule[3] for rule in printed)
@@ -272,22 +434,21 @@ def inspect(checks, label, doc_id, pdf_bytes, template_path, notes):
                          bbox[3] <= rule_top + 1.2,
                          f"ink {bbox[3]:.2f} rule {rule_top:.2f}")
 
-        # Rows of ONE anchor keep one pitch. Rules further apart than a couple
-        # of rows belong to different anchors and are compared separately.
-        clusters, current = [], []
-        for rule in sorted(added):
-            if current and rule[0] - current[-1][0] > 25.0:
-                clusters.append(current)
-                current = []
-            current.append(rule)
-        if current:
-            clusters.append(current)
-        for cluster in clusters:
-            if len(cluster) < 2:
-                continue
-            steps = [round(b[0] - a[0], 2) for a, b in zip(cluster, cluster[1:])]
-            checks.check(f"{at}: generated rows keep one pitch",
-                         max(steps) - min(steps) < 0.05, str(steps))
+        # Reviewed Word-flow underlines are inline run decorations, not
+        # continuation-row rules.  Check their owning vector text against the
+        # locked source sizes and approved frame instead of treating several
+        # fragments on one baseline as separate rows.
+        block_spans_by_index = assign_spans(page_blocks, drawn_text)
+        for index_block, block in enumerate(page_blocks):
+            block_spans = block_spans_by_index[index_block]
+            checks.check(f"{at}: {block['id']} draws vector text in its reviewed frame",
+                         bool(block_spans), str(block_bounds[index_block]))
+            expected_sizes = [float(size) for size in block.get("expectedSizes") or []]
+            wrong_sizes = [(round(size, 3), text[:20]) for _bbox, size, text in block_spans
+                           if not any(abs(size - expected) <= 0.05
+                                      for expected in expected_sizes)]
+            checks.check(f"{at}: {block['id']} keeps its locked source font sizes",
+                         not wrong_sizes, str(wrong_sizes[:3]))
 
         # No generated text covers a printed glyph. A printed blank is not text
         # a value can cover: it is the line the value is typed on.
@@ -353,10 +514,12 @@ def main() -> int:
                 with open(os.path.join(args.keep, f"{doc_id}--{name}.pdf"), "wb") as fh:
                     fh.write(pdf)
             template_path = os.path.join(TEMPLATES, os.path.basename(payload["url"]))
-            inspect(checks, label, doc_id, pdf, template_path, payload["notes"])
+            inspect(checks, label, doc_id, pdf, template_path, payload["notes"],
+                    payload.get("activeWordFlow") or [],
+                    payload.get("expansionStyles") or {})
             if label == "cross-page legal block transfer":
-                checks.check(f"{label}: reviewed transfer activates",
-                             bool(payload["flowPages"]), str(payload["flowPages"]))
+                checks.check(f"{label}: local Word flow avoids an unnecessary transfer",
+                             not payload["flowPages"], str(payload["flowPages"]))
             rows = sum(note["rows"] for note in payload["notes"])
             flow = f", cross-page from {payload['flowPages']}" if payload["flowPages"] else ""
             print(f"{label:34s} {doc_id:34s} {rows} inserted row(s){flow}",
