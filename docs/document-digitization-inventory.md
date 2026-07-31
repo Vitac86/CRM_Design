@@ -17,6 +17,12 @@ Verified this survey: all 22 files are byte-distinct from one another, and
 every migrated field map records the SHA-256 of the document it was built
 from — all 11 recorded hashes match the authoritative file.
 
+The committed browser-PDF inventory is independently locked by the
+[full PDF-template audit](document-full-template-audit.md). Its QA gate verifies
+the filename, byte length, page count and SHA-256 of all 22 source PDFs, checks
+all 77 pages and every extracted source text line, and requires classification
+coverage for every field in all 18 executable maps.
+
 ## Two regulations, colliding appendix numbers
 
 Documents must be matched by **content**, not filename. Two different

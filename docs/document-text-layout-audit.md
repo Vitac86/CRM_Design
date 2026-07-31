@@ -11,7 +11,14 @@ python static-uikit/tools/qa/measure_field_room.py --maps static-uikit/tools/qa/
 python static-uikit/tools/qa/measure_page_layout.py
 python static-uikit/tools/qa/run_document_regression.py
 python static-uikit/tools/qa/audit_ordinary_failures.py
+python static-uikit/tools/qa/check_full_template_audit.py
 ```
+
+The complete, generated audit is [document-full-template-audit.md](document-full-template-audit.md).
+Its machine-readable companion, `static-uikit/tools/qa/document-full-template-audit.json`,
+covers all 22 committed PDFs, all 77 pages, every extracted source-PDF text line,
+and every current field. The original 621 field ID/source pairs are an immutable
+compatibility floor; additive fields are reported and classified separately.
 
 ## 1. Scope
 
