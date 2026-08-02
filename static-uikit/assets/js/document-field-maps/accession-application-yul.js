@@ -71,6 +71,11 @@
         frame: { left: 56.64, baselineTop: 101.78, width: 472.88, initialLineCount: 8 },
         font: 'legalSerif', fontSize: 8.52, minFontSize: 8.52,
         fontSizeLocked: true, lineHeight: 9.72, alignment: 'left',
+        // As in the individual form: the printed wording keeps its 8.52 pt,
+        // the entered values are drawn at the 9 pt floor. Measured cost for
+        // this block: none — the worst production profile still asks for one
+        // continuation row out of the four it is allowed.
+        valueFontSize: 9,
         overflowStrategy: 'expand-layout',
         expansion: {
           page: 0, insertionTop: 171.4, shiftFromTop: 171.4,

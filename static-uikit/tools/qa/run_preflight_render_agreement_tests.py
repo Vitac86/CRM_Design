@@ -236,26 +236,40 @@ def main() -> int:
         def rows_of(result):
             return {r["fieldId"]: r["rows"] for r in result["preflight"]["rows"]}
 
+        # The identity values are drawn at the 9 pt readability floor while the
+        # form's own wording keeps its printed 8.52 pt, so an ordinary payload
+        # already uses the one continuation row this page budgets for. That is
+        # the measured cost of the floor on this form, not an accident.
         zero = agreement(browser, "accession-application-fl", "ru-resident-normal")
-        checks.check("no long identity value inserts no row",
-                     rows_of(zero) == {} and zero["render"]["ok"],
+        checks.check("an ordinary payload uses the one reviewed row",
+                     rows_of(zero).get("accession-application-fl-identity") == 1
+                     and zero["render"]["ok"],
                      json.dumps(rows_of(zero)))
 
         one_auth = agreement(browser, "accession-application-fl",
                              "ru-resident-normal",
                              {"field.passportIssuedBy": RU_AUTHORITY_LONG})
-        checks.check("one long value inserts exactly one row",
+        checks.check("a long issuing authority still fits in that one row",
                      rows_of(one_auth).get("accession-application-fl-identity") == 1
                      and one_auth["render"]["ok"],
                      json.dumps(rows_of(one_auth)))
 
         one_addr = agreement(browser, "accession-application-fl",
                              "ru-resident-normal",
-                             {"field.registrationAddress": RU_ADDRESS_LONG})
-        checks.check("a long registration address alone inserts one row",
+                             {"field.registrationAddress": RU_ADDRESS_ORDINARY})
+        checks.check("an ordinary long address fits in that one row",
                      rows_of(one_addr).get("accession-application-fl-identity") == 1
                      and one_addr["render"]["ok"],
                      json.dumps(rows_of(one_addr)))
+
+        # The most extreme address — municipal formation, building, premises
+        # and office all present — needs a second row at 9 pt and is refused.
+        extreme = agreement(browser, "accession-application-fl",
+                            "ru-resident-normal",
+                            {"field.registrationAddress": RU_ADDRESS_LONG})
+        checks.check("the most extreme address is refused, by both phases",
+                     not extreme["preflight"]["ok"] and not extreme["render"]["ok"],
+                     json.dumps(rows_of(extreme)))
 
         both_ordinary = agreement(
             browser, "accession-application-fl", "ru-resident-normal",

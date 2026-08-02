@@ -394,6 +394,24 @@
   // block only references them and therefore cannot silently fork the business
   // schema. `useRawValue` is an explicit layout choice for a full name whose
   // legacy fixed signature slot still uses initials.
+  // The size a client or transaction value is drawn at inside a reviewed block.
+  //
+  // A Word-flow block locks its size to the printed paragraph it replaces, so
+  // that the form's own wording is reproduced exactly. Two forms set that
+  // paragraph in 8.52 pt, which is below the 9 pt readability floor the
+  // business set for values a client has to be able to read.
+  //
+  // `valueFontSize` separates the two: the static wording keeps the source's
+  // size, and the values the manager entered are drawn at the floor. It is
+  // stated per block, in the map, next to the size it overrides — there is no
+  // implicit exception anywhere for a run merely being locked.
+  function valueRunSize(block, run) {
+    if (run.fontSize != null) return run.fontSize;
+    if (block.valueFontSize != null) return Number(block.valueFontSize);
+    return block.fontSize;
+  }
+  Renderer.valueRunSize = valueRunSize;
+
   function resolveWordFlowRuns(template, block, payload) {
     var index = fieldsById(template);
     var resolved = [];
@@ -444,7 +462,7 @@
       run.text = value || '';
       run.sourceFieldId = field.id;
       run.font = run.font || block.font || field.font || 'legalSerif';
-      run.fontSize = run.fontSize != null ? run.fontSize : block.fontSize;
+      run.fontSize = valueRunSize(block, run);
       values[field.id] = run.text;
       resolved.push(run);
     });

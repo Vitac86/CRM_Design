@@ -84,6 +84,14 @@
         },
         font: 'legalSerif', fontSize: 8.52, minFontSize: 8.52,
         fontSizeLocked: true, lineHeight: 19.56,
+        // The source paragraph is set in 8.52 pt, and the block reproduces
+        // that wording exactly. The values the manager entered are drawn at
+        // the 9 pt readability floor instead: a client has to be able to
+        // read their own name, passport and address on a printed form, and
+        // being inside a locked block is not a reason to go below it.
+        // Measured cost: an ordinary payload now uses the one reviewed
+        // continuation row this page already budgets for.
+        valueFontSize: 9,
         alignment: 'justify', justifyMinRatio: 0.55,
         overflowStrategy: 'expand-layout',
         // The cut sits in the blank band that follows the complete identity

@@ -70,6 +70,26 @@ RENDER = r"""
       });
       reviewedFontSizes[group.page] = Array.from(new Set(sizes));
     });
+  // Which strings in a reviewed block are the client's, rather than the form's
+  // own printed wording. A locked block may reproduce its source paragraph at
+  // the source's size; the values a manager entered may not go below the
+  // readability floor, and telling them apart needs the resolved values.
+  const reviewedValueSizes = [];
+  try {
+    const ctx = await CRMDocumentEngine.overlayRenderer.open(t, {});
+    const plan = CRMDocumentEngine.overlayRenderer.planWordFlowBlocks(
+      t, payload, ctx.fonts);
+    Object.keys(plan.byBlock).forEach(function (id) {
+      const result = plan.byBlock[id];
+      if (!result.drawn) return;
+      (result.runs || []).forEach(function (run) {
+        if (run.type !== 'fieldRef' || run.inactive) return;
+        if (!String(run.text == null ? '' : run.text).trim()) return;
+        reviewedValueSizes.push({ block: id, fieldId: run.sourceFieldId || null,
+                                  size: Number(run.fontSize) });
+      });
+    });
+  } catch (e) { /* a block that does not lay out draws no values */ }
   try {
     const first = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
       onReviewedRanges: function (entries) {
@@ -90,7 +110,8 @@ RENDER = r"""
       s += String.fromCharCode.apply(null, a.subarray(i, i + c));
     }
     return JSON.stringify({ pdf: btoa(s), deterministic: deterministic,
-      reviewedRanges: reviewedRanges, reviewedFontSizes: reviewedFontSizes });
+      reviewedRanges: reviewedRanges, reviewedFontSizes: reviewedFontSizes,
+      reviewedValueSizes: reviewedValueSizes });
   } catch (error) {
     return JSON.stringify({ error: true, message: error.message,
       overflows: error.overflows || [] });
@@ -149,7 +170,8 @@ def painted_image_counter(document):
 
 
 def inspect(pdf_bytes, template_path, expected_pages, reviewed=None,
-            reviewed_font_sizes=None, deterministic=True):
+            reviewed_font_sizes=None, deterministic=True,
+            reviewed_value_sizes=None):
     """Structural verdict for one generated document."""
     problems = []
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
@@ -166,6 +188,16 @@ def inspect(pdf_bytes, template_path, expected_pages, reviewed=None,
 
     if not deterministic:
         problems.append("repeated generation is not byte-for-byte deterministic")
+
+    # Every client or transaction value drawn inside a reviewed Word-flow block,
+    # at the size it was really drawn. Being inside a locked block is not an
+    # exception: the floor applies to what the manager entered.
+    for entry in reviewed_value_sizes or []:
+        size = float(entry.get("size") or 0)
+        if size < MIN_DYNAMIC_FONT_SIZE - 1e-6:
+            problems.append(
+                f"client value below the {MIN_DYNAMIC_FONT_SIZE:g} pt floor: "
+                f"{entry.get('block')}/{entry.get('fieldId')} at {size} pt")
 
     if generated.page_count != base.page_count:
         problems.append(f"page count {generated.page_count} != base {base.page_count}")
@@ -191,6 +223,12 @@ def inspect(pdf_bytes, template_path, expected_pages, reviewed=None,
         for size, text, _bbox in spans:
             if smallest is None or size < smallest:
                 smallest = size
+            # A locked reviewed block may reproduce the form's own printed
+            # wording at the size the source prints it. Values are held to the
+            # floor regardless, and that is checked on the runs themselves
+            # below rather than on drawn glyphs — the wording and the values
+            # share commas and short words, so text matching cannot tell them
+            # apart.
             source_locked = any(
                 abs(size - approved) <= 0.05
                 for approved in approved_sizes.get(index, []))
@@ -221,9 +259,16 @@ def inspect(pdf_bytes, template_path, expected_pages, reviewed=None,
             f"painted images changed: {sum(missing_images.values())} missing / "
             f"{sum(added_images.values())} added")
 
+    # Two different numbers, deliberately kept apart: the smallest thing this
+    # engine drew at all (which includes the form's own wording, reproduced at
+    # the source's size), and the smallest value a client has to read.
+    smallest_value = min((float(entry.get("size") or 0)
+                          for entry in reviewed_value_sizes or []), default=None)
+
     result = {
         "problems": problems,
         "smallestDynamicSize": smallest,
+        "smallestClientValueSize": smallest_value,
         "cyrillic": cyrillic,
         "latin": latin,
         "pages": generated.page_count,
@@ -281,7 +326,8 @@ def main() -> int:
                         pdf, template_path, maps[doc_id]["pages"],
                         payload.get("reviewedRanges"),
                         payload.get("reviewedFontSizes"),
-                        payload.get("deterministic", False)))
+                        payload.get("deterministic", False),
+                        payload.get("reviewedValueSizes")))
                     entry["ok"] = not entry["problems"]
                 else:
                     entry.update({"ok": False, "overflow": True,
@@ -304,11 +350,20 @@ def main() -> int:
 
     smallest = min((e["smallestDynamicSize"] for e in rendered
                     if e["smallestDynamicSize"] is not None), default=None)
+    smallest_value = min((e.get("smallestClientValueSize") for e in rendered
+                          if e.get("smallestClientValueSize") is not None),
+                         default=None)
+    # Legacy fields outside reviewed blocks are drawn straight from the map and
+    # are already floor-checked span by span; the smallest of those is the
+    # overall smallest that is not reproduced source wording.
 
     print("\n── structural QA ─────────────────────────────────────────────")
     print(f"documents × profiles rendered : {len(rendered)}/{len(report)}")
     print(f"structural problems           : {len(structural)}")
-    print(f"smallest dynamic font size    : {smallest} pt")
+    print(f"smallest drawn size           : {smallest} pt "
+          f"(includes source wording reproduced by reviewed blocks)")
+    print(f"smallest CLIENT VALUE size    : {smallest_value} pt "
+          f"(the {MIN_DYNAMIC_FONT_SIZE:g} pt floor applies to this)")
     print(f"documents with overflow       : {len(overflowed)}")
     for entry in structural[:20]:
         print(f"  {entry['doc']}/{entry['profile']}: {entry['problems'][:3]}")
