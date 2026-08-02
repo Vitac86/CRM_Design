@@ -221,7 +221,20 @@
         type: 'wordFlowBlock',
         page: 0,
         showWhen: UL_ONLY,
-        frame: { left: 157.34, baselineTop: 135.26, width: 316.4, initialLineCount: 2 },
+        // 316.4 pt was the distance to the last thing the SOURCE prints on this
+        // line — the trailing space after the date rule at 436.15 — not the
+        // width the line really has. A date in words is 227.61 pt at this size,
+        // and «г. » + city + gap + date is 326.18 pt, so the complete date was
+        // 9.78 pt short of fitting on the line the form gives it, and the ФЛ
+        // and ЮЛ variants both fell back to a numeric year.
+        //
+        // The real line runs to the page's own text boundary, which this page
+        // states once as the intro block's right edge (56.54 + 478.35 =
+        // 534.89). Nothing is printed between 436.15 and there. Using it costs
+        // no expansion, moves no content and keeps «(дата прописью)» exactly
+        // where the source puts it, because that caption is positioned by its
+        // own measured spacer, not by this width.
+        frame: { left: 157.34, baselineTop: 135.26, width: 377.55, initialLineCount: 2 },
         font: 'legalSerif', fontSize: 9.48, minFontSize: 9.48,
         fontSizeLocked: true, lineHeight: 9.84, alignment: 'left',
         sourceReplacement: {
@@ -343,7 +356,13 @@
         type: 'wordFlowBlock',
         page: 2,
         showWhen: FL_ONLY,
-        frame: { left: 133.94, baselineTop: 89.54, width: 339.8, initialLineCount: 2 },
+        // As on the ЮЛ page: 339.8 pt reached the source's last printed glyph on
+        // this line (473.74), not the end of the line. «г. Москва» + gap + the
+        // date in words is 367.24 pt at this size. The page's own text boundary
+        // is the intro block's right edge, 70.22 + 464.96 = 535.18, and nothing
+        // is printed between 473.74 and it, so the complete date fits on the
+        // one line the form drew for it.
+        frame: { left: 133.94, baselineTop: 89.54, width: 401.24, initialLineCount: 2 },
         font: 'legalSerif', fontSize: 10.56, minFontSize: 10.56,
         fontSizeLocked: true, lineHeight: 18.12, alignment: 'left',
         sourceReplacement: {
