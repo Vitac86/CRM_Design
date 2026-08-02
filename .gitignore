@@ -12,3 +12,7 @@ static-uikit/tools/qa/wrapping-candidates.json
 static-uikit/tools/qa/ordinary-substitutions.json
 static-uikit/tools/qa/ordinary-substitutions.csv
 maps.json
+
+# Focused visual-review pack — regenerated locally by
+# static-uikit/tools/qa/build_ordinary_review_pack.py, never committed.
+static-uikit/manual-smoke/ordinary-substitution-review/
