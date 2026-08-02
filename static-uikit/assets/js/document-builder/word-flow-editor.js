@@ -583,6 +583,11 @@
       runControl('Keep with next', 'keepWithNext', input('checkbox', run.keepWithNext), Boolean);
       runControl('Emergency character wrap', 'emergencyBreak', input('checkbox',
         run.emergencyBreak || run.allowEmergencyBreak), Boolean);
+      runControl('Keep the printed blank', 'blankWhenEmpty',
+        input('checkbox', run.blankWhenEmpty), Boolean,
+        'Печатный бланк исходной формы сохраняется, даже если значение пустое ' +
+        'или скрыто showWhen. Требуется decoration → minimum width: это ' +
+        'измеренная ширина того самого бланка.');
       this._renderDecoration(card, block, run, index);
     } else if (run.type === 'spacer') {
       runControl('Width · pt', 'width', input('number', run.width, { min: 0, step: 0.01 }), numberValue,

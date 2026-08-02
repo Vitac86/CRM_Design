@@ -526,6 +526,65 @@
         return error.code === 'flow-region-overlap';
       }), 'overlap not detected');
     });
+    add('A kept printed blank is configurable and survives both round trips', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var block = app.state.project.wordFlowBlocks.filter(function (candidate) {
+          return (candidate.runs || []).some(function (run) {
+            return run.blankWhenEmpty;
+          });
+        })[0];
+        assert(block, 'no production block keeps a printed blank');
+        var run = block.runs.filter(function (item) { return item.blankWhenEmpty; })[0];
+        assert(run.decoration && Number(run.decoration.minWidth) > 0,
+          'a kept blank must carry the measured width of the printed one');
+
+        app.state.selectWordFlowBlock(block.id);
+        var editor = frame.document.getElementById('dtb-word-flow-editor');
+        var controls = Array.prototype.map.call(
+          editor.querySelectorAll('[data-word-flow-run-control]'),
+          function (node) { return node.dataset.wordFlowRunControl; });
+        assert(controls.indexOf('blankWhenEmpty') !== -1,
+          'the Word-flow editor does not expose the kept blank');
+
+        var imported = ns.io.importProjectText(ns.io.exportProject(app.state.project)).project;
+        assert(ns.io.semanticEqual(imported.wordFlowBlocks, app.state.project.wordFlowBlocks),
+          'Builder JSON lost the kept blank');
+        var entry = app.catalog.filter(function (item) {
+          return item.overlayTemplateId === app.state.project.templateId;
+        })[0];
+        var production = ns.schema.fromProduction(
+          ns.schema.toProduction(app.state.project), entry);
+        assert(ns.io.semanticEqual(production.wordFlowBlocks, app.state.project.wordFlowBlocks),
+          'production export lost the kept blank');
+      });
+    });
+    add('An exact-reference slot is configurable and survives both round trips', function () {
+      return app.openExisting('account-opening-notice').then(function () {
+        var exact = app.state.project.fields.filter(function (field) {
+          return field.tokenBreak === 'none';
+        });
+        assert(exact.length >= 3, 'no production field forbids breaking its value');
+
+        app.state.selectField(exact[0].id);
+        var inspector = frame.document.getElementById('dtb-inspector');
+        var control = inspector.querySelector('[data-field-control="tokenBreak"]');
+        assert(control, 'the inspector does not expose the token-break rule');
+        equal(control.value, 'none', 'the inspector shows the wrong rule');
+
+        var imported = ns.io.importProjectText(ns.io.exportProject(app.state.project)).project;
+        exact.forEach(function (field) {
+          var round = imported.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(round.tokenBreak, 'none', 'Builder JSON lost tokenBreak for ' + field.id);
+        });
+        var production = ns.schema.toProduction(app.state.project);
+        exact.forEach(function (field) {
+          var round = production.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(round.tokenBreak, 'none', 'production export lost tokenBreak for ' + field.id);
+        });
+      });
+    });
     add('Continuation lines survive a builder JSON round trip', function () {
       return app.openExisting('accession-application-fl').then(function () {
         var text = ns.io.exportProject(app.state.project);

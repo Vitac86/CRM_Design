@@ -85,6 +85,10 @@
 
   Inspector.prototype._addFieldControl = function (section, field, label, name, control, transform, hint) {
     control.classList.add('dtb-control');
+    // Name the control after the production property it edits, the way the
+    // Word-flow editor already does. QA can then assert that a property really
+    // is configurable rather than inferring it from a label.
+    control.dataset.fieldControl = name;
     this._fieldPatch(field, name, control, transform);
     section.appendChild(row(label, control, hint));
     return control;
@@ -262,6 +266,18 @@
       }, this);
     this._addFieldControl(section, field, 'Выравнивание', 'align', select(field.align || 'left', ['left', 'center', 'right']), String);
     this._addFieldControl(section, field, 'Многострочное', 'multiline', input('checkbox', field.multiline), Boolean);
+    // How this slot's own value may be broken when it is wider than the line.
+    // The default is the engine's rule: split only after a character that
+    // already reads as a break in the value itself. 'none' is for a slot that
+    // holds one exact reference — it moves whole to a wider approved line or
+    // overflows; 'anywhere' is the reviewed opposite, for a machine identifier
+    // the source itself allows to be cut mid-token.
+    this._addFieldControl(section, field, 'Перенос внутри слова', 'tokenBreak',
+      select(field.tokenBreak || '', [
+        { value: '', label: 'По знакам самого значения' },
+        { value: 'none', label: 'Никогда — точный идентификатор' },
+        { value: 'anywhere', label: 'В любом месте — проверенное решение' }
+      ]), function (value) { return value || undefined; });
     this._addFieldControl(section, field, 'Обязательное', 'required', input('checkbox', field.required), Boolean);
     this._addFieldControl(section, field, 'Optional source', 'optional', input('checkbox', field.optional), Boolean);
     var formats = [{ value: '', label: 'Без форматтера' }].concat(Object.keys(global.CRMDocumentEngine.overlayRenderer.formatters).sort().map(function (name) { return { value: name, label: name }; }));
