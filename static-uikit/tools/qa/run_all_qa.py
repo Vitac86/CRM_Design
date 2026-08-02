@@ -66,6 +66,9 @@ SUITES = [
     # These two read the regression report, so they run after it.
     ("regression denominator", "audit_regression_denominator.py", []),
     ("accession row capacity", "verify_accession_row_capacity.py", []),
+    # The release gate: no ordinary payload may be shortened, and every value
+    # the engine does accept has to come back out of the PDF unchanged.
+    ("ordinary requested/rendered equality", "audit_ordinary_equality.py", []),
 ]
 
 
