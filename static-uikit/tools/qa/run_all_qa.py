@@ -63,6 +63,9 @@ SUITES = [
     ("structural PDF", "run_structural_pdf_tests.py", []),
     ("full template audit", "check_full_template_audit.py", ["--self-test"]),
     ("document regression", "run_document_regression.py", []),
+    # These two read the regression report, so they run after it.
+    ("regression denominator", "audit_regression_denominator.py", []),
+    ("accession row capacity", "verify_accession_row_capacity.py", []),
 ]
 
 
