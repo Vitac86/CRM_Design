@@ -916,6 +916,74 @@
     });
   }
 
+  // ── Anchor geometry, against the real PDF ─────────────────────────────────
+  //
+  // Everything else here checks declared numbers against each other. Only the
+  // page's own content stream can say whether an insertion point actually
+  // falls between two complete drawing blocks, and until it did, a builder
+  // could export a map whose anchor sat inside printed text — which is how
+  // seven Word-flow anchors shipped unable to add a row.
+  //
+  // Uses the production normalizer and the production analyser, so the builder
+  // blocks exactly what the renderer would refuse.
+  function anchorGeometry(project, runtimePdfUrl) {
+    var engine = global.CRMDocumentEngine;
+    var errors = [];
+    var warnings = [];
+    if (!engine || !runtimePdfUrl || !global.PDFLib) {
+      return Promise.resolve({ errors: errors, warnings: warnings });
+    }
+    var template;
+    try {
+      template = ns.schema.toProduction(project, runtimePdfUrl);
+    } catch (error) {
+      return Promise.resolve({ errors: errors, warnings: warnings });
+    }
+    var anchors = engine.overlayRenderer.expansionAnchors(template);
+    if (!anchors.length) return Promise.resolve({ errors: errors, warnings: warnings });
+
+    return fetch(runtimePdfUrl).then(function (response) {
+      return response.arrayBuffer();
+    }).then(function (bytes) {
+      return global.PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
+    }).then(function (pdfDoc) {
+      var pages = pdfDoc.getPages();
+      anchors.forEach(function (anchor) {
+        var page = pages[anchor.page];
+        if (!page) {
+          errors.push(item('error', 'anchor-page',
+            'Якорь «' + anchor.id + '» ссылается на страницу ' +
+            (anchor.page + 1) + ', которой нет в PDF.', null, anchor.page));
+          return;
+        }
+        var analysis;
+        try {
+          analysis = engine.pageExpander.analysePageShift(page, [{
+            fieldId: anchor.id, fromTop: anchor.top, toTop: anchor.toTop,
+            delta: anchor.delta, moveTopLevelPaths: anchor.moveTopLevelPaths
+          }], {});
+        } catch (error) {
+          errors.push(item('error', 'anchor-geometry',
+            'Якорь «' + anchor.id + '»: ' + error.message, null, anchor.page));
+          return;
+        }
+        if (!analysis.straddling.length) return;
+        var first = analysis.straddling[0];
+        errors.push(item('error', 'anchor-straddles-source',
+          'Точка вставки пересекает исходный блок PDF; выберите границу ' +
+          'полного блока. Якорь «' + anchor.id + '» на стр. ' +
+          (anchor.page + 1) + ': точка ' + anchor.top + ' pt попадает внутрь ' +
+          'блока ' + first.top + '–' + first.bottom + ' pt.',
+          null, anchor.page));
+      });
+      return { errors: errors, warnings: warnings };
+    }, function () {
+      // The PDF could not be read here; `structural` already reports that.
+      return { errors: errors, warnings: warnings };
+    });
+  }
+  Validation.anchorGeometry = anchorGeometry;
+
   Validation.visible = visible;
   Validation.format = format;
   Validation.loadProjectFonts = loadProjectFonts;

@@ -602,7 +602,16 @@
     }
     var structural = ns.validation.structural(this.state.project, this.sourceInfo, this.getPayload());
     this.state.validation = structural;
-    return ns.validation.analyzeProfile(this.state.project, this.state.profileId, this.state.payloadOverrides).then(function (fit) {
+    // Whether each anchor really sits between two complete drawing blocks can
+    // only be answered by the PDF itself, so it is checked here rather than
+    // among the declared-number rules above.
+    return ns.validation.anchorGeometry(this.state.project, this.state.runtimePdfUrl)
+      .then(function (geometry) {
+        geometry.errors.forEach(function (issue) { structural.errors.push(issue); });
+        geometry.warnings.forEach(function (issue) { structural.warnings.push(issue); });
+        return ns.validation.analyzeProfile(self.state.project, self.state.profileId,
+                                            self.state.payloadOverrides);
+      }).then(function (fit) {
       self.currentFit = fit;
       fit.fields.forEach(function (entry) {
         if (['overflow', 'missing', 'unsupported-glyph', 'error'].indexOf(entry.result.status) !== -1) {

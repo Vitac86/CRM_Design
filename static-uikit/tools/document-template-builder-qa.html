@@ -774,6 +774,41 @@
                'cross-page flow changed in production round trip');
       }).then(function () { return app.openExisting('qualification-notice'); });
     });
+    add('An insertion point inside printed source content blocks export', function () {
+      // Declared numbers alone cannot see this: the page's own content stream
+      // has to be read. Seven Word-flow anchors shipped sitting inside printed
+      // blocks because nothing in the builder or the gates ever looked.
+      return app.openExisting('accession-application-fl').then(function () {
+        var project = app.state.project;
+        var block = (project.wordFlowBlocks || []).filter(function (item) {
+          return item.id === 'accession-application-fl-identity';
+        })[0];
+        assert(block && block.expansion, 'the identity block has no expansion');
+        assert(Math.abs(block.expansion.insertionTop - 143.82) < 0.01,
+               'the identity anchor is not at its re-cut boundary');
+
+        return ns.validation.anchorGeometry(project, app.state.runtimePdfUrl)
+          .then(function (clean) {
+            assert(clean.errors.length === 0,
+                   'the corrected anchor was reported as straddling: ' +
+                   (clean.errors[0] || {}).message);
+
+            // 159.95 pt is the value that shipped: inside the block painting
+            // 159.02–167.54 pt.
+            var broken = cloneProject(project);
+            broken.wordFlowBlocks.filter(function (item) {
+              return item.id === 'accession-application-fl-identity';
+            })[0].expansion.insertionTop = 159.95;
+            return ns.validation.anchorGeometry(broken, app.state.runtimePdfUrl);
+          }).then(function (bad) {
+            assert(bad.errors.some(function (error) {
+              return error.code === 'anchor-straddles-source';
+            }), 'an insertion point inside printed content was accepted');
+            assert(/Точка вставки пересекает исходный блок PDF/.test(
+              bad.errors[0].message), 'the message does not name the problem');
+          });
+      }).then(function () { return app.openExisting('qualification-notice'); });
+    });
     add('Every production map round-trips its page budget', function () {
       var flowCount = 0;
       app.catalog.forEach(function (entry) {
