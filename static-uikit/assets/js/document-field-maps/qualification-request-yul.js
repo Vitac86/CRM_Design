@@ -108,8 +108,13 @@
         fontSizeLocked: true, lineHeight: 11.52,
         alignment: 'left',
         overflowStrategy: 'expand-layout',
+        // Re-cut at a measured complete-operator boundary.
+        //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
+        // 297.00 fell inside a printed block. The continuation line paints
+        // 288.99–300.01, so the cut belongs at or above 288.99. Measured
+        // clean band 286.25–293.50; midpoint, +/-3.62 pt of margin.
         expansion: {
-          page: 0, insertionTop: 297.00, shiftFromTop: 297.00,
+          page: 0, insertionTop: 289.88, shiftFromTop: 289.88,
           rowHeight: 11.52, maxExtraRows: 3, lineStyle: 'none',
           reviewStatus: 'approved'
         },
@@ -172,8 +177,13 @@
         fontSizeLocked: true, lineHeight: 11.52,
         alignment: 'left',
         overflowStrategy: 'expand-layout',
+        // Re-cut at a measured complete-operator boundary.
+        //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
+        // 135.70 fell inside a printed block. The continuation line paints
+        // 126.63–137.65, so the cut belongs at or above 126.63. Measured
+        // clean band 124.20–125.95; midpoint, +/-0.88 pt of margin.
         expansion: {
-          page: 1, insertionTop: 135.70, shiftFromTop: 135.70,
+          page: 1, insertionTop: 125.08, shiftFromTop: 125.08,
           rowHeight: 11.52, maxExtraRows: 5, lineStyle: 'none',
           reviewStatus: 'approved'
         },

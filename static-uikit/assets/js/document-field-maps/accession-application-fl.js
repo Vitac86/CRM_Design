@@ -86,8 +86,24 @@
         fontSizeLocked: true, lineHeight: 19.56,
         alignment: 'justify', justifyMinRatio: 0.55,
         overflowStrategy: 'expand-layout',
+        // The cut sits in the blank band that follows the complete identity
+        // paragraph, not on the heading below it.
+        //
+        // 159.95 was the *declared* top of «1. Присоединяется…», taken from a
+        // glyph box. That block actually paints 159.02–167.54, so the band
+        // began inside it: the renderer refused every payload that needed the
+        // row, and nothing caught it because the anchor audit only walked
+        // `fields[].expansion`.
+        //
+        // The block draws its own continuation line from its frame, at
+        // 99.26 + 3 × 19.56 = 157.94, which paints 150.35–159.78. Every source
+        // block that line overlaps has to move, so the cut has to be at or
+        // above 150.35. Measured clean bands there: 119.95–129.70 and
+        // 138.45–149.20. The lower one is the gap immediately after the
+        // paragraph, so the cut is its midpoint — ±5.38 pt of margin.
+        //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
         expansion: {
-          page: 0, insertionTop: 159.95, shiftFromTop: 159.95,
+          page: 0, insertionTop: 143.82, shiftFromTop: 143.82,
           rowHeight: 19.56, maxExtraRows: 1, lineStyle: 'none',
           reviewStatus: 'approved'
         },

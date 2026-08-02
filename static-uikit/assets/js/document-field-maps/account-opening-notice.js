@@ -140,8 +140,15 @@
         fontSizeLocked: true, lineHeight: 12.72,
         alignment: 'justify', justifyMinRatio: 0.55,
         overflowStrategy: 'expand-layout',
+        // Re-cut at a measured complete-operator boundary.
+        //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
+        // 177.86 fell inside the block painting 169.9–181.1. The block's
+        // own continuation line is at 126.74 + 4 x 12.72 = 177.62 and
+        // paints 167.78–180.00, so that block must move: the cut belongs
+        // at or above 167.78. Measured clean band 164.86–169.86; midpoint,
+        // +/-2.50 pt of margin.
         expansion: {
-          page: 0, insertionTop: 177.86, shiftFromTop: 177.86,
+          page: 0, insertionTop: 167.36, shiftFromTop: 167.36,
           rowHeight: 12.72, maxExtraRows: 1, lineStyle: 'none',
           reviewStatus: 'approved'
         },
