@@ -675,6 +675,15 @@
   // Public deterministic styled-run layout.  This never shrinks: a reviewed
   // Word-flow block normally sets `fontSizeLocked: true`, and validation also
   // enforces minFontSize === fontSize for that mode.
+  // ES5 shallow merge: this file targets the same browsers the rest of the
+  // engine does and does not assume Object.assign.
+  function withOverrides(base, overrides) {
+    var out = {};
+    Object.keys(base || {}).forEach(function (key) { out[key] = base[key]; });
+    Object.keys(overrides || {}).forEach(function (key) { out[key] = overrides[key]; });
+    return out;
+  }
+
   function layoutRuns(fonts, runs, input) {
     var spec = input || {};
     var frame = spec.frame || {};
@@ -784,6 +793,18 @@
     });
 
     if (overflow) {
+      // «It does not fit» is not something a manager can act on. Lay the same
+      // runs out once more with the cap lifted, purely to learn how many rows
+      // the values really wanted, so the refusal can say how far over it is.
+      // `probe` stops that second pass from recursing.
+      var wanted = null;
+      if (overflow.reason === 'no-space' && !spec.probe) {
+        var relaxed = layoutRuns(fonts, runs, withOverrides(spec, {
+          maxAdditionalLines: maxAdditionalLines + 24,
+          probe: true
+        }));
+        if (relaxed.fits) wanted = Math.max(0, relaxed.lines.length - initialLineCount);
+      }
       return {
         fits: false,
         reason: overflow.reason,
@@ -792,6 +813,8 @@
         availableWidth: overflow.availableWidth || width,
         requiredWidth: overflow.requiredWidth || null,
         lineCapacity: maxLines,
+        additionalLinesAllowed: maxAdditionalLines,
+        additionalLinesWanted: wanted,
         lines: rawLines,
         size: fontSize,
         fontSizeLocked: !!spec.fontSizeLocked

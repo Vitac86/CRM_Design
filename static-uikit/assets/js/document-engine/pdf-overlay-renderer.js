@@ -453,6 +453,33 @@
   }
   Renderer.resolveWordFlowRuns = resolveWordFlowRuns;
 
+  // Why a reviewed paragraph could not be laid out, in physical terms.
+  //
+  // The three refusals a manager can actually meet are different problems and
+  // need different words: a value with no space in it can never be wrapped;
+  // more continuation rows than the source page was reviewed for is a capacity
+  // limit with a number attached; anything else is a configuration fault.
+  function wordFlowOverflowMessage(block, result) {
+    var layout = result.layout || {};
+    if (layout.reason === 'unbreakable-token') {
+      return 'неразрывное значение не помещается в Word-подобный блок';
+    }
+    var expansion = block.expansion || {};
+    var allowed = Number(expansion.maxExtraRows == null ? 0 : expansion.maxExtraRows);
+    var wanted = Number(layout.additionalLinesWanted != null
+      ? layout.additionalLinesWanted : layout.additionalLines || 0);
+    if (layout.reason === 'no-space' || wanted > allowed) {
+      var rows = wanted > allowed
+        ? 'требуется дополнительных строк: ' + wanted + ', разрешено: ' + allowed
+        : 'дополнительных строк разрешено: ' + allowed;
+      return 'значения не умещаются в блок «' + block.id + '»: ' + rows +
+        '. Исходная форма даёт этому блоку ровно столько места; сократите одно ' +
+        'из длинных значений или согласуйте увеличение запаса строк.';
+    }
+    return result.message || 'Word-подобный блок не помещается в проверенные границы';
+  }
+  Renderer.wordFlowOverflowMessage = wordFlowOverflowMessage;
+
   function layoutWordFlowBlock(template, block, payload, fonts) {
     if (!isVisible(block, payload)) {
       return { drawn: false, reason: 'hidden', blockId: block.id };
@@ -550,9 +577,10 @@
         source: field && field.source || null,
         reason: result.layout && result.layout.reason || result.reason,
         editable: !!(field && field.source && field.source.indexOf('extra.') === 0),
-        message: result.layout && result.layout.reason === 'unbreakable-token'
-          ? 'неразрывное значение не помещается в Word-подобный блок'
-          : (result.message || 'Word-подобный блок не помещается в проверенные границы')
+        // A capacity refusal has to say what physically ran out. «The block
+        // does not fit» tells the manager nothing they can act on; the rows
+        // wanted against the rows the reviewed source can give does.
+        message: wordFlowOverflowMessage(block, result)
       });
     });
     return { byBlock: byBlock, overflows: overflows };
@@ -1719,7 +1747,10 @@
   // lands. The Document Wizard's preflight and the final render call THIS, so
   // a preflight that succeeds cannot be followed by a generation that fails —
   // there is no second implementation to disagree with.
-  function decide(template, payload, pages, fonts) {
+  // `context` is the result of `open()`. It is optional so existing callers and
+  // QA harnesses keep working; when it is given, the plan fingerprint also
+  // records which template bytes the plan was decided against.
+  function decide(template, payload, pages, fonts, context) {
     var wordFlowPlan = planWordFlowBlocks(template, payload, fonts);
     var demands = expansionDemands(template, payload, fonts, wordFlowPlan);
     var plans = {};
@@ -1754,6 +1785,47 @@
         });
       });
 
+    // ── Does the real page content allow this plan? ─────────────────────────
+    //
+    // Everything above reasons about declared coordinates. Only the page's own
+    // content stream can say whether a shift band actually falls between two
+    // complete drawing blocks, and the renderer used to be the first thing to
+    // find out — it asked `shiftPageContent`, which threw, long after preflight
+    // had told the manager the document was fine.
+    //
+    // The same analysis now runs here, in the one decision pass both preflight
+    // and render share, so an impossible anchor is a plan error like any other.
+    var contentFingerprints = {};
+    Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
+      .forEach(function (index) {
+        var pagePlan = plans[index];
+        if (!pages[index]) return;
+        var analysis;
+        try {
+          analysis = Expander.analysePageShift(pages[index], pagePlan.shifts, {});
+        } catch (error) {
+          planErrors.push({
+            fieldId: (pagePlan.shifts[0] || {}).fieldId || 'page[' + index + ']',
+            reason: 'content-stream',
+            message: String(error && error.message || error)
+          });
+          return;
+        }
+        contentFingerprints[index] = {
+          blocks: analysis.blocks,
+          moved: analysis.moved,
+          straddling: analysis.straddling.length
+        };
+        analysis.straddling.forEach(function (entry) {
+          planErrors.push({
+            fieldId: entry.band.fieldId || (pagePlan.shifts[0] || {}).fieldId ||
+              'page[' + index + ']',
+            reason: 'straddle',
+            message: Expander.straddleMessage(entry)
+          });
+        });
+      });
+
     var regionsFor = makeRegionsFor(plans, rowsByField);
     var planned = plan(template, payload, fonts, {
       regionsFor: regionsFor,
@@ -1778,7 +1850,13 @@
         source: field.source || null,
         reason: error.reason,
         editable: !!field.source && field.source.indexOf('extra.') === 0,
-        message: 'страница не может быть расширена: ' + error.message
+        // A straddle is not «the page has no room»: the room exists, the
+        // configured insertion point simply falls inside printed content. Say
+        // which it is, so the message points at the map and not at the value.
+        message: error.reason === 'straddle'
+          ? 'точка вставки дополнительной строки пересекает исходный блок PDF: ' +
+            error.message
+          : 'страница не может быть расширена: ' + error.message
       });
     });
 
@@ -1787,11 +1865,95 @@
       plans: plans,
       rowsByField: rowsByField,
       planned: planned,
+      contentFingerprints: contentFingerprints,
       notes: expansionNotes(template, plans),
-      fingerprint: fingerprintOf(template, plans, planned)
+      templateSha256: (context && context.templateSha256) || null,
+      fingerprint: fingerprintOf(template, plans, planned, contentFingerprints,
+                                 context && context.templateSha256)
     };
   }
   Renderer.decide = decide;
+
+  // ── Every declared cut in a template, in one normalized list ───────────────
+  //
+  // A template can move page content from five different places in the schema,
+  // and a validator that only walks `fields[].expansion` silently approves the
+  // other four. That is how `accession-application-fl`'s Word-flow anchor came
+  // to sit inside a printed block with every gate passing.
+  //
+  // Anything that validates or previews an insertion point — the QA anchor
+  // audit, the Template Builder — reads this, so a new schema location has to
+  // be added here once rather than in each of them.
+  function expansionAnchors(template) {
+    var layout = template.pageLayout || {};
+    var out = [];
+
+    function add(entry) {
+      if (entry.top == null || entry.delta == null) return;
+      var pageLayout = layout[entry.page] || {};
+      out.push({
+        documentId: template.id,
+        origin: entry.origin,
+        id: entry.id,
+        page: Number(entry.page),
+        top: Number(entry.top),
+        delta: Number(entry.delta),
+        toTop: Number(entry.toTop != null ? entry.toTop : pageLayout.shiftToTop),
+        maxExtraRows: entry.maxExtraRows != null ? entry.maxExtraRows : null,
+        moveTopLevelPaths: !!entry.moveTopLevelPaths,
+        reviewStatus: entry.reviewStatus || null
+      });
+    }
+
+    function fromExpansion(origin, id, owner, expansion) {
+      if (!expansion) return;
+      add({
+        origin: origin, id: id,
+        page: expansion.page != null ? expansion.page : owner.page,
+        top: expansion.insertionTop,
+        delta: expansion.rowHeight,
+        toTop: expansion.shiftToTop,
+        maxExtraRows: expansion.maxExtraRows,
+        moveTopLevelPaths: expansion.lineStyle === 'table-row',
+        reviewStatus: expansion.reviewStatus
+      });
+    }
+
+    (template.fields || []).forEach(function (field) {
+      fromExpansion('field', field.id, field, field.expansion);
+    });
+    (template.wordFlowBlocks || []).forEach(function (block) {
+      fromExpansion('wordFlowBlock', block.id, block, block.expansion);
+    });
+
+    Object.keys(layout).forEach(function (key) {
+      var page = Number(key);
+      var entry = layout[key] || {};
+      (entry.compaction || []).forEach(function (zone, index) {
+        add({
+          origin: 'compaction', id: 'compaction[' + index + ']', page: page,
+          top: zone.top, delta: -(zone.originalGap - zone.minGap),
+          toTop: entry.shiftToTop, reviewStatus: zone.reviewStatus
+        });
+      });
+      var flow = entry.crossPageFlow;
+      if (!flow) return;
+      add({
+        origin: 'crossPageFlow', id: 'crossPageFlow[source]', page: page,
+        top: flow.sourceFromTop, delta: 1, toTop: flow.sourceToTop,
+        reviewStatus: flow.reviewStatus
+      });
+      add({
+        origin: 'crossPageFlow', id: 'crossPageFlow[target]',
+        page: Number(flow.targetPage),
+        top: flow.targetShiftFromTop, delta: flow.targetShift,
+        toTop: flow.targetShiftToTop, reviewStatus: flow.reviewStatus
+      });
+    });
+
+    return out;
+  }
+  Renderer.expansionAnchors = expansionAnchors;
 
   // What the manager is told about: rows were added, nothing to decide.
   function expansionNotes(template, plans) {
@@ -1818,8 +1980,20 @@
   // every page shift, every inserted row, and every line of every value with
   // the size and region it landed in. Identical input gives an identical
   // string, so QA can prove the preflight and the final render agreed.
-  function fingerprintOf(template, plans, planned) {
+  function fingerprintOf(template, plans, planned, contentFingerprints,
+                         templateSha256) {
     var parts = ['doc=' + template.id];
+    if (templateSha256) parts.push('template=' + templateSha256);
+    // What the plan was decided *against*: if the page content the geometry
+    // was validated on is not the content the renderer later shifts, the two
+    // are not the same plan however identical the coordinates look.
+    Object.keys(contentFingerprints || {}).map(Number)
+      .sort(function (a, b) { return a - b; })
+      .forEach(function (index) {
+        var entry = contentFingerprints[index];
+        parts.push('content p' + index + ' blocks=' + entry.blocks +
+          ' moved=' + entry.moved + ' straddling=' + entry.straddling);
+      });
     Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
       .forEach(function (index) {
         var page = plans[index];
@@ -1873,6 +2047,38 @@
   // Both `render` and `preflight` start here, so the document a preflight
   // reasons about is the one that would be generated, measured with the same
   // embedded faces.
+  // SHA-256 of the authoritative bytes, hex. Falls back to a deterministic
+  // FNV-1a digest where WebCrypto is unavailable (a page opened over file://
+  // is not a secure context); the fingerprint only has to be stable and to
+  // differ when the bytes differ.
+  function templateDigest(bytes) {
+    var subtle = global.crypto && global.crypto.subtle;
+    if (!subtle || typeof subtle.digest !== 'function') {
+      return Promise.resolve('fnv1a:' + fnv1a(bytes));
+    }
+    return subtle.digest('SHA-256', bytes).then(function (buffer) {
+      var view = new Uint8Array(buffer);
+      var hex = '';
+      for (var i = 0; i < view.length; i += 1) {
+        hex += (view[i] < 16 ? '0' : '') + view[i].toString(16);
+      }
+      return 'sha256:' + hex;
+    }, function () {
+      return 'fnv1a:' + fnv1a(bytes);
+    });
+  }
+
+  function fnv1a(bytes) {
+    var hash = 0x811c9dc5;
+    for (var i = 0; i < bytes.length; i += 1) {
+      hash ^= bytes[i];
+      hash = (hash + ((hash << 1) + (hash << 4) + (hash << 7) +
+        (hash << 8) + (hash << 24))) >>> 0;
+    }
+    return ('00000000' + hash.toString(16)).slice(-8);
+  }
+  Renderer.templateDigest = templateDigest;
+
   function open(template, options) {
     var opts = options || {};
     var PDFLib = global.PDFLib;
@@ -1934,12 +2140,19 @@
         }
 
         return embedFonts(pdfDoc, template.fonts || {}).then(function (fonts) {
-          return {
-            pdfDoc: pdfDoc,
-            pages: pages,
-            fonts: fonts,
-            templateBytes: templateBytes
-          };
+          // The identity of the bytes the plan is about to be decided against.
+          // Preflight and render each fetch the file themselves; carrying the
+          // digest into the plan fingerprint is what proves the document the
+          // manager was promised is the document that was drawn.
+          return templateDigest(templateBytes).then(function (digest) {
+            return {
+              pdfDoc: pdfDoc,
+              pages: pages,
+              fonts: fonts,
+              templateBytes: templateBytes,
+              templateSha256: digest
+            };
+          });
         });
       });
   }
@@ -1957,12 +2170,15 @@
     return open(template, {
       validatePayload: opts.validatePayload, payload: payload
     }).then(function (context) {
-      var decided = decide(template, payload, context.pages, context.fonts);
+      var decided = decide(template, payload, context.pages, context.fonts,
+                           context);
       return inspectActiveReviewedRanges(context, template, payload)
         .then(function (reviewed) {
           return {
             ok: !decided.planned.overflows.length,
             fingerprint: decided.fingerprint,
+            templateSha256: decided.templateSha256,
+            contentFingerprints: decided.contentFingerprints,
             overflows: decided.planned.overflows,
             expansion: decided.notes,
             summary: decided.planned.summary,
@@ -2006,7 +2222,7 @@
       // value lands. Nothing is drawn and no Blob exists until the whole
       // document is known to be printable, so a failure reports every problem
       // at once instead of dying on the first one.
-      var decided = decide(template, payload, pages, context.fonts);
+      var decided = decide(template, payload, pages, context.fonts, context);
       var plans = decided.plans;
       if (typeof opts.onPlan === 'function') opts.onPlan(decided);
 
