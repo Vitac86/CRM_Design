@@ -127,6 +127,17 @@
   }
   Layout.breakToken = breakToken;
 
+  // The opposite reviewed decision: `tokenBreak: 'none'` says this slot holds
+  // ONE exact identifier — a contract number, a payment reference — that the
+  // document owner's format does not allow to be broken anywhere at all, not
+  // even after a slash or a hyphen it happens to contain. Such a token is never
+  // split; it moves whole to a wider approved line, or the field overflows and
+  // says so. Without this the engine would helpfully print «БД-2026/» on the
+  // printed blank and «000417-СПБ» underneath, which reads as two references.
+  function mayBreakToken(options) {
+    return !options || options.tokenBreak !== 'none';
+  }
+
   // A last-resort split at an arbitrary character. Only used when the field
   // explicitly declares `tokenBreak: 'anywhere'`, which is a reviewed decision
   // for slots that hold machine identifiers rather than legal wording.
@@ -313,7 +324,8 @@
         if (!line) {
           // The next word alone is wider than this line.
           var token = words[wordIndex];
-          var split = breakToken(font, token, size, slot.width);
+          var split = mayBreakToken(opts)
+            ? breakToken(font, token, size, slot.width) : null;
           if (!split && opts.tokenBreak === 'anywhere') {
             split = breakAnywhere(font, token, size, slot.width);
           }
@@ -478,6 +490,30 @@
       ? (run.fieldId || run.sourceFieldId || null) : null;
     var text = collapseFlowText(run.text);
     var pieces = [];
+
+    // A printed form's blank is part of its wording: «По электронной почте
+    // ______» shows that rule whether or not anybody filled it in. A reviewed
+    // reference may therefore declare `blankWhenEmpty`; an empty value — or one
+    // switched off by `showWhen` — then reserves its decoration's minimum width
+    // and keeps the rule, exactly as the suppressed source printed it. Without
+    // this, choosing «по почте» would silently delete the e-mail blank from the
+    // generated form.
+    if (type === 'fieldRef' && run.blankWhenEmpty && !text.replace(/\s+/g, '')) {
+      var blankWidth = run.decoration && isFinite(Number(run.decoration.minWidth))
+        ? Math.max(0, Number(run.decoration.minWidth)) : 0;
+      pieces.push({
+        type: type, text: '', font: fontKey, fontSize: size,
+        textWidth: 0, slotWidth: blankWidth,
+        spaceBefore: pendingSpace.value, sourceFieldId: sourceFieldId,
+        decoration: run.decoration ? copyOwn(run.decoration) : null,
+        emergencyBreak: false, keepTogether: true,
+        keepWithNext: !!run.keepWithNext, attachPrevious: false,
+        runIndex: run._runIndex
+      });
+      pendingSpace.value = false;
+      return pieces;
+    }
+
     var lineParts = text.split('\n');
 
     lineParts.forEach(function (part, lineIndex) {

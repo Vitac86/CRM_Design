@@ -434,10 +434,14 @@
         // An inactive reference is zero-width and undecorated: it neither asks
         // for a business value nor leaves a blank underline in the active
         // branch, and it is deliberately absent from the rendered-value set.
+        //
+        // `blankWhenEmpty` is the reviewed exception: the source form prints
+        // this blank unconditionally, so an unselected branch keeps the rule
+        // rather than deleting it from the document.
         run.text = '';
         run.sourceFieldId = field.id;
         run.inactive = true;
-        delete run.decoration;
+        if (!run.blankWhenEmpty) delete run.decoration;
         run.font = run.font || block.font || field.font || 'legalSerif';
         run.fontSize = run.fontSize != null ? run.fontSize : block.fontSize;
         resolved.push(run);
@@ -685,6 +689,12 @@
   // ── Configuration validation ───────────────────────────────────────────────
 
   var TEXT_TYPES = { text: 1, static: 1 };
+
+  // The two reviewed departures from ordinary word wrapping. 'none' forbids
+  // splitting a token even at punctuation it already contains — an exact
+  // reference printed whole or moved whole. 'anywhere' permits a mid-token cut
+  // for a machine identifier the source itself allows to be broken.
+  var TOKEN_BREAK_MODES = { none: 1, anywhere: 1 };
 
   // The page-level expansion budget: measured once per page, shared by every
   // anchor on it. Checked against the real page so a map cannot promise room
@@ -1133,6 +1143,14 @@
             problems.push(id + '.runs[' + runIndex + ']: invalid underline thickness');
           }
         }
+        // Keeping the source's blank is only meaningful if the run knows how
+        // wide that blank was; without it an unfilled reference would draw a
+        // zero-length rule where the form printed a line to write on.
+        if (run.blankWhenEmpty &&
+            !(run.decoration && Number(run.decoration.minWidth) > 0)) {
+          problems.push(id + '.runs[' + runIndex + ']: blankWhenEmpty needs ' +
+            'decoration.minWidth — the printed blank it reproduces');
+        }
       });
 
       if (block.sourceStaticText != null) {
@@ -1230,6 +1248,10 @@
         }
         if (type === 'static' && f.text == null) {
           problems.push(id + ': static field has no text');
+        }
+        if (f.tokenBreak != null && !TOKEN_BREAK_MODES[f.tokenBreak]) {
+          problems.push(id + ': unsupported tokenBreak "' + f.tokenBreak +
+            '" (expected "none" or "anywhere")');
         }
         validateRegions(template, f, id, pages, problems);
       }
