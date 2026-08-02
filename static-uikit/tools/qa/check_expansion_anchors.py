@@ -6,6 +6,13 @@
 A page's content can only be split where no drawing block crosses the line.
 This asks the production expander to try each declared `insertionTop` and, when
 it straddles, scans nearby for the closest value that does not.
+
+The anchor list comes from `CRMDocumentEngine.overlayRenderer.expansionAnchors`,
+the production normalizer, so every schema location that can move page content
+is audited: `fields[].expansion`, `wordFlowBlocks[].expansion`, page compaction
+zones and both ends of a reviewed cross-page flow. Walking `fields[]` alone —
+what this tool used to do — is why a Word-flow anchor sitting inside a printed
+block passed for as long as it did.
 """
 
 from __future__ import annotations
@@ -37,40 +44,20 @@ PROBE = r"""
 
 
 def anchors(browser):
-    """Every declared cut: an anchor's insertion point, and every compaction
-    zone, because recovered white space moves the page just as a row does."""
+    """Every declared cut in every map, from the production normalizer."""
     raw = browser.eval(
-        "JSON.stringify(Object.keys(window.CRMDocumentEngine.fieldMaps).reduce("
-        "function (out, id) {"
-        "  var t = window.CRMDocumentEngine.fieldMaps[id];"
-        "  var layout = t.pageLayout || {};"
-        "  (t.fields || []).forEach(function (f) {"
-        "    if (!f.expansion) return;"
-        "    var page = f.expansion.page != null ? f.expansion.page : f.page;"
-        "    var l = layout[page] || {};"
-        "    out.push({ doc: id, field: f.id, page: page,"
-        "      top: f.expansion.insertionTop, delta: f.expansion.rowHeight,"
-        "      toTop: l.shiftToTop != null ? l.shiftToTop : f.expansion.shiftToTop,"
-        "      moveTopLevelPaths: f.expansion.lineStyle === 'table-row' });"
-        "  });"
-        "  Object.keys(layout).forEach(function (page) {"
-        "    (layout[page].compaction || []).forEach(function (zone, i) {"
-        "      out.push({ doc: id, field: 'compaction[' + i + ']', page: Number(page),"
-        "        top: zone.top, delta: -(zone.originalGap - zone.minGap),"
-        "        toTop: layout[page].shiftToTop });"
-        "    });"
-        "    var flow = layout[page].crossPageFlow;"
-        "    if (flow) {"
-        "      out.push({ doc: id, field: 'crossPageFlow[source]', page: Number(page),"
-        "        top: flow.sourceFromTop, delta: 1, toTop: flow.sourceToTop });"
-        "      out.push({ doc: id, field: 'crossPageFlow[target]', page: Number(flow.targetPage),"
-        "        top: flow.targetShiftFromTop, delta: flow.targetShift,"
-        "        toTop: flow.targetShiftToTop });"
-        "    }"
-        "  });"
-        "  return out; }, []))"
+        "JSON.stringify(Object.keys(window.CRMDocumentEngine.fieldMaps)"
+        " .sort().reduce(function (out, id) {"
+        "   return out.concat(window.CRMDocumentEngine.overlayRenderer"
+        "     .expansionAnchors(window.CRMDocumentEngine.fieldMaps[id]));"
+        " }, []))"
     )
-    return json.loads(raw)
+    return [
+        {"doc": item["documentId"], "field": item["id"], "origin": item["origin"],
+         "page": item["page"], "top": item["top"], "delta": item["delta"],
+         "toTop": item["toTop"], "moveTopLevelPaths": item["moveTopLevelPaths"]}
+        for item in json.loads(raw)
+    ]
 
 
 def probe(browser, doc, page, tops, to_top, delta, move_paths=False):
@@ -103,12 +90,13 @@ def main() -> int:
             move_paths = bool(entry.get("moveTopLevelPaths"))
             ok = probe(browser, entry["doc"], page, [declared], to_top,
                        delta, move_paths)
+            label = f"{entry['field']} [{entry['origin']}]"
             if ok:
-                print(f"OK    {entry['doc']:34s} {entry['field']:34s} "
+                print(f"OK    {entry['doc']:34s} {label:48s} "
                       f"p{page} @{declared} ({ok[0][1]} blocks move)")
                 continue
             bad += 1
-            print(f"CLASH {entry['doc']:34s} {entry['field']:34s} "
+            print(f"CLASH {entry['doc']:34s} {label:48s} "
                   f"p{page} @{declared}")
             if not args.suggest:
                 continue
