@@ -103,6 +103,34 @@
     return text(id, source, 0, VALUE_LEFT, baselineTop, VALUE_WIDTH, options);
   }
 
+  // The agreement reference on a payment-purpose row: the printed «№» blank,
+  // and the reviewed continuation line on the row's own third printed line.
+  var PURPOSE_LEFT = 389.0;
+  var PURPOSE_BLANK_WIDTH = 48.5;
+  var PURPOSE_CONTINUATION_WIDTH = 160.0;
+
+  function paymentPurpose(id, page, baselineTop, continuationTop) {
+    return text(id, 'extra.extra-brokerage-contract',
+                page, PURPOSE_LEFT, baselineTop, PURPOSE_BLANK_WIDTH, {
+      required: true,
+      fontSize: 10.0,
+      tokenBreak: 'none',
+      overflowStrategy: 'flow',
+      flowRegions: [
+        {
+          page: page, left: PURPOSE_LEFT, baselineTop: baselineTop,
+          width: PURPOSE_BLANK_WIDTH, maxLines: 1
+        },
+        {
+          page: page, left: PURPOSE_LEFT, baselineTop: continuationTop,
+          width: PURPOSE_CONTINUATION_WIDTH, maxLines: 1, maxFontSize: 10.0,
+          generated: true, reviewStatus: 'approved',
+          drawUnderline: true, underlineThickness: 0.48, underlineOffset: 1.6
+        }
+      ]
+    });
+  }
+
   var TEMPLATE = {
     id: 'account-opening-notice',
     title: 'Уведомление об открытии брокерского/депозитарного счета',
@@ -247,12 +275,27 @@
       // ── Page 2: the brokerage agreement number repeated in each
       //    payment-purpose row. One operator input drives all three; the
       //    adjacent 11.04 pt "дата__" rule is too small to fill.
-      text('paymentPurposeStock', 'extra.extra-brokerage-contract',
-           1, 389.0, 59.40, 48.5, { required: true, fontSize: 10.0 }),
-      text('paymentPurposeCurrency', 'extra.extra-brokerage-contract',
-           1, 389.0, 97.82, 48.5, { required: true, fontSize: 10.0 }),
-      text('paymentPurposeDerivatives', 'extra.extra-brokerage-contract',
-           1, 389.0, 136.22, 48.5, { required: true, fontSize: 10.0 })
+      //
+      // The printed «№_________» blank is nine underscores, 48.5 pt. A real
+      // agreement reference — «БД-2026/000417-СПБ» — is 82.47 pt at the 9 pt
+      // floor, and this is an exact identifier: printing «БД-2026/» on the
+      // blank and «000417-СПБ» underneath reads as two different references,
+      // even though the value does contain a slash and hyphens the ordinary
+      // wrapper would happily break at. `tokenBreak: 'none'` forbids that, and
+      // the engine then moves the whole token to the next wider approved line
+      // instead of splitting it.
+      //
+      // That line is real and belongs to the same cell: each purpose row is
+      // three printed lines high (36.48–74.40, 74.88–112.94, 113.42–151.34) and
+      // the third one ends at «РЫНОК» / x 294.05, leaving the cell blank from
+      // there to its right rule at 553.30. The continuation sits directly under
+      // the «№» blank, 389.0 → 549.0, and carries the same 0.48 pt rule the
+      // source prints for a blank, so the reference reads as written on a
+      // second line of the same cell. A reference that fits the printed blank
+      // never reaches it and nothing extra is drawn.
+      paymentPurpose('paymentPurposeStock', 1, 59.40, 72.00),
+      paymentPurpose('paymentPurposeCurrency', 1, 97.82, 110.42),
+      paymentPurpose('paymentPurposeDerivatives', 1, 136.22, 148.82)
     ]
   };
 
