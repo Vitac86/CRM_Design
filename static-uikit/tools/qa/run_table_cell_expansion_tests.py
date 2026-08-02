@@ -1,7 +1,7 @@
 """Focused QA for the retained multiline-table-cell expansion anchors.
 
 The Word-flow suite owns reviewed paragraph replacement.  This suite covers the
-thirteen field-level ``expand-layout`` anchors and proves that each one:
+fourteen field-level ``expand-layout`` anchors and proves that each one:
 
 * is classified as a table cell, never an independent underline;
 * uses centre-lines and insertion geometry measured from the committed PDF;
@@ -76,6 +76,9 @@ CASES = (
     Case("anketa-fl", "anketa-fl.pdf", "ru-resident-normal",
          "field.client-passport-issued-by", "passportIssuedBy", 0,
          503.59, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60), 6),
+    Case("anketa-fl", "anketa-fl.pdf", "ru-resident-normal",
+         "extra.bank-name", "bankName", 1, 305.21, 13.44,
          (63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60), 6),
     Case("anketa-fl", "anketa-fl.pdf", "en-nonresident-normal",
          "extra.bank-address", "bankAddress", 1, 318.65, 13.44,
@@ -235,7 +238,7 @@ def main() -> int:
                   for entry in inventory["fields"]}
         expected = {(case.document, case.field) for case in CASES}
 
-        checks.check("all 18 maps leave exactly thirteen field expansion anchors",
+        checks.check("all 18 maps leave exactly fourteen field expansion anchors",
                      actual == expected,
                      json.dumps(sorted(actual), ensure_ascii=False))
         checks.check("all retained field anchors are multiline table cells",

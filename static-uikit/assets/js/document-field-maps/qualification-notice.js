@@ -330,10 +330,28 @@
       }),
 
       // "иное ______" — free text, drawn only when that branch is chosen.
+      // «иное ______» closes the list of instrument categories, and the printed
+      // rule (135.86 → 500.97) is the last thing on it: the page is then blank
+      // down to «Дата внесения записи о …» at 463.16, which is 35.67 pt of
+      // paragraph spacing at this slot's own x range. One reviewed continuation
+      // line takes 11 pt of it and still leaves 25 pt before the next
+      // paragraph, so a real list of instruments is written out instead of
+      // being cut back to «Акции». The rule matches the printed one's 0.48 pt
+      // weight, and it is drawn only if the value actually reaches the line.
       text('otherInstruments', 'extra.extra-qualification-instruments-other',
            137.5, 425.93, 362.0, {
         optional: true,
-        showWhen: { source: 'extra.extra-qualification-scope', equals: 'other' }
+        showWhen: { source: 'extra.extra-qualification-scope', equals: 'other' },
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 0, left: 137.5, baselineTop: 425.93, width: 362.0, maxLines: 1 },
+          {
+            page: 0, left: 137.5, baselineTop: 437.30, width: 362.0,
+            maxLines: 1, maxFontSize: 9.96,
+            generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.48, underlineOffset: 1.6
+          }
+        ]
       }),
 
       // "Дата внесения записи о ______ (Ф.И.О./ наименование организации)" —

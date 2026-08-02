@@ -307,8 +307,27 @@
           flowBlockId: 'qualification-request-fl-delivery-address'
         }),
       // Handwritten signature stays blank; only the printed client name is drawn.
+      // The printed rule is 79.92 pt, which at the readability floor holds
+      // about «Соколов А.М.» — a long hyphenated surname in initials form does
+      // not fit it. Below the rule the page is blank at this x range from
+      // 696.46 down to the next signature line at 749.77: «Подпись» sits to the
+      // left of 407 and «ФИО» to the right of 488, so neither is touched. One
+      // reviewed continuation line therefore sits directly under the rule, the
+      // same width, centred the same way and carrying the same 0.48 pt weight,
+      // exactly as the accession form's signature transcript already does. The
+      // surname keeps its own hyphen as the break, so nothing is abbreviated.
       text('signatureName', 'field.clientFullName', 1, 409.06, 694.90, 79.92, {
-        format: 'initials', fallbacks: ['surname'], align: 'center', required: true
+        format: 'initials', fallbacks: ['surname'], align: 'center', required: true,
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 1, left: 409.06, baselineTop: 694.90, width: 79.92, maxLines: 1 },
+          {
+            page: 1, left: 409.06, baselineTop: 708.60, width: 79.92,
+            maxLines: 1, align: 'center', maxFontSize: 9.96,
+            generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.48, underlineOffset: 1.6
+          }
+        ]
       })
 
       // Page 2 y >= 709 and the authoritative blank page 3 stay untouched.

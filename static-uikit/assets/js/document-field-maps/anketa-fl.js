@@ -128,7 +128,7 @@
         shiftToTop: 830.0,
         bottomClearance: 30.0,
         compaction: [],
-        anchors: ['bankAddress']
+        anchors: ['bankName', 'bankAddress']
       }
     },
 
@@ -255,7 +255,32 @@
       cell('landlinePhone', 'extra.landline-phone', 1, 238.22, 251.66, { optional: true }),
       cell('email', 'subject.email', 1, 251.66, 266.69, { required: true }),
 
-      cell('bankName', 'extra.bank-name', 1, 292.13, 305.45, { optional: true }),
+      // A full Russian bank name — «Акционерное общество «Северо-Западный
+      // инвестиционно-коммерческий банк»» — does not fit this 12.84 pt row at a
+      // readable size, and the 16.22 pt under it is the bank-ADDRESS row, not
+      // this one's. So the row grows, exactly as its neighbour already does:
+      // same 13.44 pt pitch, same seven centre-lines, cut at 305.21 where this
+      // row's verticals end and its bottom rule sits.
+      //
+      // One row, not two. Page 2 has 34.34 pt of reserve and this anchor is
+      // above the bank-address one, so a payload that needs both still leaves
+      // the address 20.90 pt — its own first row.
+      cell('bankName', 'extra.bank-name', 1, 292.13, 305.45, {
+        optional: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 1, insertionTop: 305.21, shiftFromTop: 305.21,
+          rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 503.86,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.30, ruleThickness: 0.48
+          }
+        }
+      }),
       // A foreign bank address is an ordinary value for a nonresident and does
       // not fit this 237 pt cell at a readable size: «27 King George the Fifth
       // Avenue, London, United Kingdom, SW1A 2AA» needs 267.71 pt at 9 pt.

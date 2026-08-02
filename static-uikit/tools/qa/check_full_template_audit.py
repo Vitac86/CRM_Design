@@ -188,7 +188,7 @@ TABLE_DOCUMENTS = {
     "order-forms",
 }
 
-# Reviewed final continuation decision: these thirteen source sections are
+# Reviewed final continuation decision: these fourteen source sections are
 # bordered table rows and retain row growth. Word-flow expansion lives on its
 # block, not on a field. Any other field-level expansion is a regression.
 #
@@ -203,6 +203,7 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("accession-application-yul", "tariffCurrency"),
     ("account-opening-notice", "clientName"),
     ("anketa-fl", "passportIssuedBy"),
+    ("anketa-fl", "bankName"),
     ("anketa-fl", "bankAddress"),
     ("anketa-yul", "foreignName"),
     ("anketa-yul", "licenceAuthority"),

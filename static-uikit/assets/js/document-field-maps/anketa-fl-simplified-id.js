@@ -188,9 +188,16 @@
       // ── 11. Public official (ПДЛ) ────────────────────────────────────────
       // Position, employer name and employer address, printed in the free part
       // of the right-hand column beside "Укажите статус…" and above the boxes.
+      // `maxLines: 2` promised a second line that `maxHeight: 23.0` then took
+      // away: at the printed 11.88 pt pitch, 23.0 pt holds one line, so a real
+      // «должность, наименование и адрес работодателя» never got the second one.
+      // The cell itself has the room — it runs 465.91 → 562.99 and the next
+      // printed thing inside it is the status checkbox at 492.86, so two lines
+      // at 475.87 and 487.75 leave the descender 3.17 pt clear of it. 23.76 pt
+      // is exactly those two pitches.
       text('pdlDetails', 'extra.extra-pdl-details', 0, 345.0, 475.87, 226.0, {
         optional: true, multiline: true, maxLines: 2, lineHeight: 11.88,
-        maxHeight: 23.0,
+        maxHeight: 23.76,
         showWhen: { source: 'extra.extra-pdl-status', equals: PDL_SET }
       }),
 
