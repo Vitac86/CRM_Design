@@ -177,6 +177,76 @@
           },
           { type: 'static', text: '.' }
         ]
+      },
+      {
+        // «По электронной почте ______(необходимо указать адрес электронной
+        // почты)» — the report-delivery line of §3.
+        //
+        // The printed blank is 22 underscores, 93.4 pt. An ordinary client
+        // e-mail is 136.25 pt at the 9 pt floor, so it never fitted, and the
+        // form has nowhere to put a second line: the 23.63 pt of paper measured
+        // below the slot is the «По системе ЭДО» row (422.78–432.21) and the
+        // paragraph gap before §4. Writing there would attach the address to a
+        // different delivery method. This page's 19.98 pt reserve is already
+        // committed to the identity paragraph, so an inserted row is not
+        // available either.
+        //
+        // What Word does with that line is simply reflow it: the typed address
+        // takes the room it needs and the parenthetical instruction moves
+        // right. Block 148 is exactly the underscores plus that instruction —
+        // one complete q…Q block, 583 bytes — so replacing it reproduces the
+        // line with the blank as vector underline and the instruction after it.
+        // The ☐ glyph and the words «По электронной почте» are NOT in the
+        // range and stay printed by the source.
+        //
+        // Line room: 149.42 → 557.60 (the identity block's right edge, the
+        // widest text boundary this page states) = 408.18 pt. Address at 9 pt
+        // plus a space plus the 173.64 pt instruction is 309.9 pt for an
+        // ordinary address and 358.6 pt for the longest realistic one, so both
+        // stay on the source's own single line and nothing below moves.
+        id: 'accession-application-fl-report-email',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 149.42, baselineTop: 419.09, width: 408.18,
+          initialLineCount: 1
+        },
+        font: 'legalSerif', fontSize: 8.52, minFontSize: 8.52,
+        fontSizeLocked: true, lineHeight: 11.28, alignment: 'left',
+        // As in the identity paragraph: the form's own instruction keeps the
+        // source's 8.52 pt, the address the client has to be able to read is
+        // drawn at the 9 pt floor.
+        valueFontSize: 9,
+        sourceReplacement: {
+          firstBlock: 148, lastBlock: 148,
+          expectedBlockCount: 1, expectedPageBlockCount: 264,
+          expectedSha256: '7b324e48a1e1710de59fcb82c97616426be831042a01d1163c49b5ab36f00093',
+          expectedTemplateSha256: '8fec088402d46b6a9251e92ceee15f4a7cdc74b12684f7be339194d04904c1e6',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: '______________________' +
+          '(необходимо указать адрес электронной почты)',
+        runs: [
+          {
+            type: 'fieldRef', fieldId: 'reportEmail',
+            // The form prints this blank whether or not e-mail delivery was
+            // chosen. `blankWhenEmpty` reproduces it at the measured 93.4 pt,
+            // so selecting «в офисе», «по почте» or «ЭДО» leaves the line
+            // looking exactly like the source instead of deleting its rule.
+            blankWhenEmpty: true,
+            decoration: {
+              underline: true, minWidth: 93.4, thickness: 0.36, offset: 1.2
+            }
+          },
+          // The source sets the instruction immediately after the last
+          // underscore. One space keeps a filled-in address from touching the
+          // opening bracket; it adds no visible glyph and no token.
+          { type: 'space' },
+          {
+            type: 'static',
+            text: '(необходимо указать адрес электронной почты)'
+          }
+        ]
       }
     ],
 
@@ -308,11 +378,18 @@
         // Address printed on the "По электронной почте ______" line. It belongs
         // to that delivery option only, so it stays blank whenever another
         // method (офис / почта / ЭДО) is selected.
+        //
+        // Laid out by the reviewed Word-flow block for that line, which lets a
+        // complete address take the room the printed instruction is reflowed
+        // out of. `left`/`width` remain the measured printed blank, which is
+        // what the block reproduces as the value's minimum slot.
         id: 'reportEmail',
         source: 'subject.email', optional: true,
         showWhen: { source: 'extra.report-delivery', equals: 'email' },
         page: 0, left: 149.4, baselineTop: 419.09, width: 93.4,
-        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN, align: 'left'
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN, align: 'left',
+        layoutMode: 'flow-reference',
+        flowBlockId: 'accession-application-fl-report-email'
       },
 
       // ── §4 Рынки и тарифные планы ─────────────────────────────────────────

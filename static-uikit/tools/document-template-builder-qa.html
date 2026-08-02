@@ -464,9 +464,15 @@
     });
     add('Adding a continuation line builds ordered flow regions', function () {
       return app.openExisting('accession-application-fl').then(function () {
+        // Deliberately the first field that still has only its own printed
+        // slot: this map also carries fields that already flow through a
+        // reviewed continuation, and picking one of those would test nothing.
         var field = app.state.project.fields.filter(function (item) {
-          return (item.type || 'text') !== 'check' && item.layoutMode !== 'flow-reference';
+          return (item.type || 'text') !== 'check' &&
+            item.layoutMode !== 'flow-reference' &&
+            ns.schema.flowRegions(item).length === 1;
         })[0];
+        assert(field, 'no single-slot field to extend');
         app.state.selectField(field.id);
         var regions = ns.schema.flowRegions(field);
         equal(regions.length, 1, 'starts with its own slot');

@@ -126,6 +126,57 @@
           { type: 'static', text: 'Документ, подтверждающий полномочия: ' },
           { type: 'fieldRef', fieldId: 'representativeAuthority' }
         ]
+      },
+      {
+        // The §3 report-delivery e-mail line, resolved exactly as on the
+        // individual form (see accession-application-fl.js for the full
+        // reasoning). The printed blank is 22 underscores, 93.51 pt, and an
+        // ordinary client address is 136.25 pt at the 9 pt floor. The 23 pt
+        // measured below the slot is the «По системе ЭДО» row, so it is not
+        // this field's space.
+        //
+        // Blocks 167–168 are the underscores (F2) and the parenthetical
+        // instruction (F1). Replacing exactly those two reflows the line the
+        // way Word would: the address takes what it needs and the instruction
+        // follows it. The ☐ and «По электронной почте» stay printed.
+        //
+        // Line room: 155.42 → 529.40, this form's own body-text boundary,
+        // = 373.98 pt. Address at 9 pt plus a space plus the 173.64 pt
+        // instruction is 309.9 pt ordinary and 360.6 pt for the longest
+        // realistic address, so both fit the source's single line.
+        id: 'accession-application-yul-report-email',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 155.42, baselineTop: 458.35, width: 373.98,
+          initialLineCount: 1
+        },
+        font: 'legalSerif', fontSize: 8.52, minFontSize: 8.52,
+        fontSizeLocked: true, lineHeight: 11.04, alignment: 'left',
+        valueFontSize: 9,
+        sourceReplacement: {
+          firstBlock: 167, lastBlock: 168,
+          expectedBlockCount: 2, expectedPageBlockCount: 221,
+          expectedSha256: '2062817ce59905265c1374816d0cb009e6232fa2b197e76cde90a36245bf73a4',
+          expectedTemplateSha256: '1b3365ce9ed177fb5069ae67ab70d8e5bc6556bbcb160544a439a2db2be9067d',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: '______________________' +
+          '(необходимо указать адрес электронной почты)',
+        runs: [
+          {
+            type: 'fieldRef', fieldId: 'reportEmail',
+            blankWhenEmpty: true,
+            decoration: {
+              underline: true, minWidth: 93.51, thickness: 0.36, offset: 1.2
+            }
+          },
+          { type: 'space' },
+          {
+            type: 'static',
+            text: '(необходимо указать адрес электронной почты)'
+          }
+        ]
       }
     ],
 
@@ -213,12 +264,16 @@
       check('reportsEmail', 'extra.report-delivery', 'email', 0, 56.6, 458.35),
       check('reportsEdo', 'extra.report-delivery', 'edo', 0, 56.6, 469.39),
       {
+        // Laid out by the reviewed Word-flow block for this line; `left`/`width`
+        // stay the measured printed blank it reproduces.
         id: 'reportEmail',
         source: 'subject.email', optional: true,
         showWhen: { source: 'extra.report-delivery', equals: 'email' },
-        page: 0, left: 155.4, baselineTop: 458.35, width: 93.4,
+        page: 0, left: 155.42, baselineTop: 458.35, width: 93.51,
         font: 'legalSerif', fontSize: SIZE_10, minFontSize: MIN,
-        align: 'left'
+        align: 'left',
+        layoutMode: 'flow-reference',
+        flowBlockId: 'accession-application-yul-report-email'
       },
 
       // ── §4 Markets and tariff plans ───────────────────────────────────

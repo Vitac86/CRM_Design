@@ -320,11 +320,15 @@ def main() -> int:
                  "accession-application-yul-applicant" and
                  accession_pre["pages"][0]["ranges"][0]["blockCount"] == 34,
                  json.dumps(accession_pre, ensure_ascii=False))
-    checks.check("accession render suppresses exactly 34 reviewed blocks",
+    # Page 1 of the company accession form carries two reviewed ranges: the
+    # 34-block applicant paragraph and the 2-block report-delivery e-mail line
+    # (its printed blank and the parenthetical instruction beside it).
+    checks.check("accession render suppresses exactly 36 reviewed blocks",
                  result["accession"]["suppressed"] == [{
                      "page": 0,
-                     "removedBlocks": 34,
-                     "ids": ["accession-application-yul-applicant"]
+                     "removedBlocks": 36,
+                     "ids": ["accession-application-yul-applicant",
+                             "accession-application-yul-report-email"]
                  }], json.dumps(result["accession"]["suppressed"]))
     checks.check("accession Word-flow consumes one complete locked line",
                  accession_pre["expansion"] == [{
