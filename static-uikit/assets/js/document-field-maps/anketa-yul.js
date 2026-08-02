@@ -109,6 +109,20 @@
     appliesTo: ['company'],
 
     pageLayout: {
+      // Page 1 is one continuous table from 182 pt to its last rule at 780.10,
+      // and its own bottom margin is 61.82 pt. Keeping 44 pt of that margin —
+      // still an ordinary 1.55 cm — leaves 17.82 pt, which is one complete
+      // 13.44 pt table row. That is exactly what the foreign-name cell may ask
+      // for, and a payload that does not need it leaves the page untouched.
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 780.10,
+        fixedFooterFrom: null,
+        shiftToTop: 800.0,
+        bottomClearance: 44.0,
+        compaction: [],
+        anchors: ['foreignName']
+      },
       2: {
         fixedHeaderUntil: 0,
         bodyBottom: 767.02,
@@ -135,10 +149,38 @@
       // Page 1 — names, tax and state registration, principal addresses.
       cell('fullLegalName', 'field.client-full-legal-name', 0, 182.54, 196.46, { required: true }),
       cell('shortName', 'field.client-short-name', 0, 196.46, 209.90, { required: true }),
+      // Row 3 is already a double-height row (rules 209.66 → 234.02, 24.36 pt)
+      // and holds two lines of 11 pt. A real foreign legal name does not fit
+      // them: «Interregional Investment, Industrial and Infrastructure Company
+      // for Technological Development, Joint-Stock Company» is 431.38 pt of
+      // text at the 9 pt floor and wraps to three lines in this 222.9 pt cell.
+      // Three lines need 31.35 pt of cell, and no font at or above the floor
+      // makes three lines fit 22.36 pt — so the answer cannot be a bigger
+      // `maxHeight`, which would only reach into row 4.
+      //
+      // The анкета is a table, so the Word-like answer is a real inserted row:
+      // the rows below move down by one 13.44 pt pitch, the printed bottom rule
+      // travels with them to close the grown cell, and the row's seven vertical
+      // centre-lines are continued exactly where the printed ones stop.
+      // 234.02 is the clean cut — the verticals of row 3 end there and its
+      // bottom rule sits just under them.
       cell('foreignName', 'field.client-english-name', 0, 209.90, 234.26, {
         optional: true,
         multiline: true,
-        maxLines: 2
+        maxLines: 2,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 234.02, shiftFromTop: 234.02,
+          rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 11,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.44, ruleThickness: 0.48
+          }
+        }
       }),
       cell('legalForm', 'field.client-legal-form', 0, 234.26, 247.70, { required: true }),
 
@@ -412,9 +454,30 @@
       // source. Preserve it; only the two genuinely empty boxes are overlaid.
       check('fundsBorrowed', 'check.funds-borrowed', true, 3, 331.5, 589.51),
       check('fundsOther', 'check.funds-other', true, 3, 331.5, 603.07, true),
+      // «Иное (указать)» is free text and the source gives it 142.4 pt after
+      // its own printed label — about 41 characters at the floor, where a
+      // plain answer such as «Доход от предпринимательской деятельности и
+      // инвестиционных операций» is 289.01 pt.
+      //
+      // The 18.38 pt below the label line, from 605.12 to the cell's bottom
+      // rule at 623.50, is inside the SAME «источник происхождения средств»
+      // cell — it is the rest of the answer's own box, not another field and
+      // not another row. One reviewed continuation line therefore sits there,
+      // starting at the cell's left edge rather than after the label, so the
+      // answer continues with the cell's full 222.9 pt. Together the two lines
+      // hold 365.3 pt of text at the floor. Nothing moves and no row grows.
       text('fundsOtherDetails', 'extra.source-of-funds-other', 3, 412.0, 603.07, 142.4, {
         optional: true,
-        showWhen: { source: 'check.funds-other', equals: true }
+        showWhen: { source: 'check.funds-other', equals: true },
+        overflowStrategy: 'flow',
+        flowRegions: [
+          { page: 3, left: 412.0, baselineTop: 603.07, width: 142.4, maxLines: 1 },
+          {
+            page: 3, left: VALUE_LEFT, baselineTop: 613.20, width: VALUE_WIDTH,
+            maxLines: 1, maxFontSize: 9.5,
+            generated: true, reviewStatus: 'approved'
+          }
+        ]
       }),
 
       check('foreignTrustOwnerYes', 'extra.foreign-trust-owner-status', 'yes', 3, 331.5, 634.06, true),

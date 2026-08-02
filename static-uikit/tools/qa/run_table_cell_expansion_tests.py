@@ -1,7 +1,7 @@
 """Focused QA for the retained multiline-table-cell expansion anchors.
 
 The Word-flow suite owns reviewed paragraph replacement.  This suite covers the
-nine remaining field-level ``expand-layout`` anchors and proves that each one:
+thirteen field-level ``expand-layout`` anchors and proves that each one:
 
 * is classified as a table cell, never an independent underline;
 * uses centre-lines and insertion geometry measured from the committed PDF;
@@ -45,9 +45,31 @@ class Case:
     row_height: float
     columns: tuple[float, ...]
     long_words: int
+    # The row's printed bottom rule. Usually the insertion point sits exactly on
+    # it, but a cut has to clear whatever the row's widest cell paints, and in
+    # the accession form's market table that is 1.58 pt above the rule.
+    border_top: float | None = None
+
+    @property
+    def rule_top(self) -> float:
+        return self.insertion_top if self.border_top is None else self.border_top
 
 
 CASES = (
+    # The company accession form's three tariff cells. This table draws no
+    # vertical rules at all — its rules are horizontal segments across the whole
+    # row — so `columns` is empty and the expansion must add no verticals
+    # either. The валютный row holds two value lines in its own padding, which
+    # is why it needs one more token than the other two to ask for a row.
+    Case("accession-application-yul", "accession-application-yul.pdf",
+         "ru-company-normal", "extra.tariff-stock", "tariffStock", 0,
+         540.41, 9.72, (), 2, 541.99),
+    Case("accession-application-yul", "accession-application-yul.pdf",
+         "ru-company-normal", "extra.tariff-derivatives", "tariffDerivatives",
+         0, 561.43, 9.72, (), 2, 562.03),
+    Case("accession-application-yul", "accession-application-yul.pdf",
+         "ru-company-normal", "extra.tariff-currency", "tariffCurrency", 0,
+         610.85, 9.72, (), 3, 612.67),
     Case("account-opening-notice", "account-opening-notice.pdf",
          "ru-company-normal", "field.client-full-name", "clientName", 0,
          229.82, 14.28, (36.00, 324.07, 567.72), 6),
@@ -58,6 +80,9 @@ CASES = (
     Case("anketa-fl", "anketa-fl.pdf", "en-nonresident-normal",
          "extra.bank-address", "bankAddress", 1, 318.65, 13.44,
          (63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60), 6),
+    Case("anketa-yul", "anketa-yul.pdf", "en-company-normal",
+         "field.client-english-name", "foreignName", 0, 234.02, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 11),
     Case("anketa-yul", "anketa-yul.pdf", "ru-company-normal",
          "extra.licence-authority", "licenceAuthority", 2, 193.94, 17.40,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 6),
@@ -210,7 +235,7 @@ def main() -> int:
                   for entry in inventory["fields"]}
         expected = {(case.document, case.field) for case in CASES}
 
-        checks.check("all 18 maps leave exactly nine field expansion anchors",
+        checks.check("all 18 maps leave exactly thirteen field expansion anchors",
                      actual == expected,
                      json.dumps(sorted(actual), ensure_ascii=False))
         checks.check("all retained field anchors are multiline table cells",
@@ -279,12 +304,11 @@ def main() -> int:
 
             short_page, long_page = short_doc[case.page], long_doc[case.page]
             source_page = source_doc[case.page]
-            original_rules = horizontal_rectangles(source_page,
-                                                    case.insertion_top)
-            short_rules = horizontal_rectangles(short_page, case.insertion_top)
-            long_rules = horizontal_rectangles(long_page, case.insertion_top)
+            original_rules = horizontal_rectangles(source_page, case.rule_top)
+            short_rules = horizontal_rectangles(short_page, case.rule_top)
+            long_rules = horizontal_rectangles(long_page, case.rule_top)
             shifted_rules = horizontal_rectangles(
-                long_page, case.insertion_top + case.row_height)
+                long_page, case.rule_top + case.row_height)
             checks.check(prefix + ": short output keeps the source boundary",
                          bool(original_rules) and len(short_rules) == len(original_rules),
                          f"source={len(original_rules)} short={len(short_rules)}")
@@ -299,10 +323,14 @@ def main() -> int:
             checks.check(prefix + ": generated verticals match source columns",
                          tuple(x for x, _width in verticals) == case.columns,
                          json.dumps(verticals))
-            checks.check(prefix + ": generated rules retain 0.48 pt weight",
-                         verticals and all(abs(width - 0.48) <= 0.01
-                                           for _x, width in verticals),
-                         json.dumps(verticals))
+            # A table whose source draws no vertical rules must not acquire any:
+            # for those rows the check above already asserts «none», and a
+            # weight assertion would have nothing to measure.
+            if case.columns:
+                checks.check(prefix + ": generated rules retain 0.48 pt weight",
+                             verticals and all(abs(width - 0.48) <= 0.01
+                                               for _x, width in verticals),
+                             json.dumps(verticals))
             checks.check(prefix + ": no synthetic horizontal separator is added",
                          not generated_horizontals(
                              long_page, case.insertion_top,
@@ -314,9 +342,16 @@ def main() -> int:
             reader = pypdf.PdfReader(stream=io.BytesIO(long_pdf))
             fields = reader.get_fields() or {}
             annotations = sum(len(page.get("/Annots", [])) for page in reader.pages)
+            # Two of the authoritative templates print a live URL and a mailto
+            # link. Those are the source's own /Link annotations, not widgets:
+            # the invariant is that expansion adds none, not that none exists.
+            source_reader = pypdf.PdfReader(os.path.join(TEMPLATES, case.template))
+            source_annotations = sum(len(page.get("/Annots", []))
+                                     for page in source_reader.pages)
             checks.check(prefix + ": expansion introduces no form or annotation",
-                         not fields and annotations == 0,
-                         f"fields={len(fields)} annots={annotations}")
+                         not fields and annotations == source_annotations,
+                         f"fields={len(fields)} annots={annotations} "
+                         f"source={source_annotations}")
 
         # One repeated production render protects deterministic operator moves
         # without doubling the runtime for every map.

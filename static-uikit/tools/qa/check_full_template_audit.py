@@ -188,13 +188,23 @@ TABLE_DOCUMENTS = {
     "order-forms",
 }
 
-# Reviewed final continuation decision: these nine source sections are bordered
-# table rows and retain row growth. Word-flow expansion lives on its block, not
-# on a field. Any other field-level expansion is a regression.
+# Reviewed final continuation decision: these thirteen source sections are
+# bordered table rows and retain row growth. Word-flow expansion lives on its
+# block, not on a field. Any other field-level expansion is a regression.
+#
+# The last four were added when the remaining ordinary substitutions were
+# resolved: the анкета's foreign-name cell is a double-height table row that
+# still cannot hold a real foreign legal name at the readability floor, and the
+# three tariff cells of the company accession form are bordered rows whose
+# printed «Тарифный план:» label leaves one line for a two-word plan name.
 REVIEWED_TABLE_ROW_ANCHORS = {
+    ("accession-application-yul", "tariffStock"),
+    ("accession-application-yul", "tariffDerivatives"),
+    ("accession-application-yul", "tariffCurrency"),
     ("account-opening-notice", "clientName"),
     ("anketa-fl", "passportIssuedBy"),
     ("anketa-fl", "bankAddress"),
+    ("anketa-yul", "foreignName"),
     ("anketa-yul", "licenceAuthority"),
     ("anketa-yul", "bankAddress"),
     ("broker-use-refusal-request", "clientName"),
