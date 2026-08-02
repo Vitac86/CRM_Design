@@ -533,9 +533,13 @@ def main() -> int:
         browser.stop()
 
     write_index(out, results)
+    drawn = sum(1 for card in results for entry in card["entries"]
+                if not entry.get("error"))
+    refused = sum(1 for card in results for entry in card["entries"]
+                  if entry.get("error"))
     print(f"\n-> {out}")
-    print(f"   {sum(len(c['entries']) for c in results)} PDFs, "
-          f"{sum(len(c['entries']) for c in results)} screenshots, "
+    print(f"   {drawn} PDFs, {drawn} screenshots, "
+          f"{refused} recorded refusal(s), "
           f"{len(results)} fields awaiting manual visual approval")
     return 0
 
