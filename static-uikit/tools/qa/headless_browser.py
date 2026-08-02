@@ -26,7 +26,6 @@ import json
 import os
 import shutil
 import socket
-import socketserver
 import subprocess
 import tempfile
 import threading
@@ -74,18 +73,72 @@ def _free_port() -> int:
     return port
 
 
+class _ThreadingHTTPServer(http.server.ThreadingHTTPServer):
+    """One connection per thread, with a backlog deep enough for this job.
+
+    The Template Builder page opens all 18 maps, their PDFs and their fonts at
+    once. The stdlib default backlog of 5 drops connections under that burst,
+    and a dropped connection surfaces in the browser as a failed fetch — which
+    the harness reports as a missing template or a missing PDF worker. That is
+    what produced 404s in the combined run and never in a single run.
+    """
+
+    allow_reuse_address = True
+    daemon_threads = True
+    request_queue_size = 128
+
+
 class Server:
     """Static file server rooted at `static-uikit/` (fetch() needs http://)."""
 
     def __init__(self, root: str = STATIC_UIKIT) -> None:
         self.root = root
-        self.port = _free_port()
-        socketserver.ThreadingTCPServer.allow_reuse_address = True
-        self.httpd = socketserver.ThreadingTCPServer(
-            ("127.0.0.1", self.port), self._handler()
-        )
+        # Bind, serve, then prove it answers before any test navigates to it.
+        # A suite that starts driving a server which has not finished coming up
+        # sees connection failures the harness can only report as missing
+        # files, which is what made the combined run look flaky.
+        last_error = None
+        for _attempt in range(10):
+            self.port = _free_port()
+            try:
+                self.httpd = _ThreadingHTTPServer(
+                    ("127.0.0.1", self.port), self._handler())
+                break
+            except OSError as error:            # the port went in the meantime
+                last_error = error
+        else:
+            raise RuntimeError(f"could not bind a loopback port: {last_error}")
+
         self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
         self.thread.start()
+        self._wait_until_ready()
+
+    def _wait_until_ready(self, timeout: float = 20.0) -> None:
+        deadline = time.time() + timeout
+        url = f"http://127.0.0.1:{self.port}/tools/document-map-audit.html"
+        while time.time() < deadline:
+            try:
+                with _OPENER.open(url, timeout=2) as response:
+                    if response.status < 400:
+                        return
+            except Exception:
+                time.sleep(0.05)
+        raise RuntimeError(f"static server on {self.port} did not become ready")
+
+    def assert_assets(self, paths) -> None:
+        """Fail loudly, before any test runs, if a needed asset is not served.
+
+        A missing PDF template or a `.mjs` worker served under the wrong type
+        makes a product test fail for an environment reason. Checking first
+        keeps that from being reported as a product defect.
+        """
+        for path in paths:
+            url = f"http://127.0.0.1:{self.port}{path}"
+            with _OPENER.open(url, timeout=10) as response:
+                if response.status >= 400:
+                    raise RuntimeError(f"{path}: HTTP {response.status}")
+                if response.length == 0:
+                    raise RuntimeError(f"{path}: empty")
 
     def _handler(self):
         root = self.root
@@ -109,6 +162,14 @@ class Server:
                 self.send_header("Cache-Control", "no-store")
                 super().end_headers()
 
+        # `.mjs` is not registered on a stock Windows install, so the stdlib
+        # falls back to application/octet-stream and the browser refuses to
+        # import pdf.worker.mjs as a module. That is an environment fault that
+        # looks exactly like a broken viewer.
+        Handler.extensions_map = dict(Handler.extensions_map)
+        Handler.extensions_map[".mjs"] = "text/javascript"
+        Handler.extensions_map[".js"] = "text/javascript"
+        Handler.extensions_map[".json"] = "application/json"
         return Handler
 
     @property
@@ -118,6 +179,9 @@ class Server:
     def stop(self) -> None:
         self.httpd.shutdown()
         self.httpd.server_close()
+        # Wait for the serving thread to actually finish, so the next suite in
+        # a combined run cannot reach a half-closed listener.
+        self.thread.join(timeout=10)
 
 
 class Chrome:
