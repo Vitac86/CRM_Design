@@ -371,6 +371,13 @@ A token wider than its line is handled deterministically, in this order:
    legal wording;
 4. otherwise report that the token itself cannot fit at 9 pt.
 
+Step 2 is skipped entirely when the field declares `tokenBreak: 'none'`. That
+is for a slot holding one exact reference the document owner's format does not
+allow to be broken *anywhere* — `БД-2026/000417-СПБ` contains a slash and two
+hyphens the wrapper would gladly use, but «БД-2026/» on the printed blank and
+«000417-СПБ» underneath reads as two different references. Such a token goes
+whole to a wider approved line, or the field overflows and says so.
+
 There is no dictionary hyphenation, and nothing is ever invented.
 
 Long names, addresses, issuing authorities and contract numbers are **never
@@ -398,6 +405,27 @@ Blob, and the committed template is never modified.
 
 Both are declarative. Use A wherever the form allows it; B only when it does
 not.
+
+### C. Reflowing the printed line itself
+
+There is a third answer, and where it applies it is the best one: replace the
+reviewed source blocks that paint the line and lay the same wording out again
+with the value in it. A printed blank is usually not the width the *line* has —
+«По электронной почте ______(необходимо указать адрес электронной почты)» gives
+an address 93.4 pt of underscores on a text column running to 557 pt, and the
+instruction after it can simply move right, exactly as it would in Word.
+
+Prefer this when the space under a slot belongs to something else. On both
+accession forms the paper below that line is the «По системе ЭДО» row: writing
+there would attach the address to a different delivery method, and one form has
+no page reserve left anyway. Reflowing costs no budget, moves nothing and keeps
+the value on the line the form drew for it.
+
+A reference inside such a block may set `blankWhenEmpty: true`. The printed
+blank belongs to the form's wording, not to the value, so an empty — or
+`showWhen`-hidden — reference then keeps its rule at the measured width from
+`decoration.minWidth` instead of deleting it from the document. Validation
+refuses the flag without that width.
 
 ### Which fields may expand
 
@@ -815,6 +843,8 @@ does not fit, the document map is the thing to fix.
 | `check_expansion_anchors.py` | every anchor and compaction zone sits on a clean operator cut |
 | `measure_page_layout.py` | a page's reserve, its fixed footer, its block gaps and its row geometry |
 | `audit_ordinary_failures.py` | the failure matrix, split into ordinary / realistic-long / stress |
+| `audit_ordinary_equality.py` | no ordinary payload is shortened, and every value it draws comes back out of the PDF character for character |
+| `build_ordinary_review_pack.py` | writes the local, git-excluded visual-review pack for a layout change that needs a person to look at it |
 
 All under `static-uikit/tools/qa/`.
 

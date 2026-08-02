@@ -217,3 +217,37 @@ Every anchor used a generic 14 pt row. Measured from the forms themselves:
 The generic 14 pt row was not the cause of any of the seven, but it is 2 pt more
 than the power of attorney needs per row — and on a page with 33 pt of reserve
 that is the difference between two rows and three.
+
+---
+
+## 6. The ten later ordinary failures — resolved
+
+The seven above were the first pass. A second, wider audit found ten distinct
+production fields that an *ordinary* value — the medium-length, entirely
+realistic kind a manager types every day — still could not fit, across sixteen
+occurrences. All ten are resolved, and the resolution mechanism differs per
+field because the measured geometry does:
+
+| Document / field | Measured problem | Resolution |
+| --- | --- | --- |
+| `accession-application-fl/reportEmail` | 93.4 pt printed blank vs 136.25 pt address; paper below is the «ЭДО» row; page reserve already spent | reflow the printed line (mechanism C) |
+| `accession-application-yul/reportEmail` | same line, same form family | reflow the printed line (mechanism C) |
+| `accession-application-yul/tariffStock` | 71.5 pt column, two-word plan name, one line under the printed label | grow the table row by the source's own 9.72 pt pitch |
+| `accession-application-yul/tariffDerivatives` | as above, 9.8 pt left in the row | grow the table row |
+| `accession-application-yul/tariffCurrency` | as above, but 30.56 pt of the row's own padding | second line inside the printed row; nothing moves |
+| `anketa-yul/foreignName` | 114-character name wraps to three lines in a 22.36 pt double-height cell | grow the table row by one 13.44 pt pitch |
+| `anketa-yul/fundsOtherDetails` | 142.4 pt after the label vs 289.01 pt of free text | continuation line in the rest of the same cell |
+| `account-opening-notice/paymentPurposeStock` | 48.5 pt printed blank vs an 82.47 pt exact reference | `tokenBreak: 'none'` + continuation on the row's own third line |
+| `power-of-attorney/ulDateInWords` | frame stopped at the last printed glyph, 9.78 pt short | use the page's real text boundary |
+| `power-of-attorney/flDateInWords` | same, 27.44 pt short | use the page's real text boundary |
+
+Four realistic-long fields were resolved in the same pass — `pdlDetails`,
+`otherInstruments`, `qualification-request-fl/signatureName` and
+`anketa-fl/bankName` — and two were measured and left as physical limits:
+`accession-application-yul/clientEmail`, whose printed cell is a single 11.4 pt
+row with the signing-date block beneath it, and `anketa-yul/signatoryPosition`,
+whose «(должность)» caption is printed 0.42 pt under its blank.
+
+The standing gate is `tools/qa/audit_ordinary_equality.py`, in the canonical
+run: zero ordinary substitutions, and every drawn value identical to the value
+requested.
