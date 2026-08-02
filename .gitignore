@@ -9,4 +9,6 @@ __pycache__/
 static-uikit/tools/qa/document-regression.json
 static-uikit/tools/qa/regression-denominator.json
 static-uikit/tools/qa/wrapping-candidates.json
+static-uikit/tools/qa/ordinary-substitutions.json
+static-uikit/tools/qa/ordinary-substitutions.csv
 maps.json
