@@ -3210,7 +3210,10 @@
 
     var head = document.createElement('p');
     head.className = 'crm-docwiz-expansion-head';
-    head.textContent = 'Длинные реквизиты будут автоматически перенесены с сохранением структуры документа.';
+    // Neutral and factual: the manager is told what happened, never asked to
+    // shorten a legal identity value or to pick a template variant.
+    head.textContent = 'Длинные реквизиты будут автоматически перенесены на ' +
+      'дополнительные строки с сохранением структуры документа.';
     box.appendChild(head);
 
     if (documentDebugEnabled()) {
