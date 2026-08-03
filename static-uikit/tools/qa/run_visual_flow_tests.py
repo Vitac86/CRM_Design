@@ -189,6 +189,22 @@ CLIENT_CODES = {
     "long": "INV-TEST-2026-00000017",
 }
 
+DEPOSITORY_REFERENCES = {
+    "ordinary": "ДЕПО-QA/0417",
+    "reviewed-long": "ДЕПО-2026/000417-СПБ-01",
+}
+
+DEPOSITORY_DATES = {
+    "summer": ("2026-08-02", "02.08.2026"),
+    "year-end": ("2026-12-31", "31.12.2026"),
+}
+
+TRANSFER_BASIS_BLOCK = "account-opening-transfer-basis"
+TRANSFER_BASIS_TAIL = (
+    "Договор купли-продажи, займа и т.п. "
+    "(в случае перевода со сменой права собственности)."
+)
+
 # Placeholder text that must never reach a generated document.
 PLACEHOLDERS = ("INV0000X", "INVXXXXXX", "XXXXXXХ", "XXXXXXX")
 
@@ -254,7 +270,7 @@ def introducer_of(lines, line_index, run):
 
 
 def assert_label_holds_value(results, prefix, lines, line_index, run, label,
-                             what) -> None:
+                             what, gap_limit=None) -> None:
     """A printed label and the value it introduces share a line, touching."""
     introducer = introducer_of(lines, line_index, run)
     check(results, introducer is not None and introducer["text"].endswith(label),
@@ -263,7 +279,8 @@ def assert_label_holds_value(results, prefix, lines, line_index, run, label,
     if introducer is None:
         return
     gap = run["x"] - (introducer["x"] + introducer["width"])
-    limit = INTRODUCER_GAP if label == "№" else LABELLED_VALUE_GAP
+    limit = (gap_limit if gap_limit is not None else
+             (INTRODUCER_GAP if label == "№" else LABELLED_VALUE_GAP))
     check(results, gap <= limit,
           f"{prefix}: «{label}» and the {what} are not separated",
           f"{gap:.2f} pt (limit {limit})")
@@ -414,6 +431,103 @@ def assert_payment_row(results, where, block_id, field_id, market, block,
                       [line["baselineTop"] for line in lines])
 
 
+def transfer_basis_checks(browser: SmokeBrowser, results: list) -> None:
+    """The client depository agreement reads as item 2, before intact item 3."""
+    for ref_name, reference in DEPOSITORY_REFERENCES.items():
+        for date_name, (iso, printed_date) in DEPOSITORY_DATES.items():
+            where = (f"account-opening-notice transfer basis "
+                     f"[{ref_name} / {date_name}]")
+            probe = run_probe(browser, "account-opening-notice",
+                              "ru-company-normal", {
+                                  "extra.extra-depository-contract": reference,
+                                  "extra.extra-depository-contract-date": iso,
+                              })
+            if not probe.get("ok"):
+                check(results, False, where,
+                      probe.get("message", "render refused"))
+                continue
+
+            block = probe["blocks"].get(TRANSFER_BASIS_BLOCK)
+            if not block:
+                check(results, False, where,
+                      "the reviewed transfer-basis block did not draw")
+                continue
+
+            lines = block["lines"]
+            runs = [(line_index, run)
+                    for line_index, line in enumerate(lines)
+                    for run in line["runs"]]
+            number_runs = [(line_index, run) for line_index, run in runs
+                           if run["fieldId"] == "transferBasisDepositoryNumber"]
+            date_runs = [(line_index, run) for line_index, run in runs
+                         if run["fieldId"] == "transferBasisDepositoryDate"]
+
+            check(results, len(number_runs) == 1,
+                  f"{where}: number is one unbroken token",
+                  f"drew {[run['text'] for _, run in number_runs]}")
+            check(results, len(date_runs) == 1,
+                  f"{where}: date is one unbroken token",
+                  f"drew {[run['text'] for _, run in date_runs]}")
+            if len(number_runs) != 1 or len(date_runs) != 1:
+                continue
+
+            number_line, number_run = number_runs[0]
+            date_line, date_run = date_runs[0]
+            check(results, number_run["text"] == reference,
+                  f"{where}: number is rendered verbatim",
+                  f"wanted {reference!r}, drew {number_run['text']!r}")
+            check(results, date_run["text"] == printed_date,
+                  f"{where}: ISO date is rendered as dd.mm.yyyy",
+                  f"wanted {printed_date!r}, drew {date_run['text']!r}")
+            assert_label_holds_value(results, where, lines, number_line,
+                                     number_run, "№", "depository number",
+                                     gap_limit=LABELLED_VALUE_GAP)
+            assert_label_holds_value(results, where, lines, date_line,
+                                     date_run, "«", "depository date")
+            assert_sentence_continues(results, where, block, lines,
+                                      number_line, number_run)
+            check(results,
+                  (date_line, date_run["x"]) >
+                  (number_line, number_run["x"]),
+                  f"{where}: date follows number in reading order",
+                  f"number at {number_line}/{number_run['x']:.2f}, "
+                  f"date at {date_line}/{date_run['x']:.2f}")
+
+            after_date = [run for run in lines[date_line]["runs"]
+                          if run["x"] >=
+                          date_run["x"] + date_run["width"] - 1e-6]
+            closing = after_date[0] if after_date else None
+            check(results, closing is not None and
+                  closing["text"].startswith("» г."),
+                  f"{where}: date keeps its closing legal wording",
+                  lines[date_line]["text"])
+            if closing:
+                gap = closing["x"] - (date_run["x"] + date_run["width"])
+                check(results, gap <= 0.5,
+                      f"{where}: date and closing guillemet stay together",
+                      f"gap {gap:.2f} pt")
+
+            printed = re.sub(r"\s+", " ",
+                             " ".join(line["text"] for line in lines)).strip()
+            expected_item = (
+                "Депозитарный договор клиента с ООО «ИНВЕСТИКА» "
+                f"(Заявление о присоединении) № {reference} "
+                f"от «{printed_date}» г."
+            )
+            check(results, expected_item in printed,
+                  f"{where}: item 2 is one complete legal phrase", printed)
+            check(results, TRANSFER_BASIS_TAIL in printed,
+                  f"{where}: following item 3 remains intact", printed)
+            check(results, "№ от" not in printed and "«__»" not in printed,
+                  f"{where}: no empty agreement placeholder remains", printed)
+            check(results,
+                  number_run["fontSize"] >= 9 and date_run["fontSize"] >= 9,
+                  f"{where}: pair stays at a readable size",
+                  f"number {number_run['fontSize']}, date {date_run['fontSize']}")
+            assert_one_rhythm(results, f"{where}: block",
+                              [line["baselineTop"] for line in lines])
+
+
 def assert_one_rhythm(results, label, baselines) -> None:
     """Every step between consecutive lines of one value is the same step."""
     steps = [round(b - a, 3) for a, b in zip(baselines, baselines[1:])]
@@ -485,6 +599,7 @@ def main() -> int:
     browser = SmokeBrowser()
     try:
         payment_purpose_checks(browser, results)
+        transfer_basis_checks(browser, results)
         continuation_checks(browser, results)
     finally:
         browser.stop()

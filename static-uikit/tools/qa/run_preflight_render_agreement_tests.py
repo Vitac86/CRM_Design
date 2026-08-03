@@ -118,6 +118,8 @@ ANCHOR_PROBE = r"""
   for (const id of Object.keys(maps).sort()) {
     const t = maps[id];
     const bytes = await (await fetch(t.templateUrl)).arrayBuffer();
+    const suppressedBlocks = E.unconditionalSuppressedBlocksByPage(t) || {};
+    const suppressedPaths = E.unconditionalSuppressedPathsByPage(t) || {};
     for (const anchor of E.expansionAnchors(t)) {
       const doc = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
       const page = doc.getPages()[anchor.page];
@@ -126,7 +128,10 @@ ANCHOR_PROBE = r"""
         const analysis = X.analysePageShift(page, [{
           fieldId: anchor.id, fromTop: anchor.top, toTop: anchor.toTop,
           delta: anchor.delta, moveTopLevelPaths: anchor.moveTopLevelPaths
-        }], {});
+        }], {
+          suppressedBlocks: suppressedBlocks[anchor.page] || [],
+          suppressedPaths: suppressedPaths[anchor.page] || []
+        });
         straddling = analysis.straddling.length;
       }
       out.push({ doc: id, id: anchor.id, origin: anchor.origin,

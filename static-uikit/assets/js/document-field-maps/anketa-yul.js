@@ -24,6 +24,53 @@
   var VALUE_LEFT = 331.5;
   var VALUE_WIDTH = 222.9;
 
+  var TABLE_COLUMNS = [63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62];
+  var CELL_OWNERSHIP = [];
+  var OWNERSHIP_EXEMPTIONS = [];
+
+  function tableId(page) {
+    return 'anketa-yul-p' + (page + 1) + '-main';
+  }
+
+  function ownershipFor(field, geometry, options) {
+    var o = options || {};
+    var id = o.tableId || tableId(field.page);
+    CELL_OWNERSHIP.push({
+      fieldId: field.id, source: field.source, page: field.page,
+      tableId: id, rowId: o.rowId || ('p' + (field.page + 1) + '-' + field.id),
+      bounds: { top: geometry.top, bottom: geometry.bottom,
+        left: o.left != null ? o.left : 326.11,
+        right: o.right != null ? o.right : 560.62 },
+      maxReviewedLines: o.maxReviewedLines || geometry.lines || 1,
+      canGrow: !!field.expansion,
+      nextRowId: geometry.nextRowId || o.nextRowId || null,
+      affectedBorders: { horizontal: [geometry.ruleTop, geometry.ruleBottom],
+        vertical: o.vertical || TABLE_COLUMNS.slice() },
+      budgetId: o.budgetId || id, reviewStatus: 'approved', inkInset: 0,
+      sourceRepeatGroup: o.sourceRepeatGroup || null,
+      sourceRepeatReason: o.sourceRepeatReason || null
+    });
+  }
+
+  function exempt(field, reason) {
+    OWNERSHIP_EXEMPTIONS.push({ fieldId: field.id, source: field.source,
+      page: field.page, reason: reason, reviewStatus: 'approved' });
+  }
+
+  function finishOwnership() {
+    CELL_OWNERSHIP.forEach(function (owner, index) {
+      if (owner.nextRowId) return;
+      for (var i = index + 1; i < CELL_OWNERSHIP.length; i += 1) {
+        var next = CELL_OWNERSHIP[i];
+        if (next.tableId === owner.tableId && next.page === owner.page &&
+            next.bounds.top >= owner.bounds.bottom - 0.05) {
+          owner.nextRowId = next.rowId;
+          return;
+        }
+      }
+    });
+  }
+
   // Rows that physically cannot take BODY. Each value is the largest
   // half-point step the measured room allows, floored at MIN.
   var ROW_SIZE = {
@@ -40,7 +87,7 @@
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
-    return {
+    var field = {
       id: id,
       source: source,
       page: page,
@@ -70,6 +117,9 @@
       label: o.label,
       showWhen: o.showWhen
     };
+    if (o.ownership) ownershipFor(field, o.ownership, o.ownershipOptions);
+    else exempt(field, o.exemptionReason || 'reviewed non-table or inline value region');
+    return field;
   }
 
   // A value cell is a printed box of a measured height, not a single rule, so
@@ -82,6 +132,15 @@
     o.multiline = o.multiline !== false;
     o.maxHeight = o.maxHeight || (bottom - top - 2.0);
     o.lineHeightRatio = o.lineHeightRatio || 0.95;
+    o.ownership = {
+      top: o.ownershipTop != null ? o.ownershipTop : top,
+      bottom: o.ownershipBottom != null ? o.ownershipBottom : bottom,
+      ruleTop: o.ownershipRuleTop != null ? o.ownershipRuleTop
+        : Math.round((top - 0.24) * 100) / 100,
+      ruleBottom: o.ownershipRuleBottom != null ? o.ownershipRuleBottom
+        : Math.round((bottom - 0.24) * 100) / 100,
+      lines: o.maxLines || Math.max(1,
+        Math.floor((bottom - top - 2.0) / (MIN * o.lineHeightRatio))) };
     return text(id, source, page, VALUE_LEFT, top + 10.3, VALUE_WIDTH, o);
   }
 
@@ -97,6 +156,7 @@
     };
     if (equals !== undefined) f.equals = equals;
     if (optional) f.optional = true;
+    exempt(f, 'reviewed source checkbox glyph; no text cell is drawn');
     return f;
   }
 
@@ -108,20 +168,36 @@
     expectedPages: 5,
     appliesTo: ['company'],
 
+    tableOwnershipRequired: true,
+    cellOwnership: CELL_OWNERSHIP,
+    ownershipExemptions: OWNERSHIP_EXEMPTIONS,
+    tableBudgets: [
+      { id: tableId(0), tableId: tableId(0), page: 0, top: 182.54,
+        bottom: 780.10, maxGrowth: 33.82, reviewStatus: 'approved' },
+      { id: tableId(1), tableId: tableId(1), page: 1, top: 56.88,
+        bottom: 769.54, maxGrowth: 0, reviewStatus: 'approved' },
+      { id: tableId(2), tableId: tableId(2), page: 2, top: 56.88,
+        bottom: 767.02, maxGrowth: 44.90, reviewStatus: 'approved' },
+      { id: tableId(3), tableId: tableId(3), page: 3, top: 56.88,
+        bottom: 781.06, maxGrowth: 0, reviewStatus: 'approved' },
+      { id: tableId(4), tableId: tableId(4), page: 4, top: 56.88,
+        bottom: 198.98, maxGrowth: 0, reviewStatus: 'approved' }
+    ],
+
     pageLayout: {
       // Page 1 is one continuous table from 182 pt to its last rule at 780.10,
-      // and its own bottom margin is 61.82 pt. Keeping 44 pt of that margin —
-      // still an ordinary 1.55 cm — leaves 17.82 pt, which is one complete
-      // 13.44 pt table row. That is exactly what the foreign-name cell may ask
-      // for, and a payload that does not need it leaves the page untouched.
+      // and its own bottom margin is 61.82 pt.  Keeping a reviewed 28 pt print
+      // margin leaves 33.82 pt: either one 19.92 pt registration continuation,
+      // or that continuation together with foreignName's 13.44 pt row.
       0: {
         fixedHeaderUntil: 0,
         bodyBottom: 780.10,
         fixedFooterFrom: null,
         shiftToTop: 800.0,
-        bottomClearance: 44.0,
+        bottomClearance: 28.0,
         compaction: [],
-        anchors: ['foreignName']
+        anchors: ['foreignName', 'stateRegistrationAuthority',
+          'pre2002RegistrationDocument', 'pre2002RegistrationAuthority']
       },
       2: {
         fixedHeaderUntil: 0,
@@ -147,7 +223,9 @@
       check('modeChange', 'check.anketa-mode-change', true, 0, 281.8, 148.10),
 
       // Page 1 — names, tax and state registration, principal addresses.
-      cell('fullLegalName', 'field.client-full-legal-name', 0, 182.54, 196.46, { required: true }),
+      cell('fullLegalName', 'field.client-full-legal-name', 0, 182.54, 196.46, {
+        required: true, ownershipTop: 183.02, ownershipRuleTop: 182.78
+      }),
       cell('shortName', 'field.client-short-name', 0, 196.46, 209.90, { required: true }),
       // Row 3 is already a double-height row (rules 209.66 → 234.02, 24.36 pt)
       // and holds two lines of 11 pt. A real foreign legal name does not fit
@@ -223,17 +301,43 @@
       cell('stateRegistrationPlace', 'field.client-legal-address', 0, 501.67, 534.91, {
         required: true,
         multiline: true,
-        maxLines: 3
+        maxLines: 3,
+        ownershipOptions: {
+          sourceRepeatGroup: 'legal-address-required-rows',
+          sourceRepeatReason: 'the source form separately asks for registration place and the full EGRUL legal address'
+        }
       }),
       cell('stateRegistrationAuthority', 'field.client-registration-authority', 0, 534.91, 554.83, {
         required: true,
         multiline: true,
-        maxLines: 2
+        maxLines: 1,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 554.59, shiftFromTop: 554.59,
+          rowHeight: 19.92, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: TABLE_COLUMNS.slice(),
+          line: { left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.54, ruleOffset: 19.92, ruleThickness: 0.48 }
+        }
       }),
       cell('pre2002RegistrationDocument', 'extra.pre2002-registration-document', 0, 574.27, 594.31, {
         optional: true,
         multiline: true,
-        maxLines: 2
+        maxLines: 1,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 594.07, shiftFromTop: 594.07,
+          rowHeight: 19.92, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: TABLE_COLUMNS.slice(),
+          line: { left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.54, ruleOffset: 19.92, ruleThickness: 0.48 }
+        }
       }),
       cell('pre2002RegistrationNumber', 'extra.pre2002-registration-number', 0, 594.31, 614.23, { optional: true }),
       cell('pre2002RegistrationDate', 'extra.pre2002-registration-date', 0, 614.23, 634.18, {
@@ -244,13 +348,28 @@
       cell('pre2002RegistrationAuthority', 'extra.pre2002-registration-authority', 0, 634.18, 654.10, {
         optional: true,
         multiline: true,
-        maxLines: 2
+        maxLines: 1,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 653.86, shiftFromTop: 653.86,
+          rowHeight: 19.92, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: TABLE_COLUMNS.slice(),
+          line: { left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.54, ruleOffset: 19.92, ruleThickness: 0.48 }
+        }
       }),
 
       cell('egrulAddress', 'field.client-legal-address', 0, 669.10, 713.38, {
         required: true,
         multiline: true,
-        maxLines: 4
+        maxLines: 4,
+        ownershipOptions: {
+          sourceRepeatGroup: 'legal-address-required-rows',
+          sourceRepeatReason: 'the source form separately asks for registration place and the full EGRUL legal address'
+        }
       }),
       cell('executiveBodyAddress', 'extra.executive-body-address', 0, 713.38, 757.54, {
         optional: true,
@@ -313,10 +432,30 @@
 
       // Rows 19–20 have labelled two-column subheaders followed by one blank
       // data row. These coordinates use that actual blank row.
-      text('managementStructure', 'extra.extra-management-structure', 1, 90.5, 654.32, 230.0, { optional: true }),
-      text('managementComposition', 'extra.management-composition', 1, 331.5, 654.32, 222.9, { optional: true }),
-      text('shareholdersNamesInn', 'extra.shareholders-names-inn', 1, 90.5, 708.44, 230.0, { optional: true }),
-      text('shareholdersPercentages', 'extra.shareholders-percentages', 1, 331.5, 708.44, 222.9, { optional: true }),
+      text('managementStructure', 'extra.extra-management-structure', 1, 90.5, 654.32, 230.0, {
+        optional: true,
+        ownership: { top: 644.02, bottom: 661.78,
+          ruleTop: 643.78, ruleBottom: 661.54, lines: 1 },
+        ownershipOptions: { left: 85.58, right: 326.11,
+          vertical: [63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62] }
+      }),
+      text('managementComposition', 'extra.management-composition', 1, 331.5, 654.32, 222.9, {
+        optional: true,
+        ownership: { top: 644.02, bottom: 661.78,
+          ruleTop: 643.78, ruleBottom: 661.54, lines: 1 }
+      }),
+      text('shareholdersNamesInn', 'extra.shareholders-names-inn', 1, 90.5, 708.44, 230.0, {
+        optional: true,
+        ownership: { top: 698.14, bottom: 714.10,
+          ruleTop: 697.90, ruleBottom: 713.86, lines: 1 },
+        ownershipOptions: { left: 85.58, right: 326.11,
+          vertical: [63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62] }
+      }),
+      text('shareholdersPercentages', 'extra.shareholders-percentages', 1, 331.5, 708.44, 222.9, {
+        optional: true,
+        ownership: { top: 698.14, bottom: 714.10,
+          ruleTop: 697.90, ruleBottom: 713.86, lines: 1 }
+      }),
 
       // Row 21's value row continues at the top of page 3.
       cell('controllingPersons', 'extra.extra-controlling-persons', 2, 56.88, 78.36, {
@@ -452,6 +591,10 @@
         maxLines: 10,
         maxHeight: 120.0,
         lineHeight: 10.8,
+        ownership: { top: 405.65, bottom: 564.55,
+          ruleTop: 405.41, ruleBottom: 564.31, lines: 10 },
+        ownershipOptions: { left: 85.58, right: 326.11,
+          vertical: TABLE_COLUMNS.slice() },
         showWhen: { source: 'check.reputation-other', equals: true }
       }),
 
@@ -473,6 +616,8 @@
       // hold 365.3 pt of text at the floor. Nothing moves and no row grows.
       text('fundsOtherDetails', 'extra.source-of-funds-other', 3, 412.0, 603.07, 142.4, {
         optional: true,
+        ownership: { top: 564.55, bottom: 623.74,
+          ruleTop: 564.31, ruleBottom: 623.50, lines: 2 },
         showWhen: { source: 'check.funds-other', equals: true },
         overflowStrategy: 'flow',
         flowRegions: [
@@ -500,7 +645,9 @@
       cell('otherInformation', 'extra.extra-other-info', 4, 168.98, 187.46, {
         optional: true,
         multiline: true,
-        maxLines: 2
+        maxLines: 2,
+        ownershipTop: 169.22,
+        ownershipRuleTop: 168.98
       }),
 
       // Page 5 footer: date and position are typed; the middle rule remains
@@ -519,6 +666,8 @@
       // Page 5 employee-only block: no overlays.
     ]
   };
+
+  finishOwnership();
 
   global.CRMDocumentEngine = global.CRMDocumentEngine || {};
   global.CRMDocumentEngine.fieldMaps = global.CRMDocumentEngine.fieldMaps || {};

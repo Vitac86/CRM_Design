@@ -11,8 +11,16 @@ each one has a reason, so this classifies all 234:
   variant-not-selected    a mutually exclusive branch the profile did not pick,
                           so a value the printed form needs was never entered
   stress-refusal          a deliberately unprintable stress value
-  physical-limit          a realistic value the source form cannot hold
-  UNEXPECTED              anything else — must be zero
+  physical-limit          a realistic value the source form cannot hold —
+                          either the slot itself has no room left at the 9 pt
+                          floor (`overflow`/`no-space`), or growing the owning
+                          row would spend more than the page's reviewed
+                          reserve (`reserve-exceeded`). Both are refusals of
+                          the printed page, not defects: the alternative is
+                          drawing over a signature or an employee-only block.
+  UNEXPECTED              anything else — must be zero. A `row-ownership` or
+                          `straddle` refusal deliberately lands here: those
+                          say the map is wrong, not that the paper is full.
 
 It reads `document-regression.json`, so run the regression first.
 """
@@ -76,11 +84,21 @@ def classify(entry, applies_to):
             f"a value with no legal break point: "
             f"{', '.join(sorted({f for f, r in zip(fields, reasons) if r == 'unbreakable-token'}))}")
 
-    if reasons and all(reason in ("overflow", "no-space", "missing")
+    # `reserve-exceeded` is the shared page/table budget saying the reviewed
+    # reserve is spent: the owning row could grow, but only by pushing a
+    # signature or employee-only block off its reviewed place. That is the
+    # same class of answer as a slot with no room — the page cannot hold the
+    # value — so it is accounted for here rather than left unexplained.
+    if reasons and all(reason in ("overflow", "no-space", "missing",
+                                  "reserve-exceeded")
                        for reason in reasons):
+        limited = sorted({field for field, reason in zip(fields, reasons)
+                          if reason == "reserve-exceeded"})
+        detail = (f"; page/table reserve spent: {', '.join(limited)}"
+                  if limited else "")
         return "physical-limit", (
             f"the source slot cannot hold the profile's value: "
-            f"{', '.join(sorted(set(fields)))}")
+            f"{', '.join(sorted(set(fields)))}{detail}")
 
     return "UNEXPECTED", json.dumps(entry.get("overflows") or
                                     entry.get("problems") or entry,

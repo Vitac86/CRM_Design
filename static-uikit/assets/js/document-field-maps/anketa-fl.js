@@ -25,6 +25,51 @@
   var VALUE_LEFT = 324.4;
   var VALUE_WIDTH = 237.0;
 
+  var TABLE_COLUMNS = [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60];
+  var CELL_OWNERSHIP = [];
+  var OWNERSHIP_EXEMPTIONS = [];
+
+  function tableId(page) {
+    return 'anketa-fl-p' + (page + 1) + '-main';
+  }
+
+  function ownershipFor(field, geometry, options) {
+    var o = options || {};
+    var id = o.tableId || tableId(field.page);
+    CELL_OWNERSHIP.push({
+      fieldId: field.id, source: field.source, page: field.page,
+      tableId: id, rowId: o.rowId || ('p' + (field.page + 1) + '-' + field.id),
+      bounds: { top: geometry.top, bottom: geometry.bottom,
+        left: o.left != null ? o.left : 319.03,
+        right: o.right != null ? o.right : 567.60 },
+      maxReviewedLines: o.maxReviewedLines || geometry.lines || 1,
+      canGrow: !!field.expansion,
+      nextRowId: geometry.nextRowId || o.nextRowId || null,
+      affectedBorders: { horizontal: [geometry.ruleTop, geometry.ruleBottom],
+        vertical: o.vertical || TABLE_COLUMNS.slice() },
+      budgetId: o.budgetId || id, reviewStatus: 'approved', inkInset: 0
+    });
+  }
+
+  function exempt(field, reason) {
+    OWNERSHIP_EXEMPTIONS.push({ fieldId: field.id, source: field.source,
+      page: field.page, reason: reason, reviewStatus: 'approved' });
+  }
+
+  function finishOwnership() {
+    CELL_OWNERSHIP.forEach(function (owner, index) {
+      if (owner.nextRowId) return;
+      for (var i = index + 1; i < CELL_OWNERSHIP.length; i += 1) {
+        var next = CELL_OWNERSHIP[i];
+        if (next.tableId === owner.tableId && next.page === owner.page &&
+            next.bounds.top >= owner.bounds.bottom - 0.05) {
+          owner.nextRowId = next.rowId;
+          return;
+        }
+      }
+    });
+  }
+
   // Rows that physically cannot take BODY. Each value is the largest
   // half-point step the measured room allows, floored at MIN.
   var ROW_SIZE = {
@@ -39,7 +84,7 @@
 
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
-    return {
+    var field = {
       id: id,
       source: source,
       page: page,
@@ -69,6 +114,9 @@
       label: o.label,
       showWhen: o.showWhen
     };
+    if (o.ownership) ownershipFor(field, o.ownership, o.ownershipOptions);
+    else exempt(field, o.exemptionReason || 'reviewed non-table or inline value region');
+    return field;
   }
 
   // A value cell is a printed box of a measured height, not a single rule, so
@@ -81,6 +129,15 @@
     o.multiline = o.multiline !== false;
     o.maxHeight = o.maxHeight || (bottom - top - 2.0);
     o.lineHeightRatio = o.lineHeightRatio || 0.95;
+    o.ownership = {
+      top: o.ownershipTop != null ? o.ownershipTop : top,
+      bottom: o.ownershipBottom != null ? o.ownershipBottom : bottom,
+      ruleTop: o.ownershipRuleTop != null ? o.ownershipRuleTop
+        : Math.round((top - 0.24) * 100) / 100,
+      ruleBottom: o.ownershipRuleBottom != null ? o.ownershipRuleBottom
+        : Math.round((bottom - 0.24) * 100) / 100,
+      lines: o.maxLines || Math.max(1,
+        Math.floor((bottom - top - 2.0) / (MIN * o.lineHeightRatio))) };
     return text(id, source, page, VALUE_LEFT, top + 10.3, VALUE_WIDTH, o);
   }
 
@@ -96,6 +153,7 @@
     };
     if (equals !== undefined) f.equals = equals;
     if (optional) f.optional = true;
+    exempt(f, 'reviewed source checkbox glyph; no text cell is drawn');
     return f;
   }
 
@@ -106,6 +164,18 @@
     outputFilename: 'anketa-fl.pdf',
     expectedPages: 4,
     appliesTo: ['individual'],
+
+    tableOwnershipRequired: true,
+    cellOwnership: CELL_OWNERSHIP,
+    ownershipExemptions: OWNERSHIP_EXEMPTIONS,
+    tableBudgets: [
+      { id: tableId(0), tableId: tableId(0), page: 0, top: 203.90,
+        bottom: 781.42, maxGrowth: 30.50, reviewStatus: 'approved' },
+      { id: tableId(1), tableId: tableId(1), page: 1, top: 56.88,
+        bottom: 777.58, maxGrowth: 34.34, reviewStatus: 'approved' },
+      { id: tableId(2), tableId: tableId(2), page: 2, top: 56.88,
+        bottom: 667.66, maxGrowth: 0, reviewStatus: 'approved' }
+    ],
 
     // The bank block sits on page 2. The table's last row ends at 777.10 with
     // its border at 777.58, and the page carries no footer, so 841.92 − 777.58
@@ -146,7 +216,9 @@
       check('modeChange', 'check.anketa-mode-change', true, 0, 281.8, 148.70),
 
       // Page 1 — identity (rows 1–12).
-      cell('fullName', 'field.client-full-name', 0, 203.90, 217.82, { required: true }),
+      cell('fullName', 'field.client-full-name', 0, 203.90, 217.82, {
+        required: true, ownershipTop: 204.38, ownershipRuleTop: 204.14
+      }),
       cell('birthDate', 'field.client-birth-date', 0, 217.82, 231.26, { required: true, align: 'center' }),
       cell('birthPlace', 'field.client-birth-place', 0, 231.26, 244.70, { required: true }),
 
@@ -154,6 +226,9 @@
       check('citizenshipOther', 'check.citizenship-other', true, 0, 324.4, 281.21),
       text('citizenshipCountries', 'field.client-citizenship', 0, 339.0, 281.21, 222.4, {
         optional: true,
+        multiline: true, maxLines: 3, maxHeight: 40.99, lineHeightRatio: 0.95,
+        ownership: { top: 258.14, bottom: 301.13,
+          ruleTop: 257.90, ruleBottom: 300.89, lines: 3 },
         showWhen: { source: 'check.citizenship-other', equals: true }
       }),
 
@@ -161,6 +236,9 @@
       check('taxResidentOther', 'check.tax-resident-rf-no', true, 0, 324.4, 337.61),
       text('taxResidencyCountries', 'extra.tax-residency-countries', 0, 339.0, 337.61, 222.4, {
         optional: true,
+        multiline: true, maxLines: 4, maxHeight: 49.60, lineHeightRatio: 0.95,
+        ownership: { top: 301.13, bottom: 352.73,
+          ruleTop: 300.89, ruleBottom: 352.49, lines: 4 },
         showWhen: { source: 'check.tax-resident-rf-no', equals: true }
       }),
 
@@ -243,7 +321,9 @@
         multiline: true,
         maxLines: 2,
         maxHeight: 32.0,
-        lineHeight: 10.8
+        lineHeight: 10.8,
+        ownership: { top: 80.28, bottom: 160.70,
+          ruleTop: 80.04, ruleBottom: 160.46, lines: 2 }
       }),
       cell('pepRelation', 'extra.extra-pep-relation', 1, 174.14, 211.46, {
         optional: true,
@@ -412,6 +492,8 @@
       // Page 4 — explanatory notes and employee-only block: no overlays.
     ]
   };
+
+  finishOwnership();
 
   global.CRMDocumentEngine = global.CRMDocumentEngine || {};
   global.CRMDocumentEngine.fieldMaps = global.CRMDocumentEngine.fieldMaps || {};

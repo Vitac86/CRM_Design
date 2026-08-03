@@ -1,7 +1,7 @@
 """Focused QA for the retained multiline-table-cell expansion anchors.
 
-The Word-flow suite owns reviewed paragraph replacement.  This suite covers the
-fourteen field-level ``expand-layout`` anchors and proves that each one:
+The Word-flow suite owns reviewed paragraph replacement.  This suite covers
+every reviewed field-level ``expand-layout`` anchor and proves that each one:
 
 * is classified as a table cell, never an independent underline;
 * uses centre-lines and insertion geometry measured from the committed PDF;
@@ -83,9 +83,66 @@ CASES = (
     Case("anketa-fl", "anketa-fl.pdf", "en-nonresident-normal",
          "extra.bank-address", "bankAddress", 1, 318.65, 13.44,
          (63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60), 6),
+    Case("anketa-fl-simplified-id", "anketa-fl-simplified-id.pdf",
+         "ru-resident-normal", "field.clientFullName", "clientFullName", 0,
+         153.62, 14.16,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 573.72, 574.68), 8),
+    Case("anketa-fl-simplified-id", "anketa-fl-simplified-id.pdf",
+         "ru-resident-normal", "extra.extra-bank-name", "bankName", 0,
+         653.26, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 573.72, 574.68), 8),
+    Case("anketa-fl-simplified-id", "anketa-fl-simplified-id.pdf",
+         "en-nonresident-normal", "extra.extra-bank-address", "bankAddress", 0,
+         666.70, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 573.72, 574.68), 8),
+    Case("anketa-fl-simplified-id", "anketa-fl-simplified-id.pdf",
+         "ru-resident-normal", "extra.extra-other-information",
+         "otherInformation", 0, 757.18, 11.52,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 573.72, 574.68), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "field.clientFullName", "clientFullName", 0, 245.78, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "extra.extra-bank-name", "bankName", 1, 335.57, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "en-nonresident-normal",
+         "extra.extra-bank-address", "bankAddress", 1, 349.01, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "extra.extra-ip-registration-authority", "ipRegistrationAuthority",
+         1, 540.55, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "extra.extra-ip-registration-place", "ipRegistrationPlace", 1,
+         553.99, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "field.client-rep-full-name", "representativeName", 2,
+         155.90, 15.72,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "extra.extra-beneficiary-name", "beneficiaryName", 2,
+         280.49, 18.24,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "extra.extra-beneficial-owner", "beneficialOwnerName", 2,
+         366.53, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
     Case("anketa-yul", "anketa-yul.pdf", "en-company-normal",
          "field.client-english-name", "foreignName", 0, 234.02, 13.44,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 11),
+    Case("anketa-yul", "anketa-yul.pdf", "ru-company-normal",
+         "field.client-registration-authority", "stateRegistrationAuthority",
+         0, 554.59, 19.92,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-yul", "anketa-yul.pdf", "ru-company-normal",
+         "extra.pre2002-registration-document", "pre2002RegistrationDocument",
+         0, 594.07, 19.92,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    Case("anketa-yul", "anketa-yul.pdf", "ru-company-normal",
+         "extra.pre2002-registration-authority", "pre2002RegistrationAuthority",
+         0, 653.86, 19.92,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
     Case("anketa-yul", "anketa-yul.pdf", "ru-company-normal",
          "extra.licence-authority", "licenceAuthority", 2, 193.94, 17.40,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 6),
@@ -120,6 +177,20 @@ RENDER = r"""
     : namespace === 'field' ? payload.fields
     : namespace === 'extra' ? payload.extraValues : payload.checks;
   target[key] = value;
+  const field = (template.fields || []).find(function (item) {
+    return item.id === FIELD;
+  });
+  if (field && field.showWhen && field.showWhen.source) {
+    const condition = field.showWhen;
+    const conditionDot = condition.source.indexOf('.');
+    const conditionNamespace = condition.source.slice(0, conditionDot);
+    const conditionKey = condition.source.slice(conditionDot + 1);
+    const conditionTarget = conditionNamespace === 'subject' ? payload.subject
+      : conditionNamespace === 'field' ? payload.fields
+      : conditionNamespace === 'extra' ? payload.extraValues : payload.checks;
+    conditionTarget[conditionKey] = Array.isArray(condition.equals)
+      ? condition.equals[0] : condition.equals;
+  }
   const notes = [];
   const blob = await CRMDocumentEngine.overlayRenderer.render(template, payload, {
     onExpansion: function (items) {
@@ -161,6 +232,7 @@ class Renderer:
     def render(self, case: Case, value: str) -> tuple[bytes, list[dict]]:
         script = (RENDER.replace("DOC", json.dumps(case.document))
                   .replace("PROFILE", json.dumps(case.profile))
+                  .replace("FIELD", json.dumps(case.field))
                   .replace("SOURCE", json.dumps(case.source))
                   .replace("VALUE", json.dumps(value)))
         result = json.loads(self.browser.eval(script, await_promise=True))
@@ -238,7 +310,7 @@ def main() -> int:
                   for entry in inventory["fields"]}
         expected = {(case.document, case.field) for case in CASES}
 
-        checks.check("all 18 maps leave exactly fourteen field expansion anchors",
+        checks.check("all field expansion anchors are explicitly reviewed",
                      actual == expected,
                      json.dumps(sorted(actual), ensure_ascii=False))
         checks.check("all retained field anchors are multiline table cells",

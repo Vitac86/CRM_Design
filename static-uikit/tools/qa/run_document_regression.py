@@ -56,6 +56,7 @@ RENDER = r"""
   const project = CRMDocumentBuilder.schema.fromProduction(t, null);
   const payload = CRMDocumentBuilder.fixtures.payloadFor(profileId, project);
   let reviewedRanges = [];
+  let reviewedPathSuppressions = [];
   const reviewedFontSizes = {};
   CRMDocumentEngine.overlayRenderer.activeReviewedRangePages(t, payload)
     .forEach(function (group) {
@@ -91,13 +92,14 @@ RENDER = r"""
     });
   } catch (e) { /* a block that does not lay out draws no values */ }
   try {
-    const first = await CRMDocumentEngine.overlayRenderer.render(t, payload, {
-      onReviewedRanges: function (entries) {
-        reviewedRanges = entries.map(function (entry) {
-          return { page: entry.page, inspection: entry.suppression };
-        });
-      }
-    });
+    // Structural proof needs the byte offsets recorded against the untouched
+    // source content stream. Render callbacks run after earlier suppressions
+    // have shifted those offsets, while preflight retains the originals.
+    const preflight = await CRMDocumentEngine.overlayRenderer.preflight(
+      t, payload);
+    reviewedRanges = preflight.reviewedRanges || [];
+    reviewedPathSuppressions = preflight.reviewedPathSuppressions || [];
+    const first = await CRMDocumentEngine.overlayRenderer.render(t, payload);
     const second = await CRMDocumentEngine.overlayRenderer.render(t, payload);
     const a = new Uint8Array(await first.arrayBuffer());
     const b = new Uint8Array(await second.arrayBuffer());
@@ -111,6 +113,7 @@ RENDER = r"""
     }
     return JSON.stringify({ pdf: btoa(s), deterministic: deterministic,
       reviewedRanges: reviewedRanges, reviewedFontSizes: reviewedFontSizes,
+      reviewedPathSuppressions: reviewedPathSuppressions,
       reviewedValueSizes: reviewedValueSizes });
   } catch (error) {
     return JSON.stringify({ error: true, message: error.message,
@@ -171,12 +174,13 @@ def painted_image_counter(document):
 
 def inspect(pdf_bytes, template_path, expected_pages, reviewed=None,
             reviewed_font_sizes=None, deterministic=True,
-            reviewed_value_sizes=None):
+            reviewed_value_sizes=None, reviewed_paths=None):
     """Structural verdict for one generated document."""
     problems = []
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
-    ranges_by_page = reviewed_ranges_by_page(reviewed, base.page_count)
+    ranges_by_page = reviewed_ranges_by_page(
+        reviewed, base.page_count, reviewed_paths)
     protected_bytes = comparison_pdf(template_path, ranges_by_page) \
         if ranges_by_page else None
     protected = fitz.open(stream=protected_bytes, filetype="pdf") \
@@ -327,7 +331,8 @@ def main() -> int:
                         payload.get("reviewedRanges"),
                         payload.get("reviewedFontSizes"),
                         payload.get("deterministic", False),
-                        payload.get("reviewedValueSizes")))
+                        payload.get("reviewedValueSizes"),
+                        payload.get("reviewedPathSuppressions")))
                     entry["ok"] = not entry["problems"]
                 else:
                     entry.update({"ok": False, "overflow": True,
