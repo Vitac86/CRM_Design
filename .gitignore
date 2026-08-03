@@ -16,3 +16,7 @@ maps.json
 # Focused visual-review pack — regenerated locally by
 # static-uikit/tools/qa/build_ordinary_review_pack.py, never committed.
 static-uikit/manual-smoke/ordinary-substitution-review/
+
+# Final all-document visual-review pack — regenerated locally by
+# static-uikit/tools/qa/build_final_review_pack.py, never committed.
+static-uikit/manual-smoke/final-document-review/

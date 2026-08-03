@@ -443,6 +443,17 @@ ASSIGNMENTS = r"""
         (planned.layout.lines || []).forEach(function (line, lineIndex) {
           (line.runs || []).forEach(function (run) {
             if (run.type !== 'fieldRef' || !run.sourceFieldId) return;
+            // A reference that draws nothing is not a drawn value. An inactive
+            // branch — a `blankWhenEmpty` e-mail slot on a form where the
+            // client chose paper — keeps the source's printed rule and no
+            // text, and takes the block's own locked size while doing it.
+            // Counted as a value, that reads as a client value below the
+            // readability floor when nothing was drawn at all. The document
+            // regression suite has always made this distinction; this probe
+            // did not, and only never showed it because no card had rendered
+            // a form with a suppressed branch.
+            if (run.inactive) return;
+            if (!String(run.text == null ? '' : run.text).trim()) return;
             var key = run.sourceFieldId;
             if (!pieces[key]) { pieces[key] = []; seen[key] = {}; }
             pieces[key].push(run.text);
