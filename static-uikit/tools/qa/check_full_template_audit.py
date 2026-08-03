@@ -69,28 +69,50 @@ REQUIRED_MATRIX_COLUMNS = {
 # This is the closed template set. SHA-256 and byte sizes live only in the
 # generated baseline, so a changed source cannot be silently accepted by code.
 DOCUMENT_SPECS: dict[str, dict[str, str]] = {
-    "accession-application-fl.pdf": {"id": "accession-application-fl", "role": "dynamic-overlay"},
-    "accession-application-yul.pdf": {"id": "accession-application-yul", "role": "dynamic-overlay"},
-    "account-opening-notice.pdf": {"id": "account-opening-notice", "role": "dynamic-overlay"},
-    "anketa-fl.pdf": {"id": "anketa-fl", "role": "dynamic-overlay"},
-    "anketa-fl-simplified-id.pdf": {"id": "anketa-fl-simplified-id", "role": "dynamic-overlay"},
-    "anketa-ip-sz.pdf": {"id": "anketa-ip-sz", "role": "dynamic-overlay"},
-    "anketa-isbyul.pdf": {"id": "anketa-isbyul", "role": "hidden"},
-    "anketa-yul.pdf": {"id": "anketa-yul", "role": "dynamic-overlay"},
-    "broker-use-refusal-request.pdf": {"id": "broker-use-refusal-request", "role": "dynamic-overlay"},
-    "brokerage-key-information.pdf": {"id": "brokerage-key-information", "role": "package-static"},
-    "client-notifications.pdf": {"id": "client-notifications", "role": "dynamic-overlay"},
-    "code-word-request.pdf": {"id": "code-word-request", "role": "dynamic-overlay"},
-    "order-forms.pdf": {"id": "order-forms", "role": "dynamic-overlay"},
-    "power-of-attorney.pdf": {"id": "power-of-attorney", "role": "dynamic-overlay"},
-    "qualification-consequences-notice.pdf": {"id": "qualification-consequences-notice", "role": "dynamic-overlay"},
-    "qualification-notice.pdf": {"id": "qualification-notice", "role": "dynamic-overlay"},
-    "qualification-request-fl.pdf": {"id": "qualification-request-fl", "role": "dynamic-overlay"},
-    "qualification-request-yul.pdf": {"id": "qualification-request-yul", "role": "dynamic-overlay"},
-    "regulation-full-refusal-notice.pdf": {"id": "regulation-full-refusal-notice", "role": "dynamic-overlay"},
-    "regulation-partial-refusal-notice.pdf": {"id": "regulation-partial-refusal-notice", "role": "dynamic-overlay"},
-    "Risks.pdf": {"id": "risks-declaration", "role": "package-static"},
-    "transfer-requisites.pdf": {"id": "transfer-requisites", "role": "static"},
+    "accession-application-fl.pdf": {"id": "accession-application-fl", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "accession-application-yul.pdf": {"id": "accession-application-yul", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "account-opening-notice.pdf": {"id": "account-opening-notice", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "anketa-fl.pdf": {"id": "anketa-fl", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "anketa-fl-simplified-id.pdf": {"id": "anketa-fl-simplified-id", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "anketa-ip-sz.pdf": {"id": "anketa-ip-sz", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "anketa-isbyul.pdf": {"id": "anketa-isbyul", "role": "hidden",
+        "status": "hidden-by-decision"},
+    "anketa-yul.pdf": {"id": "anketa-yul", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "broker-use-refusal-request.pdf": {"id": "broker-use-refusal-request", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "brokerage-key-information.pdf": {"id": "brokerage-key-information", "role": "package-static",
+        "status": "static-download-by-design"},
+    "client-notifications.pdf": {"id": "client-notifications", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "code-word-request.pdf": {"id": "code-word-request", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "order-forms.pdf": {"id": "order-forms", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "power-of-attorney.pdf": {"id": "power-of-attorney", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "qualification-consequences-notice.pdf": {"id": "qualification-consequences-notice", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "qualification-notice.pdf": {"id": "qualification-notice", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "qualification-request-fl.pdf": {"id": "qualification-request-fl", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "qualification-request-yul.pdf": {"id": "qualification-request-yul", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "regulation-full-refusal-notice.pdf": {"id": "regulation-full-refusal-notice", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "regulation-partial-refusal-notice.pdf": {"id": "regulation-partial-refusal-notice", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "Risks.pdf": {"id": "risks-declaration", "role": "package-static",
+        "status": "static-download-by-design"},
+    "transfer-requisites.pdf": {"id": "transfer-requisites", "role": "static",
+        "status": "unexposed-by-decision"},
 }
 
 STATIC_TITLES = {
@@ -98,6 +120,91 @@ STATIC_TITLES = {
     "transfer-requisites": "Реквизиты для перечисления денежных средств",
     "risks-declaration": "Декларация о рисках",
     "brokerage-key-information": "Ключевая информация о договоре",
+}
+
+# ── One final production status per PDF ──────────────────────────────────────
+#
+# `role` above says how a template is rendered. This says whether it is
+# finished, which is a different question and the one a release has to answer.
+# Every one of the 22 PDFs gets exactly one of these and no template may be
+# left in between: partially mapped, silently missing, exposed without QA, or
+# in the catalogue with no working generator are all failures, not states.
+PRODUCTION_STATUSES = {
+    # Generated from CRM data, mapped, and covered by the ordinary QA set.
+    "dynamic-production-ready": {
+        "map": True, "catalogue": True, "generated": True,
+    },
+    # Offered to the user and returned byte-for-byte. It carries no client
+    # value, so there is nothing to map.
+    "static-download-by-design": {
+        "map": False, "catalogue": True, "generated": False,
+    },
+    # Deliberately absent from the catalogue: the business does not want this
+    # form offered at all in this release.
+    "hidden-by-decision": {
+        "map": False, "catalogue": False, "generated": False,
+    },
+    # Present in the repository but not offered: the form is kept because its
+    # content is authoritative, and exposing it is a later decision.
+    "unexposed-by-decision": {
+        "map": False, "catalogue": False, "generated": False,
+    },
+    # Cannot be finished for a reason outside this repository — a missing
+    # authoritative source, or legal wording that has not been settled.
+    "blocked": {
+        "map": False, "catalogue": False, "generated": False,
+    },
+}
+
+# Why each non-dynamic template is where it is, and what would have to happen
+# for that to change. Recorded here rather than in prose so the release report
+# cannot describe a template the gate does not also account for.
+NON_DYNAMIC_RATIONALE = {
+    "anketa-isbyul": {
+        "reason": (
+            "Анкета ИСБОЮЛ is for a foreign structure without a legal entity. "
+            "The CRM has no subject kind for one, so there is no payload to "
+            "map and no wizard entry to offer it from."
+        ),
+        "userCanDownload": False,
+        "futureMappingRequired": True,
+        "excludedFromRelease": True,
+    },
+    "transfer-requisites": {
+        "reason": (
+            "The transfer-requisites sheet repeats the three payment-purpose "
+            "rows of the account-opening notice — same sample client codes, "
+            "same «№_________ дата__» blanks — for a client who already has an "
+            "account. The notice is the form the release generates; exposing a "
+            "second sheet that states the same three references is a business "
+            "decision that has not been taken. It is NOT static-by-design: it "
+            "contains client-specific blanks, so if it is ever exposed it has "
+            "to be mapped first, exactly as the notice was."
+        ),
+        "userCanDownload": False,
+        "futureMappingRequired": True,
+        "excludedFromRelease": True,
+    },
+    "risks-declaration": {
+        "reason": (
+            "Risks.pdf is a 17-page declaration with no client-specific field "
+            "anywhere in it. It is delivered unchanged as part of the brokerage "
+            "starter package."
+        ),
+        "userCanDownload": True,
+        "futureMappingRequired": False,
+        "excludedFromRelease": False,
+    },
+    "brokerage-key-information": {
+        "reason": (
+            "The key-information sheet describes the product, not the client. "
+            "It has no blanks and is delivered unchanged with the starter "
+            "package."
+        ),
+        "userCanDownload": True,
+        "futureMappingRequired": False,
+        "excludedFromRelease": False,
+    },
 }
 
 # Target semantic sections that cannot be inferred from rectangle geometry.
@@ -213,7 +320,18 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("regulation-full-refusal-notice", "clientName"),
     ("regulation-partial-refusal-notice", "clientName"),
 }
-EXPECTED_WORD_FLOW_EXPANSION_ANCHORS = 15
+EXPECTED_WORD_FLOW_EXPANSION_ANCHORS = 18
+
+# Reviewed paragraphs that grow inside a bordered table, and are therefore the
+# only Word-flow anchors allowed to draw a table row when they take an extra
+# line. Every other reviewed paragraph reflows in open page space: if one of
+# those started painting rules, it would be inventing borders the form has not
+# got, so they must stay at `lineStyle: none`.
+BORDERED_WORD_FLOW_ANCHORS = {
+    ("account-opening-notice", "account-opening-payment-purpose-stock"),
+    ("account-opening-notice", "account-opening-payment-purpose-currency"),
+    ("account-opening-notice", "account-opening-payment-purpose-derivatives"),
+}
 
 
 def canonical(value: Any) -> str:
@@ -413,7 +531,16 @@ def validate_runtime(
             f"runtime has {len(block_expansions)} Word-flow expansion anchors, "
             f"expected {EXPECTED_WORD_FLOW_EXPANSION_ANCHORS}"
         )
+    bordered = {(map_id, block_id) for map_id, block_id, expansion
+                in block_expansions if expansion.get("lineStyle") == "table-row"}
+    if bordered != BORDERED_WORD_FLOW_ANCHORS:
+        errors.append(
+            "Word-flow anchors drawing a table row changed: "
+            f"{sorted(bordered)} != {sorted(BORDERED_WORD_FLOW_ANCHORS)}"
+        )
     for map_id, block_id, expansion in block_expansions:
+        if (map_id, block_id) in BORDERED_WORD_FLOW_ANCHORS:
+            continue
         if expansion.get("lineStyle") != "none":
             errors.append(
                 f"Word-flow anchor renders a continuation row: {map_id}/{block_id}: "
@@ -498,6 +625,7 @@ def pdf_inventory() -> tuple[list[dict[str, Any]], list[str]]:
             "templateFilename": filename,
             "templatePath": str(path.relative_to(REPO_ROOT)).replace("\\", "/"),
             "documentRole": spec["role"],
+            "productionStatus": spec["status"],
             "byteLength": len(data),
             "sha256": sha256_bytes(data),
             "pageCount": len(pages),
@@ -1191,6 +1319,142 @@ def attach_metadata(
     return errors
 
 
+def production_status_inventory(
+    documents: list[dict[str, Any]],
+    catalog: dict[str, dict[str, Any]],
+    maps: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """One final status per PDF, checked against what the code actually does.
+
+    The status in DOCUMENT_SPECS is a declaration. Everything else in each row
+    is observed — is there a map, is there a catalogue entry, does that entry
+    generate or download — and a declaration that disagrees with the
+    observation is a failure. That is the whole point: a template cannot be
+    called production-ready because somebody wrote it down.
+    """
+    rows: list[dict[str, Any]] = []
+    errors: list[str] = []
+    catalogue_ids = set(catalog)
+
+    for document in documents:
+        doc_id = document["documentId"]
+        status = document["productionStatus"]
+        entry = catalog.get(doc_id) or {}
+        template = maps.get(doc_id)
+        rationale = NON_DYNAMIC_RATIONALE.get(doc_id)
+
+        observed = {
+            "map": bool(template),
+            "catalogue": bool(entry),
+            "generated": bool(entry.get("overlayTemplateId")),
+        }
+        if status not in PRODUCTION_STATUSES:
+            errors.append(
+                f"{doc_id}: unknown production status {status!r}; allowed: "
+                + ", ".join(sorted(PRODUCTION_STATUSES))
+            )
+            continue
+        expected = PRODUCTION_STATUSES[status]
+        for key, want in expected.items():
+            if observed[key] != want:
+                errors.append(
+                    f"{doc_id}: declared {status!r} but {key}={observed[key]} "
+                    f"(a {status!r} template must have {key}={want})"
+                )
+
+        if status == "dynamic-production-ready":
+            if rationale:
+                errors.append(
+                    f"{doc_id}: a production-ready template must not carry a "
+                    "non-dynamic rationale"
+                )
+        elif not rationale:
+            errors.append(
+                f"{doc_id}: {status!r} without a recorded reason — every "
+                "template that is not generated has to say why in "
+                "NON_DYNAMIC_RATIONALE"
+            )
+
+        rows.append({
+            "documentId": doc_id,
+            "templateFilename": document["templateFilename"],
+            "title": document.get("title") or doc_id,
+            "productionStatus": status,
+            "pageCount": document["pageCount"],
+            "catalogueEntry": entry.get("id"),
+            "cataloguePackage": entry.get("packageId"),
+            "appliesTo": entry.get("appliesTo") or [],
+            "fieldMap": doc_id if template else None,
+            "generationMode": (
+                "browser-overlay" if observed["generated"]
+                else "static-download" if observed["catalogue"]
+                else "not-offered"
+            ),
+            "exposure": "offered" if observed["catalogue"] else "not-offered",
+            "qaStatus": (
+                "ordinary + realistic-long fixtures, structural and visual QA"
+                if status == "dynamic-production-ready"
+                else "source SHA-256 / page-count byte baseline only"
+            ),
+            "reason": (rationale or {}).get("reason"),
+            "userCanDownload": (rationale or {}).get(
+                "userCanDownload", observed["catalogue"]),
+            "futureMappingRequired": (rationale or {}).get(
+                "futureMappingRequired", False),
+            "excludedFromCurrentRelease": (rationale or {}).get(
+                "excludedFromRelease", False),
+        })
+
+    # Nothing may be offered that cannot be produced. A catalogue entry naming
+    # an overlay template with no registered map is the failure mode this whole
+    # inventory exists to make impossible.
+    # A package is a container: it offers no PDF of its own, its members do.
+    containers = {
+        doc_id for doc_id, entry in catalog.items()
+        if entry.get("packageDocuments")
+    }
+    for doc_id, entry in sorted(catalog.items()):
+        overlay = entry.get("overlayTemplateId")
+        if overlay and overlay not in maps:
+            errors.append(
+                f"catalogue entry {doc_id!r} generates {overlay!r}, which has "
+                "no registered field map"
+            )
+        if (not overlay and doc_id not in containers
+                and not entry.get("pdfTemplateUrl") and not entry.get("closure")):
+            errors.append(
+                f"catalogue entry {doc_id!r} neither generates a PDF nor "
+                "offers one for download"
+            )
+
+    known = {row["documentId"] for row in rows}
+    for doc_id in sorted(NON_DYNAMIC_RATIONALE):
+        if doc_id not in known:
+            errors.append(
+                f"NON_DYNAMIC_RATIONALE describes {doc_id!r}, which is not one "
+                "of the committed templates"
+            )
+    # A map that belongs to no PDF, or a catalogue document that is neither a
+    # template nor a non-document flow, would both escape the count above.
+    for doc_id in sorted(maps):
+        if doc_id not in known:
+            errors.append(f"field map {doc_id!r} has no committed PDF template")
+    unaccounted = catalogue_ids - known - containers - {
+        doc_id for doc_id, entry in catalog.items() if entry.get("closure")
+    }
+    for doc_id in sorted(unaccounted):
+        errors.append(
+            f"catalogue document {doc_id!r} is offered but is not one of the "
+            "committed templates, a package container or a non-document flow"
+        )
+
+    if len(rows) != EXPECTED_PDFS:
+        errors.append(
+            f"the inventory accounts for {len(rows)} templates, not {EXPECTED_PDFS}"
+        )
+    return rows, errors
+
+
 def static_page_sections(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
     rows = []
     for document in documents:
@@ -1459,6 +1723,12 @@ def build_snapshot(
     )
     maps = map_inventory(runtime, floor)
     summaries = document_summaries(documents, fields, maps)
+    status_rows, status_errors = production_status_inventory(
+        documents,
+        flatten_catalog(runtime.get("catalog") or {}),
+        runtime.get("maps") or {},
+    )
+    errors.extend(status_errors)
     baseline_keys = {
         (row["documentId"], field["fieldId"])
         for row in floor
@@ -1510,6 +1780,11 @@ def build_snapshot(
             "semanticSections": len(semantic_sections),
             "sourceStaticPageSections": len(source_sections),
         },
+        "productionStatusCounts": {
+            status: sum(row["productionStatus"] == status for row in status_rows)
+            for status in sorted(PRODUCTION_STATUSES)
+        },
+        "productionStatusInventory": status_rows,
         "classificationCategories": sorted(FIELD_CATEGORIES),
         "fixtureEvidence": {
             "normal": "ordinary-failures.json: 0 ordinary failures",
@@ -1626,11 +1901,56 @@ def markdown(snapshot: dict[str, Any]) -> str:
         "Registry IDs, wizard/check keys and formatter names are frozen by the companion",
         "`document-identifier-manifest.json` / `check_identifier_manifest.py` gate.",
         "",
+        "## Final production status — every PDF, exactly one status",
+        "",
+        "Every committed template has exactly one of five final statuses. The status is",
+        "declared in `DOCUMENT_SPECS` and checked against what the code actually does:",
+        "whether a field map is registered, whether the wizard catalogue offers the",
+        "document, and whether that catalogue entry generates a PDF or hands one over",
+        "unchanged. A declaration that disagrees with the observation fails the gate, so",
+        "no template can be called production-ready because somebody wrote it down.",
+        "",
+        "| Status | Templates |",
+        "| --- | ---: |",
+    ]
+    for status, total in snapshot["productionStatusCounts"].items():
+        lines.append(f"| {status} | {total} |")
+    lines.extend([
+        f"| **Total** | **{counts['documents']}** |",
+        "",
+        "| Template | Document ID | Status | Catalogue entry | Field map | Generation | Exposure | QA |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ])
+    for row in snapshot["productionStatusInventory"]:
+        lines.append("| " + " | ".join(md_cell(value) for value in (
+            row["templateFilename"], row["documentId"], row["productionStatus"],
+            row["catalogueEntry"] or "—", row["fieldMap"] or "—",
+            row["generationMode"], row["exposure"], row["qaStatus"],
+        )) + " |")
+
+    non_dynamic = [row for row in snapshot["productionStatusInventory"]
+                   if row["productionStatus"] != "dynamic-production-ready"]
+    lines.extend([
+        "",
+        "### Templates that are not generated, and why",
+        "",
+        "| Template | Status | Reason | User can download | Future mapping required | Excluded from this release |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ])
+    for row in non_dynamic:
+        lines.append("| " + " | ".join(md_cell(value) for value in (
+            row["templateFilename"], row["productionStatus"], row["reason"],
+            row["userCanDownload"], row["futureMappingRequired"],
+            row["excludedFromCurrentRelease"],
+        )) + " |")
+
+    lines.extend([
+        "",
         "## Document and page matrix",
         "",
         "| Document ID | Title | Template | Role | Page | Lines | Text SHA-256 | PDF SHA-256 | Bytes | Map fields |",
         "| --- | --- | --- | --- | ---: | ---: | --- | --- | ---: | ---: |",
-    ]
+    ])
     for document in snapshot["documents"]:
         for page in document["pages"]:
             lines.append("| " + " | ".join(md_cell(value) for value in (
@@ -1842,6 +2162,63 @@ def run_self_tests(
         renderer_errors,
         "word-flow field retains an independent continuation renderer",
     )
+
+    # ── The final-status gates ────────────────────────────────────────────────
+    #
+    # Each of these is a way a template could be left unfinished while every
+    # other gate stayed green, which is exactly what this phase exists to make
+    # impossible.
+    catalog = flatten_catalog(runtime.get("catalog") or {})
+    maps = runtime.get("maps") or {}
+    documents = snapshot["documents"]
+
+    exposed_without_map = copy.deepcopy(catalog)
+    exposed_without_map["invented-document"] = {
+        "id": "invented-document",
+        "overlayTemplateId": "invented-document",
+        "packageId": None,
+    }
+    _, errors = production_status_inventory(documents, exposed_without_map, maps)
+    expect(
+        "exposed document with no field map",
+        errors,
+        "has no registered field map",
+    )
+
+    unfinished = copy.deepcopy(documents)
+    unfinished[0]["productionStatus"] = "dynamic-production-ready"
+    hidden = next(
+        document for document in unfinished
+        if document["documentId"] == "anketa-isbyul"
+    )
+    hidden["productionStatus"] = "dynamic-production-ready"
+    _, errors = production_status_inventory(unfinished, catalog, maps)
+    expect(
+        "template claimed production-ready without a map",
+        errors,
+        "declared 'dynamic-production-ready' but map=False",
+    )
+
+    invented_status = copy.deepcopy(documents)
+    invented_status[0]["productionStatus"] = "mostly-done"
+    _, errors = production_status_inventory(invented_status, catalog, maps)
+    expect(
+        "status outside the closed vocabulary",
+        errors,
+        "unknown production status",
+    )
+
+    dropped = [
+        document for document in copy.deepcopy(documents)
+        if document["documentId"] != "transfer-requisites"
+    ]
+    _, errors = production_status_inventory(dropped, catalog, maps)
+    expect(
+        "template silently missing from the inventory",
+        errors,
+        f"not {EXPECTED_PDFS}",
+    )
+
     return failures
 
 
@@ -1879,10 +2256,11 @@ def main() -> int:
             print(f"\nFull-template audit self-test: {len(failures)} failure(s)")
             return 1
         print(
-            "Full-template audit self-test: PASS · 10/10 negative gates "
+            "Full-template audit self-test: PASS · 14/14 negative gates "
             "(missing/duplicate identifiers, invalid/missing pages, duplicate templates, "
             "missing/duplicate classifications, changed PDF hash, committed additive removal, "
-            "duplicate rendering)"
+            "duplicate rendering, exposed-without-map, production-ready-without-map, "
+            "invented status, template missing from the inventory)"
         )
         return 0
 

@@ -17,14 +17,461 @@
     "staticOrHiddenTemplates": 4,
     "maps": 18,
     "baselineFields": 621,
-    "currentFields": 624,
-    "additiveCurrentFields": 3,
-    "currentTextFields": 400,
+    "currentFields": 625,
+    "additiveCurrentFields": 4,
+    "currentTextFields": 401,
     "currentCheckFields": 224,
     "sourceTextLines": 4016,
     "semanticSections": 576,
     "sourceStaticPageSections": 77
   },
+  "productionStatusCounts": {
+    "blocked": 0,
+    "dynamic-production-ready": 18,
+    "hidden-by-decision": 1,
+    "static-download-by-design": 2,
+    "unexposed-by-decision": 1
+  },
+  "productionStatusInventory": [
+    {
+      "documentId": "accession-application-fl",
+      "templateFilename": "accession-application-fl.pdf",
+      "title": "Заявление о присоединении (ФЛ)",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 3,
+      "catalogueEntry": "accession-application-fl",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual"
+      ],
+      "fieldMap": "accession-application-fl",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "accession-application-yul",
+      "templateFilename": "accession-application-yul.pdf",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 2,
+      "catalogueEntry": "accession-application-yul",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "company"
+      ],
+      "fieldMap": "accession-application-yul",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "account-opening-notice",
+      "templateFilename": "account-opening-notice.pdf",
+      "title": "Уведомление об открытии брокерского-депозитарного счета",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 2,
+      "catalogueEntry": "account-opening-notice",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "account-opening-notice",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "anketa-fl-simplified-id",
+      "templateFilename": "anketa-fl-simplified-id.pdf",
+      "title": "Анкета ФЛ (упрощённая идентификация)",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 2,
+      "catalogueEntry": "anketa-fl-simplified-id",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual"
+      ],
+      "fieldMap": "anketa-fl-simplified-id",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "anketa-fl",
+      "templateFilename": "anketa-fl.pdf",
+      "title": "Анкета физического лица",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 4,
+      "catalogueEntry": "anketa-fl",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual"
+      ],
+      "fieldMap": "anketa-fl",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "anketa-ip-sz",
+      "templateFilename": "anketa-ip-sz.pdf",
+      "title": "Анкета (досье) ИП или лица, занимающегося частной практикой",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 5,
+      "catalogueEntry": "anketa-ip-sz",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual"
+      ],
+      "fieldMap": "anketa-ip-sz",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "anketa-isbyul",
+      "templateFilename": "anketa-isbyul.pdf",
+      "title": "Анкета иностранной структуры без образования юридического лица",
+      "productionStatus": "hidden-by-decision",
+      "pageCount": 4,
+      "catalogueEntry": null,
+      "cataloguePackage": null,
+      "appliesTo": [],
+      "fieldMap": null,
+      "generationMode": "not-offered",
+      "exposure": "not-offered",
+      "qaStatus": "source SHA-256 / page-count byte baseline only",
+      "reason": "Анкета ИСБОЮЛ is for a foreign structure without a legal entity. The CRM has no subject kind for one, so there is no payload to map and no wizard entry to offer it from.",
+      "userCanDownload": false,
+      "futureMappingRequired": true,
+      "excludedFromCurrentRelease": true
+    },
+    {
+      "documentId": "anketa-yul",
+      "templateFilename": "anketa-yul.pdf",
+      "title": "Анкета юридического лица",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 5,
+      "catalogueEntry": "anketa-yul",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "company"
+      ],
+      "fieldMap": "anketa-yul",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "broker-use-refusal-request",
+      "templateFilename": "broker-use-refusal-request.pdf",
+      "title": "Отказ от права использования средств и ценных бумаг",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 1,
+      "catalogueEntry": "broker-use-refusal-request",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "broker-use-refusal-request",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "brokerage-key-information",
+      "templateFilename": "brokerage-key-information.pdf",
+      "title": "Ключевая информация о договоре",
+      "productionStatus": "static-download-by-design",
+      "pageCount": 3,
+      "catalogueEntry": "brokerage-key-information",
+      "cataloguePackage": "brokerage-starter-package",
+      "appliesTo": [],
+      "fieldMap": null,
+      "generationMode": "static-download",
+      "exposure": "offered",
+      "qaStatus": "source SHA-256 / page-count byte baseline only",
+      "reason": "The key-information sheet describes the product, not the client. It has no blanks and is delivered unchanged with the starter package.",
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "client-notifications",
+      "templateFilename": "client-notifications.pdf",
+      "title": "Уведомления клиента",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 10,
+      "catalogueEntry": "client-notifications",
+      "cataloguePackage": "brokerage-starter-package",
+      "appliesTo": [],
+      "fieldMap": "client-notifications",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "code-word-request",
+      "templateFilename": "code-word-request.pdf",
+      "title": "Заявление об установлении/изменении кодового слова",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 1,
+      "catalogueEntry": "code-word-request",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "code-word-request",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "order-forms",
+      "templateFilename": "order-forms.pdf",
+      "title": "Поручение (формы поручений)",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 4,
+      "catalogueEntry": "order-forms",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "order-forms",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "power-of-attorney",
+      "templateFilename": "power-of-attorney.pdf",
+      "title": "Доверенность",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 4,
+      "catalogueEntry": "power-of-attorney",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "power-of-attorney",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "qualification-consequences-notice",
+      "templateFilename": "qualification-consequences-notice.pdf",
+      "title": "Уведомление о последствиях признания квалифицированным инвестором",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 1,
+      "catalogueEntry": "qualification-consequences-notice",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual"
+      ],
+      "fieldMap": "qualification-consequences-notice",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "qualification-notice",
+      "templateFilename": "qualification-notice.pdf",
+      "title": "Уведомление о признании лица квалифицированным инвестором",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 1,
+      "catalogueEntry": "qualification-notice",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "qualification-notice",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "qualification-request-fl",
+      "templateFilename": "qualification-request-fl.pdf",
+      "title": "Заявление о признании ФЛ квалифицированным инвестором",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 3,
+      "catalogueEntry": "qualification-request-fl",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual"
+      ],
+      "fieldMap": "qualification-request-fl",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "qualification-request-yul",
+      "templateFilename": "qualification-request-yul.pdf",
+      "title": "Заявление о признании ЮЛ квалифицированным инвестором",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 2,
+      "catalogueEntry": "qualification-request-yul",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "company"
+      ],
+      "fieldMap": "qualification-request-yul",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "regulation-full-refusal-notice",
+      "templateFilename": "regulation-full-refusal-notice.pdf",
+      "title": "Отказ от исполнения Регламента в целом",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 1,
+      "catalogueEntry": "regulation-full-refusal-notice",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "regulation-full-refusal-notice",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "regulation-partial-refusal-notice",
+      "templateFilename": "regulation-partial-refusal-notice.pdf",
+      "title": "Отказ от части услуг по Регламенту",
+      "productionStatus": "dynamic-production-ready",
+      "pageCount": 1,
+      "catalogueEntry": "regulation-partial-refusal-notice",
+      "cataloguePackage": null,
+      "appliesTo": [
+        "individual",
+        "company"
+      ],
+      "fieldMap": "regulation-partial-refusal-notice",
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "risks-declaration",
+      "templateFilename": "Risks.pdf",
+      "title": "Декларация о рисках",
+      "productionStatus": "static-download-by-design",
+      "pageCount": 17,
+      "catalogueEntry": "risks-declaration",
+      "cataloguePackage": "brokerage-starter-package",
+      "appliesTo": [],
+      "fieldMap": null,
+      "generationMode": "static-download",
+      "exposure": "offered",
+      "qaStatus": "source SHA-256 / page-count byte baseline only",
+      "reason": "Risks.pdf is a 17-page declaration with no client-specific field anywhere in it. It is delivered unchanged as part of the brokerage starter package.",
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
+    },
+    {
+      "documentId": "transfer-requisites",
+      "templateFilename": "transfer-requisites.pdf",
+      "title": "Реквизиты для перечисления денежных средств",
+      "productionStatus": "unexposed-by-decision",
+      "pageCount": 1,
+      "catalogueEntry": null,
+      "cataloguePackage": null,
+      "appliesTo": [],
+      "fieldMap": null,
+      "generationMode": "not-offered",
+      "exposure": "not-offered",
+      "qaStatus": "source SHA-256 / page-count byte baseline only",
+      "reason": "The transfer-requisites sheet repeats the three payment-purpose rows of the account-opening notice — same sample client codes, same «№_________ дата__» blanks — for a client who already has an account. The notice is the form the release generates; exposing a second sheet that states the same three references is a business decision that has not been taken. It is NOT static-by-design: it contains client-specific blanks, so if it is ever exposed it has to be mapped first, exactly as the notice was.",
+      "userCanDownload": false,
+      "futureMappingRequired": true,
+      "excludedFromCurrentRelease": true
+    }
+  ],
   "classificationCategories": [
     "checkbox-or-static",
     "fixed-exact-token",
@@ -2629,6 +3076,11 @@
       "source": "field.client-code"
     },
     {
+      "documentId": "account-opening-notice",
+      "fieldId": "paymentPurposeAgreementDate",
+      "source": "extra.extra-brokerage-contract-date"
+    },
+    {
       "documentId": "power-of-attorney",
       "fieldId": "ulAttorneyIssueDate",
       "source": "extra.extra-attorney-issue-date"
@@ -2640,6 +3092,7 @@
       "templateFilename": "accession-application-fl.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/accession-application-fl.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 290380,
       "sha256": "8fec088402d46b6a9251e92ceee15f4a7cdc74b12684f7be339194d04904c1e6",
       "pageCount": 3,
@@ -8481,6 +8934,7 @@
       "templateFilename": "accession-application-yul.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/accession-application-yul.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 281569,
       "sha256": "1b3365ce9ed177fb5069ae67ab70d8e5bc6556bbcb160544a439a2db2be9067d",
       "pageCount": 2,
@@ -13262,6 +13716,7 @@
       "templateFilename": "account-opening-notice.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 291850,
       "sha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
       "pageCount": 2,
@@ -16973,13 +17428,14 @@
       "catalogStatus": "production",
       "packageId": null,
       "mapId": "account-opening-notice",
-      "currentFieldCount": 17
+      "currentFieldCount": 18
     },
     {
       "documentId": "anketa-fl-simplified-id",
       "templateFilename": "anketa-fl-simplified-id.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/anketa-fl-simplified-id.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 239865,
       "sha256": "02188223de965fcfeec9297e2817eba35efa37aef69435dc0ee53887e399b787",
       "pageCount": 2,
@@ -20753,6 +21209,7 @@
       "templateFilename": "anketa-fl.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/anketa-fl.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 326010,
       "sha256": "30321d1e0b0f2a0b9128580ae478aaac37e70af81c839309b47af56f4f968c34",
       "pageCount": 4,
@@ -31097,6 +31554,7 @@
       "templateFilename": "anketa-ip-sz.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/anketa-ip-sz.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 305833,
       "sha256": "51cc11efe301e72ea57f45fb885cdcd3db2269b4b857407ca6b2986fa5c53ebc",
       "pageCount": 5,
@@ -42639,6 +43097,7 @@
       "templateFilename": "anketa-isbyul.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/anketa-isbyul.pdf",
       "documentRole": "hidden",
+      "productionStatus": "hidden-by-decision",
       "byteLength": 257460,
       "sha256": "c7056f5e38e5ed6e6b0d79a8a4001b9f9355dacbf7a67f3c59af5f28e39a4f3c",
       "pageCount": 4,
@@ -53226,6 +53685,7 @@
       "templateFilename": "anketa-yul.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/anketa-yul.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 294161,
       "sha256": "d24244e014e5aacb55f890bb900ac32e5e3b7b6477b699a0ab5ebaa1fb43a24f",
       "pageCount": 5,
@@ -66089,6 +66549,7 @@
       "templateFilename": "broker-use-refusal-request.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/broker-use-refusal-request.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 179280,
       "sha256": "5496a348839501fd0f5e5a808e634f18f3aa4f7ba4809dcdd72523a3386f9ce2",
       "pageCount": 1,
@@ -67338,6 +67799,7 @@
       "templateFilename": "brokerage-key-information.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/brokerage-key-information.pdf",
       "documentRole": "package-static",
+      "productionStatus": "static-download-by-design",
       "byteLength": 426859,
       "sha256": "2af0df2ce691f5185dd3c73672d410dbe4ba68ace5b2502ca16ca1a6db54cb41",
       "pageCount": 3,
@@ -76465,6 +76927,7 @@
       "templateFilename": "client-notifications.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/client-notifications.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 2634047,
       "sha256": "8f5a922c9b2140fc8724bc9365de073ac10a1c48a5f44b55b78e319d2b501657",
       "pageCount": 10,
@@ -85690,6 +86153,7 @@
       "templateFilename": "code-word-request.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/code-word-request.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 176855,
       "sha256": "e1be6148975c0884b133b770f42353acbf374fcfc5deee7ba1dd4452dc346500",
       "pageCount": 1,
@@ -86570,6 +87034,7 @@
       "templateFilename": "order-forms.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/order-forms.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 253605,
       "sha256": "24e593d1df7f5438252814d31a64e1b8516cce61c76127dd468606f829de17b1",
       "pageCount": 4,
@@ -94311,6 +94776,7 @@
       "templateFilename": "power-of-attorney.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/power-of-attorney.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 228897,
       "sha256": "a7bcaf8dc97cf1a368b8a22d024c9d9f44e5fb3cef42dc64d56890d03a62a801",
       "pageCount": 4,
@@ -101084,6 +101550,7 @@
       "templateFilename": "qualification-consequences-notice.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/qualification-consequences-notice.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 82266,
       "sha256": "471b08285a154b04cf4d1702852171f2ed4e0b3fc7478084be5058899d8836b0",
       "pageCount": 1,
@@ -102398,6 +102865,7 @@
       "templateFilename": "qualification-notice.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/qualification-notice.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 114656,
       "sha256": "2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494",
       "pageCount": 1,
@@ -103327,6 +103795,7 @@
       "templateFilename": "qualification-request-fl.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/qualification-request-fl.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 157500,
       "sha256": "6478113b5d1d7abede7ccb9acea043a9b08c70c0b392cbdce25aa84c00020efc",
       "pageCount": 3,
@@ -107741,6 +108210,7 @@
       "templateFilename": "qualification-request-yul.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/qualification-request-yul.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 123631,
       "sha256": "9cff0dc94bbb155d6a4aadffa036d482b29f8a8cf1fbb63652cefe7ffc0ddeb8",
       "pageCount": 2,
@@ -110335,6 +110805,7 @@
       "templateFilename": "regulation-full-refusal-notice.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/regulation-full-refusal-notice.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 173330,
       "sha256": "e376d95894a77d559a303ac7bc3503384e3c1c681d763464079603e6352fcb59",
       "pageCount": 1,
@@ -111517,6 +111988,7 @@
       "templateFilename": "regulation-partial-refusal-notice.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/regulation-partial-refusal-notice.pdf",
       "documentRole": "dynamic-overlay",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 199970,
       "sha256": "c96cb21475f021b088003c09eadece1f92aec23d4f4f9001d94a4f223a7a5ad6",
       "pageCount": 1,
@@ -113100,6 +113572,7 @@
       "templateFilename": "Risks.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/Risks.pdf",
       "documentRole": "package-static",
+      "productionStatus": "static-download-by-design",
       "byteLength": 462280,
       "sha256": "576d6873a266ff0ee8b2a6dd6ea0f193ef0b2310bde74133a6d1b27f88fa5659",
       "pageCount": 17,
@@ -139108,6 +139581,7 @@
       "templateFilename": "transfer-requisites.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/transfer-requisites.pdf",
       "documentRole": "static",
+      "productionStatus": "unexposed-by-decision",
       "byteLength": 244739,
       "sha256": "7a4317aa93e2e0b35ecc91a6136e22f19090ef2ead406d64fbfc8f40f989cd79",
       "pageCount": 1,
@@ -141275,7 +141749,7 @@
       "templateFilename": "account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
       "pageCount": 2,
-      "fieldCount": 17,
+      "fieldCount": 18,
       "reviewed": "classification-and-source-inventory-complete",
       "layoutCategoriesFound": [
         "fixed-exact-token",
@@ -142657,7 +143131,7 @@
       "documentId": "account-opening-notice",
       "templateFilename": "account-opening-notice.pdf",
       "expectedPages": 2,
-      "currentFieldCount": 17,
+      "currentFieldCount": 18,
       "wordFlowBlockIds": [
         "account-opening-broker-introduction",
         "account-opening-payment-purpose-stock",
@@ -142675,6 +143149,19 @@
           "anchors": [
             "account-opening-broker-introduction",
             "clientName"
+          ]
+        },
+        "1": {
+          "fixedHeaderUntil": 0,
+          "bodyBottom": 738.92,
+          "fixedFooterFrom": null,
+          "shiftToTop": 835.92,
+          "bottomClearance": 6,
+          "compaction": [],
+          "anchors": [
+            "account-opening-payment-purpose-stock",
+            "account-opening-payment-purpose-currency",
+            "account-opening-payment-purpose-derivatives"
           ]
         }
       },
@@ -142753,6 +143240,35 @@
           "fontSizeLocked": true,
           "lineHeight": 12.6,
           "alignment": "left",
+          "overflowStrategy": "expand-layout",
+          "expansion": {
+            "page": 1,
+            "insertionTop": 74.4,
+            "shiftFromTop": 74.4,
+            "rowHeight": 12.6,
+            "maxExtraRows": 1,
+            "lineStyle": "table-row",
+            "reviewStatus": "approved",
+            "rowLeft": 41.64,
+            "rowWidth": 511.9,
+            "borders": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false
+            },
+            "columns": [
+              41.64,
+              247.01,
+              553.54
+            ],
+            "line": {
+              "left": 252.41,
+              "width": 295.25,
+              "baselineOffset": 10.08,
+              "ruleThickness": 0.48
+            }
+          },
           "sourceReplacement": {
             "firstBlock": 2,
             "lastBlock": 2,
@@ -142799,7 +143315,28 @@
             },
             {
               "type": "static",
-              "text": " дата__. ФОНДОВЫЙ РЫНОК"
+              "text": " дата ",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeAgreementDate",
+              "keepTogether": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 11.04,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": "."
+            },
+            {
+              "type": "static",
+              "text": " ФОНДОВЫЙ РЫНОК",
+              "keepTogether": true
             }
           ]
         },
@@ -142819,6 +143356,35 @@
           "fontSizeLocked": true,
           "lineHeight": 12.6,
           "alignment": "left",
+          "overflowStrategy": "expand-layout",
+          "expansion": {
+            "page": 1,
+            "insertionTop": 112.94,
+            "shiftFromTop": 112.94,
+            "rowHeight": 12.6,
+            "maxExtraRows": 1,
+            "lineStyle": "table-row",
+            "reviewStatus": "approved",
+            "rowLeft": 41.64,
+            "rowWidth": 511.9,
+            "borders": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false
+            },
+            "columns": [
+              41.64,
+              247.01,
+              553.54
+            ],
+            "line": {
+              "left": 252.41,
+              "width": 295.25,
+              "baselineOffset": 10.08,
+              "ruleThickness": 0.48
+            }
+          },
           "sourceReplacement": {
             "firstBlock": 4,
             "lastBlock": 4,
@@ -142865,7 +143431,28 @@
             },
             {
               "type": "static",
-              "text": " дата__. ВАЛЮТНЫЙ РЫНОК"
+              "text": " дата ",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeAgreementDate",
+              "keepTogether": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 11.04,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": "."
+            },
+            {
+              "type": "static",
+              "text": " ВАЛЮТНЫЙ РЫНОК",
+              "keepTogether": true
             }
           ]
         },
@@ -142885,6 +143472,35 @@
           "fontSizeLocked": true,
           "lineHeight": 12.6,
           "alignment": "left",
+          "overflowStrategy": "expand-layout",
+          "expansion": {
+            "page": 1,
+            "insertionTop": 151.34,
+            "shiftFromTop": 151.34,
+            "rowHeight": 12.6,
+            "maxExtraRows": 1,
+            "lineStyle": "table-row",
+            "reviewStatus": "approved",
+            "rowLeft": 41.64,
+            "rowWidth": 511.9,
+            "borders": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false
+            },
+            "columns": [
+              41.64,
+              247.01,
+              553.54
+            ],
+            "line": {
+              "left": 252.41,
+              "width": 295.25,
+              "baselineOffset": 10.08,
+              "ruleThickness": 0.48
+            }
+          },
           "sourceReplacement": {
             "firstBlock": 6,
             "lastBlock": 6,
@@ -142931,7 +143547,28 @@
             },
             {
               "type": "static",
-              "text": " дата__. СРОЧНЫЙ РЫНОК"
+              "text": " дата ",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeAgreementDate",
+              "keepTogether": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 11.04,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": "."
+            },
+            {
+              "type": "static",
+              "text": " СРОЧНЫЙ РЫНОК",
+              "keepTogether": true
             }
           ]
         }
@@ -143052,6 +143689,13 @@
         {
           "fieldId": "paymentPurposeClientCode",
           "source": "field.client-code",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "paymentPurposeAgreementDate",
+          "source": "extra.extra-brokerage-contract-date",
           "page": 2,
           "type": "text",
           "identifierStatus": "additive-current"
@@ -149674,7 +150318,7 @@
         9
       ],
       "lineHeightPt": [
-        null
+        10.5
       ],
       "alignment": [
         "left"
@@ -149725,7 +150369,7 @@
         9
       ],
       "lineHeightPt": [
-        null
+        10.5
       ],
       "alignment": [
         "left"
@@ -149776,7 +150420,7 @@
         9
       ],
       "lineHeightPt": [
-        null
+        10.5
       ],
       "alignment": [
         "left"
@@ -151408,10 +152052,10 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
-        10.8
+        9.72
       ],
       "alignment": [
         "center"
@@ -151462,7 +152106,7 @@
         9
       ],
       "lineHeightPt": [
-        null
+        9.72
       ],
       "alignment": [
         "center"
@@ -151510,10 +152154,10 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
-        null
+        9.72
       ],
       "alignment": [
         "center"
@@ -152963,11 +153607,13 @@
       "sectionId": "account-opening-payment-purpose-stock",
       "fieldIds": [
         "paymentPurposeStock",
-        "paymentPurposeClientCode"
+        "paymentPurposeClientCode",
+        "paymentPurposeAgreementDate"
       ],
       "sourcePaths": [
         "extra.extra-brokerage-contract",
-        "field.client-code"
+        "field.client-code",
+        "extra.extra-brokerage-contract-date"
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
@@ -183142,8 +183788,8 @@
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 9,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 10.5,
+      "lineHeightModel": "explicit",
       "alignment": "left",
       "underlineBorderStyle": "source-rule-plus-generated-continuation-rule",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -183160,6 +183806,7 @@
         "label": "Тарифный план (валютный рынок)",
         "source": "extra.tariff-currency",
         "optional": true,
+        "typographyGroup": "accession-tariff-plans",
         "page": 0,
         "left": 506.5,
         "baselineTop": 531.19,
@@ -183168,6 +183815,7 @@
         "fontSize": 9,
         "minFontSize": 9,
         "align": "left",
+        "lineHeight": 10.5,
         "overflowStrategy": "flow",
         "flowRegions": [
           {
@@ -183183,7 +183831,7 @@
             "baselineTop": 541.5,
             "width": 119.9,
             "maxLines": 1,
-            "maxFontSize": 9.5,
+            "maxFontSize": 9,
             "generated": true,
             "reviewStatus": "approved",
             "drawUnderline": true,
@@ -183221,8 +183869,8 @@
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 9,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 10.5,
+      "lineHeightModel": "explicit",
       "alignment": "left",
       "underlineBorderStyle": "source-rule-plus-generated-continuation-rule",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -183239,6 +183887,7 @@
         "label": "Тарифный план (срочный рынок)",
         "source": "extra.tariff-derivatives",
         "optional": true,
+        "typographyGroup": "accession-tariff-plans",
         "page": 0,
         "left": 506.5,
         "baselineTop": 511.15,
@@ -183247,6 +183896,7 @@
         "fontSize": 9,
         "minFontSize": 9,
         "align": "left",
+        "lineHeight": 10.5,
         "overflowStrategy": "flow",
         "flowRegions": [
           {
@@ -183267,7 +183917,7 @@
             "reviewStatus": "approved",
             "drawUnderline": true,
             "underlineThickness": 0.36,
-            "underlineOffset": 1.2
+            "underlineOffset": 1.6
           }
         ]
       }
@@ -183300,8 +183950,8 @@
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 9,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 10.5,
+      "lineHeightModel": "explicit",
       "alignment": "left",
       "underlineBorderStyle": "source-rule-plus-generated-continuation-rule",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -183318,6 +183968,7 @@
         "label": "Тарифный план (фондовый рынок)",
         "source": "extra.tariff-stock",
         "optional": true,
+        "typographyGroup": "accession-tariff-plans",
         "page": 0,
         "left": 506.8,
         "baselineTop": 470.35,
@@ -183326,6 +183977,7 @@
         "fontSize": 9,
         "minFontSize": 9,
         "align": "left",
+        "lineHeight": 10.5,
         "overflowStrategy": "flow",
         "flowRegions": [
           {
@@ -183341,7 +183993,7 @@
             "baselineTop": 481,
             "width": 119.9,
             "maxLines": 1,
-            "maxFontSize": 9.5,
+            "maxFontSize": 9,
             "generated": true,
             "reviewStatus": "approved",
             "drawUnderline": true,
@@ -185180,8 +185832,8 @@
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
-      "lineHeightPt": 10.8,
+      "fontSizePt": 9,
+      "lineHeightPt": 9.72,
       "lineHeightModel": "explicit",
       "alignment": "center",
       "underlineBorderStyle": "generated-table-row",
@@ -185199,17 +185851,18 @@
         "label": "Тарифный план (валютный рынок)",
         "source": "extra.tariff-currency",
         "optional": true,
+        "typographyGroup": "accession-tariff-plans",
         "page": 0,
         "left": 471.5,
         "baselineTop": 593,
         "width": 71.5,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
         "multiline": true,
         "maxLines": 2,
-        "lineHeight": 10.8,
+        "lineHeight": 9.72,
         "overflowStrategy": "expand-layout",
         "expansion": {
           "page": 0,
@@ -185217,7 +185870,7 @@
           "shiftFromTop": 610.85,
           "rowHeight": 9.72,
           "maxExtraRows": 1,
-          "maxFontSize": 12,
+          "maxFontSize": 9,
           "lineStyle": "table-row",
           "reviewStatus": "approved",
           "rowLeft": 56.64,
@@ -185266,8 +185919,8 @@
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 9,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 9.72,
+      "lineHeightModel": "explicit",
       "alignment": "center",
       "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -185284,6 +185937,7 @@
         "label": "Тарифный план (срочный рынок)",
         "source": "extra.tariff-derivatives",
         "optional": true,
+        "typographyGroup": "accession-tariff-plans",
         "page": 0,
         "left": 471.5,
         "baselineTop": 559,
@@ -185292,6 +185946,9 @@
         "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
+        "multiline": false,
+        "maxLines": 1,
+        "lineHeight": 9.72,
         "overflowStrategy": "expand-layout",
         "expansion": {
           "page": 0,
@@ -185347,9 +186004,9 @@
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "fontSizePt": 9,
+      "lineHeightPt": 9.72,
+      "lineHeightModel": "explicit",
       "alignment": "center",
       "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -185366,14 +186023,18 @@
         "label": "Тарифный план (фондовый рынок)",
         "source": "extra.tariff-stock",
         "optional": true,
+        "typographyGroup": "accession-tariff-plans",
         "page": 0,
         "left": 471.5,
         "baselineTop": 533.5,
         "width": 71.5,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
+        "multiline": false,
+        "maxLines": 1,
+        "lineHeight": 9.72,
         "overflowStrategy": "expand-layout",
         "expansion": {
           "page": 0,
@@ -185381,7 +186042,7 @@
           "shiftFromTop": 540.41,
           "rowHeight": 9.72,
           "maxExtraRows": 1,
-          "maxFontSize": 12,
+          "maxFontSize": 9,
           "lineStyle": "table-row",
           "reviewStatus": "approved",
           "rowLeft": 56.64,
@@ -186854,6 +187515,72 @@
         "tokenBreak": "none",
         "layoutMode": "flow-reference",
         "flowBlockId": "account-opening-payment-purpose-derivatives"
+      }
+    },
+    {
+      "documentId": "account-opening-notice",
+      "title": "Уведомление об открытии брокерского-депозитарного счета",
+      "templateFilename": "account-opening-notice.pdf",
+      "page": 2,
+      "sectionId": "account-opening-payment-purpose-stock",
+      "fieldId": "paymentPurposeAgreementDate",
+      "fieldIds": [
+        "paymentPurposeAgreementDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-brokerage-contract-date"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "paymentPurposeAgreementDate",
+        "source": "extra.extra-brokerage-contract-date",
+        "format": "dateRu",
+        "fallbacks": []
+      },
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ФОНДОВЫЙ РЫНОК",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.6,
+      "lineHeightModel": "explicit",
+      "alignment": "left",
+      "underlineBorderStyle": "word-flow-underline",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "post-migration-visual-review-required",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "paymentPurposeAgreementDate",
+        "source": "extra.extra-brokerage-contract-date",
+        "page": 1,
+        "left": 252.41,
+        "baselineTop": 46.68,
+        "width": 11.04,
+        "font": "legalSerif",
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
+        "align": "left",
+        "required": true,
+        "optional": false,
+        "multiline": false,
+        "format": "dateRu",
+        "tokenBreak": "none",
+        "layoutMode": "flow-reference",
+        "flowBlockId": [
+          "account-opening-payment-purpose-stock",
+          "account-opening-payment-purpose-currency",
+          "account-opening-payment-purpose-derivatives"
+        ],
+        "allowMultipleFlowReferences": true
       }
     },
     {
