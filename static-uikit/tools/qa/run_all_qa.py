@@ -66,6 +66,14 @@ SUITES = [
     ("expansion anchors", "check_expansion_anchors.py", []),
     ("structural PDF", "run_structural_pdf_tests.py", []),
     ("full template audit", "check_full_template_audit.py", ["--self-test"]),
+    # Every other suite asks whether the values a map produces are right. These
+    # two ask whether a map produces a value at all where the form asked for
+    # one — a half-filled sentence, a group set two ways, a printed sample
+    # nobody replaces — and are run against the source PDFs, not the maps, so a
+    # blank nobody mapped is still found.
+    ("production completeness", "check_production_completeness.py", []),
+    ("production completeness gates", "check_production_completeness.py",
+     ["--self-test"]),
     ("document regression", "run_document_regression.py", []),
     # These two read the regression report, so they run after it.
     ("regression denominator", "audit_regression_denominator.py", []),
