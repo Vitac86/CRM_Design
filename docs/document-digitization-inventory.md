@@ -113,20 +113,41 @@ without an overlay map cannot appear even by accident.
 Document Wizard and have passed structural, visual and browser QA. Nothing is
 left template-only, map-only or registry-only.
 
-Final layout verification on **2026-07-31** covers 18 maps × 13 profiles:
-177/234 combinations render, with the other combinations returning explicit
-field overflow rather than clipping. Release classification is **0 ordinary,
-0 supported realistic-long and 23 stress-only fields**. Structural generation
-passes 1624/1624 checks, visual geometry 247/247, expansion 67/67, Wizard 20/20
-and Template Builder 59/59; the smallest dynamic text is 9.0 pt. All 43 reviewed
-anchor/compaction/cross-page boundaries are clean.
+Layout verification covers 18 maps × 13 profiles, and every combination that
+does not render returns an explicit field overflow rather than clipping. The
+smallest dynamic text is 9.0 pt.
 
-The only documents not offered are the two intentional cases below:
-`anketa-isbyul` (no CRM subject model) and `transfer-requisites` (a broker
-requisites sheet whose requisites are blank in the authoritative source).
+Per-suite totals are deliberately **not** restated here. They moved with every
+change and were quietly wrong for several phases — the stress-only count read
+23 against a matrix of 22, and two suite figures were hundreds of checks out of
+date. The current numbers come from one place:
 
-Static: `brokerage-key-information` — a disclosure sheet with no client-specific
-blanks, issued unchanged.
+```bash
+python static-uikit/tools/qa/run_all_qa.py
+```
+
+and the release classification from
+`static-uikit/tools/qa/ordinary-failures.json`.
+
+The final status of all 22 templates — which are generated, which are offered
+as a static download, which are hidden or unexposed, and why — is
+[document-full-template-audit.md](document-full-template-audit.md), which is
+generated from the executable maps and the wizard catalogue rather than
+maintained by hand. In summary: 18 dynamic production-ready, 2 static by
+design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model) and 1
+unexposed by decision (`transfer-requisites`).
+
+Static by design, issued unchanged because neither carries a client-specific
+blank anywhere: `brokerage-key-information` (a disclosure sheet about the
+product) and `Risks.pdf` (a 17-page declaration). Both are delivered with the
+brokerage starter package.
+
+`transfer-requisites` is a different case and is **not** static by design. It
+repeats the three payment-purpose sentences of the account-opening notice —
+the same «Код INV0000X» sample codes, the same «№\_\_\_\_\_ дата\_\_» blanks —
+for a client who already has an account. Those blanks are client-specific, so
+if the sheet is ever offered it has to be mapped first, exactly as the notice
+was. It is unexposed by decision, not finished and shelved.
 
 ## Manually exported templates
 

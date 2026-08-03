@@ -308,18 +308,22 @@ not copied, clipped into bands, rasterised or reconstructed.
 | Base template vector rules lost | 0 |
 | Cyrillic / Latin extractable | yes, both |
 
-`run_structural_pdf_tests.py` adds 1624 checks over every document as printed
-and fully expanded, with pymupdf and pypdf together: every original show-text
+`run_structural_pdf_tests.py` checks every document as printed and fully
+expanded, with pymupdf and pypdf together: every original show-text
 operator survives exactly once document-wide, no original operator is lost, the
 added `q … cm … Q` wrappers remain balanced, the static text is complete under
 both parsers, and nothing is rasterised. Document-wide ownership is intentional
 for the three cross-page rules; the same original operator never remains on both
 pages.
 
-`run_visual_geometry_tests.py` adds 247 checks on what a generated row looks
-like — weight, measure, the text sitting on the rule with its descenders clear,
-one pitch per anchor, no rule without text, inserted verticals on printed
-columns, no printed glyph covered, and an explicitly activated cross-page case.
+`run_visual_geometry_tests.py` checks what a generated row looks like — weight,
+measure, the text sitting on the rule with its descenders clear, one pitch per
+anchor, no rule without text, inserted verticals on printed columns, no printed
+glyph covered, and an explicitly activated cross-page case.
+
+Per-suite check counts are not quoted anywhere in this file. They move with
+every change, and a number that has to be edited by hand to stay true will not
+be; `python static-uikit/tools/qa/run_all_qa.py` prints the current ones.
 
 ## 7. Overflow by profile class
 

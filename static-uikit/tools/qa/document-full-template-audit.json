@@ -482,11 +482,13 @@
     "word-flow-paragraph"
   ],
   "fixtureEvidence": {
-    "normal": "ordinary-failures.json: 0 ordinary failures",
-    "realisticLong": "ordinary-failures.json: 0 realistic-long failures",
-    "stressOnly": "23 documented stress-only fields; not release-class failures",
-    "structural": "run_structural_pdf_tests.py baseline: 1624/1624",
-    "visual": "run_visual_geometry_tests.py baseline: 247/247"
+    "source": "static-uikit/tools/qa/ordinary-failures.json",
+    "ordinaryFailures": 0,
+    "realisticLongFailures": 0,
+    "stressOnlyFields": 22,
+    "stressOnlyNote": "documented capacity limits of printed slots; not release-class failures",
+    "ordinaryProfiles": 9,
+    "longProfiles": 4
   },
   "identifierCompatibilityFloor": [
     {

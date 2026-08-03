@@ -184,6 +184,36 @@ and blocks production export until it is corrected. The floor applies only to
 text the engine draws — static legal text already printed in the base PDF is
 untouched.
 
+### Typography groups
+
+Some values are not read one at a time. The three tariff plans of an accession
+application are a column of answers to the same question, and a row set larger
+than the row above it does not read as emphasis — it reads as a defect in the
+form. Sizing each row against its own headroom is how that column came to print
+at 12 / 9 / 12 pt.
+
+Name the group in **Типографика и overflow → Группа оформления**. Every field
+carrying the same name must agree on:
+
+* font, size, minimum size, line height and alignment;
+* what happens to a value that wraps — the size of the continuation line, the
+  clearance of the rule under it, and the height of a grown row.
+
+The inspector lists the rest of the group beside the field you are editing and
+marks any member that diverges, because a difference you can only see by
+opening two panels is not one you will see. Production export fails with
+
+```
+Группа «…»: кегль поля «tariffStock» (12) отличается от «tariffDerivatives» (9).
+Одна группа — одно оформление.
+```
+
+Where a value sits, how wide its slot is and how many lines its own printed row
+has room for are **not** part of the group: those are geometry the source
+decided per row. The size the group can be is decided by its tightest member —
+`tools/qa/measure_field_room.py` reports the largest size whose ascender still
+clears whatever is printed above each baseline.
+
 ## Word-flow blocks
 
 Use a Word-flow block when a source paragraph contains interleaved legal text,
@@ -218,6 +248,32 @@ jump between either side of the relationship. Run all synthetic profiles and
 inspect the generated PDF before approving the replacement and expansion
 metadata. Source text and hashes are evidence, not editable shortcuts around
 the committed PDF.
+
+### A label and the value it introduces
+
+Where the source wording names a value — «№», «дата», «от» — bind the two so a
+line break cannot come between them: `keepWithNext` on the static run that ends
+with the label, `keepTogether` on the reference that follows it. A label left
+introducing nothing at the end of a line is the defect these two exist for.
+
+The same applies to a printed pair. If a form prints «№\_\_\_\_ … дата\_\_» in
+one sentence, a block that binds the number and not the date will print a real
+agreement beside an empty rule, and
+`tools/qa/check_production_completeness.py` fails the map for it — that gate
+reads the source PDFs, so it finds the pair whether or not anyone mapped it.
+
+### Growing a bordered row
+
+A block inside a table can take `expansion.lineStyle: 'table-row'`. Page
+expansion moves the rules it can, but it cannot lengthen the column rules that
+stop at the cut, so the block redraws them across the inserted row from
+`columns` — the drawn centre lines of the source's own rules, at the source's
+own thickness. Only the rows the value really filled are drawn, so a short
+value never adds a stray row.
+
+Every other reviewed paragraph keeps `lineStyle: 'none'`: it reflows in open
+page space, and painting rules there would invent borders the form has not got.
+The full-template audit pins the exact set of blocks allowed to draw a row.
 
 ## Continuation lines
 
@@ -543,9 +599,14 @@ until the behavior is replaced or explicitly preserved outside this schema.
 ## QA
 
 Serve the directory and open
-`tools/document-template-builder-qa.html`. It runs the 68 builder checks against
+`tools/document-template-builder-qa.html`. It runs the builder checks against
 the actual PDF.js worker and production renderer. Also run the established
 document harness and the repository structural validation before integration.
+
+The check count is not quoted here on purpose — it grows with the suite, and a
+number kept true by hand will not be. `python static-uikit/tools/qa/run_builder_qa.py`
+runs the same page headlessly and prints the current total; the combined
+`run_all_qa.py` is the run that has to be green.
 
 ### Add a new production document
 

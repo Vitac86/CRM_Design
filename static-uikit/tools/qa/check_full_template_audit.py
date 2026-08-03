@@ -1319,6 +1319,26 @@ def attach_metadata(
     return errors
 
 
+def fixture_evidence() -> dict[str, Any]:
+    """What the committed failure matrix currently says, not what was typed."""
+    path = QA_DIR / "ordinary-failures.json"
+    if not path.exists():
+        return {"source": "ordinary-failures.json is missing; run "
+                          "audit_ordinary_failures.py"}
+    recorded = json.loads(path.read_text(encoding="utf-8"))
+    counts = recorded.get("counts") or {}
+    return {
+        "source": "static-uikit/tools/qa/ordinary-failures.json",
+        "ordinaryFailures": counts.get("ordinary"),
+        "realisticLongFailures": counts.get("realisticLong"),
+        "stressOnlyFields": counts.get("stressOnly"),
+        "stressOnlyNote": "documented capacity limits of printed slots; "
+                          "not release-class failures",
+        "ordinaryProfiles": len(recorded.get("ordinaryProfiles") or []),
+        "longProfiles": len(recorded.get("longProfiles") or []),
+    }
+
+
 def production_status_inventory(
     documents: list[dict[str, Any]],
     catalog: dict[str, dict[str, Any]],
@@ -1786,13 +1806,12 @@ def build_snapshot(
         },
         "productionStatusInventory": status_rows,
         "classificationCategories": sorted(FIELD_CATEGORIES),
-        "fixtureEvidence": {
-            "normal": "ordinary-failures.json: 0 ordinary failures",
-            "realisticLong": "ordinary-failures.json: 0 realistic-long failures",
-            "stressOnly": "23 documented stress-only fields; not release-class failures",
-            "structural": "run_structural_pdf_tests.py baseline: 1624/1624",
-            "visual": "run_visual_geometry_tests.py baseline: 247/247",
-        },
+        # Read from the committed failure matrix rather than written down here.
+        # These numbers were prose, and prose goes stale silently: the
+        # stress-only count said 23 while the matrix said 22, and two suite
+        # totals were several hundred checks out of date. A number that has to
+        # be edited by hand to stay true is a number that will not be.
+        "fixtureEvidence": fixture_evidence(),
         "identifierCompatibilityFloor": floor,
         "additiveCurrentFields": additive,
         "documents": documents,

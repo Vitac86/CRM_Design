@@ -739,12 +739,23 @@ so the row grows. The third line was placed at the row's own 13.44 pt pitch
 while the two above it kept the cell's 9.975 pt leading. One value, two
 rhythms: a paragraph that stops and a second entry that starts.
 
+**The half-filled sentence.** The same three rows then named a real client code
+and a real agreement number and printed «дата\_\_» after them. Every gate was
+green, because every value the map produced was correct — the map simply did
+not produce one for the date. A sentence that gets that far and stops reads as
+a form nobody finished.
+
 Both are now rules rather than opinions:
 
 - an exact reference is **one whole token** — a slash or a hyphen inside it is
   not a break opportunity (`tokenBreak: 'none'`, `keepTogether`);
 - it stays on the same line as the token that **introduces** it, with no gap
   (`keepWithNext` after «№»), and the sentence continues after it;
+- where a form prints **«№ …» and «дата …» in one sentence**, a template that
+  fills one fills the other. `check_production_completeness.py` searches the
+  source PDFs, not the maps, so a sentence nobody mapped is still found, and
+  joins each page's lines first because the two blanks are not always on the
+  same one;
 - a value's own printed lines keep **one step**. A continuation may start
   further left than the first line — Word does that when the first line began
   after a printed label — but never further right;
@@ -753,6 +764,73 @@ Both are now rules rather than opinions:
   not move;
 - printed **sample** content is replaced by the CRM value it stands for, and
   the swap is declared (`sourcePlaceholders`), not assumed.
+
+### The payment-purpose sentence
+
+Page 2 of the account-opening notice prints one sentence per market, three
+times. Composed, it reads:
+
+```
+Код {clientCode}. Перевод денежных средств по Договору на брокерское
+обслуживание №{agreementNumber} дата {agreementDate}. {MARKET} РЫНОК
+```
+
+Where each value comes from:
+
+| value | source | note |
+|---|---|---|
+| client code | `field.client-code` | the same CRM value the «Код клиента» cell of §1 prints |
+| agreement number | `extra.extra-brokerage-contract` | the same wizard input as the §2 «Номер договора» cell |
+| agreement date | `extra.extra-brokerage-contract-date` | the same wizard input as the §2 «Дата» cell, `format: 'dateRu'` |
+| market | printed wording | one unbreakable token, so «ФОНДОВЫЙ» never leaves «РЫНОК» |
+
+The form records **one** brokerage agreement and quotes it three times, so
+there is one number and one date, not three copies of each. A second date here
+could only ever contradict §2.
+
+Adding the date makes 28 of 72 fixture combinations need a fourth line, so each
+row may grow **one** complete bordered table row at the source's own 12.60 pt
+pitch. The widest reference this form can hold — «№» plus 45 characters — is
+272.40 pt of a 295.25 pt line, so a fifth line is not reachable.
+
+Growing a row inside a table means the table grows with it. Page expansion
+moves the rules it can, but it cannot lengthen the column rules that end at the
+cut, so a Word-flow block with `expansion.lineStyle: 'table-row'` redraws them
+across the inserted row — the same `drawTableRow` a field-level anchor already
+uses, and only for the rows its value really filled.
+
+### Values a reader compares side by side
+
+Some values are not read one at a time. The three tariff plans of an accession
+application are a column of answers to the same question, and a row set larger
+than the row above it does not read as emphasis — it reads as a defect in the
+form. A map declares the group and the production validator holds it to it:
+
+```js
+{ id: 'tariffStock', typographyGroup: 'accession-tariff-plans', … }
+```
+
+Members must agree on face, size, minimum size, leading and alignment, and on
+what happens to a value that wraps — the size of the continuation line, the
+clearance of the rule under it, the height of a grown row. Where the value
+sits, how wide its slot is and how many lines its own printed row has room for
+are geometry the source decided per row and are not part of the group.
+
+**The size a group can be is decided by its tightest member.** For the
+legal-entity application the three rows measure 13.86, 7.60 and 12.22 pt of
+headroom (`measure_field_room.py`: the largest size whose ascender still clears
+whatever is printed above the baseline), so 12 pt is available to two of them
+and not the third — the 12 / 9 / 12 the form used to print. 10 and 11 pt fail
+on the same row: «срочный» sets its printed label on one line instead of two
+and leaves its value 6.77 pt, and a 10 pt ascender is 8.91 pt.
+
+Row growth does not buy it, because growth adds room *below* the baseline and
+what is missing is *above* it, against a printed label. Taking it would mean
+moving that value's baseline down as well and spending a 9.72 pt row on every
+legal-entity application that names a срочный tariff, printed long or short.
+Distorting the table on every document to gain 3 pt on one value is the wrong
+trade, so the group is set at the 9 pt readability floor — which is what the
+individual form already prints.
 
 ### Reviewed source placeholders
 
@@ -825,9 +903,25 @@ viewing scale and at print scale:
 - [ ] a continuation reads as the rest of the sentence, not as a new entry
 - [ ] an exact reference sits where the wording introduces it, whole
 - [ ] no sample value the form printed survives next to a real one
+- [ ] no printed blank is left empty beside a label whose neighbour was filled —
+      «дата» has a date wherever «№» has a number
+- [ ] values a reader compares side by side are the same size: the three tariff
+      plans are one column of answers, not three decisions
+- [ ] a market designation, a name and any other two-word label that means one
+      thing is on one line
+- [ ] a grown table row has its side rules, and they meet the rules above and
+      below it without a step
 
 Test the output in the Chrome/Edge viewer, the Firefox viewer, and Adobe Reader
 where available.
+
+For a change to shared machinery rather than to one form,
+`build_final_review_pack.py` writes a local, git-excluded pack covering all 18
+production dynamic documents — ordinary, realistic-long, English, both subject
+kinds and a pass built on the values that make a row grow — with every page
+rendered full-bleed and each card carrying the client code, agreement number
+and date, tariff sizes, inserted rows, page shift, the smallest client value on
+the page and the structural verdict.
 
 ### Testing Cyrillic
 
@@ -921,9 +1015,15 @@ does not fit, the document map is the thing to fix.
 | `measure_page_layout.py` | a page's reserve, its fixed footer, its block gaps and its row geometry |
 | `audit_ordinary_failures.py` | the failure matrix, split into ordinary / realistic-long / stress |
 | `audit_ordinary_equality.py` | no ordinary payload is shortened, and every value it draws comes back out of the PDF character for character |
+| `check_full_template_audit.py` | every one of the 22 PDFs has exactly one final production status, and the declaration matches what the code does; `--self-test` proves the 14 negative gates |
+| `check_production_completeness.py` | a half-filled labelled sentence, a typography group set two ways, a printed sample nobody replaces; `--self-test` proves the 6 negative gates |
 | `build_ordinary_review_pack.py` | writes the local, git-excluded visual-review pack for a layout change that needs a person to look at it |
+| `build_final_review_pack.py` | writes the local, git-excluded pack covering **all 18** production dynamic documents, for a change to shared machinery |
 
 All under `static-uikit/tools/qa/`.
+
+`run_all_qa.py` is the canonical combined run and the one that has to be green;
+a suite that passes alone and fails in the combined run has failed.
 
 There is no Node on the target workstation, so these drive Chrome over the
 DevTools protocol. The same pages open by hand in any browser over

@@ -25,8 +25,14 @@ failures**, 14 realistic-long-only, 27 stress-only, 0 structural problems,
 smallest generated size 9.0 pt.
 
 Final release rerun: **0 ordinary failures, 0 supported realistic-long
-failures, 23 stress-only fields, 0 structural problems**, and a smallest
-generated size of 9.0 pt. The seven baseline failures were resolved as follows:
+failures, 0 structural problems**, and a smallest generated size of 9.0 pt.
+The stress-only field count is deliberately not restated here — it changes with
+the fixtures and was written down as 23 against a matrix of 22 for several
+phases. `static-uikit/tools/qa/ordinary-failures.json` is the live count, and
+`document-full-template-audit.json` now reads it from there rather than
+carrying its own copy.
+
+The seven baseline failures were resolved as follows:
 
 | Original field | Resolution |
 | --- | --- |
