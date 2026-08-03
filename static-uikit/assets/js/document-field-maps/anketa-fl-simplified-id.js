@@ -213,7 +213,8 @@
       0: {
         fixedHeaderUntil: 0, bodyBottom: 780.46, fixedFooterFrom: null,
         shiftToTop: 841.92, bottomClearance: 30.0, compaction: [],
-        anchors: ['clientFullName', 'bankName', 'bankAddress', 'otherInformation']
+        anchors: ['clientFullName', 'idIssuedBy', 'bankName', 'bankAddress',
+          'otherInformation']
       }
     },
 
@@ -252,9 +253,29 @@
       cell('idSeriesNumber', 'field.passportSeriesNumber', 205.46, { required: true }),
       cell('idIssueDate', 'field.client-passport-issue-date', 219.50, { required: true }),
       // The issuing authority routinely runs past one line; the row is 25.9 pt
-      // tall, which holds two.
+      // tall, which holds two. A full department name — «Отделом по вопросам
+      // миграции ОМВД России по … району Главного управления МВД России по
+      // городу Москве» — is 111 characters and needs a third, so the row grows
+      // by one reviewed 14.16 pt band and the 250.10 rule closes underneath it.
+      //
+      // `baselineOffset` is 5.52, not the 10.44 the one-line rows use: it puts
+      // the third baseline at 255.62, exactly 10.5 pt below the second, so all
+      // three lines keep the cell's own pitch. The bottom rule has moved to
+      // 264.26 by then, so nothing is crossed — offsetting to the row grid
+      // instead would open a 15.42 pt step inside one wrapped value.
       cell('idIssuedBy', 'field.client-passport-issued-by', 234.62, {
-        required: true, multiline: true, maxLines: 2, lineHeight: 10.5, maxHeight: 23.0
+        required: true, multiline: true, maxLines: 2, lineHeight: 10.5, maxHeight: 23.0,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 250.10, shiftFromTop: 250.10,
+          rowHeight: 14.16, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 510.94,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: TABLE_COLUMNS.slice(),
+          line: { left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 5.52, ruleOffset: 14.16, ruleThickness: 0.48 }
+        }
       }),
       cell('idDepartmentCode', 'field.client-passport-dept-code', 260.54, { required: true }),
 

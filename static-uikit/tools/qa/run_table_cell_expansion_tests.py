@@ -87,6 +87,12 @@ CASES = (
          "ru-resident-normal", "field.clientFullName", "clientFullName", 0,
          153.62, 14.16,
          (63.74, 64.70, 84.62, 85.58, 326.11, 573.72, 574.68), 8),
+    # Same two-line issuer cell as `anketa-ip-sz`, one 14.16 pt band under the
+    # 250.10 rule.
+    Case("anketa-fl-simplified-id", "anketa-fl-simplified-id.pdf",
+         "ru-resident-normal", "field.client-passport-issued-by", "idIssuedBy",
+         0, 250.10, 14.16,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 573.72, 574.68), 14),
     Case("anketa-fl-simplified-id", "anketa-fl-simplified-id.pdf",
          "ru-resident-normal", "extra.extra-bank-name", "bankName", 0,
          653.26, 13.44,
@@ -102,6 +108,11 @@ CASES = (
     Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
          "field.clientFullName", "clientFullName", 0, 245.78, 13.44,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    # The passport issuer, whose printed cell already holds two lines: a full
+    # department name needs a third, so this band opens under the 501.31 rule.
+    Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
+         "field.client-passport-issued-by", "idIssuedBy", 0, 501.31, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 13),
     Case("anketa-ip-sz", "anketa-ip-sz.pdf", "ru-resident-normal",
          "extra.extra-bank-name", "bankName", 1, 335.57, 13.44,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),

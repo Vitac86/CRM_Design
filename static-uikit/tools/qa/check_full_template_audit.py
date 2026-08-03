@@ -364,10 +364,14 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("anketa-fl", "bankName"),
     ("anketa-fl", "bankAddress"),
     ("anketa-fl-simplified-id", "clientFullName"),
+    # The passport issuer's printed cell holds two lines; a full department
+    # name needs a third, so both simplified questionnaires grow one band.
+    ("anketa-fl-simplified-id", "idIssuedBy"),
     ("anketa-fl-simplified-id", "bankName"),
     ("anketa-fl-simplified-id", "bankAddress"),
     ("anketa-fl-simplified-id", "otherInformation"),
     ("anketa-ip-sz", "clientFullName"),
+    ("anketa-ip-sz", "idIssuedBy"),
     ("anketa-ip-sz", "bankName"),
     ("anketa-ip-sz", "bankAddress"),
     ("anketa-ip-sz", "ipRegistrationAuthority"),

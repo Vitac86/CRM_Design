@@ -237,7 +237,7 @@
     pageLayout: {
       0: { fixedHeaderUntil: 0, bodyBottom: 779.02, fixedFooterFrom: null,
         shiftToTop: 841.92, bottomClearance: 30.0, compaction: [],
-        anchors: ['clientFullName'] },
+        anchors: ['clientFullName', 'idIssuedBy'] },
       1: { fixedHeaderUntil: 0, bodyBottom: 784.90, fixedFooterFrom: null,
         shiftToTop: 841.92, bottomClearance: 30.0, compaction: [],
         anchors: ['bankName', 'bankAddress', 'ipRegistrationAuthority',
@@ -328,8 +328,25 @@
       cell('idIssueDate', 'field.client-passport-issue-date', 0, 473.95, {
         required: true, format: 'dateRu'
       }),
+      // Two printed lines hold an ordinary authority. A full department name —
+      // 111 characters in this 226 pt column — needs a third, so the row grows
+      // by one reviewed 13.44 pt band and the 501.31 rule closes under it.
+      // `baselineOffset` 6.96 puts that third baseline at 508.27, exactly
+      // 10.5 pt below the second, so the wrapped value keeps one pitch instead
+      // of stepping onto the row grid in the middle of a sentence.
       cell('idIssuedBy', 'field.client-passport-issued-by', 0, 487.27, {
-        required: true, multiline: true, maxLines: 2, lineHeight: 10.5, fontSize: 9.0
+        required: true, multiline: true, maxLines: 2, lineHeight: 10.5, fontSize: 9.0,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 501.31, shiftFromTop: 501.31,
+          rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 9.0,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: TABLE_COLUMNS.slice(),
+          line: { left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 6.96, ruleOffset: 13.44, ruleThickness: 0.48 }
+        }
       }),
       cell('idDepartmentCode', 'field.client-passport-dept-code', 0, 511.75, { required: true }),
 

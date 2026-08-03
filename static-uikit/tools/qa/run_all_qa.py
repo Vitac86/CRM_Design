@@ -58,6 +58,11 @@ SUITES = [
     ("page expansion", "run_expansion_tests.py", []),
     ("table-cell expansion", "run_table_cell_expansion_tests.py", []),
     ("questionnaire table ownership", "run_table_ownership_tests.py", []),
+    # The longest routine value on an identity form. Enumerated from the live
+    # maps, so a new «кем выдан» field anywhere is audited automatically.
+    ("passport issuing authority", "run_passport_authority_tests.py", []),
+    ("passport issuing authority gates", "run_passport_authority_tests.py",
+     ["--self-test"]),
     ("visual geometry and cross-page flow", "run_visual_geometry_tests.py", []),
     # Geometry says the value is inside its box. This says the result still
     # reads as one field: an exact reference stays in its sentence, a grown row

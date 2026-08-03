@@ -265,12 +265,19 @@
       // source row is 13.44 pt high (border tops 490.15 -> 503.59), with 0.48 pt
       // rules.  Continue every source vertical at its measured centre; the
       // horizontal border at 503.59 moves down and closes the expanded cell.
+      //
+      // Two reviewed bands, not one. A full department name — «Отделом по
+      // вопросам миграции ОМВД России по … району Главного управления МВД
+      // России по городу Москве» — is 111 characters and needs three lines in
+      // this 237 pt column; one band left «городу Москве» unplaced and the
+      // engine refused the whole document. 2 × 13.44 = 26.88 pt still fits the
+      // page's own 30.50 pt reserve, and every band keeps the 13.44 pt pitch.
       cell('passportIssuedBy', 'field.client-passport-issued-by', 0, 490.39, 503.83, {
         required: true,
         overflowStrategy: 'expand-layout',
         expansion: {
           page: 0, insertionTop: 503.59, shiftFromTop: 503.59,
-          rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 9.5,
+          rowHeight: 13.44, maxExtraRows: 2, maxFontSize: 9.5,
           lineStyle: 'table-row', reviewStatus: 'approved',
           rowLeft: 63.74, rowWidth: 503.86,
           borders: { left: false, right: false, top: false, bottom: false },

@@ -141569,6 +141569,7 @@
         "bankAddress",
         "bankName",
         "clientFullName",
+        "idIssuedBy",
         "otherInformation"
       ],
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
@@ -141618,6 +141619,7 @@
       "wordFlowBlocksAdded": [],
       "activeIndependentExpansionFields": [
         "clientFullName",
+        "idIssuedBy",
         "bankAddress",
         "bankName",
         "ipRegistrationAuthority",
@@ -144223,6 +144225,7 @@
           "compaction": [],
           "anchors": [
             "clientFullName",
+            "idIssuedBy",
             "bankName",
             "bankAddress",
             "otherInformation"
@@ -144451,7 +144454,8 @@
           "bottomClearance": 30,
           "compaction": [],
           "anchors": [
-            "clientFullName"
+            "clientFullName",
+            "idIssuedBy"
           ]
         },
         "1": {
@@ -159159,7 +159163,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -159178,7 +159182,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -160685,7 +160689,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160704,7 +160708,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -189930,7 +189934,7 @@
           "insertionTop": 503.59,
           "shiftFromTop": 503.59,
           "rowHeight": 13.44,
-          "maxExtraRows": 1,
+          "maxExtraRows": 2,
           "maxFontSize": 9.5,
           "lineStyle": "table-row",
           "reviewStatus": "approved",
@@ -194355,7 +194359,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -194365,7 +194369,7 @@
       "lineHeightPt": 10.5,
       "lineHeightModel": "explicit",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -194392,7 +194396,42 @@
         "maxLines": 2,
         "maxHeight": 23,
         "lineHeight": 10.5,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 250.1,
+          "shiftFromTop": 250.1,
+          "rowHeight": 14.16,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 510.94,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            573.72,
+            574.68
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 242.1,
+            "baselineOffset": 5.52,
+            "ruleOffset": 14.16,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -196075,7 +196114,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -196085,7 +196124,7 @@
       "lineHeightPt": 10.5,
       "lineHeightModel": "explicit",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -196112,7 +196151,42 @@
         "maxLines": 2,
         "maxHeight": 22.360000000000014,
         "lineHeight": 10.5,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 501.31,
+          "shiftFromTop": 501.31,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 6.96,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
