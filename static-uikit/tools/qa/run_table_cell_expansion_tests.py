@@ -275,7 +275,9 @@ def main() -> int:
                      drawing == BORDERED_BLOCKS,
                      json.dumps(sorted(drawing), ensure_ascii=False))
         checks.check("every other reviewed Word-flow anchor stays lineStyle none",
-                     len(inventory["blocks"]) == 18 and
+                     # 18 until the updated account-opening notice made its
+                     # introduction paragraph static and removed that block.
+                     len(inventory["blocks"]) == 17 and
                      all(entry["lineStyle"] == "none"
                          for entry in inventory["blocks"]
                          if (entry["document"], entry["id"]) not in BORDERED_BLOCKS),

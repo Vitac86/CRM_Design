@@ -6,7 +6,7 @@
 //                 для оцифровки\ПРИЛОЖЕНИЕ 3 К РЕГЛАМЕНТУ. УВЕДОМЛЕНИЕ ОБ
 //                 ОТКРЫТИИ БРОКЕРСКОГО-ДЕПОЗИТАРНОГО СЧЕТА.docx
 // Source SHA-256: 600f6fb134bd0117093ccec690d979a4b54e26475bc93c736d3557c609d56edc
-// PDF SHA-256   : d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834
+// PDF SHA-256   : 5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a
 // Pages         : 2 (A4, 595.32 × 841.92 pt; 0 AcroForm fields/widgets/annots)
 //
 // Not to be confused with «Приложение № 3» of the qualification regulation
@@ -77,7 +77,8 @@
   // that print at the source's own locked 11.04 pt, not overlays sized against
   // the room left over in a printed blank.
   var ROW_SIZE = {
-    brokerRepresentative: 11.5,      // 11.60 pt of room
+    // (Empty since the introduction paragraph became static in the updated
+    // template — every remaining row takes BODY.)
   };
 
   function text(id, source, page, left, baselineTop, width, options) {
@@ -232,7 +233,7 @@
         firstBlock: range.block, lastBlock: range.block,
         expectedBlockCount: 1, expectedPageBlockCount: 10,
         expectedSha256: range.sha256,
-        expectedTemplateSha256: 'd46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834',
+        expectedTemplateSha256: '5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a',
         reviewStatus: 'approved'
       },
       // The printed sample code. Declared so the legal-text gate drops exactly
@@ -314,7 +315,9 @@
         shiftToTop: 807.44,
         bottomClearance: 2.0,
         compaction: [],
-        anchors: ['account-opening-broker-introduction', 'clientName']
+        // The introduction is static in the updated template, so the only
+        // block page 1 can grow for is the client-name table row.
+        anchors: ['clientName']
       },
       // Page 2. Its movable body ends at 738.92 — «Подпись ответственного
       // лица …» — and the sheet is 841.92 pt tall with no page number of its
@@ -344,58 +347,13 @@
     },
 
     wordFlowBlocks: [
-      {
-        id: 'account-opening-broker-introduction',
-        type: 'wordFlowBlock',
-        page: 0,
-        frame: {
-          left: 41.40, baselineTop: 126.74, width: 523.58,
-          initialLineCount: 4
-        },
-        font: 'legalSerif', fontSize: 11.04, minFontSize: 11.04,
-        fontSizeLocked: true, lineHeight: 12.72,
-        alignment: 'justify', justifyMinRatio: 0.55,
-        overflowStrategy: 'expand-layout',
-        // Re-cut at a measured complete-operator boundary.
-        //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
-        // 177.86 fell inside the block painting 169.9–181.1. The block's
-        // own continuation line is at 126.74 + 4 x 12.72 = 177.62 and
-        // paints 167.78–180.00, so that block must move: the cut belongs
-        // at or above 167.78. Measured clean band 164.86–169.86; midpoint,
-        // +/-2.50 pt of margin.
-        expansion: {
-          page: 0, insertionTop: 167.36, shiftFromTop: 167.36,
-          rowHeight: 12.72, maxExtraRows: 1, lineStyle: 'none',
-          reviewStatus: 'approved'
-        },
-        sourceReplacement: {
-          firstBlock: 24, lastBlock: 31,
-          expectedBlockCount: 8, expectedPageBlockCount: 126,
-          expectedSha256: '8cd5a73729ce0a18cea885681440b8acc2bc51c69c75a6c392111e6ddeb72749',
-          expectedTemplateSha256: 'd46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834',
-          reviewStatus: 'approved'
-        },
-        sourceStaticText: 'Общество с ограниченной ответственностью "Инвестика", ' +
-          'в лице ________, действующего на основании Доверенности № , ' +
-          'настоящим извещает Клиента о заключении Договора о брокерском ' +
-          'обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)',
-        runs: [
-          {
-            type: 'static',
-            text: 'Общество с ограниченной ответственностью "Инвестика", в лице '
-          },
-          {
-            type: 'fieldRef', fieldId: 'brokerRepresentative',
-            decoration: {
-              underline: true, minWidth: 398.00, thickness: 0.48, offset: 1.20
-            }
-          },
-          {
-            type: 'static',
-            text: ', действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)'
-          }
-        ]
-      },
+      // The introduction paragraph used to be replaced here. The updated
+      // authoritative template prints it itself —
+      //   «Общество с ограниченной ответственностью "Инвестика",  в  лице
+      //    Генерального Директора Козырева Александра Юрьвеича, действующего
+      //    на основании Устава, настоящим извещает Клиента …»
+      // — so there is no blank to fill and no rule to draw. Drawing anything
+      // over it would print the representative twice.
 
       // Page 2, §5 «Назначение платежа». One block per market row; each
       // replaces exactly one top-level q…Q block of the source page, and the
@@ -420,15 +378,6 @@
       text('formationDate', 'field.documentDateRu', 0, 142.0, 78.96, 120.0, {
         required: true, format: 'dateRu'
       }),
-
-      // "…в лице ____________________________________, действующего на
-      // основании Доверенности № , …" — a 401.5 pt rule on the next line.
-      text('brokerRepresentative', 'extra.extra-authorized-signer',
-           0, 43.0, 139.46, 398.0, {
-             required: true,
-             layoutMode: 'flow-reference',
-             flowBlockId: 'account-opening-broker-introduction'
-           }),
 
       // ── 1. Информация о клиенте (from the subject card) ──────────────────
       // This is the right-hand cell of the first ruled table row, not an

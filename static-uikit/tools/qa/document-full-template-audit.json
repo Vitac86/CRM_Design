@@ -16,13 +16,13 @@
     "dynamicTemplates": 18,
     "staticOrHiddenTemplates": 4,
     "maps": 18,
-    "baselineFields": 621,
-    "currentFields": 625,
-    "additiveCurrentFields": 4,
-    "currentTextFields": 401,
+    "baselineFields": 620,
+    "currentFields": 634,
+    "additiveCurrentFields": 14,
+    "currentTextFields": 410,
     "currentCheckFields": 224,
-    "sourceTextLines": 4016,
-    "semanticSections": 576,
+    "sourceTextLines": 4007,
+    "semanticSections": 585,
     "sourceStaticPageSections": 77
   },
   "productionStatusCounts": {
@@ -792,10 +792,6 @@
     {
       "documentId": "account-opening-notice",
       "fields": [
-        {
-          "fieldId": "brokerRepresentative",
-          "source": "extra.extra-authorized-signer"
-        },
         {
           "fieldId": "brokerageContractDate",
           "source": "extra.extra-brokerage-contract-date"
@@ -3068,9 +3064,59 @@
   ],
   "additiveCurrentFields": [
     {
+      "documentId": "accession-application-fl",
+      "fieldId": "brokerageContractNumber",
+      "source": "field.extra-contract-number"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "fieldId": "brokerageContractDate",
+      "source": "field.extra-contract-date"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "fieldId": "depositoryContractNumber",
+      "source": "extra.extra-depository-contract"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "fieldId": "depositoryContractDate",
+      "source": "extra.extra-depository-contract-date"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "fieldId": "internalClientCode",
+      "source": "field.client-code"
+    },
+    {
       "documentId": "accession-application-yul",
       "fieldId": "companyForeignName",
       "source": "field.client-english-name"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "fieldId": "brokerageContractNumber",
+      "source": "field.extra-contract-number"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "fieldId": "brokerageContractDate",
+      "source": "field.extra-contract-date"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "fieldId": "depositoryContractNumber",
+      "source": "extra.extra-depository-contract"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "fieldId": "depositoryContractDate",
+      "source": "extra.extra-depository-contract-date"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "fieldId": "internalClientCode",
+      "source": "field.client-code"
     },
     {
       "documentId": "account-opening-notice",
@@ -8929,7 +8975,7 @@
       "catalogStatus": "production",
       "packageId": null,
       "mapId": "accession-application-fl",
-      "currentFieldCount": 37
+      "currentFieldCount": 42
     },
     {
       "documentId": "accession-application-yul",
@@ -13711,7 +13757,7 @@
       "catalogStatus": "production",
       "packageId": null,
       "mapId": "accession-application-yul",
-      "currentFieldCount": 36
+      "currentFieldCount": 41
     },
     {
       "documentId": "account-opening-notice",
@@ -13719,16 +13765,16 @@
       "templatePath": "static-uikit/assets/document-pdf-templates/account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
       "productionStatus": "dynamic-production-ready",
-      "byteLength": 291850,
-      "sha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+      "byteLength": 285412,
+      "sha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
       "pageCount": 2,
       "pages": [
         {
           "page": 1,
           "widthPt": 595.32,
           "heightPt": 841.92,
-          "sourceTextLineCount": 51,
-          "sourceTextSha256": "0c248c44a8cb73f9f962726f86b30f6d1fd69c60d9613b54f364adaef4bf2212",
+          "sourceTextLineCount": 42,
+          "sourceTextSha256": "e986e9cdadcd33d82c55629a3476905b41fb24c1e1d8655c3214f6914c21c0e5",
           "imageCount": 0,
           "drawingCount": 288,
           "sourceTextLines": [
@@ -13860,377 +13906,98 @@
               "lineNumber": 5,
               "sourceBlockNumber": 4,
               "sourceLineNumber": 1,
-              "text": "Общество",
+              "text": "Общество с ограниченной ответственностью \"Инвестика\",  в  лице Генерального Директора Козырева",
               "bbox": [
                 41.4,
-                116.903,
-                91.533,
-                129.125
+                123.263,
+                565.052,
+                135.485
               ],
               "spans": [
                 {
-                  "text": "Общество ",
+                  "text": "Общество с ограниченной ответственностью \"Инвестика\",  в  лице Генерального Директора Козырева ",
                   "fontFamily": "TimesNewRomanPSMT",
                   "fontSizePt": 11.04,
                   "flags": 4,
                   "color": 0,
                   "bbox": [
                     41.4,
-                    116.903,
-                    91.533,
-                    129.125
+                    123.263,
+                    565.052,
+                    135.485
                   ]
                 }
               ],
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "1f73c0f5658f23f92a6f9e76dc28146923b88735c958edb03c0551c31d56822d"
+              "lineSha256": "f18c99c1e375e92d704f21e919e56ec5620e385514c5ce0560b420ca9fff3926"
             },
             {
               "lineNumber": 6,
               "sourceBlockNumber": 4,
               "sourceLineNumber": 2,
-              "text": "с",
+              "text": "Александра Юрьвеича, действующего на основании Устава, настоящим извещает Клиента о заключении",
               "bbox": [
-                117.322,
-                116.903,
-                124.984,
-                129.125
+                41.4,
+                135.863,
+                564.921,
+                148.085
               ],
               "spans": [
                 {
-                  "text": "с ",
+                  "text": "Александра Юрьвеича, действующего на основании Устава, настоящим извещает Клиента о заключении ",
                   "fontFamily": "TimesNewRomanPSMT",
                   "fontSizePt": 11.04,
                   "flags": 4,
                   "color": 0,
                   "bbox": [
-                    117.322,
-                    116.903,
-                    124.984,
-                    129.125
+                    41.4,
+                    135.863,
+                    564.921,
+                    148.085
                   ]
                 }
               ],
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "727569b0049070dbda5595b44f0cd51bc9b5bc2462885a2ac18bf5edc1e5827d"
+              "lineSha256": "38c08823b1920602a498099627141110f62c57fa659974d450217f3cac409dab"
             },
             {
               "lineNumber": 7,
               "sourceBlockNumber": 4,
               "sourceLineNumber": 3,
-              "text": "ограниченной",
+              "text": "Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)",
               "bbox": [
-                150.906,
-                116.903,
-                219.332,
-                129.125
+                41.4,
+                148.583,
+                532.54,
+                160.805
               ],
               "spans": [
                 {
-                  "text": "ограниченной ",
+                  "text": "Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО) ",
                   "fontFamily": "TimesNewRomanPSMT",
                   "fontSizePt": 11.04,
                   "flags": 4,
                   "color": 0,
                   "bbox": [
-                    150.906,
-                    116.903,
-                    219.332,
-                    129.125
+                    41.4,
+                    148.583,
+                    532.54,
+                    160.805
                   ]
                 }
               ],
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "d7749d077eb097a517432d3a9c9fbd1a385e4cb28058de5fe19c7f9ecdea2937"
+              "lineSha256": "a1cf9742abc0b4a7b28e328bbf37976a2dd46c616839c58abaacbdf5f3f8bc67"
             },
             {
               "lineNumber": 8,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 4,
-              "text": "ответственностью",
-              "bbox": [
-                245.209,
-                116.903,
-                333.132,
-                129.125
-              ],
-              "spans": [
-                {
-                  "text": "ответственностью ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    245.209,
-                    116.903,
-                    333.132,
-                    129.125
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "5d304f93cca3f6eeb23fb98f2bd894554da5e4e9526554c163c2e25a79afff01"
-            },
-            {
-              "lineNumber": 9,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 5,
-              "text": "\"Инвестика\",",
-              "bbox": [
-                358.955,
-                116.903,
-                423.297,
-                129.125
-              ],
-              "spans": [
-                {
-                  "text": "\"Инвестика\", ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    358.955,
-                    116.903,
-                    423.297,
-                    129.125
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "48b6eed25de7f3188efe9d604a95454d1329fe5aad412e8f5154eab47a24176e"
-            },
-            {
-              "lineNumber": 10,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 7,
-              "text": "в",
-              "bbox": [
-                477.879,
-                116.903,
-                485.684,
-                129.125
-              ],
-              "spans": [
-                {
-                  "text": "в ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    477.879,
-                    116.903,
-                    485.684,
-                    129.125
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "03938a04fb4cf3630ab80f640be7b211e240c31995a5b197765522f9d00c017b"
-            },
-            {
-              "lineNumber": 11,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 9,
-              "text": "лице",
-              "bbox": [
-                540.144,
-                116.903,
-                564.984,
-                129.125
-              ],
-              "spans": [
-                {
-                  "text": "лице ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    540.144,
-                    116.903,
-                    564.984,
-                    129.125
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "8c2b727b1be387030a46ee272ad0da222c7f139d204a5aea10c8e6094016d798"
-            },
-            {
-              "lineNumber": 12,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 10,
-              "text": "________________________________________________________________________,",
-              "bbox": [
-                41.4,
-                129.623,
-                442.902,
-                141.845
-              ],
-              "spans": [
-                {
-                  "text": "________________________________________________________________________, ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    41.4,
-                    129.623,
-                    442.902,
-                    141.845
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "64afe0c0a874e77ab3c428b02fb410821d92046074e0b9c8e711121535a55779"
-            },
-            {
-              "lineNumber": 13,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 11,
-              "text": "действующего",
-              "bbox": [
-                461.615,
-                129.623,
-                532.636,
-                141.845
-              ],
-              "spans": [
-                {
-                  "text": "действующего ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    461.615,
-                    129.623,
-                    532.636,
-                    141.845
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "190575edd01fb464dd42d6424b196fdc84d591de8f965ad9f0056f90d07a50e3"
-            },
-            {
-              "lineNumber": 14,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 12,
-              "text": "на",
-              "bbox": [
-                551.349,
-                129.623,
-                564.917,
-                141.845
-              ],
-              "spans": [
-                {
-                  "text": "на ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    551.349,
-                    129.623,
-                    564.917,
-                    141.845
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "3caa1174bf212043ab845d9d0b5022fdaa169b146582ec22c929a5a6f6ea910e"
-            },
-            {
-              "lineNumber": 15,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 13,
-              "text": "основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском",
-              "bbox": [
-                41.4,
-                142.223,
-                564.763,
-                154.445
-              ],
-              "spans": [
-                {
-                  "text": "основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    41.4,
-                    142.223,
-                    564.763,
-                    154.445
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "6c0e657f021752c0896867c4afd88c1ed342b8fedf5b398e903eaed794faaa7c"
-            },
-            {
-              "lineNumber": 16,
-              "sourceBlockNumber": 4,
-              "sourceLineNumber": 14,
-              "text": "обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)",
-              "bbox": [
-                41.4,
-                154.823,
-                419.59,
-                167.045
-              ],
-              "spans": [
-                {
-                  "text": "обслуживании и о заключении Депозитарного договора (договора счета ДЕПО) ",
-                  "fontFamily": "TimesNewRomanPSMT",
-                  "fontSizePt": 11.04,
-                  "flags": 4,
-                  "color": 0,
-                  "bbox": [
-                    41.4,
-                    154.823,
-                    419.59,
-                    167.045
-                  ]
-                }
-              ],
-              "currentRenderingModel": "source-pdf-static-text",
-              "intendedLayoutCategory": "preserved-source-static-line",
-              "reviewStatus": "source-line-inventoried",
-              "lineSha256": "aaf8d97cd118aeb4c2cd5d50deb5bbd66e39154b14a53b3e4ed17aaf88c6aa63"
-            },
-            {
-              "lineNumber": 17,
-              "sourceBlockNumber": 5,
+              "sourceBlockNumber": 6,
               "sourceLineNumber": 1,
               "text": "1. Информация о клиенте",
               "bbox": [
@@ -14257,11 +14024,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "c46c8eb6e314f0d16a4b98c29214ca4be76e9dbf1a6e223fc293e54754087c48"
+              "lineSha256": "321c5b0522cf0ed53436ccf76ba91c2459e71be10cb4d1a70b51bc135552ff09"
             },
             {
-              "lineNumber": 18,
-              "sourceBlockNumber": 6,
+              "lineNumber": 9,
+              "sourceBlockNumber": 7,
               "sourceLineNumber": 1,
               "text": "Наименование клиента/ФИО клиента",
               "bbox": [
@@ -14288,11 +14055,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "782200ee107207c0e516b41d71f205f99c10acb040544f13d479e37f17d3b422"
+              "lineSha256": "a217f14b3af6cc983d2ee235e769c12a0668d988ffb7036a57371aff97530c27"
             },
             {
-              "lineNumber": 19,
-              "sourceBlockNumber": 7,
+              "lineNumber": 10,
+              "sourceBlockNumber": 8,
               "sourceLineNumber": 1,
               "text": "ИНН (для юридических лиц) / Номер документа,",
               "bbox": [
@@ -14319,11 +14086,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "b87110cb343ca98ab59d5294ac57b598e309b29ef13595fb8faefc8207ac2b76"
+              "lineSha256": "98c04aec227b62df0410a147ad868c32b4be581a193d038c94f54df813ed45ba"
             },
             {
-              "lineNumber": 20,
-              "sourceBlockNumber": 7,
+              "lineNumber": 11,
+              "sourceBlockNumber": 8,
               "sourceLineNumber": 2,
               "text": "удостоверяющего личность (для физических лиц)",
               "bbox": [
@@ -14350,11 +14117,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "3f214f1cf8713c414a8e9eaf0b5ec0dce110c4afc66a46217a63a8eb599f4aff"
+              "lineSha256": "dcfe4649fbe6dab724b31bb54f983d322df231be5095e94081018e878bf63bc0"
             },
             {
-              "lineNumber": 21,
-              "sourceBlockNumber": 8,
+              "lineNumber": 12,
+              "sourceBlockNumber": 9,
               "sourceLineNumber": 1,
               "text": "Код Клиента",
               "bbox": [
@@ -14381,11 +14148,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "d5935409fb6d41e45205024f871386eaecbc928835ed78555df8166d775594fd"
+              "lineSha256": "9e6f7d0d896c93627a500f8eb920b6775a4ff28cf87fda409baa146f0a7b2704"
             },
             {
-              "lineNumber": 22,
-              "sourceBlockNumber": 9,
+              "lineNumber": 13,
+              "sourceBlockNumber": 10,
               "sourceLineNumber": 1,
               "text": "2. Информация о заключенных договорах",
               "bbox": [
@@ -14412,11 +14179,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "1580cc1ca8ab36b58ed8506251838288f486290b12fa87682e91ed437e574c56"
+              "lineSha256": "bd63d792963af164be9bb31ec1185a91fd22de94e340aeb130c404e9ff9c285b"
             },
             {
-              "lineNumber": 23,
-              "sourceBlockNumber": 10,
+              "lineNumber": 14,
+              "sourceBlockNumber": 11,
               "sourceLineNumber": 1,
               "text": "Договор",
               "bbox": [
@@ -14443,11 +14210,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "518cf4688a7a8898caae4421de40ef9b3499541a5f47d106a33565ecc1d1ae02"
+              "lineSha256": "1e591b9ff11faec926acdb37995731001224e48780de14d6fa23a451449c77db"
             },
             {
-              "lineNumber": 24,
-              "sourceBlockNumber": 10,
+              "lineNumber": 15,
+              "sourceBlockNumber": 11,
               "sourceLineNumber": 2,
               "text": "Номер договора",
               "bbox": [
@@ -14474,11 +14241,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "c1ecae8281a5c3e00794e8dae1b7f6d4371a635fabce28ff7b153415db6088f8"
+              "lineSha256": "bf6d0b097d742e1692c74cfabcaadb69b06070e64382e678b36ec797eba6e7aa"
             },
             {
-              "lineNumber": 25,
-              "sourceBlockNumber": 10,
+              "lineNumber": 16,
+              "sourceBlockNumber": 11,
               "sourceLineNumber": 3,
               "text": "Дата",
               "bbox": [
@@ -14505,11 +14272,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "0951aec9bfaa9316fd7232790d582d2aa535e204b5c3714b479065d5106e9864"
+              "lineSha256": "7a634b174f4e0fb2a232f7785dab351954725afdd22d9b3d84327bfcc74d6462"
             },
             {
-              "lineNumber": 26,
-              "sourceBlockNumber": 11,
+              "lineNumber": 17,
+              "sourceBlockNumber": 12,
               "sourceLineNumber": 1,
               "text": "Договор на брокерское обслуживание",
               "bbox": [
@@ -14536,11 +14303,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "875f29affaebf086dd079cac3428790d16e57449c665d6a3d95d0bbe31652c0d"
+              "lineSha256": "e64557591f7b1054eb612e45d9587de822a4431bcdce0e0145e2b31b4d4ee37c"
             },
             {
-              "lineNumber": 27,
-              "sourceBlockNumber": 12,
+              "lineNumber": 18,
+              "sourceBlockNumber": 13,
               "sourceLineNumber": 1,
               "text": "Депозитарный договор (Договор счета ДЕПО)",
               "bbox": [
@@ -14567,11 +14334,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "1edc6eda7caa4271e19cd43553d30a5ae3b739e3709bc6cfa2fb21b9cdb4cbf7"
+              "lineSha256": "02953d07c9d605c92455772bb1d412d57c07d3af78ae34b2548b1a28ab71e182"
             },
             {
-              "lineNumber": 28,
-              "sourceBlockNumber": 13,
+              "lineNumber": 19,
+              "sourceBlockNumber": 14,
               "sourceLineNumber": 1,
               "text": "3. Информация об открытых счетах в системе внутреннего учета ООО \"Инвестика\"",
               "bbox": [
@@ -14598,11 +14365,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "a80844f83c4442db0b1e882002792862135dad7d04ddf3fad0c8f03464a9d901"
+              "lineSha256": "9dec3b3b5e83298e24efb3abcbebdd9604e27ffdbb122e9b488c45e4f6a33d1b"
             },
             {
-              "lineNumber": 29,
-              "sourceBlockNumber": 14,
+              "lineNumber": 20,
+              "sourceBlockNumber": 15,
               "sourceLineNumber": 1,
               "text": "Наименование",
               "bbox": [
@@ -14629,11 +14396,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "586f8229c88e1b29eb3c2c1a95ec039bd9a5db0ba1940fa3e1eab9ec0bc312dc"
+              "lineSha256": "ab8535bcfde57b878d6a948d9e49d7a2412f28870025ea10f1da875bf592631b"
             },
             {
-              "lineNumber": 30,
-              "sourceBlockNumber": 14,
+              "lineNumber": 21,
+              "sourceBlockNumber": 15,
               "sourceLineNumber": 2,
               "text": "Номер счета",
               "bbox": [
@@ -14660,11 +14427,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "1fe49d01d2d01faf961d23c2a08a4ba98852afecc919882184c228c4bae938fa"
+              "lineSha256": "f8cb1fe67a8ea6363d749751217c148fd1e3440df9319fd384d1ddec3b7636e1"
             },
             {
-              "lineNumber": 31,
-              "sourceBlockNumber": 15,
+              "lineNumber": 22,
+              "sourceBlockNumber": 16,
               "sourceLineNumber": 1,
               "text": "фондовый рынок",
               "bbox": [
@@ -14691,11 +14458,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "735b81949d0bccf54c9419f73965b3cca662e84c0490be483f17bde3a46a4afd"
+              "lineSha256": "f51eaf4ae1384215a0181390054bfb116498dde868fe454a4cdea558597731ff"
             },
             {
-              "lineNumber": 32,
-              "sourceBlockNumber": 16,
+              "lineNumber": 23,
+              "sourceBlockNumber": 17,
               "sourceLineNumber": 1,
               "text": "срочный рынок",
               "bbox": [
@@ -14722,11 +14489,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "bbc7878c9816498dffb65b6b30ae3c6053b44b227fc3d2343e13da9e4b68162c"
+              "lineSha256": "3f95b63c92c726be39141d02cb67334f63bbcc89b598bf8dc52dd640b19d7494"
             },
             {
-              "lineNumber": 33,
-              "sourceBlockNumber": 17,
+              "lineNumber": 24,
+              "sourceBlockNumber": 18,
               "sourceLineNumber": 1,
               "text": "валютный рынок и рынок драг металлов",
               "bbox": [
@@ -14753,11 +14520,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "480514648bebce6962f26215806f0bcc6cf2987bcc245343d9f3dda23fee68fb"
+              "lineSha256": "6ce7c8b43b4f7f70478096ecf3622007813cd956f48ff4a03b16fc578cacf593"
             },
             {
-              "lineNumber": 34,
-              "sourceBlockNumber": 18,
+              "lineNumber": 25,
+              "sourceBlockNumber": 19,
               "sourceLineNumber": 1,
               "text": "4. Информация об открытых счетах депо в депозитарии ООО \"Инвестика\"",
               "bbox": [
@@ -14784,11 +14551,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "7d08685084ec268a93c64800aa7f15305fa62c452421ac8db05249651e2ba87d"
+              "lineSha256": "70902838c5bd2de86f0ae2c66913028a3e382bf985f99c7a93d6b615d670285e"
             },
             {
-              "lineNumber": 35,
-              "sourceBlockNumber": 19,
+              "lineNumber": 26,
+              "sourceBlockNumber": 20,
               "sourceLineNumber": 1,
               "text": "Наименование",
               "bbox": [
@@ -14815,11 +14582,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "1d585aacc5fb26cdf435faa4b69dd3821ca64f6612ba2ccea86c969ac0b4c862"
+              "lineSha256": "fd251ea8dbfe869d181aa1ecf4afd5a1d37e6e8ecc5f21ba01293de51df4e0d0"
             },
             {
-              "lineNumber": 36,
-              "sourceBlockNumber": 19,
+              "lineNumber": 27,
+              "sourceBlockNumber": 20,
               "sourceLineNumber": 2,
               "text": "Номер счета",
               "bbox": [
@@ -14846,11 +14613,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "b7951c9f3861c0f1722f6b498c192fb43f8c7a0d685b984886b1627ce43d755a"
+              "lineSha256": "46a68890999e2add2b76100a20f81d0329348900b31e2ee48ef88c89db23113b"
             },
             {
-              "lineNumber": 37,
-              "sourceBlockNumber": 20,
+              "lineNumber": 28,
+              "sourceBlockNumber": 21,
               "sourceLineNumber": 1,
               "text": "Счет депо Клиента",
               "bbox": [
@@ -14877,11 +14644,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "3609ba55b63c6da52ecfdca1d07d53f91e1d3a16dfbc9106d0046377432a907a"
+              "lineSha256": "d4692761f3ab3e91e4b0136658de83719182e85ea915ce4c4a925cec8ffc05c7"
             },
             {
-              "lineNumber": 38,
-              "sourceBlockNumber": 21,
+              "lineNumber": 29,
+              "sourceBlockNumber": 22,
               "sourceLineNumber": 1,
               "text": "5. Реквизиты для перечисления Клиентами ДЕНЕЖНЫХ СРЕДСТВ для участия в торгах в рублях РФ",
               "bbox": [
@@ -14908,11 +14675,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "43786fc69679fd92278e62b9d6f11f3a57af53a1033bfcbd68d96233ed34cd71"
+              "lineSha256": "09257794119b500818e0e1da337b8eaa7a67cfcd12a78c73b01882795e1668bd"
             },
             {
-              "lineNumber": 39,
-              "sourceBlockNumber": 22,
+              "lineNumber": 30,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 1,
               "text": "Получатель",
               "bbox": [
@@ -14939,11 +14706,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "3db4100a4f41d86536b95cbced20a5bbda3a0ebee30cffb9b00e0f39cd5d75c8"
+              "lineSha256": "b3ef9e182a19054eed54736d8fff285b366bc7ef810509780a17f61046a0a2c4"
             },
             {
-              "lineNumber": 40,
-              "sourceBlockNumber": 22,
+              "lineNumber": 31,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 2,
               "text": "ООО «Инвестика»",
               "bbox": [
@@ -14970,11 +14737,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "0486374e18582f95c17cfe67c9ccc84162b0885b395f23bf31c7f96044dff5f6"
+              "lineSha256": "de3672017fa586951667a5b23a382ea38cbba59a3ffccb9417ad0e0c721d9fed"
             },
             {
-              "lineNumber": 41,
-              "sourceBlockNumber": 22,
+              "lineNumber": 32,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 3,
               "text": "ИНН",
               "bbox": [
@@ -15001,11 +14768,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "fe4a40ba18155f70e13f5196a572a3deab04fc7b9b913a34d5978e57c4eec164"
+              "lineSha256": "ff8fa34887f0476098233fa5e5765dc2797b68d323fbc2bfd74ac904af5d4de2"
             },
             {
-              "lineNumber": 42,
-              "sourceBlockNumber": 22,
+              "lineNumber": 33,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 4,
               "text": "7802953900",
               "bbox": [
@@ -15032,11 +14799,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "96092e3d7bc030792cfc8630b57ac15b9a563ad71531dfef06a714592dcad7ba"
+              "lineSha256": "6e6550b52b9558be273b12b01c9b7bb17de6fb88410afcf859ffc9e5677a0ae0"
             },
             {
-              "lineNumber": 43,
-              "sourceBlockNumber": 22,
+              "lineNumber": 34,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 5,
               "text": "Р/сч",
               "bbox": [
@@ -15063,11 +14830,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "6aaff95d02801d256acef082f54c671710051cda8eaa4755a9641ad969052ba9"
+              "lineSha256": "0b3a845a5de3bc9b3b0baf6af561a46de5761ab66dc71b07fca9d1d38ed7fa04"
             },
             {
-              "lineNumber": 44,
-              "sourceBlockNumber": 22,
+              "lineNumber": 35,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 6,
               "text": "40701810700000002900",
               "bbox": [
@@ -15094,11 +14861,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "09ee30d00d3761771cee4ea7d04d8dec9bec612ae956ea54ebb5ff9c7a6f7500"
+              "lineSha256": "b653fe845657657fc177595bc08c1167d1cad6260170ed4e31148bb8e62f7fe0"
             },
             {
-              "lineNumber": 45,
-              "sourceBlockNumber": 22,
+              "lineNumber": 36,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 7,
               "text": "Банк",
               "bbox": [
@@ -15125,11 +14892,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "894e0dcdc63d585898593305f959add66a22ce6ca755e655feaba48606f6d0ff"
+              "lineSha256": "fc8ddb41428742a05936da568fbf74ef1c3e5190a6f948ddc87a01beb56464c0"
             },
             {
-              "lineNumber": 46,
-              "sourceBlockNumber": 22,
+              "lineNumber": 37,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 8,
               "text": "АО \"Райффайзенбанк\"",
               "bbox": [
@@ -15156,11 +14923,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "a817fa1dd9526f3749ce3fdd1491e94156b0618513b6528ca4e4db305556bfff"
+              "lineSha256": "361b1a5f8c2ce5396bc814d1ee71834847a16ea3acc874d4c94c50aba184917c"
             },
             {
-              "lineNumber": 47,
-              "sourceBlockNumber": 22,
+              "lineNumber": 38,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 9,
               "text": "К/сч",
               "bbox": [
@@ -15187,11 +14954,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "7fa13e83a0580e20365f0a4ca6efa612fe62840e0f17fcf8da860dab9cc2a84c"
+              "lineSha256": "ef6cd44410dd78ea60ee9dc881a84abdc2f1e2368f4b4c65aa9e63890baabe95"
             },
             {
-              "lineNumber": 48,
-              "sourceBlockNumber": 22,
+              "lineNumber": 39,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 10,
               "text": "30101810200000000700",
               "bbox": [
@@ -15218,11 +14985,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "8afb8896d1e6c5dcd6066479625a4b38cfdd292d19b9b9a7cacc95d7fcc73070"
+              "lineSha256": "4c91bbf323bca1bbf9520f5d793f4f93fd5617dd9e2001af95adda64953ba30c"
             },
             {
-              "lineNumber": 49,
-              "sourceBlockNumber": 22,
+              "lineNumber": 40,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 11,
               "text": "БИК",
               "bbox": [
@@ -15249,11 +15016,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "25c696c230fda9a88b8d9208ea11b4cc85e7e5b1ea9bfc17dda5a8792a39ac0e"
+              "lineSha256": "6ee0e7634dd94b546d4abad57b977a070d718ee2fe10438f68f1dbf835d04f2d"
             },
             {
-              "lineNumber": 50,
-              "sourceBlockNumber": 22,
+              "lineNumber": 41,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 12,
               "text": "044525700",
               "bbox": [
@@ -15280,11 +15047,11 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "9b41f46d9f7760bc7d369c90665948bd137242526e72524b27229933da7ee7d0"
+              "lineSha256": "ce94eb0c464f55c92a47a086fbd7f07ebb97cf77b8a74d4207c36d23e17c7550"
             },
             {
-              "lineNumber": 51,
-              "sourceBlockNumber": 22,
+              "lineNumber": 42,
+              "sourceBlockNumber": 23,
               "sourceLineNumber": 13,
               "text": "Назначение платежа",
               "bbox": [
@@ -15311,7 +15078,7 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "fdc76a17c1fc7621318dd8baf0a42211e39dd9679cd5c9031fc6bd01fa4cfa4e"
+              "lineSha256": "4e839ecf13e150022fcbd523a8dbf92529236d3520645403dd121bac9eab7b49"
             }
           ]
         },
@@ -17430,7 +17197,7 @@
       "catalogStatus": "production",
       "packageId": null,
       "mapId": "account-opening-notice",
-      "currentFieldCount": 18
+      "currentFieldCount": 17
     },
     {
       "documentId": "anketa-fl-simplified-id",
@@ -141696,7 +141463,7 @@
       "templateFilename": "accession-application-fl.pdf",
       "documentRole": "dynamic-overlay",
       "pageCount": 3,
-      "fieldCount": 37,
+      "fieldCount": 42,
       "reviewed": "classification-and-source-inventory-complete",
       "layoutCategoriesFound": [
         "checkbox-or-static",
@@ -141721,7 +141488,7 @@
       "templateFilename": "accession-application-yul.pdf",
       "documentRole": "dynamic-overlay",
       "pageCount": 2,
-      "fieldCount": 36,
+      "fieldCount": 41,
       "reviewed": "classification-and-source-inventory-complete",
       "layoutCategoriesFound": [
         "checkbox-or-static",
@@ -141751,7 +141518,7 @@
       "templateFilename": "account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
       "pageCount": 2,
-      "fieldCount": 18,
+      "fieldCount": 17,
       "reviewed": "classification-and-source-inventory-complete",
       "layoutCategoriesFound": [
         "fixed-exact-token",
@@ -141759,7 +141526,6 @@
         "word-flow-paragraph"
       ],
       "wordFlowBlocksAdded": [
-        "account-opening-broker-introduction",
         "account-opening-payment-purpose-stock",
         "account-opening-payment-purpose-currency",
         "account-opening-payment-purpose-derivatives"
@@ -141770,7 +141536,7 @@
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
       "migrationResult": "identified Word-flow migrations complete; remaining fields retain their simpler reviewed categories",
       "migrationCompleted": true,
-      "visualQaStatus": "post-migration-visual-review-required; baseline-visual-qa-passed",
+      "visualQaStatus": "baseline-visual-qa-passed; post-migration-visual-review-required",
       "structuralQaStatus": "baseline structural QA passed"
     },
     {
@@ -142215,7 +141981,7 @@
       "documentId": "accession-application-fl",
       "templateFilename": "accession-application-fl.pdf",
       "expectedPages": 3,
-      "currentFieldCount": 37,
+      "currentFieldCount": 42,
       "wordFlowBlockIds": [
         "accession-application-fl-identity",
         "accession-application-fl-report-email"
@@ -142693,6 +142459,41 @@
           "page": 2,
           "type": "text",
           "identifierStatus": "baseline-preserved"
+        },
+        {
+          "fieldId": "brokerageContractNumber",
+          "source": "field.extra-contract-number",
+          "page": 3,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "brokerageContractDate",
+          "source": "field.extra-contract-date",
+          "page": 3,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "depositoryContractNumber",
+          "source": "extra.extra-depository-contract",
+          "page": 3,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "depositoryContractDate",
+          "source": "extra.extra-depository-contract-date",
+          "page": 3,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "internalClientCode",
+          "source": "field.client-code",
+          "page": 3,
+          "type": "text",
+          "identifierStatus": "additive-current"
         }
       ]
     },
@@ -142700,7 +142501,7 @@
       "documentId": "accession-application-yul",
       "templateFilename": "accession-application-yul.pdf",
       "expectedPages": 2,
-      "currentFieldCount": 36,
+      "currentFieldCount": 41,
       "wordFlowBlockIds": [
         "accession-application-yul-applicant",
         "accession-application-yul-report-email"
@@ -143126,6 +142927,41 @@
           "page": 2,
           "type": "text",
           "identifierStatus": "baseline-preserved"
+        },
+        {
+          "fieldId": "brokerageContractNumber",
+          "source": "field.extra-contract-number",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "brokerageContractDate",
+          "source": "field.extra-contract-date",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "depositoryContractNumber",
+          "source": "extra.extra-depository-contract",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "depositoryContractDate",
+          "source": "extra.extra-depository-contract-date",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "internalClientCode",
+          "source": "field.client-code",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
         }
       ]
     },
@@ -143133,9 +142969,8 @@
       "documentId": "account-opening-notice",
       "templateFilename": "account-opening-notice.pdf",
       "expectedPages": 2,
-      "currentFieldCount": 18,
+      "currentFieldCount": 17,
       "wordFlowBlockIds": [
-        "account-opening-broker-introduction",
         "account-opening-payment-purpose-stock",
         "account-opening-payment-purpose-currency",
         "account-opening-payment-purpose-derivatives"
@@ -143149,7 +142984,6 @@
           "bottomClearance": 2,
           "compaction": [],
           "anchors": [
-            "account-opening-broker-introduction",
             "clientName"
           ]
         },
@@ -143168,64 +143002,6 @@
         }
       },
       "wordFlowBlocks": [
-        {
-          "id": "account-opening-broker-introduction",
-          "type": "wordFlowBlock",
-          "page": 0,
-          "frame": {
-            "left": 41.4,
-            "baselineTop": 126.74,
-            "width": 523.58,
-            "initialLineCount": 4
-          },
-          "font": "legalSerif",
-          "fontSize": 11.04,
-          "minFontSize": 11.04,
-          "fontSizeLocked": true,
-          "lineHeight": 12.72,
-          "alignment": "justify",
-          "justifyMinRatio": 0.55,
-          "overflowStrategy": "expand-layout",
-          "expansion": {
-            "page": 0,
-            "insertionTop": 167.36,
-            "shiftFromTop": 167.36,
-            "rowHeight": 12.72,
-            "maxExtraRows": 1,
-            "lineStyle": "none",
-            "reviewStatus": "approved"
-          },
-          "sourceReplacement": {
-            "firstBlock": 24,
-            "lastBlock": 31,
-            "expectedBlockCount": 8,
-            "expectedPageBlockCount": 126,
-            "expectedSha256": "8cd5a73729ce0a18cea885681440b8acc2bc51c69c75a6c392111e6ddeb72749",
-            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
-            "reviewStatus": "approved"
-          },
-          "sourceStaticText": "Общество с ограниченной ответственностью \"Инвестика\", в лице ________, действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)",
-          "runs": [
-            {
-              "type": "static",
-              "text": "Общество с ограниченной ответственностью \"Инвестика\", в лице "
-            },
-            {
-              "type": "fieldRef",
-              "fieldId": "brokerRepresentative",
-              "decoration": {
-                "underline": true,
-                "minWidth": 398,
-                "thickness": 0.48,
-                "offset": 1.2
-              }
-            },
-            {
-              "type": "static",
-              "text": ", действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)"
-            }
-          ]
-        },
         {
           "id": "account-opening-payment-purpose-stock",
           "type": "wordFlowBlock",
@@ -143277,7 +143053,7 @@
             "expectedBlockCount": 1,
             "expectedPageBlockCount": 10,
             "expectedSha256": "8d508405d9190a64921835d973104e4b7ee9010a000e4e6952ced5dd7d725738",
-            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+            "expectedTemplateSha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
             "reviewStatus": "approved"
           },
           "sourcePlaceholders": [
@@ -143393,7 +143169,7 @@
             "expectedBlockCount": 1,
             "expectedPageBlockCount": 10,
             "expectedSha256": "0cc104761d1b66bdc93f286bd0a80cefac3a04e726ec61fb67ab80115dfae191",
-            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+            "expectedTemplateSha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
             "reviewStatus": "approved"
           },
           "sourcePlaceholders": [
@@ -143509,7 +143285,7 @@
             "expectedBlockCount": 1,
             "expectedPageBlockCount": 10,
             "expectedSha256": "81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd",
-            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+            "expectedTemplateSha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
             "reviewStatus": "approved"
           },
           "sourcePlaceholders": [
@@ -143579,13 +143355,6 @@
         {
           "fieldId": "formationDate",
           "source": "field.documentDateRu",
-          "page": 1,
-          "type": "text",
-          "identifierStatus": "baseline-preserved"
-        },
-        {
-          "fieldId": "brokerRepresentative",
-          "source": "extra.extra-authorized-signer",
           "page": 1,
           "type": "text",
           "identifierStatus": "baseline-preserved"
@@ -150829,7 +150598,7 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
@@ -150880,7 +150649,7 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
@@ -150931,7 +150700,7 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
@@ -150972,7 +150741,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multi-region-field-overlay"
+        "fixed-field-overlay"
       ],
       "targetRenderingModel": "fixed-inline-overlay",
       "intendedLayoutCategory": "fixed-inline-overlay",
@@ -150982,16 +150751,16 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
       ],
       "alignment": [
-        "center"
+        "left"
       ],
       "underlineBorderStyle": [
-        "source-rule-plus-generated-continuation-rule"
+        "source-pdf-underlay-rule-or-border"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -151052,6 +150821,261 @@
       "visualReviewStatus": "source-page-inventoried",
       "structuralQaStatus": "source-sha256-baseline-locked",
       "sectionKind": "source-static-page"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-brokerageContractDate",
+      "fieldIds": [
+        "brokerageContractDate"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-date"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-brokerageContractNumber",
+      "fieldIds": [
+        "brokerageContractNumber"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-number"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-depositoryContractDate",
+      "fieldIds": [
+        "depositoryContractDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract-date"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-depositoryContractNumber",
+      "fieldIds": [
+        "depositoryContractNumber"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-internalClientCode",
+      "fieldIds": [
+        "internalClientCode"
+      ],
+      "sourcePaths": [
+        "field.client-code"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
     },
     {
       "documentId": "accession-application-yul",
@@ -152445,6 +152469,108 @@
       "title": "Заявление о присоединении (ЮЛ)",
       "templateFilename": "accession-application-yul.pdf",
       "page": 2,
+      "sectionId": "accession-application-yul-p2-brokerageContractDate",
+      "fieldIds": [
+        "brokerageContractDate"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-date"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
+      "sectionId": "accession-application-yul-p2-brokerageContractNumber",
+      "fieldIds": [
+        "brokerageContractNumber"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-number"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
       "sectionId": "accession-application-yul-p2-clientEmail",
       "fieldIds": [
         "clientEmail"
@@ -152547,6 +152673,159 @@
       "title": "Заявление о присоединении (ЮЛ)",
       "templateFilename": "accession-application-yul.pdf",
       "page": 2,
+      "sectionId": "accession-application-yul-p2-depositoryContractDate",
+      "fieldIds": [
+        "depositoryContractDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract-date"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
+      "sectionId": "accession-application-yul-p2-depositoryContractNumber",
+      "fieldIds": [
+        "depositoryContractNumber"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
+      "sectionId": "accession-application-yul-p2-internalClientCode",
+      "fieldIds": [
+        "internalClientCode"
+      ],
+      "sourcePaths": [
+        "field.client-code"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "fixed-field-overlay"
+      ],
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "classificationSource": "one production field per source form section",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        9
+      ],
+      "lineHeightPt": [
+        null
+      ],
+      "alignment": [
+        "center"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
       "sectionId": "accession-application-yul-p2-signDay",
       "fieldIds": [
         "signDay"
@@ -152566,7 +152845,7 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
@@ -152617,7 +152896,7 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
@@ -152668,7 +152947,7 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
@@ -152719,13 +152998,13 @@
         "Liberation Serif"
       ],
       "fontSizePt": [
-        12
+        9
       ],
       "lineHeightPt": [
         null
       ],
       "alignment": [
-        "center"
+        "left"
       ],
       "underlineBorderStyle": [
         "source-pdf-underlay-rule-or-border"
@@ -152761,8 +153040,8 @@
       "targetRenderingModel": "byte-invariant-source-pdf-static-underlay",
       "intendedLayoutCategory": "preserved-source-static",
       "staticTextInvolved": {
-        "lineCount": 51,
-        "lineTextSha256": "0c248c44a8cb73f9f962726f86b30f6d1fd69c60d9613b54f364adaef4bf2212"
+        "lineCount": 42,
+        "lineTextSha256": "e986e9cdadcd33d82c55629a3476905b41fb24c1e1d8655c3214f6914c21c0e5"
       },
       "fontFamily": [
         "TimesNewRomanPS-BoldMT",
@@ -152788,57 +153067,6 @@
       "visualReviewStatus": "source-page-inventoried",
       "structuralQaStatus": "source-sha256-baseline-locked",
       "sectionKind": "source-static-page"
-    },
-    {
-      "documentId": "account-opening-notice",
-      "title": "Уведомление об открытии брокерского-депозитарного счета",
-      "templateFilename": "account-opening-notice.pdf",
-      "page": 1,
-      "sectionId": "account-opening-broker-introduction",
-      "fieldIds": [
-        "brokerRepresentative"
-      ],
-      "sourcePaths": [
-        "extra.extra-authorized-signer"
-      ],
-      "existingVariableNamesPreserved": true,
-      "currentRenderingModel": [
-        "word-flow-block-run"
-      ],
-      "targetRenderingModel": "word-flow-paragraph",
-      "intendedLayoutCategory": "word-flow-paragraph",
-      "classificationSource": "executable wordFlowBlocks",
-      "staticTextInvolved": "Общество с ограниченной ответственностью \"Инвестика\", в лице ________, действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)",
-      "fontFamily": [
-        "Liberation Serif"
-      ],
-      "fontSizePt": [
-        11.04
-      ],
-      "lineHeightPt": [
-        12.72
-      ],
-      "alignment": [
-        "justify"
-      ],
-      "underlineBorderStyle": [
-        "word-flow-underline"
-      ],
-      "normalFixtureResult": "pass",
-      "realisticLongFixtureResult": "pass",
-      "currentVisualDefect": [
-        "none in audited ordinary or realistic-long fixture classes"
-      ],
-      "requiredMigration": [
-        "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path."
-      ],
-      "migrationCompleted": true,
-      "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": [
-        "post-migration-visual-review-required"
-      ],
-      "structuralQaStatus": "baseline-structural-qa-passed",
-      "sectionKind": "semantic-field-section"
     },
     {
       "documentId": "account-opening-notice",
@@ -184358,7 +184586,7 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
@@ -184376,12 +184604,13 @@
         "id": "signDay",
         "source": "field.documentDateRu",
         "format": "dateDay",
+        "typographyGroup": "accession-fl-source-date",
         "page": 1,
         "left": 309.8,
         "baselineTop": 732.82,
         "width": 21.3,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center"
       }
@@ -184413,7 +184642,7 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
@@ -184431,12 +184660,13 @@
         "id": "signMonth",
         "source": "field.documentDateRu",
         "format": "monthOnly",
+        "typographyGroup": "accession-fl-source-date",
         "page": 1,
         "left": 334.5,
         "baselineTop": 732.82,
         "width": 42.5,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center"
       }
@@ -184468,7 +184698,7 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
@@ -184486,12 +184716,13 @@
         "id": "signYear",
         "source": "field.documentDateRu",
         "format": "dateYear2",
+        "typographyGroup": "accession-fl-source-date",
         "page": 1,
         "left": 391,
         "baselineTop": 732.82,
         "width": 17,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center"
       }
@@ -184515,21 +184746,19 @@
         "fieldId": "signatureName",
         "source": "field.clientFullName",
         "format": "initials",
-        "fallbacks": [
-          "surname"
-        ]
+        "fallbacks": []
       },
-      "currentRenderingModel": "multi-region-field-overlay",
+      "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "fixed-inline-overlay",
       "intendedLayoutCategory": "fixed-inline-overlay",
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
-      "alignment": "center",
-      "underlineBorderStyle": "source-rule-plus-generated-continuation-rule",
+      "alignment": "left",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -184544,41 +184773,307 @@
         "label": "Расшифровка подписи",
         "source": "field.clientFullName",
         "format": "initials",
-        "fallbacks": [
-          "surname"
-        ],
         "page": 1,
-        "left": 400.3,
+        "left": 400.31,
         "baselineTop": 752.38,
-        "width": 46.7,
+        "width": 138.37,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "left",
+        "maxLines": 1
+      }
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-brokerageContractDate",
+      "fieldId": "brokerageContractDate",
+      "fieldIds": [
+        "brokerageContractDate"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-date"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "brokerageContractDate",
+        "source": "field.extra-contract-date",
+        "format": "dateRu",
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "brokerageContractDate",
+        "label": "Дата договора на брокерское обслуживание",
+        "source": "field.extra-contract-date",
+        "optional": true,
+        "typographyGroup": "accession-fl-internal-table",
+        "page": 2,
+        "left": 410.44,
+        "baselineTop": 110.78,
+        "width": 128,
+        "font": "legalSerif",
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
-        "overflowStrategy": "flow",
-        "flowRegions": [
-          {
-            "page": 1,
-            "left": 400.3,
-            "baselineTop": 752.38,
-            "width": 46.7,
-            "maxLines": 1
-          },
-          {
-            "page": 1,
-            "left": 400.3,
-            "baselineTop": 778,
-            "width": 46.7,
-            "maxLines": 1,
-            "align": "center",
-            "maxFontSize": 9.5,
-            "generated": true,
-            "reviewStatus": "approved",
-            "drawUnderline": true,
-            "underlineThickness": 0.36,
-            "underlineOffset": 1.6
-          }
-        ]
+        "maxLines": 1,
+        "format": "dateRu"
+      }
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-brokerageContractNumber",
+      "fieldId": "brokerageContractNumber",
+      "fieldIds": [
+        "brokerageContractNumber"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-number"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "brokerageContractNumber",
+        "source": "field.extra-contract-number",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "brokerageContractNumber",
+        "label": "Номер договора на брокерское обслуживание",
+        "source": "field.extra-contract-number",
+        "optional": true,
+        "typographyGroup": "accession-fl-internal-table",
+        "page": 2,
+        "left": 274.64,
+        "baselineTop": 110.78,
+        "width": 128,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1
+      }
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-depositoryContractDate",
+      "fieldId": "depositoryContractDate",
+      "fieldIds": [
+        "depositoryContractDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract-date"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "depositoryContractDate",
+        "source": "extra.extra-depository-contract-date",
+        "format": "dateRu",
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "depositoryContractDate",
+        "label": "Дата депозитарного договора",
+        "source": "extra.extra-depository-contract-date",
+        "optional": true,
+        "typographyGroup": "accession-fl-internal-table",
+        "page": 2,
+        "left": 410.44,
+        "baselineTop": 132.02,
+        "width": 128,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1,
+        "format": "dateRu"
+      }
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-depositoryContractNumber",
+      "fieldId": "depositoryContractNumber",
+      "fieldIds": [
+        "depositoryContractNumber"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "depositoryContractNumber",
+        "source": "extra.extra-depository-contract",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "depositoryContractNumber",
+        "label": "Номер депозитарного договора",
+        "source": "extra.extra-depository-contract",
+        "optional": true,
+        "typographyGroup": "accession-fl-internal-table",
+        "page": 2,
+        "left": 274.64,
+        "baselineTop": 132.02,
+        "width": 128,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1
+      }
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 3,
+      "sectionId": "accession-application-fl-p3-internalClientCode",
+      "fieldId": "internalClientCode",
+      "fieldIds": [
+        "internalClientCode"
+      ],
+      "sourcePaths": [
+        "field.client-code"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "internalClientCode",
+        "source": "field.client-code",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 3",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "internalClientCode",
+        "label": "Код клиента в системе внутреннего учета",
+        "source": "field.client-code",
+        "optional": true,
+        "typographyGroup": "accession-fl-internal-table",
+        "page": 2,
+        "left": 274.91,
+        "baselineTop": 156.02,
+        "width": 265,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1
       }
     },
     {
@@ -186288,6 +186783,123 @@
       "title": "Заявление о присоединении (ЮЛ)",
       "templateFilename": "accession-application-yul.pdf",
       "page": 2,
+      "sectionId": "accession-application-yul-p2-brokerageContractDate",
+      "fieldId": "brokerageContractDate",
+      "fieldIds": [
+        "brokerageContractDate"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-date"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "brokerageContractDate",
+        "source": "field.extra-contract-date",
+        "format": "dateRu",
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "brokerageContractDate",
+        "label": "Дата договора на брокерское обслуживание",
+        "source": "field.extra-contract-date",
+        "optional": true,
+        "typographyGroup": "accession-yul-internal-table",
+        "page": 1,
+        "left": 405.44,
+        "baselineTop": 630.46,
+        "width": 126,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1,
+        "format": "dateRu"
+      }
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
+      "sectionId": "accession-application-yul-p2-brokerageContractNumber",
+      "fieldId": "brokerageContractNumber",
+      "fieldIds": [
+        "brokerageContractNumber"
+      ],
+      "sourcePaths": [
+        "field.extra-contract-number"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "brokerageContractNumber",
+        "source": "field.extra-contract-number",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "brokerageContractNumber",
+        "label": "Номер договора на брокерское обслуживание",
+        "source": "field.extra-contract-number",
+        "optional": true,
+        "typographyGroup": "accession-yul-internal-table",
+        "page": 1,
+        "left": 271.56,
+        "baselineTop": 630.46,
+        "width": 126,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1
+      }
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
       "sectionId": "accession-application-yul-p2-clientEmail",
       "fieldId": "clientEmail",
       "fieldIds": [
@@ -186398,6 +187010,181 @@
       "title": "Заявление о присоединении (ЮЛ)",
       "templateFilename": "accession-application-yul.pdf",
       "page": 2,
+      "sectionId": "accession-application-yul-p2-depositoryContractDate",
+      "fieldId": "depositoryContractDate",
+      "fieldIds": [
+        "depositoryContractDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract-date"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "depositoryContractDate",
+        "source": "extra.extra-depository-contract-date",
+        "format": "dateRu",
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "depositoryContractDate",
+        "label": "Дата депозитарного договора",
+        "source": "extra.extra-depository-contract-date",
+        "optional": true,
+        "typographyGroup": "accession-yul-internal-table",
+        "page": 1,
+        "left": 405.44,
+        "baselineTop": 651.7,
+        "width": 126,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1,
+        "format": "dateRu"
+      }
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
+      "sectionId": "accession-application-yul-p2-depositoryContractNumber",
+      "fieldId": "depositoryContractNumber",
+      "fieldIds": [
+        "depositoryContractNumber"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "depositoryContractNumber",
+        "source": "extra.extra-depository-contract",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "depositoryContractNumber",
+        "label": "Номер депозитарного договора",
+        "source": "extra.extra-depository-contract",
+        "optional": true,
+        "typographyGroup": "accession-yul-internal-table",
+        "page": 1,
+        "left": 271.56,
+        "baselineTop": 651.7,
+        "width": 126,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1
+      }
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
+      "sectionId": "accession-application-yul-p2-internalClientCode",
+      "fieldId": "internalClientCode",
+      "fieldIds": [
+        "internalClientCode"
+      ],
+      "sourcePaths": [
+        "field.client-code"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "internalClientCode",
+        "source": "field.client-code",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "fixed-field-overlay",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "source PDF underlay on page 2",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 9,
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
+      "alignment": "center",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "baseline-visual-qa-passed",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "internalClientCode",
+        "label": "Код клиента в системе внутреннего учета",
+        "source": "field.client-code",
+        "optional": true,
+        "typographyGroup": "accession-yul-internal-table",
+        "page": 1,
+        "left": 271.87,
+        "baselineTop": 675.7,
+        "width": 261,
+        "font": "legalSerif",
+        "fontSize": 9,
+        "minFontSize": 9,
+        "align": "center",
+        "maxLines": 1
+      }
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 2,
       "sectionId": "accession-application-yul-p2-signDay",
       "fieldId": "signDay",
       "fieldIds": [
@@ -186420,7 +187207,7 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
@@ -186438,12 +187225,13 @@
         "id": "signDay",
         "source": "field.documentDateRu",
         "format": "dateDay",
+        "typographyGroup": "accession-yul-source-date",
         "page": 1,
         "left": 60.1,
         "baselineTop": 496.39,
         "width": 21.3,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
         "required": true
@@ -186476,7 +187264,7 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
@@ -186494,12 +187282,13 @@
         "id": "signMonth",
         "source": "field.documentDateRu",
         "format": "monthOnly",
+        "typographyGroup": "accession-yul-source-date",
         "page": 1,
         "left": 84.8,
         "baselineTop": 496.39,
         "width": 42.5,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
         "required": true
@@ -186532,7 +187321,7 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
@@ -186550,12 +187339,13 @@
         "id": "signYear",
         "source": "field.documentDateRu",
         "format": "dateYear2",
+        "typographyGroup": "accession-yul-source-date",
         "page": 1,
         "left": 141.4,
         "baselineTop": 496.39,
         "width": 17,
         "font": "legalSerif",
-        "fontSize": 12,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
         "required": true
@@ -186580,9 +187370,7 @@
         "fieldId": "signatureName",
         "source": "field.representativeFullName",
         "format": "initials",
-        "fallbacks": [
-          "surname"
-        ]
+        "fallbacks": []
       },
       "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "fixed-inline-overlay",
@@ -186590,10 +187378,10 @@
       "staticTextInvolved": "source PDF underlay on page 2",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 12,
+      "fontSizePt": 9,
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
-      "alignment": "center",
+      "alignment": "left",
       "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
@@ -186606,79 +187394,19 @@
       "rawFieldType": "text",
       "currentFieldDefinition": {
         "id": "signatureName",
+        "label": "Расшифровка подписи",
         "source": "field.representativeFullName",
         "format": "initials",
-        "fallbacks": [
-          "surname"
-        ],
         "page": 1,
-        "left": 393.1,
+        "left": 393.09,
         "baselineTop": 535.51,
-        "width": 46.7,
+        "width": 145.59,
         "font": "legalSerif",
-        "fontSize": 12,
-        "minFontSize": 9,
-        "align": "center",
-        "required": true
-      }
-    },
-    {
-      "documentId": "account-opening-notice",
-      "title": "Уведомление об открытии брокерского-депозитарного счета",
-      "templateFilename": "account-opening-notice.pdf",
-      "page": 1,
-      "sectionId": "account-opening-broker-introduction",
-      "fieldId": "brokerRepresentative",
-      "fieldIds": [
-        "brokerRepresentative"
-      ],
-      "sourcePaths": [
-        "extra.extra-authorized-signer"
-      ],
-      "existingVariableNamesPreserved": {
-        "status": true,
-        "identifierStatus": "baseline-preserved",
-        "fieldId": "brokerRepresentative",
-        "source": "extra.extra-authorized-signer",
-        "format": null,
-        "fallbacks": []
-      },
-      "currentRenderingModel": "word-flow-block-run",
-      "targetRenderingModel": "word-flow-paragraph",
-      "intendedLayoutCategory": "word-flow-paragraph",
-      "staticTextInvolved": "Общество с ограниченной ответственностью \"Инвестика\", в лице ________, действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)",
-      "fontFamily": "Liberation Serif",
-      "fontKey": "legalSerif",
-      "fontSizePt": 11.04,
-      "lineHeightPt": 12.72,
-      "lineHeightModel": "explicit",
-      "alignment": "justify",
-      "underlineBorderStyle": "word-flow-underline",
-      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
-      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
-      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path.",
-      "migrationCompleted": true,
-      "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": "post-migration-visual-review-required",
-      "structuralQaStatus": "baseline-structural-qa-passed",
-      "rawFieldType": "text",
-      "currentFieldDefinition": {
-        "id": "brokerRepresentative",
-        "source": "extra.extra-authorized-signer",
-        "page": 0,
-        "left": 43,
-        "baselineTop": 139.46,
-        "width": 398,
-        "font": "legalSerif",
-        "fontSize": 11.5,
+        "fontSize": 9,
         "minFontSize": 9,
         "align": "left",
-        "required": true,
-        "optional": false,
-        "multiline": false,
-        "layoutMode": "flow-reference",
-        "flowBlockId": "account-opening-broker-introduction"
+        "maxLines": 1,
+        "required": true
       }
     },
     {

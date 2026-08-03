@@ -1,4 +1,4 @@
-"""Gate: the three accession blocks manual review rejected cannot come back.
+"""Gate: the blocks manual review rejected cannot come back.
 
     python static-uikit/tools/qa/check_accession_blocks.py
     python static-uikit/tools/qa/check_accession_blocks.py --self-test
@@ -85,6 +85,32 @@ FORMS = {
         },
         "columns": [(268.73, 400.39), (400.87, 536.01), (268.73, 536.01)],
     },
+}
+
+# The account-opening notice: what the replaced template must and must not say.
+# Taken verbatim from the supplied PDF, including its straight quotes, its
+# doubled spaces around «в лице», and its spelling of the patronymic.
+ACCOUNT_OPENING = {
+    "pdf": "account-opening-notice.pdf",
+    "sha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
+    "mapId": "account-opening-notice",
+    "required": [
+        'Общество с ограниченной ответственностью "Инвестика",  в  лице '
+        'Генерального Директора Козырева',
+        'действующего на основании Устава, настоящим извещает Клиента',
+    ],
+    # Checked against the whole document.
+    "forbidden": [
+        "Тестовое значение",       # a printed sample nobody replaced
+        "Доверенности №",          # the superseded representative wording
+    ],
+    # Checked against the introduction paragraph only. The rest of the form is
+    # full of legitimate blanks — the signature rules on page 2 among them.
+    "forbiddenInIntro": ["____"],
+    # A field mapped into the introduction paragraph would print the
+    # representative a second time, over wording the template already prints.
+    "introBand": (120.0, 170.0),
+    "introPage": 0,
 }
 
 READABILITY_FLOOR = 9.0
@@ -242,6 +268,77 @@ def check_pdf_unchanged(spec: dict) -> list[str]:
     return []
 
 
+def check_account_opening(maps: dict) -> tuple[int, list[str]]:
+    """The replaced template still says exactly what it was replaced to say."""
+    failures: list[str] = []
+    checks = 0
+    spec = ACCOUNT_OPENING
+    path = os.path.join(PDF_DIR, spec["pdf"])
+
+    checks += 1
+    with open(path, "rb") as fh:
+        import hashlib
+        digest = hashlib.sha256(fh.read()).hexdigest()
+    if digest != spec["sha256"]:
+        failures.append(
+            f"{spec['pdf']}: sha256 {digest} != the reviewed replacement "
+            f"{spec['sha256']}")
+
+    doc = fitz.open(path)
+    text = " ".join(" ".join(page.get_text().split()) for page in doc)
+    doc.close()
+
+    for phrase in spec["required"]:
+        checks += 1
+        count = text.count(" ".join(phrase.split()))
+        if count != 1:
+            failures.append(
+                f"{spec['pdf']}: expected exactly one {phrase[:48]!r}, found {count}")
+    for phrase in spec["forbidden"]:
+        checks += 1
+        if phrase in text:
+            failures.append(f"{spec['pdf']}: still contains {phrase!r}")
+
+    intro_start = text.find("Общество с ограниченной")
+    intro_end = text.find("1. Информация о клиенте")
+    checks += 1
+    if intro_start == -1 or intro_end == -1 or intro_end <= intro_start:
+        failures.append(f"{spec['pdf']}: introduction paragraph not found")
+    else:
+        intro = text[intro_start:intro_end]
+        for phrase in spec["forbiddenInIntro"]:
+            checks += 1
+            if phrase in intro:
+                failures.append(
+                    f"{spec['pdf']}: the introduction still has a blank "
+                    f"({phrase!r}) — the representative must be printed, not filled")
+
+    template = maps.get(spec["mapId"]) or {}
+    top, bottom = spec["introBand"]
+    for field in template.get("fields", []):
+        for region in regions_of(field):
+            if region.get("page") != spec["introPage"]:
+                continue
+            base = region.get("baselineTop")
+            checks += 1
+            if base is not None and top <= base <= bottom:
+                failures.append(
+                    f"{spec['mapId']}/{field['id']}: baseline {base} is inside "
+                    "the introduction the template now prints itself — it would "
+                    "print the representative twice")
+    for block in template.get("wordFlowBlocks", []) or []:
+        if block.get("page") != spec["introPage"]:
+            continue
+        frame = block.get("frame") or {}
+        base = frame.get("baselineTop")
+        checks += 1
+        if base is not None and top <= base <= bottom:
+            failures.append(
+                f"{spec['mapId']}/{block.get('id')}: a Word-flow block still "
+                "replaces the introduction paragraph")
+    return checks, failures
+
+
 def run(maps: dict) -> tuple[int, list[str]]:
     failures: list[str] = []
     checks = 0
@@ -256,6 +353,10 @@ def run(maps: dict) -> tuple[int, list[str]]:
         # Every assertion above is one check; count them so the summary is real.
         checks += 4 + len(spec["required"]) + len(spec["dateFields"])
         failures.extend(result)
+
+    extra_checks, extra_failures = check_account_opening(maps)
+    checks += extra_checks
+    failures.extend(extra_failures)
     return checks, failures
 
 
@@ -327,8 +428,9 @@ def main() -> int:
     checks, failures = run(maps)
     for failure in failures:
         print(f"  FAIL {failure}")
-    print(f"Accession blocks: {checks - len(failures)}/{checks} checks passed "
-          f"({len(FORMS)} forms: transcript, source date, internal page)")
+    print(f"Manual-review blocks: {checks - len(failures)}/{checks} checks "
+          f"passed ({len(FORMS)} accession forms: transcript, source date, "
+          "internal page; plus the replaced account-opening notice)")
     return 1 if failures else 0
 
 

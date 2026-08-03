@@ -1657,13 +1657,10 @@
           type: 'date',
           required: true
         },
-        {
-          key: 'extra-authorized-signer',
-          label: 'Уполномоченное лицо ООО «Инвестика» (в лице …)',
-          type: 'text',
-          required: true,
-          placeholder: 'ФИО в родительном падеже'
-        },
+        // «Уполномоченное лицо ООО «Инвестика»» was asked for here while the
+        // template left a blank for it. The updated authoritative template
+        // prints the representative itself, so asking would put a value on
+        // screen that the document no longer has anywhere to print.
         {
           key: 'extra-brokerage-contract',
           label: 'Номер договора на брокерское обслуживание',

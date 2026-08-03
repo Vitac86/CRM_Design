@@ -3,10 +3,10 @@
   "generatedBy": "static-uikit/tools/qa/check_identifier_manifest.py --write",
   "counts": {
     "maps": 18,
-    "fields": 621,
+    "fields": 634,
     "registryDocuments": 22,
     "overlayBindings": 18,
-    "wizardKeys": 297,
+    "wizardKeys": 304,
     "checkKeys": 59,
     "formatterNames": 13
   },
@@ -29,6 +29,14 @@
         {
           "id": "agreementQuik",
           "source": "check.agreement-quik"
+        },
+        {
+          "id": "brokerageContractDate",
+          "source": "field.extra-contract-date"
+        },
+        {
+          "id": "brokerageContractNumber",
+          "source": "field.extra-contract-number"
         },
         {
           "id": "clientEmail",
@@ -57,6 +65,18 @@
         {
           "id": "depoTrustee",
           "source": "extra.depo-account-type"
+        },
+        {
+          "id": "depositoryContractDate",
+          "source": "extra.extra-depository-contract-date"
+        },
+        {
+          "id": "depositoryContractNumber",
+          "source": "extra.extra-depository-contract"
+        },
+        {
+          "id": "internalClientCode",
+          "source": "field.client-code"
         },
         {
           "id": "marketCurrency",
@@ -184,12 +204,24 @@
           "source": "check.agreement-quik"
         },
         {
+          "id": "brokerageContractDate",
+          "source": "field.extra-contract-date"
+        },
+        {
+          "id": "brokerageContractNumber",
+          "source": "field.extra-contract-number"
+        },
+        {
           "id": "clientEmail",
           "source": "subject.email"
         },
         {
           "id": "clientPhone",
           "source": "subject.phone"
+        },
+        {
+          "id": "companyForeignName",
+          "source": "field.client-english-name"
         },
         {
           "id": "companyFullLegalName",
@@ -218,6 +250,18 @@
         {
           "id": "depoTrustee",
           "source": "extra.depo-account-type"
+        },
+        {
+          "id": "depositoryContractDate",
+          "source": "extra.extra-depository-contract-date"
+        },
+        {
+          "id": "depositoryContractNumber",
+          "source": "extra.extra-depository-contract"
+        },
+        {
+          "id": "internalClientCode",
+          "source": "field.client-code"
         },
         {
           "id": "marketCurrency",
@@ -313,10 +357,6 @@
       "id": "account-opening-notice",
       "fields": [
         {
-          "id": "brokerRepresentative",
-          "source": "extra.extra-authorized-signer"
-        },
-        {
           "id": "brokerageContractDate",
           "source": "extra.extra-brokerage-contract-date"
         },
@@ -359,6 +399,14 @@
         {
           "id": "formationDate",
           "source": "field.documentDateRu"
+        },
+        {
+          "id": "paymentPurposeAgreementDate",
+          "source": "extra.extra-brokerage-contract-date"
+        },
+        {
+          "id": "paymentPurposeClientCode",
+          "source": "field.client-code"
         },
         {
           "id": "paymentPurposeCurrency",
@@ -2170,6 +2218,10 @@
           "source": "extra.extra-attorney-citizenship"
         },
         {
+          "id": "ulAttorneyIssueDate",
+          "source": "extra.extra-attorney-issue-date"
+        },
+        {
           "id": "ulAttorneyIssuedBy",
           "source": "extra.extra-attorney-issued-by"
         },
@@ -2693,6 +2745,26 @@
     {
       "documentId": "accession-application-fl",
       "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "extra-depository-contract"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
+      "key": "extra-depository-contract-date"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "group": "fields",
       "key": "extra-document-date"
     },
     {
@@ -2733,6 +2805,26 @@
     {
       "documentId": "accession-application-yul",
       "group": "fields",
+      "key": "extra-contract-date"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "extra-contract-number"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "extra-depository-contract"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
+      "key": "extra-depository-contract-date"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "group": "fields",
       "key": "extra-document-date"
     },
     {
@@ -2769,11 +2861,6 @@
       "documentId": "accession-application-yul",
       "group": "fields",
       "key": "trading-depo-account-type"
-    },
-    {
-      "documentId": "account-opening-notice",
-      "group": "fields",
-      "key": "extra-authorized-signer"
     },
     {
       "documentId": "account-opening-notice",

@@ -43,7 +43,10 @@ AUDIT_MD = REPO_ROOT / "docs" / "document-full-template-audit.md"
 IDENTIFIER_MANIFEST = QA_DIR / "document-identifier-manifest.json"
 
 EXPECTED_MAPS = 18
-EXPECTED_BASELINE_FIELDS = 621
+# 621 before the updated account-opening notice made its introduction
+# paragraph static: the overlay that filled the representative blank has
+# nothing left to draw, so `brokerRepresentative` is gone with it.
+EXPECTED_BASELINE_FIELDS = 620
 EXPECTED_PDFS = 22
 EXPECTED_PAGES = 77
 
@@ -231,12 +234,10 @@ TARGET_SECTIONS: tuple[dict[str, Any], ...] = (
             "representativeAuthority",
         ),
     },
-    {
-        "documentId": "account-opening-notice",
-        "sectionId": "account-opening-notice-intro",
-        "category": "word-flow-paragraph",
-        "fieldIds": ("brokerRepresentative",),
-    },
+    # The account-opening notice had an "intro" section here, replacing the
+    # paragraph that left a blank for the Investika representative. The updated
+    # authoritative template prints that sentence itself, so there is no
+    # reviewed replacement and no field: the section is gone rather than empty.
     {
         "documentId": "client-notifications",
         "sectionId": "client-notifications-client-identity",
@@ -320,7 +321,8 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("regulation-full-refusal-notice", "clientName"),
     ("regulation-partial-refusal-notice", "clientName"),
 }
-EXPECTED_WORD_FLOW_EXPANSION_ANCHORS = 18
+# 18 before the same replacement removed the introduction block.
+EXPECTED_WORD_FLOW_EXPANSION_ANCHORS = 17
 
 # Reviewed paragraphs that grow inside a bordered table, and are therefore the
 # only Word-flow anchors allowed to draw a table row when they take an extra
@@ -1825,8 +1827,17 @@ def build_snapshot(
 
 
 def validate_byte_baseline(
-    committed: dict[str, Any], current: dict[str, Any]
+    committed: dict[str, Any],
+    current: dict[str, Any],
+    authorised: frozenset[str] = frozenset(),
 ) -> list[str]:
+    """Refuse any source PDF whose bytes moved.
+
+    `authorised` names the templates an operator has explicitly said were
+    replaced on purpose, via --replace-source-pdf. Everything else still fails:
+    a template that changes without somebody naming it is the failure this
+    baseline exists to catch.
+    """
     errors: list[str] = []
     before = {row["templateFilename"]: row for row in committed.get("documents") or []}
     after = {row["templateFilename"]: row for row in current.get("documents") or []}
@@ -1838,6 +1849,8 @@ def validate_byte_baseline(
         elif actual is None:
             errors.append(f"PDF removed from committed byte baseline: {filename}")
         else:
+            if filename in authorised:
+                continue
             for key in ("sha256", "byteLength", "pageCount"):
                 if expected.get(key) != actual.get(key):
                     errors.append(
@@ -1848,14 +1861,26 @@ def validate_byte_baseline(
 
 
 def validate_committed_identifiers(
-    committed: dict[str, Any], current: dict[str, Any]
+    committed: dict[str, Any],
+    current: dict[str, Any],
+    authorised_templates: frozenset[str] = frozenset(),
 ) -> list[str]:
-    """Protect additive identifiers too once they enter the committed matrix."""
+    """Protect additive identifiers too once they enter the committed matrix.
+
+    A template the business replaced may legitimately lose a field: the updated
+    account-opening notice prints its representative itself, so the overlay that
+    used to fill that blank has nothing left to draw. Identifiers belonging to a
+    template named in --replace-source-pdf are therefore allowed to disappear;
+    every other identifier stays frozen.
+    """
     errors: list[str] = []
+    replaced_docs = {name[:-4] for name in authorised_templates
+                     if name.lower().endswith(".pdf")}
     expected = {
         (map_row["documentId"], field["fieldId"]): field.get("source")
         for map_row in committed.get("mapInventory") or []
         for field in map_row.get("fields") or []
+        if map_row["documentId"] not in replaced_docs
     }
     actual = {
         (map_row["documentId"], field["fieldId"]): field.get("source")
@@ -2248,21 +2273,62 @@ def main() -> int:
         help="refresh the matrix after additive map changes (never resets PDF/identifier baselines)",
     )
     parser.add_argument(
+        "--replace-source-pdf", action="append", default=[], metavar="FILENAME",
+        help=(
+            "name a source PDF the business has supplied a replacement for. "
+            "Only with --write, and only for the templates named: every other "
+            "PDF, and every identifier, stays protected."
+        ),
+    )
+    parser.add_argument(
         "--self-test", action="store_true",
         help="exercise missing/duplicate/page/template/hash failures with in-memory mutations",
     )
     args = parser.parse_args()
+
+    authorised = frozenset(args.replace_source_pdf)
+    if authorised and not args.write:
+        print("--replace-source-pdf only makes sense with --write")
+        return 2
+    unknown = sorted(name for name in authorised
+                     if not (TEMPLATE_DIR / name).exists())
+    if unknown:
+        print("no such template: " + ", ".join(unknown))
+        return 2
 
     committed = None
     if AUDIT_JSON.exists():
         committed = json.loads(AUDIT_JSON.read_text(encoding="utf-8"))
     floor = compatibility_floor(committed)
     runtime = load_runtime()
+
+    # A template the business replaced may legitimately lose a field. Re-cut
+    # that one document's compatibility floor to what the map really exposes
+    # now; every other document's floor is untouched, so this cannot be used to
+    # quietly drop an identifier from a template nobody replaced.
+    if authorised:
+        replaced_docs = {name[:-4] for name in authorised
+                         if name.lower().endswith(".pdf")}
+        runtime_maps = runtime.get("maps") or {}
+        for row in floor:
+            if row["documentId"] not in replaced_docs:
+                continue
+            live = {str(f.get("id") or "")
+                    for f in (runtime_maps.get(row["documentId"]) or {}).get("fields") or []}
+            dropped = [f["fieldId"] for f in row.get("fields") or []
+                       if f["fieldId"] not in live]
+            if dropped:
+                print(f"authorised replacement {row['documentId']}: dropping "
+                      f"{len(dropped)} floor identifier(s): {', '.join(dropped)}")
+            row["fields"] = [f for f in row.get("fields") or []
+                             if f["fieldId"] in live]
+
     snapshot, errors = build_snapshot(runtime, floor)
 
     if committed:
-        errors.extend(validate_byte_baseline(committed, snapshot))
-        errors.extend(validate_committed_identifiers(committed, snapshot))
+        errors.extend(validate_byte_baseline(committed, snapshot, authorised))
+        errors.extend(validate_committed_identifiers(committed, snapshot,
+                                                     authorised))
     if errors:
         print_errors(errors)
         print(f"\nFull-template audit: {len(errors)} failure(s)")
