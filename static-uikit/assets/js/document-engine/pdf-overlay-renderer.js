@@ -38,6 +38,7 @@
   var Layout = ns.textLayout;
   var Checkbox = ns.checkbox;
   var Expander = ns.pageExpander;
+  var Ownership = ns.tableOwnership;
 
   var Renderer = {};
 
@@ -633,6 +634,11 @@
       expectedBlockCount: Number(source.expectedBlockCount),
       expectedPageBlockCount: source.expectedPageBlockCount == null
         ? null : Number(source.expectedPageBlockCount),
+      operatorScope: source.operatorScope || 'top-level',
+      operatorDepth: source.operatorDepth == null ? null : Number(source.operatorDepth),
+      parentTopLevelBlock: source.parentTopLevelBlock == null
+        ? null : Number(source.parentTopLevelBlock),
+      expectedParentSha256: source.expectedParentSha256 || null,
       expectedSha256: source.expectedSha256,
       expectedTemplateSha256: source.expectedTemplateSha256,
       reviewStatus: source.reviewStatus
@@ -667,12 +673,31 @@
     activeReviewedRangePages(template, payload).forEach(function (group) {
       var ordinals = byPage[group.page] || (byPage[group.page] = []);
       group.ranges.forEach(function (range) {
+        // Page-shift geometry is indexed by top-level movable q…Q blocks.
+        // Nested reviewed ranges are removed exactly at render time but must
+        // never be misread here as impossible top-level ordinals.
+        if ((range.operatorScope || 'top-level') !== 'top-level') return;
         for (var n = range.firstBlock; n <= range.lastBlock; n += 1) ordinals.push(n);
       });
     });
     return byPage;
   }
   Renderer.suppressedBlocksByPage = suppressedBlocksByPage;
+
+  // Exact path suppressions are removed before page shifting just like
+  // reviewed balanced ranges.  The decision pass runs against the untouched
+  // template, so it must omit those future-absent path units when checking an
+  // insertion band for straddles.
+  function suppressedPathsByPage(template, payload) {
+    var byPage = {};
+    activeReviewedPathPages(template, payload).forEach(function (group) {
+      byPage[group.page] = group.suppressions.map(function (entry) {
+        return Number(entry.pathOrdinal);
+      });
+    });
+    return byPage;
+  }
+  Renderer.suppressedPathsByPage = suppressedPathsByPage;
 
   // The same question without a payload, for static audits: a reviewed range
   // guarded by `showWhen` is suppressed only for the payloads that select it,
@@ -683,6 +708,7 @@
       if (block.showWhen) return;
       var range = reviewedRangeForBlock(block);
       if (!range) return;
+      if ((range.operatorScope || 'top-level') !== 'top-level') return;
       var page = Number(block.page);
       var ordinals = byPage[page] || (byPage[page] = []);
       for (var n = range.firstBlock; n <= range.lastBlock; n += 1) ordinals.push(n);
@@ -690,6 +716,17 @@
     return byPage;
   }
   Renderer.unconditionalSuppressedBlocksByPage = unconditionalSuppressedBlocksByPage;
+
+  function unconditionalSuppressedPathsByPage(template) {
+    var byPage = {};
+    (template.sourcePathSuppressions || []).forEach(function (entry) {
+      if (entry.showWhen) return;
+      var page = Number(entry.page);
+      (byPage[page] = byPage[page] || []).push(Number(entry.pathOrdinal));
+    });
+    return byPage;
+  }
+  Renderer.unconditionalSuppressedPathsByPage = unconditionalSuppressedPathsByPage;
 
   function inspectActiveReviewedRanges(context, template, payload) {
     var groups = activeReviewedRangePages(template, payload);
@@ -716,6 +753,43 @@
     }));
   }
   Renderer.suppressActiveReviewedRanges = suppressActiveReviewedRanges;
+
+  function activeReviewedPathPages(template, payload) {
+    var byPage = {};
+    (template.sourcePathSuppressions || []).forEach(function (entry) {
+      if (!isVisible(entry, payload)) return;
+      var page = Number(entry.page);
+      var group = byPage[page] || (byPage[page] = { page: page, suppressions: [] });
+      group.suppressions.push(entry);
+    });
+    return Object.keys(byPage).map(Number).sort(function (a, b) { return a - b; })
+      .map(function (page) { return byPage[page]; });
+  }
+  Renderer.activeReviewedPathPages = activeReviewedPathPages;
+
+  function inspectActiveReviewedPathSuppressions(context, template, payload) {
+    return Promise.all(activeReviewedPathPages(template, payload).map(function (group) {
+      return Expander.inspectReviewedPathSuppressions(
+        context.pdfDoc, context.pages[group.page], group.suppressions,
+        { templateBytes: context.templateBytes }
+      ).then(function (inspection) {
+        return { page: group.page, inspection: inspection };
+      });
+    }));
+  }
+  Renderer.inspectActiveReviewedPathSuppressions = inspectActiveReviewedPathSuppressions;
+
+  function suppressActiveReviewedPathSuppressions(context, template, payload) {
+    return Promise.all(activeReviewedPathPages(template, payload).map(function (group) {
+      return Expander.suppressReviewedPathSuppressions(
+        context.pdfDoc, context.pages[group.page], group.suppressions,
+        { templateBytes: context.templateBytes }
+      ).then(function (suppression) {
+        return { page: group.page, suppression: suppression };
+      });
+    }));
+  }
+  Renderer.suppressActiveReviewedPathSuppressions = suppressActiveReviewedPathSuppressions;
 
   // Human-readable reason, reused by the renderer error and the wizard UI.
   function overflowMessage(diagnostics) {
@@ -1122,6 +1196,10 @@
       if (!replacement) {
         problems.push(id + ': reviewed sourceReplacement is required');
       } else {
+        var operatorScope = replacement.operatorScope || 'top-level';
+        if (operatorScope !== 'top-level' && operatorScope !== 'all-balanced') {
+          problems.push(id + ': sourceReplacement.operatorScope is unsupported');
+        }
         var first = Number(replacement.firstBlock);
         var last = Number(replacement.lastBlock);
         if (!Number.isInteger(first) || !Number.isInteger(last) || first < 1 || last < first) {
@@ -1138,6 +1216,19 @@
         if (!/^[0-9a-f]{64}$/i.test(String(replacement.expectedTemplateSha256 || ''))) {
           problems.push(id + ': sourceReplacement.expectedTemplateSha256 must freeze the authoritative PDF');
         }
+        if (operatorScope === 'all-balanced') {
+          if (!Number.isInteger(Number(replacement.operatorDepth)) ||
+              Number(replacement.operatorDepth) < 2) {
+            problems.push(id + ': nested sourceReplacement needs operatorDepth >= 2');
+          }
+          if (!Number.isInteger(Number(replacement.parentTopLevelBlock)) ||
+              Number(replacement.parentTopLevelBlock) < 1) {
+            problems.push(id + ': nested sourceReplacement needs parentTopLevelBlock');
+          }
+          if (!/^[0-9a-f]{64}$/i.test(String(replacement.expectedParentSha256 || ''))) {
+            problems.push(id + ': nested sourceReplacement must freeze expectedParentSha256');
+          }
+        }
         if (replacement.expectedPageBlockCount != null &&
             (!Number.isInteger(Number(replacement.expectedPageBlockCount)) ||
              Number(replacement.expectedPageBlockCount) < 1)) {
@@ -1146,7 +1237,8 @@
         if (replacement.reviewStatus !== 'approved') {
           problems.push(id + ': sourceReplacement is not visually approved');
         }
-        var pageRanges = ranges[block.page] = ranges[block.page] || [];
+        var rangeKey = block.page + ':' + operatorScope;
+        var pageRanges = ranges[rangeKey] = ranges[rangeKey] || [];
         pageRanges.forEach(function (other) {
           if (first <= other.last && last >= other.first) {
             problems.push(id + ': sourceReplacement overlaps "' + other.id + '"');
@@ -1233,6 +1325,44 @@
       }
     });
   }
+
+  function validateSourcePathSuppressions(template, pages, problems) {
+    var blocks = {};
+    (template.wordFlowBlocks || []).forEach(function (block) { blocks[block.id] = true; });
+    var seen = {};
+    (template.sourcePathSuppressions || []).forEach(function (entry, index) {
+      var id = entry.id || ('sourcePathSuppressions[' + index + ']');
+      if (seen[id]) problems.push('duplicate source path suppression id "' + id + '"');
+      seen[id] = true;
+      if (!Number.isInteger(Number(entry.page)) || Number(entry.page) < 0 ||
+          Number(entry.page) >= pages.length) {
+        problems.push(id + ': invalid path-suppression page');
+      }
+      if (!Number.isInteger(Number(entry.pathOrdinal)) || Number(entry.pathOrdinal) < 1) {
+        problems.push(id + ': pathOrdinal must be a positive integer');
+      }
+      if (!Number.isInteger(Number(entry.expectedPagePathCount)) ||
+          Number(entry.expectedPagePathCount) < 1) {
+        problems.push(id + ': expectedPagePathCount must be a positive integer');
+      }
+      if (!/^[0-9a-f]{64}$/i.test(String(entry.expectedSha256 || ''))) {
+        problems.push(id + ': expectedSha256 must freeze the source path bytes');
+      }
+      if (!/^[0-9a-f]{64}$/i.test(String(entry.expectedTemplateSha256 || ''))) {
+        problems.push(id + ': expectedTemplateSha256 must freeze the authoritative PDF');
+      }
+      if (entry.reviewStatus !== 'approved') {
+        problems.push(id + ': source path suppression is not visually approved');
+      }
+      if (!entry.ownerBlockId || !blocks[entry.ownerBlockId]) {
+        problems.push(id + ': ownerBlockId must name a reviewed Word-flow block');
+      }
+      var key = Number(entry.page) + ':' + Number(entry.pathOrdinal);
+      if (seen[key]) problems.push(id + ': the same source path is suppressed twice');
+      seen[key] = true;
+    });
+  }
+  Renderer.validateSourcePathSuppressions = validateSourcePathSuppressions;
   Renderer.validateWordFlowBlocks = validateWordFlowBlocks;
 
   // A reviewed source placeholder: printed sample content that the CRM value
@@ -1369,7 +1499,16 @@
 
     validatePageLayout(template, pages, problems);
     validateWordFlowBlocks(template, pages, problems);
+    validateSourcePathSuppressions(template, pages, problems);
     validateTypographyGroups(template, problems);
+    if (Ownership && typeof Ownership.validateTemplate === 'function') {
+      Ownership.validateTemplate(template, pages).forEach(function (problem) {
+        problems.push('table ownership: ' + problem);
+      });
+    } else if (template.tableOwnershipRequired ||
+               (template.cellOwnership || []).length) {
+      problems.push('table ownership validator is not loaded');
+    }
 
     fields.forEach(function (f, i) {
       var id = f.id || ('#' + i);
@@ -2060,6 +2199,7 @@
     // and render share, so an impossible anchor is a plan error like any other.
     var contentFingerprints = {};
     var suppressedBlocks = suppressedBlocksByPage(template, payload);
+    var suppressedPaths = suppressedPathsByPage(template, payload);
     Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
       .forEach(function (index) {
         var pagePlan = plans[index];
@@ -2067,7 +2207,8 @@
         var analysis;
         try {
           analysis = Expander.analysePageShift(pages[index], pagePlan.shifts, {
-            suppressedBlocks: suppressedBlocks[index] || []
+            suppressedBlocks: suppressedBlocks[index] || [],
+            suppressedPaths: suppressedPaths[index] || []
           });
         } catch (error) {
           planErrors.push({
@@ -2096,6 +2237,30 @@
     var planned = plan(template, payload, fonts, {
       regionsFor: regionsFor,
       wordFlowPlan: wordFlowPlan
+    });
+
+    var ownershipAudit = Ownership && typeof Ownership.auditPlan === 'function'
+      ? Ownership.auditPlan(template, planned, plans, fonts)
+      : { violations: [], metrics: [], budgetUse: [] };
+    var ownershipSeen = {};
+    ownershipAudit.violations.forEach(function (entry) {
+      var key = entry.fieldId + '|' + entry.reason + '|' + entry.message;
+      if (ownershipSeen[key]) return;
+      ownershipSeen[key] = true;
+      var field = (template.fields || []).filter(function (item) {
+        return item.id === entry.fieldId;
+      })[0] || {};
+      planned.overflows.push({
+        documentId: template.id,
+        documentTitle: template.title || template.id,
+        fieldId: entry.fieldId,
+        label: field.label || entry.fieldId,
+        source: entry.source || field.source || null,
+        reason: 'row-ownership',
+        ownershipReason: entry.reason,
+        editable: !!field.source && field.source.indexOf('extra.') === 0,
+        message: entry.message
+      });
     });
 
     planErrors.forEach(function (error) {
@@ -2131,11 +2296,13 @@
       plans: plans,
       rowsByField: rowsByField,
       planned: planned,
+      ownershipAudit: ownershipAudit,
       contentFingerprints: contentFingerprints,
       notes: expansionNotes(template, plans),
       templateSha256: (context && context.templateSha256) || null,
       fingerprint: fingerprintOf(template, plans, planned, contentFingerprints,
-                                 context && context.templateSha256)
+                                 context && context.templateSha256,
+                                 ownershipAudit)
     };
   }
   Renderer.decide = decide;
@@ -2180,7 +2347,8 @@
         delta: expansion.rowHeight,
         toTop: expansion.shiftToTop,
         maxExtraRows: expansion.maxExtraRows,
-        moveTopLevelPaths: expansion.lineStyle === 'table-row',
+        moveTopLevelPaths: expansion.lineStyle === 'table-row' ||
+          expansion.moveTopLevelPaths === true,
         reviewStatus: expansion.reviewStatus
       });
     }
@@ -2247,7 +2415,7 @@
   // the size and region it landed in. Identical input gives an identical
   // string, so QA can prove the preflight and the final render agreed.
   function fingerprintOf(template, plans, planned, contentFingerprints,
-                         templateSha256) {
+                         templateSha256, ownershipAudit) {
     var parts = ['doc=' + template.id];
     if (templateSha256) parts.push('template=' + templateSha256);
     // What the plan was decided *against*: if the page content the geometry
@@ -2279,6 +2447,10 @@
             return e.fieldId + ':' + e.reason;
           }).join(','));
       });
+    if (Ownership && typeof Ownership.fingerprint === 'function') {
+      var ownershipFingerprint = Ownership.fingerprint(ownershipAudit);
+      if (ownershipFingerprint) parts.push('ownership=' + ownershipFingerprint);
+    }
     Object.keys(planned.byField).sort().forEach(function (id) {
       var result = planned.byField[id];
       if (!result.drawn) {
@@ -2438,8 +2610,12 @@
     }).then(function (context) {
       var decided = decide(template, payload, context.pages, context.fonts,
                            context);
-      return inspectActiveReviewedRanges(context, template, payload)
-        .then(function (reviewed) {
+      return Promise.all([
+        inspectActiveReviewedRanges(context, template, payload),
+        inspectActiveReviewedPathSuppressions(context, template, payload)
+      ]).then(function (inspections) {
+          var reviewed = inspections[0];
+          var paths = inspections[1];
           return {
             ok: !decided.planned.overflows.length,
             fingerprint: decided.fingerprint,
@@ -2448,7 +2624,11 @@
             overflows: decided.planned.overflows,
             expansion: decided.notes,
             summary: decided.planned.summary,
+            ownershipAudit: decided.ownershipAudit,
             reviewedRanges: reviewed.map(function (entry) {
+              return { page: entry.page, inspection: entry.inspection };
+            }),
+            reviewedPathSuppressions: paths.map(function (entry) {
               return { page: entry.page, inspection: entry.inspection };
             })
           };
@@ -2505,8 +2685,15 @@
       // being left as a duplicate appended content stream.
       return suppressActiveReviewedRanges(context, template, payload)
         .then(function (reviewedPages) {
+          return suppressActiveReviewedPathSuppressions(context, template, payload)
+            .then(function (pathPages) {
           if (typeof opts.onReviewedRanges === 'function') {
             opts.onReviewedRanges(reviewedPages.map(function (entry) {
+              return { page: entry.page, suppression: entry.suppression };
+            }));
+          }
+          if (typeof opts.onReviewedPathSuppressions === 'function') {
+            opts.onReviewedPathSuppressions(pathPages.map(function (entry) {
               return { page: entry.page, suppression: entry.suppression };
             }));
           }
@@ -2554,6 +2741,7 @@
           return pdfDoc.save().then(function (bytes) {
             return new Blob([bytes], { type: 'application/pdf' });
           });
+            });
         });
     });
   }
