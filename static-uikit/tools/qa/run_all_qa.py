@@ -64,6 +64,13 @@ SUITES = [
     # keeps the paragraph's rhythm, and no printed placeholder survives.
     ("visual reading flow", "run_visual_flow_tests.py", []),
     ("qualification notice layout", "run_qualification_notice_layout_tests.py", []),
+    # A reviewed paragraph nested inside a moved parent block inherited that
+    # move and was drawn one whole page shift low. This measures the printed
+    # rhythm of the notice's transfer basis, and its gates against the exact
+    # geometry manual review rejected.
+    ("transfer-basis paragraph", "run_transfer_basis_paragraph_tests.py", []),
+    ("transfer-basis paragraph gates", "run_transfer_basis_paragraph_tests.py",
+     ["--self-test"]),
     ("reviewed operator ranges", "run_reviewed_operator_range_tests.py", []),
     ("preflight/render agreement", "run_preflight_render_agreement_tests.py", []),
     ("Document Wizard", "run_wizard_tests.py", []),
