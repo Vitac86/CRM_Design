@@ -33,6 +33,64 @@
   var SIZE_9_5 = 9.5;       // measured room: 9.56 pt
   var SIZE_9 = 9;         // measured room: 8.89, 8.89, 8.89 pt
 
+  // ── The three tariff plans are one visual group ───────────────────────────
+  //
+  // Same policy as the legal-entity form (1В): one face, one size, one leading,
+  // one alignment, one clearance between the value and the rule under it. Here
+  // all three rows measure 8.89 pt of room, so all three are already held at
+  // the 9 pt readability floor and the size was never in question — but the
+  // continuation rules underneath them were not alike. Two rows allowed a 9.5
+  // pt second line and sat their rule 1.6 pt below the baseline while the third
+  // allowed 9 pt and sat its rule at 1.2 pt, so a value that wrapped came out
+  // slightly larger in two rows than in the third and its rule sat closer.
+  // Stated once, they cannot drift again.
+  var TARIFF_GROUP = 'accession-tariff-plans';
+  var TARIFF_SIZE = SIZE_9;
+  var TARIFF_ALIGN = 'left';
+  var TARIFF_LINE_HEIGHT = 10.5;      // the source's own body line pitch
+  // The reviewed continuation line: the full width of the column, from the
+  // printed label's left edge to the text block's right edge.
+  var TARIFF_ROW_LEFT = 437.7;
+  var TARIFF_ROW_WIDTH = 119.9;
+  var TARIFF_RULE_THICKNESS = 0.36;
+  var TARIFF_RULE_OFFSET = 1.6;
+
+  // One tariff value: the printed slot after «Тарифный план:», plus the
+  // reviewed continuation line beneath it. The arguments are the measured
+  // coordinates; everything a reader can see about the type is shared.
+  function tariff(id, market, source, left, baselineTop, width,
+                  continuationTop) {
+    return {
+      id: id,
+      label: 'Тарифный план (' + market + ')',
+      source: source,
+      optional: true,
+      typographyGroup: TARIFF_GROUP,
+      page: 0,
+      left: left,
+      baselineTop: baselineTop,
+      width: width,
+      font: 'legalSerif',
+      fontSize: TARIFF_SIZE,
+      minFontSize: MIN,
+      align: TARIFF_ALIGN,
+      lineHeight: TARIFF_LINE_HEIGHT,
+      overflowStrategy: 'flow',
+      flowRegions: [
+        { page: 0, left: left, baselineTop: baselineTop, width: width,
+          maxLines: 1 },
+        {
+          page: 0, left: TARIFF_ROW_LEFT, baselineTop: continuationTop,
+          width: TARIFF_ROW_WIDTH, maxLines: 1,
+          maxFontSize: TARIFF_SIZE, generated: true, reviewStatus: 'approved',
+          drawUnderline: true,
+          underlineThickness: TARIFF_RULE_THICKNESS,
+          underlineOffset: TARIFF_RULE_OFFSET
+        }
+      ]
+    };
+  }
+
   // Every checkbox glyph in this template is drawn at the body size.
   // (The source mixes MS-Gothic and Segoe UI Symbol for "☐"; both render the
   // same box, and the mark is drawn geometrically, so the font does not matter.)
@@ -407,54 +465,15 @@
       // the label's left edge, 437.7 pt, to the text block's right edge. That
       // takes the usable length to roughly 35 characters without touching the
       // market checkboxes above or the next printed label below.
-      {
-        id: 'tariffStock',
-        label: 'Тарифный план (фондовый рынок)',
-        source: 'extra.tariff-stock', optional: true,
-        page: 0, left: 506.8, baselineTop: 470.35, width: 50.8,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left',
-        overflowStrategy: 'flow',
-        flowRegions: [
-          { page: 0, left: 506.8, baselineTop: 470.35, width: 50.8, maxLines: 1 },
-          {
-            page: 0, left: 437.7, baselineTop: 481.00, width: 119.9, maxLines: 1,
-            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
-          }
-        ]
-      },
-      {
-        id: 'tariffDerivatives',
-        label: 'Тарифный план (срочный рынок)',
-        source: 'extra.tariff-derivatives', optional: true,
-        page: 0, left: 506.5, baselineTop: 511.15, width: 51.1,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left',
-        overflowStrategy: 'flow',
-        flowRegions: [
-          { page: 0, left: 506.5, baselineTop: 511.15, width: 51.1, maxLines: 1 },
-          {
-            page: 0, left: 437.7, baselineTop: 520.60, width: 119.9, maxLines: 1,
-            maxFontSize: 9, generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.2
-          }
-        ]
-      },
-      {
-        id: 'tariffCurrency',
-        label: 'Тарифный план (валютный рынок)',
-        source: 'extra.tariff-currency', optional: true,
-        page: 0, left: 506.5, baselineTop: 531.19, width: 51.1,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN, align: 'left',
-        overflowStrategy: 'flow',
-        flowRegions: [
-          { page: 0, left: 506.5, baselineTop: 531.19, width: 51.1, maxLines: 1 },
-          {
-            page: 0, left: 437.7, baselineTop: 541.50, width: 119.9, maxLines: 1,
-            maxFontSize: 9.5, generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
-          }
-        ]
-      },
+      //
+      // Only the measured coordinates differ between the three; every visible
+      // typographic decision comes from `tariff()` and is shared.
+      tariff('tariffStock', 'фондовый рынок', 'extra.tariff-stock',
+             506.8, 470.35, 50.8, 481.00),
+      tariff('tariffDerivatives', 'срочный рынок', 'extra.tariff-derivatives',
+             506.5, 511.15, 51.1, 520.60),
+      tariff('tariffCurrency', 'валютный рынок', 'extra.tariff-currency',
+             506.5, 531.19, 51.1, 541.50),
 
       // ── §5 Соглашения ─────────────────────────────────────────────────────
       check('agreementEsign', 'check.agreement-esignature', true, 0, 62.1, 602.11),

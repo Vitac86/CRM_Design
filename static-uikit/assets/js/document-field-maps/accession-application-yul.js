@@ -28,6 +28,99 @@
   // and the table row that has to grow to hold it — uses exactly that step.
   var TARIFF_PITCH = 9.72;
 
+  // ── The three tariff plans are one visual group ───────────────────────────
+  //
+  // «Тарифный план» appears three times in the market table, once per market,
+  // and a reader takes in all three at once — they are a column of answers to
+  // the same question. So they get ONE typography policy: one face, one size,
+  // one leading, one alignment, one clearance from the rules around them. A row
+  // that is set larger than the row above it does not read as emphasis, it
+  // reads as a mistake in the form.
+  //
+  // The size that policy can be is decided by the tightest of the three, and
+  // the three are not alike (measure_field_room.py, room = the largest size
+  // whose ascender still clears whatever is printed above the baseline):
+  //
+  //   фондовый    room 13.86 pt   label ends 521.15, baseline 533.50
+  //   валютный    room 12.22 pt   label ends 582.11, baseline 593.00
+  //   срочный     room  7.60 pt   label ends 552.23, baseline 559.00
+  //
+  // So 12 pt is available to two of the three and not to the third, which is
+  // exactly the 12 / 9 / 12 the form must not print. 10 and 11 pt fail on the
+  // same row for the same reason: «срочный» prints its label on ONE line
+  // instead of two, which leaves its value 6.77 pt of headroom, and a 10 pt
+  // ascender is 8.91 pt.
+  //
+  // Row growth does not rescue it. Growing the row adds space BELOW the
+  // baseline; what is missing is above it, against a printed label. Buying the
+  // headroom would mean moving the value's baseline ~4 pt down as well, which
+  // costs a 9.72 pt row on every legal-entity application that names a срочный
+  // tariff — printed or not, large or small — and leaves that one value sitting
+  // visibly lower in its row than the other two do in theirs. Distorting the
+  // table on every document to gain 3 pt on one value is not worth it.
+  //
+  // The largest size all three can share is therefore the 9 pt readability
+  // floor, which is also what the individual form (1А) already prints. Nine
+  // points is a deliberate floor, not a fallback: no client value goes below
+  // it anywhere in this repository.
+  var TARIFF_GROUP = 'accession-tariff-plans';
+  var TARIFF_SIZE = SIZE_9;
+  var TARIFF_ALIGN = 'center';       // the source centres this column
+  var TARIFF_WIDTH = 71.5;           // column 468.22–545.74 less its padding
+  var TARIFF_LEFT = 471.5;
+
+  // One tariff value. Every typographic decision is shared and stated once;
+  // the arguments are only the geometry the source measured differently for
+  // each row. `typographyGroup` says out loud that these three belong
+  // together, and the production validator refuses a map where two members of
+  // one group are set differently.
+  // `printedLines` is the only per-row difference that is not a coordinate:
+  // how many lines the source's own row has room for before one has to be
+  // added. That is geometry the form decided — «валютный» prints its label on
+  // two lines and leaves 30.56 pt underneath, «срочный» prints one and leaves
+  // 9.80 — and it is not something a reader compares between rows. What a
+  // reader does compare, the type itself, is identical for all three.
+  function tariff(id, market, source, baselineTop, printedLines,
+                  insertionTop, baselineOffset) {
+    return {
+      id: id,
+      label: 'Тарифный план (' + market + ')',
+      source: source,
+      optional: true,
+      typographyGroup: TARIFF_GROUP,
+      page: 0,
+      left: TARIFF_LEFT,
+      baselineTop: baselineTop,
+      width: TARIFF_WIDTH,
+      font: 'legalSerif',
+      fontSize: TARIFF_SIZE,
+      minFontSize: MIN,
+      align: TARIFF_ALIGN,
+      // Every real plan name is two words — «Стандартный фондовый» is 93.02 pt
+      // in a 71.5 pt column — so every row has to be able to show a second
+      // line, and it has to look the same wherever it lands. The leading is
+      // the source's own label pitch, which is also the height of an inserted
+      // row, so a value that wraps inside its printed row and a value that
+      // wraps into a grown one keep exactly the same rhythm.
+      multiline: printedLines > 1,
+      maxLines: printedLines,
+      lineHeight: TARIFF_PITCH,
+      overflowStrategy: 'expand-layout',
+      expansion: {
+        page: 0, insertionTop: insertionTop, shiftFromTop: insertionTop,
+        rowHeight: TARIFF_PITCH, maxExtraRows: 1, maxFontSize: TARIFF_SIZE,
+        lineStyle: 'table-row', reviewStatus: 'approved',
+        rowLeft: 56.64, rowWidth: 489.1,
+        borders: { left: false, right: false, top: false, bottom: false },
+        columns: [],
+        line: {
+          left: TARIFF_LEFT, width: TARIFF_WIDTH,
+          baselineOffset: baselineOffset, ruleThickness: 0.48
+        }
+      }
+    };
+  }
+
   function check(id, source, equals, page, left, baselineTop) {
     return {
       id: id,
@@ -301,7 +394,9 @@
       // «Стандартный фондовый» is 93.02 pt at the 9 pt floor — so no product's
       // plan ever fitted on one line and all three fell back to «Стандартный».
       //
-      // The three rows are NOT alike, and each was measured on its own:
+      // The three values are set identically (see TARIFF_GROUP above). What
+      // differs is only where the source put them, and each was measured on its
+      // own:
       //
       //   фондовый   row 501.19–541.99, label on two printed lines ending at
       //              521.15, value baseline 533.5. A second line at 543.22
@@ -328,76 +423,16 @@
       //   срочный    560.23 …………………………………………… 561.91 → 561.43
       //   валютный   610.75 …………………………………………… 612.58 → 610.85
       //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
-      {
-        id: 'tariffStock',
-        label: 'Тарифный план (фондовый рынок)',
-        source: 'extra.tariff-stock', optional: true,
-        page: 0, left: 471.5, baselineTop: 533.5, width: 71.5,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'center',
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 540.41, shiftFromTop: 540.41,
-          rowHeight: TARIFF_PITCH, maxExtraRows: 1, maxFontSize: BODY,
-          lineStyle: 'table-row', reviewStatus: 'approved',
-          rowLeft: 56.64, rowWidth: 489.1,
-          borders: { left: false, right: false, top: false, bottom: false },
-          columns: [],
-          line: {
-            left: 471.5, width: 71.5,
-            baselineOffset: 2.81, ruleThickness: 0.48
-          }
-        }
-      },
-      {
-        id: 'tariffDerivatives',
-        label: 'Тарифный план (срочный рынок)',
-        source: 'extra.tariff-derivatives', optional: true,
-        page: 0, left: 471.5, baselineTop: 559.0, width: 71.5,
-        font: 'legalSerif', fontSize: SIZE_9, minFontSize: MIN,
-        align: 'center',
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 561.43, shiftFromTop: 561.43,
-          rowHeight: TARIFF_PITCH, maxExtraRows: 1, maxFontSize: SIZE_9,
-          lineStyle: 'table-row', reviewStatus: 'approved',
-          rowLeft: 56.64, rowWidth: 489.1,
-          borders: { left: false, right: false, top: false, bottom: false },
-          columns: [],
-          line: {
-            left: 471.5, width: 71.5,
-            baselineOffset: 7.29, ruleThickness: 0.48
-          }
-        }
-      },
-      {
-        id: 'tariffCurrency',
-        label: 'Тарифный план (валютный рынок)',
-        source: 'extra.tariff-currency', optional: true,
-        page: 0, left: 471.5, baselineTop: 593.0, width: 71.5,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'center',
-        // This row's own padding holds the second line without growing
-        // anything: 30.56 pt are free under the printed label. The leading is
-        // the face's own ink height at the preferred size (0.9 em of 12 pt),
-        // not the source's 9.72 pt label pitch, because these two lines are the
-        // value's own — 593.0 and 603.80 leave the descender 6.28 pt clear of
-        // the row's 612.67 rule.
-        multiline: true, maxLines: 2, lineHeight: 10.8,
-        overflowStrategy: 'expand-layout',
-        expansion: {
-          page: 0, insertionTop: 610.85, shiftFromTop: 610.85,
-          rowHeight: TARIFF_PITCH, maxExtraRows: 1, maxFontSize: BODY,
-          lineStyle: 'table-row', reviewStatus: 'approved',
-          rowLeft: 56.64, rowWidth: 489.1,
-          borders: { left: false, right: false, top: false, bottom: false },
-          columns: [],
-          line: {
-            left: 471.5, width: 71.5,
-            baselineOffset: 1.59, ruleThickness: 0.48
-          }
-        }
-      },
+      //
+      // Only the geometry below differs between the three rows — where the
+      // value sits and where its row may be cut. Everything a reader can see
+      // about the type comes from `tariff()`, so the three cannot drift apart.
+      tariff('tariffStock', 'фондовый рынок', 'extra.tariff-stock',
+             533.5, 1, 540.41, 2.81),
+      tariff('tariffDerivatives', 'срочный рынок', 'extra.tariff-derivatives',
+             559.0, 1, 561.43, 7.29),
+      tariff('tariffCurrency', 'валютный рынок', 'extra.tariff-currency',
+             593.0, 2, 610.85, 1.59),
 
       // ── §5 Agreements ─────────────────────────────────────────────────
       check('agreementEsign', 'check.agreement-esignature', true, 0, 62.1, 641.38),

@@ -1270,6 +1270,83 @@
   }
   Renderer.validateSourcePlaceholders = validateSourcePlaceholders;
 
+  // ── Fields a reader takes in as one group ──────────────────────────────────
+  //
+  // Some values on a form are not read one at a time. The three tariff plans of
+  // an accession application are a column of answers to the same question, and
+  // a row set larger than the row above it does not read as emphasis — it reads
+  // as a defect in the form. The map says so with `typographyGroup`, and this
+  // holds it to it.
+  //
+  // Only what a reader can actually compare is checked. Where the value sits,
+  // how wide its slot is and how many lines its own printed row has room for
+  // are geometry the source decided separately for each row; the face, the
+  // size, the leading, the alignment and the clearance between the value and
+  // the rule under it are the group's, and they must be identical.
+  var TYPOGRAPHY_GROUP_PROPERTIES = [
+    'font', 'fontSize', 'minFontSize', 'lineHeight', 'lineHeightRatio', 'align'
+  ];
+
+  // The same policy has to survive into a continuation line or a grown row —
+  // a value that wraps must not change size on the way.
+  function groupContinuationStyle(field) {
+    var regions = (field.flowRegions || []).filter(function (region) {
+      return region.generated;
+    });
+    var expansion = field.expansion || {};
+    return {
+      continuationFontSize: regions.length && regions[0].maxFontSize != null
+        ? Number(regions[0].maxFontSize)
+        : (expansion.maxFontSize != null ? Number(expansion.maxFontSize) : null),
+      continuationRuleOffset: regions.length && regions[0].underlineOffset != null
+        ? Number(regions[0].underlineOffset) : null,
+      continuationRuleThickness: regions.length &&
+        regions[0].underlineThickness != null
+        ? Number(regions[0].underlineThickness) : null,
+      rowHeight: expansion.rowHeight != null ? Number(expansion.rowHeight) : null
+    };
+  }
+
+  function validateTypographyGroups(template, problems) {
+    var groups = {};
+    (template.fields || []).forEach(function (field) {
+      if (!field.typographyGroup) return;
+      var name = String(field.typographyGroup);
+      (groups[name] = groups[name] || []).push(field);
+    });
+
+    Object.keys(groups).forEach(function (name) {
+      var members = groups[name];
+      if (members.length < 2) {
+        problems.push('typographyGroup "' + name + '": a group of one is not a ' +
+          'group — either a second field joins it or the declaration goes');
+        return;
+      }
+      var first = members[0];
+      var firstStyle = groupContinuationStyle(first);
+      members.slice(1).forEach(function (field) {
+        TYPOGRAPHY_GROUP_PROPERTIES.forEach(function (property) {
+          var a = first[property] == null ? null : first[property];
+          var b = field[property] == null ? null : field[property];
+          if (a === b) return;
+          problems.push('typographyGroup "' + name + '": ' + field.id + '.' +
+            property + ' is ' + JSON.stringify(b) + ' but ' + first.id +
+            '.' + property + ' is ' + JSON.stringify(a) +
+            ' — one group, one typography policy');
+        });
+        var style = groupContinuationStyle(field);
+        Object.keys(firstStyle).forEach(function (property) {
+          if (firstStyle[property] === style[property]) return;
+          problems.push('typographyGroup "' + name + '": ' + field.id + ' ' +
+            property + ' is ' + JSON.stringify(style[property]) + ' but ' +
+            first.id + ' uses ' + JSON.stringify(firstStyle[property]) +
+            ' — a value that wraps must not change size or clearance');
+        });
+      });
+    });
+  }
+  Renderer.validateTypographyGroups = validateTypographyGroups;
+
   // Validate one template definition against the loaded PDF. Returns an array
   // of human-readable problems; empty means the map is usable.
   function validateTemplate(template, pages, payload) {
@@ -1281,6 +1358,7 @@
 
     validatePageLayout(template, pages, problems);
     validateWordFlowBlocks(template, pages, problems);
+    validateTypographyGroups(template, problems);
 
     fields.forEach(function (f, i) {
       var id = f.id || ('#' + i);
