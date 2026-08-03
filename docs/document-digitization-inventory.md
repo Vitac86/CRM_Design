@@ -196,12 +196,15 @@ re-supplied with constants printed in and the template replaced).
 under «Основание для перевода», and the company seal image on page 2 at
 (200.65, 647.30)–(329.25, 805.65).
 
-**CRM:** client name, ИНН/document number, client code.
+**CRM:** client name, ИНН/document number, client code. The client code prints
+twice: in the «Код клиента» cell of §1, and inside all three payment-purpose
+sentences on page 2, where the source form prints a sample code instead of a
+blank.
 **Operator:** formation date, signing officer, both agreement numbers and dates,
 three internal market accounts, счёт депо. One agreement-number input drives
 four overlays.
 **Blank:** «Подпись ответственного лица», the 8.18 pt gap after «Доверенности №»,
-the 11.04 pt «дата__» rules, and the printed «Код INV0000X» placeholders.
+and the 11.04 pt «дата__» rules.
 
 ### `power-of-attorney` — ПРИЛОЖЕНИЕ 6, 4 pages, both subject kinds
 
@@ -394,7 +397,7 @@ standalone card.
 | УВЕДОМЛЕНИЕ о признании | The register-entry date slot after «признанных квалифицированными инвесторами» is **10.86 pt** wide, measured from real glyph boxes. No date fits even at the 6 pt floor, so the slot is left blank rather than overprinted onto the "(дата)" caption. |
 | Приложение 11 Уведомление риски | The broker's e-mail rule in clause 3 is **20.64 pt** wide — no address fits. The broker's own address is also not held in the CRM. Left blank. |
 | ПРИЛОЖЕНИЕ 4 | The broker's own payment details (ИНН, Р/сч, Банк, К/сч, БИК) and the whole торговый/неторговый раздел table are blank in the authoritative source. |
-| ПРИЛОЖЕНИЕ 3 | Same blank broker requisites, plus «Код INV0000X» / «Код XXXXXXХ» placeholder codes left in the payment-purpose rows. |
+| ПРИЛОЖЕНИЕ 3 | Same blank broker requisites. The «Код INV0000X» / «Код XXXXXXХ» sample codes in the payment-purpose rows are **no longer left as printed**: each row is a reviewed Word-flow block that replaces the source paragraph and puts the CRM client code where the sample stood. The one dropped token per row is declared in `sourcePlaceholders`; every other token still has to match the authoritative PDF. |
 | ПРИЛОЖЕНИЕ 3 | The gap after «на основании Доверенности №» is 8.18 pt and the «дата__» rules in the payment-purpose rows are 11.04 pt — neither can hold a value. Left blank. |
 | ПРИЛОЖЕНИЕ 6 (ЮЛ) | «серии» ends its line with no rule after it, so series and number share the «№» rule; «дата выдачи _,» reserves 4.56 pt and stays blank. |
 | ПРИЛОЖЕНИЕ 6 (ФЛ) | «выданный» reserves 50.2 pt against 114.5 pt for the same value in the legal-entity variant, so a normal issuing authority needs three wrapped lines. |

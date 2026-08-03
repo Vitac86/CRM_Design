@@ -713,6 +713,79 @@ Only step 5 makes the document visible to users — do it last.
 
 ## 9. Visual QA
 
+### Three kinds of valid
+
+A layout can be right in one of these senses and wrong in another. Keep them
+apart, because a document that passes the first two can still be unacceptable:
+
+| | asks | proved by |
+|---|---|---|
+| **structural** | is the value complete, is the PDF sound, is nothing below the readability floor, is any source content lost? | `run_structural_pdf_tests.py`, `audit_ordinary_equality.py` |
+| **geometric** | does it overlap, cross a rule, leave its cell, or land outside a reviewed band? | `run_visual_geometry_tests.py`, `run_preflight_render_agreement_tests.py` |
+| **reading flow** | does the result still read as one field a person typed? | `run_visual_flow_tests.py` |
+
+The third one exists because two defects reached a visual review with every
+other suite green.
+
+**The payment reference.** The account-opening notice prints
+«…брокерское обслуживание №\_\_\_\_\_\_\_\_\_ дата\_\_. ФОНДОВЫЙ РЫНОК» in a
+bordered cell. The printed blank is 49.68 pt; a real reference is 101.17 pt, so
+the reference was moved whole to the row's third printed line — approved,
+inside the cell, at a legal size, and 95 pt to the right of a still-empty «№»,
+underneath the market name. It read as a caption someone had dropped in.
+
+**The grown row.** A foreign legal name needs three lines in a two-line cell,
+so the row grows. The third line was placed at the row's own 13.44 pt pitch
+while the two above it kept the cell's 9.975 pt leading. One value, two
+rhythms: a paragraph that stops and a second entry that starts.
+
+Both are now rules rather than opinions:
+
+- an exact reference is **one whole token** — a slash or a hyphen inside it is
+  not a break opportunity (`tokenBreak: 'none'`, `keepTogether`);
+- it stays on the same line as the token that **introduces** it, with no gap
+  (`keepWithNext` after «№»), and the sentence continues after it;
+- a value's own printed lines keep **one step**. A continuation may start
+  further left than the first line — Word does that when the first line began
+  after a printed label — but never further right;
+- a row grown to finish a sentence keeps the sentence's leading, not the row's
+  pitch (`expansion.line.continuesParagraph`); its height, borders and rules do
+  not move;
+- printed **sample** content is replaced by the CRM value it stands for, and
+  the swap is declared (`sourcePlaceholders`), not assumed.
+
+### Reviewed source placeholders
+
+A blank printed as underscores is geometry: `_+` normalises away and the
+legal-text gates never see it. A few forms instead print a *sample value* where
+a real one belongs — the account-opening notice prints «Код INV0000X» in two
+payment-purpose rows and «Код XXXXXXХ» in the third. Those are ordinary letters
+and digits, indistinguishable from the wording around them, so they can only be
+dropped where the map says so:
+
+```js
+sourcePlaceholders: [
+  { text: 'INV0000X', fieldId: 'paymentPurposeClientCode',
+    reviewStatus: 'approved',
+    note: 'sample client code printed by the source form' }
+]
+```
+
+The placeholder must be approved and must name a field the block actually
+resolves, so it can never remove wording that no value replaces. Everything
+else in the paragraph still has to match the authoritative PDF token for token
+— `sourceStaticText` keeps the sample verbatim, which is the proof the map
+transcribed the block rather than edited it.
+
+One CRM value may print in several reviewed paragraphs. The field declares
+every owner and opts in explicitly:
+
+```js
+layoutMode: 'flow-reference',
+flowBlockId: ['…-stock', '…-currency', '…-derivatives'],
+allowMultipleFlowReferences: true
+```
+
 ```bash
 cd static-uikit && python -m http.server 8000
 # http://localhost:8000/tools/document-qa-harness.html
@@ -748,6 +821,10 @@ viewing scale and at print scale:
 - [ ] an inserted row looks like a row the form printed itself
 - [ ] page numbers, headers and footers are where the template put them
 - [ ] no unexplained empty row
+- [ ] every line of one value is the same distance from the last
+- [ ] a continuation reads as the rest of the sentence, not as a new entry
+- [ ] an exact reference sits where the wording introduces it, whole
+- [ ] no sample value the form printed survives next to a real one
 
 Test the output in the Chrome/Edge viewer, the Firefox viewer, and Adobe Reader
 where available.

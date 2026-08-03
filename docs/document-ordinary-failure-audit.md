@@ -251,3 +251,100 @@ whose «(должность)» caption is printed 0.42 pt under its blank.
 The standing gate is `tools/qa/audit_ordinary_equality.py`, in the canonical
 run: zero ordinary substitutions, and every drawn value identical to the value
 requested.
+
+---
+
+## 7. The visual pass — two of the ten were not acceptable
+
+A visual review of the ten resolutions above rejected two of them. Both had
+passed every automated suite: the value was complete, the geometry was legal,
+nothing overlapped, nothing sat below the readability floor. Neither *looked*
+like a form a person had filled in.
+
+### `account-opening-notice/paymentPurposeStock` (and its two sibling rows)
+
+The row prints one paragraph in a bordered cell:
+
+```
+Код INV0000X. Перевод денежных средств по Договору на
+брокерское обслуживание №_________ дата__. ФОНДОВЫЙ
+РЫНОК
+```
+
+`tokenBreak: 'none'` correctly refused to print «БД-2026/» on the blank and
+«000417-СПБ» underneath — that reads as two references. But the line it moved
+the whole token to was the row's third printed line, which is where «РЫНОК»
+ends, at x 294.05. So the reference printed at x 389.0: 95 pt to the right of a
+still-empty «№» blank, on the line that names the market. Geometrically inside
+the cell; visually a stray caption.
+
+**Why the obvious repair was not available.** The blank is nine underscores,
+49.68 pt. The reference is 101.17 pt at the row's 11.04 pt. Nothing that leaves
+the printed sentence where it is can hold the value.
+
+**Resolution.** Each of the three rows is now a reviewed Word-flow block
+replacing exactly one top-level q…Q block of the source page, so the sentence
+itself can move. The reference is drawn inline, immediately after the «№» that
+introduces it, carrying the rule the source prints for that blank.
+`keepWithNext` holds «№» and the reference on one line; `keepTogether` keeps
+the reference one token. The longest reviewed reference with the longest client
+code still ends on the third line the source itself uses — no row grows, the
+table rules are separate q…Q blocks and are untouched, and nothing below moves.
+
+**The client code, in the same change.** «Код INV0000X» (stock, currency) and
+«Код XXXXXXХ» (derivatives) are not blanks: the form prints a *sample* where
+the client's own code belongs, so an overlay would have to draw on top of
+existing glyphs. Now that the paragraph is redrawn, the blocks reference
+`field.client-code` — the same CRM value the «Код клиента» cell of §1 prints —
+through one flow-reference field shared by all three rows. The one dropped
+token per row is declared in `sourcePlaceholders` and checked by both
+legal-text gates; every other token still has to match the authoritative PDF.
+
+### `anketa-yul/foreignName`
+
+Grown correctly by one 13.44 pt pitch, borders intact, nothing below disturbed
+— and the three lines of one name read at two different rhythms:
+
+```
+Interregional Investment, Industrial and          step  9.975
+Infrastructure Company for Technological          step 14.285
+Development, Joint-Stock Company, Branch Office
+```
+
+The inserted row was normalised against a stand-in owner that existed only to
+force `maxLines: 1`, which `rowRegion` already declares. The row therefore
+inherited none of its field's typography and was laid out at the engine's
+default 1.15 leading while the lines above kept the cell's 0.95. The owner is
+now the field itself, and a continuation may declare
+`expansion.line.continuesParagraph`, which resolves its baseline against the
+size the value ended up at — the step is the font size times the leading ratio,
+so it cannot be a constant in the map. The row keeps its height, borders and
+travelling rules; only the text moves.
+
+### Re-reviewed and unchanged
+
+`accession-application-fl/reportEmail`, `accession-application-yul/reportEmail`
+(the address sits inline on the «По электронной почте» line, the parenthetical
+follows it); `power-of-attorney/ulDateInWords`, `flDateInWords` (on the printed
+rule, above the «(дата прописью)» caption); `anketa-yul/fundsOtherDetails` (the
+continuation returns to the cell's left margin, which is what Word does when
+the first line began after a printed label); `pdlDetails`, `bankName`,
+`otherInstruments`, `signatureName`.
+
+### Recorded, not changed
+
+The three `accession-application-yul` tariff values sit in one table column at
+**12 / 9 / 12 pt**. The срочный row is the odd one and it is the source's doing:
+its band is 541.99–562.03, its printed label «Тарифный план:» occupies one line
+ending at 552.23, and the 9.8 pt left below it cannot hold 12 pt ink without
+either touching the label or crossing the bottom rule — at 12 pt the two
+constraints contradict each other outright. Reaching 12 pt would mean growing a
+row that does not need to grow and spending page reserve on it. The value stays
+at the 9 pt floor the policy allows, and this note is here so the difference is
+read as measured rather than missed. **Awaiting manual approval.**
+
+The standing gate for all of the above is
+`tools/qa/run_visual_flow_tests.py`, in the canonical run: an exact reference
+stays whole and inside its sentence, a value's own lines keep one step, a
+continuation never starts right of the line it continues, and no printed sample
+survives next to a real value.
