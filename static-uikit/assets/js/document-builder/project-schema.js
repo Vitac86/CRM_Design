@@ -22,7 +22,12 @@
     'firstLineIndent', 'expansion',
     // A Word-flow block consumes the same business field by reference. These
     // are production properties, never replacement variable names.
-    'layoutMode', 'flowBlockId', 'allowMultipleFlowReferences'
+    'layoutMode', 'flowBlockId', 'allowMultipleFlowReferences',
+    // Fields a reader takes in as one group — the three tariff plans of an
+    // accession application — are set alike, and say so here. Production
+    // export refuses a group whose members are set differently, so this has to
+    // survive a round trip or the policy would be lost on re-import.
+    'typographyGroup'
   ];
 
   // Everything a page-expansion definition may carry. Nothing here may be lost

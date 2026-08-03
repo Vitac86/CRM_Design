@@ -182,6 +182,85 @@
     }
   }
 
+  // ── Values a reader compares side by side ──────────────────────────────────
+  //
+  // The three tariff plans of an accession application are a column of answers
+  // to the same question, and one row set larger than its neighbours reads as a
+  // defect. A map says so with `typographyGroup`; this is the Builder's half of
+  // holding it to that, with the field named so the editor can jump to it.
+  //
+  // Only what a reader can compare is checked. Where the value sits, how wide
+  // its slot is and how many lines its own printed row has room for are
+  // geometry the source decided per row.
+  var TYPOGRAPHY_GROUP_LABELS = {
+    font: 'гарнитура',
+    fontSize: 'кегль',
+    minFontSize: 'минимальный кегль',
+    lineHeight: 'интерлиньяж',
+    lineHeightRatio: 'интерлиньяж (доля кегля)',
+    align: 'выключка'
+  };
+
+  function continuationStyleOf(field) {
+    var generated = (field.flowRegions || []).filter(function (region) {
+      return region.generated;
+    });
+    var expansion = field.expansion || {};
+    var region = generated[0] || {};
+    return {
+      'кегль перенесённой строки': generated.length
+        ? region.maxFontSize : expansion.maxFontSize,
+      'отступ линейки от базовой линии': generated.length
+        ? region.underlineOffset : null,
+      'толщина линейки': generated.length ? region.underlineThickness : null,
+      'высота добавленной строки': expansion.rowHeight
+    };
+  }
+
+  function validateTypographyGroups(project, errors) {
+    var groups = {};
+    (project.fields || []).forEach(function (field) {
+      if (!field.typographyGroup) return;
+      var name = String(field.typographyGroup);
+      (groups[name] = groups[name] || []).push(field);
+    });
+
+    Object.keys(groups).forEach(function (name) {
+      var members = groups[name];
+      if (members.length < 2) {
+        errors.push(item('error', 'typography-group-single',
+          'Группа оформления «' + name + '» состоит из одного поля. ' +
+          'Либо к ней присоединяется второе поле, либо объявление удаляется.',
+          members[0]));
+        return;
+      }
+      var first = members[0];
+      var firstStyle = continuationStyleOf(first);
+      members.slice(1).forEach(function (field) {
+        Object.keys(TYPOGRAPHY_GROUP_LABELS).forEach(function (property) {
+          var a = first[property] == null ? null : first[property];
+          var b = field[property] == null ? null : field[property];
+          if (a === b) return;
+          errors.push(item('error', 'typography-group-mismatch',
+            'Группа «' + name + '»: ' + TYPOGRAPHY_GROUP_LABELS[property] +
+            ' поля «' + field.id + '» (' + JSON.stringify(b) + ') отличается ' +
+            'от «' + first.id + '» (' + JSON.stringify(a) + '). ' +
+            'Одна группа — одно оформление.', field));
+        });
+        var style = continuationStyleOf(field);
+        Object.keys(firstStyle).forEach(function (property) {
+          if (firstStyle[property] === style[property]) return;
+          errors.push(item('error', 'typography-group-continuation',
+            'Группа «' + name + '»: ' + property + ' поля «' + field.id +
+            '» (' + JSON.stringify(style[property]) + ') отличается от «' +
+            first.id + '» (' + JSON.stringify(firstStyle[property]) + '). ' +
+            'Значение, перешедшее на дополнительную строку, не должно менять ' +
+            'кегль или отбивку.', field));
+        });
+      });
+    });
+  }
+
   function validateWordFlowBlocks(project, pageSizes, knownFormats, errors) {
     var renderer = global.CRMDocumentEngine.overlayRenderer;
     var blocks = project.wordFlowBlocks || [];
@@ -694,6 +773,7 @@
       });
     }
     validateWordFlowBlocks(project, pageSizes, knownFormats, errors);
+    validateTypographyGroups(project, errors);
     (wizard.fields || []).concat(wizard.companyFields || []).forEach(function (field) { extraProviders[field.key] = field; });
     (wizard.checkFields || []).forEach(function (field) { checkProviders[field.key] = field; });
     var usedWizard = {};

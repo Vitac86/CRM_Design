@@ -99,6 +99,12 @@ textarea.dtb-control { resize: vertical; }
 .dtb-word-flow-decoration > strong { display: block; margin-bottom: 4px; font-size: 11px; }
 .dtb-word-flow-add-run { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 5px; margin-top: 8px; }
 
+/* The rest of a field's typography group, shown beside the field being edited:
+   a group only works if a difference is visible without opening two panels. */
+.dtb-inspector-note { margin-top: 7px; padding: 6px; border-left: 3px solid #0ea5e9; background: #fff; font-size: 11px; line-height: 1.5; }
+.dtb-inspector-note > strong { display: block; margin-bottom: 4px; }
+.dtb-inspector-note .dtb-note-warning { color: #b45309; font-weight: 600; }
+
 /* Continuation lines — the ordered regions one logical value flows through. */
 .dtb-flow-region { margin: 6px 0; padding: 6px 8px; border: 1px solid #d7dfec; border-radius: 5px; background: #fbfcfe; }
 .dtb-flow-region.is-suggested { border-color: #e0b45c; background: #fffaf0; }

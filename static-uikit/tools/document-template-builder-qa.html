@@ -585,6 +585,141 @@
         });
       });
     });
+    // ── Values a reader compares side by side ───────────────────────────────
+    add('A typography group is configurable and survives both round trips', function () {
+      return app.openExisting('accession-application-yul').then(function () {
+        var members = app.state.project.fields.filter(function (field) {
+          return field.typographyGroup === 'accession-tariff-plans';
+        });
+        equal(members.length, 3, 'the three tariff plans are not one group');
+
+        app.state.selectField(members[0].id);
+        var inspector = frame.document.getElementById('dtb-inspector');
+        var control = inspector.querySelector('[data-field-control="typographyGroup"]');
+        assert(control, 'the inspector does not expose the typography group');
+        equal(control.value, 'accession-tariff-plans',
+          'the inspector shows the wrong group');
+        // The other members are shown beside the field being edited: a group
+        // whose difference is only visible by opening two panels is not one.
+        assert(inspector.textContent.indexOf(members[1].id) !== -1,
+          'the inspector does not show the rest of the group');
+
+        var imported = ns.io.importProjectText(
+          ns.io.exportProject(app.state.project)).project;
+        var production = ns.schema.toProduction(app.state.project);
+        members.forEach(function (field) {
+          var builderRound = imported.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(builderRound.typographyGroup, 'accession-tariff-plans',
+            'Builder JSON lost the group for ' + field.id);
+          var productionRound = production.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(productionRound.typographyGroup, 'accession-tariff-plans',
+            'production export lost the group for ' + field.id);
+          equal(productionRound.fontSize, field.fontSize,
+            'production export changed the size of ' + field.id);
+        });
+      });
+    });
+    add('Production export refuses a group set two ways', function () {
+      return app.openExisting('accession-application-yul').then(function () {
+        var members = app.state.project.fields.filter(function (field) {
+          return field.typographyGroup === 'accession-tariff-plans';
+        });
+        var sizes = members.map(function (field) { return field.fontSize; });
+        assert(sizes.every(function (size) { return size === sizes[0]; }),
+          'the committed map already sets one group two ways: ' + sizes);
+
+        // Make one row larger than its neighbours — the 12 / 9 / 12 the form
+        // must not print — and require the gate to name it.
+        var broken = ns.schema.clone(app.state.project);
+        broken.fields.filter(function (field) {
+          return field.id === members[0].id;
+        })[0].fontSize = 12;
+        var report = ns.validation.structural(broken, app.sourceInfo,
+                                              app.getPayload());
+        var mismatch = report.errors.filter(function (entry) {
+          return entry.code === 'typography-group-mismatch';
+        });
+        assert(mismatch.length > 0,
+          'a group with two different sizes was accepted');
+        assert(mismatch.some(function (entry) {
+          return String(entry.message).indexOf(members[0].id) !== -1;
+        }), 'the error does not name the field that differs');
+
+        // The clean project still passes, so the gate is about the difference
+        // and not about the group merely existing.
+        var clean = ns.validation.structural(app.state.project, app.sourceInfo,
+                                             app.getPayload());
+        assert(!clean.errors.some(function (entry) {
+          return String(entry.code).indexOf('typography-group') === 0;
+        }), 'the committed map fails its own group gate');
+      });
+    });
+    add('A grown table row inside a reviewed paragraph round-trips', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['account-opening-notice'];
+      var bordered = (map.wordFlowBlocks || []).filter(function (block) {
+        return (block.expansion || {}).lineStyle === 'table-row';
+      });
+      equal(bordered.length, 3,
+        'the three payment-purpose rows no longer grow a bordered row');
+      var project = ns.schema.fromProduction(map, app.catalog.filter(function (entry) {
+        return entry.overlayTemplateId === 'account-opening-notice';
+      })[0]);
+      var exported = ns.schema.toProduction(project);
+      bordered.forEach(function (block) {
+        var round = (exported.wordFlowBlocks || []).filter(function (item) {
+          return item.id === block.id; })[0];
+        assert(round, 'production export lost ' + block.id);
+        assert(ns.io.semanticEqual(round.expansion, block.expansion),
+          'the row geometry changed for ' + block.id);
+        // The rules the row is continued with are the whole point of a
+        // bordered growth; losing them would leave a hole in the table.
+        assert(ns.io.semanticEqual(round.expansion.columns, block.expansion.columns),
+          'the column rules changed for ' + block.id);
+      });
+      var pageLayout = (exported.pageLayout || {})[1] || {};
+      assert(ns.io.semanticEqual(pageLayout, (map.pageLayout || {})[1] || {}),
+        'the page budget that pays for those rows changed');
+    });
+    add('The payment-purpose sentence keeps its date binding', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['account-opening-notice'];
+      var project = ns.schema.fromProduction(map, app.catalog.filter(function (entry) {
+        return entry.overlayTemplateId === 'account-opening-notice';
+      })[0]);
+      var exported = ns.schema.toProduction(project);
+      var blocks = (exported.wordFlowBlocks || []).filter(function (block) {
+        return block.id.indexOf('payment-purpose') !== -1;
+      });
+      equal(blocks.length, 3, 'the three market rows did not survive');
+      blocks.forEach(function (block) {
+        var refs = (block.runs || []).filter(function (run) {
+          return run.type === 'fieldRef';
+        }).map(function (run) { return run.fieldId; });
+        assert(refs.indexOf('paymentPurposeAgreementDate') !== -1,
+          block.id + ' no longer binds the agreement date');
+        assert(refs.indexOf('paymentPurposeClientCode') !== -1,
+          block.id + ' no longer binds the client code');
+        // «дата» has to keep the value it labels, and the value has to stay
+        // one token, or the sentence comes apart at a line break.
+        var labels = (block.runs || []).filter(function (run) {
+          return (run.type || 'static') === 'static' &&
+            /(№|дата)\s*$/i.test(String(run.text || ''));
+        });
+        assert(labels.length >= 2, block.id + ' lost a bound label');
+        labels.forEach(function (run) {
+          assert(run.keepWithNext,
+            block.id + ': ' + JSON.stringify(run.text) + ' lost keepWithNext');
+        });
+      });
+      var date = (exported.fields || []).filter(function (field) {
+        return field.id === 'paymentPurposeAgreementDate';
+      })[0];
+      assert(date, 'the agreement-date field did not survive the round trip');
+      equal(date.source, 'extra.extra-brokerage-contract-date',
+        'the agreement date changed source');
+      equal(date.format, 'dateRu', 'the agreement date lost its formatter');
+    });
     add('Continuation lines survive a builder JSON round trip', function () {
       return app.openExisting('accession-application-fl').then(function () {
         var text = ns.io.exportProject(app.state.project);
@@ -858,12 +993,21 @@
                    'the corrected anchor was reported as straddling: ' +
                    (clean.errors[0] || {}).message);
 
-            // 159.95 pt is the value that shipped: inside the block painting
-            // 159.02–167.54 pt.
+            // 164.00 pt is inside the block that paints «1. Присоединяется
+            // согласно ст. 428 ГК РФ», whose ink runs 159.95–169.38 pt and
+            // whose baseline is at 167.54.
+            //
+            // The value that shipped, and that this used to probe with, was
+            // 159.95 — the top of that same ink. It stopped being a straddle
+            // when the shift analysis started taking a line's height from the
+            // page's own font descriptors instead of assuming a whole em:
+            // 159.95 is now exactly the block's boundary rather than 0.93 pt
+            // inside a phantom. The gate is about cutting printed content, so
+            // it is probed with a point that really is printed on.
             var broken = cloneProject(project);
             broken.wordFlowBlocks.filter(function (item) {
               return item.id === 'accession-application-fl-identity';
-            })[0].expansion.insertionTop = 159.95;
+            })[0].expansion.insertionTop = 164.00;
             return ns.validation.anchorGeometry(broken, app.state.runtimePdfUrl);
           }).then(function (bad) {
             assert(bad.errors.some(function (error) {

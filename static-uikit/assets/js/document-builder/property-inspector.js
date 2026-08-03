@@ -177,6 +177,38 @@
     if (field.source && (field.source.indexOf('extra.') === 0 || field.source.indexOf('check.') === 0)) this._renderWizard(field);
   };
 
+  // What the rest of this field's group is set to, next to the field being
+  // edited. The whole point of a group is that a difference is visible, and a
+  // difference between two panels the user has to open one at a time is not.
+  Inspector.prototype._renderTypographyGroupPeers = function (section, field) {
+    if (!field.typographyGroup) return;
+    var name = String(field.typographyGroup);
+    var peers = (this.state.project.fields || []).filter(function (other) {
+      return other.id !== field.id && other.typographyGroup === name;
+    });
+    var box = element('div', 'dtb-inspector-note');
+    if (!peers.length) {
+      box.appendChild(element('div', '',
+        'В группе «' + name + '» больше нет полей — группа из одного поля не ' +
+        'является группой.'));
+      section.appendChild(box);
+      return;
+    }
+    box.appendChild(element('strong', '', 'Остальные поля группы «' + name + '»'));
+    peers.forEach(function (peer) {
+      var differs = ['font', 'fontSize', 'minFontSize', 'lineHeight', 'align']
+        .filter(function (property) {
+          return (peer[property] == null ? null : peer[property]) !==
+            (field[property] == null ? null : field[property]);
+        });
+      box.appendChild(element('div', differs.length ? 'dtb-note-warning' : '',
+        peer.id + ': ' + (peer.fontSize == null ? '—' : peer.fontSize) + ' pt / ' +
+        (peer.font || 'legalSerif') + ' / ' + (peer.align || 'left') +
+        (differs.length ? '  — расходится: ' + differs.join(', ') : '  — совпадает')));
+    });
+    section.appendChild(box);
+  };
+
   Inspector.prototype._section = function (title) {
     var section = element('section', 'dtb-inspector-section');
     section.appendChild(element('h3', '', title));
@@ -278,6 +310,19 @@
         { value: 'none', label: 'Никогда — точный идентификатор' },
         { value: 'anywhere', label: 'В любом месте — проверенное решение' }
       ]), function (value) { return value || undefined; });
+    // Fields a reader takes in as one group — the three tariff plans of an
+    // accession application are a column of answers to the same question — are
+    // set alike, and say so here. Naming a group makes the Builder check the
+    // members against each other and makes production export refuse a group
+    // whose members were given different type. It is free text because the
+    // group is a property of one form, not a fixed list.
+    this._addFieldControl(section, field, 'Группа оформления', 'typographyGroup',
+      input('text', field.typographyGroup || ''),
+      function (value) { return String(value || '').trim() || undefined; },
+      'Поля одной группы читаются рядом и должны иметь одинаковые гарнитуру, ' +
+      'кегль, интерлиньяж, выключку и отбивку переноса. Экспорт в production ' +
+      'отклоняет группу, набранную по-разному.');
+    this._renderTypographyGroupPeers(section, field);
     this._addFieldControl(section, field, 'Обязательное', 'required', input('checkbox', field.required), Boolean);
     this._addFieldControl(section, field, 'Optional source', 'optional', input('checkbox', field.optional), Boolean);
     var formats = [{ value: '', label: 'Без форматтера' }].concat(Object.keys(global.CRMDocumentEngine.overlayRenderer.formatters).sort().map(function (name) { return { value: name, label: name }; }));
