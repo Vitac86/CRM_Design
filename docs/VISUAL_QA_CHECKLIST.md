@@ -102,50 +102,77 @@
 - [ ] `/archives`
 - [ ] `/agents`
 
-## Open manual-review findings — NOT visually accepted
+## Document correction review — implementation complete, manual approval pending
 
-Recorded 2026-08-03. These were found by manual visual review and are **not**
-fixed. Nothing in this repository may describe them as accepted, and the
-automated suite does not currently catch them: every suite below is green while
-these defects are on the page, which is exactly why they are written down here.
+Recorded 2026-08-03. The previously open document findings are implemented and
+have dedicated fail-closed automated checks. They are **not yet manually
+accepted**: the remaining release action is to inspect the synthetic
+`static-uikit/manual-smoke/manual-findings-fix` review pack at high zoom and
+sign off the items below. The completed pack covers 6 affected documents and
+24 scenarios: 24 PDFs, 24 fixture JSON files, 73 full-page PNGs and 84 block
+close-ups. Its automated pack gates report zero failures; all 115 manual
+checklist items remain deliberately unchecked. `review.json` SHA-256 is
+`a530978bf2cf59a59a5b96a131f9b90d1a424701c9fcdd28a217fa938fec33bb`
+— rebuilding the pack twice from the same tree reproduces that byte exactly,
+so the fingerprint identifies the pack a reviewer is looking at.
+A green automated run does not mark these boxes.
 
-### `qualification-notice` — recipient block escapes its column
+### Account-opening notice and depository agreement pair
 
-Screenshots `qualification-notice__ru-company-normal__ordinary__p1` and
-`__ru-company-long__realistic-long__p1`.
+- [ ] Page 1 prints «Козырева Александра Юрьевича» exactly; the former
+  `Юрьвеича` spelling is absent and no surrounding text moved.
+- [ ] The depository agreement number and date shown in both accession forms
+  and the account-opening notice match the two requested operator values.
+- [ ] Page 2 item 2 «Основание для перевода» reads as one sentence with the
+  number and date; item 3 remains present once; no empty source sentence is
+  visible behind the replacement.
+- [ ] The number/date inputs start empty, have no current-date default, survive
+  Back/reselection for the same document, and do not leak to another document.
 
-* «Кому:» and «Адрес:» are right-aligned near x 760, but a value that needs a
-  second line starts its continuation at the **far left page margin**, so the
-  address reads as two unrelated blocks. Visible even in the ordinary fixture:
-  `ул. Тверская, д. 14, кв. 38` sits alone at the left margin.
-* In the body sentence «ООО «Инвестика» настоящим уведомляет, что …» a
-  horizontal rule crosses the middle of the organization name, and the
-  qualification date `29.07.2026` is struck through by the rule belonging to
-  its own field.
-* The `(Ф.И.О./ наименование организации)` caption detaches from the field it
-  labels once the name wraps.
+No printable depository agreement number/date exists in UMI. These are
+required workflow inputs only for `accession-application-fl`,
+`accession-application-yul`, and `account-opening-notice`; that limitation is
+intentional and must remain visible during review.
 
-Required: treat the recipient name, the recipient address, the body
-organization name, the date and the instrument section as five separate
-reviewed blocks; grow the recipient block downward instead of wrapping to the
-page margin; keep every rule clear of glyphs.
+### `qualification-notice`
 
-### Individual questionnaires — row ownership
+- [ ] Short and long recipient names stay in the reviewed right-hand column;
+  every continuation begins at the same hanging indent.
+- [ ] Russian and foreign formatted registration addresses appear exactly once
+  and remain attached to «Адрес:».
+- [ ] The body organization name, its caption, the recognition wording, and the
+  date remain in reading order when the name wraps.
+- [ ] Underlines sit below glyphs and travel with their owning block; none
+  strikes through the organization name or date.
+- [ ] The `other` instrument branch has enough reviewed underlined lines and
+  the unused source rule is absent only in that branch.
 
-`anketa-fl-simplified-id` and `anketa-ip-sz`, and any full individual
-questionnaire sharing the same table machinery. Manual review reports values
-crossing into the following row (full name into birth date, bank address into
-the bank-INN row, registration place into OKVED), values crossing horizontal
-borders, and duplicated address components.
+Review short, long-name, Russian-address, foreign-address, combined-long,
+body/date, and long-`other` scenarios separately.
 
-Required: an owning row per field, measured original row boundaries, growth of
-the owning row with every lower row and border moved by the same delta, and one
-shared page/table expansion budget.
+### Four questionnaires — physical table ownership
 
-### Why the suite is green anyway
+- [ ] `anketa-fl-simplified-id`, `anketa-ip-sz`, `anketa-fl`, and `anketa-yul`
+  keep every rendered value inside its declared owning row/cell.
+- [ ] Full name, registration/address, bank, licence/authority, and free-text
+  stress cases do not enter the next row or cross a horizontal/vertical rule.
+- [ ] When an owning row grows, every lower row and each declared table border
+  moves by the same delta; vertical borders continue through the inserted row.
+- [ ] A formatted address or other one-logical-value group is rendered once;
+  no duplicated address components remain.
+- [ ] The review metadata identifies the field/source, owner row/cell, line
+  count, expansion count, cumulative shift, font size, and render fingerprint.
 
-The geometry suites ask whether a value is inside the box its map names. They
-do not ask whether that box is the right box, whether a continuation region
-belongs to the same visual block as its label, or whether a printed rule passes
-through a glyph. Closing these findings means adding those questions, not only
-moving coordinates.
+The renderer and Template Builder now reject missing/unreviewed ownership,
+wrong field/source links, overlapping cells, ink outside the reviewed cell,
+border intersections, discontinuous grown borders, duplicate logical values,
+and shared table-budget overruns. Manual approval therefore checks the actual
+page appearance, not whether those declarations exist.
+
+### Final gate
+
+- [ ] Run the canonical `python static-uikit/tools/qa/run_all_qa.py` after all
+  branch changes are assembled; record its result in the final handoff rather
+  than copying a mutable check count into this file.
+- [ ] Inspect every affected ordinary and realistic-long close-up in the review
+  pack and record manual visual approval.

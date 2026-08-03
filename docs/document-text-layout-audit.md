@@ -1,4 +1,4 @@
-# Text-layout audit — 18 production maps, 621 fields
+# Text-layout audit — executable maps and compatibility floor
 
 Measured against the committed base templates, with the production layout engine
 and the real embedded font.
@@ -12,25 +12,34 @@ python static-uikit/tools/qa/measure_page_layout.py
 python static-uikit/tools/qa/run_document_regression.py
 python static-uikit/tools/qa/audit_ordinary_failures.py
 python static-uikit/tools/qa/check_full_template_audit.py
+python static-uikit/tools/qa/run_qualification_notice_layout_tests.py
+python static-uikit/tools/qa/run_table_ownership_tests.py
 ```
 
 The complete, generated audit is [document-full-template-audit.md](document-full-template-audit.md).
 Its machine-readable companion, `static-uikit/tools/qa/document-full-template-audit.json`,
 covers all 22 committed PDFs, all 77 pages, every extracted source-PDF text line,
-and every current field. The original 621 field ID/source pairs are an immutable
-compatibility floor; additive fields are reported and classified separately.
+and every current field. The original 621 field ID/source pairs across 18
+executable maps are an immutable compatibility floor, **not** the release
+classification: 17 maps are dynamic production-ready and the retained
+`order-forms` map is blocked on incomplete mapping. Additive fields are reported
+and classified separately.
 
 ## 1. Scope
 
 | | Count |
 | --- | --- |
-| Documents (field maps) | 18 |
-| Fields total | 621 |
+| Executable field maps (including blocked `order-forms`) | 18 |
+| Immutable field ID/source compatibility floor | 621 |
 | Dynamic text fields | 397 |
 | Checkbox fields | 224 |
 | Single-line text fields | 321 |
 | Multiline text fields | 76 |
-| Fields with safe formatter fallbacks | 21 |
+| Baseline fields with safe formatter fallbacks | 21 |
+
+The remaining numeric field tables in §§2–3 describe that locked compatibility
+floor. They are not a hand-maintained count of additive fields introduced by
+later reviewed Word-flow work.
 
 ## 2. Before: every dynamic field could render unreadably
 
@@ -99,8 +108,9 @@ A multiline cell is bounded by `maxHeight`, measured with
 horizontal band. A cell with no bound is not generous — it is unbounded, and a
 long value runs straight through whatever the form prints below it.
 
-Two maps built their fields from a named list of properties that omitted
-`maxHeight`, so six cells were unbounded and four of them really did overprint:
+In the original compatibility-floor audit, two maps built fields from a named
+list of properties that omitted `maxHeight`, so six cells were unbounded and
+four of them really did overprint:
 
 | Field | Clear space | Lines at 9 pt |
 | --- | --- | --- |
@@ -114,14 +124,38 @@ Two maps built their fields from a named list of properties that omitted
 
 `run_visual_geometry_tests.py` now fails if any drawn glyph covers a printed one.
 
+The qualification recipient no longer relies on that old independent cell: a
+reviewed Word-flow semantic group owns the name and one formatted registration
+address inside the right-hand column. First and continuation lines share the
+same hanging indent, and underline clearance is checked against glyph ink.
+
+### Physical ownership in questionnaire tables
+
+Geometric containment is now stricter for `anketa-fl-simplified-id`,
+`anketa-ip-sz`, `anketa-fl`, and `anketa-yul`. Each sets
+`tableOwnershipRequired` and declares an approved `cellOwnership` entry or
+reviewed exemption for every dynamic field, plus shared `tableBudgets` per
+page/table. An owner records the exact field/source/page, table/row IDs,
+measured cell bounds, reviewed line capacity, next row, moved border set and
+budget.
+
+The renderer audits planned line ink in shifted coordinates and fails closed
+for a wrong/missing/overlapping owner, ink outside its cell, horizontal-border
+intersection, excessive lines, broken grown-row verticals, duplicate logical
+values or table-budget overrun. Thus a full name cannot enter the birth-date
+row, a bank address cannot enter the INN row, registration cannot enter OKVED,
+and a formatted address cannot be printed again as components. When a row
+grows, all lower content and declared borders move by the same delta.
+
 ## 5. Where a document grows a row
 
 A value that does not fit its printed blank is not necessarily unprintable: a
 page has vertical reserve even when its body has no blank band, and the
-generated document can grow a row the way Word would have. Thirty-three anchors,
-four compaction zones and three cross-page transfers do so. All 43 source,
-target, anchor and compaction boundaries are verified to sit on a clean operator
-cut with `check_expansion_anchors.py`.
+generated document can grow a row the way Word would have. The authoritative
+anchor/compaction/transfer inventory is read directly from the current maps by
+`check_expansion_anchors.py`; no hand-maintained total is repeated here. Every
+declared source, target, anchor and compaction boundary must sit on a clean
+operator cut.
 
 ### The budget belongs to the page
 
@@ -150,6 +184,9 @@ is the form exactly as printed.
 The fixed footer never moves. `shiftToTop` is bounded by the page's measured
 `fixedFooterFrom`, and a configuration that reaches it is refused.
 
+Selected established budgets (the questionnaire ownership registries add their
+own measured per-table limits in the maps):
+
 | Page | Budget | Bottom | Recoverable white space |
 | --- | --- | --- | --- |
 | `power-of-attorney` p1 (ЮЛ) | 61.36 | 27.01 | top margin 2.25→1.5 cm (21.35) + two header gaps (13.00) |
@@ -175,15 +212,21 @@ The ФЛ доверенность uses an 11.0 pt row carrying 9.5 pt text rathe
 12.0 pt row of its own body: that page needs a fourth row and 44.42 pt is what
 it has. The text stays well above the 9 pt floor.
 
-### Every anchor
+### Representative reviewed anchors
+
+This table documents the established layout patterns; it is not the executable
+inventory. The current maps and `check_expansion_anchors.py` are authoritative,
+including the additional questionnaire owning-row anchors.
 
 | Document | Field | Page | Anchor | Max rows × height | Style |
 | --- | --- | --- | --- | --- | --- |
-| `qualification-notice` | `recipientName` | 1 | 181.20 | 2 × 11.5 | underline |
-| `qualification-notice` | `clientName` | 1 | 297.60 | 2 × 11.5 | underline |
-| `qualification-notice` | `registerEntryOrgName` | 1 | 484.95 | 2 × 11.5 | underline |
+| `qualification-notice` | `qualification-notice-recipient` Word flow | 1 | 212.20 | 10 × 11.52 | no invented rule; move owned paths |
+| `qualification-notice` | `qualification-notice-recognition` Word flow | 1 | 345.38 | 4 × 11.52 | reviewed underlines; move owned paths |
+| `qualification-notice` | `qualification-notice-register-entry` Word flow | 1 | 484.95 | 4 × 11.52 | reviewed underlines; move owned paths |
 | `qualification-consequences-notice` | `applicantFullName` | 1 | 210.49 | 2 × 11.5 | underline |
 | `accession-application-fl` | `clientFullName` | 1 | 101.70 | 1 × 10.5 | underline |
+| `anketa-fl-simplified-id` | `clientFullName` owning row | 1 | 153.62 | 1 × 14.16 | table-row + ownership |
+| `anketa-ip-sz` | `clientFullName` owning row | 1 | 245.78 | 1 × 13.44 | table-row + ownership |
 | `anketa-fl` | `passportIssuedBy` | 1 | 503.59 | 1 × 13.44 | table-row |
 | `anketa-yul` | `licenceAuthority` | 3 | 193.94 | 1 × 17.4 | table-row |
 | `client-notifications` | `clientFullName` | 9 | 280.00 | 1 × 12.5 | underline |
@@ -294,19 +337,15 @@ not copied, clipped into bands, rasterised or reconstructed.
 
 ## 6. Structural QA of generated PDFs
 
-234 document × profile combinations, 177 rendered:
-
-| Check | Result |
-| --- | --- |
-| Structural problems | **0** |
-| Smallest dynamic font size in any output | **9.0 pt** |
-| Clipping (text outside its page) | none |
-| Appended pages | none |
-| Page count matches the map | all |
-| AcroForm fields | 0 |
-| Widget annotations | 0 |
-| Base template vector rules lost | 0 |
-| Cyrillic / Latin extractable | yes, both |
+The current gates require a 9.0 pt minimum, no clipping or appended pages,
+unchanged declared page counts, no AcroForm/widgets, no unreviewed loss of base
+vectors, and extractable Cyrillic/Latin text. They also include exact reviewed
+source-path suppression and questionnaire ownership audits. The assembled
+correction branch was run through the canonical combined `run_all_qa.py`:
+**27 of 27 suites passed**, with zero unexpected regression cases. Only the
+suite-level verdict is recorded here — the per-suite check counts stay where
+the runner prints them, and the run itself is logged in
+[manual-findings-continuation.md](../static-uikit/docs/manual-findings-continuation.md).
 
 `run_structural_pdf_tests.py` checks every document as printed and fully
 expanded, with pymupdf and pypdf together: every original show-text
@@ -327,25 +366,27 @@ be; `python static-uikit/tools/qa/run_all_qa.py` prints the current ones.
 
 ## 7. Overflow by profile class
 
-| Class | Fields | Release gate |
-| --- | --- | --- |
-| ordinary | **0** | pass |
-| realistic-long only | **0** for supported subject variants and configured realistic fields | pass |
-| stress only | 23 | not a gate |
-| only in a subject the document does not apply to | 2 | not a gate |
+Ordinary and supported realistic-long cases are release gates; deliberately
+maximal stress values and inapplicable subject variants remain diagnostic
+classes. The current machine-readable classification is
+`static-uikit/tools/qa/ordinary-failures.json`; no manually copied field total
+is authoritative.
 
-The release rerun resolves the earlier long-name, company-name, address, city
-and issuing-authority failures through the measured anchors listed above. The
-three short printed-name signature slots use their existing initials/surname
-fallbacks; deliberately oversized double-surname fixtures remain stress tests,
-not realistic-long fields.
+The correction branch adds short/long Russian/foreign qualification scenarios
+and ordinary/long Russian/foreign ownership scenarios for all four
+questionnaires. In the canonical run every one of the 234 regression cases is
+now accounted for: 187 rendered, 25 physical limits of the printed page, 19
+inapplicable subject variants, 3 branches the profile did not select, and 0
+unexplained. The 3 cases the shared table budget newly refuses are page-reserve
+refusals, not ownership defects — growing those rows would push a signature or
+an employee-only block off its reviewed place.
 
 ### Stress-only
 
-23 fields fail only in the deliberately maximal profiles — 62-character e-mail
-addresses, 47-character contract numbers and 75-character synthetic sentences in
-free-text cells. They are not a release gate, and no artificial input limit has
-been imposed on exact legal values to make them pass.
+Deliberately maximal e-mail addresses, contract numbers and synthetic
+free-text sentences remain stress diagnostics, not permission to truncate an
+exact legal value. They are not a release gate, and no artificial input limit
+is imposed merely to make them pass.
 
 ## 8. Print overrides
 

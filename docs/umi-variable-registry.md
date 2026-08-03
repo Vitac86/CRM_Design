@@ -132,10 +132,9 @@ Evidence, not the label alone:
 («Номер Брокерского договора») and date to **`umi.datesign`** («Дата
 Договора»). Both exist on `company` and `phys` under the same exact names.
 
-## Open questions
+## Depository agreement — no printable UMI pair
 
-Two sources are marked `unresolved-business` and the gate reports them on every
-run:
+Two exact workflow sources deliberately do **not** pretend to be UMI fields:
 
 * `extra.extra-depository-contract`
 * `extra.extra-depository-contract-date`
@@ -149,8 +148,27 @@ run:
 | `id_broking_contracts` | «ИД брокерского договора ЛК», `Строка` | internal LK object ID for the *brokerage* agreement |
 | `data_zaklyucheniya_dogovra` | «Дата заключения договра», `Дата`, on `accession` | the accession agreement's conclusion date, not the depository agreement's date |
 
-Until the business names the fields, both values stay **operator input** in the
-Document Wizard and are never sourced from a guessed UMI name.
+Both aliases are therefore registered as `kind: "workflow"` with
+`operatorInput: true`, not `unresolved-business`. They are required, empty by
+default operator inputs in exactly three documents:
+
+| Document | Printed occurrences |
+|---|---|
+| `accession-application-fl` | agreement number + date |
+| `accession-application-yul` | agreement number + date |
+| `account-opening-notice` | page-1 agreement pair and the same pair in page-2 transfer-basis item 2 |
+
+The account-opening repetitions use separate field IDs but the same two source
+paths, so one requested pair is printed consistently. No wizard control may
+declare `default` or `defaultValue`; in particular the date is never silently
+set to today. The Wizard keeps values while the operator goes Back or reselects
+the same document, isolates them between documents, validates a real ISO
+calendar date, and refuses generation when either half is absent.
+
+`check_umi_registry.py` locks the alias kind, `operatorInput` flag, exact
+`usedBy` occurrences and the absence of a guessed UMI target.
+
+## Open question
 
 The registration number and date of the accession application are in the same
 position: `Front Заявление о присоединении` contains `mask` (`Строка`,

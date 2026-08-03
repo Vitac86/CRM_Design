@@ -377,15 +377,40 @@ ASSIGNMENTS = r"""
   var R = window.CRMDocumentEngine.overlayRenderer;
   var template = maps[docId];
   var payload = window.__smoke.payloadFor(docId, baseProfile, overrides);
+  // Synthetic review scenarios may exercise canonical UMI component paths.
+  // The fixture helper intentionally accepts the four ordinary payload bags
+  // only, so apply `umi.*` overrides here without changing production or the
+  // shared fixture contract.
+  Object.keys(overrides || {}).forEach(function (path) {
+    if (path.indexOf('umi.') !== 0) return;
+    var parts = path.split('.').slice(1);
+    var target = payload.umi = payload.umi || {};
+    parts.forEach(function (part, index) {
+      if (index === parts.length - 1) target[part] = overrides[path];
+      else target = target[part] = target[part] || {};
+    });
+  });
   var fields = {};
   (template.fields || []).forEach(function (f) { fields[f.id] = f; });
+  var fieldCatalog = (template.fields || []).map(function (f) {
+    return { fieldId: f.id, source: f.source || null, page: Number(f.page || 0),
+             type: f.type || 'text',
+             format: f.format || null, layoutMode: f.layoutMode || null,
+             flowBlockId: f.flowBlockId || null };
+  });
   var drawn = [];
   var notes = [];
   var shifts = [];
-  var reviewedRanges = [];
+    var reviewedRanges = [];
+    var reviewedPathSuppressions = [];
   var reviewedFontSizes = {};
   var reviewedValueSizes = [];
   var blockFields = {};
+  var blockMetrics = {};
+  var ownershipAudit = { violations: [], metrics: [], budgetUse: [] };
+  var preflightOk = false;
+  var preflightFingerprint = null;
+  var renderFingerprint = null;
   R.activeReviewedRangePages(template, payload).forEach(function (group) {
     var sizes = [];
     group.blocks.forEach(function (block) {
@@ -399,16 +424,21 @@ ASSIGNMENTS = r"""
     reviewedFontSizes[group.page] = Array.from(new Set(sizes));
   });
 
-  return R.render(template, payload, {
-    onReviewedRanges: function (entries) {
-      reviewedRanges = entries.map(function (entry) {
-        return { page: entry.page, inspection: entry.suppression };
-      });
-    },
+  // Structural evidence must refer to the untouched source stream. Renderer
+  // callbacks observe offsets after earlier suppressions have shifted them.
+  return R.preflight(template, payload).then(function (preflight) {
+    reviewedRanges = preflight.reviewedRanges || [];
+    reviewedPathSuppressions = preflight.reviewedPathSuppressions || [];
+    ownershipAudit = preflight.ownershipAudit || ownershipAudit;
+    preflightOk = preflight.ok === true;
+    preflightFingerprint = preflight.fingerprint || null;
+    return R.render(template, payload, {
     onExpansion: function (items) {
       items.forEach(function (item) { notes.push(item); });
     },
     onPlan: function (decided) {
+      renderFingerprint = decided.fingerprint || null;
+      ownershipAudit = decided.ownershipAudit || ownershipAudit;
       Object.keys(decided.plans || {}).forEach(function (page) {
         var plan = decided.plans[page];
         (plan.shifts || []).forEach(function (shift) {
@@ -419,7 +449,8 @@ ASSIGNMENTS = r"""
       Object.keys(decided.planned.byField).forEach(function (id) {
         var planned = decided.planned.byField[id];
         if (!planned || !planned.drawn || !planned.layout) return;
-        drawn.push({ fieldId: id, requested: planned.value,
+        drawn.push({ fieldId: id, source: (fields[id] || {}).source || null,
+          page: Number((fields[id] || {}).page || 0), requested: planned.value,
           rendered: (planned.layout.lines || []).map(function (l) {
             return l.text; }).join('\n'),
           size: planned.layout.size,
@@ -439,6 +470,14 @@ ASSIGNMENTS = r"""
       Object.keys(decided.planned.byBlock || {}).forEach(function (id) {
         var planned = decided.planned.byBlock[id];
         if (!planned || !planned.drawn) return;
+        var block = (template.wordFlowBlocks || []).filter(function (entry) {
+          return entry.id === id;
+        })[0] || {};
+        blockMetrics[id] = {
+          page: Number(block.page || 0),
+          additionalLines: Number((planned.layout || {}).additionalLines || 0),
+          size: Number((planned.layout || {}).size || 0)
+        };
         var pieces = {}, sizes = {}, seen = {};
         (planned.layout.lines || []).forEach(function (line, lineIndex) {
           (line.runs || []).forEach(function (run) {
@@ -468,7 +507,9 @@ ASSIGNMENTS = r"""
         });
         blockFields[id] = Object.keys(pieces);
         Object.keys(pieces).forEach(function (key) {
-          drawn.push({ fieldId: key, requested: (planned.values || {})[key],
+          drawn.push({ fieldId: key, source: (fields[key] || {}).source || null,
+            page: Number(block.page || 0), blockId: id,
+            requested: (planned.values || {})[key],
             rendered: pieces[key].join(' '), size: sizes[key],
             lines: Object.keys(seen[key]).length,
             // A value inside a reviewed paragraph shares the block's own
@@ -481,6 +522,7 @@ ASSIGNMENTS = r"""
         });
       });
     }
+    });
   }).then(function (blob) { return blob.arrayBuffer(); })
     .then(function (buffer) {
       var bytes = new Uint8Array(buffer);
@@ -490,8 +532,15 @@ ASSIGNMENTS = r"""
       }
       return JSON.stringify({ ok: true, pdf: btoa(binary), drawn: drawn,
                               notes: notes, shifts: shifts,
+                              fieldCatalog: fieldCatalog,
                               blockFields: blockFields,
+                              blockMetrics: blockMetrics,
+                              ownershipAudit: ownershipAudit,
+                              preflightOk: preflightOk,
+                              preflightFingerprint: preflightFingerprint,
+                              renderFingerprint: renderFingerprint,
                               reviewedRanges: reviewedRanges,
+                              reviewedPathSuppressions: reviewedPathSuppressions,
                               reviewedFontSizes: reviewedFontSizes,
                               reviewedValueSizes: reviewedValueSizes });
     }, function (error) {
@@ -606,7 +655,8 @@ def main() -> int:
                     None,
                     reviewed=result.get("reviewedRanges"),
                     reviewed_font_sizes=result.get("reviewedFontSizes"),
-                    reviewed_value_sizes=result.get("reviewedValueSizes"))
+                    reviewed_value_sizes=result.get("reviewedValueSizes"),
+                    reviewed_paths=result.get("reviewedPathSuppressions"))
 
                 entry = {
                     "rung": rung,

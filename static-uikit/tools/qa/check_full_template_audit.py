@@ -69,6 +69,27 @@ REQUIRED_MATRIX_COLUMNS = {
     "migrationCompleted", "visualReviewStatus", "structuralQaStatus",
 }
 
+# Exact, reviewed source migrations. The qualification notice now consumes the
+# centralized component-aware registration-address adapter instead of the old
+# postal-address fallback; every other frozen identifier/source pair remains
+# immutable. Keeping both endpoints here makes this an exception, not a broad
+# permission to rename sources.
+REVIEWED_SOURCE_MIGRATIONS = {
+    ("qualification-notice", "recipientAddress"): (
+        "field.client-postal-address", "umi.address.registration"
+    ),
+}
+
+
+def source_is_preserved(
+    map_id: str, field_id: str, expected: Any, actual: Any
+) -> bool:
+    if actual == expected:
+        return True
+    return REVIEWED_SOURCE_MIGRATIONS.get((map_id, field_id)) == (
+        expected, actual
+    )
+
 # This is the closed template set. SHA-256 and byte sizes live only in the
 # generated baseline, so a changed source cannot be silently accepted by code.
 DOCUMENT_SPECS: dict[str, dict[str, str]] = {
@@ -173,7 +194,7 @@ PRODUCTION_STATUSES = {
 NON_DYNAMIC_RATIONALE = {
     "order-forms": {
         "reason": (
-            "Приложение 7 carries four order types across five pages. The map "
+            "Приложение 7 carries three order forms across four pages. The map "
             "places 93 fields, but 89 of them read `extra.*` — values an "
             "operator types — and every one is optional, so the form generates "
             "almost entirely blank unless a manager fills a form the wizard "
@@ -325,9 +346,9 @@ TABLE_DOCUMENTS = {
     "order-forms",
 }
 
-# Reviewed final continuation decision: these fourteen source sections are
-# bordered table rows and retain row growth. Word-flow expansion lives on its
-# block, not on a field. Any other field-level expansion is a regression.
+# Reviewed final continuation decision: these source sections are bordered
+# table rows and retain row growth. Word-flow expansion lives on its block,
+# not on a field. Any other field-level expansion is a regression.
 #
 # The last four were added when the remaining ordinary substitutions were
 # resolved: the анкета's foreign-name cell is a double-height table row that
@@ -342,7 +363,22 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("anketa-fl", "passportIssuedBy"),
     ("anketa-fl", "bankName"),
     ("anketa-fl", "bankAddress"),
+    ("anketa-fl-simplified-id", "clientFullName"),
+    ("anketa-fl-simplified-id", "bankName"),
+    ("anketa-fl-simplified-id", "bankAddress"),
+    ("anketa-fl-simplified-id", "otherInformation"),
+    ("anketa-ip-sz", "clientFullName"),
+    ("anketa-ip-sz", "bankName"),
+    ("anketa-ip-sz", "bankAddress"),
+    ("anketa-ip-sz", "ipRegistrationAuthority"),
+    ("anketa-ip-sz", "ipRegistrationPlace"),
+    ("anketa-ip-sz", "representativeName"),
+    ("anketa-ip-sz", "beneficiaryName"),
+    ("anketa-ip-sz", "beneficialOwnerName"),
     ("anketa-yul", "foreignName"),
+    ("anketa-yul", "stateRegistrationAuthority"),
+    ("anketa-yul", "pre2002RegistrationDocument"),
+    ("anketa-yul", "pre2002RegistrationAuthority"),
     ("anketa-yul", "licenceAuthority"),
     ("anketa-yul", "bankAddress"),
     ("broker-use-refusal-request", "clientName"),
@@ -491,7 +527,9 @@ def validate_runtime(
             actual = current_by_id.get(field_id)
             if actual is None:
                 errors.append(f"removed/renamed baseline field: {map_id}/{field_id}")
-            elif actual.get("source") != required.get("source"):
+            elif not source_is_preserved(
+                map_id, field_id, required.get("source"), actual.get("source")
+            ):
                 errors.append(
                     f"changed baseline source: {map_id}/{field_id}: "
                     f"{required.get('source')!r} -> {actual.get('source')!r}"
@@ -1184,7 +1222,9 @@ def build_field_and_section_rows(
             )
             required, complete, defect = migration_status(category, model)
             identifier_status = "baseline-preserved" if key in baseline else "additive-current"
-            if key in baseline and field.get("source") != baseline[key]:
+            if key in baseline and not source_is_preserved(
+                map_id, field_id, baseline[key], field.get("source")
+            ):
                 errors.append(f"baseline source mismatch while building row: {map_id}/{field_id}")
 
             visual_status = (
@@ -1923,7 +1963,7 @@ def validate_committed_identifiers(
     for key, source in sorted(expected.items()):
         if key not in actual:
             errors.append(f"removed/renamed committed current field: {key[0]}/{key[1]}")
-        elif actual[key] != source:
+        elif not source_is_preserved(key[0], key[1], source, actual[key]):
             errors.append(
                 f"changed committed current source: {key[0]}/{key[1]}: "
                 f"{source!r} -> {actual[key]!r}"

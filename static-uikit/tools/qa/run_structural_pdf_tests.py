@@ -71,11 +71,13 @@ RENDER = r"""
   const notes = [];
   let flowPages = [];
   let reviewedRanges = [];
+  let reviewedPathSuppressions = [];
   const reviewedFontSizes = {};
   let blob;
   try {
     const preflight = await CRMDocumentEngine.overlayRenderer.preflight(t, payload);
     reviewedRanges = preflight.reviewedRanges || [];
+    reviewedPathSuppressions = preflight.reviewedPathSuppressions || [];
     CRMDocumentEngine.overlayRenderer.activeReviewedRangePages(t, payload)
       .forEach(function (group) {
         const sizes = [];
@@ -105,6 +107,7 @@ RENDER = r"""
   for (let i = 0; i < u8.length; i += c) s += String.fromCharCode.apply(null, u8.subarray(i, i + c));
   return JSON.stringify({ pdf: btoa(s), notes: notes, flowPages: flowPages,
                           reviewedRanges: reviewedRanges,
+                          reviewedPathSuppressions: reviewedPathSuppressions,
                           reviewedFontSizes: reviewedFontSizes,
                           pages: t.expectedPages,
                           url: t.templateUrl });
@@ -154,25 +157,35 @@ def words(text):
     return collections.Counter(w for w in text.split() if len(w) > 2)
 
 
-def reviewed_ranges_by_page(reviewed, page_count):
-    """Validate preflight metadata and return zero-based page -> byte ranges."""
+def reviewed_ranges_by_page(reviewed, page_count, reviewed_paths=None):
+    """Validate all exact suppressions and return page -> source byte ranges."""
     result = collections.defaultdict(list)
-    for entry in reviewed or []:
-        page = int(entry["page"])
-        if page < 0 or page >= page_count:
-            raise AssertionError(f"reviewed range page {page} is outside the PDF")
-        inspection = entry.get("inspection") or {}
-        for item in inspection.get("ranges") or []:
-            start, end = int(item["startByte"]), int(item["endByte"])
-            if start < 0 or end <= start:
+    for collection, key in ((reviewed or [], "ranges"),
+                            (reviewed_paths or [], "suppressions")):
+        for entry in collection:
+            page = int(entry["page"])
+            if page < 0 or page >= page_count:
                 raise AssertionError(
-                    f"invalid byte range for {item.get('id')}: {start}:{end}")
-            result[page].append({
-                "id": item.get("id"),
-                "start": start,
-                "end": end,
-                "sha256": item.get("sha256"),
-            })
+                    f"reviewed suppression page {page} is outside the PDF")
+            inspection = entry.get("inspection") or {}
+            for item in inspection.get(key) or []:
+                start, end = int(item["startByte"]), int(item["endByte"])
+                if start < 0 or end <= start:
+                    raise AssertionError(
+                        f"invalid byte range for {item.get('id')}: {start}:{end}")
+                units = item.get("unitRanges") or [
+                    {"startByte": start, "endByte": end}]
+                for unit_index, unit in enumerate(units):
+                    result[page].append({
+                        "id": (item.get("id") if len(units) == 1 else
+                               f"{item.get('id')}#{unit_index + 1}"),
+                        "start": int(unit["startByte"]),
+                        "end": int(unit["endByte"]),
+                        "proof_id": item.get("id"),
+                        "proof_start": start,
+                        "proof_end": end,
+                        "sha256": item.get("sha256"),
+                    })
     for ranges in result.values():
         ranges.sort(key=lambda item: (item["start"], item["end"]))
         for previous, current in zip(ranges, ranges[1:]):
@@ -184,17 +197,25 @@ def reviewed_ranges_by_page(reviewed, page_count):
 
 def stream_outside_reviewed_ranges(stream, ranges):
     """Remove only hash-proved ranges from a decoded source content stream."""
+    proofs = {}
+    for item in ranges:
+        key = (item["proof_id"], item["proof_start"], item["proof_end"])
+        proofs[key] = item["sha256"]
+    for (proof_id, start, end), expected in proofs.items():
+        if end > len(stream):
+            raise AssertionError(
+                f"reviewed range {proof_id} ends at {end}, stream has {len(stream)} bytes")
+        actual = hashlib.sha256(stream[start:end]).hexdigest()
+        if actual != expected:
+            raise AssertionError(
+                f"reviewed range {proof_id} has {actual}, expected {expected}; "
+                "browser and pypdf decoded-stream offsets disagree")
     pieces, cursor = [], 0
     for item in ranges:
         start, end = item["start"], item["end"]
         if end > len(stream):
             raise AssertionError(
                 f"reviewed range {item['id']} ends at {end}, stream has {len(stream)} bytes")
-        actual = hashlib.sha256(stream[start:end]).hexdigest()
-        if actual != item["sha256"]:
-            raise AssertionError(
-                f"reviewed range {item['id']} has {actual}, expected {item['sha256']}; "
-                "browser and pypdf decoded-stream offsets disagree")
         pieces.append(stream[cursor:start])
         cursor = end
     pieces.append(stream[cursor:])
@@ -238,12 +259,14 @@ class Checks:
 
 
 def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
-            cross_page=False, reviewed=None, reviewed_font_sizes=None):
+            cross_page=False, reviewed=None, reviewed_paths=None,
+            reviewed_font_sizes=None):
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
     where = f"{doc_id} [{label}]"
 
-    ranges_by_page = reviewed_ranges_by_page(reviewed, base.page_count)
+    ranges_by_page = reviewed_ranges_by_page(
+        reviewed, base.page_count, reviewed_paths)
     comparison_bytes = comparison_pdf(template_path, ranges_by_page) \
         if ranges_by_page else None
     protected = fitz.open(stream=comparison_bytes, filetype="pdf") \
@@ -265,8 +288,11 @@ def inspect(checks, doc_id, label, pdf_bytes, template_path, expected_pages,
         if comparison_bytes else base_reader
 
     checks.check(f"{where}: approved ranges are hash-proved before comparison",
-                 all(item.get("sha256") for entry in (reviewed or [])
-                     for item in (entry.get("inspection") or {}).get("ranges", [])),
+                 all(item.get("sha256")
+                     for entries, key in ((reviewed or [], "ranges"),
+                                          (reviewed_paths or [], "suppressions"))
+                     for entry in entries
+                     for item in (entry.get("inspection") or {}).get(key, [])),
                  f"{sum(len(items) for items in ranges_by_page.values())} ranges")
 
     # A cross-page rule intentionally changes which page owns a static block,
@@ -469,6 +495,7 @@ def main() -> int:
                 size = inspect(checks, doc_id, label, pdf, template_path,
                                payload["pages"], bool(payload.get("flowPages")),
                                payload.get("reviewedRanges"),
+                               payload.get("reviewedPathSuppressions"),
                                payload.get("reviewedFontSizes"))
                 if size is not None:
                     smallest_overall = size if smallest_overall is None \

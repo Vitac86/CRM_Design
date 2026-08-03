@@ -2,19 +2,29 @@
 
 **Production status: `blocked-incomplete-mapping` — separate implementation required.**
 
-ПРИЛОЖЕНИЕ 7 К РЕГЛАМЕНТУ. ФОРМЫ ПОРУЧЕНИЙ · `order-forms.pdf` · 5 pages
+ПРИЛОЖЕНИЕ 7 К РЕГЛАМЕНТУ. ФОРМЫ ПОРУЧЕНИЙ · `order-forms.pdf` · 4 pages
 
 ## Why it is not production-ready
 
-The map places **93 printed fields**. Of those:
+The retained incomplete map places **93 printed fields**. Its current sources
+are:
 
-- **80** operator input
-- **13** UMI
+- **89** `extra.*` operator values;
+- **1** `check.*` operator acknowledgement;
+- **3** normalized client-name values.
 
-Every field in the map is declared `optional`, so nothing refuses to
-generate when it is absent: the form simply prints blank. Only the client
-name reaches CRM data. That is why the form was reclassified — a document
-that renders mostly empty is not a document a client can be sent.
+Every mapped field is currently declared `optional`, so nothing refuses to
+generate when an amount, market, contract, recipient, bank requisite or
+signature-side value is absent: the form simply prints blank. Only the three
+form variants' client-name occurrences reach normalized CRM data. The table
+below identifies **13 rows for which an exact UMI source is available** (the
+three names and ten bank rows); those availability notes are the target mapping,
+not a claim that the current map already uses those UMI paths.
+
+That is why the form remains `blocked-incomplete-mapping`, is not offered by
+the wizard, and is excluded from the 17 dynamic production-ready templates.
+The catalogue entry and map remain only as a measured starting point for the
+separate implementation.
 
 The bank rows are the clearest case: `Front Реквизиты` holds every one of
 them under an exact UMI name (see docs/umi-variable-registry.md), and the map

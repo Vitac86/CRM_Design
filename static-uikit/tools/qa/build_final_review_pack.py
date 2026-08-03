@@ -1,33 +1,11 @@
-"""The final visual-review pack: every production dynamic document.
+"""Build the focused manual-findings correction review pack.
+
+The pack is deliberately local and git-excluded.  Every PDF is produced by
+the production browser renderer from repository-owned synthetic fixtures; the
+authoritative templates are read-only and neither Word nor LibreOffice is
+used.
 
     python static-uikit/tools/qa/build_final_review_pack.py
-
-The focused pack next door covers the ten fields one earlier phase changed.
-This one covers all eighteen production-ready documents, because the last round
-of changes touched shared machinery — how a printed line's height is measured,
-how a reviewed paragraph grows a bordered row, how a group of values is set —
-and a person has to look at every form those things can reach, not only at the
-two that were edited.
-
-Each document is generated for every fixture profile its catalogue entry
-applies to, so the pack covers an ordinary payload, a realistic-long one, an
-English one and both subject kinds wherever the form has both.
-
-Each card records what a reviewer would otherwise have to work out by hand: the
-client code, the agreement number and date the sentence was built from, the
-size the tariff group came out at, how many rows were inserted, how far the
-page moved, the smallest size any client value was drawn at, whether every
-requested value came back out of the finished PDF unchanged, and the production
-structural verdict. Then a full-page render of every page, so nothing is
-reviewed through a crop chosen by the tool that made it.
-
-Output is deliberately local and git-excluded:
-
-    static-uikit/manual-smoke/final-document-review/
-
-Everything is drawn by the production renderer through the smoke pack's own
-browser harness. Word and LibreOffice are not involved, no source PDF is
-touched, and every value is this repository's own synthetic fixture data.
 """
 
 from __future__ import annotations
@@ -39,262 +17,670 @@ import json
 import os
 import shutil
 import sys
+from typing import Any
 
 import fitz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC_UIKIT = os.path.abspath(os.path.join(HERE, "..", ".."))
-SMOKE_TOOLS = os.path.join(STATIC_UIKIT, "manual-smoke", "word-flow-long-data", "tools")
+SMOKE_TOOLS = os.path.join(
+    STATIC_UIKIT, "manual-smoke", "word-flow-long-data", "tools"
+)
 TEMPLATES = os.path.join(STATIC_UIKIT, "assets", "document-pdf-templates")
-AUDIT_JSON = os.path.join(HERE, "document-full-template-audit.json")
-OUT = os.path.join(STATIC_UIKIT, "manual-smoke", "final-document-review")
+OUT = os.path.join(STATIC_UIKIT, "manual-smoke", "manual-findings-fix")
 
 for path in (HERE, SMOKE_TOOLS):
     if path not in sys.path:
         sys.path.insert(0, path)
 
-from build_ordinary_review_pack import ASSIGNMENTS, screenshot, slug  # noqa: E402
+from build_ordinary_review_pack import ASSIGNMENTS, slug  # noqa: E402
 from run_document_regression import inspect as production_inspect  # noqa: E402
 from smoke_engine import SmokeBrowser  # noqa: E402
 
-PAGE_SCALE = 2  # 144 dpi — legible full pages without a gigabyte of PNG
+FULL_PAGE_SCALE = 1.65
+FOCUS_SCALE = 2.5
 
-# The fixtures every document is reviewed at. `kind` selects which apply: a
-# form for individuals is never rendered with a company payload.
-#
-#   ordinary        what a manager types on a normal day
-#   realistic-long  the longest values the reviewed configuration holds
-#   foreign         Latin values, non-resident
-#   expansion       the payload that makes a row grow or a value wrap
-PROFILES = [
-    {"id": "ru-resident-normal", "kind": "individual", "rung": "ordinary",
-     "language": "Russian"},
-    {"id": "ru-resident-long", "kind": "individual", "rung": "realistic-long",
-     "language": "Russian"},
-    {"id": "en-nonresident-long", "kind": "individual", "rung": "foreign",
-     "language": "English"},
-    {"id": "ru-company-normal", "kind": "company", "rung": "ordinary",
-     "language": "Russian"},
-    {"id": "ru-company-long", "kind": "company", "rung": "realistic-long",
-     "language": "Russian"},
-    {"id": "en-company-long", "kind": "company", "rung": "foreign",
-     "language": "English"},
-]
+RU_ADDRESS = {
+    "index": "125009",
+    "country": "Российская Федерация",
+    "region": "Центральный федеральный округ",
+    "district": "внутригородская территория муниципальный округ Пресненский",
+    "city": "Москва",
+    "street": "Большая Дмитровка",
+    "house": "128",
+    "corps": "4, строение 7",
+    "flat": "385",
+}
+FOREIGN_ADDRESS = {
+    "index": "SW1A 2AA",
+    "country": "United Kingdom",
+    "region": "Greater London",
+    "district": "City of Westminster",
+    "city": "London",
+    "settlement": "Saint Christopher International Business Park",
+    "street": "King George the Fifth Avenue",
+    "house": "27",
+    "flat": "148",
+}
+LONG_NAME = (
+    "Акционерное общество «Международные инвестиционные технологии, "
+    "инфраструктурные решения и управление активами»"
+)
+BODY_NAME = (
+    "Публичное акционерное общество «Международный центр инвестиционных "
+    "технологий, инфраструктурных решений, управления активами и финансовых "
+    "инструментов»"
+)
+OTHER_INSTRUMENTS = (
+    "акций и облигаций иностранных эмитентов, паев международных "
+    "инвестиционных фондов, депозитарных расписок, структурных облигаций и "
+    "производных финансовых инструментов, предназначенных для "
+    "квалифицированных инвесторов"
+)
 
-# One extra pass per document that can grow: the values that actually make a
-# row appear, so the reviewer sees the grown form and not only the flat one.
-EXPANSION_OVERRIDES = {
+
+DOCUMENTS: dict[str, dict[str, Any]] = {
     "account-opening-notice": {
-        "extra.extra-brokerage-contract": "БД-2026/000417-СПБ-01",
-        "extra.extra-brokerage-contract-date": "2026-12-31",
-        "field.client-code": "INV-TEST-2026-00000017",
+        "title": "Извещение об открытии брокерского счёта",
+        "focusFields": [
+            "depositaryContractNumber", "depositaryContractDate",
+            "transferBasisDepositoryNumber", "transferBasisDepositoryDate",
+        ],
+        "focusRegions": [
+            {"id": "representative-spelling", "title": "Исправленное отчество представителя",
+             "page": 0, "clip": [30, 90, 565, 205], "fields": []},
+            {"id": "depository-contract-row", "title": "Депозитарный договор: номер и дата",
+             "page": 0, "clip": [30, 380, 570, 470],
+             "fields": ["depositaryContractNumber", "depositaryContractDate"]},
+            {"id": "transfer-basis", "title": "Основание перевода на странице 2",
+             "page": 1, "clip": [30, 555, 570, 785],
+             "fields": ["transferBasisDepositoryNumber", "transferBasisDepositoryDate"]},
+        ],
+        "staticChecks": [
+            {"id": "correct-patronymic-once",
+             "text": "Козырева Александра Юрьевича", "expectedCount": 1},
+            {"id": "misspelled-patronymic-absent",
+             "text": "Козырева Александра Юрьвеича", "expectedCount": 0},
+            {"id": "printed-test-phrase-absent",
+             "text": "Тестовое значение", "expectedCount": 0},
+        ],
     },
-    "accession-application-yul": {
-        "extra.tariff-stock": "Стандартный фондовый",
-        "extra.tariff-derivatives": "Стандартный срочный",
-        "extra.tariff-currency": "Стандартный валютный",
-        "check.market-stock": True,
-        "check.market-derivatives": True,
-        "check.market-currency": True,
+    "qualification-notice": {
+        "title": "Уведомление о признании квалифицированным инвестором",
+        "focusFields": [
+            "recipientName", "recipientAddress", "clientName",
+            "recognitionDate", "otherInstruments", "registerEntryOrgName",
+        ],
+        "focusRegions": [
+            {"id": "recipient", "title": "Получатель и единый форматированный адрес",
+             "page": 0, "clip": [330, 140, 565, 360],
+             "fields": ["recipientName", "recipientAddress"]},
+            {"id": "recognition-body", "title": "Наименование организации и дата в тексте",
+             "page": 0, "clip": [35, 255, 565, 440],
+             "fields": ["clientName", "recognitionDate"]},
+            {"id": "other-and-register", "title": "«Иное» и запись в реестре",
+             "page": 0, "clip": [35, 390, 565, 555],
+             "fields": ["otherInstruments", "registerEntryOrgName"]},
+        ],
     },
-    "accession-application-fl": {
-        "extra.tariff-stock": "Стандартный фондовый",
-        "extra.tariff-derivatives": "Стандартный срочный",
-        "extra.tariff-currency": "Стандартный валютный",
-        "check.market-stock": True,
-        "check.market-derivatives": True,
-        "check.market-currency": True,
+    "anketa-fl-simplified-id": {
+        "title": "Упрощённая анкета физического лица",
+        "kind": "individual",
+        "focusFields": [
+            "clientFullName", "idIssuedBy", "registrationAddress",
+            "bankName", "bankAddress", "otherInformation",
+        ],
+        "focusRegions": [
+            {"id": "identity", "title": "ФИО и удостоверяющий документ", "page": 0,
+             "clip": [45, 130, 575, 335],
+             "fields": ["clientFullName", "idIssuedBy"]},
+            {"id": "registration", "title": "Адрес регистрации", "page": 0,
+             "clip": [45, 265, 575, 370], "fields": ["registrationAddress"]},
+            {"id": "bank-and-free-text", "title": "Банк и дополнительные сведения", "page": 0,
+             "clip": [45, 620, 575, 835],
+             "fields": ["bankName", "bankAddress", "otherInformation"]},
+        ],
     },
-    "anketa-yul": {
-        "field.client-english-name":
-            "International Industrial and Infrastructure Development "
-            "Holdings Corporation Limited",
+    "anketa-ip-sz": {
+        "title": "Анкета ИП / самозанятого",
+        "kind": "individual",
+        "focusFields": [
+            "clientFullName", "idIssuedBy", "registrationAddress",
+            "bankName", "bankAddress", "ipRegistrationAuthority",
+            "ipRegistrationPlace", "otherInformation",
+        ],
+        "focusRegions": [
+            {"id": "identity", "title": "ФИО и удостоверяющий документ", "page": 0,
+             "clip": [45, 225, 575, 535],
+             "fields": ["clientFullName", "idIssuedBy"]},
+            {"id": "registration", "title": "Адрес регистрации", "page": 0,
+             "clip": [45, 645, 575, 835], "fields": ["registrationAddress"]},
+            {"id": "bank-and-ip-registration", "title": "Банк и регистрация ИП", "page": 1,
+             "clip": [45, 300, 575, 595],
+             "fields": ["bankName", "bankAddress", "ipRegistrationAuthority",
+                        "ipRegistrationPlace"]},
+            {"id": "free-text", "title": "Дополнительные сведения", "page": 3,
+             "clip": [45, 290, 575, 385], "fields": ["otherInformation"]},
+        ],
     },
     "anketa-fl": {
-        "field.passport-issued-by":
-            "Отделение по вопросам миграции Управления Министерства внутренних "
-            "дел Российской Федерации по Центральному административному округу "
-            "города Москвы",
+        "title": "Полная анкета физического лица",
+        "kind": "individual",
+        "focusFields": [
+            "fullName", "passportIssuedBy", "registrationAddress",
+            "bankName", "bankAddress", "otherInformation",
+        ],
+        "focusRegions": [
+            {"id": "identity", "title": "ФИО и удостоверяющий документ", "page": 0,
+             "clip": [45, 190, 575, 545],
+             "fields": ["fullName", "passportIssuedBy"]},
+            {"id": "registration", "title": "Адрес регистрации", "page": 0,
+             "clip": [45, 645, 575, 835], "fields": ["registrationAddress"]},
+            {"id": "bank", "title": "Банковские реквизиты", "page": 1,
+             "clip": [45, 270, 575, 430], "fields": ["bankName", "bankAddress"]},
+            {"id": "free-text", "title": "Иные сведения", "page": 2,
+             "clip": [45, 620, 575, 715], "fields": ["otherInformation"]},
+        ],
+    },
+    "anketa-yul": {
+        "title": "Анкета юридического лица",
+        "kind": "company",
+        "focusFields": [
+            "fullLegalName", "foreignName", "stateRegistrationAuthority",
+            "pre2002RegistrationDocument", "pre2002RegistrationAuthority",
+            "egrulAddress", "licenceAuthority", "bankName", "bankAddress",
+            "otherInformation",
+        ],
+        "focusRegions": [
+            {"id": "names", "title": "Полное и иностранное наименование", "page": 0,
+             "clip": [45, 170, 575, 275],
+             "fields": ["fullLegalName", "foreignName"]},
+            {"id": "registration", "title": "Регистрация и адрес ЕГРЮЛ", "page": 0,
+             "clip": [45, 495, 575, 825],
+             "fields": ["stateRegistrationAuthority", "pre2002RegistrationDocument",
+                        "pre2002RegistrationAuthority", "egrulAddress"]},
+            {"id": "licence-and-bank", "title": "Лицензия и банковские реквизиты", "page": 2,
+             "clip": [45, 130, 575, 430],
+             "fields": ["licenceAuthority", "bankName", "bankAddress"]},
+            {"id": "free-text", "title": "Иные сведения", "page": 4,
+             "clip": [45, 140, 575, 225], "fields": ["otherInformation"]},
+        ],
     },
 }
 
-# Documented stress-only capacity limits, and the realistic value that takes
-# their place here.
-#
-# `ordinary-failures.json` records 22 fields that refuse a long-profile value
-# and are not release-class failures — the long fixture e-mail is 62 characters
-# and the printed slot holds about 40. Those refusals are already accounted for
-# and re-proving them is not what this pack is for; a refusal also aborts the
-# whole document, which would cost the reviewer the realistic-long card for a
-# form whose every other value is fine. So the realistic-long pass substitutes
-# an ordinary value for exactly those fields, and the card says it did.
-STRESS_RELIEF = {
-    "subject.email": "client@example.test",
-    "extra.extra-other-info": "Дополнительных сведений нет.",
-    "extra.extra-order-other-info": "Дополнительных сведений нет.",
-    "extra.extra-management-structure": "Единоличный исполнительный орган",
-    "extra.licensed-activities": "Брокерская деятельность.",
-    "extra.extra-pdl-details": "Не является ПДЛ.",
-    "extra.extra-supporting-docs-1": "Выписка из ЕГРЮЛ от 12.01.2026",
-    # The long fixture's brokerage-contract number is 45 characters, which is
-    # the recorded stress value rather than a shape any agreement really has.
-    # A long but real one is what the reviewed slot was measured against.
-    "field.extra-contract-number": "BR-2026/00444-INTL-00000017",
-}
 
-# Four forms print a signature line whose «расшифровка подписи» slot is 46.7 pt
-# — about ten Cyrillic characters — and derive it from the client's own name.
-# The long fixture surnames «Александров-Смирнов» and «O'Connor-Smith-Jones»
-# do not fit it at the 9 pt floor, which the substitution audit has recorded
-# and accepted; that limit is a property of the printed form, not something
-# this phase changed.
-#
-# Substituting a short name would take the realistic-long card away from the
-# value that actually needs one on these forms — the client-name table cell
-# that grows. So the name is long, and its surname fits the signature slot.
-DOCUMENT_STRESS_RELIEF = {
-    document: {
-        "Russian": {
-            "field.clientFullName": "Верещагин Максимилиан Владиславович",
-            "field.client-full-name": "Верещагин Максимилиан Владиславович",
-        },
-        # Surname first, the order these forms read a name in and the order the
-        # `initials` formatter abbreviates from.
-        "English": {
-            "field.clientFullName": "Fitzgerald Maximilian Alexander",
-            "field.client-full-name": "Fitzgerald Maximilian Alexander",
-        },
-    }
-    for document in ("broker-use-refusal-request",
-                     "regulation-full-refusal-notice",
-                     "regulation-partial-refusal-notice",
-                     "qualification-request-fl")
-}
-
-# The values a reviewer is told about on every card, whichever form they came
-# from. Named by source rather than by field id, because the same business
-# value is a different field in each map.
-REPORTED_SOURCES = {
-    "client code": ("field.client-code",),
-    "agreement number": ("extra.extra-brokerage-contract",
-                         "extra.extra-contract-number"),
-    "agreement date": ("extra.extra-brokerage-contract-date",
-                       "extra.extra-contract-date"),
-}
-TARIFF_FIELDS = ("tariffStock", "tariffDerivatives", "tariffCurrency")
+def umi_address(parts: dict[str, str]) -> dict[str, str]:
+    return {f"umi.company.{key}": value for key, value in parts.items()}
 
 
-def dynamic_documents() -> list[dict]:
-    """The production-ready dynamic templates, from the committed inventory."""
-    with open(AUDIT_JSON, encoding="utf-8") as handle:
-        audit = json.load(handle)
-    return [row for row in audit["productionStatusInventory"]
-            if row["productionStatus"] == "dynamic-production-ready"]
+def qualification_scenarios() -> list[dict[str, Any]]:
+    short = "АО «Тестовые инвестиции»"
+
+    def scenario(identifier: str, name: str, address: str = "г. Москва",
+                 address_parts: dict[str, str] | None = None,
+                 other: str | None = None) -> dict[str, Any]:
+        overrides: dict[str, Any] = {
+            "field.client-full-name": name,
+            "field.client-registration-address": address,
+            "field.documentDateRu": "2026-08-03",
+            "umi.company.origname": name,
+            "extra.extra-qualification-scope": "other" if other else "all",
+            "extra.extra-qualification-instruments-other": other or "",
+        }
+        if address_parts:
+            # A deliberately different fallback makes a duplicate or fallback
+            # address obvious in the finished PDF.
+            overrides["field.client-registration-address"] = (
+                "РЕЗЕРВНЫЙ СИНТЕТИЧЕСКИЙ АДРЕС — НЕ ДОЛЖЕН ПЕЧАТАТЬСЯ"
+            )
+            overrides.update(umi_address(address_parts))
+        required = ["recipientName", "recipientAddress", "clientName",
+                    "recognitionDate", "registerEntryOrgName"]
+        if other:
+            required.append("otherInstruments")
+        return {"id": identifier, "profile": "ru-company-normal",
+                "overrides": overrides, "requiredFocusFields": required}
+
+    return [
+        scenario("short", short),
+        scenario("long-name", LONG_NAME),
+        scenario("long-ru-address", short, address_parts=RU_ADDRESS),
+        scenario("long-foreign-address", short, address_parts=FOREIGN_ADDRESS),
+        scenario("combined-long-name-address", LONG_NAME, address_parts=RU_ADDRESS),
+        scenario("body-date", BODY_NAME),
+        scenario("other", short, other=OTHER_INSTRUMENTS),
+    ]
 
 
-def documented_stress_fields() -> set[tuple[str, str]]:
-    """Capacity limits the substitution audit has already recorded and accepted.
+def questionnaire_overrides(doc_id: str, language: str, long: bool) -> dict[str, Any]:
+    overrides: dict[str, Any] = {"subject.email": "client@example.test"}
+    if doc_id == "anketa-yul":
+        if language == "foreign":
+            full_name = (
+                "North Star Infrastructure Investments Ltd."
+                if long else "North Star Investments Ltd."
+            )
+            foreign_name = (
+                "Interregional Investment, Industrial and Infrastructure Company "
+                "for Technological Development, Joint-Stock Company"
+                if long else full_name
+            )
+            overrides.update({
+                "field.client-full-legal-name": full_name,
+                "field.client-short-name": ("North Star Infrastructure Ltd."
+                                             if long else "North Star Ltd."),
+                "field.client-english-name": foreign_name,
+                "field.client-legal-form": "Limited company",
+            })
+        else:
+            full_name = (
+                "Акционерное общество «Северные инвестиции»" if long else
+                "Акционерное общество «Тестовые инвестиции»"
+            )
+            overrides.update({
+                "field.client-full-legal-name": full_name,
+                "field.client-short-name": ("АО «Международные технологии»"
+                                             if long else "АО «Тестовые инвестиции»"),
+                "field.client-english-name":
+                    ("Interregional Investment, Industrial and Infrastructure "
+                     "Company for Technological Development, Joint-Stock Company"
+                     if long else "Test Investments JSC"),
+                "field.client-legal-form": "Акционерное общество",
+            })
+    if not long:
+        return overrides
+    ru_bank = "Акционерное общество «Северо-Западный инвестиционно-коммерческий банк»"
+    en_bank = "International Commercial and Infrastructure Development Bank Limited"
+    bank = en_bank if language == "foreign" else ru_bank
+    address = (
+        "27 King George the Fifth Avenue, International Business Park, London, "
+        "United Kingdom, SW1A 2AA"
+        if language == "foreign" else
+        "125009, Российская Федерация, г. Москва, ул. Большая Дмитровка, "
+        "д. 128, корп. 4, стр. 7"
+    )
+    if doc_id == "anketa-fl-simplified-id":
+        overrides.update({"extra.extra-bank-name": bank,
+                          "extra.extra-bank-address": address,
+                          # Identity and both bank rows can grow in this same
+                          # one-page table. Keep the free-text cell realistic
+                          # and single-line so the combined long case stays
+                          # inside the page's reviewed aggregate budget.
+                          "extra.extra-other-information":
+                              ("No additional information."
+                               if language == "foreign" else
+                               "Дополнительных сведений нет.")})
+    elif doc_id == "anketa-ip-sz":
+        overrides.update({"extra.extra-bank-name": bank,
+                          "extra.extra-bank-address": address,
+                          "extra.extra-other-info":
+                              ("No additional information."
+                               if language == "foreign" else
+                               "Дополнительных сведений нет."),
+                          # Bank name + address consume the two reviewed row
+                          # insertions on page 2. Keep the independent IP
+                          # registration pair ordinary in this combined case;
+                          # its own owner cell remains visible in the crop.
+                          "extra.extra-ip-registration-authority":
+                              ("Companies House" if language == "foreign" else
+                               "ИФНС России № 46 по г. Москве"),
+                          "extra.extra-ip-registration-place":
+                              ("London" if language == "foreign" else "Москва"),
+                          "extra.extra-ipsz-status": "entrepreneur"})
+    elif doc_id == "anketa-fl":
+        overrides.update({"extra.bank-name": bank, "extra.bank-address": address,
+                          # This row is intentionally reviewed at a realistic
+                          # two-line value, not at an artificial essay.
+                          "extra.extra-other-info": "Дополнительных сведений нет."})
+    elif doc_id == "anketa-yul":
+        overrides.update({
+                          # This printed form gives the bank name a single
+                          # fixed line; the adjacent address is the reviewed
+                          # expandable row. Exercise that row with a long
+                          # address and use a realistic fitting institution
+                          # name instead of manufacturing a known refusal.
+                          "extra.bank-name":
+                              ("North Star Investments Ltd." if language == "foreign" else
+                               "АО «Инвестиционный Банк»"),
+                          "extra.bank-address": address,
+                          "extra.extra-other-info": "Дополнительных сведений нет.",
+                          "extra.licensed-activities": "Брокерская деятельность.",
+                          "extra.extra-management-structure":
+                              "Единоличный исполнительный орган",
+                          # Foreign name and the current registration authority
+                          # already exercise page 1's reviewed aggregate growth
+                          # budget. The historical pre-2002 pair remains
+                          # visible, but uses plausible compact document text.
+                          "extra.pre2002-registration-document":
+                              ("Legacy register extract" if language == "foreign" else
+                               "Выписка из реестра"),
+                          "extra.pre2002-registration-authority":
+                              ("Companies House" if language == "foreign" else
+                               "Московская регистрационная палата")})
+    return overrides
 
-    A refusal from one of these is a known limit of a printed slot, not a
-    defect this pack has found. Saying which is which is the difference
-    between a pack a reviewer can act on and a list of red text.
-    """
-    path = os.path.join(HERE, "ordinary-failures.json")
-    if not os.path.exists(path):
-        return set()
-    with open(path, encoding="utf-8") as handle:
-        recorded = json.load(handle)
-    return {(row["documentId"], row["fieldId"])
-            for row in recorded.get("stressOnlyFailures") or []}
+
+def scenarios_for(doc_id: str) -> list[dict[str, Any]]:
+    if doc_id == "account-opening-notice":
+        return [{
+            "id": "corrected-spelling-and-depository",
+            "profile": "ru-company-normal",
+            "requiredFocusFields": list(DOCUMENTS[doc_id]["focusFields"]),
+            "overrides": {
+                "extra.extra-depository-contract": "ДЕПО-2026/000417-СПБ-01",
+                "extra.extra-depository-contract-date": "2026-08-02",
+                "extra.extra-brokerage-contract": "БД-2026/000417-СПБ-01",
+                "extra.extra-brokerage-contract-date": "2026-07-29",
+                "field.client-code": "INV-TEST-2026-00000017",
+            },
+        }]
+    if doc_id == "qualification-notice":
+        return qualification_scenarios()
+    kind = DOCUMENTS[doc_id]["kind"]
+    matrix = [
+        ("ru-normal", "ru-company-normal" if kind == "company" else "ru-resident-normal", "ru", False),
+        ("ru-long", "ru-company-long" if kind == "company" else "ru-resident-long", "ru", True),
+        ("foreign-normal", "en-company-normal" if kind == "company" else "en-nonresident-normal", "foreign", False),
+        ("foreign-long", "en-company-long" if kind == "company" else "en-nonresident-long", "foreign", True),
+    ]
+    return [{"id": identifier, "profile": profile,
+             "requiredFocusFields": list(DOCUMENTS[doc_id]["focusFields"]),
+             "overrides": questionnaire_overrides(doc_id, language, is_long)}
+            for identifier, profile, language, is_long in matrix]
 
 
-def classify_refusal(message: str, doc_id: str,
-                     documented: set[tuple[str, str]]) -> dict:
-    """Name the field a refusal is about, and say whether it is already known."""
-    field_id = None
-    for candidate_doc, candidate_field in documented:
-        if candidate_doc == doc_id and f"{candidate_field}:" in (message or ""):
-            field_id = candidate_field
-            break
-    return {
-        "fieldId": field_id,
-        "documentedStressOnly": field_id is not None,
-        "verdict": (
-            "documented stress-only capacity limit — not a defect found here"
-            if field_id else
-            "UNEXPECTED refusal — needs review"),
-    }
-
-
-def full_pages(pdf_bytes: bytes, out_dir: str, stem: str) -> list[str]:
-    """Every page, full-bleed. A crop chosen by the tool hides what it chose."""
-    names = []
-    document = fitz.open(stream=pdf_bytes, filetype="pdf")
-    try:
-        for index, page in enumerate(document):
-            name = f"{stem}__p{index + 1}.png"
-            page.get_pixmap(matrix=fitz.Matrix(PAGE_SCALE, PAGE_SCALE)).save(
-                os.path.join(out_dir, name))
-            names.append("screenshots/" + name)
-    finally:
-        document.close()
-    return names
+def normalized(value: Any) -> str:
+    return "".join(str(value or "").split())
 
 
 def extracted_text(pdf_bytes: bytes) -> str:
     document = fitz.open(stream=pdf_bytes, filetype="pdf")
     try:
-        return "".join("".join(page.get_text("text").split())
-                       for page in document)
+        return "".join(normalized(page.get_text("text")) for page in document)
     finally:
         document.close()
 
 
-def equality(drawn: list[dict], squashed: str) -> dict:
-    """Did every value the engine says it drew come back out of the PDF?"""
-    missing = []
-    for entry in drawn:
-        rendered = "".join(str(entry.get("rendered") or "").split())
-        if rendered and rendered not in squashed:
-            missing.append(entry["fieldId"])
-    return {"checked": len(drawn), "missing": sorted(set(missing))}
+def execute_static_checks(config: dict[str, Any], squashed_pdf: str) -> list[dict[str, Any]]:
+    results = []
+    for check in config.get("staticChecks") or []:
+        needle = normalized(check["text"])
+        actual = squashed_pdf.count(needle)
+        expected = int(check["expectedCount"])
+        results.append({**check, "actualCount": actual, "ok": actual == expected})
+    return results
 
 
-def reported_values(payload_sources: dict) -> dict:
-    out = {}
-    for label, paths in REPORTED_SOURCES.items():
-        for path in paths:
-            if payload_sources.get(path) not in (None, ""):
-                out[label] = payload_sources[path]
-                break
-        else:
-            out[label] = None
-    return out
+def render_image(pdf_bytes: bytes, page_index: int, path: str,
+                 clip: list[float] | None = None, scale: float = 2.0) -> None:
+    document = fitz.open(stream=pdf_bytes, filetype="pdf")
+    try:
+        page = document[page_index]
+        rect = page.rect if clip is None else fitz.Rect(*clip) & page.rect
+        pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect)
+        pixmap.save(path)
+    finally:
+        document.close()
 
 
-PAYLOAD_PROBE = r"""
-(function (docId, profile, overrides) {
-  var payload = window.__smoke.payloadFor(docId, profile, overrides);
-  function at(path) {
-    var dot = path.indexOf('.');
-    var space = path.slice(0, dot), key = path.slice(dot + 1);
-    var bag = space === 'subject' ? payload.subject
-      : space === 'field' ? payload.fields
-      : space === 'extra' ? payload.extraValues : payload.checks;
-    return bag ? bag[key] : undefined;
-  }
-  var out = {};
-  PATHS.forEach(function (path) { out[path] = at(path); });
-  return JSON.stringify(out);
-}(DOC, PROFILE, OVERRIDES))
-"""
+def expansion_for(field_id: str, drawn: dict[str, Any], owner: dict[str, Any] | None,
+                  result: dict[str, Any]) -> tuple[int, float]:
+    if owner:
+        return (int(owner.get("rowExpansionCount") or 0),
+                float(owner.get("cumulativeShift") or 0))
+    block_id = drawn.get("blockId")
+    if block_id:
+        block = (result.get("blockMetrics") or {}).get(block_id) or {}
+        expansion = int(block.get("additionalLines") or 0)
+        shifts = [float(item.get("delta") or 0) for item in result.get("shifts") or []
+                  if item.get("fieldId") == block_id]
+        return expansion, round(sum(shifts), 3)
+    notes = [item for item in result.get("notes") or []
+             if item.get("fieldId") == field_id]
+    return (sum(int(item.get("rows") or 0) for item in notes),
+            round(sum(float(item.get("delta") or 0) for item in result.get("shifts") or []
+                      if item.get("fieldId") == field_id), 3))
+
+
+def field_evidence(config: dict[str, Any], scenario: dict[str, Any],
+                   result: dict[str, Any], squashed_pdf: str) -> list[dict[str, Any]]:
+    catalog = {item["fieldId"]: item for item in result.get("fieldCatalog") or []}
+    drawn = {item["fieldId"]: item for item in result.get("drawn") or []}
+    ownership = {item["fieldId"]: item
+                 for item in (result.get("ownershipAudit") or {}).get("metrics") or []}
+    focus_ids = list(config["focusFields"])
+    required_ids = set(scenario.get("requiredFocusFields") or [])
+    # This is intentionally a superset of the crop annotations. Any dynamic
+    # value visible in any crop was drawn by the document plan, so recording
+    # every drawn field makes omission impossible even where a broad crop also
+    # shows neighbouring rows.
+    field_ids = focus_ids + sorted(set(drawn) - set(focus_ids))
+    evidence = []
+    for field_id in field_ids:
+        meta = catalog.get(field_id) or {"fieldId": field_id, "source": None,
+                                         "page": None, "format": None}
+        item = drawn.get(field_id)
+        owner = ownership.get(field_id)
+        if not item:
+            evidence.append({
+                "fieldId": field_id, "source": meta.get("source"),
+                "page": meta.get("page"), "active": False,
+                "fieldType": meta.get("type") or "text",
+                "requested": None, "rendered": None, "pdfTextExact": None,
+                "requestedRenderedEqual": None, "owner": owner,
+                "lineCount": 0, "expansionCount": 0, "cumulativeShiftPt": 0,
+                "fontSize": None, "logicalBlock": meta.get("flowBlockId"),
+                "isScenarioFocus": field_id in focus_ids,
+                "requiredFocus": field_id in required_ids,
+            })
+            continue
+        expansion, cumulative = expansion_for(field_id, item, owner, result)
+        rendered = item.get("rendered")
+        field_type = meta.get("type") or "text"
+        pdf_text_exact = None if field_type == "check" else bool(
+            normalized(rendered) and normalized(rendered) in squashed_pdf
+        )
+        evidence.append({
+            "fieldId": field_id,
+            "source": item.get("source") or meta.get("source"),
+            "page": item.get("page", meta.get("page")),
+            "active": True,
+            "fieldType": field_type,
+            "requested": item.get("requested"),
+            "rendered": rendered,
+            "pdfTextExact": pdf_text_exact,
+            "requestedRenderedEqual": normalized(item.get("requested")) == normalized(rendered),
+            "owner": ({"tableId": owner.get("tableId"),
+                       "rowId": owner.get("rowId"),
+                       "bounds": owner.get("bounds"),
+                       "sourceRepeatGroup": owner.get("sourceRepeatGroup")}
+                      if owner else None),
+            "lineCount": int(item.get("lines") or 0),
+            "expansionCount": expansion,
+            "cumulativeShiftPt": cumulative,
+            "fontSize": item.get("size"),
+            "logicalBlock": item.get("blockId") or meta.get("flowBlockId"),
+            "format": meta.get("format"),
+            "isScenarioFocus": field_id in focus_ids,
+            "requiredFocus": field_id in required_ids,
+        })
+    return evidence
+
+
+def write_readme(out: str, cards: list[dict[str, Any]]) -> None:
+    pdfs = len(cards)
+    pages = sum(len(card["fullPages"]) for card in cards)
+    closeups = sum(len(card["closeups"]) for card in cards)
+    by_doc: dict[str, list[str]] = {}
+    for card in cards:
+        by_doc.setdefault(card["documentId"], []).append(card["scenarioId"])
+    lines = [
+        "# Focused manual-findings correction review pack", "",
+        "Status: **Awaiting manual visual approval**.", "",
+        f"This local pack contains {pdfs} synthetic PDFs, {pages} full-page images, "
+        f"and {closeups} close-ups. It is intentionally git-excluded.", "",
+        "Open `index.html` for the review cards. Each card links its production-rendered "
+        "PDF, JSON evidence, full pages, and close-ups.", "",
+        "No real client data is present. The authoritative PDFs were not modified, and "
+        "Word/LibreOffice were not used.", "", "## Scenario inventory", "",
+    ]
+    for doc_id, scenarios in by_doc.items():
+        lines.append(f"- `{doc_id}`: {', '.join(f'`{item}`' for item in scenarios)}")
+    lines.extend([
+        "", "## Evidence on every card", "",
+        "- every dynamic field drawn anywhere in the scenario (a strict superset of "
+        "the fields visible or named in the close-ups), with exact field ID and "
+        "source path plus requested and rendered values;",
+        "- reviewed owner table/row/cell bounds where the field is table-owned;",
+        "- line count, expansion count, cumulative shift, and font size;",
+        "- full preflight fingerprint and preflight/render equality;",
+        "- production structural result and exact PDF text recovery result.", "",
+        "The account-opening card executes three static-text gates against the "
+        "finished PDF: corrected patronymic exactly once, misspelling zero times, "
+        "and `Тестовое значение` zero times.", "",
+    ])
+    with open(os.path.join(out, "README.md"), "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines))
+
+
+def write_checklist(out: str, cards: list[dict[str, Any]]) -> None:
+    lines = [
+        "# Manual visual approval checklist", "",
+        "Automated evidence is recorded in `review.json`; these boxes stay unchecked "
+        "until a person reviews the linked images/PDFs.", "",
+        "Global checks:", "",
+        "- [ ] No text overlaps a horizontal or vertical table border.",
+        "- [ ] Every grown row remains connected to its original table.",
+        "- [ ] Continued lines read as one value, with consistent alignment and leading.",
+        "- [ ] No unrelated text moves, disappears, duplicates, or crosses the page edge.",
+        "- [ ] Account opening says `Юрьевича` and never `Юрьвеича`.",
+        "- [ ] Depository number/date are distinct, complete, and appear in both legal slots.",
+        "- [ ] Qualification recipient name/address stay in the right column and render once.",
+        "", "Scenario checks:", "",
+    ]
+    for card in cards:
+        lines.append(
+            f"- [ ] `{card['documentId']} / {card['scenarioId']}` — PDF and all close-ups approved"
+        )
+        for shot in card["closeups"]:
+            lines.append(f"  - [ ] `{shot['id']}`: {shot['title']}")
+    lines.append("")
+    with open(os.path.join(out, "CHECKLIST.md"), "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines))
+
+
+def write_index(out: str, cards: list[dict[str, Any]]) -> None:
+    esc = lambda value: html.escape("" if value is None else str(value))
+    parts = ["""<!doctype html><html lang="ru"><head><meta charset="utf-8"/>
+<title>Focused manual-findings review</title><style>
+body{font:14px/1.45 system-ui,sans-serif;margin:0;background:#f1f5f9;color:#0f172a}
+header{background:#0f172a;color:#fff;padding:22px 28px}header h1{margin:0 0 7px;font-size:21px}
+main{padding:20px 28px 60px}.card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin:0 0 24px;overflow:hidden}
+.card>h2{font-size:16px;margin:0;padding:12px 16px;background:#e2e8f0}.body{padding:14px 16px}
+.pending{color:#b45309;font-weight:700}.ok{color:#047857;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 12px;font-size:12.5px}dt{color:#475569}dd{margin:0;font-family:ui-monospace,Consolas,monospace;word-break:break-word}
+table{border-collapse:collapse;width:100%;font-size:12px;margin:12px 0}th,td{border:1px solid #cbd5e1;padding:5px 7px;text-align:left;vertical-align:top}th{background:#f8fafc}
+.shots{display:flex;flex-wrap:wrap;gap:10px}.shot{border:1px solid #cbd5e1;padding:6px;background:#fff;max-width:360px}.shot img{display:block;max-width:100%;height:auto}.shot p{margin:5px 0 0;font-size:12px}.full img{width:150px}
+a{color:#0369a1}.mono{font-family:ui-monospace,Consolas,monospace}.dim{color:#64748b}
+</style></head><body><header><h1>Focused manual-findings correction review</h1>
+<p>Synthetic data only · production renderer · Awaiting manual visual approval</p></header><main>"""]
+    parts.append(
+        f"<p><a href='README.md'>README</a> · <a href='CHECKLIST.md'>checklist</a> · "
+        f"<a href='review.json'>combined JSON</a> · {len(cards)} PDFs</p>"
+    )
+    for card in cards:
+        diagnostics_ok = (card["preflightOk"] and card["fingerprintsEqual"]
+                          and card["structural"]["ok"]
+                          and card["equality"]["ok"]
+                          and not card["ownershipViolations"]
+                          and not card["inactiveRequiredFocusFields"]
+                          and card["evidenceCoverage"]["ok"]
+                          and card["staticChecksOk"])
+        parts.append(
+            f"<section class='card'><h2>{esc(card['title'])} · "
+            f"<span class='mono'>{esc(card['documentId'])}/{esc(card['scenarioId'])}</span></h2><div class='body'>"
+        )
+        parts.append("<dl>")
+        for label, value in [
+            ("Profile", card["profile"]),
+            ("Status", card["approval"]),
+            ("Automated verdict", "PASS" if diagnostics_ok else "REVIEW FAILURE"),
+            ("Preflight fingerprint", card["preflightFingerprint"]),
+            ("Preflight = render", card["fingerprintsEqual"]),
+            ("Structural", "PASS" if card["structural"]["ok"] else card["structural"]["problems"]),
+            ("Rendered values recovered from PDF", card["equality"]),
+            ("Ownership violations", card["ownershipViolations"] or "none"),
+            ("Required focus fields", card["requiredFocusFields"]),
+            ("Inactive required focus", card["inactiveRequiredFocusFields"] or "none"),
+            ("Dynamic evidence coverage", card["evidenceCoverage"]),
+        ]:
+            css = " class='pending'" if label == "Status" else ""
+            if label == "Automated verdict":
+                css = " class='ok'" if diagnostics_ok else " class='bad'"
+            parts.append(f"<dt>{esc(label)}</dt><dd{css}>{esc(value)}</dd>")
+        parts.append(
+            f"<dt>Files</dt><dd><a href='{esc(card['pdf'])}'>PDF</a> · "
+            f"<a href='{esc(card['fixture'])}'>fixture JSON</a></dd></dl>"
+        )
+        if card.get("staticChecks"):
+            parts.append("<table><thead><tr><th>Executed static-text gate</th>"
+                         "<th>Text</th><th>Expected count</th><th>Actual count</th>"
+                         "<th>Result</th></tr></thead><tbody>")
+            for check in card["staticChecks"]:
+                parts.append(
+                    f"<tr><td>{esc(check['id'])}</td><td>{esc(check['text'])}</td>"
+                    f"<td>{esc(check['expectedCount'])}</td><td>{esc(check['actualCount'])}</td>"
+                    f"<td class='{'ok' if check['ok'] else 'bad'}'>"
+                    f"{'PASS' if check['ok'] else 'FAIL'}</td></tr>"
+                )
+            parts.append("</tbody></table>")
+        parts.append("<table><thead><tr><th>Role</th><th>Field / exact source</th><th>Requested → rendered</th><th>Owner row/cell</th><th>Layout evidence</th><th>PDF equality</th></tr></thead><tbody>")
+        for field in card["fields"]:
+            owner = field.get("owner")
+            ownership = (f"{owner['tableId']} / {owner['rowId']}<br>{esc(owner['bounds'])}"
+                         if owner else "<span class='dim'>not table-owned</span>")
+            equality_class = "ok" if field.get("pdfTextExact") is not False else "bad"
+            role = ("required focus" if field.get("requiredFocus") else
+                    "scenario focus" if field.get("isScenarioFocus") else
+                    "other drawn dynamic field")
+            equality_value = ("n/a (non-text check glyph)"
+                              if field.get("pdfTextExact") is None and field["active"]
+                              else field.get("pdfTextExact"))
+            parts.append(
+                f"<tr><td>{esc(role)}</td><td><span class='mono'>{esc(field['fieldId'])}</span><br>"
+                f"<span class='mono'>{esc(field.get('source'))}</span></td>"
+                f"<td>{esc(field.get('requested'))}<br>→ {esc(field.get('rendered'))}</td>"
+                f"<td>{ownership}</td>"
+                f"<td>{esc(field.get('lineCount'))} lines · {esc(field.get('expansionCount'))} expansions · "
+                f"shift {esc(field.get('cumulativeShiftPt'))} pt · {esc(field.get('fontSize'))} pt</td>"
+                f"<td class='{equality_class}'>{esc(equality_value)}</td></tr>"
+            )
+        parts.append("</tbody></table><h3>Close-ups</h3><div class='shots'>")
+        for shot in card["closeups"]:
+            parts.append(
+                f"<a class='shot' href='{esc(shot['path'])}'><img loading='lazy' src='{esc(shot['path'])}'/>"
+                f"<p>{esc(shot['title'])}<br>Named focus: "
+                f"<span class='mono'>{esc(', '.join(shot['fields']) or 'static')}</span><br>"
+                f"Dynamic page evidence ({len(shot['evidenceFieldIds'])}): "
+                f"<span class='mono'>{esc(', '.join(shot['evidenceFieldIds']) or 'none')}</span>"
+                f"</p></a>"
+            )
+        parts.append("</div><h3>Full pages</h3><div class='shots full'>")
+        for page in card["fullPages"]:
+            parts.append(
+                f"<a class='shot' href='{esc(page)}'><img loading='lazy' src='{esc(page)}'/></a>"
+            )
+        parts.append("</div></div></section>")
+    parts.append("</main></body></html>")
+    with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as handle:
+        handle.write("\n".join(parts))
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", default=OUT)
     parser.add_argument("--only", action="append",
-                        help="restrict to one document id (repeatable)")
+                        help="restrict to one of the six focused document IDs")
     args = parser.parse_args()
 
     out = os.path.abspath(args.out)
@@ -302,288 +688,194 @@ def main() -> int:
         target = os.path.join(out, name)
         if os.path.isdir(target):
             shutil.rmtree(target)
-        os.makedirs(target)
+        os.makedirs(target, exist_ok=True)
 
-    documents = dynamic_documents()
-    documented = documented_stress_fields()
+    selected = list(DOCUMENTS)
     if args.only:
-        documents = [row for row in documents if row["documentId"] in args.only]
+        unknown = sorted(set(args.only) - set(DOCUMENTS))
+        if unknown:
+            parser.error("unknown document id(s): " + ", ".join(unknown))
+        selected = [item for item in selected if item in set(args.only)]
 
-    wanted_paths = sorted({path for paths in REPORTED_SOURCES.values()
-                           for path in paths})
+    cards: list[dict[str, Any]] = []
+    failures: list[str] = []
     browser = SmokeBrowser()
-    cards: list[dict] = []
     try:
-        for document in documents:
-            doc_id = document["documentId"]
-            applies = set(document["appliesTo"] or ["individual", "company"])
-            per_document = DOCUMENT_STRESS_RELIEF.get(doc_id, {})
-            passes = []
-            for profile in PROFILES:
-                if profile["kind"] not in applies:
-                    continue
-                overrides = {}
-                if profile["rung"] in ("realistic-long", "foreign"):
-                    overrides = {**STRESS_RELIEF,
-                                 **per_document.get(profile["language"], {})}
-                passes.append(dict(profile, overrides=overrides))
-            if doc_id in EXPANSION_OVERRIDES:
-                # The expansion pass is built on the ORDINARY payload, not the
-                # long one. What it is for is the grown row itself, and pairing
-                # it with long values everywhere else would let an unrelated
-                # capacity limit somewhere on the form take the card away —
-                # which is exactly what happens on the individual accession
-                # application, where a 46.7 pt signature slot refuses a long
-                # double surname long before anything reaches a tariff.
-                base = next(p for p in passes if p["rung"] == "ordinary")
-                passes.append(dict(base, rung="expansion",
-                                   overrides=dict(EXPANSION_OVERRIDES[doc_id])))
-
-            entries = []
-            for profile in passes:
-                overrides = dict(profile["overrides"])
-                stem = f"{doc_id}__{slug(profile['id'])}__{slug(profile['rung'])}"
-
-                sources = json.loads(browser.browser.eval(
-                    PAYLOAD_PROBE
-                    .replace("PATHS", json.dumps(wanted_paths))
-                    .replace("DOC", json.dumps(doc_id))
-                    .replace("PROFILE", json.dumps(profile["id"]))
-                    .replace("OVERRIDES", json.dumps(overrides, ensure_ascii=False))))
-
-                result = json.loads(browser.browser.eval(
-                    ASSIGNMENTS
-                    .replace("DOC", json.dumps(doc_id))
-                    .replace("PROFILE", json.dumps(profile["id"]))
-                    .replace("OVERRIDES", json.dumps(overrides, ensure_ascii=False)),
-                    await_promise=True))
+        for doc_id in selected:
+            config = DOCUMENTS[doc_id]
+            for scenario in scenarios_for(doc_id):
+                stem = f"{doc_id}__{slug(scenario['id'])}"
+                script = (ASSIGNMENTS
+                          .replace("DOC", json.dumps(doc_id))
+                          .replace("PROFILE", json.dumps(scenario["profile"]))
+                          .replace("OVERRIDES", json.dumps(
+                              scenario["overrides"], ensure_ascii=False)))
+                result = json.loads(browser.browser.eval(script, await_promise=True))
                 if not result.get("ok"):
-                    verdict = classify_refusal(result.get("message"), doc_id,
-                                               documented)
-                    entries.append({
-                        "profile": profile["id"], "rung": profile["rung"],
-                        "subjectKind": profile["kind"],
-                        "language": profile["language"],
-                        "error": result.get("message"), **verdict,
-                    })
-                    print(f"  {doc_id:36s} {profile['rung']:14s} REFUSED "
-                          f"({'known' if verdict['documentedStressOnly'] else 'NEW'})")
+                    failure = f"{doc_id}/{scenario['id']}: {result.get('message')}"
+                    failures.append(failure)
+                    print("  REFUSED", failure)
                     continue
 
                 pdf_bytes = base64.b64decode(result["pdf"])
-                measured = browser.measure(doc_id, profile["id"], overrides)
-                squashed = extracted_text(pdf_bytes)
+                pdf_name = stem + ".pdf"
+                fixture_name = stem + ".json"
+                with open(os.path.join(out, "pdfs", pdf_name), "wb") as handle:
+                    handle.write(pdf_bytes)
 
-                with open(os.path.join(out, "pdfs", stem + ".pdf"), "wb") as fh:
-                    fh.write(pdf_bytes)
-                pages = full_pages(pdf_bytes, os.path.join(out, "screenshots"), stem)
+                full_pages = []
+                pdf = fitz.open(stream=pdf_bytes, filetype="pdf")
+                page_count = len(pdf)
+                pdf.close()
+                for page_index in range(page_count):
+                    name = f"{stem}__page-{page_index + 1}.png"
+                    render_image(pdf_bytes, page_index,
+                                 os.path.join(out, "screenshots", name),
+                                 scale=FULL_PAGE_SCALE)
+                    full_pages.append("screenshots/" + name)
+
+                closeups = []
+                for region in config["focusRegions"]:
+                    name = f"{stem}__focus-{slug(region['id'])}.png"
+                    render_image(pdf_bytes, region["page"],
+                                 os.path.join(out, "screenshots", name),
+                                 clip=region["clip"], scale=FOCUS_SCALE)
+                    closeups.append({**region, "path": "screenshots/" + name})
 
                 structural = production_inspect(
-                    pdf_bytes,
-                    os.path.join(TEMPLATES,
-                                 os.path.basename(document["templateFilename"])),
-                    None,
+                    pdf_bytes, os.path.join(TEMPLATES, doc_id + ".pdf"), None,
                     reviewed=result.get("reviewedRanges"),
                     reviewed_font_sizes=result.get("reviewedFontSizes"),
-                    reviewed_value_sizes=result.get("reviewedValueSizes"))
-
-                drawn = result["drawn"]
-                sizes = [float(entry["size"]) for entry in drawn
-                         if entry.get("size")]
-                tariffs = {entry["fieldId"]: entry for entry in drawn
-                           if entry["fieldId"] in TARIFF_FIELDS}
-                entry = {
+                    reviewed_value_sizes=result.get("reviewedValueSizes"),
+                    reviewed_paths=result.get("reviewedPathSuppressions"),
+                )
+                squashed = extracted_text(pdf_bytes)
+                fields = field_evidence(config, scenario, result, squashed)
+                checked = [field for field in fields
+                           if field["active"] and field["pdfTextExact"] is not None]
+                missing = [field["fieldId"] for field in checked
+                           if not field["pdfTextExact"]]
+                evidence_ids = {field["fieldId"] for field in fields}
+                drawn_ids = {field["fieldId"] for field in result.get("drawn") or []}
+                named_ids = {field_id for region in config["focusRegions"]
+                             for field_id in region["fields"]}
+                missing_drawn_evidence = sorted(drawn_ids - evidence_ids)
+                missing_named_evidence = sorted(named_ids - evidence_ids)
+                missing_sources = sorted(field["fieldId"] for field in fields
+                                         if field["active"] and not field.get("source"))
+                required_focus = list(scenario.get("requiredFocusFields") or [])
+                active_ids = {field["fieldId"] for field in fields if field["active"]}
+                for closeup in closeups:
+                    # A crop can show neighbouring rows beyond the small set
+                    # named in its caption. Attach every active dynamic field
+                    # on that page as a conservative evidence superset; all of
+                    # those IDs resolve to full records in `card.fields`.
+                    closeup["evidenceFieldIds"] = sorted(
+                        field["fieldId"] for field in fields
+                        if field["active"] and field.get("page") == closeup["page"]
+                    )
+                    closeup["missingNamedFieldEvidence"] = sorted(
+                        set(closeup["fields"]) - evidence_ids
+                    )
+                inactive_required = sorted(set(required_focus) - active_ids)
+                coverage = {
+                    "ok": not (missing_drawn_evidence or missing_named_evidence or
+                               missing_sources),
+                    "drawnFieldCount": len(drawn_ids),
+                    "evidenceFieldCount": len(evidence_ids),
+                    "closeupNamedFieldCount": len(named_ids),
+                    "missingDrawnFieldEvidence": missing_drawn_evidence,
+                    "missingCloseupNamedFieldEvidence": missing_named_evidence,
+                    "activeFieldsWithoutExactSource": missing_sources,
+                }
+                static_checks = execute_static_checks(config, squashed)
+                static_checks_ok = all(item["ok"] for item in static_checks)
+                fingerprint_equal = (
+                    result.get("preflightFingerprint") == result.get("renderFingerprint")
+                    and bool(result.get("preflightFingerprint"))
+                )
+                ownership = result.get("ownershipAudit") or {}
+                card = {
+                    "synthetic": True,
                     "documentId": doc_id,
-                    "templateFilename": document["templateFilename"],
-                    "fieldMap": document["fieldMap"],
-                    "profile": profile["id"],
-                    "rung": profile["rung"],
-                    "subjectKind": profile["kind"],
-                    "language": profile["language"],
-                    **reported_values(sources),
-                    "tariffStyle": (
-                        " / ".join(f"{tariffs[f]['size']:g} pt" for f in TARIFF_FIELDS
-                                   if f in tariffs) or None),
-                    "tariffValues": {f: tariffs[f].get("rendered")
-                                     for f in TARIFF_FIELDS if f in tariffs},
-                    "insertedRows": sum(int(note.get("rows") or 0)
-                                        for note in result["notes"]),
-                    "pageShiftPt": round(sum(float(shift["delta"])
-                                             for shift in result["shifts"]), 2),
-                    "minClientValuePt": round(min(sizes), 2) if sizes else None,
-                    "valuesDrawn": len(drawn),
-                    "requestedRenderedEquality": equality(drawn, squashed),
-                    "structuralProblems": structural.get("problems", []),
-                    "preflightFingerprint": measured.get("fingerprint"),
-                    "preflightOk": measured.get("ok"),
-                    "pdf": "pdfs/" + stem + ".pdf",
-                    "screenshots": pages,
-                    "fixture": "fixtures/" + stem + ".json",
-                    "overrides": overrides,
+                    "title": config["title"],
+                    "scenarioId": scenario["id"],
+                    "profile": scenario["profile"],
+                    "overrides": scenario["overrides"],
+                    "fields": fields,
+                    "requiredFocusFields": required_focus,
+                    "inactiveRequiredFocusFields": inactive_required,
+                    "evidenceCoverage": coverage,
+                    "staticChecks": static_checks,
+                    "staticChecksOk": static_checks_ok,
+                    "preflightOk": result.get("preflightOk") is True,
+                    "preflightFingerprint": result.get("preflightFingerprint"),
+                    "renderFingerprint": result.get("renderFingerprint"),
+                    "fingerprintsEqual": fingerprint_equal,
+                    "structural": {"ok": not structural.get("problems"),
+                                   "problems": structural.get("problems", [])},
+                    "equality": {"ok": not missing, "checked": len(checked),
+                                 "missing": missing},
+                    "ownershipViolations": ownership.get("violations") or [],
+                    "ownershipBudgetUse": ownership.get("budgetUse") or [],
+                    "pageCount": page_count,
+                    "pdf": "pdfs/" + pdf_name,
+                    "fixture": "fixtures/" + fixture_name,
+                    "fullPages": full_pages,
+                    "closeups": closeups,
                     "approval": "Awaiting manual visual approval",
                 }
-                with open(os.path.join(out, "fixtures", stem + ".json"), "w",
-                          encoding="utf-8") as fh:
-                    json.dump({"synthetic": True, **entry}, fh,
-                              ensure_ascii=False, indent=1)
-                entries.append(entry)
-                print(f"  {doc_id:36s} {profile['rung']:14s} "
-                      f"{len(pages)} page(s), min {entry['minClientValuePt']} pt")
-            cards.append({**document, "entries": entries})
+                with open(os.path.join(out, "fixtures", fixture_name), "w",
+                          encoding="utf-8") as handle:
+                    json.dump(card, handle, ensure_ascii=False, indent=2)
+                cards.append(card)
+                diagnostic_problems = []
+                if not card["preflightOk"]:
+                    diagnostic_problems.append("preflight")
+                if not fingerprint_equal:
+                    diagnostic_problems.append("fingerprint")
+                if card["structural"]["problems"]:
+                    diagnostic_problems.append("structure")
+                if missing:
+                    diagnostic_problems.append("equality")
+                if card["ownershipViolations"]:
+                    diagnostic_problems.append("ownership")
+                if inactive_required:
+                    diagnostic_problems.append("inactive-required-focus")
+                if not coverage["ok"]:
+                    diagnostic_problems.append("evidence-coverage")
+                if not static_checks_ok:
+                    diagnostic_problems.append("static-text")
+                if diagnostic_problems:
+                    failures.append(f"{doc_id}/{scenario['id']}: " +
+                                    ", ".join(diagnostic_problems))
+                print(f"  {doc_id:31s} {scenario['id']:31s} "
+                      f"{page_count} page(s), {len(closeups)} close-up(s), "
+                      f"{'PASS' if not diagnostic_problems else 'FAIL'}")
     finally:
         browser.stop()
 
+    with open(os.path.join(out, "review.json"), "w", encoding="utf-8") as handle:
+        json.dump({"synthetic": True,
+                   "approval": "Awaiting manual visual approval",
+                   "cards": cards, "generationFailures": failures},
+                  handle, ensure_ascii=False, indent=2)
+    write_readme(out, cards)
+    write_checklist(out, cards)
     write_index(out, cards)
-    drawn_total = sum(1 for card in cards for entry in card["entries"]
-                      if not entry.get("error"))
-    shots = sum(len(entry.get("screenshots") or [])
-                for card in cards for entry in card["entries"])
-    refused = [entry for card in cards for entry in card["entries"]
-               if entry.get("error")]
-    unexpected = [entry for entry in refused
-                  if not entry.get("documentedStressOnly")]
-    problems = sum(len(entry.get("structuralProblems") or [])
-                   for card in cards for entry in card["entries"])
-    mismatched = sum(len(entry.get("requestedRenderedEquality", {}).get("missing") or [])
-                     for card in cards for entry in card["entries"])
-    smallest = [entry["minClientValuePt"] for card in cards
-                for entry in card["entries"] if entry.get("minClientValuePt")]
+
+    pdf_count = len(cards)
+    page_count = sum(len(card["fullPages"]) for card in cards)
+    closeup_count = sum(len(card["closeups"]) for card in cards)
+    fixture_count = len(cards)
     print(f"\n-> {out}")
-    print(f"   {len(cards)} documents, {drawn_total} PDFs, {shots} page images")
-    print(f"   {len(refused)} refusal(s), of which {len(unexpected)} unexpected")
-    for entry in unexpected:
-        print(f"      {entry['documentId'] if 'documentId' in entry else ''} "
-              f"{entry['profile']}: {entry['error']}")
-    print(f"   {problems} structural problem(s), "
-          f"{mismatched} requested/rendered mismatch(es)")
-    print(f"   smallest client value across the pack: "
-          f"{min(smallest) if smallest else 'n/a'} pt")
-    print(f"   {len(cards)} documents awaiting manual visual approval")
-    return 0
-
-
-def write_index(out: str, cards: list[dict]) -> None:
-    def esc(value):
-        return html.escape("" if value is None else str(value))
-
-    total_pdfs = sum(1 for card in cards for entry in card["entries"]
-                     if not entry.get("error"))
-    parts = ["""<!doctype html>
-<html lang="ru"><head><meta charset="utf-8"/>
-<title>Финальная визуальная проверка — все динамические документы</title>
-<style>
- body { font: 14px/1.5 -apple-system, Segoe UI, Roboto, sans-serif; margin: 0;
-        background: #f1f5f9; color: #0f172a; }
- header { padding: 20px 28px; background: #0f172a; color: #fff; }
- header h1 { margin: 0 0 6px; font-size: 20px; }
- header p { margin: 0; opacity: .8; font-size: 13px; }
- main { padding: 20px 28px 60px; }
- .doc { margin: 0 0 26px; background: #fff; border: 1px solid #cbd5e1;
-        border-radius: 8px; overflow: hidden; }
- .doc > h2 { margin: 0; padding: 12px 16px; font-size: 15px;
-             background: #e2e8f0; border-bottom: 1px solid #cbd5e1; }
- .doc > h2 small { font-weight: 400; color: #475569; }
- .case { padding: 14px 16px; border-top: 1px solid #e2e8f0;
-         display: grid; grid-template-columns: minmax(0,3fr) minmax(0,4fr); gap: 16px; }
- .case:first-of-type { border-top: 0; }
- dl { margin: 0; display: grid; grid-template-columns: auto minmax(0,1fr);
-      gap: 3px 12px; font-size: 12.5px; align-content: start; }
- dt { color: #475569; }
- dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      word-break: break-word; }
- .shots { display: flex; flex-wrap: wrap; gap: 8px; }
- .shots a { display: block; border: 1px solid #cbd5e1; background: #fff; }
- .shots img { display: block; width: 150px; height: auto; }
- .ok { color: #047857; font-weight: 600; }
- .bad { color: #b91c1c; font-weight: 600; }
- .pending { color: #b45309; font-weight: 600; }
- .links a { margin-right: 10px; }
-</style></head><body>
-<header>
- <h1>Финальная визуальная проверка</h1>
- <p>Все документы, которые система формирует по данным CRM. Значения —
-    синтетические фикстуры репозитория; реальные клиентские данные не
-    использовались. Автоматические проверки пройдены; остаётся только
-    визуальное подтверждение человеком.</p>
-</header><main>"""]
-    parts.append(f"<p>{len(cards)} документов · {total_pdfs} PDF</p>")
-
-    for card in cards:
-        parts.append(
-            f'<section class="doc"><h2>{esc(card["title"])} '
-            f'<small>· {esc(card["documentId"])} · '
-            f'{esc(card["templateFilename"])} · карта {esc(card["fieldMap"])} · '
-            f'{esc(card["pageCount"])} стр.</small></h2>')
-        for entry in card["entries"]:
-            if entry.get("error"):
-                parts.append(
-                    f'<div class="case"><dl>'
-                    f'<dt>Фикстура</dt><dd>{esc(entry["profile"])} · '
-                    f'{esc(entry["rung"])}</dd>'
-                    f'<dt>Результат</dt>'
-                    f'<dd class="{"pending" if entry.get("documentedStressOnly") else "bad"}">'
-                    f'{esc(entry.get("verdict"))}</dd>'
-                    f'<dt>Сообщение</dt><dd>{esc(entry["error"])}</dd>'
-                    f'</dl><div></div></div>')
-                continue
-            eq = entry["requestedRenderedEquality"]
-            eq_ok = not eq["missing"]
-            structural_ok = not entry["structuralProblems"]
-            rows = [
-                ("Субъект", f'{entry["subjectKind"]} · {entry["language"]}'),
-                ("Фикстура", f'{entry["profile"]} · {entry["rung"]}'),
-                ("Код клиента", entry.get("client code")),
-                ("Номер договора", entry.get("agreement number")),
-                ("Дата договора", entry.get("agreement date")),
-                ("Тарифы", entry.get("tariffStyle")),
-                ("Добавлено строк", entry["insertedRows"]),
-                ("Сдвиг страницы", f'{entry["pageShiftPt"]} pt'),
-                ("Мин. кегль значения", f'{entry["minClientValuePt"]} pt'),
-                ("Значений отрисовано", entry["valuesDrawn"]),
-                # What this pass changed relative to the plain fixture, so a
-                # reviewer is never looking at a substituted value without
-                # being told.
-                ("Подстановки", ", ".join(sorted(entry["overrides"])) or None),
-            ]
-            parts.append('<div class="case"><dl>')
-            for label, value in rows:
-                if value in (None, ""):
-                    continue
-                parts.append(f"<dt>{esc(label)}</dt><dd>{esc(value)}</dd>")
-            parts.append(
-                '<dt>Запрошено = отрисовано</dt>'
-                f'<dd class="{"ok" if eq_ok else "bad"}">'
-                f'{eq["checked"]}/{eq["checked"]} совпало'
-                if eq_ok else
-                f'<dt>Запрошено = отрисовано</dt><dd class="bad">'
-                f'не найдено: {esc(", ".join(eq["missing"]))}')
-            parts.append("</dd>")
-            parts.append(
-                '<dt>Структурная проверка</dt>'
-                f'<dd class="{"ok" if structural_ok else "bad"}">'
-                f'{"без замечаний" if structural_ok else esc("; ".join(entry["structuralProblems"]))}'
-                "</dd>")
-            parts.append(
-                '<dt>Preflight = render</dt>'
-                f'<dd class="{"ok" if entry["preflightOk"] else "bad"}">'
-                f'{esc(str(entry["preflightFingerprint"])[:60])}…</dd>')
-            parts.append(
-                f'<dt>Статус</dt><dd class="pending">{esc(entry["approval"])}</dd>')
-            parts.append(
-                f'<dt>Файлы</dt><dd class="links">'
-                f'<a href="{esc(entry["pdf"])}">PDF</a>'
-                f'<a href="{esc(entry["fixture"])}">fixture</a></dd>')
-            parts.append("</dl><div class=\"shots\">")
-            for shot in entry["screenshots"]:
-                parts.append(
-                    f'<a href="{esc(shot)}"><img src="{esc(shot)}" '
-                    f'alt="{esc(shot)}" loading="lazy"/></a>')
-            parts.append("</div></div>")
-        parts.append("</section>")
-
-    parts.append("</main></body></html>")
-    with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as fh:
-        fh.write("\n".join(parts))
+    print(f"   {pdf_count} PDFs, {fixture_count} fixture JSON files, "
+          f"{page_count} full-page images, {closeup_count} close-ups")
+    print(f"   {len(failures)} generation/automated-evidence failure(s)")
+    for failure in failures:
+        print("      " + failure)
+    print("   all cards remain Awaiting manual visual approval")
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

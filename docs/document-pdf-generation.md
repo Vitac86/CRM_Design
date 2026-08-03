@@ -60,7 +60,10 @@ Internet Explorer is not supported. The engine is ES5-style and uses only
 | --- | --- |
 | `document-engine/pdf-text-layout.js` | measuring, word wrapping, shrink-to-fit, alignment |
 | `document-engine/pdf-checkbox-renderer.js` | vector marks inside existing checkboxes |
+| `document-engine/pdf-page-expander.js` | reviewed content-stream suppression and page/row movement |
+| `document-engine/table-ownership.js` | fail-closed owning-cell metadata validation and planned-ink audit |
 | `document-engine/pdf-overlay-renderer.js` | orchestration, coordinate conversion, formatters, validation, errors |
+| `document-engine/umi-registry.js` | exact UMI fields plus explicit workflow/operator aliases |
 | `document-field-maps/<doc-id>.js` | one document's coordinates — **no rendering logic** |
 | `pages/document-wizard.js` | wizard UI, payload normalisation, download/upload |
 
@@ -427,6 +430,25 @@ blank belongs to the form's wording, not to the value, so an empty — or
 `decoration.minWidth` instead of deleting it from the document. Validation
 refuses the flag without that width.
 
+### Exact source suppression: balanced operators and vector paths
+
+A Word-flow replacement removes source drawing operators; it never paints a
+white rectangle over old text or rules. The common case names a top-level
+balanced `q … Q` range. A reviewed nested paragraph such as account-opening
+transfer-basis items 2–3 can instead set `operatorScope: 'all-balanced'` and
+pin the nested-unit ordinals, depth, parent hash, unit hash, page block count
+and template SHA-256. The engine suppresses exactly those bytes and proves the
+parent stream stays balanced.
+
+Some Word exports paint an obsolete underline as a top-level vector path rather
+than inside the text block. `sourcePathSuppressions` handles that separate
+case. Every entry declares the page/path ordinal and page path count, operator
+SHA-256, template SHA-256, owner Word-flow block, exact field IDs, geometry,
+approval and optional `showWhen`. A stale hash, wrong owner, unreviewed path or
+conditional path without its mapped replacement blocks preflight. The
+qualification notice uses this to remove only the rules replaced by its
+recipient, recognition/date, register-entry and `other` flows.
+
 ### Which fields may expand
 
 Not many. The candidates are long client data:
@@ -487,6 +509,47 @@ the table it joins — including rules that break at column boundaries.
 
 Nothing is inferred at runtime. Every one of those numbers must be present, and
 validation rejects the field if any is missing.
+
+### Physical table-cell ownership
+
+An expansion box is not proof that it is the **right** table cell. The four
+offered questionnaires (`anketa-fl-simplified-id`, `anketa-ip-sz`, `anketa-fl`,
+`anketa-yul`) therefore set `tableOwnershipRequired: true` and declare three
+root registries:
+
+```js
+cellOwnership: [{
+  fieldId: 'bankAddress', source: 'extra.extra-bank-address', page: 1,
+  tableId: 'anketa-fl-p2-main', rowId: 'p2-bank-address',
+  bounds: { left: MEASURED_LEFT, top: MEASURED_TOP,
+            right: MEASURED_RIGHT, bottom: MEASURED_BOTTOM },
+  maxReviewedLines: 2, canGrow: true, nextRowId: 'p2-bank-inn',
+  affectedBorders: { horizontal: MEASURED_HORIZONTAL_RULES,
+                     vertical: MEASURED_COLUMN_RULES },
+  budgetId: 'anketa-fl-p2-main', reviewStatus: 'approved'
+}],
+tableBudgets: [{
+  id: 'anketa-fl-p2-main', tableId: 'anketa-fl-p2-main', page: 1,
+  top: MEASURED_TABLE_TOP, bottom: MEASURED_TABLE_BOTTOM,
+  maxGrowth: MEASURED_PAGE_RESERVE,
+  reviewStatus: 'approved'
+}],
+ownershipExemptions: [/* exact field/source/page + reviewed reason */]
+```
+
+The numbers above illustrate the schema; the maps are the geometry authority.
+Every dynamic field must have exactly one owner or approved exemption. A
+growing owner must name its next row, approved `table-row` expansion, insertion
+cut, every affected vertical/horizontal border and one table budget. The
+vertical list must exactly equal the row expansion's columns.
+
+After layout planning, `table-ownership.js` measures the **actual line ink** in
+shifted coordinates. It rejects ink outside the owner, horizontal-border
+intersection, dynamic ink overlap, a line count above review, discontinuous
+verticals in a grown row, duplicate one-logical-value/source rendering and
+cumulative growth above the shared table budget. `ownershipAudit` metrics and
+violations enter the preflight result and deterministic fingerprint, so render
+cannot disagree with the ownership decision.
 
 ### The schema — the page's budget
 
@@ -621,6 +684,13 @@ transcripts, further continuation regions and conditional fields. Field maps
 stay written in the template's own coordinates; the transformation is applied
 at render time, never baked into the map.
 
+Top-level PDF vector paths are conservative by default: they move only for a
+reviewed table-row insertion whose columns/borders own them. A Word-flow block
+whose standalone rules must travel with its body sets
+`expansion.moveTopLevelPaths: true`. The qualification recipient,
+recognition/date and register-entry blocks use that explicit proof so a rule
+cannot stay behind and strike through text after expansion.
+
 Several expandable fields may share a page. Anchors are processed top to bottom,
 shifts accumulate, a later anchor's rows open below what an earlier one already
 opened, and a coordinate's total shift is the sum of every band containing it:
@@ -660,8 +730,10 @@ same payload.
 
 `decide` also returns a **fingerprint**: a deterministic, readable summary of
 every page shift, every inserted row and every line of every value with the size
-and region it landed in. `render` hands it to `onPlan`, and
-`run_expansion_tests.py` compares the two over 18 maps × 6 profiles.
+and region it landed in. Reviewed source-range/path proofs and table-ownership
+metrics are part of the same preflight decision; ownership violations block it.
+`render` hands the fingerprint to `onPlan`, and the preflight/render agreement
+suite compares both paths across the supported synthetic profiles.
 
 If any value cannot be printed, `render` throws a `DocumentOverflowError`
 carrying every diagnostic at once, and no Blob is produced for a document that
@@ -724,8 +796,8 @@ apart, because a document that passes the first two can still be unacceptable:
 | **geometric** | does it overlap, cross a rule, leave its cell, or land outside a reviewed band? | `run_visual_geometry_tests.py`, `run_preflight_render_agreement_tests.py` |
 | **reading flow** | does the result still read as one field a person typed? | `run_visual_flow_tests.py` |
 
-The third one exists because two defects reached a visual review with every
-other suite green.
+The third one exists because visible defects reached manual review while the
+older structural/geometric questions were still green.
 
 **The payment reference.** The account-opening notice prints
 «…брокерское обслуживание №\_\_\_\_\_\_\_\_\_ дата\_\_. ФОНДОВЫЙ РЫНОК» in a
@@ -798,6 +870,49 @@ moves the rules it can, but it cannot lengthen the column rules that end at the
 cut, so a Word-flow block with `expansion.lineStyle: 'table-row'` redraws them
 across the inserted row — the same `drawTableRow` a field-level anchor already
 uses, and only for the rows its value really filled.
+
+### The depository agreement number/date
+
+The UMI workbook has no printable depository agreement number or date.
+`extra.extra-depository-contract` and
+`extra.extra-depository-contract-date` are therefore registry-classified
+workflow operator inputs, not aliases to an internal LK ID, accession checkbox
+or unrelated date. They are required only by the two accession applications
+and `account-opening-notice`, start empty, and may not declare a default.
+
+The account-opening notice prints the same pair in its page-1 agreement table
+and page-2 transfer-basis item 2. The latter is a nested balanced Word-flow
+replacement that redraws item 2 with the requested pair and item 3 verbatim;
+the empty source «№ от» sentence is removed as content-stream operators, not
+covered. Strict ISO/calendar validation and independent missing-number/date
+preflight prevent a half-filled legal pair.
+
+### Qualification notice semantic blocks
+
+The qualification notice treats its recipient, recognition name/date and
+register-entry/instrument regions as reviewed Word-flow units. `semanticGroup`
+pins exact field/source links and approved bounds for the recipient and body:
+the recipient uses one right-column first/hanging indent and renders
+`umi.address.registration` once; the body keeps the full legal name, its
+caption, recognition clause and date in order; each underline has measured
+clearance below glyph ink. Exact owner/path proofs cover the remaining source
+rules. The `other` instrument branch owns multiple reviewed underlined lines
+and conditionally suppresses only its obsolete source rule.
+
+Validation refuses an unapproved semantic group, a wrong source, a detached
+label/caption/reference, an incomplete date rule, a continuation outside the
+recipient column, or an underline entering the configured text ink box.
+
+### Questionnaire ownership close-ups
+
+For all four offered questionnaires, visual review is paired with the
+declarative `cellOwnership` audit described above. Review long full names,
+Russian/foreign registration addresses, bank name/address rows,
+licence/authority rows and free text. The acceptance question is no longer
+only “inside the map's box”; it is “inside the measured owning cell, clear of
+its borders, with every lower row and vertical rule moved by the same growth
+delta, and rendered once.” `run_table_ownership_tests.py` carries the mutation
+gates; the final screenshot approval remains manual.
 
 ### Values a reader compares side by side
 
@@ -915,13 +1030,14 @@ viewing scale and at print scale:
 Test the output in the Chrome/Edge viewer, the Firefox viewer, and Adobe Reader
 where available.
 
-For a change to shared machinery rather than to one form,
-`build_final_review_pack.py` writes a local, git-excluded pack covering all 18
-production dynamic documents — ordinary, realistic-long, English, both subject
-kinds and a pass built on the values that make a row grow — with every page
-rendered full-bleed and each card carrying the client code, agreement number
-and date, tariff sizes, inserted rows, page shift, the smallest client value on
-the page and the structural verdict.
+For this correction branch, `build_ordinary_review_pack.py` wrote the local,
+git-excluded `manual-smoke/manual-findings-fix` pack for the 6 affected
+documents and 24 focused scenarios. It contains 24 PDFs and fixture JSON files,
+73 full-page PNGs and 84 close-ups; its automated gates are zero and its 115
+manual checklist items remain unchecked until a reviewer signs them off. Each
+card records the exact requested/rendered source, owner cell/row where
+applicable, line/expansion/shift/font metrics, deterministic fingerprint and
+structural/equality verdict.
 
 ### Testing Cyrillic
 
@@ -1007,6 +1123,8 @@ does not fit, the document map is the thing to fix.
 | `run_layout_specs.py` | the layout engine, against the real embedded font |
 | `run_document_regression.py` | every map × every RU/EN profile, plus PDF structure |
 | `run_expansion_tests.py` | page budgets, scenario allocation, white-space recovery, preflight/render agreement |
+| `run_qualification_notice_layout_tests.py` | recipient/address boundaries, semantic body/date flow, rule clearance and long `other` branch |
+| `run_table_ownership_tests.py` | all four questionnaire ownership registries, planned ink, moved borders, budgets and negative mutations |
 | `run_structural_pdf_tests.py` | every original operator exactly once, read by pymupdf *and* pypdf |
 | `run_visual_geometry_tests.py` | what a generated row looks like, measured; writes the QA examples with `--keep` |
 | `run_wizard_tests.py` | the Document Wizard end to end |
@@ -1015,15 +1133,17 @@ does not fit, the document map is the thing to fix.
 | `measure_page_layout.py` | a page's reserve, its fixed footer, its block gaps and its row geometry |
 | `audit_ordinary_failures.py` | the failure matrix, split into ordinary / realistic-long / stress |
 | `audit_ordinary_equality.py` | no ordinary payload is shortened, and every value it draws comes back out of the PDF character for character |
-| `check_full_template_audit.py` | every one of the 22 PDFs has exactly one final production status, and the declaration matches what the code does; `--self-test` proves the 14 negative gates |
-| `check_production_completeness.py` | a half-filled labelled sentence, a typography group set two ways, a printed sample nobody replaces; `--self-test` proves the 6 negative gates |
-| `build_ordinary_review_pack.py` | writes the local, git-excluded visual-review pack for a layout change that needs a person to look at it |
-| `build_final_review_pack.py` | writes the local, git-excluded pack covering **all 18** production dynamic documents, for a change to shared machinery |
+| `check_full_template_audit.py` | every one of the 22 PDFs has exactly one final production status, and the declaration matches what the code does; `--self-test` exercises its negative gates |
+| `check_production_completeness.py` | a half-filled labelled sentence, a typography group set two ways, or a printed sample nobody replaces; `--self-test` exercises its negative gates |
+| `build_ordinary_review_pack.py` | writes the local, git-excluded ordinary/long and focused `manual-findings-fix` visual-review pack |
 
 All under `static-uikit/tools/qa/`.
 
 `run_all_qa.py` is the canonical combined run and the one that has to be green;
-a suite that passes alone and fails in the combined run has failed.
+a suite that passes alone and fails in the combined run has failed. For the
+assembled correction branch it reports **27 of 27 suites passed**. Only that
+verdict is repeated here; the per-suite counts stay where the runner prints
+them.
 
 There is no Node on the target workstation, so these drive Chrome over the
 DevTools protocol. The same pages open by hand in any browser over

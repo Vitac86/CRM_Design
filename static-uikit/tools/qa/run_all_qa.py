@@ -42,6 +42,7 @@ REQUIRED_ASSETS = [
     "/assets/vendor/pdfjs/pdf.worker.mjs",
     "/assets/fonts/pdf/LiberationSerif-Regular.ttf",
     "/assets/js/document-engine/pdf-overlay-renderer.js",
+    "/assets/js/document-engine/table-ownership.js",
     "/assets/js/pages/document-wizard.js",
     "/assets/document-pdf-templates/accession-application-fl.pdf",
     "/assets/document-pdf-templates/power-of-attorney.pdf",
@@ -56,11 +57,13 @@ SUITES = [
     ("Word flow", "run_word_flow_renderer_tests.py", []),
     ("page expansion", "run_expansion_tests.py", []),
     ("table-cell expansion", "run_table_cell_expansion_tests.py", []),
+    ("questionnaire table ownership", "run_table_ownership_tests.py", []),
     ("visual geometry and cross-page flow", "run_visual_geometry_tests.py", []),
     # Geometry says the value is inside its box. This says the result still
     # reads as one field: an exact reference stays in its sentence, a grown row
     # keeps the paragraph's rhythm, and no printed placeholder survives.
     ("visual reading flow", "run_visual_flow_tests.py", []),
+    ("qualification notice layout", "run_qualification_notice_layout_tests.py", []),
     ("reviewed operator ranges", "run_reviewed_operator_range_tests.py", []),
     ("preflight/render agreement", "run_preflight_render_agreement_tests.py", []),
     ("Document Wizard", "run_wizard_tests.py", []),

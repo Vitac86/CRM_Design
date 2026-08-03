@@ -17,12 +17,12 @@
     "staticOrHiddenTemplates": 4,
     "maps": 18,
     "baselineFields": 620,
-    "currentFields": 634,
-    "additiveCurrentFields": 14,
-    "currentTextFields": 410,
+    "currentFields": 636,
+    "additiveCurrentFields": 16,
+    "currentTextFields": 412,
     "currentCheckFields": 224,
     "sourceTextLines": 4007,
-    "semanticSections": 585,
+    "semanticSections": 586,
     "sourceStaticPageSections": 77
   },
   "productionStatusCounts": {
@@ -287,7 +287,7 @@
       "generationMode": "not-offered",
       "exposure": "not-offered",
       "qaStatus": "source SHA-256 / page-count byte baseline only",
-      "reason": "Приложение 7 carries four order types across five pages. The map places 93 fields, but 89 of them read `extra.*` — values an operator types — and every one is optional, so the form generates almost entirely blank unless a manager fills a form the wizard does not really ask. Only the client name is bound to CRM data. Amount, currency, venue, recipient, bank name, BIK/SWIFT, correspondent and settlement accounts, intermediary bank, personal identifiers, the initiator block and the representative's authority are all unbound, and the bank details among them exist in UMI (Front Реквизиты) and simply are not wired. Calling that production-ready would put a mostly empty order in front of a client. The per-row inventory and the exact UMI name for every row that has one are in docs/order-forms-mapping-gap.md; finishing it is a separate task.",
+      "reason": "Приложение 7 carries three order forms across four pages. The map places 93 fields, but 89 of them read `extra.*` — values an operator types — and every one is optional, so the form generates almost entirely blank unless a manager fills a form the wizard does not really ask. Only the client name is bound to CRM data. Amount, currency, venue, recipient, bank name, BIK/SWIFT, correspondent and settlement accounts, intermediary bank, personal identifiers, the initiator block and the representative's authority are all unbound, and the bank details among them exist in UMI (Front Реквизиты) and simply are not wired. Calling that production-ready would put a mostly empty order in front of a client. The per-row inventory and the exact UMI name for every row that has one are in docs/order-forms-mapping-gap.md; finishing it is a separate task.",
       "userCanDownload": false,
       "futureMappingRequired": true,
       "excludedFromCurrentRelease": true
@@ -3128,6 +3128,16 @@
       "documentId": "account-opening-notice",
       "fieldId": "paymentPurposeAgreementDate",
       "source": "extra.extra-brokerage-contract-date"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "fieldId": "transferBasisDepositoryNumber",
+      "source": "extra.extra-depository-contract"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "fieldId": "transferBasisDepositoryDate",
+      "source": "extra.extra-depository-contract-date"
     },
     {
       "documentId": "power-of-attorney",
@@ -17198,7 +17208,7 @@
       "catalogStatus": "production",
       "packageId": null,
       "mapId": "account-opening-notice",
-      "currentFieldCount": 17
+      "currentFieldCount": 19
     },
     {
       "documentId": "anketa-fl-simplified-id",
@@ -141519,7 +141529,7 @@
       "templateFilename": "account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
       "pageCount": 2,
-      "fieldCount": 17,
+      "fieldCount": 19,
       "reviewed": "classification-and-source-inventory-complete",
       "layoutCategoriesFound": [
         "fixed-exact-token",
@@ -141529,7 +141539,8 @@
       "wordFlowBlocksAdded": [
         "account-opening-payment-purpose-stock",
         "account-opening-payment-purpose-currency",
-        "account-opening-payment-purpose-derivatives"
+        "account-opening-payment-purpose-derivatives",
+        "account-opening-transfer-basis"
       ],
       "activeIndependentExpansionFields": [
         "clientName"
@@ -141554,7 +141565,12 @@
         "multiline-table-cell"
       ],
       "wordFlowBlocksAdded": [],
-      "activeIndependentExpansionFields": [],
+      "activeIndependentExpansionFields": [
+        "bankAddress",
+        "bankName",
+        "clientFullName",
+        "otherInformation"
+      ],
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
       "migrationResult": "no Word-flow migration required: dynamic content is table-cell, fixed/exact, checkbox/static or genuinely independent-row content",
       "migrationCompleted": true,
@@ -141600,7 +141616,16 @@
         "multiline-table-cell"
       ],
       "wordFlowBlocksAdded": [],
-      "activeIndependentExpansionFields": [],
+      "activeIndependentExpansionFields": [
+        "clientFullName",
+        "bankAddress",
+        "bankName",
+        "ipRegistrationAuthority",
+        "ipRegistrationPlace",
+        "beneficialOwnerName",
+        "beneficiaryName",
+        "representativeName"
+      ],
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
       "migrationResult": "no Word-flow migration required: dynamic content is table-cell, fixed/exact, checkbox/static or genuinely independent-row content",
       "migrationCompleted": true,
@@ -141642,6 +141667,9 @@
       "wordFlowBlocksAdded": [],
       "activeIndependentExpansionFields": [
         "foreignName",
+        "pre2002RegistrationAuthority",
+        "pre2002RegistrationDocument",
+        "stateRegistrationAuthority",
         "bankAddress",
         "licenceAuthority"
       ],
@@ -142970,11 +142998,12 @@
       "documentId": "account-opening-notice",
       "templateFilename": "account-opening-notice.pdf",
       "expectedPages": 2,
-      "currentFieldCount": 17,
+      "currentFieldCount": 19,
       "wordFlowBlockIds": [
         "account-opening-payment-purpose-stock",
         "account-opening-payment-purpose-currency",
-        "account-opening-payment-purpose-derivatives"
+        "account-opening-payment-purpose-derivatives",
+        "account-opening-transfer-basis"
       ],
       "pageLayout": {
         "0": {
@@ -143350,6 +143379,108 @@
               "keepTogether": true
             }
           ]
+        },
+        {
+          "id": "account-opening-transfer-basis",
+          "type": "wordFlowBlock",
+          "page": 1,
+          "frame": {
+            "left": 41.4,
+            "baselineTop": 628.42,
+            "width": 511.42,
+            "initialLineCount": 2
+          },
+          "font": "legalSerif",
+          "fontSize": 11.04,
+          "minFontSize": 11.04,
+          "fontSizeLocked": true,
+          "lineHeight": 12.96,
+          "firstLineIndent": 0,
+          "hangingIndent": 24.504,
+          "alignment": "left",
+          "maxAdditionalLines": 3,
+          "overflowStrategy": "flow",
+          "sourceReplacement": {
+            "operatorScope": "all-balanced",
+            "operatorDepth": 2,
+            "parentTopLevelBlock": 7,
+            "firstBlock": 250,
+            "lastBlock": 292,
+            "expectedBlockCount": 43,
+            "expectedPageBlockCount": 312,
+            "expectedParentSha256": "38de8f2ffc2d14f3322a31faf44a0a70098471242a7fbcec3ccdcfe1c079fe60",
+            "expectedSha256": "1a33b2e34ffd9d96dd21744ca0869602d96d0e65a89d1228476d26fb50956235",
+            "expectedTemplateSha256": "8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294",
+            "reviewStatus": "approved"
+          },
+          "sourceStaticText": "2. Депозитарный договор клиента с ООО «ИНВЕСТИКА» (Заявление о присоединении) № от «__» г. 3. Договор купли-продажи, займа и т.п. (в случае перевода со сменой права собственности).",
+          "runs": [
+            {
+              "type": "static",
+              "text": "2."
+            },
+            {
+              "type": "spacer",
+              "width": 16.224
+            },
+            {
+              "type": "static",
+              "keepWithNext": true,
+              "text": "Депозитарный договор клиента с ООО «ИНВЕСТИКА» (Заявление о присоединении) № "
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "transferBasisDepositoryNumber",
+              "keepTogether": true
+            },
+            {
+              "type": "static",
+              "text": " от «",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "transferBasisDepositoryDate",
+              "keepTogether": true,
+              "keepWithNext": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 11.04,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": "» г.",
+              "keepTogether": true
+            },
+            {
+              "type": "paragraphBreak"
+            },
+            {
+              "type": "static",
+              "text": "3."
+            },
+            {
+              "type": "spacer",
+              "width": 16.224
+            },
+            {
+              "type": "static",
+              "text": "Договор купли-продажи, займа и т.п. (в случае перевода со сменой права собственности)."
+            }
+          ],
+          "semanticGroup": {
+            "kind": "depository-transfer-basis",
+            "boundary": {
+              "left": 41.4,
+              "top": 618.58,
+              "right": 552.82,
+              "bottom": 683.26
+            },
+            "reviewStatus": "approved"
+          }
         }
       ],
       "fields": [
@@ -143468,6 +143599,20 @@
         {
           "fieldId": "paymentPurposeAgreementDate",
           "source": "extra.extra-brokerage-contract-date",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "transferBasisDepositoryNumber",
+          "source": "extra.extra-depository-contract",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
+        },
+        {
+          "fieldId": "transferBasisDepositoryDate",
+          "source": "extra.extra-depository-contract-date",
           "page": 2,
           "type": "text",
           "identifierStatus": "additive-current"
@@ -144068,7 +144213,22 @@
       "expectedPages": 2,
       "currentFieldCount": 29,
       "wordFlowBlockIds": [],
-      "pageLayout": {},
+      "pageLayout": {
+        "0": {
+          "fixedHeaderUntil": 0,
+          "bodyBottom": 780.46,
+          "fixedFooterFrom": null,
+          "shiftToTop": 841.92,
+          "bottomClearance": 30,
+          "compaction": [],
+          "anchors": [
+            "clientFullName",
+            "bankName",
+            "bankAddress",
+            "otherInformation"
+          ]
+        }
+      },
       "wordFlowBlocks": [],
       "fields": [
         {
@@ -144282,7 +144442,46 @@
       "expectedPages": 5,
       "currentFieldCount": 92,
       "wordFlowBlockIds": [],
-      "pageLayout": {},
+      "pageLayout": {
+        "0": {
+          "fixedHeaderUntil": 0,
+          "bodyBottom": 779.02,
+          "fixedFooterFrom": null,
+          "shiftToTop": 841.92,
+          "bottomClearance": 30,
+          "compaction": [],
+          "anchors": [
+            "clientFullName"
+          ]
+        },
+        "1": {
+          "fixedHeaderUntil": 0,
+          "bodyBottom": 784.9,
+          "fixedFooterFrom": null,
+          "shiftToTop": 841.92,
+          "bottomClearance": 30,
+          "compaction": [],
+          "anchors": [
+            "bankName",
+            "bankAddress",
+            "ipRegistrationAuthority",
+            "ipRegistrationPlace"
+          ]
+        },
+        "2": {
+          "fixedHeaderUntil": 0,
+          "bodyBottom": 781.18,
+          "fixedFooterFrom": null,
+          "shiftToTop": 841.92,
+          "bottomClearance": 30,
+          "compaction": [],
+          "anchors": [
+            "representativeName",
+            "beneficiaryName",
+            "beneficialOwnerName"
+          ]
+        }
+      },
       "wordFlowBlocks": [],
       "fields": [
         {
@@ -144943,10 +145142,13 @@
           "bodyBottom": 780.1,
           "fixedFooterFrom": null,
           "shiftToTop": 800,
-          "bottomClearance": 44,
+          "bottomClearance": 28,
           "compaction": [],
           "anchors": [
-            "foreignName"
+            "foreignName",
+            "stateRegistrationAuthority",
+            "pre2002RegistrationDocument",
+            "pre2002RegistrationAuthority"
           ]
         },
         "2": {
@@ -147883,14 +148085,38 @@
           "lineHeight": 11.52,
           "paragraphSpacingAfter": 11.88,
           "alignment": "left",
+          "firstLineIndent": 259.51,
+          "hangingIndent": 259.51,
+          "semanticGroup": {
+            "id": "qualification-notice-recipient-address",
+            "kind": "recipient-block",
+            "reviewStatus": "approved",
+            "bounds": {
+              "left": 379.51,
+              "right": 533.6
+            },
+            "name": {
+              "fieldId": "recipientName",
+              "source": "field.client-full-name",
+              "companyUmi": "umi.company.origname",
+              "representation": "full-name"
+            },
+            "address": {
+              "fieldId": "recipientAddress",
+              "source": "umi.address.registration",
+              "representation": "single-formatted-address",
+              "renderOnce": true
+            }
+          },
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
             "insertionTop": 212.2,
             "shiftFromTop": 212.2,
             "rowHeight": 11.52,
-            "maxExtraRows": 6,
+            "maxExtraRows": 10,
             "lineStyle": "none",
+            "moveTopLevelPaths": true,
             "reviewStatus": "approved"
           },
           "sourceReplacement": {
@@ -147905,44 +148131,52 @@
           "sourceStaticText": "Кому:_________________________ Адрес:________________________",
           "runs": [
             {
-              "type": "spacer",
-              "width": 259.51
-            },
-            {
               "type": "static",
               "text": "Кому:",
-              "keepWithNext": true
+              "keepWithNext": true,
+              "semanticRole": "recipient-label"
+            },
+            {
+              "type": "spacer",
+              "width": 3.5,
+              "keepWithNext": true,
+              "semanticRole": "recipient-label-gap"
             },
             {
               "type": "fieldRef",
               "fieldId": "recipientName",
+              "semanticRole": "recipient-full-name",
               "decoration": {
                 "underline": true,
                 "minWidth": 124.9,
                 "thickness": 0.48,
-                "offset": 1.2
+                "offset": 2.4
               }
             },
             {
               "type": "paragraphBreak"
             },
             {
-              "type": "spacer",
-              "width": 259.51
-            },
-            {
               "type": "static",
               "text": "Адрес:",
-              "keepWithNext": true
+              "keepWithNext": true,
+              "semanticRole": "address-label"
+            },
+            {
+              "type": "spacer",
+              "width": 3.5,
+              "keepWithNext": true,
+              "semanticRole": "address-label-gap"
             },
             {
               "type": "fieldRef",
               "fieldId": "recipientAddress",
+              "semanticRole": "formatted-address",
               "decoration": {
                 "underline": true,
                 "minWidth": 117.9,
                 "thickness": 0.48,
-                "offset": 1.2
+                "offset": 2.4
               }
             }
           ]
@@ -147963,6 +148197,35 @@
           "fontSizeLocked": true,
           "lineHeight": 11.52,
           "alignment": "left",
+          "semanticGroup": {
+            "id": "qualification-notice-recognition-body",
+            "kind": "organization-name-and-date",
+            "reviewStatus": "approved",
+            "fullName": {
+              "fieldId": "clientName",
+              "source": "field.client-full-name",
+              "companyUmi": "umi.company.origname",
+              "representation": "full-name"
+            },
+            "caption": {
+              "role": "full-name-caption",
+              "keepWith": "clientName"
+            },
+            "date": {
+              "fieldId": "recognitionDate",
+              "source": "field.documentDateRu",
+              "rule": {
+                "left": 99.264,
+                "width": 141.62,
+                "thickness": 0.48,
+                "offset": 2.4
+              }
+            },
+            "continuation": {
+              "role": "recognition-clause",
+              "shiftWithBlock": true
+            }
+          },
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
@@ -147971,6 +148234,7 @@
             "rowHeight": 11.52,
             "maxExtraRows": 4,
             "lineStyle": "none",
+            "moveTopLevelPaths": true,
             "reviewStatus": "approved"
           },
           "sourceReplacement": {
@@ -147986,16 +148250,18 @@
           "runs": [
             {
               "type": "static",
-              "text": "ООО «Инвестика» настоящим уведомляет, что "
+              "text": "ООО «Инвестика» настоящим уведомляет, что ",
+              "semanticRole": "recognition-lead-in"
             },
             {
               "type": "fieldRef",
               "fieldId": "clientName",
+              "semanticRole": "client-full-name",
               "decoration": {
                 "underline": true,
-                "minWidth": 234,
+                "minWidth": 233.8,
                 "thickness": 0.48,
-                "offset": 1.2
+                "offset": 2.4
               }
             },
             {
@@ -148003,12 +148269,15 @@
             },
             {
               "type": "spacer",
-              "width": 237.05
+              "width": 237.05,
+              "keepWithNext": true
             },
             {
               "type": "static",
               "text": "(Ф.И.О./ наименование организации)",
-              "font": "legalSerifItalic"
+              "font": "legalSerifItalic",
+              "keepTogether": true,
+              "semanticRole": "client-full-name-caption"
             },
             {
               "type": "lineBreak"
@@ -148017,16 +148286,19 @@
               "type": "fieldRef",
               "fieldId": "recognitionDate",
               "keepTogether": true,
+              "keepWithNext": true,
+              "semanticRole": "recognition-date",
               "decoration": {
                 "underline": true,
-                "minWidth": 138,
+                "minWidth": 141.62,
                 "thickness": 0.48,
-                "offset": 1.2
+                "offset": 2.4
               }
             },
             {
               "type": "static",
-              "text": " признано квалифицированным инвестором в отношении следующих видов:"
+              "text": " признано квалифицированным инвестором в отношении следующих видов:",
+              "semanticRole": "recognition-clause"
             },
             {
               "type": "lineBreak"
@@ -148066,6 +148338,7 @@
             "rowHeight": 11.52,
             "maxExtraRows": 4,
             "lineStyle": "none",
+            "moveTopLevelPaths": true,
             "reviewStatus": "approved"
           },
           "sourceReplacement": {
@@ -148090,7 +148363,7 @@
                 "underline": true,
                 "minWidth": 89,
                 "thickness": 0.48,
-                "offset": 1.08
+                "offset": 2.4
               }
             },
             {
@@ -148100,7 +148373,7 @@
                 "underline": true,
                 "minWidth": 89,
                 "thickness": 0.48,
-                "offset": 1.08
+                "offset": 2.4
               }
             },
             {
@@ -148120,7 +148393,7 @@
         },
         {
           "fieldId": "recipientAddress",
-          "source": "field.client-postal-address",
+          "source": "umi.address.registration",
           "page": 1,
           "type": "text",
           "identifierStatus": "baseline-preserved"
@@ -153888,6 +154161,60 @@
       "sectionKind": "semantic-field-section"
     },
     {
+      "documentId": "account-opening-notice",
+      "title": "Уведомление об открытии брокерского-депозитарного счета",
+      "templateFilename": "account-opening-notice.pdf",
+      "page": 2,
+      "sectionId": "account-opening-transfer-basis",
+      "fieldIds": [
+        "transferBasisDepositoryNumber",
+        "transferBasisDepositoryDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract",
+        "extra.extra-depository-contract-date"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "word-flow-block-run"
+      ],
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "classificationSource": "executable wordFlowBlocks",
+      "staticTextInvolved": "2. Депозитарный договор клиента с ООО «ИНВЕСТИКА» (Заявление о присоединении) № от «__» г. 3. Договор купли-продажи, займа и т.п. (в случае перевода со сменой права собственности).",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        11.04
+      ],
+      "lineHeightPt": [
+        12.96
+      ],
+      "alignment": [
+        "left"
+      ],
+      "underlineBorderStyle": [
+        "source-pdf-underlay-rule-or-border",
+        "word-flow-underline"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "post-migration-visual-review-required"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
       "documentId": "anketa-fl",
       "title": "Анкета физического лица",
       "templateFilename": "anketa-fl.pdf",
@@ -154053,7 +154380,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -155329,7 +155656,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -158220,7 +158547,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -158239,7 +158566,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -158424,7 +158751,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -158443,7 +158770,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -158577,7 +158904,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -158596,7 +158923,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -159189,7 +159516,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -159202,13 +159529,13 @@
         10
       ],
       "lineHeightPt": [
-        11
+        null
       ],
       "alignment": [
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -159745,7 +160072,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -159796,7 +160123,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -159847,7 +160174,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -159899,7 +160226,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160052,7 +160379,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160071,7 +160398,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -160205,7 +160532,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -160256,7 +160583,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160307,7 +160634,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -160358,7 +160685,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160409,7 +160736,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -160460,7 +160787,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -160613,7 +160940,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160664,7 +160991,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160716,7 +161043,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "fixed-field-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -160768,7 +161095,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -160820,7 +161147,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "fixed-field-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161076,7 +161403,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161275,7 +161602,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161326,7 +161653,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161345,7 +161672,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -161377,7 +161704,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161428,7 +161755,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161479,7 +161806,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161530,7 +161857,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161549,7 +161876,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -161581,7 +161908,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161632,7 +161959,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161684,7 +162011,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161736,7 +162063,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161755,7 +162082,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -161788,7 +162115,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "fixed-field-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161840,7 +162167,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161859,7 +162186,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -161891,7 +162218,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -161943,7 +162270,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -161995,7 +162322,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162047,7 +162374,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162099,7 +162426,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162252,7 +162579,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162304,7 +162631,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "fixed-field-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162356,7 +162683,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162509,7 +162836,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162612,7 +162939,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162664,7 +162991,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "fixed-field-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162716,7 +163043,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162768,7 +163095,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162819,7 +163146,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
@@ -162917,7 +163244,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162968,7 +163295,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -162987,7 +163314,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -163019,7 +163346,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -163070,7 +163397,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -163089,7 +163416,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -163631,7 +163958,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -163682,7 +164009,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -163701,7 +164028,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -163835,7 +164162,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -164343,7 +164670,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "multiline-overlay"
+        "bounded-multiline-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -165484,7 +165811,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -165503,7 +165830,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -165586,7 +165913,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -165605,7 +165932,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -165944,7 +166271,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -165963,7 +166290,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -178046,7 +178373,7 @@
       ],
       "sourcePaths": [
         "field.client-full-name",
-        "field.client-postal-address"
+        "umi.address.registration"
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
@@ -184830,6 +185157,7 @@
         "id": "brokerageContractDate",
         "label": "Дата договора на брокерское обслуживание",
         "source": "field.extra-contract-date",
+        "required": false,
         "optional": true,
         "typographyGroup": "accession-fl-internal-table",
         "page": 2,
@@ -184889,6 +185217,7 @@
         "id": "brokerageContractNumber",
         "label": "Номер договора на брокерское обслуживание",
         "source": "field.extra-contract-number",
+        "required": false,
         "optional": true,
         "typographyGroup": "accession-fl-internal-table",
         "page": 2,
@@ -184947,7 +185276,8 @@
         "id": "depositoryContractDate",
         "label": "Дата депозитарного договора",
         "source": "extra.extra-depository-contract-date",
-        "optional": true,
+        "required": true,
+        "optional": false,
         "typographyGroup": "accession-fl-internal-table",
         "page": 2,
         "left": 410.44,
@@ -185006,7 +185336,8 @@
         "id": "depositoryContractNumber",
         "label": "Номер депозитарного договора",
         "source": "extra.extra-depository-contract",
-        "optional": true,
+        "required": true,
+        "optional": false,
         "typographyGroup": "accession-fl-internal-table",
         "page": 2,
         "left": 274.64,
@@ -185016,7 +185347,8 @@
         "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
-        "maxLines": 1
+        "maxLines": 1,
+        "format": null
       }
     },
     {
@@ -185064,6 +185396,7 @@
         "id": "internalClientCode",
         "label": "Код клиента в системе внутреннего учета",
         "source": "field.client-code",
+        "required": false,
         "optional": true,
         "typographyGroup": "accession-fl-internal-table",
         "page": 2,
@@ -186824,6 +187157,7 @@
         "id": "brokerageContractDate",
         "label": "Дата договора на брокерское обслуживание",
         "source": "field.extra-contract-date",
+        "required": false,
         "optional": true,
         "typographyGroup": "accession-yul-internal-table",
         "page": 1,
@@ -186883,6 +187217,7 @@
         "id": "brokerageContractNumber",
         "label": "Номер договора на брокерское обслуживание",
         "source": "field.extra-contract-number",
+        "required": false,
         "optional": true,
         "typographyGroup": "accession-yul-internal-table",
         "page": 1,
@@ -187051,7 +187386,8 @@
         "id": "depositoryContractDate",
         "label": "Дата депозитарного договора",
         "source": "extra.extra-depository-contract-date",
-        "optional": true,
+        "required": true,
+        "optional": false,
         "typographyGroup": "accession-yul-internal-table",
         "page": 1,
         "left": 405.44,
@@ -187110,7 +187446,8 @@
         "id": "depositoryContractNumber",
         "label": "Номер депозитарного договора",
         "source": "extra.extra-depository-contract",
-        "optional": true,
+        "required": true,
+        "optional": false,
         "typographyGroup": "accession-yul-internal-table",
         "page": 1,
         "left": 271.56,
@@ -187120,7 +187457,8 @@
         "fontSize": 9,
         "minFontSize": 9,
         "align": "center",
-        "maxLines": 1
+        "maxLines": 1,
+        "format": null
       }
     },
     {
@@ -187168,6 +187506,7 @@
         "id": "internalClientCode",
         "label": "Код клиента в системе внутреннего учета",
         "source": "field.client-code",
+        "required": false,
         "optional": true,
         "typographyGroup": "accession-yul-internal-table",
         "page": 1,
@@ -188439,6 +188778,127 @@
       }
     },
     {
+      "documentId": "account-opening-notice",
+      "title": "Уведомление об открытии брокерского-депозитарного счета",
+      "templateFilename": "account-opening-notice.pdf",
+      "page": 2,
+      "sectionId": "account-opening-transfer-basis",
+      "fieldId": "transferBasisDepositoryDate",
+      "fieldIds": [
+        "transferBasisDepositoryDate"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract-date"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "transferBasisDepositoryDate",
+        "source": "extra.extra-depository-contract-date",
+        "format": "dateRu",
+        "fallbacks": []
+      },
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "2. Депозитарный договор клиента с ООО «ИНВЕСТИКА» (Заявление о присоединении) № от «__» г. 3. Договор купли-продажи, займа и т.п. (в случае перевода со сменой права собственности).",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.96,
+      "lineHeightModel": "explicit",
+      "alignment": "left",
+      "underlineBorderStyle": "word-flow-underline",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "post-migration-visual-review-required",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "transferBasisDepositoryDate",
+        "source": "extra.extra-depository-contract-date",
+        "page": 1,
+        "left": 497.16,
+        "baselineTop": 628.42,
+        "width": 55,
+        "font": "legalSerif",
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
+        "align": "left",
+        "required": true,
+        "optional": false,
+        "multiline": false,
+        "format": "dateRu",
+        "tokenBreak": "none",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "account-opening-transfer-basis"
+      }
+    },
+    {
+      "documentId": "account-opening-notice",
+      "title": "Уведомление об открытии брокерского-депозитарного счета",
+      "templateFilename": "account-opening-notice.pdf",
+      "page": 2,
+      "sectionId": "account-opening-transfer-basis",
+      "fieldId": "transferBasisDepositoryNumber",
+      "fieldIds": [
+        "transferBasisDepositoryNumber"
+      ],
+      "sourcePaths": [
+        "extra.extra-depository-contract"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "transferBasisDepositoryNumber",
+        "source": "extra.extra-depository-contract",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "2. Депозитарный договор клиента с ООО «ИНВЕСТИКА» (Заявление о присоединении) № от «__» г. 3. Договор купли-продажи, займа и т.п. (в случае перевода со сменой права собственности).",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.96,
+      "lineHeightModel": "explicit",
+      "alignment": "left",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "post-migration-visual-review-required",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "transferBasisDepositoryNumber",
+        "source": "extra.extra-depository-contract",
+        "page": 1,
+        "left": 471.1,
+        "baselineTop": 628.42,
+        "width": 70,
+        "font": "legalSerif",
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
+        "align": "left",
+        "required": true,
+        "optional": false,
+        "multiline": false,
+        "tokenBreak": "none",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "account-opening-transfer-basis"
+      }
+    },
+    {
       "documentId": "anketa-fl",
       "title": "Анкета физического лица",
       "templateFilename": "anketa-fl.pdf",
@@ -188578,7 +189038,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -188611,7 +189071,10 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": false,
+        "multiline": true,
+        "maxLines": 3,
+        "maxHeight": 40.99,
+        "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "check.citizenship-other",
           "equals": true
@@ -190022,7 +190485,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -190055,7 +190518,10 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": false,
+        "multiline": true,
+        "maxLines": 4,
+        "maxHeight": 49.6,
+        "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "check.tax-resident-rf-no",
           "equals": true
@@ -193038,7 +193504,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 24.8,
+        "maxLines": 2,
+        "maxHeight": 23.319999999999936,
         "lineHeightRatio": 0.95
       }
     },
@@ -193063,7 +193530,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -193073,7 +193540,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -193097,8 +193564,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 26.4,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 11.440000000000055,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 666.7,
+          "shiftFromTop": 666.7,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 510.94,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            573.72,
+            574.68
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 242.1,
+            "baselineOffset": 10.44,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -193156,7 +193659,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 26.3,
+        "maxLines": 1,
+        "maxHeight": 11.32000000000005,
         "lineHeightRatio": 0.95
       }
     },
@@ -193215,7 +193719,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 26.4,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999994,
         "lineHeightRatio": 0.95
       }
     },
@@ -193274,7 +193779,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 26.3,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999994,
         "lineHeightRatio": 0.95
       }
     },
@@ -193299,7 +193805,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -193309,7 +193815,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -193333,8 +193839,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 26.4,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 11.440000000000055,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 653.26,
+          "shiftFromTop": 653.26,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 510.94,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            573.72,
+            574.68
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 242.1,
+            "baselineOffset": 10.44,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -193392,7 +193934,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 13,
+        "maxLines": 1,
+        "maxHeight": 11.440000000000055,
         "lineHeightRatio": 0.95
       }
     },
@@ -193451,7 +193994,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.6,
+        "maxLines": 1,
+        "maxHeight": 12.039999999999992,
         "lineHeightRatio": 0.95
       }
     },
@@ -193476,7 +194020,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -193486,7 +194030,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -193510,8 +194054,44 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.8,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 12.280000000000001,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 153.62,
+          "shiftFromTop": 153.62,
+          "rowHeight": 14.16,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 510.94,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            573.72,
+            574.68
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 242.1,
+            "baselineOffset": 10.44,
+            "ruleOffset": 14.16,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -193569,7 +194149,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.159999999999968,
         "lineHeightRatio": 0.95
       }
     },
@@ -193628,7 +194209,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.18999999999997,
         "lineHeightRatio": 0.95
       }
     },
@@ -193687,7 +194269,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.159999999999997,
         "lineHeightRatio": 0.95
       }
     },
@@ -193746,7 +194329,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.159999999999997,
         "lineHeightRatio": 0.95
       }
     },
@@ -193866,7 +194450,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.159999999999997,
         "lineHeightRatio": 0.95
       }
     },
@@ -193925,7 +194510,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.160000000000025,
         "lineHeightRatio": 0.95
       }
     },
@@ -194045,7 +194631,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 13.6,
+        "maxLines": 1,
+        "maxHeight": 12.04000000000002,
         "lineHeightRatio": 0.95
       }
     },
@@ -194104,7 +194691,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxHeight": 25.3,
+        "maxLines": 2,
+        "maxHeight": 23.799999999999955,
         "lineHeightRatio": 0.95
       }
     },
@@ -194163,7 +194751,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.159999999999968,
         "lineHeightRatio": 0.95
       }
     },
@@ -194188,17 +194777,17 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 10,
-      "lineHeightPt": 11,
-      "lineHeightModel": "explicit",
+      "lineHeightPt": null,
+      "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -194222,10 +194811,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxLines": 2,
-        "maxHeight": 22,
-        "lineHeight": 11,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 9.519999999999982,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 757.18,
+          "shiftFromTop": 757.18,
+          "rowHeight": 11.52,
+          "maxExtraRows": 1,
+          "maxFontSize": 10,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 510.94,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            573.72,
+            574.68
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 242.1,
+            "baselineOffset": 9.24,
+            "ruleOffset": 11.52,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -194572,7 +195195,8 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxHeight": 13.7,
+        "maxLines": 1,
+        "maxHeight": 12.160000000000025,
         "lineHeightRatio": 0.95
       }
     },
@@ -194718,7 +195342,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -194752,6 +195376,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999997,
         "lineHeightRatio": 0.95
       }
     },
@@ -194776,7 +195402,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -194810,6 +195436,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.350000000000023,
         "lineHeightRatio": 0.95
       }
     },
@@ -194834,7 +195462,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -194868,6 +195496,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -194893,7 +195523,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -194926,7 +195556,10 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": false,
+        "multiline": true,
+        "maxLines": 3,
+        "maxHeight": 36.76,
+        "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-citizenship-kind",
           "equals": "other"
@@ -195060,7 +195693,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195070,7 +195703,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -195094,7 +195727,44 @@
         "required": true,
         "optional": true,
         "multiline": true,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 11.560000000000002,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 245.78,
+          "shiftFromTop": 245.78,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.54,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -195224,7 +195894,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195258,6 +195928,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.319999999999993,
         "lineHeightRatio": 0.95
       }
     },
@@ -195282,7 +195954,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195316,6 +195988,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.45999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -195340,7 +196014,7 @@
         "format": "dateRu",
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195374,6 +196048,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95,
         "format": "dateRu"
       }
@@ -195399,7 +196075,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195434,6 +196110,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 22.360000000000014,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -195459,7 +196136,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195493,6 +196170,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -195517,7 +196196,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195550,7 +196229,10 @@
         "align": "left",
         "required": true,
         "optional": true,
-        "multiline": false
+        "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999994,
+        "lineHeightRatio": 0.95
       }
     },
     {
@@ -195680,7 +196362,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195715,6 +196397,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 33.280000000000086,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -195740,7 +196423,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195774,7 +196457,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
-        "maxLines": 3,
+        "maxLines": 4,
+        "maxHeight": 45.15999999999997,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -195801,7 +196485,7 @@
         "format": "dateRu",
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195834,7 +196518,9 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": true,
+        "multiline": false,
+        "maxLines": 1,
+        "maxHeight": 44.19999999999993,
         "lineHeightRatio": 0.95,
         "format": "dateRu",
         "showWhen": {
@@ -195865,7 +196551,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195899,6 +196585,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.440000000000055,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-citizenship-kind",
@@ -195928,7 +196616,7 @@
         "format": "dateRu",
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -195961,7 +196649,9 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": true,
+        "multiline": false,
+        "maxLines": 1,
+        "maxHeight": 44.23000000000002,
         "lineHeightRatio": 0.95,
         "format": "dateRu",
         "showWhen": {
@@ -196204,7 +196894,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -196237,7 +196927,10 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": false,
+        "multiline": true,
+        "maxLines": 3,
+        "maxHeight": 36.76,
+        "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-tax-residency",
           "equals": "other"
@@ -196371,7 +197064,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196405,6 +197098,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 2,
+        "maxHeight": 23.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -196429,7 +197124,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196439,7 +197134,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -196463,7 +197158,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 1,
+          "insertionTop": 349.01,
+          "shiftFromTop": 349.01,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.44,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -196487,7 +197219,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196521,6 +197253,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -196545,7 +197279,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196579,6 +197313,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -196603,7 +197339,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196637,6 +197373,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -196661,7 +197399,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196671,7 +197409,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -196695,7 +197433,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 1,
+          "insertionTop": 335.57,
+          "shiftFromTop": 335.57,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.44,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -196719,7 +197494,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196753,6 +197528,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.319999999999993,
         "lineHeightRatio": 0.95
       }
     },
@@ -196777,7 +197554,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196811,6 +197588,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -196836,7 +197615,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196871,6 +197650,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 3,
+        "maxHeight": 45.400000000000034,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95,
         "showWhen": {
@@ -196901,7 +197681,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196911,7 +197691,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -196935,7 +197715,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.319999999999936,
         "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 1,
+          "insertionTop": 540.55,
+          "shiftFromTop": 540.55,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.56,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout",
         "showWhen": {
           "source": "extra.extra-ipsz-status",
           "equals": "entrepreneur"
@@ -196964,7 +197781,7 @@
         "format": "dateRu",
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -196997,7 +197814,9 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": true,
+        "multiline": false,
+        "maxLines": 1,
+        "maxHeight": 12.04000000000002,
         "lineHeightRatio": 0.95,
         "format": "dateRu",
         "showWhen": {
@@ -197028,7 +197847,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197038,7 +197857,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -197062,7 +197881,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.440000000000055,
         "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 1,
+          "insertionTop": 553.99,
+          "shiftFromTop": 553.99,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.56,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout",
         "showWhen": {
           "source": "extra.extra-ipsz-status",
           "equals": "entrepreneur"
@@ -197090,7 +197946,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197124,6 +197980,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
         "lineHeightRatio": 0.95
       }
     },
@@ -197149,7 +198007,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197183,6 +198041,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 13.719999999999914,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-licensing",
@@ -197212,7 +198072,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197246,6 +198106,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 13.720000000000027,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-licensing",
@@ -197275,7 +198137,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197309,6 +198171,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 13.840000000000032,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-licensing",
@@ -197338,7 +198202,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197372,6 +198236,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 13.720000000000027,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-licensing",
@@ -197506,7 +198372,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197540,6 +198406,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.470000000000027,
         "lineHeightRatio": 0.95
       }
     },
@@ -197565,7 +198433,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197598,7 +198466,9 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": true,
+        "multiline": false,
+        "maxLines": 1,
+        "maxHeight": 22.239999999999952,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-ipsz-status",
@@ -197628,7 +198498,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197662,6 +198532,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999994,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-ipsz-status",
@@ -197796,7 +198668,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197831,6 +198703,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 33.28,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -197910,7 +198783,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -197944,6 +198817,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.440000000000055,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-ipsz-status",
@@ -197973,7 +198848,7 @@
         "format": "dateRu",
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "fixed-field-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -198006,7 +198881,9 @@
         "align": "left",
         "required": false,
         "optional": true,
-        "multiline": true,
+        "multiline": false,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999994,
         "lineHeightRatio": 0.95,
         "format": "dateRu",
         "showWhen": {
@@ -198037,7 +198914,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -198072,6 +198949,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 33.27999999999997,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95,
         "showWhen": {
@@ -198102,7 +198980,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -198136,6 +199014,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.470000000000027,
         "lineHeightRatio": 0.95,
         "showWhen": {
           "source": "extra.extra-ipsz-status",
@@ -198164,7 +199044,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "nonbreaking-exact-token",
       "intendedLayoutCategory": "fixed-exact-token",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -198198,6 +199078,8 @@
         "required": true,
         "optional": true,
         "multiline": true,
+        "maxLines": 1,
+        "maxHeight": 11.43999999999999,
         "lineHeightRatio": 0.95
       }
     },
@@ -198222,7 +199104,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -198257,6 +199139,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 20.319999999999993,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -198282,7 +199165,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -198292,7 +199175,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -198316,7 +199199,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 11.439999999999998,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 2,
+          "insertionTop": 366.53,
+          "shiftFromTop": 366.53,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.44,
+            "ruleOffset": 13.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -198340,7 +199260,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -198375,6 +199295,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 24.399999999999977,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -198400,7 +199321,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -198410,7 +199331,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -198434,7 +199355,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 16.24000000000001,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 2,
+          "insertionTop": 280.49,
+          "shiftFromTop": 280.49,
+          "rowHeight": 18.24,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 9.36,
+            "ruleOffset": 18.24,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -198988,7 +199946,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -199023,6 +199981,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 47.20000000000002,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -199048,7 +200007,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -199058,7 +200017,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -199082,7 +200041,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "lineHeightRatio": 0.95
+        "maxLines": 1,
+        "maxHeight": 13.719999999999999,
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 2,
+          "insertionTop": 155.9,
+          "shiftFromTop": 155.9,
+          "rowHeight": 15.72,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 329.1,
+            "width": 226,
+            "baselineOffset": 10.44,
+            "ruleOffset": 15.72,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -199212,7 +200208,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
@@ -199246,6 +200242,8 @@
         "required": false,
         "optional": true,
         "multiline": true,
+        "maxLines": 3,
+        "maxHeight": 35.339999999999996,
         "lineHeightRatio": 0.95
       }
     },
@@ -199694,7 +200692,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "multiline-overlay",
+      "currentRenderingModel": "bounded-multiline-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 4",
@@ -199729,6 +200727,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
+        "maxHeight": 11.439999999999998,
         "lineHeight": 10.5,
         "lineHeightRatio": 0.95
       }
@@ -200718,7 +201717,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -200728,7 +201727,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -200752,9 +201751,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxLines": 2,
+        "maxLines": 1,
         "maxHeight": 17.920000000000073,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 653.86,
+          "shiftFromTop": 653.86,
+          "rowHeight": 19.92,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 331.5,
+            "width": 222.9,
+            "baselineOffset": 10.54,
+            "ruleOffset": 19.92,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -200838,7 +201872,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -200848,7 +201882,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -200872,9 +201906,44 @@
         "required": false,
         "optional": true,
         "multiline": true,
-        "maxLines": 2,
+        "maxLines": 1,
         "maxHeight": 18.039999999999964,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 594.07,
+          "shiftFromTop": 594.07,
+          "rowHeight": 19.92,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 331.5,
+            "width": 222.9,
+            "baselineOffset": 10.54,
+            "ruleOffset": 19.92,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -201234,7 +202303,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -201244,7 +202313,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -201268,9 +202337,44 @@
         "required": true,
         "optional": false,
         "multiline": true,
-        "maxLines": 2,
+        "maxLines": 1,
         "maxHeight": 17.920000000000073,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 554.59,
+          "shiftFromTop": 554.59,
+          "rowHeight": 19.92,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 331.5,
+            "width": 222.9,
+            "baselineOffset": 10.54,
+            "ruleOffset": 19.92,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -215317,12 +216421,16 @@
             "left": 137.5,
             "baselineTop": 425.93,
             "width": 362,
-            "maxLines": 1
+            "maxLines": 1,
+            "maxFontSize": 9.96,
+            "drawUnderline": true,
+            "underlineThickness": 0.48,
+            "underlineOffset": 2.4
           },
           {
             "page": 0,
             "left": 137.5,
-            "baselineTop": 437.3,
+            "baselineTop": 437.45,
             "width": 362,
             "maxLines": 1,
             "maxFontSize": 9.96,
@@ -215330,7 +216438,20 @@
             "reviewStatus": "approved",
             "drawUnderline": true,
             "underlineThickness": 0.48,
-            "underlineOffset": 1.6
+            "underlineOffset": 2.4
+          },
+          {
+            "page": 0,
+            "left": 137.5,
+            "baselineTop": 448.97,
+            "width": 362,
+            "maxLines": 1,
+            "maxFontSize": 9.96,
+            "generated": true,
+            "reviewStatus": "approved",
+            "drawUnderline": true,
+            "underlineThickness": 0.48,
+            "underlineOffset": 2.4
           }
         ],
         "overflowStrategy": "flow",
@@ -215457,13 +216578,13 @@
         "recipientAddress"
       ],
       "sourcePaths": [
-        "field.client-postal-address"
+        "umi.address.registration"
       ],
       "existingVariableNamesPreserved": {
         "status": true,
         "identifierStatus": "baseline-preserved",
         "fieldId": "recipientAddress",
-        "source": "field.client-postal-address",
+        "source": "umi.address.registration",
         "format": null,
         "fallbacks": []
       },
@@ -215489,7 +216610,7 @@
       "rawFieldType": "text",
       "currentFieldDefinition": {
         "id": "recipientAddress",
-        "source": "field.client-postal-address",
+        "source": "umi.address.registration",
         "page": 0,
         "left": 407.7,
         "baselineTop": 200.42,
@@ -215672,9 +216793,9 @@
         "id": "recognitionDate",
         "source": "field.documentDateRu",
         "page": 0,
-        "left": 101,
+        "left": 99.264,
         "baselineTop": 333.1,
-        "width": 138,
+        "width": 141.62,
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
