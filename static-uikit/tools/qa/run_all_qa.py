@@ -48,6 +48,10 @@ REQUIRED_ASSETS = [
 ]
 
 SUITES = [
+    # First: a map may only name a source the exact UMI registry can explain.
+    # Everything after this assumes the names it reads are real.
+    ("UMI registry", "check_umi_registry.py", []),
+    ("UMI registry gates", "check_umi_registry.py", ["--self-test"]),
     ("text layout", "run_layout_specs.py", []),
     ("Word flow", "run_word_flow_renderer_tests.py", []),
     ("page expansion", "run_expansion_tests.py", []),

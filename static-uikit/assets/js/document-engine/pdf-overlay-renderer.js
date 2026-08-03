@@ -203,11 +203,22 @@
 
   // ── Payload resolution ─────────────────────────────────────────────────────
 
-  // Resolve 'field.clientFullName' / 'subject.email' / 'extra.x' / 'check.y'.
+  // Resolve 'umi.origname' / 'umi.requisites.bank_name' and the CRM payload
+  // aliases 'field.clientFullName' / 'subject.email' / 'extra.x' / 'check.y'.
+  //
+  // The work is done by the UMI adapter (document-engine/umi-adapter.js), which
+  // is the single normalization layer: nothing in the engine reads the payload
+  // directly. The local fallback below only exists so a harness page that
+  // forgot the adapter script still resolves the legacy namespaces instead of
+  // silently rendering every field blank.
+  //
   // Returns undefined for an unknown namespace or a missing key so the caller
   // can distinguish "absent" from "empty string".
   function resolve(path, payload) {
-    if (!path || typeof path !== 'string') return undefined;
+    if (!path || typeof path !== 'string' || !payload) return undefined;
+    var adapter = global.CRMDocumentEngine && global.CRMDocumentEngine.umiAdapter;
+    if (adapter) return adapter.resolve(path, payload);
+
     var dot = path.indexOf('.');
     if (dot === -1) return undefined;
     var ns_ = path.slice(0, dot);
