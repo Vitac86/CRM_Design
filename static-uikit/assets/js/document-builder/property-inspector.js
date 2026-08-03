@@ -79,6 +79,9 @@
       var patch = {};
       patch[name] = value === '' && ['baselineShift', 'maxHeight', 'maxLines', 'lineHeight', 'boxSize', 'thickness', 'inset', 'offsetX', 'offsetY'].indexOf(name) !== -1
         ? undefined : value;
+      if (name === 'source' && ns.sourceCatalog) {
+        patch.sourceKind = value ? ns.sourceCatalog.sourceKindFor(value) : undefined;
+      }
       self.state.updateField(field.id, patch, 'edit ' + name);
     });
   };
@@ -144,6 +147,19 @@
       this._addFieldControl(common, field, 'Источник', 'source', sourceControl, String,
         identifierLocked ? 'Production source path доступен только для чтения.' :
           'Можно ввести raw path; он будет проверен.');
+      var sourceInfo = ns.sourceCatalog.infoFor(field.source);
+      this._addFieldControl(common, field, 'Source kind', 'sourceKind',
+        select(field.sourceKind || sourceInfo.sourceKind || '', [
+          { value: '', label: 'Not declared' },
+          { value: 'umi', label: 'UMI / normalized UMI' },
+          { value: 'operator-input', label: 'Workflow operator input' },
+          { value: 'workflow', label: 'Workflow value' },
+          { value: 'wizard-input', label: 'Wizard input' },
+          { value: 'normalized', label: 'Normalized CRM value' }
+        ]), function (value) { return value || undefined; },
+        'Registry classification: ' + sourceInfo.sourceKind +
+          (sourceInfo.operatorInput ? ' · entered by an operator' : '') +
+          (sourceInfo.note ? ' · ' + sourceInfo.note : ''));
       this._renderSourceBrowser(common, field, identifierLocked);
     }
     if (identifierLocked) {
@@ -174,6 +190,8 @@
     if ((field.type || 'text') === 'check') this._renderCheckbox(field);
     else this._renderTypography(field);
     this._renderCondition(field);
+    this._renderOwnership(field);
+    this._renderSourcePathSuppressions(field);
     if (field.source && (field.source.indexOf('extra.') === 0 || field.source.indexOf('check.') === 0)) this._renderWizard(field);
   };
 
@@ -283,7 +301,12 @@
       });
     }
     search.addEventListener('input', fill);
-    tree.addEventListener('change', function () { self.state.updateField(field.id, { source: tree.value }, 'select source'); });
+    tree.addEventListener('change', function () {
+      self.state.updateField(field.id, {
+        source: tree.value,
+        sourceKind: ns.sourceCatalog.sourceKindFor(tree.value)
+      }, 'select source');
+    });
     fill();
     section.appendChild(row('Searchable source tree', search));
     section.appendChild(tree);
@@ -417,6 +440,15 @@
         });
         section.appendChild(row(entry[1], control));
       });
+
+    var movePaths = input('checkbox', spec.moveTopLevelPaths === true);
+    movePaths.classList.add('dtb-control');
+    movePaths.dataset.expansionControl = 'moveTopLevelPaths';
+    movePaths.addEventListener('change', function () {
+      patch({ moveTopLevelPaths: movePaths.checked ? true : undefined });
+    });
+    section.appendChild(row('Move top-level PDF paths', movePaths,
+      'Use only for reviewed rules or borders that must travel with the expanded block.'));
 
     var style = select(spec.lineStyle || 'underline', [
       { value: 'underline', label: 'Строка с подчёркиванием' },
@@ -1025,6 +1057,183 @@
     this.container.appendChild(section);
   };
 
+  // Table ownership is root metadata, but it belongs next to the field whose
+  // ink it governs. Editing it here keeps the PDF slot, reviewed cell, moved
+  // borders and shared budget visible together instead of hiding the contract
+  // in an opaque JSON property.
+  Inspector.prototype._renderOwnership = function (field) {
+    var self = this;
+    var project = this.state.project;
+    var owners = project.cellOwnership || [];
+    var exemptions = project.ownershipExemptions || [];
+    var ownerIndex = owners.findIndex(function (entry) {
+      return entry && entry.fieldId === field.id;
+    });
+    var exemptionIndex = exemptions.findIndex(function (entry) {
+      return entry && entry.fieldId === field.id;
+    });
+    if (!project.tableOwnershipRequired && ownerIndex < 0 && exemptionIndex < 0) return;
+
+    var sectionNode = this._section('Table / cell ownership');
+    sectionNode.dataset.ownershipInspector = field.id;
+    sectionNode.appendChild(element('p', 'dtb-inspector-hint',
+      project.tableOwnershipRequired
+        ? 'Every dynamic field must have one approved owning cell or one approved exemption.'
+        : 'This field carries optional reviewed ownership metadata.'));
+
+    function rootPatch(key, index, name, value, label) {
+      self.state.commit(label || ('edit ' + key), function (candidate) {
+        var list = candidate[key] || [];
+        var target = list[index];
+        if (!target) return;
+        if (value === undefined || value === '') delete target[name];
+        else target[name] = value;
+      });
+    }
+
+    function addOwnerControl(label, name, control, transform) {
+      control.classList.add('dtb-control');
+      control.dataset.ownershipControl = name;
+      control.addEventListener('change', function () {
+        var raw = control.type === 'checkbox' ? control.checked : control.value;
+        rootPatch('cellOwnership', ownerIndex, name,
+          transform ? transform(raw) : raw, 'edit cell ownership ' + name);
+      });
+      sectionNode.appendChild(row(label, control));
+    }
+
+    if (ownerIndex >= 0) {
+      var owner = owners[ownerIndex];
+      sectionNode.appendChild(element('strong', '',
+        String(owner.tableId || 'table') + ' / ' + String(owner.rowId || 'row')));
+      [['tableId', 'Table ID'], ['rowId', 'Row ID'], ['nextRowId', 'Next row ID'],
+        ['budgetId', 'Shared table budget']].forEach(function (definition) {
+        addOwnerControl(definition[1], definition[0],
+          input('text', owner[definition[0]] || ''), function (value) {
+            return String(value || '').trim() || undefined;
+          });
+      });
+      ['left', 'top', 'right', 'bottom'].forEach(function (name) {
+        var control = input('number', owner.bounds && owner.bounds[name], { step: 0.01 });
+        control.classList.add('dtb-control');
+        control.dataset.ownershipControl = 'bounds.' + name;
+        control.addEventListener('change', function () {
+          self.state.commit('edit owning-cell bounds', function (candidate) {
+            var target = (candidate.cellOwnership || [])[ownerIndex];
+            if (!target) return;
+            target.bounds = target.bounds || {};
+            if (control.value === '') delete target.bounds[name];
+            else target.bounds[name] = Number(control.value);
+          });
+        });
+        sectionNode.appendChild(row('Cell ' + name, control));
+      });
+      addOwnerControl('Maximum reviewed lines', 'maxReviewedLines',
+        input('number', owner.maxReviewedLines, { min: 1, step: 1 }), function (value) {
+          return value === '' ? undefined : Number(value);
+        });
+      addOwnerControl('Cell may grow', 'canGrow', input('checkbox', owner.canGrow), Boolean);
+      addOwnerControl('Ink inset', 'inkInset',
+        input('number', owner.inkInset == null ? '' : owner.inkInset, { min: 0, step: 0.01 }),
+        function (value) { return value === '' ? undefined : Number(value); });
+      addOwnerControl('Visual review', 'reviewStatus',
+        select(owner.reviewStatus || 'suggested', ['suggested', 'required', 'approved']), String);
+
+      var borders = document.createElement('textarea');
+      borders.className = 'dtb-control';
+      borders.rows = 4;
+      borders.value = JSON.stringify(owner.affectedBorders || {}, null, 2);
+      borders.dataset.ownershipControl = 'affectedBorders';
+      borders.addEventListener('change', function () {
+        var parsed;
+        try { parsed = borders.value.trim() ? JSON.parse(borders.value) : undefined; }
+        catch (error) {
+          self.onMessage('affectedBorders must be valid JSON: ' + error.message);
+          return;
+        }
+        rootPatch('cellOwnership', ownerIndex, 'affectedBorders', parsed,
+          'edit moved table borders');
+      });
+      sectionNode.appendChild(row('Moved horizontal / vertical borders', borders));
+
+      var budgetIndex = (project.tableBudgets || []).findIndex(function (budget) {
+        return budget && budget.id === owner.budgetId;
+      });
+      if (budgetIndex >= 0) {
+        var budget = project.tableBudgets[budgetIndex];
+        var budgetBox = element('div', 'dtb-inspector-note');
+        budgetBox.dataset.tableBudget = budget.id;
+        budgetBox.appendChild(element('strong', '', 'Budget ' + budget.id));
+        [['top', 0.01], ['bottom', 0.01], ['maxGrowth', 0.01]].forEach(function (definition) {
+          var control = input('number', budget[definition[0]], { step: definition[1] });
+          control.dataset.tableBudgetControl = definition[0];
+          control.addEventListener('change', function () {
+            self.state.commit('edit table budget ' + definition[0], function (candidate) {
+              var target = (candidate.tableBudgets || [])[budgetIndex];
+              if (!target) return;
+              if (control.value === '') delete target[definition[0]];
+              else target[definition[0]] = Number(control.value);
+            });
+          });
+          budgetBox.appendChild(row(definition[0], control));
+        });
+        var approved = input('checkbox', budget.reviewStatus === 'approved');
+        approved.dataset.tableBudgetControl = 'reviewStatus';
+        approved.addEventListener('change', function () {
+          self.state.commit('review table budget', function (candidate) {
+            candidate.tableBudgets[budgetIndex].reviewStatus =
+              approved.checked ? 'approved' : 'suggested';
+          });
+        });
+        budgetBox.appendChild(row('Visually approved', approved));
+        sectionNode.appendChild(budgetBox);
+      }
+    } else if (exemptionIndex >= 0) {
+      var exemption = exemptions[exemptionIndex];
+      var reason = input('text', exemption.reason || '');
+      reason.dataset.ownershipExemptionControl = 'reason';
+      reason.addEventListener('change', function () {
+        rootPatch('ownershipExemptions', exemptionIndex, 'reason',
+          reason.value.trim() || undefined, 'edit ownership exemption');
+      });
+      sectionNode.appendChild(row('Reviewed exemption reason', reason));
+      var exemptionReview = select(exemption.reviewStatus || 'suggested',
+        ['suggested', 'required', 'approved']);
+      exemptionReview.dataset.ownershipExemptionControl = 'reviewStatus';
+      exemptionReview.addEventListener('change', function () {
+        rootPatch('ownershipExemptions', exemptionIndex, 'reviewStatus',
+          exemptionReview.value, 'review ownership exemption');
+      });
+      sectionNode.appendChild(row('Visual review', exemptionReview));
+    } else {
+      sectionNode.appendChild(element('p', 'dtb-warning-text',
+        'No owning cell or reviewed exemption is declared for this dynamic field.'));
+    }
+    this.container.appendChild(sectionNode);
+  };
+
+  // Exact path suppression is deliberately inspected but not edited as free
+  // geometry: ordinal and SHA-256 identify authoritative PDF bytes. Changing
+  // either requires a fresh measured review, not a coordinate tweak.
+  Inspector.prototype._renderSourcePathSuppressions = function (field) {
+    var entries = (this.state.project.sourcePathSuppressions || []).filter(function (entry) {
+      return entry && (entry.fieldIds || []).indexOf(field.id) !== -1;
+    });
+    if (!entries.length) return;
+    var sectionNode = this._section('Reviewed source-path suppression');
+    entries.forEach(function (entry) {
+      var card = element('div', 'dtb-inspector-note');
+      card.dataset.sourcePathSuppression = entry.id;
+      card.appendChild(element('strong', '', entry.id));
+      card.appendChild(element('div', '', 'page ' + Number(entry.page) +
+        ' · path ' + Number(entry.pathOrdinal) + '/' + Number(entry.expectedPagePathCount) +
+        ' · owner ' + entry.ownerBlockId));
+      card.appendChild(element('code', '', entry.expectedSha256 || 'missing SHA-256'));
+      sectionNode.appendChild(card);
+    });
+    this.container.appendChild(sectionNode);
+  };
+
   Inspector.prototype._findWizardControl = function (source) {
     var key = source.split('.').slice(1).join('.');
     var wizard = this.state.project.wizard || {};
@@ -1051,8 +1260,17 @@
       create.addEventListener('click', function () {
         var key = field.source.split('.').slice(1).join('.');
         var group = field.source.indexOf('check.') === 0 ? 'checkFields' : 'fields';
+        var sourceInfo = ns.sourceCatalog.infoFor(field.source);
         self.state.commit('create wizard control', function (project) {
-          project.wizard[group].push({ key: key, label: ns.sourceCatalog.labelFor(field.source), type: group === 'checkFields' ? 'checkbox' : 'text', required: !!field.required });
+          var created = {
+            key: key,
+            label: ns.sourceCatalog.labelFor(field.source),
+            type: group === 'checkFields' ? 'checkbox' :
+              (/-date$/.test(field.source) ? 'date' : 'text'),
+            required: sourceInfo.operatorInput ? true : !!field.required
+          };
+          if (sourceInfo.sourceKind) created.sourceKind = sourceInfo.sourceKind;
+          project.wizard[group].push(created);
         });
       });
       section.appendChild(create);
@@ -1074,6 +1292,14 @@
       ['Label', 'label', input('text', control.label || ''), String],
       ['Type', 'type', select(control.type || 'text', ['text', 'textarea', 'date', 'number', 'select', 'radio', 'checkbox']), String],
       ['Required', 'required', input('checkbox', control.required), Boolean],
+      ['Source kind', 'sourceKind', select(control.sourceKind ||
+        ns.sourceCatalog.sourceKindFor(field.source) || '', [
+          { value: '', label: 'Not declared' },
+          { value: 'operator-input', label: 'Workflow operator input' },
+          { value: 'workflow', label: 'Workflow value' },
+          { value: 'wizard-input', label: 'Wizard input' },
+          { value: 'umi', label: 'UMI' }
+        ]), function (value) { return value || undefined; }],
       ['Placeholder', 'placeholder', input('text', control.placeholder || ''), String],
       ['Help text', 'help', input('text', control.help || control.helpText || ''), String],
       ['Options (value|label per line)', 'options', document.createElement('textarea'), function (value) {
@@ -1093,6 +1319,7 @@
         widget.dataset.identifierRole = 'wizard-key';
         if (keyLocked) widget.title = ns.identifierProtection.WARNING;
       }
+      widget.dataset.wizardControl = definition[1];
       widget.classList.add('dtb-control');
       widget.addEventListener('change', function () { update(definition[1], definition[3](widget.type === 'checkbox' ? widget.checked : widget.value)); });
       section.appendChild(row(definition[0], widget));

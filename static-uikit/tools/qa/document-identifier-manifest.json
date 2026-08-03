@@ -3,7 +3,7 @@
   "generatedBy": "static-uikit/tools/qa/check_identifier_manifest.py --write",
   "counts": {
     "maps": 18,
-    "fields": 634,
+    "fields": 636,
     "registryDocuments": 22,
     "overlayBindings": 18,
     "wizardKeys": 304,
@@ -423,6 +423,14 @@
         {
           "id": "stockMarketAccount",
           "source": "extra.extra-stock-market-account"
+        },
+        {
+          "id": "transferBasisDepositoryDate",
+          "source": "extra.extra-depository-contract-date"
+        },
+        {
+          "id": "transferBasisDepositoryNumber",
+          "source": "extra.extra-depository-contract"
         }
       ]
     },
@@ -2309,7 +2317,7 @@
         },
         {
           "id": "recipientAddress",
-          "source": "field.client-postal-address"
+          "source": "umi.address.registration"
         },
         {
           "id": "recipientName",

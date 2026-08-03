@@ -50,8 +50,10 @@ telemetry, analytics, CDN, external font, external API, or backend PDF service.
 3. Select a field on the canvas or in the field list, edit it, and run validation.
 4. Generate the real PDF and inspect it visually before exporting review files.
 
-All 18 production overlay maps are available. `anketa-isbyul` remains hidden,
-and static `transfer-requisites` is not exposed.
+All 18 executable overlay maps are available for inspection, including the
+retained blocked `order-forms` scaffold. `anketa-isbyul` remains hidden and
+`transfer-requisites` remains unexposed; the latter is not static by design and
+would need a complete client-specific map before product exposure.
 
 Template coverage is closed by `tools/qa/check_full_template_audit.py`. The
 checked-in JSON/Markdown matrices cover all 22 PDFs and 77 pages, preserve the
@@ -121,14 +123,28 @@ actual point dimensions, including mixed portrait/landscape PDFs.
 
 The inspector contains a searchable, categorized source tree and always shows
 the technical path. Supported namespaces are `subject.*`, `field.*`, `extra.*`,
-and `check.*`. Advanced raw paths remain possible but are validated.
+`check.*`, and exact `umi.*`. The catalog is built from the generated UMI
+registry: exact workbook fields, registered aliases and composed adapter paths
+are searchable, while an unknown `umi.*` path fails validation. Advanced raw
+non-UMI paths remain possible but are validated.
 
 Selecting an `extra.*` or `check.*` source shows its wizard provider, usage
 count, and pages. Missing providers can be created. Controls support text,
 textarea, date, number, select, radio, checkbox, required state, placeholder,
 help, options, default, applicability, `showWhen`, mutual-exclusion group,
-multiple selection, and documented workflow-only inputs. Displayed unused
-controls or missing required providers block production export.
+multiple selection, and documented workflow-only inputs. Each field/control
+preserves `sourceKind` (`umi`, `normalized`, `wizard-input`, `workflow`, or
+`operator-input`) through map/project round trips. Displayed unused controls or
+missing required providers block production export.
+
+The depository agreement pair is an explicit registry exception:
+`extra.extra-depository-contract` and
+`extra.extra-depository-contract-date` are `workflow` aliases with
+`operatorInput: true`, because no printable UMI pair exists. In each of the two
+accession maps and `account-opening-notice`, the Builder requires both mapped
+fields, one required text/date provider apiece, `sourceKind: 'operator-input'`,
+`dateRu` on every printed date, and no `default`/`defaultValue`. Export fails
+if a UMI target or silent date default is substituted.
 
 Conditions are declarative only: truthy, false, equals one value, or equals one
 of several values. Arbitrary JavaScript cannot be entered.
@@ -231,6 +247,8 @@ Choose **Создать Word-подобный блок заполнения** in
   and spacer runs, including bold/italic/underline decoration where applicable;
 - optional reviewed expansion, its page budget, anchors, compaction zones, and
   cross-page settings;
+- an optional reviewed `semanticGroup` carrying exact field/source links and
+  recipient/body boundaries;
 - the reviewed source replacement range, expected block/page counts, source
   SHA-256, template SHA-256, and the original static text.
 
@@ -242,6 +260,20 @@ overlay. Removing or moving the run synchronizes those markers. Validation
 rejects missing or duplicated references, cross-block ownership, an independent
 double render, an unlocked source font size, unreviewed source ranges, stale
 hashes, and expansion rules that exceed the page budget.
+
+`semanticGroup` is editable as reviewed JSON and must carry
+`reviewStatus: 'approved'`. Recipient groups bind the name and one formatted
+address, require both label roles, keep first and continuation lines inside the
+reviewed horizontal boundary and render the address once. Organization/date
+groups bind the full legal name and date to the exact sources, caption and
+continuation roles, and the date's complete rule. Underline offset/thickness is
+validated against the configured glyph-ink box.
+
+Exact source-path suppression is visible in the field inspector but is not
+freehand-editable: path ordinal, operator SHA-256 and template SHA-256 are
+review evidence. The same rule applies to a nested `operatorScope:
+'all-balanced'` replacement. Changing either requires fresh PDF measurement,
+not a coordinate shortcut.
 
 The canvas shows the block frame and its referenced fields; the inspector can
 jump between either side of the relationship. Run all synthetic profiles and
@@ -274,6 +306,25 @@ value never adds a stray row.
 Every other reviewed paragraph keeps `lineStyle: 'none'`: it reflows in open
 page space, and painting rules there would invent borders the form has not got.
 The full-template audit pins the exact set of blocks allowed to draw a row.
+
+### Table/cell ownership
+
+The four offered questionnaire maps require physical ownership metadata. For a
+selected field, the inspector shows its owner or reviewed exemption, exact
+field/source/page, table and row IDs, cell bounds, reviewed line count,
+growth/next-row link, affected horizontal/vertical borders, ink inset, budget
+and review state. The referenced table budget exposes its measured top, bottom,
+maximum growth and approval.
+
+Production export is fail-closed. Every dynamic field in a
+`tableOwnershipRequired` project needs exactly one approved owner or exemption;
+owners may not overlap except for declared mutually exclusive variants. A
+growing owner must use an approved `table-row` expansion, name the next row and
+shared budget, include the insertion cut among its horizontal borders and list
+exactly the same vertical columns as the expansion. The configured first
+region must already fit the owning cell; runtime then audits the actual shifted
+line ink, border clearance, line count, grown-border continuity, duplicate
+logical values and cumulative budget.
 
 ## Continuation lines
 
@@ -401,16 +452,18 @@ automatic legal-text reflow.
    the maximum row size to the size the form itself is set in.
 7. Set the maximum number of rows this field may insert.
 8. Choose `Строка с подчёркиванием` or `Пустая строка таблицы`.
-9. Press **Взять толщину соседней линии** to copy the weight of a printed rule
+9. Enable **Move top-level PDF paths** only when measured standalone rules or
+   borders belong to the complete block and must move by the same delta.
+10. Press **Взять толщину соседней линии** to copy the weight of a printed rule
    nearby, then set the row's baseline and rule offsets from the measurement.
-10. Read the previews: the movement at zero, one and the maximum row count
+11. Read the previews: the movement at zero, one and the maximum row count
     against the page budget, how much of that budget comes from recovered white
     space, and what the other anchors on the page have already spoken for.
-11. Look at the page. The canvas draws the insertion anchor, the end of the
+12. Look at the page. The canvas draws the insertion anchor, the end of the
     movable block, and one preview rectangle per row that could open.
-12. Tick **Правило проверено визуально**.
+13. Tick **Правило проверено визуально**.
 
-Until step 12, `reviewStatus` stays `suggested` and production export is
+Until step 13, `reviewStatus` stays `suggested` and production export is
 blocked.
 
 ### What blocks export
@@ -445,8 +498,22 @@ Of the anchor:
 * an insertion point above the fixed header, or rows that would reach the
   fixed footer;
 * the inserted row's width or rule thickness missing;
+* `moveTopLevelPaths` present with a value other than the explicit boolean
+  `true`/`false`;
 * the rule not visually reviewed;
 * a minimum font size below 9 pt anywhere in the document.
+
+Of semantic/source/ownership evidence:
+
+* an unapproved semantic group, wrong field/source link, detached label or
+  caption, recipient continuation outside its reviewed column, incomplete date
+  rule, or underline intersecting the configured ink box;
+* a source-path suppression with a stale ordinal/hash/template proof, unknown
+  owner/field, missing approval, or conditional rule not tied to its mapped
+  branch;
+* any missing/duplicate/unreviewed questionnaire owner or exemption, invalid
+  cell/budget bounds, overlapping claimed cells, growth without its next row
+  and moved borders, or an expansion whose columns disagree with ownership.
 
 An inserted row that would overlap another field on the page is reported as a
 warning, since that field may itself be moving; so is a compaction zone below
@@ -477,7 +544,11 @@ maximum lines and print-override permission. `pageLayout` is a first-class
 project property, not an opaque passenger in `productionProperties`. All 18 maps
 still round-trip semantically, budget and anchors included, and no property is
 silently discarded. The three production `crossPageFlow` rules also round-trip
-exactly; editing one to incomplete or unreviewed blocks export.
+exactly; editing one to incomplete or unreviewed blocks export. The same
+round-trip contract now covers root `tableOwnershipRequired`, `cellOwnership`,
+`tableBudgets`, `ownershipExemptions` and `sourcePathSuppressions`, field
+`sourceKind`, Word-flow `semanticGroup`, and expansion
+`moveTopLevelPaths`.
 
 ### Migrating an existing map
 
@@ -549,8 +620,9 @@ is no `eval` or `new Function`. Future migrations pass through
 `project-schema.js:migrate()`.
 
 The project contains metadata, template URL/hash/page geometry, fonts, fields,
-first-class `wordFlowBlocks`, wizard controls, fixtures, QA state, and
-replacement review. Word-flow runs, typography, frame, spacing, expansion, and
+first-class `wordFlowBlocks`, wizard controls, fixtures, QA state, replacement
+review, exact source-path suppression and table/cell ownership registries.
+Word-flow runs, typography, frame, spacing, semantic groups, expansion, and
 source-replacement metadata survive Builder JSON and production-map round trips.
 Referenced fields retain `layoutMode` and `flowBlockId`; unrelated Builder-only
 field geometry/review properties are omitted from production output. Import
@@ -606,7 +678,10 @@ document harness and the repository structural validation before integration.
 The check count is not quoted here on purpose — it grows with the suite, and a
 number kept true by hand will not be. `python static-uikit/tools/qa/run_builder_qa.py`
 runs the same page headlessly and prints the current total; the combined
-`run_all_qa.py` is the run that has to be green.
+`run_all_qa.py` is the run that has to be green. For the assembled correction
+branch it reports **27 of 27 suites passed**, the Template Builder suite among
+them; the run is logged in
+[manual-findings-continuation.md](manual-findings-continuation.md).
 
 ### Add a new production document
 

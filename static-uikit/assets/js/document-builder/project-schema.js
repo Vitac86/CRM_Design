@@ -12,7 +12,7 @@
   };
 
   var FIELD_PRODUCTION_KEYS = [
-    'id', 'label', 'source', 'type', 'page', 'left', 'baselineTop', 'width', 'font',
+    'id', 'label', 'source', 'sourceKind', 'type', 'page', 'left', 'baselineTop', 'width', 'font',
     'fontSize', 'minFontSize', 'align', 'multiline', 'lineHeight', 'lineHeightRatio',
     'maxHeight', 'maxLines', 'format', 'fallbacks', 'required', 'optional',
     'baselineShift', 'showWhen', 'equals', 'invert', 'glyphSize', 'markStyle',
@@ -36,7 +36,17 @@
     'page', 'insertionTop', 'rowHeight', 'maxExtraRows', 'shiftFromTop',
     'shiftToTop', 'bottomReserve', 'lineStyle', 'reviewStatus', 'line',
     'maxFontSize', 'rowLeft', 'rowWidth', 'borders', 'columns',
-    'bottomSegments', 'topSegments'
+    'bottomSegments', 'topSegments', 'moveTopLevelPaths'
+  ];
+
+  // Root production contracts that the Builder understands and validates.
+  // Keeping these first-class is important: leaving them in the opaque
+  // `productionProperties` bag makes row ownership and exact source-path
+  // replacement invisible to the inspector and too easy to lose in a hand
+  // edited Builder project.
+  var ROOT_LAYOUT_KEYS = [
+    'tableOwnershipRequired', 'cellOwnership', 'tableBudgets',
+    'ownershipExemptions', 'sourcePathSuppressions'
   ];
 
   // The budget a page shares between all of its anchors. Measured from the
@@ -127,6 +137,11 @@
     sourcePdf: true,
     pageGeometry: true,
     pageLayout: true,
+    tableOwnershipRequired: true,
+    cellOwnership: true,
+    tableBudgets: true,
+    ownershipExemptions: true,
+    sourcePathSuppressions: true,
     wordFlowBlocks: true,
     fonts: true,
     fields: true,
@@ -262,6 +277,11 @@
     // production property: the builder edits it and validates against it.
     project.pageLayout = clone(template.pageLayout || {});
     project.wordFlowBlocks = clone(template.wordFlowBlocks || []);
+    ROOT_LAYOUT_KEYS.forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(template, key)) {
+        project[key] = clone(template[key]);
+      }
+    });
     project.fields = (template.fields || []).map(addBuilderGeometry);
     project.wizard = wizardFromRegistry(entry);
     if (ns.identifierProtection) {
@@ -276,7 +296,8 @@
     project.productionProperties = {};
     Object.keys(template).forEach(function (key) {
       if (['id', 'title', 'templateUrl', 'outputFilename', 'expectedPages',
-           'appliesTo', 'fonts', 'fields', 'pageLayout', 'wordFlowBlocks'].indexOf(key) === -1) {
+           'appliesTo', 'fonts', 'fields', 'pageLayout', 'wordFlowBlocks']
+          .concat(ROOT_LAYOUT_KEYS).indexOf(key) === -1) {
         project.productionProperties[key] = clone(template[key]);
       }
     });
@@ -316,6 +337,13 @@
     } else {
       delete template.wordFlowBlocks;
     }
+    ROOT_LAYOUT_KEYS.forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(project, key)) {
+        template[key] = clone(project[key]);
+      } else {
+        delete template[key];
+      }
+    });
     template.fields = (project.fields || [])
       .filter(function (field) { return !field.explanatory; })
       .map(cleanProductionField);
@@ -341,6 +369,17 @@
     if (!Array.isArray(project.fields)) errors.push({ path: 'fields', message: 'fields должен быть массивом.' });
     if (project.wordFlowBlocks != null && !Array.isArray(project.wordFlowBlocks)) {
       errors.push({ path: 'wordFlowBlocks', message: 'wordFlowBlocks должен быть массивом.' });
+    }
+    ['cellOwnership', 'tableBudgets', 'ownershipExemptions',
+      'sourcePathSuppressions'].forEach(function (key) {
+      if (project[key] != null && !Array.isArray(project[key])) {
+        errors.push({ path: key, message: key + ' must be an array.' });
+      }
+    });
+    if (Object.prototype.hasOwnProperty.call(project, 'tableOwnershipRequired') &&
+        typeof project.tableOwnershipRequired !== 'boolean') {
+      errors.push({ path: 'tableOwnershipRequired',
+        message: 'tableOwnershipRequired must be boolean.' });
     }
     if (!project.wizard || typeof project.wizard !== 'object') {
       errors.push({ path: 'wizard', message: 'Не задан раздел wizard.' });
@@ -371,6 +410,13 @@
     }
     if (!Array.isArray(migrated.wordFlowBlocks)) migrated.wordFlowBlocks = [];
     delete migrated.productionProperties.wordFlowBlocks;
+    ROOT_LAYOUT_KEYS.forEach(function (key) {
+      if (!Object.prototype.hasOwnProperty.call(migrated, key) &&
+          Object.prototype.hasOwnProperty.call(migrated.productionProperties, key)) {
+        migrated[key] = clone(migrated.productionProperties[key]);
+      }
+      delete migrated.productionProperties[key];
+    });
     return { project: migrated, errors: [], warnings: checked.warnings };
   }
 
@@ -577,6 +623,7 @@
   Schema.FIELD_PRODUCTION_KEYS = FIELD_PRODUCTION_KEYS;
   Schema.FLOW_REGION_KEYS = FLOW_REGION_KEYS;
   Schema.EXPANSION_KEYS = EXPANSION_KEYS;
+  Schema.ROOT_LAYOUT_KEYS = ROOT_LAYOUT_KEYS;
   Schema.suggestExpansion = suggestExpansion;
   Schema.suggestPageLayout = suggestPageLayout;
   Schema.WORD_FLOW_RUN_TYPES = WORD_FLOW_RUN_TYPES;

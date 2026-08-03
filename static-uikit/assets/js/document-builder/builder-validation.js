@@ -261,6 +261,527 @@
     });
   }
 
+  function syntheticPages(project, pageSizes) {
+    var count = Math.max(Number(project.expectedPages || 0), pageSizes.length, 1);
+    var pages = [];
+    for (var index = 0; index < count; index += 1) {
+      (function (size) {
+        pages.push({
+          getSize: function () {
+            return {
+              width: Number(size && size.width || 595.32),
+              height: Number(size && size.height || 841.92)
+            };
+          }
+        });
+      }(pageSizes[index]));
+    }
+    return pages;
+  }
+
+  function finiteCoordinate(bounds, name) {
+    return !!bounds && Object.prototype.hasOwnProperty.call(bounds, name) &&
+      bounds[name] !== null && bounds[name] !== '' &&
+      Number.isFinite(Number(bounds[name]));
+  }
+
+  function validBounds(bounds) {
+    return bounds && ['left', 'top', 'right', 'bottom'].every(function (name) {
+      return finiteCoordinate(bounds, name);
+    }) && Number(bounds.right) > Number(bounds.left) &&
+      Number(bounds.bottom) > Number(bounds.top);
+  }
+
+  function validHorizontalBounds(bounds) {
+    return bounds && finiteCoordinate(bounds, 'left') &&
+      finiteCoordinate(bounds, 'right') &&
+      Number(bounds.right) > Number(bounds.left);
+  }
+
+  function fieldIndex(project) {
+    var fields = {};
+    (project.fields || []).forEach(function (field) {
+      if (field && field.id) fields[field.id] = field;
+    });
+    return fields;
+  }
+
+  function validateSourcePathSuppressions(project, pageSizes, errors) {
+    if (project.sourcePathSuppressions != null &&
+        !Array.isArray(project.sourcePathSuppressions)) {
+      errors.push(item('error', 'source-path-suppression-schema',
+        'sourcePathSuppressions must be an array.', null, 'sourcePathSuppressions'));
+      return;
+    }
+    var renderer = global.CRMDocumentEngine.overlayRenderer;
+    if (!renderer || typeof renderer.validateSourcePathSuppressions !== 'function') {
+      if ((project.sourcePathSuppressions || []).length) {
+        errors.push(item('error', 'source-path-suppression-validator',
+          'The reviewed source-path validator is not loaded.', null,
+          'sourcePathSuppressions'));
+      }
+      return;
+    }
+    var problems = [];
+    try {
+      renderer.validateSourcePathSuppressions(
+        project, syntheticPages(project, pageSizes), problems);
+    } catch (error) {
+      problems.push(error.message);
+    }
+    problems.forEach(function (message) {
+      errors.push(item('error', 'source-path-suppression', message, null,
+        'sourcePathSuppressions'));
+    });
+    var fields = fieldIndex(project);
+    (project.sourcePathSuppressions || []).forEach(function (entry, index) {
+      if (!entry || typeof entry !== 'object') return;
+      var geometry = entry.geometry || {};
+      var geometryNames = ['left', 'top', 'right', 'bottom'];
+      var coordinates = geometryNames.map(function (name) {
+        return Number(geometry[name]);
+      });
+      if (!geometryNames.every(function (name) {
+        return finiteCoordinate(geometry, name);
+      }) ||
+          coordinates[2] <= coordinates[0] || coordinates[3] < coordinates[1]) {
+        errors.push(item('error', 'source-path-suppression-boundary',
+          (entry.id || ('sourcePathSuppressions[' + index + ']')) +
+          ': reviewed path geometry is incomplete or reversed.', null,
+          'sourcePathSuppressions.' + index + '.geometry'));
+      } else {
+        var page = pageSizes[Number(entry.page)] || {};
+        if (coordinates[0] < 0 || coordinates[1] < 0 ||
+            coordinates[2] > Number(page.width || 595.32) + 0.5 ||
+            coordinates[3] > Number(page.height || 841.92) + 0.5) {
+          errors.push(item('error', 'source-path-suppression-boundary',
+            (entry.id || ('sourcePathSuppressions[' + index + ']')) +
+            ': reviewed path geometry leaves the PDF page.', null,
+            'sourcePathSuppressions.' + index + '.geometry'));
+        }
+      }
+      if (!Array.isArray(entry.fieldIds)) {
+        errors.push(item('error', 'source-path-suppression-fields',
+          (entry.id || ('sourcePathSuppressions[' + index + ']')) +
+          ': fieldIds must record the dynamic replacements (or an empty reviewed list).',
+          null, 'sourcePathSuppressions.' + index + '.fieldIds'));
+      } else {
+        entry.fieldIds.forEach(function (fieldId) {
+          if (!fields[fieldId]) {
+            errors.push(item('error', 'source-path-suppression-fields',
+              (entry.id || ('sourcePathSuppressions[' + index + ']')) +
+              ': replacement field "' + fieldId + '" does not exist.', null,
+              'sourcePathSuppressions.' + index + '.fieldIds'));
+          }
+        });
+      }
+    });
+  }
+
+  function semanticField(groupName, spec, fields, errors, path) {
+    if (!spec || !spec.fieldId || !spec.source) {
+      errors.push(item('error', 'semantic-group-field',
+        groupName + ': ' + path + ' must declare fieldId and exact source.', null,
+        path));
+      return null;
+    }
+    var field = fields[spec.fieldId];
+    if (!field) {
+      errors.push(item('error', 'semantic-group-field',
+        groupName + ': field "' + spec.fieldId + '" does not exist.', null, path));
+      return null;
+    }
+    if (field.source !== spec.source) {
+      errors.push(item('error', 'semantic-group-source',
+        groupName + ': ' + spec.fieldId + '.source must exactly match ' +
+        JSON.stringify(spec.source) + '.', field, path));
+    }
+    return field;
+  }
+
+  function validateSemanticUnderline(block, run, errors, path) {
+    var decoration = run && run.decoration;
+    if (!decoration || !decoration.underline) return;
+    var size = Number(run.fontSize != null ? run.fontSize : block.fontSize);
+    var offset = Number(decoration.offset);
+    var thickness = Number(decoration.thickness);
+    if (!Number.isFinite(offset) || !Number.isFinite(thickness) || thickness <= 0) {
+      errors.push(item('error', 'semantic-underline',
+        block.id + ': reviewed underline needs numeric offset and thickness.',
+        null, path));
+      return;
+    }
+    // A configured field box extends below the baseline. This conservative
+    // ink descent catches a rule placed through glyphs while leaving the
+    // reviewed 2.4 pt legal-form clearance intact.
+    if (offset - thickness / 2 < size * 0.18 - 0.01) {
+      errors.push(item('error', 'semantic-underline-intersection',
+        block.id + ': underline enters the configured text ink box.', null, path));
+    }
+  }
+
+  function requireSemanticUnderline(block, run, errors, path) {
+    if (!run.decoration || run.decoration.underline !== true ||
+        !(Number(run.decoration.minWidth) > 0)) {
+      errors.push(item('error', 'semantic-underline',
+        block.id + ': reviewed semantic field must keep its measured underline.',
+        null, path));
+      return;
+    }
+    validateSemanticUnderline(block, run, errors, path);
+  }
+
+  function validateSemanticGroups(project, pageSizes, errors) {
+    var fields = fieldIndex(project);
+    (project.wordFlowBlocks || []).forEach(function (block, blockIndex) {
+      if (block.semanticGroup == null) return;
+      var group = block.semanticGroup;
+      var at = 'wordFlowBlocks.' + blockIndex + '.semanticGroup';
+      if (!group || typeof group !== 'object' || Array.isArray(group)) {
+        errors.push(item('error', 'semantic-group-schema',
+          block.id + ': semanticGroup must be an object.', null, at));
+        return;
+      }
+      if (group.reviewStatus !== 'approved') {
+        errors.push(item('error', 'semantic-group-unreviewed',
+          block.id + ': semantic layout group is not visually approved.', null, at));
+      }
+      if (!String(group.kind || '').trim()) {
+        errors.push(item('error', 'semantic-group-kind',
+          block.id + ': semanticGroup.kind is required.', null, at));
+        return;
+      }
+      var bounds = group.bounds || group.boundary;
+      var boundaryRequired = group.kind === 'depository-transfer-basis';
+      var boundaryValid = group.kind === 'recipient-block'
+        ? validHorizontalBounds(bounds) : validBounds(bounds);
+      if ((bounds || boundaryRequired || group.kind === 'recipient-block') &&
+          !boundaryValid) {
+        errors.push(item('error', 'semantic-group-boundary',
+          block.id + ': semantic group has incomplete reviewed bounds.', null, at));
+      } else if (boundaryValid) {
+        var size = pageSizes[Number(block.page)] || {};
+        if (Number(bounds.left) < 0 ||
+            (bounds.top != null && Number(bounds.top) < 0) ||
+            Number(bounds.right) > Number(size.width || 595.32) + 0.5 ||
+            (bounds.bottom != null &&
+              Number(bounds.bottom) > Number(size.height || 841.92) + 0.5)) {
+          errors.push(item('error', 'semantic-group-boundary',
+            block.id + ': semantic boundary leaves the PDF page.', null, at));
+        }
+      }
+
+      if (group.kind === 'recipient-block') {
+        var recipientName = semanticField(block.id, group.name, fields, errors,
+          at + '.name');
+        var recipientAddress = semanticField(block.id, group.address, fields, errors,
+          at + '.address');
+        if (!group.address || group.address.renderOnce !== true) {
+          errors.push(item('error', 'recipient-render-once',
+            block.id + ': formatted address must declare renderOnce=true.',
+            recipientAddress, at + '.address'));
+        }
+        var frame = block.frame || {};
+        var first = Number(frame.left) + Number(block.firstLineIndent);
+        var hanging = Number(frame.left) + Number(block.hangingIndent);
+        var right = Number(frame.left) + Number(frame.width);
+        if (!validHorizontalBounds(bounds) || !Number.isFinite(first) ||
+            !Number.isFinite(hanging) || first < Number(bounds.left) - 0.05 ||
+            hanging < Number(bounds.left) - 0.05 || right > Number(bounds.right) + 0.05) {
+          errors.push(item('error', 'recipient-boundary',
+            block.id + ': first and continuation lines must stay inside the reviewed recipient bounds.',
+            null, at));
+        }
+        var nameRef = false, addressRef = false, recipientLabel = false,
+          addressLabel = false;
+        (block.runs || []).forEach(function (run, runIndex) {
+          if (run.type === 'fieldRef' && recipientName &&
+              run.fieldId === recipientName.id) {
+            nameRef = true;
+            requireSemanticUnderline(block, run, errors,
+              at + '.runs.' + runIndex + '.decoration');
+          }
+          if (run.type === 'fieldRef' && recipientAddress &&
+              run.fieldId === recipientAddress.id) {
+            addressRef = true;
+            requireSemanticUnderline(block, run, errors,
+              at + '.runs.' + runIndex + '.decoration');
+          }
+          if (run.semanticRole === 'recipient-label') recipientLabel = true;
+          if (run.semanticRole === 'address-label') addressLabel = true;
+        });
+        if (!nameRef || !addressRef || !recipientLabel || !addressLabel) {
+          errors.push(item('error', 'recipient-semantic-runs',
+            block.id + ': recipient labels and both reviewed field references must remain in one block.',
+            null, at));
+        }
+      } else if (group.kind === 'organization-name-and-date') {
+        var fullName = semanticField(block.id, group.fullName, fields, errors,
+          at + '.fullName');
+        var date = semanticField(block.id, group.date, fields, errors,
+          at + '.date');
+        if (!group.caption || !group.continuation) {
+          errors.push(item('error', 'semantic-group-reading-order',
+            block.id + ': full-name caption and continuation roles are required.', null, at));
+        }
+        if (!group.date || !group.date.rule ||
+            !Number.isFinite(Number(group.date.rule.left)) ||
+            !Number.isFinite(Number(group.date.rule.width)) ||
+            Number(group.date.rule.width) <= 0) {
+          errors.push(item('error', 'semantic-date-rule',
+            block.id + ': date must own a complete reviewed rule.', date, at + '.date.rule'));
+        }
+        var fullNameRef = false, dateRef = false, caption = false,
+          continuation = false;
+        (block.runs || []).forEach(function (run, runIndex) {
+          if (run.type === 'fieldRef' && fullName && run.fieldId === fullName.id) {
+            fullNameRef = true;
+            requireSemanticUnderline(block, run, errors,
+              at + '.runs.' + runIndex + '.decoration');
+          }
+          if (run.type === 'fieldRef' && date && run.fieldId === date.id) {
+            dateRef = true;
+            requireSemanticUnderline(block, run, errors,
+              at + '.runs.' + runIndex + '.decoration');
+            if (group.date && group.date.rule && run.decoration &&
+                Math.abs(Number(run.decoration.minWidth) -
+                  Number(group.date.rule.width)) > 0.05) {
+              errors.push(item('error', 'semantic-date-rule',
+                block.id + ': date run width differs from its semantic rule.',
+                date, at + '.date.rule'));
+            }
+          }
+          if (run.semanticRole === 'client-full-name-caption') caption = true;
+          if (run.semanticRole === 'recognition-clause') continuation = true;
+        });
+        if (!fullNameRef || !dateRef || !caption || !continuation) {
+          errors.push(item('error', 'semantic-group-reading-order',
+            block.id + ': name, caption, date and continuation must remain in the reviewed reading flow.',
+            null, at));
+        }
+      } else if (group.kind === 'depository-transfer-basis') {
+        var numberRefs = [], dateRefs = [];
+        (block.runs || []).forEach(function (run) {
+          if (run.type !== 'fieldRef') return;
+          var referenced = fields[run.fieldId];
+          if (!referenced) return;
+          if (referenced.source === DEPOSITORY_NUMBER) {
+            numberRefs.push({ run: run, field: referenced });
+          }
+          if (referenced.source === DEPOSITORY_DATE) {
+            dateRefs.push({ run: run, field: referenced });
+          }
+        });
+        if (numberRefs.length !== 1 || dateRefs.length !== 1 ||
+            numberRefs.some(function (entry) { return entry.run.keepTogether !== true; }) ||
+            dateRefs.some(function (entry) { return entry.run.keepTogether !== true; })) {
+          errors.push(item('error', 'depository-semantic-pair',
+            block.id + ': reviewed transfer-basis sentence must contain one unbreakable depository number and date.',
+            null, at));
+        }
+      }
+    });
+  }
+
+  function validateTableOwnership(project, pageSizes, errors) {
+    ['cellOwnership', 'tableBudgets', 'ownershipExemptions'].forEach(function (key) {
+      if (project[key] != null && !Array.isArray(project[key])) {
+        errors.push(item('error', 'table-ownership-schema',
+          key + ' must be an array.', null, key));
+      }
+    });
+    var ownership = global.CRMDocumentEngine.tableOwnership;
+    if (!ownership || typeof ownership.validateTemplate !== 'function') {
+      if (project.tableOwnershipRequired || (project.cellOwnership || []).length) {
+        errors.push(item('error', 'table-ownership-validator',
+          'The table-ownership validator is not loaded.', null, 'cellOwnership'));
+      }
+      return;
+    }
+    var problems = [];
+    try {
+      problems = ownership.validateTemplate(
+        project, syntheticPages(project, pageSizes));
+    } catch (error) {
+      problems = [error.message];
+    }
+    problems.forEach(function (message) {
+      errors.push(item('error', 'table-ownership', message, null, 'cellOwnership'));
+    });
+
+    var fields = fieldIndex(project);
+    (project.cellOwnership || []).forEach(function (owner, index) {
+      if (!owner) return;
+      var field = fields[owner.fieldId];
+      var at = 'cellOwnership.' + index;
+      if (owner.canGrow) {
+        var borders = owner.affectedBorders || {};
+        if (!Array.isArray(borders.horizontal) || !borders.horizontal.length ||
+            !Array.isArray(borders.vertical) || !borders.vertical.length) {
+          errors.push(item('error', 'table-ownership-borders',
+            'cellOwnership[' + index + ']: a growing row must declare both moved horizontal and vertical borders.',
+            field, at + '.affectedBorders'));
+        }
+      }
+      if (!field || !owner.bounds) return;
+      if (!validBounds(owner.bounds)) {
+        errors.push(item('error', 'table-ownership',
+          'cellOwnership[' + index + ']: reviewed bounds are incomplete or reversed.',
+          field, at + '.bounds'));
+        return;
+      }
+
+      // Ownership is only useful when it constrains the configured ink, not
+      // merely the field anchor.  Check the initial region here; generated
+      // continuation rows are checked by the production ownership validator.
+      var bounds = owner.bounds;
+      var inset = Math.max(0, Number(owner.inkInset || 0));
+      var leftBound = Number(bounds.left) + inset;
+      var rightBound = Number(bounds.right) - inset;
+      var topBound = Number(bounds.top) + inset;
+      var bottomBound = Number(bounds.bottom) - inset;
+      if (![leftBound, rightBound, topBound, bottomBound].every(Number.isFinite)) return;
+
+      var fontSize = Number(field.fontSize || ns.schema.policy().preferredFontSize);
+      var regions = Array.isArray(field.flowRegions) && field.flowRegions.length
+        ? field.flowRegions.map(function (region) {
+          return {
+            page: region.page,
+            left: region.left,
+            width: region.width,
+            baselineTop: region.baselineTop,
+            maxLines: region.maxLines,
+            lineHeight: region.lineHeight,
+            lineHeightRatio: region.lineHeightRatio,
+            maxFontSize: region.maxFontSize
+          };
+        })
+        : [{
+          page: field.page,
+          left: field.left,
+          width: field.width,
+          baselineTop: field.baselineTop,
+          maxLines: field.maxLines,
+          lineHeight: field.lineHeight,
+          lineHeightRatio: field.lineHeightRatio,
+          maxFontSize: field.maxFontSize
+        }];
+
+      regions.forEach(function (region, regionIndex) {
+        // A continuation region on another page/cell has its own owner.  This
+        // owner still guarantees that its matching page region cannot leak
+        // into a neighbour row or cross a vertical border.
+        if (Number(region.page) !== Number(owner.page)) return;
+        var size = Math.min(fontSize,
+          Number.isFinite(Number(region.maxFontSize))
+            ? Number(region.maxFontSize) : fontSize);
+        var left = Number(region.left);
+        var right = left + Number(region.width);
+        var firstBaseline = Number(region.baselineTop);
+        var inkTop = firstBaseline - size * 0.78;
+        var inkBottom = firstBaseline + size * 0.22;
+        var outside = ![left, right, inkTop, inkBottom].every(Number.isFinite) ||
+          left < leftBound - 0.1 || right > rightBound + 0.1 ||
+          inkTop < topBound - 0.1 || inkBottom > bottomBound + 0.1;
+        if (outside) {
+          errors.push(item('error', 'table-ownership-region',
+            field.id + ': configured region ' + (regionIndex + 1) +
+            ' leaves its reviewed table-cell bounds.', field,
+            at + '.bounds'));
+        }
+      });
+    });
+  }
+
+  var DEPOSITORY_NUMBER = 'extra.extra-depository-contract';
+  var DEPOSITORY_DATE = 'extra.extra-depository-contract-date';
+
+  function wizardControls(wizard, key) {
+    var out = [];
+    ['fields', 'companyFields'].forEach(function (group) {
+      ((wizard || {})[group] || []).forEach(function (control, index) {
+        if (control.key === key) out.push({ control: control, group: group, index: index });
+      });
+    });
+    return out;
+  }
+
+  function validateDepositoryOperatorInputs(project, errors) {
+    var fields = project.fields || [];
+    var numberFields = fields.filter(function (field) {
+      return field.source === DEPOSITORY_NUMBER;
+    });
+    var dateFields = fields.filter(function (field) {
+      return field.source === DEPOSITORY_DATE;
+    });
+    var numberControls = wizardControls(project.wizard,
+      DEPOSITORY_NUMBER.slice('extra.'.length));
+    var dateControls = wizardControls(project.wizard,
+      DEPOSITORY_DATE.slice('extra.'.length));
+    if (!numberFields.length && !dateFields.length &&
+        !numberControls.length && !dateControls.length) return;
+
+    [DEPOSITORY_NUMBER, DEPOSITORY_DATE].forEach(function (source) {
+      var info = ns.sourceCatalog.infoFor(source);
+      if (!info.known || info.registryKind !== 'workflow' ||
+          !info.operatorInput || info.sourceKind !== 'operator-input') {
+        errors.push(item('error', 'depository-registry-classification',
+          source + ' must be classified by the UMI alias registry as a workflow operator input.',
+          null, source));
+      }
+    });
+    if (!numberFields.length || !dateFields.length) {
+      errors.push(item('error', 'depository-pair',
+        'A document that prints a depository agreement must map both number and date.',
+        null, 'fields'));
+    }
+    numberFields.concat(dateFields).forEach(function (field) {
+      if (field.required !== true) {
+        errors.push(item('error', 'depository-field-required',
+          field.source + ' must be required for every printed occurrence.', field));
+      }
+      if (field.sourceKind && field.sourceKind !== 'operator-input') {
+        errors.push(item('error', 'source-kind',
+          field.source + ' is an operator input, not ' + field.sourceKind + '.', field));
+      }
+    });
+    dateFields.forEach(function (field) {
+      if (field.format !== 'dateRu') {
+        errors.push(item('error', 'depository-date-format',
+          'Depository agreement date must use dateRu.', field));
+      }
+    });
+
+    [[numberControls, 'text', DEPOSITORY_NUMBER],
+      [dateControls, 'date', DEPOSITORY_DATE]].forEach(function (entry) {
+      var controls = entry[0], expectedType = entry[1], source = entry[2];
+      controls.forEach(function (found) {
+        var at = 'wizard.' + found.group + '.' + found.index;
+        ['default', 'defaultValue'].forEach(function (name) {
+          if (Object.prototype.hasOwnProperty.call(found.control, name)) {
+            errors.push(item('error', 'depository-operator-default',
+              source + ' must not declare wizard ' + name + '.', null,
+              at + '.' + name));
+          }
+        });
+      });
+      if (controls.length !== 1) {
+        errors.push(item('error', 'depository-wizard-pair',
+          source + ' needs exactly one wizard control.', null, 'wizard'));
+        return;
+      }
+      var found = controls[0];
+      var control = found.control;
+      var at = 'wizard.' + found.group + '.' + found.index;
+      if (control.type !== expectedType || control.required !== true ||
+          control.sourceKind !== 'operator-input') {
+        errors.push(item('error', 'depository-wizard-control',
+          source + ' must be a required ' + expectedType +
+          ' control with sourceKind="operator-input".', null, at));
+      }
+    });
+  }
+
   function validateWordFlowBlocks(project, pageSizes, knownFormats, errors) {
     var renderer = global.CRMDocumentEngine.overlayRenderer;
     var blocks = project.wordFlowBlocks || [];
@@ -630,6 +1151,12 @@
         'Блок расширения задан, но стратегия поля не «expand-layout».', field));
     }
 
+    if (Object.prototype.hasOwnProperty.call(spec, 'moveTopLevelPaths') &&
+        typeof spec.moveTopLevelPaths !== 'boolean') {
+      errors.push(item('error', 'expansion-path-movement',
+        'moveTopLevelPaths must be a boolean reviewed layout decision.', field));
+    }
+
     var page = spec.page != null ? Number(spec.page) : Number(field.page);
     if (!Number.isInteger(page) || page < 0 || page >= pageSizes.length) {
       errors.push(item('error', 'expansion-page',
@@ -763,6 +1290,11 @@
     var wizard = project.wizard || { fields: [], checkFields: [], companyFields: [] };
     var extraProviders = {};
     var checkProviders = {};
+    if (Object.prototype.hasOwnProperty.call(project, 'tableOwnershipRequired') &&
+        typeof project.tableOwnershipRequired !== 'boolean') {
+      errors.push(item('error', 'table-ownership-schema',
+        'tableOwnershipRequired must be boolean.', null, 'tableOwnershipRequired'));
+    }
     if (ns.identifierProtection) {
       ns.identifierProtection.validate(project).forEach(function (problem) {
         var protectedField = problem.fieldId && (project.fields || []).find(function (field) {
@@ -774,6 +1306,10 @@
     }
     validateWordFlowBlocks(project, pageSizes, knownFormats, errors);
     validateTypographyGroups(project, errors);
+    validateSemanticGroups(project, pageSizes, errors);
+    validateSourcePathSuppressions(project, pageSizes, errors);
+    validateTableOwnership(project, pageSizes, errors);
+    validateDepositoryOperatorInputs(project, errors);
     (wizard.fields || []).concat(wizard.companyFields || []).forEach(function (field) { extraProviders[field.key] = field; });
     (wizard.checkFields || []).forEach(function (field) { checkProviders[field.key] = field; });
     var usedWizard = {};
@@ -871,6 +1407,19 @@
       }
       if (type !== 'static' && !field.source) errors.push(item('error', 'missing-source', 'Не указан источник.', field));
       if (field.source && !ns.sourceCatalog.isValid(field.source)) errors.push(item('error', 'source-syntax', 'Некорректный путь источника: ' + field.source + '.', field));
+      if (field.source && field.source.indexOf('umi.') === 0 &&
+          !ns.sourceCatalog.isKnownUmi(field.source)) {
+        errors.push(item('error', 'unknown-umi-source',
+          'Unknown exact UMI source: ' + field.source + '.', field));
+      }
+      if (field.source && field.sourceKind) {
+        var sourceInfo = ns.sourceCatalog.infoFor(field.source);
+        if (sourceInfo.known && sourceInfo.sourceKind !== field.sourceKind) {
+          errors.push(item('error', 'source-kind',
+            field.source + ' is classified as ' + sourceInfo.sourceKind +
+            ', not ' + field.sourceKind + '.', field));
+        }
+      }
       if (field.source && field.source.indexOf('extra.') === 0) {
         var extraKey = field.source.slice(6);
         usedWizard['extra.' + extraKey] = true;
@@ -896,6 +1445,11 @@
       if (field.showWhen) {
         if (!ns.sourceCatalog.isValid(field.showWhen.source)) errors.push(item('error', 'show-when', 'Некорректный источник условия.', field));
         if (field.showWhen.invert != null || field.showWhen.expression != null) errors.push(item('error', 'show-when', 'Условие содержит неподдерживаемое выражение.', field));
+        if (field.showWhen.source && field.showWhen.source.indexOf('umi.') === 0 &&
+            !ns.sourceCatalog.isKnownUmi(field.showWhen.source)) {
+          errors.push(item('error', 'unknown-umi-source',
+            'Unknown exact UMI condition source: ' + field.showWhen.source + '.', field));
+        }
         usedWizard[field.showWhen.source] = true;
       }
       if (type === 'check' && field.markStyle && ['check', 'cross', 'fill'].indexOf(field.markStyle) === -1) errors.push(item('error', 'mark-style', 'Неизвестный стиль отметки.', field));
@@ -1021,6 +1575,10 @@
     }
     var anchors = engine.overlayRenderer.expansionAnchors(template);
     if (!anchors.length) return Promise.resolve({ errors: errors, warnings: warnings });
+    var suppressedBlocks = typeof engine.overlayRenderer.unconditionalSuppressedBlocksByPage === 'function'
+      ? engine.overlayRenderer.unconditionalSuppressedBlocksByPage(template) : {};
+    var suppressedPaths = typeof engine.overlayRenderer.unconditionalSuppressedPathsByPage === 'function'
+      ? engine.overlayRenderer.unconditionalSuppressedPathsByPage(template) : {};
 
     return fetch(runtimePdfUrl).then(function (response) {
       return response.arrayBuffer();
@@ -1041,7 +1599,10 @@
           analysis = engine.pageExpander.analysePageShift(page, [{
             fieldId: anchor.id, fromTop: anchor.top, toTop: anchor.toTop,
             delta: anchor.delta, moveTopLevelPaths: anchor.moveTopLevelPaths
-          }], {});
+          }], {
+            suppressedBlocks: suppressedBlocks[anchor.page] || [],
+            suppressedPaths: suppressedPaths[anchor.page] || []
+          });
         } catch (error) {
           errors.push(item('error', 'anchor-geometry',
             'Якорь «' + anchor.id + '»: ' + error.message, null, anchor.page));

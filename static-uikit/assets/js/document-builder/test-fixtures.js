@@ -92,6 +92,11 @@
       passportIssueDate: '2008-04-20',
       passportDeptCode: profile.resident ? '770-001' : '',
       registrationAddress: en ? enAddress : ruAddress,
+      // Canonical `umi.address.registration` falls back to this legacy payload
+      // key when a synthetic fixture does not supply individual UMI address
+      // components.  The focused qualification-notice QA supplies components
+      // as well and verifies that they are formatted exactly once.
+      'client-registration-address': en ? enAddress : ruAddress,
       postalAddress: en ? enAddress : ruAddress,
       documentDateRu: '2026-07-29',
       'extra-contract-number': long ? 'BR-2026/00444-INTERNATIONAL-00000000000000017' : 'BR-2026/00444',
@@ -120,6 +125,12 @@
 
     // ── Fixed-shape values: never lengthened ────────────────────────────────
     if (/expiry|expire|validity|valid-until|deadline/i.test(key)) return '2027-12-31';
+    // Keep the depository date distinct from the document/brokerage dates.
+    // Otherwise a map accidentally wired to the generic date still looks right
+    // in every synthetic render and the legal pair cannot be audited by eye.
+    if (/(depository|depositary|depo-contract).*date|date.*(depository|depositary|depo-contract)/i.test(key)) {
+      return '2026-08-02';
+    }
     if (/date/i.test(key)) return '2026-07-29';
     if (/okpo/i.test(key)) return '12345678';
     if (/okved/i.test(key)) return '64.99';

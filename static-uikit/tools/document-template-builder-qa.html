@@ -73,6 +73,11 @@
         chain = chain.then(function () { return app.openExisting(entry.overlayTemplateId); })
           .then(function () {
             assert(!app.state.validation.warnings.some(function (warning) { return warning.code === 'unused-wizard'; }), 'False unused wizard source: ' + entry.overlayTemplateId);
+            assert(!app.state.validation.errors.length,
+              entry.overlayTemplateId + ' has structural errors: ' +
+              app.state.validation.errors.slice(0, 4).map(function (error) {
+                return error.code + ' (' + error.message + ')';
+              }).join('; '));
             opened.push(entry.overlayTemplateId);
           });
       });
@@ -218,6 +223,75 @@
         assert(ns.io.semanticEqual(map, exported), 'Round-trip failed: ' + map.id);
       });
     });
+    add('Layout contracts and semantic metadata remain first-class through both round trips', function () {
+      var rootContracts = 0;
+      var semanticGroups = 0;
+      var movedPaths = 0;
+      var underlineMetadata = 0;
+      var typographyMetadata = 0;
+      var ownershipExtensionKeys = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var production = ns.schema.toProduction(imported);
+        ns.schema.ROOT_LAYOUT_KEYS.forEach(function (key) {
+          if (!Object.prototype.hasOwnProperty.call(map, key)) return;
+          rootContracts += 1;
+          assert(Object.prototype.hasOwnProperty.call(project, key),
+            map.id + ': ' + key + ' was not promoted into the Builder project');
+          assert(!Object.prototype.hasOwnProperty.call(project.productionProperties, key),
+            map.id + ': ' + key + ' remained opaque');
+          assert(ns.io.semanticEqual(imported[key], map[key]),
+            map.id + ': Builder JSON changed ' + key);
+          assert(ns.io.semanticEqual(production[key], map[key]),
+            map.id + ': production export changed ' + key);
+        });
+        (map.cellOwnership || []).forEach(function (owner) {
+          if (owner.sourceRepeatGroup) ownershipExtensionKeys += 1;
+        });
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (block.semanticGroup) semanticGroups += 1;
+          if (block.expansion && block.expansion.moveTopLevelPaths === true) movedPaths += 1;
+          (block.runs || []).forEach(function (run) {
+            if (run.decoration && run.decoration.underline) underlineMetadata += 1;
+          });
+        });
+        (map.fields || []).forEach(function (field) {
+          if (field.typographyGroup) typographyMetadata += 1;
+          (field.flowRegions || []).forEach(function (region) {
+            if (region.drawUnderline || region.underlineTop != null ||
+                region.underlineOffset != null) underlineMetadata += 1;
+          });
+        });
+      });
+      assert(rootContracts >= 15, 'too few first-class root layout contracts: ' + rootContracts);
+      assert(semanticGroups >= 3, 'semantic groups were not discovered');
+      assert(movedPaths >= 3, 'moveTopLevelPaths decisions were not discovered');
+      assert(underlineMetadata > 0, 'underline metadata was not discovered');
+      assert(typographyMetadata >= 3, 'typography groups were not discovered');
+      assert(ownershipExtensionKeys >= 2,
+        'arbitrary cellOwnership extension keys were not discovered');
+
+      var entry = app.catalog.find(function (item) {
+        return item.overlayTemplateId === 'account-opening-notice';
+      });
+      var operatorProject = ns.schema.fromProduction(
+        frame.CRMDocumentEngine.fieldMaps['account-opening-notice'], entry);
+      var operatorField = operatorProject.fields.find(function (field) {
+        return field.source === 'extra.extra-depository-contract';
+      });
+      operatorField.sourceKind = 'operator-input';
+      var builderRound = ns.io.importProjectText(
+        ns.io.exportProject(operatorProject)).project;
+      equal(builderRound.fields.find(function (field) {
+        return field.id === operatorField.id;
+      }).sourceKind, 'operator-input', 'Builder JSON lost field sourceKind');
+      var productionRound = ns.schema.toProduction(builderRound);
+      equal(productionRound.fields.find(function (field) {
+        return field.id === operatorField.id;
+      }).sourceKind, 'operator-input', 'production export lost field sourceKind');
+    });
     add('All 18 identifier sets survive Builder JSON and production round-trips', function () {
       app.catalog.forEach(function (entry) {
         var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
@@ -233,6 +307,47 @@
           equal(actual.source == null ? null : String(actual.source), required.source,
             'Production round-trip changed source: ' + map.id + '/' + required.id);
         });
+      });
+    });
+    add('UMI registry classifies exact sources and depository operator aliases', function () {
+      ['extra.extra-depository-contract',
+        'extra.extra-depository-contract-date'].forEach(function (source) {
+        var info = ns.sourceCatalog.infoFor(source);
+        assert(info.known, source + ' is absent from the registry catalog');
+        equal(info.registryKind, 'workflow', source + ' has the wrong registry kind');
+        equal(info.sourceKind, 'operator-input', source + ' is not an operator input');
+        equal(info.operatorInput, true, source + ' lost operatorInput metadata');
+      });
+      assert(ns.sourceCatalog.isKnownUmi('umi.address.registration'),
+        'reviewed composed address alias is unknown');
+      assert(ns.sourceCatalog.isKnownUmi('umi.company.origname'),
+        'exact company UMI field is unknown');
+      assert(!ns.sourceCatalog.isKnownUmi('umi.company.qa_not_a_real_variable'),
+        'invented exact UMI source was accepted');
+    });
+    add('An unknown exact UMI path blocks export', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var project = cloneProject(app.state.project);
+        var field = cloneProject(project.fields.find(function (candidate) {
+          return candidate.id === 'clientName';
+        }));
+        field.id = 'qa-unknown-exact-umi';
+        field.source = 'umi.company.qa_not_a_real_variable';
+        field.sourceKind = 'umi';
+        field.left = 60;
+        field.baselineTop = 100;
+        field.width = 180;
+        field.required = false;
+        field.optional = true;
+        delete field.layoutMode;
+        delete field.flowBlockId;
+        project.fields.push(field);
+        var report = ns.validation.structural(project, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-normal', project));
+        assert(report.errors.some(function (error) {
+          return error.code === 'unknown-umi-source' &&
+            error.fieldId === field.id;
+        }), 'invented exact UMI path did not block export');
       });
     });
     // ── Reviewed Word-like blocks ────────────────────────────────────────
@@ -277,6 +392,29 @@
       assert(!Object.prototype.hasOwnProperty.call(migrated.productionProperties, 'wordFlowBlocks'),
         'legacy metadata was not promoted');
     });
+    add('Legacy opaque ownership and path contracts migrate into first-class schema', function () {
+      ['anketa-yul', 'qualification-notice'].forEach(function (templateId) {
+        var map = frame.CRMDocumentEngine.fieldMaps[templateId];
+        var entry = app.catalog.find(function (candidate) {
+          return candidate.overlayTemplateId === templateId;
+        });
+        var legacy = ns.schema.fromProduction(map, entry);
+        ns.schema.ROOT_LAYOUT_KEYS.forEach(function (key) {
+          if (!Object.prototype.hasOwnProperty.call(legacy, key)) return;
+          legacy.productionProperties[key] = cloneProject(legacy[key]);
+          delete legacy[key];
+        });
+        var migrated = ns.io.importProjectText(JSON.stringify(legacy)).project;
+        ns.schema.ROOT_LAYOUT_KEYS.forEach(function (key) {
+          if (!Object.prototype.hasOwnProperty.call(map, key)) return;
+          assert(ns.io.semanticEqual(migrated[key], map[key]),
+            templateId + ': migration changed ' + key);
+          assert(!Object.prototype.hasOwnProperty.call(
+            migrated.productionProperties, key),
+            templateId + ': migration left ' + key + ' opaque');
+        });
+      });
+    });
     add('Word-flow editor exposes frame, typography, expansion, range and run controls', function () {
       return app.openExisting('power-of-attorney').then(function () {
         var block = app.state.project.wordFlowBlocks.find(function (candidate) {
@@ -290,6 +428,7 @@
           'field inspector must yield to block editor');
         ['id', 'frame-left', 'frame-baselineTop', 'frame-width',
           'fontSize', 'fontSizeLocked', 'lineHeight', 'paragraphSpacingAfter',
+          'semanticGroup', 'expansion-moveTopLevelPaths',
           'sourceReplacement-firstBlock', 'sourceReplacement-lastBlock',
           'sourceReplacement-expectedSha256', 'sourceReplacement-expectedTemplateSha256']
           .forEach(function (name) {
@@ -330,6 +469,52 @@
         app.state.undo();
         assert(app.state.wordFlowBlock(originalBlockId), 'undo did not restore the deleted block');
         app.state.selectWordFlowBlock(originalBlockId);
+      });
+    });
+    add('Inspectors expose ownership, suppression, semantics and source kind', function () {
+      return app.openExisting('anketa-yul').then(function () {
+        var owner = app.state.project.cellOwnership.find(function (entry) {
+          return entry.canGrow && entry.budgetId;
+        });
+        assert(owner, 'no growing owned questionnaire field found');
+        app.state.selectField(owner.fieldId);
+        var ownership = frame.document.querySelector(
+          '[data-ownership-inspector="' + owner.fieldId + '"]');
+        assert(ownership, 'field inspector hides cell ownership');
+        ['bounds.left', 'bounds.top', 'bounds.right', 'bounds.bottom',
+          'affectedBorders', 'reviewStatus'].forEach(function (name) {
+          assert(ownership.querySelector('[data-ownership-control="' + name + '"]'),
+            'missing ownership control: ' + name);
+        });
+        assert(ownership.querySelector('[data-table-budget="' + owner.budgetId + '"]'),
+          'shared table budget is hidden');
+        assert(frame.document.querySelector(
+          '[data-expansion-control="moveTopLevelPaths"]'),
+          'field expansion hides moveTopLevelPaths');
+      }).then(function () {
+        return app.openExisting('qualification-notice');
+      }).then(function () {
+        app.state.selectField('clientName');
+        assert(frame.document.querySelector('[data-source-path-suppression]'),
+          'exact source-path suppression is hidden from its replacement field');
+        app.state.selectWordFlowBlock('qualification-notice-recipient');
+        var editor = frame.document.getElementById('dtb-word-flow-editor');
+        assert(editor.querySelector('[data-word-flow-control="semanticGroup"]'),
+          'semantic group editor is missing');
+        var movePaths = editor.querySelector(
+          '[data-word-flow-control="expansion-moveTopLevelPaths"]');
+        assert(movePaths && movePaths.checked,
+          'reviewed moveTopLevelPaths decision is not shown');
+      }).then(function () {
+        return app.openExisting('account-opening-notice');
+      }).then(function () {
+        app.state.selectField('depositaryContractNumber');
+        equal(frame.document.querySelector(
+          '[data-field-control="sourceKind"]').value, 'operator-input',
+          'field inspector did not derive the registry source kind');
+        equal(frame.document.querySelector(
+          '[data-wizard-control="sourceKind"]').value, 'operator-input',
+          'wizard inspector hid the operator source kind');
       });
     });
     add('Styled-run editing links existing fields without renaming business identifiers', function () {
@@ -720,6 +905,99 @@
         'the agreement date changed source');
       equal(date.format, 'dateRu', 'the agreement date lost its formatter');
     });
+    add('Depository workflow pair, defaults and semantic boundary gate export', function () {
+      return app.openExisting('account-opening-notice').then(function () {
+        var base = cloneProject(app.state.project);
+        function report(project) {
+          return ns.validation.structural(project, app.sourceInfo,
+            ns.fixtures.payloadFor('ru-resident-normal', project));
+        }
+        function requires(project, code, message) {
+          assert(report(project).errors.some(function (error) {
+            return error.code === code;
+          }), message);
+        }
+        function control(project, key) {
+          var groups = ['fields', 'companyFields'];
+          for (var i = 0; i < groups.length; i += 1) {
+            var found = (project.wizard[groups[i]] || []).find(function (entry) {
+              return entry.key === key;
+            });
+            if (found) return found;
+          }
+          return null;
+        }
+
+        var missing = cloneProject(base);
+        missing.fields = missing.fields.filter(function (field) {
+          return field.source !== 'extra.extra-depository-contract-date';
+        });
+        requires(missing, 'depository-pair',
+          'printed depository number without its date was accepted');
+
+        var optional = cloneProject(base);
+        optional.fields.find(function (field) {
+          return field.source === 'extra.extra-depository-contract';
+        }).required = false;
+        requires(optional, 'depository-field-required',
+          'optional printed depository reference was accepted');
+
+        var format = cloneProject(base);
+        format.fields.find(function (field) {
+          return field.source === 'extra.extra-depository-contract-date';
+        }).format = 'dateIso';
+        requires(format, 'depository-date-format',
+          'misformatted depository date was accepted');
+
+        var fieldKind = cloneProject(base);
+        fieldKind.fields.find(function (field) {
+          return field.source === 'extra.extra-depository-contract';
+        }).sourceKind = 'umi';
+        requires(fieldKind, 'source-kind',
+          'operator field misclassified as UMI was accepted');
+
+        var wizard = cloneProject(base);
+        control(wizard, 'extra-depository-contract-date').type = 'text';
+        requires(wizard, 'depository-wizard-control',
+          'depository date using a text wizard control was accepted');
+
+        var withDefault = cloneProject(base);
+        control(withDefault, 'extra-depository-contract').default = '';
+        requires(withDefault, 'depository-operator-default',
+          'explicit wizard default was accepted for an operator value');
+
+        var withDefaultValue = cloneProject(base);
+        control(withDefaultValue, 'extra-depository-contract-date').defaultValue = '';
+        requires(withDefaultValue, 'depository-operator-default',
+          'explicit wizard defaultValue was accepted for an operator value');
+
+        var duplicate = cloneProject(base);
+        duplicate.wizard.fields.push(cloneProject(
+          control(duplicate, 'extra-depository-contract')));
+        requires(duplicate, 'depository-wizard-pair',
+          'duplicate operator wizard control was accepted');
+
+        var semanticPair = cloneProject(base);
+        var transfer = semanticPair.wordFlowBlocks.find(function (block) {
+          return block.semanticGroup &&
+            block.semanticGroup.kind === 'depository-transfer-basis';
+        });
+        assert(transfer, 'reviewed depository semantic block is missing');
+        transfer.runs.find(function (run) {
+          return run.fieldId === 'transferBasisDepositoryDate';
+        }).fieldId = 'paymentPurposeAgreementDate';
+        requires(semanticPair, 'depository-semantic-pair',
+          'transfer-basis sentence lost its exact depository date unnoticed');
+
+        var incompleteBoundary = cloneProject(base);
+        delete incompleteBoundary.wordFlowBlocks.find(function (block) {
+          return block.semanticGroup &&
+            block.semanticGroup.kind === 'depository-transfer-basis';
+        }).semanticGroup.boundary.bottom;
+        requires(incompleteBoundary, 'semantic-group-boundary',
+          'incomplete depository semantic boundary was accepted');
+      });
+    });
     add('Continuation lines survive a builder JSON round trip', function () {
       return app.openExisting('accession-application-fl').then(function () {
         var text = ns.io.exportProject(app.state.project);
@@ -771,6 +1049,77 @@
     });
 
     // ── Page-section expansion ────────────────────────────────────────────
+    add('Malformed or unreviewed table ownership blocks export', function () {
+      return app.openExisting('anketa-yul').then(function () {
+        var base = cloneProject(app.state.project);
+        var growing = base.cellOwnership.find(function (owner) {
+          return owner.canGrow;
+        });
+        assert(growing, 'no growing ownership contract found');
+        function report(project) {
+          return ns.validation.structural(project, app.sourceInfo,
+            ns.fixtures.payloadFor('ru-company-long', project));
+        }
+        function requires(project, code, message) {
+          assert(report(project).errors.some(function (error) {
+            return error.code === code;
+          }), message);
+        }
+
+        var unreviewed = cloneProject(base);
+        unreviewed.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        }).reviewStatus = 'suggested';
+        requires(unreviewed, 'table-ownership',
+          'unreviewed owning cell was accepted');
+
+        var malformed = cloneProject(base);
+        var malformedOwner = malformed.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        });
+        malformedOwner.bounds.right = malformedOwner.bounds.left;
+        requires(malformed, 'table-ownership',
+          'reversed owning-cell bounds were accepted');
+
+        var uncovered = cloneProject(base);
+        uncovered.cellOwnership = uncovered.cellOwnership.filter(function (owner) {
+          return owner.fieldId !== growing.fieldId;
+        });
+        requires(uncovered, 'table-ownership',
+          'dynamic field without ownership or exemption was accepted');
+
+        var borders = cloneProject(base);
+        borders.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        }).affectedBorders.vertical = [];
+        requires(borders, 'table-ownership-borders',
+          'growing cell without moved vertical borders was accepted');
+
+        var outside = cloneProject(base);
+        var outsideOwner = outside.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        });
+        outside.fields.find(function (field) {
+          return field.id === growing.fieldId;
+        }).left = outsideOwner.bounds.right + 1;
+        requires(outside, 'table-ownership-region',
+          'value region outside its owning cell was accepted');
+
+        var budget = cloneProject(base);
+        budget.tableBudgets.find(function (entry) {
+          return entry.id === growing.budgetId;
+        }).reviewStatus = 'suggested';
+        requires(budget, 'table-ownership',
+          'unreviewed shared table budget was accepted');
+
+        var exemption = cloneProject(base);
+        assert(exemption.ownershipExemptions.length,
+          'questionnaire has no ownership exemption to test');
+        exemption.ownershipExemptions[0].reviewStatus = 'suggested';
+        requires(exemption, 'table-ownership',
+          'unreviewed ownership exemption was accepted');
+      });
+    });
     add('A suggested expansion is never approved automatically', function () {
       return app.openExisting('qualification-notice').then(function () {
         var field = app.state.project.fields.filter(function (item) {
@@ -782,6 +1131,98 @@
         assert(suggestion.insertionTop > field.baselineTop, 'anchor sits below the field');
         assert(suggestion.line.width > 0, 'the row has a width');
         assert(suggestion.line.ruleThickness > 0, 'the row has a rule');
+      });
+    });
+    add('Recipient semantics and exact source-path suppression mutations block export', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var base = cloneProject(app.state.project);
+        function report(project) {
+          return ns.validation.structural(project, app.sourceInfo,
+            ns.fixtures.payloadFor('ru-company-long', project));
+        }
+        function requires(project, code, message) {
+          assert(report(project).errors.some(function (error) {
+            return error.code === code;
+          }), message);
+        }
+        function block(project, id) {
+          return project.wordFlowBlocks.find(function (entry) {
+            return entry.id === id;
+          });
+        }
+
+        var unreviewed = cloneProject(base);
+        block(unreviewed, 'qualification-notice-recipient')
+          .semanticGroup.reviewStatus = 'suggested';
+        requires(unreviewed, 'semantic-group-unreviewed',
+          'unreviewed recipient semantics were accepted');
+
+        var boundary = cloneProject(base);
+        block(boundary, 'qualification-notice-recipient').hangingIndent = 0;
+        requires(boundary, 'recipient-boundary',
+          'recipient continuation escaped the reviewed right-hand block');
+
+        var repeated = cloneProject(base);
+        block(repeated, 'qualification-notice-recipient')
+          .semanticGroup.address.renderOnce = false;
+        requires(repeated, 'recipient-render-once',
+          'address without renderOnce semantics was accepted');
+
+        var wrongSource = cloneProject(base);
+        block(wrongSource, 'qualification-notice-recipient')
+          .semanticGroup.address.source = 'subject.registrationAddress';
+        requires(wrongSource, 'semantic-group-source',
+          'recipient semantic source drift was accepted');
+
+        var missingUnderline = cloneProject(base);
+        delete block(missingUnderline, 'qualification-notice-recipient')
+          .runs.find(function (run) {
+            return run.fieldId === 'recipientAddress';
+          }).decoration;
+        requires(missingUnderline, 'semantic-underline',
+          'recipient field without its measured underline was accepted');
+
+        var collision = cloneProject(base);
+        var decorated = block(collision, 'qualification-notice-recognition')
+          .runs.find(function (run) {
+            return run.type === 'fieldRef' && run.decoration &&
+              run.decoration.underline;
+          });
+        decorated.decoration.offset = 0;
+        requires(collision, 'semantic-underline-intersection',
+          'underline crossing the configured text ink was accepted');
+
+        var dateRule = cloneProject(base);
+        block(dateRule, 'qualification-notice-recognition')
+          .semanticGroup.date.rule.width = 0;
+        requires(dateRule, 'semantic-date-rule',
+          'incomplete organization/date rule was accepted');
+
+        var movement = cloneProject(base);
+        block(movement, 'qualification-notice-recipient')
+          .expansion.moveTopLevelPaths = 'yes';
+        requires(movement, 'expansion-path-movement',
+          'non-boolean top-level path movement was accepted');
+
+        var suppressionReview = cloneProject(base);
+        suppressionReview.sourcePathSuppressions[0].reviewStatus = 'suggested';
+        requires(suppressionReview, 'source-path-suppression',
+          'unreviewed exact path suppression was accepted');
+
+        var suppressionHash = cloneProject(base);
+        suppressionHash.sourcePathSuppressions[0].expectedSha256 = '';
+        requires(suppressionHash, 'source-path-suppression',
+          'unfrozen exact path suppression was accepted');
+
+        var suppressionOwner = cloneProject(base);
+        suppressionOwner.sourcePathSuppressions[0].ownerBlockId = 'qa-missing-owner';
+        requires(suppressionOwner, 'source-path-suppression',
+          'path suppression without its semantic owner was accepted');
+
+        var suppressionBoundary = cloneProject(base);
+        delete suppressionBoundary.sourcePathSuppressions[0].geometry.right;
+        requires(suppressionBoundary, 'source-path-suppression-boundary',
+          'incomplete reviewed path boundary was accepted');
       });
     });
     add('An unreviewed expansion blocks production export', function () {

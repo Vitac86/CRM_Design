@@ -260,6 +260,28 @@
       input('number', block.hangingIndent == null ? '' : block.hangingIndent, { step: 0.01 }), numberValue);
     this.container.appendChild(typography);
 
+    var semantics = section('Semantic layout group');
+    var semanticJson = document.createElement('textarea');
+    semanticJson.className = 'dtb-control';
+    semanticJson.rows = 8;
+    semanticJson.dataset.wordFlowControl = 'semanticGroup';
+    semanticJson.value = block.semanticGroup
+      ? JSON.stringify(block.semanticGroup, null, 2) : '';
+    semanticJson.addEventListener('change', function () {
+      var value;
+      try {
+        value = semanticJson.value.trim() ? JSON.parse(semanticJson.value) : undefined;
+      } catch (error) {
+        self.onMessage('semanticGroup must be valid JSON: ' + error.message);
+        return;
+      }
+      self.state.mutateWordFlowBlock(block.id, 'edit Word-flow semantic group',
+        function (target) { setPath(target, 'semanticGroup', value); });
+    });
+    semantics.appendChild(row('Reviewed recipient / organization boundaries', semanticJson,
+      'The group must carry reviewStatus="approved" and exact field/source links.'));
+    this.container.appendChild(semantics);
+
     this._renderExpansion(block);
     this._renderPageBudget(block);
     this._renderReplacement(block);
@@ -314,6 +336,9 @@
       });
       this._add(sectionNode, block.id, 'Line style', 'expansion.lineStyle',
         select(spec.lineStyle || 'none', ['none', 'underline', 'table-row']));
+      this._add(sectionNode, block.id, 'Move top-level PDF paths',
+        'expansion.moveTopLevelPaths', input('checkbox', spec.moveTopLevelPaths), Boolean,
+        'Reviewed rules and borders move with the same complete block delta.');
       this._add(sectionNode, block.id, 'Visual review', 'expansion.reviewStatus',
         select(spec.reviewStatus || 'suggested', ['suggested', 'required', 'approved']));
       var rows = Number(spec.maxExtraRows || 0);
