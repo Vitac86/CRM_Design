@@ -34,6 +34,7 @@ PROBE = r"""
   // that are suppressed for EVERY payload — a `showWhen` variant stays on the
   // page as far as this check is concerned.
   const gone = (R.unconditionalSuppressedBlocksByPage(t) || {})[page] || [];
+  const gonePaths = (R.unconditionalSuppressedPathsByPage(t) || {})[page] || [];
   const out = [];
   for (const top of tops) {
     const doc = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
@@ -41,7 +42,7 @@ PROBE = r"""
       const r = CRMDocumentEngine.pageExpander.shiftPageContent(
         doc, doc.getPages()[page], [{ fromTop: top, toTop: toTop, delta: delta,
           moveTopLevelPaths: moveTopLevelPaths }],
-        { suppressedBlocks: gone });
+        { suppressedBlocks: gone, suppressedPaths: gonePaths });
       out.push([top, r.moved]);
     } catch (e) { /* straddles */ }
   }

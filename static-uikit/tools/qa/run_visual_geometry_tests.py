@@ -62,6 +62,7 @@ RENDER = r"""
     if (anchor.expansion) expansionStyles[anchor.id] = anchor.expansion.lineStyle || 'underline';
   });
   const activeWordFlow = [];
+  const fieldUnderlines = [];
   CRMDocumentEngine.overlayRenderer.activeReviewedRangePages(t, payload)
     .forEach(function (group) {
       group.blocks.forEach(function (block) {
@@ -122,6 +123,32 @@ RENDER = r"""
           }, [])
         };
       });
+      // An ordinary multiline field owns reviewed rules too: a `flowRegions`
+      // continuation declared `drawUnderline` is the form's own printed blank
+      // continued, and the renderer draws it from the region the expansion
+      // pass handed back. Read those exact regions here so a reviewed
+      // continuation rule is not reported as a stray vector.
+      Object.keys((d.planned && d.planned.byField) || {}).forEach(function (id) {
+        const result = d.planned.byField[id];
+        if (!result || !result.drawn || !result.layout) return;
+        const regions = result.layout.regions || result.regions || [];
+        (result.layout.lines || []).forEach(function (line) {
+          const region = regions[line.regionIndex];
+          if (!region || !region.drawUnderline) return;
+          const lineHeight = CRMDocumentEngine.textLayout
+            .lineHeightAt(region, result.layout.size);
+          const top = region.underlineTop != null
+            ? Number(region.underlineTop) + Number(line.lineIndex || 0) * lineHeight
+            : Number(region.baselineTop) + Number(line.lineIndex || 0) * lineHeight +
+              Number(region.underlineOffset != null ? region.underlineOffset : 2);
+          const left = Number(region.underlineLeft != null
+            ? region.underlineLeft : region.left);
+          const width = Number(region.underlineWidth != null
+            ? region.underlineWidth : region.width);
+          fieldUnderlines.push({ fieldId: id, page: Number(region.page),
+                                 top: top, left: left, right: left + width });
+        });
+      });
     }
   });
   const u8 = new Uint8Array(await blob.arrayBuffer());
@@ -135,6 +162,7 @@ RENDER = r"""
   return JSON.stringify({ pdf: btoa(s), notes: notes, flowPages: flowPages,
                           expansionStyles: expansionStyles,
                           activeWordFlow: activeWordFlow,
+                          fieldUnderlines: fieldUnderlines,
                           url: t.templateUrl });
 }(DOC, PROFILE, OVERRIDES))
 """
@@ -352,12 +380,12 @@ def decoration_rules(block):
 
 
 def inspect(checks, label, doc_id, pdf_bytes, template_path, notes,
-            word_flow_blocks, expansion_styles):
+            word_flow_blocks, expansion_styles, field_underlines=()):
     generated = fitz.open(stream=pdf_bytes, filetype="pdf")
     base = fitz.open(template_path)
     pages = {note["page"] for note in notes} | {
         int(block["page"]) for block in word_flow_blocks
-    }
+    } | {int(rule["page"]) for rule in field_underlines}
 
     # A page that neither expanded nor carries a reviewed block must come out of
     # the engine untouched. Pages that do are inspected in full below: a Word
@@ -384,13 +412,18 @@ def inspect(checks, label, doc_id, pdf_bytes, template_path, notes,
                        if int(block["page"]) == index]
         block_bounds = [flow_bounds(block) for block in page_blocks]
 
-        # Every rule this engine drew has to be one of two reviewed things: the
-        # rule of a continuation row, or the underline decoration of an inline
-        # blank, drawn on the exact baseline the layout engine assigned it.
-        # Anything else is a stray vector on a legal form.
+        # Every rule this engine drew has to be one of three reviewed things:
+        # the rule of a continuation row, the underline decoration of an inline
+        # blank, or the reviewed continuation rule of an ordinary multiline
+        # field — each drawn on the exact baseline the layout engine assigned
+        # it. Anything else is a stray vector on a legal form.
         if not row_notes:
             expected = [rule for block in page_blocks
                         for rule in decoration_rules(block)]
+            expected += [(float(rule["top"]), float(rule["left"]),
+                          float(rule["right"]))
+                         for rule in field_underlines
+                         if int(rule["page"]) == index]
             stray = [rule for rule in added
                      if not any(abs(rule[0] - top) <= 1.0
                                 and abs(rule[1] - left) <= 1.0
@@ -516,7 +549,8 @@ def main() -> int:
             template_path = os.path.join(TEMPLATES, os.path.basename(payload["url"]))
             inspect(checks, label, doc_id, pdf, template_path, payload["notes"],
                     payload.get("activeWordFlow") or [],
-                    payload.get("expansionStyles") or {})
+                    payload.get("expansionStyles") or {},
+                    payload.get("fieldUnderlines") or [])
             if label == "cross-page legal block transfer":
                 checks.check(f"{label}: local Word flow avoids an unnecessary transfer",
                              not payload["flowPages"], str(payload["flowPages"]))

@@ -80,8 +80,38 @@ def static_text_of_runs(runs: list[dict]) -> str:
     return "".join(parts)
 
 
-def operator_block_text(page) -> tuple[int, dict[int, str]]:
-    """Return one-based top-level q…Q text, using pypdf's real font maps."""
+def operator_block_text(
+    page, operator_scope: str = "top-level"
+) -> tuple[int, dict[int, str]]:
+    """Return one-based reviewed q…Q text, using pypdf's real font maps."""
+    if operator_scope == "all-balanced":
+        state = {"ordinal": 0, "stack": []}
+        pieces: dict[int, list[str]] = defaultdict(list)
+
+        def before_all(operator, _operands, _cm, _tm):
+            if operator == b"q":
+                state["ordinal"] += 1
+                state["stack"].append(state["ordinal"])
+            elif operator == b"Q" and state["stack"]:
+                state["stack"].pop()
+
+        def visit_all(text, _cm, _tm, _font, _size):
+            if state["stack"]:
+                pieces[state["stack"][-1]].append(text)
+
+        page.extract_text(
+            visitor_operand_before=before_all,
+            visitor_text=visit_all,
+        )
+        return state["ordinal"], {
+            key: "".join(value) for key, value in pieces.items()
+        }
+
+    if operator_scope != "top-level":
+        raise ValueError(f"unsupported operator scope: {operator_scope}")
+
+    # Default architecture: aggregate every nested text run under its owning
+    # top-level balanced block.
     state = {"depth": 0, "ordinal": 0, "current": None}
     pieces: dict[int, list[str]] = defaultdict(list)
 
@@ -115,7 +145,7 @@ def context(sequence: list[str], limit: int = 18) -> str:
 def main() -> int:
     maps = dump()
     readers: dict[str, PdfReader] = {}
-    page_cache: dict[tuple[str, int], tuple[int, dict[int, str]]] = {}
+    page_cache: dict[tuple[str, int, str], tuple[int, dict[int, str]]] = {}
     failures: list[str] = []
     checked = 0
 
@@ -130,10 +160,11 @@ def main() -> int:
         for block in blocks:
             replacement = block.get("sourceReplacement", {})
             page_index = int(block["page"])
-            cache_key = (filename, page_index)
+            operator_scope = replacement.get("operatorScope", "top-level")
+            cache_key = (filename, page_index, operator_scope)
             if cache_key not in page_cache:
                 page_cache[cache_key] = operator_block_text(
-                    readers[filename].pages[page_index]
+                    readers[filename].pages[page_index], operator_scope
                 )
             total, by_block = page_cache[cache_key]
             first = int(replacement.get("firstBlock", 0))

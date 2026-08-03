@@ -122,6 +122,89 @@
       legalSerifItalic: '../assets/fonts/pdf/LiberationSerif-Italic.ttf'
     },
 
+    // Word emitted these ruled blanks as independent top-level path units, not
+    // inside the balanced text blocks replaced below.  Exact path ordinals and
+    // hashes keep their removal tied to the authoritative PDF bytes; this is
+    // the path-level counterpart of sourceReplacement, not a coordinate
+    // whiteout.  The instrument rule is selected only with the `other` branch,
+    // when its mapped replacement can travel with all expansion above it.
+    sourcePathSuppressions: [
+      {
+        id: 'qualification-notice-recognition-name-rule-upper',
+        page: 0, pathOrdinal: 1, expectedPagePathCount: 11,
+        expectedSha256: 'c89aacec0fd63a35aa2a8a22469d9f6fa53f78ecdd9c834639504a1eaa10bb05',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-recognition',
+        reviewStatus: 'approved', fieldIds: ['clientName'],
+        geometry: { left: 297.05, top: 293.09, right: 534.58, bottom: 293.33 }
+      },
+      {
+        id: 'qualification-notice-recognition-name-rule-lower',
+        page: 0, pathOrdinal: 2, expectedPagePathCount: 11,
+        expectedSha256: '1e3fd1246c845224557a1f7bce494dcb8a5ba439461bf14337cbab78b4843e38',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-recognition',
+        reviewStatus: 'approved', fieldIds: ['clientName'],
+        geometry: { left: 297.05, top: 294.29, right: 534.58, bottom: 294.53 }
+      },
+      {
+        id: 'qualification-notice-recognition-date-rule',
+        page: 0, pathOrdinal: 3, expectedPagePathCount: 11,
+        expectedSha256: '33b6ca5e2085753da8bc3a75a2f35be4d212f3b0a1e96474e82c5d5d95c014e5',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-recognition',
+        reviewStatus: 'approved', fieldIds: ['recognitionDate'],
+        geometry: { left: 99.264, top: 334.13, right: 240.884, bottom: 334.61 }
+      },
+      {
+        id: 'qualification-notice-other-instruments-rule',
+        page: 0, pathOrdinal: 4, expectedPagePathCount: 11,
+        expectedSha256: 'b8f392fba3fb1b5c638c05511352d7b486f9b0403d3965b942ef157a5f4fdcbe',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-recognition',
+        reviewStatus: 'approved', fieldIds: ['otherInstruments'],
+        showWhen: { source: 'extra.extra-qualification-scope', equals: 'other' },
+        geometry: { left: 135.86, top: 427.01, right: 500.97, bottom: 427.49 }
+      },
+      {
+        id: 'qualification-notice-register-name-rule',
+        page: 0, pathOrdinal: 5, expectedPagePathCount: 11,
+        expectedSha256: 'd8a147e7282168bb4bac087a81a0626a97381933ad8e63e35bd7b79a9277a74f',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-register-entry',
+        reviewStatus: 'approved',
+        fieldIds: ['registerEntryPersonName', 'registerEntryOrgName'],
+        geometry: { left: 229.01, top: 473.11, right: 322.154, bottom: 473.59 }
+      },
+      {
+        id: 'qualification-notice-register-date-micro-rule',
+        page: 0, pathOrdinal: 6, expectedPagePathCount: 11,
+        expectedSha256: '64860ef28b9e84321a60d13385b4d8e4fb295b72a6e1ea13155ca6fa80668821',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-register-entry',
+        reviewStatus: 'approved', fieldIds: [],
+        geometry: { left: 308.81, top: 484.63, right: 314.354, bottom: 485.11 }
+      },
+      {
+        id: 'qualification-notice-recognition-continuation-stroke',
+        page: 0, pathOrdinal: 7, expectedPagePathCount: 11,
+        expectedSha256: '59ef92586e64fe1b7a1d876022e27df6653588488a341ddddd56cbd44a76318e',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-recognition',
+        reviewStatus: 'approved', fieldIds: ['clientName'],
+        geometry: { left: 63.80, top: 311.90, right: 468.91, bottom: 311.90 }
+      },
+      {
+        id: 'qualification-notice-recognition-continuation-fill',
+        page: 0, pathOrdinal: 8, expectedPagePathCount: 11,
+        expectedSha256: '8f3b7860da393e144a2db31574c0726784aeab9c4941f9c44ef1b3ffebfae788',
+        expectedTemplateSha256: '2a9fab02f5b05c69b1fafe73d6d8d7c46c11114a9acb17f0f7b581fb1e3f4494',
+        ownerBlockId: 'qualification-notice-recognition',
+        reviewStatus: 'approved', fieldIds: ['clientName'],
+        geometry: { left: 63.80, top: 311.03, right: 468.80, bottom: 311.51 }
+      }
+    ],
+
     wordFlowBlocks: [
       {
         id: 'qualification-notice-recipient',
@@ -134,10 +217,32 @@
         font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
         fontSizeLocked: true, lineHeight: 11.52,
         paragraphSpacingAfter: 11.88, alignment: 'left',
+        // The source lays both labelled paragraphs in the 154.09 pt column at
+        // the right edge.  A spacer can place only the first line there: every
+        // wrapped line starts at the frame edge.  Paragraph indents own the
+        // whole line box, so name and address continuations cannot escape to
+        // the unrelated left margin.
+        firstLineIndent: 259.51,
+        hangingIndent: 259.51,
+        semanticGroup: {
+          id: 'qualification-notice-recipient-address',
+          kind: 'recipient-block',
+          reviewStatus: 'approved',
+          bounds: { left: 379.51, right: 533.60 },
+          name: {
+            fieldId: 'recipientName', source: 'field.client-full-name',
+            companyUmi: 'umi.company.origname', representation: 'full-name'
+          },
+          address: {
+            fieldId: 'recipientAddress', source: 'umi.address.registration',
+            representation: 'single-formatted-address', renderOnce: true
+          }
+        },
         overflowStrategy: 'expand-layout',
         expansion: {
           page: 0, insertionTop: 212.20, shiftFromTop: 212.20,
-          rowHeight: 11.52, maxExtraRows: 6, lineStyle: 'none',
+          rowHeight: 11.52, maxExtraRows: 10, lineStyle: 'none',
+          moveTopLevelPaths: true,
           reviewStatus: 'approved'
         },
         sourceReplacement: {
@@ -149,21 +254,35 @@
         },
         sourceStaticText: 'Кому:_________________________ Адрес:________________________',
         runs: [
-          { type: 'spacer', width: 259.51 },
-          { type: 'static', text: 'Кому:', keepWithNext: true },
+          {
+            type: 'static', text: 'Кому:', keepWithNext: true,
+            semanticRole: 'recipient-label'
+          },
+          {
+            type: 'spacer', width: 3.50, keepWithNext: true,
+            semanticRole: 'recipient-label-gap'
+          },
           {
             type: 'fieldRef', fieldId: 'recipientName',
+            semanticRole: 'recipient-full-name',
             decoration: {
-              underline: true, minWidth: 124.90, thickness: 0.48, offset: 1.20
+              underline: true, minWidth: 124.90, thickness: 0.48, offset: 2.40
             }
           },
           { type: 'paragraphBreak' },
-          { type: 'spacer', width: 259.51 },
-          { type: 'static', text: 'Адрес:', keepWithNext: true },
+          {
+            type: 'static', text: 'Адрес:', keepWithNext: true,
+            semanticRole: 'address-label'
+          },
+          {
+            type: 'spacer', width: 3.50, keepWithNext: true,
+            semanticRole: 'address-label-gap'
+          },
           {
             type: 'fieldRef', fieldId: 'recipientAddress',
+            semanticRole: 'formatted-address',
             decoration: {
-              underline: true, minWidth: 117.90, thickness: 0.48, offset: 1.20
+              underline: true, minWidth: 117.90, thickness: 0.48, offset: 2.40
             }
           }
         ]
@@ -179,6 +298,21 @@
         font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
         fontSizeLocked: true, lineHeight: 11.52,
         alignment: 'left',
+        semanticGroup: {
+          id: 'qualification-notice-recognition-body',
+          kind: 'organization-name-and-date',
+          reviewStatus: 'approved',
+          fullName: {
+            fieldId: 'clientName', source: 'field.client-full-name',
+            companyUmi: 'umi.company.origname', representation: 'full-name'
+          },
+          caption: { role: 'full-name-caption', keepWith: 'clientName' },
+          date: {
+            fieldId: 'recognitionDate', source: 'field.documentDateRu',
+            rule: { left: 99.264, width: 141.62, thickness: 0.48, offset: 2.40 }
+          },
+          continuation: { role: 'recognition-clause', shiftWithBlock: true }
+        },
         overflowStrategy: 'expand-layout',
         // Re-cut at a measured complete-operator boundary.
         //   python static-uikit/tools/qa/check_expansion_anchors.py --suggest
@@ -189,6 +323,7 @@
         expansion: {
           page: 0, insertionTop: 345.38, shiftFromTop: 345.38,
           rowHeight: 11.52, maxExtraRows: 4, lineStyle: 'none',
+          moveTopLevelPaths: true,
           reviewStatus: 'approved'
         },
         sourceReplacement: {
@@ -202,29 +337,40 @@
           '(Ф.И.О./ наименование организации) ________ признано ' +
           'квалифицированным инвестором в отношении следующих видов: (дата)',
         runs: [
-          { type: 'static', text: 'ООО «Инвестика» настоящим уведомляет, что ' },
+          {
+            type: 'static', text: 'ООО «Инвестика» настоящим уведомляет, что ',
+            semanticRole: 'recognition-lead-in'
+          },
           {
             type: 'fieldRef', fieldId: 'clientName',
+            semanticRole: 'client-full-name',
             decoration: {
-              underline: true, minWidth: 234.00, thickness: 0.48, offset: 1.20
+              // 233.80 is the measured remainder after the real lead-in and
+              // its word space.  Rounding it to 234 made an ordinary short
+              // name open a spurious continuation line by 0.11 pt.
+              underline: true, minWidth: 233.80, thickness: 0.48, offset: 2.40
             }
           },
           { type: 'lineBreak' },
-          { type: 'spacer', width: 237.05 },
+          { type: 'spacer', width: 237.05, keepWithNext: true },
           {
             type: 'static', text: '(Ф.И.О./ наименование организации)',
-            font: 'legalSerifItalic'
+            font: 'legalSerifItalic', keepTogether: true,
+            semanticRole: 'client-full-name-caption'
           },
           { type: 'lineBreak' },
           {
-            type: 'fieldRef', fieldId: 'recognitionDate', keepTogether: true,
+            type: 'fieldRef', fieldId: 'recognitionDate',
+            keepTogether: true, keepWithNext: true,
+            semanticRole: 'recognition-date',
             decoration: {
-              underline: true, minWidth: 138.00, thickness: 0.48, offset: 1.20
+              underline: true, minWidth: 141.62, thickness: 0.48, offset: 2.40
             }
           },
           {
             type: 'static',
-            text: ' признано квалифицированным инвестором в отношении следующих видов:'
+            text: ' признано квалифицированным инвестором в отношении следующих видов:',
+            semanticRole: 'recognition-clause'
           },
           { type: 'lineBreak' },
           { type: 'spacer', width: 35.40 },
@@ -246,6 +392,7 @@
         expansion: {
           page: 0, insertionTop: 484.95, shiftFromTop: 484.95,
           rowHeight: 11.52, maxExtraRows: 4, lineStyle: 'none',
+          moveTopLevelPaths: true,
           reviewStatus: 'approved'
         },
         sourceReplacement: {
@@ -263,13 +410,13 @@
           {
             type: 'fieldRef', fieldId: 'registerEntryPersonName',
             decoration: {
-              underline: true, minWidth: 89.00, thickness: 0.48, offset: 1.08
+              underline: true, minWidth: 89.00, thickness: 0.48, offset: 2.40
             }
           },
           {
             type: 'fieldRef', fieldId: 'registerEntryOrgName',
             decoration: {
-              underline: true, minWidth: 89.00, thickness: 0.48, offset: 1.08
+              underline: true, minWidth: 89.00, thickness: 0.48, offset: 2.40
             }
           },
           {
@@ -300,7 +447,7 @@
       // 36.97 pt of clear space below the baseline before the title block, so
       // this 117.9 pt rule holds four lines at the floor — enough for a full
       // foreign postal address without touching the page.
-      text('recipientAddress', 'field.client-postal-address', 407.7, 200.42, 117.9, {
+      text('recipientAddress', 'umi.address.registration', 407.7, 200.42, 117.9, {
         required: true, multiline: true, lineHeightRatio: 0.95, maxHeight: 34.0,
         layoutMode: 'flow-reference', flowBlockId: 'qualification-notice-recipient'
       }),
@@ -324,7 +471,7 @@
       }),
 
       // The recognition date sits on the 141.62 pt rule captioned "(дата)".
-      text('recognitionDate', 'field.documentDateRu', 101.0, 333.10, 138.0, {
+      text('recognitionDate', 'field.documentDateRu', 99.264, 333.10, 141.62, {
         required: true, format: 'dateRu', align: 'center',
         layoutMode: 'flow-reference', flowBlockId: 'qualification-notice-recognition'
       }),
@@ -344,12 +491,22 @@
         showWhen: { source: 'extra.extra-qualification-scope', equals: 'other' },
         overflowStrategy: 'flow',
         flowRegions: [
-          { page: 0, left: 137.5, baselineTop: 425.93, width: 362.0, maxLines: 1 },
           {
-            page: 0, left: 137.5, baselineTop: 437.30, width: 362.0,
+            page: 0, left: 137.5, baselineTop: 425.93, width: 362.0,
+            maxLines: 1, maxFontSize: 9.96,
+            drawUnderline: true, underlineThickness: 0.48, underlineOffset: 2.40
+          },
+          {
+            page: 0, left: 137.5, baselineTop: 437.45, width: 362.0,
             maxLines: 1, maxFontSize: 9.96,
             generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.48, underlineOffset: 1.6
+            drawUnderline: true, underlineThickness: 0.48, underlineOffset: 2.40
+          },
+          {
+            page: 0, left: 137.5, baselineTop: 448.97, width: 362.0,
+            maxLines: 1, maxFontSize: 9.96,
+            generated: true, reviewStatus: 'approved',
+            drawUnderline: true, underlineThickness: 0.48, underlineOffset: 2.40
           }
         ]
       }),

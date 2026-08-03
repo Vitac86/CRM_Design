@@ -72,6 +72,31 @@ RENDER = r"""
           });
         });
       });
+      // Ordinary multiline fields can own reviewed rules too.  Record the
+      // exact regions the shared layout engine chose, so the assertion below
+      // does not mistake an `otherInstruments` rule for an unreviewed
+      // Word-flow continuation.
+      Object.keys((d.planned && d.planned.byField) || {}).forEach(function (id) {
+        const result = d.planned.byField[id];
+        if (!result || !result.drawn || !result.layout) return;
+        const regions = result.layout.regions || result.regions || [];
+        (result.layout.lines || []).forEach(function (line) {
+          const region = regions[line.regionIndex];
+          if (!region || !region.drawUnderline) return;
+          const lineHeight = CRMDocumentEngine.textLayout
+            .lineHeightAt(region, result.layout.size);
+          const top = region.underlineTop != null
+            ? Number(region.underlineTop) + Number(line.lineIndex || 0) * lineHeight
+            : Number(region.baselineTop) + Number(line.lineIndex || 0) * lineHeight +
+              Number(region.underlineOffset != null ? region.underlineOffset : 2);
+          const left = Number(region.underlineLeft != null
+            ? region.underlineLeft : region.left);
+          const width = Number(region.underlineWidth != null
+            ? region.underlineWidth : region.width);
+          underlines.push({ page: Number(region.page), top: top,
+                            left: left, right: left + width });
+        });
+      });
     }
   });
   const u8 = new Uint8Array(await blob.arrayBuffer());
@@ -207,7 +232,7 @@ def main() -> int:
             pdf, notes, _flow, lines = engine.render_plan(
                 "qualification-notice", "ru-resident-normal",
                 {"field.client-full-name": name,
-                 "field.client-postal-address": TINY_ADDRESS})
+                 "field.client-registration-address": TINY_ADDRESS})
             outputs[key] = (fitz.open(stream=pdf, filetype="pdf"), notes, pdf, lines)
 
         short_doc, short_notes = outputs["short"][0], outputs["short"][1]
@@ -304,7 +329,7 @@ def main() -> int:
         # ── Determinism ──────────────────────────────────────────────────────
         again, _ = engine.render("qualification-notice", "ru-resident-normal",
                                  {"field.client-full-name": LONG_NAME,
-                                  "field.client-postal-address": TINY_ADDRESS})
+                                  "field.client-registration-address": TINY_ADDRESS})
         repeat = fitz.open(stream=again, filetype="pdf")
         checks.check("repeated generation is deterministic",
                      " ".join(repeat[0].get_text().split()) ==
@@ -516,7 +541,7 @@ def main() -> int:
               // blocks, which is what makes one page budget serve two anchors.
               const payload = CRMDocumentBuilder.fixtures.payloadFor('ru-company-normal', project);
               payload.fields['client-full-name'] = name;
-              payload.fields['client-postal-address'] = address;
+              payload.fields['client-registration-address'] = address;
               // A reviewed block reports the complete lines it needs only when
               // its own layout has been decided first.
               const flow = CRMDocumentEngine.overlayRenderer
