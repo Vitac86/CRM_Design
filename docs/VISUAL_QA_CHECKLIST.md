@@ -108,13 +108,13 @@ Recorded 2026-08-03. The previously open document findings are implemented and
 have dedicated fail-closed automated checks. They are **not yet manually
 accepted**: the remaining release action is to inspect the synthetic
 `static-uikit/manual-smoke/manual-findings-fix` review pack at high zoom and
-sign off the items below. The completed pack covers 6 affected documents and
-24 scenarios: 24 PDFs, 24 fixture JSON files, 73 full-page PNGs and 84 block
-close-ups. Its automated pack gates report zero failures; all 115 manual
+sign off the items below. The completed pack covers 9 affected documents and
+33 scenarios: 33 PDFs, 33 fixture JSON files, 118 full-page PNGs and 103 block
+close-ups. Its automated pack gates report zero failures; all 143 manual
 checklist items remain deliberately unchecked. `review.json` SHA-256 is
-`a530978bf2cf59a59a5b96a131f9b90d1a424701c9fcdd28a217fa938fec33bb`
-— rebuilding the pack twice from the same tree reproduces that byte exactly,
-so the fingerprint identifies the pack a reviewer is looking at.
+`ebbaec9731abd6428b37353348d27e1f9d0bbab616c6fa0332000a8535108ca7`
+— rebuilding the pack from the same tree reproduces that byte exactly, so the
+fingerprint identifies the pack a reviewer is looking at.
 A green automated run does not mark these boxes.
 
 ### Account-opening notice and depository agreement pair
@@ -168,6 +168,32 @@ wrong field/source links, overlapping cells, ink outside the reviewed cell,
 border intersections, discontinuous grown borders, duplicate logical values,
 and shared table-budget overruns. Manual approval therefore checks the actual
 page appearance, not whether those declarations exist.
+
+### Transfer basis — «Основание для перевода», page 2 of the notice
+
+- [ ] Item 2 reads as one paragraph: the step from printed item 1 into it, and
+  every step inside it, matches the pitch the form prints its list at. It must
+  not sit under a gap that detaches it from item 1.
+- [ ] `№` stays on the number's line, `от` on the date's, and item 3 follows on
+  the same pitch with clear space before the signature line.
+- [ ] The same holds with three payment-purpose rows inserted above it, which
+  is the arrangement the earlier review rejected.
+
+### Passport issuing authority — «кем выдан», eight fields, five documents
+
+- [ ] `accession-application-fl`, `client-notifications` and all three
+  `power-of-attorney` slots print a full department name in their paragraph
+  without a rule through the letters and without covering printed text.
+- [ ] `anketa-fl`, `anketa-fl-simplified-id` and `anketa-ip-sz` grow their
+  issuer row for a full department name — two bands in the full questionnaire,
+  one in each simplified one — and the wrapped value keeps a single line pitch
+  across the grown band rather than stepping onto the row grid.
+- [ ] An ordinary district office leaves the printed table exactly as drawn.
+- [ ] Rows above the issuer have not moved; the department code and
+  registration address below have moved together, by the whole band.
+
+Compare `authority-ordinary` against `authority-long`, and each questionnaire's
+`ru-normal` against its `passport-authority-long` card.
 
 ### Final gate
 

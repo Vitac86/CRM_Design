@@ -14,6 +14,7 @@ without re-deriving it from the diff.
 | Known completed baseline | `80300c7` — corrected status claims and recorded open work |
 | Protected, never rewritten | `a39c899`, `bb5ea4b`, `c2b37bc`, `5c19545`, `80300c7` |
 | Already present when this continuation started | `ae398f6` — account-opening representative spelling |
+| Manual-findings correction closed at | `2b7db0f` — review pack, canonical QA and documentation |
 
 `80300c7` is still an ancestor of `HEAD`. No commit has been amended, squashed,
 rebased or reset. `.vscode/` is untracked and stays that way. The generated
@@ -101,11 +102,12 @@ when it matches a size the source page itself locks, and
 python static-uikit/tools/qa/build_final_review_pack.py
 ```
 
-24 PDFs, 24 fixture JSON files, 73 full-page images, 84 close-ups, 6 documents,
-24 scenarios, 0 generation failures, all 115 checklist items deliberately
-unchecked. Rebuilding from the same tree reproduces `review.json` byte for
-byte; its SHA-256 is
-`a530978bf2cf59a59a5b96a131f9b90d1a424701c9fcdd28a217fa938fec33bb`.
+As built for this first pass: 24 PDFs, 24 fixture JSON files, 73 full-page
+images, 84 close-ups, 6 documents, 24 scenarios, 0 generation failures, all 115
+checklist items deliberately unchecked, `review.json` SHA-256
+`a530978bf2cf59a59a5b96a131f9b90d1a424701c9fcdd28a217fa938fec33bb`. **Superseded
+by the second pass below**, which rebuilds the same directory with three more
+documents; those numbers are kept only as the record of what was reviewed when.
 Synthetic data only. Neither Word nor LibreOffice is invoked.
 
 ## Commits in this continuation
@@ -155,6 +157,121 @@ Known limitations that are deliberate and must stay visible during that review:
 - Three regression cases refuse to render because the reviewed page reserve is
   spent, not because a value is wrong. They are pinned by name in
   `run_table_ownership_tests.py` so a silent “pass” cannot replace them.
+
+## Second pass — two remaining manual-review findings
+
+Started from `2b7db0f` with a clean tree. Two findings, both closed.
+
+### 1. The depository paragraph sat under a 51 pt gap
+
+Manual review rejected item 2 of «Основание для перевода» on page 2 of the
+account-opening notice: the depository-agreement sentence read as a detached
+block rather than the next item of the list.
+
+The leading was never wrong — every step *inside* the paragraph measured the
+source's own 12.96 pt. `account-opening-transfer-basis` replaces a reviewed
+span nested two operator levels deep inside one top-level `q…Q` block, because
+Word exported items 2 and 3 that way, so suppression leaves its marker inside
+that parent. When a payment-purpose row inserted higher up the page moved the
+parent, `shiftPageContent` wrapped it in `q 1 0 0 1 0 -delta cm … Q` and the
+replacement inserted at the marker inherited that translation — while
+`drawWordFlowBlock` had already added the same page shift to its own baselines.
+The paragraph was drawn one whole shift too low: 37.80 pt, which turned the
+13.35 pt step out of item 1 into 51.15 pt.
+
+`Expander.graphicsStateAt` now reads the graphics state in force at each marker
+and `replaceReviewedRangeContents` cancels its translation, so a replacement is
+placed in page space whatever the shift did around it. Where nothing moved the
+parent the state is the identity and no wrapper is emitted, so no other
+document's bytes change; a rotated or scaled state is refused rather than
+approximated.
+
+Measured after the fix, with three rows inserted above: item 1 → item 2 =
+13.35 pt, item 2 line 1 → line 2 = 12.96 pt, line 2 → item 3 = 12.96 pt, and
+82.20 pt of clearance before the signature line.
+
+`run_transfer_basis_paragraph_tests.py` covers ordinary, long and the longest
+reference the whole document accepts, each as printed and expanded, and pins
+two references the form refuses. `--self-test` feeds the rejected geometry back
+through the same verdict function and requires it to fail.
+
+### 2. A real passport authority did not fit three questionnaires
+
+Eight «кем выдан» fields exist, across five documents, enumerated from the live
+maps rather than listed by hand:
+
+| Document | Field | Source | Page | Mechanism |
+| --- | --- | --- | ---: | --- |
+| `accession-application-fl` | `passportIssuedBy` | `field.passportIssuedBy` | 1 | word-flow block |
+| `anketa-fl` | `passportIssuedBy` | `field.client-passport-issued-by` | 1 | growable table row |
+| `anketa-fl-simplified-id` | `idIssuedBy` | `field.client-passport-issued-by` | 1 | growable table row |
+| `anketa-ip-sz` | `idIssuedBy` | `field.client-passport-issued-by` | 1 | growable table row |
+| `client-notifications` | `passportIssuedBy` | `field.passportIssuedBy` | 9 | word-flow block |
+| `power-of-attorney` | `ulAttorneyIssuedBy` | `extra.extra-attorney-issued-by` | 1 | word-flow block |
+| `power-of-attorney` | `flPrincipalIssuedBy` | `field.client-passport-issued-by` | 3 | word-flow block |
+| `power-of-attorney` | `flAttorneyIssuedBy` | `extra.extra-attorney-issued-by` | 3 | word-flow block |
+
+Both `field.*` paths resolve to one exact UMI field, `umi.phys.pass_issuer`;
+the attorney's issuer is the representative's own passport and is an operator
+input, because the attorney is not the CRM subject.
+`order-forms/securityIssuer` matches the same name shape and is the issuer of a
+security, not of a passport — recorded in the suite so it is provably
+considered and excluded.
+
+Three questionnaires refused the department name a current Russian passport
+carries (111 characters), each one line short. `anketa-fl-simplified-id` and
+`anketa-ip-sz` had a two-line cell that could not grow at all and now open one
+reviewed band; `anketa-fl` grew by one band and now grows by two, which still
+fits its page's own 30.50 pt reserve. The continuation baseline is offset to
+the cell's line pitch, not the row grid, so a wrapped authority keeps one
+rhythm instead of stepping 15.42 pt in the middle of a sentence.
+
+Everything else passed unchanged: the five word-flow slots took all five
+authority names as they were.
+
+### Remaining physical limit
+
+`power-of-attorney-ul-intro` carries eleven values in one justified paragraph.
+Past its third extra line the page shift moves some of the form's own printed
+ruled blanks across the replacement, because those are top-level path units the
+reviewed text range does not cover. Reaching it needs a single 255-character
+«authority» — two full department names concatenated. Every production profile
+grows the paragraph by at most one line, and that bound is pinned in
+`run_passport_authority_tests.py`: if a profile ever grows it further the suite
+fails, and those paths have to be suppressed the way `qualification-notice`
+suppresses its own.
+
+### Canonical QA for this pass
+
+```
+python static-uikit/tools/qa/run_all_qa.py
+```
+
+**31 of 31 suites passed** in one combined run (409 s), no isolated reruns.
+Four suites are new since the first pass: the transfer-basis paragraph and its
+gates, and the passport issuing authority and its gates. Regression
+denominator: 0 unexpected. Smallest drawn client value: 9 pt. Values below the
+floor: 0.
+
+### Commits
+
+1. `ae395d7` — Place a reviewed replacement in page space, not in its parent's
+   shifted space
+2. `7f43fa1` — Let the questionnaires print the department name a real passport
+   carries
+3. this pass's documentation and refreshed review pack
+
+### Review pack
+
+Rebuilt: 33 PDFs, 33 fixture JSON files, 118 full-page images, 103 close-ups,
+9 documents, 33 scenarios, 0 generation failures, 143 manual checklist items,
+all unchecked. `review.json` SHA-256
+`ebbaec9731abd6428b37353348d27e1f9d0bbab616c6fa0332000a8535108ca7`.
+New cards: `authority-ordinary` and `authority-long` for
+`accession-application-fl`, `client-notifications` and `power-of-attorney`, and
+`passport-authority-long` for each of the three corrected questionnaires. The
+grown issuer row is a scenario of its own because the combined long fixtures
+already spend their page's reviewed reserve on the name and bank rows.
 
 ## Exact next command
 

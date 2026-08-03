@@ -71,6 +71,15 @@ BODY_NAME = (
     "технологий, инфраструктурных решений, управления активами и финансовых "
     "инструментов»"
 )
+# «Кем выдан паспорт» — an ordinary district office and the full department
+# name a current Russian passport actually carries. Synthetic, but the shape is
+# real: the long one is 111 characters and needs a third printed line.
+ORDINARY_AUTHORITY = "ОВД Пресненского района города Москвы"
+LONG_AUTHORITY = (
+    "Отделом по вопросам миграции ОМВД России по Пресненскому району "
+    "Главного управления МВД России по городу Москве"
+)
+
 OTHER_INSTRUMENTS = (
     "акций и облигаций иностранных эмитентов, паев международных "
     "инвестиционных фондов, депозитарных расписок, структурных облигаций и "
@@ -103,6 +112,46 @@ DOCUMENTS: dict[str, dict[str, Any]] = {
              "text": "Козырева Александра Юрьвеича", "expectedCount": 0},
             {"id": "printed-test-phrase-absent",
              "text": "Тестовое значение", "expectedCount": 0},
+        ],
+    },
+    # The three documents that print a passport issuer outside the
+    # questionnaires. Added so the «кем выдан» family has an ordinary and a
+    # full-department-name close-up everywhere it appears, not only where a
+    # table row grows.
+    "accession-application-fl": {
+        "title": "Заявление о присоединении (ФЛ)",
+        "kind": "individual",
+        "focusFields": ["passportIssuedBy", "passportSeries", "passportNumber",
+                        "passportIssueDay"],
+        "focusRegions": [
+            {"id": "passport-authority", "title": "Кем выдан паспорт",
+             "page": 0, "clip": [45, 80, 570, 200],
+             "fields": ["passportIssuedBy", "passportSeries", "passportNumber"]},
+        ],
+    },
+    "client-notifications": {
+        "title": "Уведомления клиенту",
+        "kind": "individual",
+        "focusFields": ["passportIssuedBy", "passportSeries", "passportNumber",
+                        "passportIssueDate"],
+        "focusRegions": [
+            {"id": "passport-authority", "title": "Кем выдан паспорт",
+             "page": 8, "clip": [45, 245, 570, 380],
+             "fields": ["passportIssuedBy", "passportSeries", "passportNumber"]},
+        ],
+    },
+    "power-of-attorney": {
+        "title": "Доверенность",
+        "kind": "individual",
+        "focusFields": ["flPrincipalIssuedBy", "flAttorneyIssuedBy",
+                        "flPrincipalPassport", "flPrincipalIssueDate"],
+        "focusRegions": [
+            {"id": "principal-authority", "title": "Кем выдан паспорт доверителя",
+             "page": 2, "clip": [55, 105, 570, 265],
+             "fields": ["flPrincipalIssuedBy", "flPrincipalPassport"]},
+            {"id": "attorney-authority", "title": "Кем выдан паспорт поверенного",
+             "page": 2, "clip": [55, 190, 570, 330],
+             "fields": ["flAttorneyIssuedBy"]},
         ],
     },
     "qualification-notice": {
@@ -360,7 +409,39 @@ def questionnaire_overrides(doc_id: str, language: str, long: bool) -> dict[str,
     return overrides
 
 
+# Which payload path carries the issuer in each document, and which of its
+# fields the card must show. `run_passport_authority_tests.py` owns the gates;
+# these scenarios exist so a reviewer can look at the same pages.
+AUTHORITY_SOURCES = {
+    "accession-application-fl": ("field.passportIssuedBy", "ru-resident-normal"),
+    "client-notifications": ("field.passportIssuedBy", "ru-resident-normal"),
+    "power-of-attorney": ("field.client-passport-issued-by", "ru-resident-normal"),
+    "anketa-fl": ("field.client-passport-issued-by", None),
+    "anketa-fl-simplified-id": ("field.client-passport-issued-by", None),
+    "anketa-ip-sz": ("field.client-passport-issued-by", None),
+}
+
+
+def authority_scenarios(doc_id: str) -> list[dict[str, Any]]:
+    """One ordinary and one full-department-name case for an issuer document."""
+    source, profile = AUTHORITY_SOURCES[doc_id]
+    required = list(DOCUMENTS[doc_id]["focusFields"])
+    scenarios = []
+    for identifier, value in (("authority-ordinary", ORDINARY_AUTHORITY),
+                              ("authority-long", LONG_AUTHORITY)):
+        overrides = {source: value}
+        if doc_id == "power-of-attorney":
+            overrides["extra.extra-attorney-issued-by"] = value
+        scenarios.append({"id": identifier, "profile": profile,
+                          "overrides": overrides,
+                          "requiredFocusFields": required})
+    return scenarios
+
+
 def scenarios_for(doc_id: str) -> list[dict[str, Any]]:
+    if doc_id in ("accession-application-fl", "client-notifications",
+                  "power-of-attorney"):
+        return authority_scenarios(doc_id)
     if doc_id == "account-opening-notice":
         return [{
             "id": "corrected-spelling-and-depository",
@@ -383,10 +464,23 @@ def scenarios_for(doc_id: str) -> list[dict[str, Any]]:
         ("foreign-normal", "en-company-normal" if kind == "company" else "en-nonresident-normal", "foreign", False),
         ("foreign-long", "en-company-long" if kind == "company" else "en-nonresident-long", "foreign", True),
     ]
-    return [{"id": identifier, "profile": profile,
-             "requiredFocusFields": list(DOCUMENTS[doc_id]["focusFields"]),
-             "overrides": questionnaire_overrides(doc_id, language, is_long)}
-            for identifier, profile, language, is_long in matrix]
+    out = [{"id": identifier, "profile": profile,
+            "requiredFocusFields": list(DOCUMENTS[doc_id]["focusFields"]),
+            "overrides": questionnaire_overrides(doc_id, language, is_long)}
+           for identifier, profile, language, is_long in matrix]
+    # The grown issuer row on its own. The combined long fixtures already spend
+    # this page's reviewed reserve on the name and bank rows, so asking for the
+    # issuer band there would only prove the budget refuses — which is a
+    # different question, and one `run_table_ownership_tests.py` already pins.
+    if doc_id in AUTHORITY_SOURCES:
+        source = AUTHORITY_SOURCES[doc_id][0]
+        out.append({
+            "id": "passport-authority-long",
+            "profile": "ru-resident-normal",
+            "requiredFocusFields": list(DOCUMENTS[doc_id]["focusFields"]),
+            "overrides": {source: LONG_AUTHORITY},
+        })
+    return out
 
 
 def normalized(value: Any) -> str:
