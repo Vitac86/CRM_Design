@@ -17,9 +17,9 @@
     "staticOrHiddenTemplates": 4,
     "maps": 18,
     "baselineFields": 621,
-    "currentFields": 623,
-    "additiveCurrentFields": 2,
-    "currentTextFields": 399,
+    "currentFields": 624,
+    "additiveCurrentFields": 3,
+    "currentTextFields": 400,
     "currentCheckFields": 224,
     "sourceTextLines": 4016,
     "semanticSections": 576,
@@ -2622,6 +2622,11 @@
       "documentId": "accession-application-yul",
       "fieldId": "companyForeignName",
       "source": "field.client-english-name"
+    },
+    {
+      "documentId": "account-opening-notice",
+      "fieldId": "paymentPurposeClientCode",
+      "source": "field.client-code"
     },
     {
       "documentId": "power-of-attorney",
@@ -16968,7 +16973,7 @@
       "catalogStatus": "production",
       "packageId": null,
       "mapId": "account-opening-notice",
-      "currentFieldCount": 16
+      "currentFieldCount": 17
     },
     {
       "documentId": "anketa-fl-simplified-id",
@@ -141224,7 +141229,8 @@
         "word-flow-paragraph"
       ],
       "wordFlowBlocksAdded": [
-        "accession-application-fl-identity"
+        "accession-application-fl-identity",
+        "accession-application-fl-report-email"
       ],
       "activeIndependentExpansionFields": [],
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
@@ -141245,12 +141251,18 @@
         "checkbox-or-static",
         "fixed-exact-token",
         "fixed-inline-overlay",
+        "multiline-table-cell",
         "word-flow-labelled-block"
       ],
       "wordFlowBlocksAdded": [
-        "accession-application-yul-applicant"
+        "accession-application-yul-applicant",
+        "accession-application-yul-report-email"
       ],
-      "activeIndependentExpansionFields": [],
+      "activeIndependentExpansionFields": [
+        "tariffCurrency",
+        "tariffDerivatives",
+        "tariffStock"
+      ],
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
       "migrationResult": "identified Word-flow migrations complete; remaining fields retain their simpler reviewed categories",
       "migrationCompleted": true,
@@ -141263,16 +141275,18 @@
       "templateFilename": "account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
       "pageCount": 2,
-      "fieldCount": 16,
+      "fieldCount": 17,
       "reviewed": "classification-and-source-inventory-complete",
       "layoutCategoriesFound": [
         "fixed-exact-token",
-        "fixed-inline-overlay",
         "multiline-table-cell",
         "word-flow-paragraph"
       ],
       "wordFlowBlocksAdded": [
-        "account-opening-broker-introduction"
+        "account-opening-broker-introduction",
+        "account-opening-payment-purpose-stock",
+        "account-opening-payment-purpose-currency",
+        "account-opening-payment-purpose-derivatives"
       ],
       "activeIndependentExpansionFields": [
         "clientName"
@@ -141320,7 +141334,8 @@
       "wordFlowBlocksAdded": [],
       "activeIndependentExpansionFields": [
         "passportIssuedBy",
-        "bankAddress"
+        "bankAddress",
+        "bankName"
       ],
       "obsoleteContinuationRulesAlongsideWordFlow": 0,
       "migrationResult": "no Word-flow migration required: dynamic content is table-cell, fixed/exact, checkbox/static or genuinely independent-row content",
@@ -141383,6 +141398,7 @@
       ],
       "wordFlowBlocksAdded": [],
       "activeIndependentExpansionFields": [
+        "foreignName",
         "bankAddress",
         "licenceAuthority"
       ],
@@ -141725,7 +141741,8 @@
       "expectedPages": 3,
       "currentFieldCount": 37,
       "wordFlowBlockIds": [
-        "accession-application-fl-identity"
+        "accession-application-fl-identity",
+        "accession-application-fl-report-email"
       ],
       "pageLayout": {
         "0": {
@@ -141756,13 +141773,14 @@
           "minFontSize": 8.52,
           "fontSizeLocked": true,
           "lineHeight": 19.56,
+          "valueFontSize": 9,
           "alignment": "justify",
           "justifyMinRatio": 0.55,
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
-            "insertionTop": 159.95,
-            "shiftFromTop": 159.95,
+            "insertionTop": 143.82,
+            "shiftFromTop": 143.82,
             "rowHeight": 19.56,
             "maxExtraRows": 1,
             "lineStyle": "none",
@@ -141888,6 +141906,54 @@
             {
               "type": "static",
               "text": "."
+            }
+          ]
+        },
+        {
+          "id": "accession-application-fl-report-email",
+          "type": "wordFlowBlock",
+          "page": 0,
+          "frame": {
+            "left": 149.42,
+            "baselineTop": 419.09,
+            "width": 408.18,
+            "initialLineCount": 1
+          },
+          "font": "legalSerif",
+          "fontSize": 8.52,
+          "minFontSize": 8.52,
+          "fontSizeLocked": true,
+          "lineHeight": 11.28,
+          "alignment": "left",
+          "valueFontSize": 9,
+          "sourceReplacement": {
+            "firstBlock": 148,
+            "lastBlock": 148,
+            "expectedBlockCount": 1,
+            "expectedPageBlockCount": 264,
+            "expectedSha256": "7b324e48a1e1710de59fcb82c97616426be831042a01d1163c49b5ab36f00093",
+            "expectedTemplateSha256": "8fec088402d46b6a9251e92ceee15f4a7cdc74b12684f7be339194d04904c1e6",
+            "reviewStatus": "approved"
+          },
+          "sourceStaticText": "______________________(необходимо указать адрес электронной почты)",
+          "runs": [
+            {
+              "type": "fieldRef",
+              "fieldId": "reportEmail",
+              "blankWhenEmpty": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 93.4,
+                "thickness": 0.36,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "space"
+            },
+            {
+              "type": "static",
+              "text": "(необходимо указать адрес электронной почты)"
             }
           ]
         }
@@ -142160,7 +142226,8 @@
       "expectedPages": 2,
       "currentFieldCount": 36,
       "wordFlowBlockIds": [
-        "accession-application-yul-applicant"
+        "accession-application-yul-applicant",
+        "accession-application-yul-report-email"
       ],
       "pageLayout": {
         "0": {
@@ -142169,8 +142236,12 @@
           "fixedFooterFrom": 841.92,
           "shiftToTop": 835.92,
           "bottomClearance": 6,
+          "compaction": [],
           "anchors": [
-            "accession-application-yul-applicant"
+            "accession-application-yul-applicant",
+            "tariffStock",
+            "tariffDerivatives",
+            "tariffCurrency"
           ]
         }
       },
@@ -142191,6 +142262,7 @@
           "fontSizeLocked": true,
           "lineHeight": 9.72,
           "alignment": "left",
+          "valueFontSize": 9,
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
@@ -142274,6 +142346,54 @@
             {
               "type": "fieldRef",
               "fieldId": "representativeAuthority"
+            }
+          ]
+        },
+        {
+          "id": "accession-application-yul-report-email",
+          "type": "wordFlowBlock",
+          "page": 0,
+          "frame": {
+            "left": 155.42,
+            "baselineTop": 458.35,
+            "width": 373.98,
+            "initialLineCount": 1
+          },
+          "font": "legalSerif",
+          "fontSize": 8.52,
+          "minFontSize": 8.52,
+          "fontSizeLocked": true,
+          "lineHeight": 11.04,
+          "alignment": "left",
+          "valueFontSize": 9,
+          "sourceReplacement": {
+            "firstBlock": 167,
+            "lastBlock": 168,
+            "expectedBlockCount": 2,
+            "expectedPageBlockCount": 221,
+            "expectedSha256": "2062817ce59905265c1374816d0cb009e6232fa2b197e76cde90a36245bf73a4",
+            "expectedTemplateSha256": "1b3365ce9ed177fb5069ae67ab70d8e5bc6556bbcb160544a439a2db2be9067d",
+            "reviewStatus": "approved"
+          },
+          "sourceStaticText": "______________________(необходимо указать адрес электронной почты)",
+          "runs": [
+            {
+              "type": "fieldRef",
+              "fieldId": "reportEmail",
+              "blankWhenEmpty": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 93.51,
+                "thickness": 0.36,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "space"
+            },
+            {
+              "type": "static",
+              "text": "(необходимо указать адрес электронной почты)"
             }
           ]
         }
@@ -142537,9 +142657,12 @@
       "documentId": "account-opening-notice",
       "templateFilename": "account-opening-notice.pdf",
       "expectedPages": 2,
-      "currentFieldCount": 16,
+      "currentFieldCount": 17,
       "wordFlowBlockIds": [
-        "account-opening-broker-introduction"
+        "account-opening-broker-introduction",
+        "account-opening-payment-purpose-stock",
+        "account-opening-payment-purpose-currency",
+        "account-opening-payment-purpose-derivatives"
       ],
       "pageLayout": {
         "0": {
@@ -142576,8 +142699,8 @@
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
-            "insertionTop": 177.86,
-            "shiftFromTop": 177.86,
+            "insertionTop": 167.36,
+            "shiftFromTop": 167.36,
             "rowHeight": 12.72,
             "maxExtraRows": 1,
             "lineStyle": "none",
@@ -142611,6 +142734,204 @@
             {
               "type": "static",
               "text": ", действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)"
+            }
+          ]
+        },
+        {
+          "id": "account-opening-payment-purpose-stock",
+          "type": "wordFlowBlock",
+          "page": 1,
+          "frame": {
+            "left": 252.41,
+            "baselineTop": 46.68,
+            "width": 295.25,
+            "initialLineCount": 3
+          },
+          "font": "legalSerif",
+          "fontSize": 11.04,
+          "minFontSize": 11.04,
+          "fontSizeLocked": true,
+          "lineHeight": 12.6,
+          "alignment": "left",
+          "sourceReplacement": {
+            "firstBlock": 2,
+            "lastBlock": 2,
+            "expectedBlockCount": 1,
+            "expectedPageBlockCount": 10,
+            "expectedSha256": "8d508405d9190a64921835d973104e4b7ee9010a000e4e6952ced5dd7d725738",
+            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+            "reviewStatus": "approved"
+          },
+          "sourcePlaceholders": [
+            {
+              "text": "INV0000X",
+              "fieldId": "paymentPurposeClientCode",
+              "reviewStatus": "approved",
+              "note": "sample client code printed by the source form"
+            }
+          ],
+          "sourceStaticText": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ФОНДОВЫЙ РЫНОК",
+          "runs": [
+            {
+              "type": "static",
+              "text": "Код "
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeClientCode",
+              "keepTogether": true
+            },
+            {
+              "type": "static",
+              "text": ". Перевод денежных средств по Договору на брокерское обслуживание №",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeStock",
+              "keepTogether": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 49.68,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": " дата__. ФОНДОВЫЙ РЫНОК"
+            }
+          ]
+        },
+        {
+          "id": "account-opening-payment-purpose-currency",
+          "type": "wordFlowBlock",
+          "page": 1,
+          "frame": {
+            "left": 252.41,
+            "baselineTop": 85.22,
+            "width": 295.25,
+            "initialLineCount": 3
+          },
+          "font": "legalSerif",
+          "fontSize": 11.04,
+          "minFontSize": 11.04,
+          "fontSizeLocked": true,
+          "lineHeight": 12.6,
+          "alignment": "left",
+          "sourceReplacement": {
+            "firstBlock": 4,
+            "lastBlock": 4,
+            "expectedBlockCount": 1,
+            "expectedPageBlockCount": 10,
+            "expectedSha256": "0cc104761d1b66bdc93f286bd0a80cefac3a04e726ec61fb67ab80115dfae191",
+            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+            "reviewStatus": "approved"
+          },
+          "sourcePlaceholders": [
+            {
+              "text": "INV0000X",
+              "fieldId": "paymentPurposeClientCode",
+              "reviewStatus": "approved",
+              "note": "sample client code printed by the source form"
+            }
+          ],
+          "sourceStaticText": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ВАЛЮТНЫЙ РЫНОК",
+          "runs": [
+            {
+              "type": "static",
+              "text": "Код "
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeClientCode",
+              "keepTogether": true
+            },
+            {
+              "type": "static",
+              "text": ". Перевод денежных средств по Договору на брокерское обслуживание №",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeCurrency",
+              "keepTogether": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 49.68,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": " дата__. ВАЛЮТНЫЙ РЫНОК"
+            }
+          ]
+        },
+        {
+          "id": "account-opening-payment-purpose-derivatives",
+          "type": "wordFlowBlock",
+          "page": 1,
+          "frame": {
+            "left": 252.41,
+            "baselineTop": 123.62,
+            "width": 295.25,
+            "initialLineCount": 3
+          },
+          "font": "legalSerif",
+          "fontSize": 11.04,
+          "minFontSize": 11.04,
+          "fontSizeLocked": true,
+          "lineHeight": 12.6,
+          "alignment": "left",
+          "sourceReplacement": {
+            "firstBlock": 6,
+            "lastBlock": 6,
+            "expectedBlockCount": 1,
+            "expectedPageBlockCount": 10,
+            "expectedSha256": "81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd",
+            "expectedTemplateSha256": "d46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834",
+            "reviewStatus": "approved"
+          },
+          "sourcePlaceholders": [
+            {
+              "text": "XXXXXXХ",
+              "fieldId": "paymentPurposeClientCode",
+              "reviewStatus": "approved",
+              "note": "sample client code printed by the source form"
+            }
+          ],
+          "sourceStaticText": "Код XXXXXXХ. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. СРОЧНЫЙ РЫНОК",
+          "runs": [
+            {
+              "type": "static",
+              "text": "Код "
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeClientCode",
+              "keepTogether": true
+            },
+            {
+              "type": "static",
+              "text": ". Перевод денежных средств по Договору на брокерское обслуживание №",
+              "keepWithNext": true
+            },
+            {
+              "type": "fieldRef",
+              "fieldId": "paymentPurposeDerivatives",
+              "keepTogether": true,
+              "decoration": {
+                "underline": true,
+                "minWidth": 49.68,
+                "thickness": 0.48,
+                "offset": 1.2
+              }
+            },
+            {
+              "type": "static",
+              "text": " дата__. СРОЧНЫЙ РЫНОК"
             }
           ]
         }
@@ -142727,6 +143048,13 @@
           "page": 2,
           "type": "text",
           "identifierStatus": "baseline-preserved"
+        },
+        {
+          "fieldId": "paymentPurposeClientCode",
+          "source": "field.client-code",
+          "page": 2,
+          "type": "text",
+          "identifierStatus": "additive-current"
         }
       ]
     },
@@ -142756,6 +143084,7 @@
           "bottomClearance": 30,
           "compaction": [],
           "anchors": [
+            "bankName",
             "bankAddress"
           ]
         }
@@ -144193,6 +144522,17 @@
       "currentFieldCount": 103,
       "wordFlowBlockIds": [],
       "pageLayout": {
+        "0": {
+          "fixedHeaderUntil": 0,
+          "bodyBottom": 780.1,
+          "fixedFooterFrom": null,
+          "shiftToTop": 800,
+          "bottomClearance": 44,
+          "compaction": [],
+          "anchors": [
+            "foreignName"
+          ]
+        },
         "2": {
           "fixedHeaderUntil": 0,
           "bodyBottom": 767.02,
@@ -146165,7 +146505,7 @@
           "frame": {
             "left": 157.34,
             "baselineTop": 135.26,
-            "width": 316.4,
+            "width": 377.55,
             "initialLineCount": 2
           },
           "font": "legalSerif",
@@ -146459,7 +146799,7 @@
           "frame": {
             "left": 133.94,
             "baselineTop": 89.54,
-            "width": 339.8,
+            "width": 401.24,
             "initialLineCount": 2
           },
           "font": "legalSerif",
@@ -147210,8 +147550,8 @@
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
-            "insertionTop": 367,
-            "shiftFromTop": 367,
+            "insertionTop": 345.38,
+            "shiftFromTop": 345.38,
             "rowHeight": 11.52,
             "maxExtraRows": 4,
             "lineStyle": "none",
@@ -147473,8 +147813,8 @@
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
-            "insertionTop": 174.5,
-            "shiftFromTop": 174.5,
+            "insertionTop": 164,
+            "shiftFromTop": 164,
             "rowHeight": 11.52,
             "maxExtraRows": 4,
             "lineStyle": "none",
@@ -147577,8 +147917,8 @@
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 1,
-            "insertionTop": 631.8,
-            "shiftFromTop": 631.8,
+            "insertionTop": 620.92,
+            "shiftFromTop": 620.92,
             "rowHeight": 11.52,
             "maxExtraRows": 3,
             "lineStyle": "none",
@@ -147858,8 +148198,8 @@
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 0,
-            "insertionTop": 297,
-            "shiftFromTop": 297,
+            "insertionTop": 289.88,
+            "shiftFromTop": 289.88,
             "rowHeight": 11.52,
             "maxExtraRows": 3,
             "lineStyle": "none",
@@ -147966,8 +148306,8 @@
           "overflowStrategy": "expand-layout",
           "expansion": {
             "page": 1,
-            "insertionTop": 135.7,
-            "shiftFromTop": 135.7,
+            "insertionTop": 125.08,
+            "shiftFromTop": 125.08,
             "rowHeight": 11.52,
             "maxExtraRows": 5,
             "lineStyle": "none",
@@ -149108,58 +149448,6 @@
       "title": "Заявление о присоединении (ФЛ)",
       "templateFilename": "accession-application-fl.pdf",
       "page": 1,
-      "sectionId": "accession-application-fl-p1-reportEmail",
-      "fieldIds": [
-        "reportEmail"
-      ],
-      "sourcePaths": [
-        "subject.email",
-        "extra.report-delivery"
-      ],
-      "existingVariableNamesPreserved": true,
-      "currentRenderingModel": [
-        "fixed-field-overlay"
-      ],
-      "targetRenderingModel": "nonbreaking-exact-token",
-      "intendedLayoutCategory": "fixed-exact-token",
-      "classificationSource": "one production field per source form section",
-      "staticTextInvolved": "source PDF underlay on page 1",
-      "fontFamily": [
-        "Liberation Serif"
-      ],
-      "fontSizePt": [
-        10.5
-      ],
-      "lineHeightPt": [
-        null
-      ],
-      "alignment": [
-        "left"
-      ],
-      "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
-      ],
-      "normalFixtureResult": "pass",
-      "realisticLongFixtureResult": "pass",
-      "currentVisualDefect": [
-        "none in audited ordinary or realistic-long fixture classes"
-      ],
-      "requiredMigration": [
-        "Keep the value nonbreaking and inside its exact-token slot."
-      ],
-      "migrationCompleted": true,
-      "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": [
-        "baseline-visual-qa-passed"
-      ],
-      "structuralQaStatus": "baseline-structural-qa-passed",
-      "sectionKind": "semantic-field-section"
-    },
-    {
-      "documentId": "accession-application-fl",
-      "title": "Заявление о присоединении (ФЛ)",
-      "templateFilename": "accession-application-fl.pdf",
-      "page": 1,
       "sectionId": "accession-application-fl-p1-reportsEdo",
       "fieldIds": [
         "reportsEdo"
@@ -149661,6 +149949,58 @@
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": [
         "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 1,
+      "sectionId": "accession-application-fl-report-email",
+      "fieldIds": [
+        "reportEmail"
+      ],
+      "sourcePaths": [
+        "subject.email",
+        "extra.report-delivery"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "word-flow-block-run"
+      ],
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "classificationSource": "executable wordFlowBlocks",
+      "staticTextInvolved": "______________________(необходимо указать адрес электронной почты)",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        8.52
+      ],
+      "lineHeightPt": [
+        11.28
+      ],
+      "alignment": [
+        "left"
+      ],
+      "underlineBorderStyle": [
+        "word-flow-underline"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "post-migration-visual-review-required"
       ],
       "structuralQaStatus": "baseline-structural-qa-passed",
       "sectionKind": "semantic-field-section"
@@ -150845,58 +151185,6 @@
       "title": "Заявление о присоединении (ЮЛ)",
       "templateFilename": "accession-application-yul.pdf",
       "page": 1,
-      "sectionId": "accession-application-yul-p1-reportEmail",
-      "fieldIds": [
-        "reportEmail"
-      ],
-      "sourcePaths": [
-        "subject.email",
-        "extra.report-delivery"
-      ],
-      "existingVariableNamesPreserved": true,
-      "currentRenderingModel": [
-        "fixed-field-overlay"
-      ],
-      "targetRenderingModel": "nonbreaking-exact-token",
-      "intendedLayoutCategory": "fixed-exact-token",
-      "classificationSource": "one production field per source form section",
-      "staticTextInvolved": "source PDF underlay on page 1",
-      "fontFamily": [
-        "Liberation Serif"
-      ],
-      "fontSizePt": [
-        10
-      ],
-      "lineHeightPt": [
-        null
-      ],
-      "alignment": [
-        "left"
-      ],
-      "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
-      ],
-      "normalFixtureResult": "pass",
-      "realisticLongFixtureResult": "pass",
-      "currentVisualDefect": [
-        "none in audited ordinary or realistic-long fixture classes"
-      ],
-      "requiredMigration": [
-        "Keep the value nonbreaking and inside its exact-token slot."
-      ],
-      "migrationCompleted": true,
-      "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": [
-        "baseline-visual-qa-passed"
-      ],
-      "structuralQaStatus": "baseline-structural-qa-passed",
-      "sectionKind": "semantic-field-section"
-    },
-    {
-      "documentId": "accession-application-yul",
-      "title": "Заявление о присоединении (ЮЛ)",
-      "templateFilename": "accession-application-yul.pdf",
-      "page": 1,
       "sectionId": "accession-application-yul-p1-reportsEdo",
       "fieldIds": [
         "reportsEdo"
@@ -151110,10 +151398,10 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "inserted-table-row"
       ],
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
+      "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
+      "intendedLayoutCategory": "multiline-table-cell",
       "classificationSource": "one production field per source form section",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": [
@@ -151123,13 +151411,13 @@
         12
       ],
       "lineHeightPt": [
-        null
+        10.8
       ],
       "alignment": [
         "center"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -151137,7 +151425,7 @@
         "none in audited ordinary or realistic-long fixture classes"
       ],
       "requiredMigration": [
-        "Retain the fixed inline overlay; no paragraph migration is required."
+        "Keep bounded cell wrapping; add a reviewed table-row insertion only when the cell's long fixture needs more lines."
       ],
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
@@ -151161,10 +151449,10 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "inserted-table-row"
       ],
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
+      "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
+      "intendedLayoutCategory": "multiline-table-cell",
       "classificationSource": "one production field per source form section",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": [
@@ -151180,7 +151468,7 @@
         "center"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -151188,7 +151476,7 @@
         "none in audited ordinary or realistic-long fixture classes"
       ],
       "requiredMigration": [
-        "Retain the fixed inline overlay; no paragraph migration is required."
+        "Keep bounded cell wrapping; add a reviewed table-row insertion only when the cell's long fixture needs more lines."
       ],
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
@@ -151212,10 +151500,10 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "inserted-table-row"
       ],
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
+      "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
+      "intendedLayoutCategory": "multiline-table-cell",
       "classificationSource": "one production field per source form section",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": [
@@ -151231,7 +151519,7 @@
         "center"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -151239,7 +151527,7 @@
         "none in audited ordinary or realistic-long fixture classes"
       ],
       "requiredMigration": [
-        "Retain the fixed inline overlay; no paragraph migration is required."
+        "Keep bounded cell wrapping; add a reviewed table-row insertion only when the cell's long fixture needs more lines."
       ],
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
@@ -151398,6 +151686,58 @@
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": [
         "baseline-visual-qa-passed"
+      ],
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "sectionKind": "semantic-field-section"
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 1,
+      "sectionId": "accession-application-yul-report-email",
+      "fieldIds": [
+        "reportEmail"
+      ],
+      "sourcePaths": [
+        "subject.email",
+        "extra.report-delivery"
+      ],
+      "existingVariableNamesPreserved": true,
+      "currentRenderingModel": [
+        "word-flow-block-run"
+      ],
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "classificationSource": "executable wordFlowBlocks",
+      "staticTextInvolved": "______________________(необходимо указать адрес электронной почты)",
+      "fontFamily": [
+        "Liberation Serif"
+      ],
+      "fontSizePt": [
+        8.52
+      ],
+      "lineHeightPt": [
+        11.04
+      ],
+      "alignment": [
+        "left"
+      ],
+      "underlineBorderStyle": [
+        "word-flow-underline"
+      ],
+      "normalFixtureResult": "pass",
+      "realisticLongFixtureResult": "pass",
+      "currentVisualDefect": [
+        "none in audited ordinary or realistic-long fixture classes"
+      ],
+      "requiredMigration": [
+        "Keep the value nonbreaking and inside its exact-token slot."
+      ],
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": [
+        "post-migration-visual-review-required"
       ],
       "structuralQaStatus": "baseline-structural-qa-passed",
       "sectionKind": "semantic-field-section"
@@ -152518,7 +152858,7 @@
       "title": "Уведомление об открытии брокерского-депозитарного счета",
       "templateFilename": "account-opening-notice.pdf",
       "page": 2,
-      "sectionId": "account-opening-notice-p2-paymentPurposeCurrency",
+      "sectionId": "account-opening-payment-purpose-currency",
       "fieldIds": [
         "paymentPurposeCurrency"
       ],
@@ -152527,26 +152867,26 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "word-flow-block-run"
       ],
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
-      "classificationSource": "one production field per source form section",
-      "staticTextInvolved": "source PDF underlay on page 2",
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "classificationSource": "executable wordFlowBlocks",
+      "staticTextInvolved": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ВАЛЮТНЫЙ РЫНОК",
       "fontFamily": [
         "Liberation Serif"
       ],
       "fontSizePt": [
-        10
+        11.04
       ],
       "lineHeightPt": [
-        null
+        12.6
       ],
       "alignment": [
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "word-flow-underline"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -152554,12 +152894,12 @@
         "none in audited ordinary or realistic-long fixture classes"
       ],
       "requiredMigration": [
-        "Retain the fixed inline overlay; no paragraph migration is required."
+        "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path."
       ],
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": [
-        "baseline-visual-qa-passed"
+        "post-migration-visual-review-required"
       ],
       "structuralQaStatus": "baseline-structural-qa-passed",
       "sectionKind": "semantic-field-section"
@@ -152569,7 +152909,7 @@
       "title": "Уведомление об открытии брокерского-депозитарного счета",
       "templateFilename": "account-opening-notice.pdf",
       "page": 2,
-      "sectionId": "account-opening-notice-p2-paymentPurposeDerivatives",
+      "sectionId": "account-opening-payment-purpose-derivatives",
       "fieldIds": [
         "paymentPurposeDerivatives"
       ],
@@ -152578,26 +152918,26 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "word-flow-block-run"
       ],
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
-      "classificationSource": "one production field per source form section",
-      "staticTextInvolved": "source PDF underlay on page 2",
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "classificationSource": "executable wordFlowBlocks",
+      "staticTextInvolved": "Код XXXXXXХ. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. СРОЧНЫЙ РЫНОК",
       "fontFamily": [
         "Liberation Serif"
       ],
       "fontSizePt": [
-        10
+        11.04
       ],
       "lineHeightPt": [
-        null
+        12.6
       ],
       "alignment": [
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "word-flow-underline"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -152605,12 +152945,12 @@
         "none in audited ordinary or realistic-long fixture classes"
       ],
       "requiredMigration": [
-        "Retain the fixed inline overlay; no paragraph migration is required."
+        "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path."
       ],
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": [
-        "baseline-visual-qa-passed"
+        "post-migration-visual-review-required"
       ],
       "structuralQaStatus": "baseline-structural-qa-passed",
       "sectionKind": "semantic-field-section"
@@ -152620,34 +152960,37 @@
       "title": "Уведомление об открытии брокерского-депозитарного счета",
       "templateFilename": "account-opening-notice.pdf",
       "page": 2,
-      "sectionId": "account-opening-notice-p2-paymentPurposeStock",
+      "sectionId": "account-opening-payment-purpose-stock",
       "fieldIds": [
-        "paymentPurposeStock"
+        "paymentPurposeStock",
+        "paymentPurposeClientCode"
       ],
       "sourcePaths": [
-        "extra.extra-brokerage-contract"
+        "extra.extra-brokerage-contract",
+        "field.client-code"
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "word-flow-block-run"
       ],
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
-      "classificationSource": "one production field per source form section",
-      "staticTextInvolved": "source PDF underlay on page 2",
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "classificationSource": "executable wordFlowBlocks",
+      "staticTextInvolved": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ФОНДОВЫЙ РЫНОК",
       "fontFamily": [
         "Liberation Serif"
       ],
       "fontSizePt": [
-        10
+        11.04
       ],
       "lineHeightPt": [
-        null
+        12.6
       ],
       "alignment": [
         "left"
       ],
       "underlineBorderStyle": [
+        "word-flow-underline",
         "source-pdf-underlay-rule-or-border"
       ],
       "normalFixtureResult": "pass",
@@ -152656,12 +152999,13 @@
         "none in audited ordinary or realistic-long fixture classes"
       ],
       "requiredMigration": [
-        "Retain the fixed inline overlay; no paragraph migration is required."
+        "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path.",
+        "Keep the value nonbreaking and inside its exact-token slot."
       ],
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": [
-        "baseline-visual-qa-passed"
+        "post-migration-visual-review-required"
       ],
       "structuralQaStatus": "baseline-structural-qa-passed",
       "sectionKind": "semantic-field-section"
@@ -154561,7 +154905,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -154580,7 +154924,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -163803,7 +164147,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -163822,7 +164166,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -168077,7 +168421,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "multi-region-field-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -176674,7 +177018,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "multi-region-field-overlay"
       ],
       "targetRenderingModel": "fixed-inline-overlay",
       "intendedLayoutCategory": "fixed-inline-overlay",
@@ -176693,7 +177037,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "source-rule-plus-generated-continuation-rule"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -178314,7 +178658,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "multi-region-field-overlay"
       ],
       "targetRenderingModel": "fixed-inline-overlay",
       "intendedLayoutCategory": "fixed-inline-overlay",
@@ -178333,7 +178677,7 @@
         "center"
       ],
       "underlineBorderStyle": [
-        "source-pdf-underlay-rule-or-border"
+        "source-rule-plus-generated-continuation-rule"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -182567,66 +182911,6 @@
       "title": "Заявление о присоединении (ФЛ)",
       "templateFilename": "accession-application-fl.pdf",
       "page": 1,
-      "sectionId": "accession-application-fl-p1-reportEmail",
-      "fieldId": "reportEmail",
-      "fieldIds": [
-        "reportEmail"
-      ],
-      "sourcePaths": [
-        "subject.email",
-        "extra.report-delivery"
-      ],
-      "existingVariableNamesPreserved": {
-        "status": true,
-        "identifierStatus": "baseline-preserved",
-        "fieldId": "reportEmail",
-        "source": "subject.email",
-        "format": null,
-        "fallbacks": []
-      },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "nonbreaking-exact-token",
-      "intendedLayoutCategory": "fixed-exact-token",
-      "staticTextInvolved": "source PDF underlay on page 1",
-      "fontFamily": "Liberation Serif",
-      "fontKey": "legalSerif",
-      "fontSizePt": 10.5,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
-      "alignment": "left",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
-      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
-      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
-      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
-      "migrationCompleted": true,
-      "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": "baseline-visual-qa-passed",
-      "structuralQaStatus": "baseline-structural-qa-passed",
-      "rawFieldType": "text",
-      "currentFieldDefinition": {
-        "id": "reportEmail",
-        "source": "subject.email",
-        "optional": true,
-        "showWhen": {
-          "source": "extra.report-delivery",
-          "equals": "email"
-        },
-        "page": 0,
-        "left": 149.4,
-        "baselineTop": 419.09,
-        "width": 93.4,
-        "font": "legalSerif",
-        "fontSize": 10.5,
-        "minFontSize": 9,
-        "align": "left"
-      }
-    },
-    {
-      "documentId": "accession-application-fl",
-      "title": "Заявление о присоединении (ФЛ)",
-      "templateFilename": "accession-application-fl.pdf",
-      "page": 1,
       "sectionId": "accession-application-fl-p1-reportsEdo",
       "fieldId": "reportsEdo",
       "fieldIds": [
@@ -183221,6 +183505,68 @@
         "left": 56.6,
         "baselineTop": 325.25,
         "glyphSize": 8.52
+      }
+    },
+    {
+      "documentId": "accession-application-fl",
+      "title": "Заявление о присоединении (ФЛ)",
+      "templateFilename": "accession-application-fl.pdf",
+      "page": 1,
+      "sectionId": "accession-application-fl-report-email",
+      "fieldId": "reportEmail",
+      "fieldIds": [
+        "reportEmail"
+      ],
+      "sourcePaths": [
+        "subject.email",
+        "extra.report-delivery"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "baseline-preserved",
+        "fieldId": "reportEmail",
+        "source": "subject.email",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "______________________(необходимо указать адрес электронной почты)",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 8.52,
+      "lineHeightPt": 11.28,
+      "lineHeightModel": "explicit",
+      "alignment": "left",
+      "underlineBorderStyle": "word-flow-underline",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "post-migration-visual-review-required",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "reportEmail",
+        "source": "subject.email",
+        "optional": true,
+        "showWhen": {
+          "source": "extra.report-delivery",
+          "equals": "email"
+        },
+        "page": 0,
+        "left": 149.4,
+        "baselineTop": 419.09,
+        "width": 93.4,
+        "font": "legalSerif",
+        "fontSize": 10.5,
+        "minFontSize": 9,
+        "align": "left",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "accession-application-fl-report-email"
       }
     },
     {
@@ -184604,66 +184950,6 @@
       "title": "Заявление о присоединении (ЮЛ)",
       "templateFilename": "accession-application-yul.pdf",
       "page": 1,
-      "sectionId": "accession-application-yul-p1-reportEmail",
-      "fieldId": "reportEmail",
-      "fieldIds": [
-        "reportEmail"
-      ],
-      "sourcePaths": [
-        "subject.email",
-        "extra.report-delivery"
-      ],
-      "existingVariableNamesPreserved": {
-        "status": true,
-        "identifierStatus": "baseline-preserved",
-        "fieldId": "reportEmail",
-        "source": "subject.email",
-        "format": null,
-        "fallbacks": []
-      },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "nonbreaking-exact-token",
-      "intendedLayoutCategory": "fixed-exact-token",
-      "staticTextInvolved": "source PDF underlay on page 1",
-      "fontFamily": "Liberation Serif",
-      "fontKey": "legalSerif",
-      "fontSizePt": 10,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
-      "alignment": "left",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
-      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
-      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
-      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
-      "migrationCompleted": true,
-      "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": "baseline-visual-qa-passed",
-      "structuralQaStatus": "baseline-structural-qa-passed",
-      "rawFieldType": "text",
-      "currentFieldDefinition": {
-        "id": "reportEmail",
-        "source": "subject.email",
-        "optional": true,
-        "showWhen": {
-          "source": "extra.report-delivery",
-          "equals": "email"
-        },
-        "page": 0,
-        "left": 155.4,
-        "baselineTop": 458.35,
-        "width": 93.4,
-        "font": "legalSerif",
-        "fontSize": 10,
-        "minFontSize": 9,
-        "align": "left"
-      }
-    },
-    {
-      "documentId": "accession-application-yul",
-      "title": "Заявление о присоединении (ЮЛ)",
-      "templateFilename": "accession-application-yul.pdf",
-      "page": 1,
       "sectionId": "accession-application-yul-p1-reportsEdo",
       "fieldId": "reportsEdo",
       "fieldIds": [
@@ -184888,21 +185174,21 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
+      "currentRenderingModel": "inserted-table-row",
+      "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
+      "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 12,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 10.8,
+      "lineHeightModel": "explicit",
       "alignment": "center",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Retain the fixed inline overlay; no paragraph migration is required.",
+      "requiredMigration": "Keep bounded cell wrapping; add a reviewed table-row insertion only when the cell's long fixture needs more lines.",
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": "baseline-visual-qa-passed",
@@ -184910,6 +185196,7 @@
       "rawFieldType": "text",
       "currentFieldDefinition": {
         "id": "tariffCurrency",
+        "label": "Тарифный план (валютный рынок)",
         "source": "extra.tariff-currency",
         "optional": true,
         "page": 0,
@@ -184919,7 +185206,36 @@
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
-        "align": "center"
+        "align": "center",
+        "multiline": true,
+        "maxLines": 2,
+        "lineHeight": 10.8,
+        "overflowStrategy": "expand-layout",
+        "expansion": {
+          "page": 0,
+          "insertionTop": 610.85,
+          "shiftFromTop": 610.85,
+          "rowHeight": 9.72,
+          "maxExtraRows": 1,
+          "maxFontSize": 12,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 56.64,
+          "rowWidth": 489.1,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [],
+          "line": {
+            "left": 471.5,
+            "width": 71.5,
+            "baselineOffset": 1.59,
+            "ruleThickness": 0.48
+          }
+        }
       }
     },
     {
@@ -184943,9 +185259,9 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
+      "currentRenderingModel": "inserted-table-row",
+      "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
+      "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
@@ -184953,11 +185269,11 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Retain the fixed inline overlay; no paragraph migration is required.",
+      "requiredMigration": "Keep bounded cell wrapping; add a reviewed table-row insertion only when the cell's long fixture needs more lines.",
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": "baseline-visual-qa-passed",
@@ -184965,6 +185281,7 @@
       "rawFieldType": "text",
       "currentFieldDefinition": {
         "id": "tariffDerivatives",
+        "label": "Тарифный план (срочный рынок)",
         "source": "extra.tariff-derivatives",
         "optional": true,
         "page": 0,
@@ -184974,7 +185291,33 @@
         "font": "legalSerif",
         "fontSize": 9,
         "minFontSize": 9,
-        "align": "center"
+        "align": "center",
+        "overflowStrategy": "expand-layout",
+        "expansion": {
+          "page": 0,
+          "insertionTop": 561.43,
+          "shiftFromTop": 561.43,
+          "rowHeight": 9.72,
+          "maxExtraRows": 1,
+          "maxFontSize": 9,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 56.64,
+          "rowWidth": 489.1,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [],
+          "line": {
+            "left": 471.5,
+            "width": 71.5,
+            "baselineOffset": 7.29,
+            "ruleThickness": 0.48
+          }
+        }
       }
     },
     {
@@ -184998,9 +185341,9 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
+      "currentRenderingModel": "inserted-table-row",
+      "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
+      "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
@@ -185008,11 +185351,11 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Retain the fixed inline overlay; no paragraph migration is required.",
+      "requiredMigration": "Keep bounded cell wrapping; add a reviewed table-row insertion only when the cell's long fixture needs more lines.",
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
       "visualReviewStatus": "baseline-visual-qa-passed",
@@ -185020,6 +185363,7 @@
       "rawFieldType": "text",
       "currentFieldDefinition": {
         "id": "tariffStock",
+        "label": "Тарифный план (фондовый рынок)",
         "source": "extra.tariff-stock",
         "optional": true,
         "page": 0,
@@ -185029,7 +185373,33 @@
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
-        "align": "center"
+        "align": "center",
+        "overflowStrategy": "expand-layout",
+        "expansion": {
+          "page": 0,
+          "insertionTop": 540.41,
+          "shiftFromTop": 540.41,
+          "rowHeight": 9.72,
+          "maxExtraRows": 1,
+          "maxFontSize": 12,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 56.64,
+          "rowWidth": 489.1,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [],
+          "line": {
+            "left": 471.5,
+            "width": 71.5,
+            "baselineOffset": 2.81,
+            "ruleThickness": 0.48
+          }
+        }
       }
     },
     {
@@ -185186,6 +185556,68 @@
         "left": 56.6,
         "baselineTop": 375.17,
         "glyphSize": 8.52
+      }
+    },
+    {
+      "documentId": "accession-application-yul",
+      "title": "Заявление о присоединении (ЮЛ)",
+      "templateFilename": "accession-application-yul.pdf",
+      "page": 1,
+      "sectionId": "accession-application-yul-report-email",
+      "fieldId": "reportEmail",
+      "fieldIds": [
+        "reportEmail"
+      ],
+      "sourcePaths": [
+        "subject.email",
+        "extra.report-delivery"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "baseline-preserved",
+        "fieldId": "reportEmail",
+        "source": "subject.email",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "______________________(необходимо указать адрес электронной почты)",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 8.52,
+      "lineHeightPt": 11.04,
+      "lineHeightModel": "explicit",
+      "alignment": "left",
+      "underlineBorderStyle": "word-flow-underline",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "post-migration-visual-review-required",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "reportEmail",
+        "source": "subject.email",
+        "optional": true,
+        "showWhen": {
+          "source": "extra.report-delivery",
+          "equals": "email"
+        },
+        "page": 0,
+        "left": 155.42,
+        "baselineTop": 458.35,
+        "width": 93.51,
+        "font": "legalSerif",
+        "fontSize": 10,
+        "minFontSize": 9,
+        "align": "left",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "accession-application-yul-report-email"
       }
     },
     {
@@ -186309,7 +186741,7 @@
       "title": "Уведомление об открытии брокерского-депозитарного счета",
       "templateFilename": "account-opening-notice.pdf",
       "page": 2,
-      "sectionId": "account-opening-notice-p2-paymentPurposeCurrency",
+      "sectionId": "account-opening-payment-purpose-currency",
       "fieldId": "paymentPurposeCurrency",
       "fieldIds": [
         "paymentPurposeCurrency"
@@ -186325,24 +186757,24 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
-      "staticTextInvolved": "source PDF underlay on page 2",
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "staticTextInvolved": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ВАЛЮТНЫЙ РЫНОК",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 10,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.6,
+      "lineHeightModel": "explicit",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "word-flow-underline",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Retain the fixed inline overlay; no paragraph migration is required.",
+      "requiredMigration": "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path.",
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": "baseline-visual-qa-passed",
+      "visualReviewStatus": "post-migration-visual-review-required",
       "structuralQaStatus": "baseline-structural-qa-passed",
       "rawFieldType": "text",
       "currentFieldDefinition": {
@@ -186351,14 +186783,17 @@
         "page": 1,
         "left": 389,
         "baselineTop": 97.82,
-        "width": 48.5,
+        "width": 49.68,
         "font": "legalSerif",
-        "fontSize": 10,
-        "minFontSize": 9,
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
         "align": "left",
         "required": true,
         "optional": false,
-        "multiline": false
+        "multiline": false,
+        "tokenBreak": "none",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "account-opening-payment-purpose-currency"
       }
     },
     {
@@ -186366,7 +186801,7 @@
       "title": "Уведомление об открытии брокерского-депозитарного счета",
       "templateFilename": "account-opening-notice.pdf",
       "page": 2,
-      "sectionId": "account-opening-notice-p2-paymentPurposeDerivatives",
+      "sectionId": "account-opening-payment-purpose-derivatives",
       "fieldId": "paymentPurposeDerivatives",
       "fieldIds": [
         "paymentPurposeDerivatives"
@@ -186382,24 +186817,24 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
-      "staticTextInvolved": "source PDF underlay on page 2",
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "staticTextInvolved": "Код XXXXXXХ. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. СРОЧНЫЙ РЫНОК",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 10,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.6,
+      "lineHeightModel": "explicit",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "word-flow-underline",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Retain the fixed inline overlay; no paragraph migration is required.",
+      "requiredMigration": "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path.",
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": "baseline-visual-qa-passed",
+      "visualReviewStatus": "post-migration-visual-review-required",
       "structuralQaStatus": "baseline-structural-qa-passed",
       "rawFieldType": "text",
       "currentFieldDefinition": {
@@ -186408,14 +186843,17 @@
         "page": 1,
         "left": 389,
         "baselineTop": 136.22,
-        "width": 48.5,
+        "width": 49.68,
         "font": "legalSerif",
-        "fontSize": 10,
-        "minFontSize": 9,
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
         "align": "left",
         "required": true,
         "optional": false,
-        "multiline": false
+        "multiline": false,
+        "tokenBreak": "none",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "account-opening-payment-purpose-derivatives"
       }
     },
     {
@@ -186423,7 +186861,71 @@
       "title": "Уведомление об открытии брокерского-депозитарного счета",
       "templateFilename": "account-opening-notice.pdf",
       "page": 2,
-      "sectionId": "account-opening-notice-p2-paymentPurposeStock",
+      "sectionId": "account-opening-payment-purpose-stock",
+      "fieldId": "paymentPurposeClientCode",
+      "fieldIds": [
+        "paymentPurposeClientCode"
+      ],
+      "sourcePaths": [
+        "field.client-code"
+      ],
+      "existingVariableNamesPreserved": {
+        "status": true,
+        "identifierStatus": "additive-current",
+        "fieldId": "paymentPurposeClientCode",
+        "source": "field.client-code",
+        "format": null,
+        "fallbacks": []
+      },
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "nonbreaking-exact-token",
+      "intendedLayoutCategory": "fixed-exact-token",
+      "staticTextInvolved": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ФОНДОВЫЙ РЫНОК",
+      "fontFamily": "Liberation Serif",
+      "fontKey": "legalSerif",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.6,
+      "lineHeightModel": "explicit",
+      "alignment": "left",
+      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
+      "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
+      "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
+      "requiredMigration": "Keep the value nonbreaking and inside its exact-token slot.",
+      "migrationCompleted": true,
+      "classificationReviewStatus": "reviewed-full-template-audit",
+      "visualReviewStatus": "post-migration-visual-review-required",
+      "structuralQaStatus": "baseline-structural-qa-passed",
+      "rawFieldType": "text",
+      "currentFieldDefinition": {
+        "id": "paymentPurposeClientCode",
+        "source": "field.client-code",
+        "page": 1,
+        "left": 252.41,
+        "baselineTop": 46.68,
+        "width": 295.25,
+        "font": "legalSerif",
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
+        "align": "left",
+        "required": true,
+        "optional": false,
+        "multiline": false,
+        "layoutMode": "flow-reference",
+        "flowBlockId": [
+          "account-opening-payment-purpose-stock",
+          "account-opening-payment-purpose-currency",
+          "account-opening-payment-purpose-derivatives"
+        ],
+        "allowMultipleFlowReferences": true
+      }
+    },
+    {
+      "documentId": "account-opening-notice",
+      "title": "Уведомление об открытии брокерского-депозитарного счета",
+      "templateFilename": "account-opening-notice.pdf",
+      "page": 2,
+      "sectionId": "account-opening-payment-purpose-stock",
       "fieldId": "paymentPurposeStock",
       "fieldIds": [
         "paymentPurposeStock"
@@ -186439,24 +186941,24 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
-      "targetRenderingModel": "fixed-inline-overlay",
-      "intendedLayoutCategory": "fixed-inline-overlay",
-      "staticTextInvolved": "source PDF underlay on page 2",
+      "currentRenderingModel": "word-flow-block-run",
+      "targetRenderingModel": "word-flow-paragraph",
+      "intendedLayoutCategory": "word-flow-paragraph",
+      "staticTextInvolved": "Код INV0000X. Перевод денежных средств по Договору на брокерское обслуживание №_________ дата__. ФОНДОВЫЙ РЫНОК",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
-      "fontSizePt": 10,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "fontSizePt": 11.04,
+      "lineHeightPt": 12.6,
+      "lineHeightModel": "explicit",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "word-flow-underline",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
-      "requiredMigration": "Retain the fixed inline overlay; no paragraph migration is required.",
+      "requiredMigration": "Replace the reviewed source text range with one word-flow paragraph; preserve every field ID and source path.",
       "migrationCompleted": true,
       "classificationReviewStatus": "reviewed-full-template-audit",
-      "visualReviewStatus": "baseline-visual-qa-passed",
+      "visualReviewStatus": "post-migration-visual-review-required",
       "structuralQaStatus": "baseline-structural-qa-passed",
       "rawFieldType": "text",
       "currentFieldDefinition": {
@@ -186465,14 +186967,17 @@
         "page": 1,
         "left": 389,
         "baselineTop": 59.4,
-        "width": 48.5,
+        "width": 49.68,
         "font": "legalSerif",
-        "fontSize": 10,
-        "minFontSize": 9,
+        "fontSize": 11.04,
+        "minFontSize": 11.04,
         "align": "left",
         "required": true,
         "optional": false,
-        "multiline": false
+        "multiline": false,
+        "tokenBreak": "none",
+        "layoutMode": "flow-reference",
+        "flowBlockId": "account-opening-payment-purpose-stock"
       }
     },
     {
@@ -188555,7 +189060,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -188565,7 +189070,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -188590,7 +189095,41 @@
         "optional": true,
         "multiline": true,
         "maxHeight": 11.319999999999993,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 1,
+          "insertionTop": 305.21,
+          "shiftFromTop": 305.21,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 9.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 503.86,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            319.03,
+            566.63,
+            567.6
+          ],
+          "line": {
+            "left": 324.4,
+            "width": 237,
+            "baselineOffset": 10.3,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -192288,7 +192827,7 @@
         "optional": true,
         "multiline": true,
         "maxLines": 2,
-        "maxHeight": 23,
+        "maxHeight": 23.76,
         "lineHeight": 11.88,
         "showWhen": {
           "source": "extra.extra-pdl-status",
@@ -198164,7 +198703,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -198174,7 +198713,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -198200,7 +198739,42 @@
         "multiline": true,
         "maxLines": 2,
         "maxHeight": 22.359999999999985,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 234.02,
+          "shiftFromTop": 234.02,
+          "rowHeight": 13.44,
+          "maxExtraRows": 1,
+          "maxFontSize": 11,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 331.5,
+            "width": 222.9,
+            "continuesParagraph": true,
+            "baselineOffset": 10.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {
@@ -202870,7 +203444,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "multi-region-field-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 4",
@@ -202904,6 +203478,26 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "flowRegions": [
+          {
+            "page": 3,
+            "left": 412,
+            "baselineTop": 603.07,
+            "width": 142.4,
+            "maxLines": 1
+          },
+          {
+            "page": 3,
+            "left": 331.5,
+            "baselineTop": 613.2,
+            "width": 222.9,
+            "maxLines": 1,
+            "maxFontSize": 9.5,
+            "generated": true,
+            "reviewStatus": "approved"
+          }
+        ],
+        "overflowStrategy": "flow",
         "showWhen": {
           "source": "check.funds-other",
           "equals": true
@@ -213225,7 +213819,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "multi-region-field-overlay",
       "targetRenderingModel": "fixed-inline-overlay",
       "intendedLayoutCategory": "fixed-inline-overlay",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -213235,7 +213829,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "source-rule-plus-generated-continuation-rule",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -213259,6 +213853,29 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "flowRegions": [
+          {
+            "page": 0,
+            "left": 137.5,
+            "baselineTop": 425.93,
+            "width": 362,
+            "maxLines": 1
+          },
+          {
+            "page": 0,
+            "left": 137.5,
+            "baselineTop": 437.3,
+            "width": 362,
+            "maxLines": 1,
+            "maxFontSize": 9.96,
+            "generated": true,
+            "reviewStatus": "approved",
+            "drawUnderline": true,
+            "underlineThickness": 0.48,
+            "underlineOffset": 1.6
+          }
+        ],
+        "overflowStrategy": "flow",
         "showWhen": {
           "source": "extra.extra-qualification-scope",
           "equals": "other"
@@ -215222,7 +215839,7 @@
           "surname"
         ]
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "multi-region-field-overlay",
       "targetRenderingModel": "fixed-inline-overlay",
       "intendedLayoutCategory": "fixed-inline-overlay",
       "staticTextInvolved": "source PDF underlay on page 2",
@@ -215232,7 +215849,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "center",
-      "underlineBorderStyle": "source-pdf-underlay-rule-or-border",
+      "underlineBorderStyle": "source-rule-plus-generated-continuation-rule",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -215258,7 +215875,31 @@
         "fallbacks": [
           "surname"
         ],
-        "required": true
+        "required": true,
+        "overflowStrategy": "flow",
+        "flowRegions": [
+          {
+            "page": 1,
+            "left": 409.06,
+            "baselineTop": 694.9,
+            "width": 79.92,
+            "maxLines": 1
+          },
+          {
+            "page": 1,
+            "left": 409.06,
+            "baselineTop": 708.6,
+            "width": 79.92,
+            "maxLines": 1,
+            "align": "center",
+            "maxFontSize": 9.96,
+            "generated": true,
+            "reviewStatus": "approved",
+            "drawUnderline": true,
+            "underlineThickness": 0.48,
+            "underlineOffset": 1.6
+          }
+        ]
       }
     },
     {

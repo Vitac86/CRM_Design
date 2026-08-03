@@ -239,7 +239,13 @@
       lineStyle: source.lineStyle,
       tableRow: source.tableRow,
       rowTop: source.rowTop,
-      rowHeight: source.rowHeight
+      rowHeight: source.rowHeight,
+      // A grown table row is two things at once: a row, whose height and rules
+      // are the source's own printed pitch, and the next line of a sentence,
+      // whose leading is the paragraph's. When this is set the row keeps its
+      // geometry but its TEXT continues the rhythm of the lines above instead
+      // of sitting wherever the row's own pitch would put it.
+      continuesParagraph: !!source.continuesParagraph
     };
   }
   Layout.normalizeRegion = normalizeRegion;
@@ -258,15 +264,63 @@
   }
   Layout.lineHeightAt = lineHeightAt;
 
+  function capacityAt(region, size, lineHeight) {
+    var capacity = region.maxLines == null ? UNBOUNDED_LINES : Math.max(0, Math.floor(region.maxLines));
+    if (region.maxHeight != null && isFinite(region.maxHeight) && lineHeight > 0) {
+      capacity = Math.min(capacity, Math.max(1, Math.floor((region.maxHeight + 1e-6) / lineHeight)));
+    }
+    return capacity;
+  }
+
+  // ── Continuing a paragraph into a grown row ────────────────────────────────
+  //
+  // A continuation region normally carries the baseline the map measured for
+  // it. That is right for a printed rule further down the form — it is where
+  // the form says to write. It is wrong for a row the engine itself grew to
+  // finish a sentence: there the map's baseline is the new ROW's position, one
+  // full source pitch below, and the reader sees a paragraph that stops and a
+  // caption that starts.
+  //
+  // The row's geometry — its height, its borders, the rules that travel with
+  // it — is untouched. Only the text moves, up to the next step of the rhythm
+  // the lines above it are already keeping. The step depends on the size the
+  // value ends up at, which is why this is resolved here and not in the map.
+  function resolveRegions(regions, size) {
+    var needed = false;
+    for (var i = 0; i < regions.length; i += 1) {
+      if (regions[i] && regions[i].continuesParagraph) { needed = true; break; }
+    }
+    if (!needed) return regions;
+
+    var out = [];
+    var previousBaseline = null;
+    regions.forEach(function (region) {
+      var lineHeight = lineHeightAt(region, size);
+      var resolved = region;
+      if (region.continuesParagraph && previousBaseline != null) {
+        resolved = {};
+        Object.keys(region).forEach(function (key) { resolved[key] = region[key]; });
+        resolved.baselineTop =
+          Math.round((previousBaseline + lineHeight) * 1000) / 1000;
+      }
+      out.push(resolved);
+      // Greedy flow fills a region completely before it opens the next one, so
+      // the line a continuation follows is this region's last one.
+      var capacity = capacityAt(resolved, size, lineHeight);
+      if (capacity > 0 && isFinite(capacity)) {
+        previousBaseline = resolved.baselineTop + (capacity - 1) * lineHeight;
+      }
+    });
+    return out;
+  }
+  Layout.resolveRegions = resolveRegions;
+
   // Ordered writable lines across every region.
   function slotsFor(regions, size) {
     var slots = [];
     regions.forEach(function (region, regionIndex) {
-      var capacity = region.maxLines == null ? UNBOUNDED_LINES : Math.max(0, Math.floor(region.maxLines));
       var lineHeight = lineHeightAt(region, size);
-      if (region.maxHeight != null && isFinite(region.maxHeight) && lineHeight > 0) {
-        capacity = Math.min(capacity, Math.max(1, Math.floor((region.maxHeight + 1e-6) / lineHeight)));
-      }
+      var capacity = capacityAt(region, size, lineHeight);
       for (var line = 0; line < capacity; line += 1) {
         var indent = line === 0 ? (region.firstLineIndent || 0) : 0;
         slots.push({
@@ -288,8 +342,11 @@
   //
   // Deterministic greedy distribution: fill each approved line in order with as
   // many whole words as fit. The same input always produces the same output.
-  function flowAtSize(font, value, size, regions, options) {
+  function flowAtSize(font, value, size, declared, options) {
     var opts = options || {};
+    // Resolve first, so the slots, the returned regions and everything the
+    // renderer later draws all agree on one set of baselines.
+    var regions = resolveRegions(declared, size);
     var slots = slotsFor(regions, size);
     var paragraphs = splitParagraphs(value);
     var lines = [];
@@ -960,63 +1017,6 @@
   }
   Layout.staticTokenSequence = staticTokenSequence;
 
-  // True when the layout used a region whose declared maximum size is smaller
-  // than the size being tried.
-  function exceedsRegionCap(attempt, regions, size) {
-    for (var i = 0; i < attempt.lines.length; i += 1) {
-      var region = regions[attempt.lines[i].regionIndex];
-      if (region && region.maxFontSize != null && size > region.maxFontSize + 1e-9) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function describe(attempt, preferred, regions) {
-    var used = {};
-    attempt.lines.forEach(function (line) { used[line.regionIndex] = true; });
-    var usedRegions = Object.keys(used).map(Number).sort(function (a, b) { return a - b; });
-    attempt.usedRegions = usedRegions;
-    attempt.shrunk = attempt.size < preferred - 1e-9;
-    attempt.preferredSize = preferred;
-    attempt.strategy = usedRegions.length > 1 ? 'flow'
-      : (attempt.lines.length > 1 ? 'wrap' : 'single');
-    attempt.regions = regions;
-    return attempt;
-  }
-
-  // ── Integrity check ────────────────────────────────────────────────────────
-  //
-  // Guarantees the printed lines carry exactly the input text — no character
-  // dropped between regions, none duplicated. Used by QA and by anyone adding a
-  // new wrapping rule.
-  function verifyIntegrity(value, lines) {
-    var expected = splitParagraphs(value).map(tokenize).reduce(function (all, words) {
-      return all.concat(words);
-    }, []).join(' ').replace(/\s+/g, '');
-    var actual = lines.map(function (line) { return line.text; }).join(' ').replace(/\s+/g, '');
-    return { ok: expected === actual, expected: expected, actual: actual };
-  }
-  Layout.verifyIntegrity = verifyIntegrity;
-
-  // ── Alignment ──────────────────────────────────────────────────────────────
-
-  // X offset for one line inside a box of `boxWidth`, given the alignment.
-  function alignOffset(alignment, lineWidth, boxWidth) {
-    if (alignment === 'center') return (boxWidth - lineWidth) / 2;
-    if (alignment === 'right') return boxWidth - lineWidth;
-    return 0;                                    // 'left' / undefined
-  }
-  Layout.alignOffset = alignOffset;
-
-  // ── Legacy single-region helper ────────────────────────────────────────────
-  //
-  // Kept so existing callers keep compiling; it is a thin wrapper over
-  // layoutValue and shares its behaviour, including the 9 pt floor. New code
-  // should call layoutValue and read the region assignments.
-  function fitText(font, text, opts) {
-    var result = layoutValue(font, text, {
-      size: opts.size,
   // ── Reviewed source placeholders ───────────────────────────────────────────
   //
   // A blank the source prints as underscores disappears from the token
@@ -1060,6 +1060,66 @@
     return -1;
   }
 
+  // True when the layout used a region whose declared maximum size is smaller
+  // than the size being tried.
+  function exceedsRegionCap(attempt, regions, size) {
+    for (var i = 0; i < attempt.lines.length; i += 1) {
+      var region = regions[attempt.lines[i].regionIndex];
+      if (region && region.maxFontSize != null && size > region.maxFontSize + 1e-9) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function describe(attempt, preferred, regions) {
+    var used = {};
+    attempt.lines.forEach(function (line) { used[line.regionIndex] = true; });
+    var usedRegions = Object.keys(used).map(Number).sort(function (a, b) { return a - b; });
+    attempt.usedRegions = usedRegions;
+    attempt.shrunk = attempt.size < preferred - 1e-9;
+    attempt.preferredSize = preferred;
+    attempt.strategy = usedRegions.length > 1 ? 'flow'
+      : (attempt.lines.length > 1 ? 'wrap' : 'single');
+    // Keep the regions the successful attempt actually used: a continuation
+    // that follows the paragraph resolves its baseline against the chosen
+    // size, and the renderer has to draw the resolved one, not the declared.
+    attempt.regions = attempt.regions || regions;
+    return attempt;
+  }
+
+  // ── Integrity check ────────────────────────────────────────────────────────
+  //
+  // Guarantees the printed lines carry exactly the input text — no character
+  // dropped between regions, none duplicated. Used by QA and by anyone adding a
+  // new wrapping rule.
+  function verifyIntegrity(value, lines) {
+    var expected = splitParagraphs(value).map(tokenize).reduce(function (all, words) {
+      return all.concat(words);
+    }, []).join(' ').replace(/\s+/g, '');
+    var actual = lines.map(function (line) { return line.text; }).join(' ').replace(/\s+/g, '');
+    return { ok: expected === actual, expected: expected, actual: actual };
+  }
+  Layout.verifyIntegrity = verifyIntegrity;
+
+  // ── Alignment ──────────────────────────────────────────────────────────────
+
+  // X offset for one line inside a box of `boxWidth`, given the alignment.
+  function alignOffset(alignment, lineWidth, boxWidth) {
+    if (alignment === 'center') return (boxWidth - lineWidth) / 2;
+    if (alignment === 'right') return boxWidth - lineWidth;
+    return 0;                                    // 'left' / undefined
+  }
+  Layout.alignOffset = alignOffset;
+
+  // ── Legacy single-region helper ────────────────────────────────────────────
+  //
+  // Kept so existing callers keep compiling; it is a thin wrapper over
+  // layoutValue and shares its behaviour, including the 9 pt floor. New code
+  // should call layoutValue and read the region assignments.
+  function fitText(font, text, opts) {
+    var result = layoutValue(font, text, {
+      size: opts.size,
       minSize: opts.minSize == null ? opts.size : opts.minSize,
       step: opts.step,
       tokenBreak: opts.tokenBreak,

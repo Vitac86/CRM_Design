@@ -319,7 +319,10 @@
           fallbackIndex: index,
           usedFallback: index > 0,
           layout: result,
-          regions: regions,
+          // The layout's own regions, not the declared ones: a continuation
+          // that follows the paragraph resolves its baseline against the size
+          // the value ended up at, and the renderer has to draw that one.
+          regions: result.regions || regions,
           overridden: override !== undefined
         };
       }
@@ -1153,13 +1156,10 @@
         }
       });
 
-      if (block.sourceStaticText != null) {
-        var actual = Layout.staticTokenSequence(Layout.staticTextOfRuns(block.runs || []));
       var placeholders = validateSourcePlaceholders(block, id, blockRefs, problems);
 
-        if (expected.join('\u0001') !== actual.join('\u0001')) {
-          problems.push(id + ': configured static token sequence differs from the source block');
-        }
+      if (block.sourceStaticText != null) {
+        var actual = Layout.staticTokenSequence(Layout.staticTextOfRuns(block.runs || []));
         // A reviewed placeholder — a sample value the source prints where a
         // real one belongs — is removed from the source side before the
         // comparison. Everything else still has to match token for token.
@@ -1168,6 +1168,9 @@
         if (expected === null) {
           problems.push(id + ': a declared sourcePlaceholder is not in sourceStaticText');
           expected = actual;
+        }
+        if (expected.join('\u0001') !== actual.join('\u0001')) {
+          problems.push(id + ': configured static token sequence differs from the source block');
         }
       } else {
         problems.push(id + ': sourceStaticText is required for legal-text equivalence QA');
@@ -1188,9 +1191,6 @@
   }
   Renderer.validateWordFlowBlocks = validateWordFlowBlocks;
 
-  // Validate one template definition against the loaded PDF. Returns an array
-  // of human-readable problems; empty means the map is usable.
-  function validateTemplate(template, pages, payload) {
   // A reviewed source placeholder: printed sample content that the CRM value
   // replaces. Underscored blanks need no declaration — the tokenizer already
   // treats them as geometry — but a sample made of ordinary letters and digits,
@@ -1237,6 +1237,9 @@
   }
   Renderer.validateSourcePlaceholders = validateSourcePlaceholders;
 
+  // Validate one template definition against the loaded PDF. Returns an array
+  // of human-readable problems; empty means the map is usable.
+  function validateTemplate(template, pages, payload) {
     var problems = [];
     var seen = {};
     var fields = template.fields || [];
@@ -1853,13 +1856,24 @@
     var rowsByField = {};
     var planErrors = [];
     var pageLayout = template.pageLayout || {};
+    var expansionOwners = {};
+    (template.fields || []).concat(template.wordFlowBlocks || [])
+      .forEach(function (item) { expansionOwners[item.id] = item; });
     pages.forEach(function (pdfPage, index) {
       var pagePlan = Expander.planPage(index, demands, pdfPage.getSize().height,
                                        pageLayout[index]);
       plans[index] = pagePlan;
       pagePlan.rows.forEach(function (row) {
+        // The owner of an inserted row is the field that asked for it. It used
+        // to be a stand-in object that existed only to force `maxLines: 1`,
+        // which `rowRegion` already declares — and the cost was that the row
+        // inherited none of its field's typography. A row grown to finish a
+        // sentence was laid out at the engine's default 1.15 leading while the
+        // lines above it kept the cell's own, so the last line of one value
+        // dropped away from the rest of it.
+        var owner = expansionOwners[row.fieldId] || {};
         rowsByField[row.fieldId] = (rowsByField[row.fieldId] || []).concat(
-          Layout.normalizeRegion(row.region, { flowRegions: [1, 2] }, 1));
+          Layout.normalizeRegion(row.region, owner, 1));
       });
       pagePlan.errors.forEach(function (error) { planErrors.push(error); });
     });

@@ -178,6 +178,11 @@
           columns: [63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62],
           line: {
             left: VALUE_LEFT, width: VALUE_WIDTH,
+            // The grown row is a full 13.44 pt source pitch tall, but the name
+            // inside it is the third line of one sentence and keeps the cell's
+            // own 0.95 leading. Placed at the row's pitch it sat 4.31 pt low
+            // and the last line read as a second, unrelated entry.
+            continuesParagraph: true,
             baselineOffset: 10.44, ruleThickness: 0.48
           }
         }
