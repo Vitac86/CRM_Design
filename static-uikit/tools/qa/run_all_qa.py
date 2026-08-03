@@ -53,6 +53,10 @@ SUITES = [
     ("page expansion", "run_expansion_tests.py", []),
     ("table-cell expansion", "run_table_cell_expansion_tests.py", []),
     ("visual geometry and cross-page flow", "run_visual_geometry_tests.py", []),
+    # Geometry says the value is inside its box. This says the result still
+    # reads as one field: an exact reference stays in its sentence, a grown row
+    # keeps the paragraph's rhythm, and no printed placeholder survives.
+    ("visual reading flow", "run_visual_flow_tests.py", []),
     ("reviewed operator ranges", "run_reviewed_operator_range_tests.py", []),
     ("preflight/render agreement", "run_preflight_render_agreement_tests.py", []),
     ("Document Wizard", "run_wizard_tests.py", []),

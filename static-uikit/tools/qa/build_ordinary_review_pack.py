@@ -110,6 +110,14 @@ FUNDS_ORDINARY = ("Доход от предпринимательской дея
                   "операций")
 PAYMENT_ORDINARY = "БД-2026/000417-СПБ"
 
+# The payment-purpose sentence now prints the CRM client code where the source
+# form printed a sample. Both ends of the real range have to look right in it:
+# a short code leaves the sentence on the source's own line breaks, a long one
+# pushes them along.
+PAYMENT_CLIENT_CODE = "INV-1011"
+PAYMENT_CLIENT_CODE_SHORT = "INV-014"
+PAYMENT_CLIENT_CODE_LONG = "INV-TEST-2026-00000017"
+
 
 CARDS = [
     {
@@ -265,19 +273,74 @@ CARDS = [
     },
     {
         "order": 9,
-        "title": "Назначение платежа — номер договора",
+        "title": "Назначение платежа — номер договора (фондовый рынок)",
         "documentId": "account-opening-notice", "fieldId": "paymentPurposeStock",
         "profile": "ru-company-normal", "page": 1,
         "source": "extra.extra-brokerage-contract",
         "clip": (240, 30, 560, 160),
-        "base": {},
-        "change": "Точный идентификатор не разрывается: он целиком уходит на "
-                  "продолжение — третью печатную строку той же ячейки.",
+        "base": {"field.client-code": PAYMENT_CLIENT_CODE},
+        "change": "Строка «Назначение платежа» — проверенный Word-блок. Точный "
+                  "идентификатор целиком стоит сразу после «№», внутри той же "
+                  "фразы, а не отдельной подписью снизу; печатный образец "
+                  "«Код INV0000X» заменён кодом клиента из CRM.",
         "fixtures": {
             "short": "БД-000417",
             "ordinary": PAYMENT_ORDINARY,
             "realistic-long": PAYMENT_ORDINARY,
             "maximum": "БД-2026/000417-СПБ-01",
+        },
+        "rungNotes": {
+            "maximum": "Самая длинная проверенная пара: максимальный номер "
+                       "договора и максимальный код клиента. Строка остаётся "
+                       "третьей и последней в своей ячейке — ряд не растёт.",
+        },
+        # The maximum rung is the longest reviewed pair, not just the longest
+        # reference: a short code would hide how the sentence reflows.
+        "rungOverrides": {
+            "maximum": {"field.client-code": PAYMENT_CLIENT_CODE_LONG},
+            "short": {"field.client-code": PAYMENT_CLIENT_CODE_SHORT},
+        },
+    },
+    {
+        "order": 11,
+        "title": "Назначение платежа — номер договора (валютный рынок)",
+        "documentId": "account-opening-notice", "fieldId": "paymentPurposeCurrency",
+        "profile": "ru-company-normal", "page": 1,
+        "source": "extra.extra-brokerage-contract",
+        "clip": (240, 68, 560, 160),
+        "base": {"field.client-code": PAYMENT_CLIENT_CODE},
+        "change": "Тот же проверенный Word-блок, второй рыночный ряд. Один "
+                  "ввод оператора печатается во всех трёх рядах.",
+        "fixtures": {
+            "short": "БД-000417",
+            "ordinary": PAYMENT_ORDINARY,
+            "realistic-long": PAYMENT_ORDINARY,
+            "maximum": "БД-2026/000417-СПБ-01",
+        },
+        "rungOverrides": {
+            "maximum": {"field.client-code": PAYMENT_CLIENT_CODE_LONG},
+            "short": {"field.client-code": PAYMENT_CLIENT_CODE_SHORT},
+        },
+    },
+    {
+        "order": 12,
+        "title": "Назначение платежа — номер договора (срочный рынок)",
+        "documentId": "account-opening-notice", "fieldId": "paymentPurposeDerivatives",
+        "profile": "ru-company-normal", "page": 1,
+        "source": "extra.extra-brokerage-contract",
+        "clip": (240, 106, 560, 160),
+        "base": {"field.client-code": PAYMENT_CLIENT_CODE},
+        "change": "Третий рыночный ряд. Здесь исходная форма печатала другой "
+                  "образец — «Код XXXXXXХ» — и он тоже заменён кодом клиента.",
+        "fixtures": {
+            "short": "БД-000417",
+            "ordinary": PAYMENT_ORDINARY,
+            "realistic-long": PAYMENT_ORDINARY,
+            "maximum": "БД-2026/000417-СПБ-01",
+        },
+        "rungOverrides": {
+            "maximum": {"field.client-code": PAYMENT_CLIENT_CODE_LONG},
+            "short": {"field.client-code": PAYMENT_CLIENT_CODE_SHORT},
         },
     },
     {
@@ -322,6 +385,7 @@ ASSIGNMENTS = r"""
   var reviewedRanges = [];
   var reviewedFontSizes = {};
   var reviewedValueSizes = [];
+  var blockFields = {};
   R.activeReviewedRangePages(template, payload).forEach(function (group) {
     var sizes = [];
     group.blocks.forEach(function (block) {
@@ -359,7 +423,18 @@ ASSIGNMENTS = r"""
           rendered: (planned.layout.lines || []).map(function (l) {
             return l.text; }).join('\n'),
           size: planned.layout.size,
-          lines: (planned.layout.lines || []).length });
+          lines: (planned.layout.lines || []).length,
+          // Where each printed line of this value really sits. One repeated
+          // step means the reader sees one paragraph; two different steps is
+          // the defect this pack exists to catch.
+          baselines: (planned.layout.lines || []).map(function (l) {
+            var region = (planned.layout.regions || [])[l.regionIndex] || {};
+            var lh = region.lineHeightRatio
+              ? planned.layout.size * region.lineHeightRatio
+              : (region.lineHeight != null ? region.lineHeight
+                                           : planned.layout.size * 1.15);
+            return region.baselineTop + l.lineIndex * lh;
+          }) });
       });
       Object.keys(decided.planned.byBlock || {}).forEach(function (id) {
         var planned = decided.planned.byBlock[id];
@@ -380,10 +455,17 @@ ASSIGNMENTS = r"""
             }
           });
         });
+        blockFields[id] = Object.keys(pieces);
         Object.keys(pieces).forEach(function (key) {
           drawn.push({ fieldId: key, requested: (planned.values || {})[key],
             rendered: pieces[key].join(' '), size: sizes[key],
-            lines: Object.keys(seen[key]).length });
+            lines: Object.keys(seen[key]).length,
+            // A value inside a reviewed paragraph shares the block's own
+            // leading, so its lines are evenly spaced by construction.
+            baselines: Object.keys(seen[key]).map(Number).sort(
+              function (a, b) { return a - b; }).map(function (index) {
+                return (planned.layout.lines[index] || {}).baselineTop;
+              }) });
           reviewedValueSizes.push({ block: id, fieldId: key, size: sizes[key] });
         });
       });
@@ -397,6 +479,7 @@ ASSIGNMENTS = r"""
       }
       return JSON.stringify({ ok: true, pdf: btoa(binary), drawn: drawn,
                               notes: notes, shifts: shifts,
+                              blockFields: blockFields,
                               reviewedRanges: reviewedRanges,
                               reviewedFontSizes: reviewedFontSizes,
                               reviewedValueSizes: reviewedValueSizes });
@@ -457,6 +540,7 @@ def main() -> int:
                 value = card["fixtures"][rung]
                 overrides = dict(card["base"])
                 overrides[card["source"]] = value
+                overrides.update((card.get("rungOverrides") or {}).get(rung, {}))
                 name = f"{card['order']:02d}__{card['documentId']}__{card['fieldId']}__{slug(rung)}"
 
                 script = (ASSIGNMENTS
@@ -483,6 +567,20 @@ def main() -> int:
 
                 drawn = [d for d in result["drawn"] if d["fieldId"] == card["fieldId"]]
                 mine = drawn[0] if drawn else {}
+                # Which client code this card was drawn with, and whether the
+                # value stayed inside one logical block. Both are review facts:
+                # the payment-purpose sentence now carries a CRM value where
+                # the form printed a sample, and a value that leaves its block
+                # is the defect this pack exists to catch.
+                code = [d for d in result["drawn"]
+                        if d["fieldId"] == "paymentPurposeClientCode"]
+                block_of = {
+                    field_id: block
+                    for block, ids in (result.get("blockFields") or {}).items()
+                    for field_id in ids
+                }
+                steps = [round(b - a, 3) for a, b in
+                         zip(mine.get("baselines") or [], (mine.get("baselines") or [])[1:])]
                 rows = [n for n in result["notes"] if n.get("fieldId") == card["fieldId"]]
                 shift = sum(float(s["delta"]) for s in result["shifts"]
                             if s["page"] == card["page"])
@@ -509,6 +607,16 @@ def main() -> int:
                     "extracted": extracted(pdf_bytes, card["page"], mine.get("rendered")),
                     "fontSize": mine.get("size"),
                     "lineCount": mine.get("lines"),
+                    "clientCode": (code[0].get("rendered") if code
+                                   else overrides.get("field.client-code")),
+                    # The reviewed block this value was drawn inside, or null
+                    # when it is an ordinary overlay into a printed blank.
+                    "logicalBlock": block_of.get(card["fieldId"]),
+                    # The vertical step between the value's own printed lines.
+                    # One number means one paragraph; two different numbers is
+                    # the defect that made this pass necessary.
+                    "lineSteps": steps,
+                    "sameLogicalBlock": len(set(steps)) <= 1,
                     "insertedRows": sum(int(r.get("rows") or 0) for r in rows),
                     "pageShiftPt": round(shift, 2),
                     "preflightFingerprint": measured.get("fingerprint"),
@@ -567,6 +675,7 @@ def write_index(out: str, cards: list[dict]) -> None:
         max-width: 640px; }
  img { max-width: 100%; border: 1px solid #ccc; margin-top: 8px; }
  .ok { color: #1a7f37; } .bad { color: #b42318; font-weight: 600; }
+ .dim { color: #6b6b6b; }
  .note { color: #555; }
 </style></head><body>
 <h1>Проверка вёрстки — десять полей с обычными значениями</h1>
@@ -604,14 +713,27 @@ def write_index(out: str, cards: list[dict]) -> None:
             structural = entry["structuralProblems"]
             struct_html = ('<span class="ok">без замечаний</span>' if not structural
                            else '<span class="bad">' + esc("; ".join(structural)) + '</span>')
+            steps = entry.get("lineSteps") or []
+            flow_html = (
+                '<span class="ok">одна строка</span>' if len(steps) < 1
+                else ('<span class="ok">единый ритм, шаг '
+                      + esc(steps[0]) + ' pt</span>' if entry.get("sameLogicalBlock")
+                      else '<span class="bad">разный шаг строк: '
+                           + esc(steps) + '</span>'))
+            block = entry.get("logicalBlock")
+            block_html = (esc(block) if block
+                          else '<span class="dim">обычная накладка</span>')
             parts.append(f"""<div class="rung"><h3>{esc(RUNG_TITLES[entry['rung']])}</h3>
 <table>
  <tr><th>Запрошенное значение</th><td class="v">{esc(entry['requested'])}</td></tr>
  <tr><th>Нарисовано</th><td class="v">{esc(entry['rendered'])}</td></tr>
  <tr><th>Извлечено из PDF</th><td class="v">{esc(entry['extracted'])}</td></tr>
  <tr><th>Сверка</th><td>{verdict}</td></tr>
+ <tr><th>Код клиента</th><td class="v">{esc(entry.get('clientCode'))}</td></tr>
  <tr><th>Кегль</th><td>{esc(entry['fontSize'])} pt</td></tr>
  <tr><th>Строк</th><td>{esc(entry['lineCount'])}</td></tr>
+ <tr><th>Логический блок</th><td>{block_html}</td></tr>
+ <tr><th>Ритм чтения</th><td>{flow_html}</td></tr>
  <tr><th>Вставлено строк таблицы</th><td>{esc(entry['insertedRows'])}</td></tr>
  <tr><th>Сдвиг страницы</th><td>{esc(entry['pageShiftPt'])} pt</td></tr>
  <tr><th>Preflight</th><td>{'ok' if entry['preflightOk'] else 'ОТКАЗ'}</td></tr>
