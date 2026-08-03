@@ -41,7 +41,8 @@ no template can be called production-ready because somebody wrote it down.
 | Status | Templates |
 | --- | ---: |
 | blocked | 0 |
-| dynamic-production-ready | 18 |
+| blocked-incomplete-mapping | 1 |
+| dynamic-production-ready | 17 |
 | hidden-by-decision | 1 |
 | static-download-by-design | 2 |
 | unexposed-by-decision | 1 |
@@ -61,7 +62,7 @@ no template can be called production-ready because somebody wrote it down.
 | brokerage-key-information.pdf | brokerage-key-information | static-download-by-design | brokerage-key-information | — | static-download | offered | source SHA-256 / page-count byte baseline only |
 | client-notifications.pdf | client-notifications | dynamic-production-ready | client-notifications | client-notifications | browser-overlay | offered | ordinary + realistic-long fixtures, structural and visual QA |
 | code-word-request.pdf | code-word-request | dynamic-production-ready | code-word-request | code-word-request | browser-overlay | offered | ordinary + realistic-long fixtures, structural and visual QA |
-| order-forms.pdf | order-forms | dynamic-production-ready | order-forms | order-forms | browser-overlay | offered | ordinary + realistic-long fixtures, structural and visual QA |
+| order-forms.pdf | order-forms | blocked-incomplete-mapping | order-forms | order-forms | not-offered | not-offered | source SHA-256 / page-count byte baseline only |
 | power-of-attorney.pdf | power-of-attorney | dynamic-production-ready | power-of-attorney | power-of-attorney | browser-overlay | offered | ordinary + realistic-long fixtures, structural and visual QA |
 | qualification-consequences-notice.pdf | qualification-consequences-notice | dynamic-production-ready | qualification-consequences-notice | qualification-consequences-notice | browser-overlay | offered | ordinary + realistic-long fixtures, structural and visual QA |
 | qualification-notice.pdf | qualification-notice | dynamic-production-ready | qualification-notice | qualification-notice | browser-overlay | offered | ordinary + realistic-long fixtures, structural and visual QA |
@@ -78,6 +79,7 @@ no template can be called production-ready because somebody wrote it down.
 | --- | --- | --- | --- | --- | --- |
 | anketa-isbyul.pdf | hidden-by-decision | Анкета ИСБОЮЛ is for a foreign structure without a legal entity. The CRM has no subject kind for one, so there is no payload to map and no wizard entry to offe… | no | yes | yes |
 | brokerage-key-information.pdf | static-download-by-design | The key-information sheet describes the product, not the client. It has no blanks and is delivered unchanged with the starter package. | yes | no | no |
+| order-forms.pdf | blocked-incomplete-mapping | Приложение 7 carries four order types across five pages. The map places 93 fields, but 89 of them read `extra.*` — values an operator types — and every one is … | no | yes | yes |
 | Risks.pdf | static-download-by-design | Risks.pdf is a 17-page declaration with no client-specific field anywhere in it. It is delivered unchanged as part of the brokerage starter package. | yes | no | no |
 | transfer-requisites.pdf | unexposed-by-decision | The transfer-requisites sheet repeats the three payment-purpose rows of the account-opening notice — same sample client codes, same «№_________ дата__» blanks … | no | yes | yes |
 

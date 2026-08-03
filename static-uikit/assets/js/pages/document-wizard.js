@@ -1809,6 +1809,16 @@
       // the other two stay blank and all four pages are always emitted.
       // The order-type names are taken verbatim from the source.
       id: 'order-forms',
+      // NOT OFFERED. The map places 93 fields but 89 read `extra.*` and every
+      // one is optional, so the form generates almost entirely blank: amount,
+      // currency, venue, recipient, bank details, initiator and the
+      // representative's authority are all unbound. Offering it would put a
+      // mostly empty order in front of a client.
+      //
+      // The entry and the map stay here — this is where finishing the mapping
+      // starts from, and docs/order-forms-mapping-gap.md lists every printed
+      // row with the exact UMI name where one exists.
+      blockedIncompleteMapping: true,
       title: 'Поручение (формы поручений)',
       description: 'Приложение 7 к Регламенту брокерского обслуживания.',
       category: 'Операционные заявки',
@@ -2147,6 +2157,11 @@
     return Object.freeze(value);
   }
 
+  // The registry still carries a document whose mapping is incomplete, and
+  // says so on the entry itself (`blockedIncompleteMapping`). It is not
+  // offered to a user — renderDocCards drops it — but the Template Builder is
+  // where the mapping gets finished, so hiding it from the builder too would
+  // hide the work from the only tool that can do it.
   window.CRMDocumentCatalog = freezeCatalogValue({
     schemaVersion: 1,
     documents: cloneCatalogValue(DOCUMENTS),
@@ -3897,6 +3912,7 @@
     // flows (account closure). Legacy HTML-only documents are hidden from the
     // user-facing list; their configs/templates remain in the repo for reference.
     var filteredDocs = DOCUMENTS.filter(function (doc) {
+      if (doc.blockedIncompleteMapping) return false;
       if (doc.appliesTo.indexOf(subject.kind) === -1) return false;
       return !!resolveRenderStrategy(doc) || !!doc.closure;
     });

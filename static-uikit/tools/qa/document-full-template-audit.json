@@ -27,7 +27,8 @@
   },
   "productionStatusCounts": {
     "blocked": 0,
-    "dynamic-production-ready": 18,
+    "blocked-incomplete-mapping": 1,
+    "dynamic-production-ready": 17,
     "hidden-by-decision": 1,
     "static-download-by-design": 2,
     "unexposed-by-decision": 1
@@ -274,7 +275,7 @@
       "documentId": "order-forms",
       "templateFilename": "order-forms.pdf",
       "title": "Поручение (формы поручений)",
-      "productionStatus": "dynamic-production-ready",
+      "productionStatus": "blocked-incomplete-mapping",
       "pageCount": 4,
       "catalogueEntry": "order-forms",
       "cataloguePackage": null,
@@ -283,13 +284,13 @@
         "company"
       ],
       "fieldMap": "order-forms",
-      "generationMode": "browser-overlay",
-      "exposure": "offered",
-      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
-      "reason": null,
-      "userCanDownload": true,
-      "futureMappingRequired": false,
-      "excludedFromCurrentRelease": false
+      "generationMode": "not-offered",
+      "exposure": "not-offered",
+      "qaStatus": "source SHA-256 / page-count byte baseline only",
+      "reason": "Приложение 7 carries four order types across five pages. The map places 93 fields, but 89 of them read `extra.*` — values an operator types — and every one is optional, so the form generates almost entirely blank unless a manager fills a form the wizard does not really ask. Only the client name is bound to CRM data. Amount, currency, venue, recipient, bank name, BIK/SWIFT, correspondent and settlement accounts, intermediary bank, personal identifiers, the initiator block and the representative's authority are all unbound, and the bank details among them exist in UMI (Front Реквизиты) and simply are not wired. Calling that production-ready would put a mostly empty order in front of a client. The per-row inventory and the exact UMI name for every row that has one are in docs/order-forms-mapping-gap.md; finishing it is a separate task.",
+      "userCanDownload": false,
+      "futureMappingRequired": true,
+      "excludedFromCurrentRelease": true
     },
     {
       "documentId": "power-of-attorney",
@@ -86803,7 +86804,7 @@
       "templateFilename": "order-forms.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/order-forms.pdf",
       "documentRole": "dynamic-overlay",
-      "productionStatus": "dynamic-production-ready",
+      "productionStatus": "blocked-incomplete-mapping",
       "byteLength": 253605,
       "sha256": "24e593d1df7f5438252814d31a64e1b8516cce61c76127dd468606f829de17b1",
       "pageCount": 4,

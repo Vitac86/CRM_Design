@@ -97,7 +97,7 @@ DOCUMENT_SPECS: dict[str, dict[str, str]] = {
     "code-word-request.pdf": {"id": "code-word-request", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
     "order-forms.pdf": {"id": "order-forms", "role": "dynamic-overlay",
-        "status": "dynamic-production-ready"},
+        "status": "blocked-incomplete-mapping"},
     "power-of-attorney.pdf": {"id": "power-of-attorney", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
     "qualification-consequences-notice.pdf": {"id": "qualification-consequences-notice", "role": "dynamic-overlay",
@@ -157,12 +157,41 @@ PRODUCTION_STATUSES = {
     "blocked": {
         "map": False, "catalogue": False, "generated": False,
     },
+    # A map exists and is partly right, but the form still prints mostly blank
+    # because most of what it asks for has no source. This is deliberately a
+    # separate state from `blocked`: the work is in this repository, the map is
+    # here to continue from, and the only thing that must not happen is the
+    # form being offered as if it worked.
+    "blocked-incomplete-mapping": {
+        "map": True, "catalogue": False, "generated": False,
+    },
 }
 
 # Why each non-dynamic template is where it is, and what would have to happen
 # for that to change. Recorded here rather than in prose so the release report
 # cannot describe a template the gate does not also account for.
 NON_DYNAMIC_RATIONALE = {
+    "order-forms": {
+        "reason": (
+            "Приложение 7 carries four order types across five pages. The map "
+            "places 93 fields, but 89 of them read `extra.*` — values an "
+            "operator types — and every one is optional, so the form generates "
+            "almost entirely blank unless a manager fills a form the wizard "
+            "does not really ask. Only the client name is bound to CRM data. "
+            "Amount, currency, venue, recipient, bank name, BIK/SWIFT, "
+            "correspondent and settlement accounts, intermediary bank, "
+            "personal identifiers, the initiator block and the "
+            "representative's authority are all unbound, and the bank details "
+            "among them exist in UMI (Front Реквизиты) and simply are not "
+            "wired. Calling that production-ready would put a mostly empty "
+            "order in front of a client. The per-row inventory and the exact "
+            "UMI name for every row that has one are in "
+            "docs/order-forms-mapping-gap.md; finishing it is a separate task."
+        ),
+        "userCanDownload": False,
+        "futureMappingRequired": True,
+        "excludedFromRelease": True,
+    },
     "anketa-isbyul": {
         "reason": (
             "Анкета ИСБОЮЛ is for a foreign structure without a legal entity. "
@@ -1365,10 +1394,14 @@ def production_status_inventory(
         template = maps.get(doc_id)
         rationale = NON_DYNAMIC_RATIONALE.get(doc_id)
 
+        # An entry that declares its mapping incomplete is in the registry but
+        # is not offered: the wizard drops it from the document list, and the
+        # Template Builder keeps it only so the mapping can be finished.
+        blocked_entry = bool(entry.get("blockedIncompleteMapping"))
         observed = {
             "map": bool(template),
-            "catalogue": bool(entry),
-            "generated": bool(entry.get("overlayTemplateId")),
+            "catalogue": bool(entry) and not blocked_entry,
+            "generated": bool(entry.get("overlayTemplateId")) and not blocked_entry,
         }
         if status not in PRODUCTION_STATUSES:
             errors.append(

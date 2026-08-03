@@ -181,6 +181,45 @@ def self_test() -> int:
     return 0 if ok else 1
 
 
+ORDER_FORMS_GAP_DOC = os.path.join(
+    ROOT, "docs", "order-forms-mapping-gap.md")
+
+
+def check_incomplete_order_forms(registry: dict, maps: dict) -> tuple[int, list[str]]:
+    """Order forms may not pass as production-ready while mostly unmapped.
+
+    Manual review found the withdrawal/order form generating almost entirely
+    blank. The map exists and is partly right, so nothing else in the suite
+    objected: every field is `optional`, so an absent value is not a failure,
+    and a form that prints nothing still passes a check that only asks whether
+    what *was* printed is correct. This asks the other question.
+    """
+    failures: list[str] = []
+    checks = 0
+
+    checks += 1
+    if not os.path.exists(ORDER_FORMS_GAP_DOC):
+        failures.append("docs/order-forms-mapping-gap.md is missing")
+
+    template = maps.get("order-forms")
+    if not template:
+        return checks, failures
+
+    fields = template.get("fields", [])
+    checks += 1
+    operator = [f for f in fields
+                if str(f.get("source", "")).startswith(("extra.", "check."))]
+    # If this ever drops far enough that the form really does fill itself, the
+    # threshold is what has to be revisited — deliberately, not by accident.
+    share = len(operator) / len(fields) if fields else 0
+    if share < 0.5:
+        failures.append(
+            f"order-forms: only {len(operator)}/{len(fields)} fields are still "
+            "operator input. If the mapping is finished, change the production "
+            "status and delete this gate rather than leaving it passing.")
+    return checks, failures
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--maps", default=os.path.join(HERE, "maps.json"))
@@ -193,6 +232,9 @@ def main() -> int:
     registry = load_registry()
     maps = load_maps(args.maps)
     checks, failures = check(registry, maps)
+    order_checks, order_failures = check_incomplete_order_forms(registry, maps)
+    checks += order_checks
+    failures.extend(order_failures)
 
     for failure in failures:
         print(f"  FAIL {failure}")
