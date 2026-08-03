@@ -25,16 +25,23 @@ from headless_browser import Chrome, Server
 
 PROBE = r"""
 (async function (docId, page, tops, toTop, delta, moveTopLevelPaths) {
+  const R = CRMDocumentEngine.overlayRenderer;
   const t = CRMDocumentEngine.fieldMaps[docId];
   const url = t.templateUrl.replace('../', '../');
   const bytes = await (await fetch(url)).arrayBuffer();
+  // A reviewed paragraph is suppressed before the page is shifted, so the cut
+  // never meets it. This audit has no payload, so it counts only the ranges
+  // that are suppressed for EVERY payload — a `showWhen` variant stays on the
+  // page as far as this check is concerned.
+  const gone = (R.unconditionalSuppressedBlocksByPage(t) || {})[page] || [];
   const out = [];
   for (const top of tops) {
     const doc = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
     try {
       const r = CRMDocumentEngine.pageExpander.shiftPageContent(
         doc, doc.getPages()[page], [{ fromTop: top, toTop: toTop, delta: delta,
-          moveTopLevelPaths: moveTopLevelPaths }]);
+          moveTopLevelPaths: moveTopLevelPaths }],
+        { suppressedBlocks: gone });
       out.push([top, r.moved]);
     } catch (e) { /* straddles */ }
   }

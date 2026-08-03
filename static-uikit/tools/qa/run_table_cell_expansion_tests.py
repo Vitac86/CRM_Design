@@ -255,10 +255,30 @@ def main() -> int:
                                   "passport-number", "date", "account-number"))
                              for entry in inventory["fields"]),
                      json.dumps(inventory["fields"], ensure_ascii=False))
-        checks.check("the fifteen reviewed Word-flow anchors remain lineStyle none",
-                     len(inventory["blocks"]) == 15 and
+        # Eighteen reviewed Word-flow anchors, and only three of them may draw
+        # a table row: the three payment-purpose rows of the account-opening
+        # notice, the only reviewed paragraphs that live in a bordered table and
+        # therefore the only ones a grown line has to extend a rule for. Every
+        # other reviewed paragraph reflows in open page space and must keep
+        # `lineStyle: none`, or it would start painting rules the form has not
+        # got. This is stated as an exact set, not a count, so a new table-row
+        # block has to be named here before it can draw anything.
+        BORDERED_BLOCKS = {
+            ("account-opening-notice", "account-opening-payment-purpose-stock"),
+            ("account-opening-notice", "account-opening-payment-purpose-currency"),
+            ("account-opening-notice", "account-opening-payment-purpose-derivatives"),
+        }
+        drawing = {(entry["document"], entry["id"])
+                   for entry in inventory["blocks"]
+                   if entry["lineStyle"] == "table-row"}
+        checks.check("only the bordered payment-purpose rows grow a table row",
+                     drawing == BORDERED_BLOCKS,
+                     json.dumps(sorted(drawing), ensure_ascii=False))
+        checks.check("every other reviewed Word-flow anchor stays lineStyle none",
+                     len(inventory["blocks"]) == 18 and
                      all(entry["lineStyle"] == "none"
-                         for entry in inventory["blocks"]),
+                         for entry in inventory["blocks"]
+                         if (entry["document"], entry["id"]) not in BORDERED_BLOCKS),
                      json.dumps(inventory["blocks"], ensure_ascii=False))
 
         metadata = {(entry["document"], entry["id"]): entry

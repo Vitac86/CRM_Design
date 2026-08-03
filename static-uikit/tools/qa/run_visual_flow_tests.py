@@ -38,6 +38,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -63,6 +64,16 @@ LEADING_TOLERANCE = 1.25
 # The largest horizontal gap between the token that introduces a value and the
 # value itself. «№» and its reference share a line or the layout is wrong.
 INTRODUCER_GAP = 1.0
+
+# «дата 29.07.2026» is written with the word space the form's own wording has,
+# so its label sits one space away rather than flush against the value. One
+# space of Liberation Serif at the 11.04 pt these rows print is 2.76 pt.
+LABELLED_VALUE_GAP = 3.0
+
+# A printed blank that has survived into the output next to a label that a real
+# value was supposed to fill.
+BLANK_DATE = re.compile(r"дата\s*_")
+BLANK_NUMBER = re.compile(r"№\s*_")
 
 
 LAYOUT_PROBE = r"""
@@ -108,11 +119,20 @@ LAYOUT_PROBE = r"""
 
     // Word-flow blocks: the printed lines of the reviewed paragraph, with
     // every run's field, x position and width.
+    var blockById = {};
+    (template.wordFlowBlocks || []).forEach(function (b) { blockById[b.id] = b; });
     Object.keys(planned.byBlock || {}).forEach(function (id) {
       var p = planned.byBlock[id];
       if (!p || !p.drawn || !p.layout) return;
+      // The frame is what decides whether a line break was forced or merely
+      // taken: without the right edge, a value that ends a line looks the same
+      // whether or not the next word could have followed it.
+      var frame = (blockById[id] || {}).frame || {};
       out.blocks[id] = {
         values: p.values || {},
+        frameLeft: frame.left,
+        frameRight: Number(frame.left) + Number(frame.width),
+        additionalLines: p.layout.additionalLines || 0,
         lines: (p.layout.lines || []).map(function (line) {
           return {
             text: line.text,
@@ -154,6 +174,14 @@ PAYMENT_REFERENCES = {
     "maximum": "БД-2026/000417-СПБ-01",
 }
 
+# The agreement date the same sentence has to carry. Stored ISO in the payload,
+# printed dd.mm.yyyy — the form's own convention, and the one §2 of page 1 uses
+# for the very same agreement.
+PAYMENT_DATES = {
+    "ordinary": ("2026-07-29", "29.07.2026"),
+    "end of year": ("2026-12-31", "31.12.2026"),
+}
+
 # Short and long CRM client codes. The form prints «Код INV0000X» /
 # «Код XXXXXXХ» as a sample; both of these have to replace it cleanly.
 CLIENT_CODES = {
@@ -193,29 +221,118 @@ def payment_purpose_checks(browser: SmokeBrowser, results: list) -> None:
     """The reading flow of the three payment-purpose rows."""
     for code_name, code in CLIENT_CODES.items():
         for rung, reference in PAYMENT_REFERENCES.items():
-            overrides = {
-                "extra.extra-brokerage-contract": reference,
-                "field.client-code": code,
-            }
-            probe = run_probe(browser, "account-opening-notice",
-                              "ru-company-normal", overrides)
-            where = f"account-opening-notice [{code_name} code / {rung}]"
-            if not probe.get("ok"):
-                check(results, False, where, probe.get("message", "render refused"))
-                continue
-
-            for field_id, block_id, market in PAYMENT_ROWS:
-                block = probe["blocks"].get(block_id)
-                if not block:
-                    check(results, False, f"{where} {block_id}",
-                          "the reviewed block did not draw")
+            for date_name, (iso, printed) in PAYMENT_DATES.items():
+                overrides = {
+                    "extra.extra-brokerage-contract": reference,
+                    "extra.extra-brokerage-contract-date": iso,
+                    "field.client-code": code,
+                }
+                probe = run_probe(browser, "account-opening-notice",
+                                  "ru-company-normal", overrides)
+                where = (f"account-opening-notice "
+                         f"[{code_name} code / {rung} / {date_name} date]")
+                if not probe.get("ok"):
+                    check(results, False, where,
+                          probe.get("message", "render refused"))
                     continue
-                assert_payment_row(results, where, block_id, field_id, market,
-                                   block, reference, code)
+
+                for field_id, block_id, market in PAYMENT_ROWS:
+                    block = probe["blocks"].get(block_id)
+                    if not block:
+                        check(results, False, f"{where} {block_id}",
+                              "the reviewed block did not draw")
+                        continue
+                    assert_payment_row(results, where, block_id, field_id,
+                                       market, block, reference, code, printed)
+
+
+def introducer_of(lines, line_index, run):
+    """The run immediately to the left of `run` on its own line, if any."""
+    before = [r for r in lines[line_index]["runs"]
+              if r["x"] + r["width"] <= run["x"] + 1e-6]
+    return before[-1] if before else None
+
+
+def assert_label_holds_value(results, prefix, lines, line_index, run, label,
+                             what) -> None:
+    """A printed label and the value it introduces share a line, touching."""
+    introducer = introducer_of(lines, line_index, run)
+    check(results, introducer is not None and introducer["text"].endswith(label),
+          f"{prefix}: «{label}» introduces the {what} on its own line",
+          f"line reads {lines[line_index]['text']!r}")
+    if introducer is None:
+        return
+    gap = run["x"] - (introducer["x"] + introducer["width"])
+    limit = INTRODUCER_GAP if label == "№" else LABELLED_VALUE_GAP
+    check(results, gap <= limit,
+          f"{prefix}: «{label}» and the {what} are not separated",
+          f"{gap:.2f} pt (limit {limit})")
+
+
+def assert_sentence_continues(results, prefix, block, lines, line_index,
+                              run) -> None:
+    """The sentence goes on after a value — and any break there was forced.
+
+    A value that ends its line used to fail outright. That was right while the
+    reference was the last dynamic thing in a three-line row, and wrong once
+    the sentence carries a date after it: «…№БД-2026/000417-СПБ» ending a full
+    line and «дата 29.07.2026. ФОНДОВЫЙ РЫНОК» continuing on the next one is
+    ordinary paragraph wrapping, not a stranded caption.
+
+    So the property is stated as what a reader actually objects to: the
+    sentence must continue somewhere, and where it continues on the NEXT line,
+    the GROUP that follows must be one that could not have fitted on this one.
+    The group, not the word — «дата» on its own is 20.24 pt and would fit after
+    almost any reference, but it is bound to the date it labels precisely so
+    that it never goes anywhere without it. Measuring the word would demand the
+    one output the form must not produce.
+    """
+    after = [r for r in lines[line_index]["runs"] if r["x"] > run["x"]]
+    if after:
+        return
+    following = lines[line_index + 1:]
+    check(results, bool(following), f"{prefix}: the sentence continues",
+          f"the block ends on {lines[line_index]['text']!r}")
+    if not following:
+        return
+    right = block.get("frameRight")
+    if right is None:
+        return
+    group = leading_group(following[0]["runs"])
+    width = (group[-1]["x"] + group[-1]["width"]) - group[0]["x"]
+    text = " ".join(r["text"] for r in group if r["text"])
+    # Deliberately ignore the word space: the break counts as forced only when
+    # the group would not fit even pressed against the value.
+    would_fit = run["x"] + run["width"] + width <= float(right) + 1e-6
+    check(results, not would_fit,
+          f"{prefix}: the line break after the value was forced",
+          f"{text!r} ({width:.2f} pt) would have fitted in the "
+          f"{float(right) - run['x'] - run['width']:.2f} pt left on "
+          f"{lines[line_index]['text']!r}")
+
+
+def leading_group(runs):
+    """The first run of a line together with everything bound to it.
+
+    A label and the value it introduces are one indivisible group, and so is
+    the punctuation that closes them. Consecutive runs that touch — no word
+    space between them — plus the value run a label leads into, are read as one
+    unbreakable unit, which is what a line-break decision is really made about.
+    """
+    group = [runs[0]]
+    reached_value = runs[0]["fieldId"] is not None
+    for previous, run in zip(runs, runs[1:]):
+        touching = run["x"] - (previous["x"] + previous["width"]) <= 0.5
+        if reached_value and not touching:
+            break
+        group.append(run)
+        if run["fieldId"] is not None:
+            reached_value = True
+    return group
 
 
 def assert_payment_row(results, where, block_id, field_id, market, block,
-                       reference, code) -> None:
+                       reference, code, date) -> None:
     prefix = f"{where} {block_id}"
     lines = block["lines"]
     runs = [(index, run) for index, line in enumerate(lines)
@@ -237,42 +354,62 @@ def assert_payment_row(results, where, block_id, field_id, market, block,
     # 2. It is preceded on the SAME line by the «№» that introduces it, with
     #    no gap. This is the check the old layout would have failed: there the
     #    reference sat alone on the row's third line, 95 pt from anything.
-    same_line = [r for r in lines[ref_line]["runs"]
-                 if r["x"] + r["width"] <= ref_run["x"] + 1e-6]
-    introducer = same_line[-1] if same_line else None
-    check(results, introducer is not None and introducer["text"].endswith("№"),
-          f"{prefix}: «№» introduces the reference on its own line",
-          f"line reads {lines[ref_line]['text']!r}")
-    if introducer is not None:
-        gap = ref_run["x"] - (introducer["x"] + introducer["width"])
-        check(results, gap <= INTRODUCER_GAP,
-              f"{prefix}: no gap between «№» and the reference",
-              f"{gap:.2f} pt (limit {INTRODUCER_GAP})")
+    assert_label_holds_value(results, prefix, lines, ref_line, ref_run,
+                             "№", "reference")
 
-    # 3. The reference is not the last thing on the line — the sentence goes
-    #    on. A reference that ends its line reads as a caption.
-    after = [r for r in lines[ref_line]["runs"] if r["x"] > ref_run["x"]]
-    check(results, bool(after),
-          f"{prefix}: the sentence continues after the reference",
-          f"line reads {lines[ref_line]['text']!r}")
+    # 3. The sentence goes on after the reference, and any break there was one
+    #    the line width forced.
+    assert_sentence_continues(results, prefix, block, lines, ref_line, ref_run)
 
-    # 4. The CRM client code replaced the printed sample, in this row.
+    # 4. The agreement DATE is in the same sentence, whole, and attached to the
+    #    «дата» that names it. A row that prints a real agreement number and
+    #    then an empty «дата__» is exactly the defect this row is here for.
+    date_runs = [(i, r) for i, r in runs
+                 if r["fieldId"] == "paymentPurposeAgreementDate"]
+    check(results, len(date_runs) == 1,
+          f"{prefix}: agreement date is one unbroken token",
+          f"drawn as {len(date_runs)} fragment(s): "
+          f"{[r['text'] for _, r in date_runs]}")
+    if len(date_runs) == 1:
+        date_line, date_run = date_runs[0]
+        check(results, date_run["text"] == date,
+              f"{prefix}: agreement date is rendered verbatim",
+              f"wanted {date!r}, drew {date_run['text']!r}")
+        assert_label_holds_value(results, prefix, lines, date_line, date_run,
+                                 "дата", "date")
+        # The reference comes first and the date follows it, in that order.
+        check(results, (date_line, date_run["x"]) > (ref_line, ref_run["x"]),
+              f"{prefix}: the date follows the reference in reading order",
+              f"reference at line {ref_line}, date at line {date_line}")
+
+    # 5. The CRM client code replaced the printed sample, in this row.
     code_runs = [r for _, r in runs if r["fieldId"] == "paymentPurposeClientCode"]
     check(results, len(code_runs) == 1 and code_runs[0]["text"] == code,
           f"{prefix}: the CRM client code is drawn",
           f"drew {[r['text'] for r in code_runs]}, wanted {code!r}")
 
-    # 5. No printed placeholder survives anywhere in the block.
+    # 6. No printed placeholder survives anywhere in the block — neither the
+    #    sample client code nor the printed blank the date now fills.
     printed = " ".join(line["text"] for line in lines)
     leaked = [p for p in PLACEHOLDERS if p in printed]
     check(results, not leaked, f"{prefix}: no placeholder client code remains",
           f"found {leaked} in {printed!r}")
+    check(results, not BLANK_DATE.search(printed),
+          f"{prefix}: no printed «дата» blank remains", printed)
+    check(results, not BLANK_NUMBER.search(printed),
+          f"{prefix}: no printed «№» blank remains", printed)
 
-    # 6. The market designation the row is about is still in the sentence.
+    # 7. The market designation the row is about is still in the sentence, and
+    #    «РЫНОК» is still attached to the market that qualifies it.
     check(results, market in printed.replace("\n", " "),
           f"{prefix}: the row still names «{market}»", printed)
+    check(results, any(market in line["text"] for line in lines),
+          f"{prefix}: «{market}» is not split across two lines",
+          " | ".join(line["text"] for line in lines))
 
-    # 7. One rhythm across the block's own lines.
+    # 8. One rhythm across the block's own lines — including a row the block
+    #    grew for itself, which must read as the next line of the paragraph and
+    #    not as a new one.
     assert_one_rhythm(results, f"{prefix}: block",
                       [line["baselineTop"] for line in lines])
 

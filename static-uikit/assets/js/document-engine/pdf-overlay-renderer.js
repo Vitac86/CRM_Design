@@ -647,6 +647,39 @@
   }
   Renderer.activeReviewedRangePages = activeReviewedRangePages;
 
+  // The balanced content-stream blocks a page will no longer hold by the time
+  // it is shifted, keyed by page. Suppression runs before the shift, so this is
+  // what tells the one decision pass which content it is really planning
+  // against.
+  function suppressedBlocksByPage(template, payload) {
+    var byPage = {};
+    activeReviewedRangePages(template, payload).forEach(function (group) {
+      var ordinals = byPage[group.page] || (byPage[group.page] = []);
+      group.ranges.forEach(function (range) {
+        for (var n = range.firstBlock; n <= range.lastBlock; n += 1) ordinals.push(n);
+      });
+    });
+    return byPage;
+  }
+  Renderer.suppressedBlocksByPage = suppressedBlocksByPage;
+
+  // The same question without a payload, for static audits: a reviewed range
+  // guarded by `showWhen` is suppressed only for the payloads that select it,
+  // so an audit with no payload must keep assuming it is present.
+  function unconditionalSuppressedBlocksByPage(template) {
+    var byPage = {};
+    (template.wordFlowBlocks || []).forEach(function (block) {
+      if (block.showWhen) return;
+      var range = reviewedRangeForBlock(block);
+      if (!range) return;
+      var page = Number(block.page);
+      var ordinals = byPage[page] || (byPage[page] = []);
+      for (var n = range.firstBlock; n <= range.lastBlock; n += 1) ordinals.push(n);
+    });
+    return byPage;
+  }
+  Renderer.unconditionalSuppressedBlocksByPage = unconditionalSuppressedBlocksByPage;
+
   function inspectActiveReviewedRanges(context, template, payload) {
     var groups = activeReviewedRangePages(template, payload);
     return Promise.all(groups.map(function (group) {
@@ -1722,6 +1755,37 @@
   }
   Renderer.insertReviewedWordFlowBlocks = insertReviewedWordFlowBlocks;
 
+  // A reviewed paragraph that grew inside a bordered table needs the table to
+  // grow with it.
+  //
+  // Page expansion already moves the row's own bottom rule, the bands beneath
+  // it and everything below them down by the inserted line. What it cannot do
+  // is lengthen a rule: the column rules of the growing band end exactly at the
+  // cut, so the gap the shift opens has no sides. This draws them — the same
+  // rules, the same weight, across exactly the inserted row — so the fourth
+  // line of a sentence sits in a fourth table row rather than in a hole.
+  //
+  // It is the `drawTableRow` a field already gets, reached the same way: a
+  // block opts in with `expansion.lineStyle: 'table-row'`, and only the rows
+  // its value actually filled are drawn, so a short value never adds a stray
+  // row to the form.
+  function drawWordFlowExpansionRows(ctx, template, decided) {
+    (template.wordFlowBlocks || []).forEach(function (block) {
+      var planned = decided.planned.byBlock[block.id];
+      if (!planned || !planned.drawn) return;
+      var used = Number(planned.layout.additionalLines || 0);
+      if (used <= 0) return;
+      var pagePlan = decided.plans[block.page];
+      if (!pagePlan) return;
+      pagePlan.rows.filter(function (row) {
+        return row.fieldId === block.id && row.region && row.region.tableRow;
+      }).slice(0, used).forEach(function (row) {
+        drawTableRow(ctx, row.region);
+      });
+    });
+  }
+  Renderer.drawWordFlowExpansionRows = drawWordFlowExpansionRows;
+
   // A blank table row opened by page expansion: real vector borders matching
   // the table it was inserted into, never underscore glyphs.
   function drawTableRow(ctx, region) {
@@ -1906,13 +1970,16 @@
     // The same analysis now runs here, in the one decision pass both preflight
     // and render share, so an impossible anchor is a plan error like any other.
     var contentFingerprints = {};
+    var suppressedBlocks = suppressedBlocksByPage(template, payload);
     Object.keys(plans).map(Number).sort(function (a, b) { return a - b; })
       .forEach(function (index) {
         var pagePlan = plans[index];
         if (!pages[index]) return;
         var analysis;
         try {
-          analysis = Expander.analysePageShift(pages[index], pagePlan.shifts, {});
+          analysis = Expander.analysePageShift(pages[index], pagePlan.shifts, {
+            suppressedBlocks: suppressedBlocks[index] || []
+          });
         } catch (error) {
           planErrors.push({
             fieldId: (pagePlan.shifts[0] || {}).fieldId || 'page[' + index + ']',
@@ -2378,6 +2445,10 @@
 
           ctx.plans = plans;
           insertReviewedWordFlowBlocks(ctx, template, decided, reviewedPages);
+
+          // After the last operator capture — this appends ordinary page
+          // content, which `capturePageOperators` refuses to run after.
+          drawWordFlowExpansionRows(ctx, template, decided);
 
           // What the manager is told about: rows were added, nothing to decide.
           if (typeof opts.onExpansion === 'function' && decided.notes.length) {

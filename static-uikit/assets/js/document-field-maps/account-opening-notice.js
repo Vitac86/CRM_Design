@@ -29,9 +29,6 @@
 //   * «на основании Доверенности № , настоящим…» — measured against real glyph
 //     boxes the gap between «№» and the following comma is 8.18 pt. No
 //     document number fits, so the source reserves no usable space.
-//   * «дата__» in the page 2 payment-purpose rows — the rule is 11.04 pt wide;
-//     no date fits even at the 6 pt floor. The «№» blank beside it *is* filled,
-//     by the reviewed Word-flow rows below.
 //
 // PRINTED SAMPLE CONTENT, REPLACED BY A REAL VALUE:
 //   * «Код INV0000X» (stock, currency) and «Код XXXXXXХ» (derivatives) in the
@@ -43,6 +40,18 @@
 //     cell on page 1 uses) where the sample stood. The one dropped token per
 //     row is declared in `sourcePlaceholders`; every other token still has to
 //     match the authoritative PDF exactly.
+//
+// THE PAYMENT-PURPOSE SENTENCE IS ONE SENTENCE:
+//   «Код {код}. Перевод денежных средств по Договору на брокерское
+//    обслуживание №{номер} дата {дата}. {РЫНОК}»
+//   All three values come from the payload the wizard already collects, and
+//   all three rows name the SAME brokerage agreement — the form has one
+//   «Договор на брокерское обслуживание», recorded once in §2 of page 1 and
+//   quoted three times on page 2. So the number is `extra-brokerage-contract`
+//   and the date is `extra-brokerage-contract-date`, the same two wizard
+//   fields «Номер/Дата договора на брокерское обслуживание» that fill the §2
+//   table, not three copies of one input. The date is `format: 'dateRu'`,
+//   which is what §2 prints beside the number.
 //
 // Column geometry (page 1), from the drawn table rules:
 //   label column        41.4 → 323.8
@@ -135,24 +144,53 @@
   //      «ФОНДОВЫЙ РЫНОК», 95 pt to the right of a still-empty «№» blank. That
   //      is geometrically inside the cell and reads as a stray caption.
   //
-  // Re-flowing the whole paragraph keeps both values inside the sentence that
-  // introduces them, and the row still ends on the third printed line the source
-  // itself uses: the longest reviewed reference with the longest client code
-  // measures three lines, so no row grows and nothing below it moves.
+  //   3. The agreement DATE belongs to the same sentence for exactly the same
+  //      reason. «дата__» is an 11.04 pt rule — no date fits it at any size, so
+  //      as an overlay this blank could only ever stay empty, and a sentence
+  //      that names a real agreement number and then prints «дата__» reads as
+  //      an unfinished form. Inside the re-flowed paragraph the label and its
+  //      value are two runs of one sentence and the printed rule's width stops
+  //      being a constraint.
+  //
+  // Re-flowing the whole paragraph keeps all three values inside the sentence
+  // that introduces them.
+  //
+  // What that costs in rows, measured against this font at this size over every
+  // fixture profile (client codes 7…27 characters, agreement references 7…45,
+  // all three market designations): 44 of 72 combinations still end on the
+  // source's own third line; the remaining 28 need a fourth. None needs a
+  // fifth — the widest reference this form can be given, «№» plus 45
+  // characters, is 272.40 pt of the 295.25 pt line. So each row is allowed
+  // exactly one additional line, taken as a complete bordered table row at the
+  // source's own 12.60 pt pitch.
   var PURPOSE_LEFT = 252.41;
   var PURPOSE_WIDTH = 295.25;       // 553.30 right rule − 252.41 − 5.64 padding
   var PURPOSE_SIZE = 11.04;         // the size the source itself prints
   var PURPOSE_LINE_HEIGHT = 12.60;
   var PURPOSE_BLANK_WIDTH = 49.68;  // «_________» at 11.04 pt
+  var PURPOSE_DATE_BLANK_WIDTH = 11.04;   // «__» at 11.04 pt
+
+  // The table's three drawn rules, as centre lines: the source paints each as a
+  // 0.48 pt rectangle at 41.40–41.88, 246.77–247.25 and 553.30–553.78. A row
+  // opened between two bands reproduces exactly these, so the growth is
+  // invisible except that the row is taller.
+  var PURPOSE_RULES = [41.64, 247.01, 553.54];
+  var PURPOSE_RULE_THICKNESS = 0.48;
 
   var PURPOSE_LEAD = 'Код ';
   var PURPOSE_BODY = '. Перевод денежных средств по Договору на брокерское ' +
     'обслуживание №';
+  // «дата» and the value it labels are one group: the trailing space becomes
+  // the space between them and `keepWithNext` refuses to break there.
+  var PURPOSE_DATE_LABEL = ' дата ';
 
-  // One row. `market` is the sentence's closing designation as the source
-  // prints it; `placeholder` is the sample client code that row prints.
+  // One row.
+  //   `market`      the sentence's closing designation, as the source prints it
+  //   `placeholder` the sample client code that row prints
+  //   `rowBottom`   the top of the row's own bottom rule — where a fourth line
+  //                 opens a new table row
   function purposeBlock(blockId, fieldId, baselineTop, market, placeholder,
-                        range) {
+                        rowBottom, range) {
     return {
       id: blockId,
       type: 'wordFlowBlock',
@@ -166,6 +204,30 @@
       lineHeight: PURPOSE_LINE_HEIGHT,
       // The source's own three lines are ragged, not justified.
       alignment: 'left',
+      // A fourth line is a fourth table row, not text spilling over a rule.
+      // The cut is the top of this row's own bottom rule: everything from there
+      // down — the rule itself, the bands below it and their rules, and the
+      // whole body of the page — moves down by one 12.60 pt line, and the gap
+      // that opens is closed by redrawing the three column rules across it.
+      // The band's own rules end exactly at the cut and so stay where they are;
+      // the inserted row continues them.
+      overflowStrategy: 'expand-layout',
+      expansion: {
+        page: 1, insertionTop: rowBottom, shiftFromTop: rowBottom,
+        rowHeight: PURPOSE_LINE_HEIGHT, maxExtraRows: 1,
+        lineStyle: 'table-row', reviewStatus: 'approved',
+        rowLeft: PURPOSE_RULES[0],
+        rowWidth: PURPOSE_RULES[PURPOSE_RULES.length - 1] - PURPOSE_RULES[0],
+        // The table draws no rule of its own at the top or bottom of an
+        // inserted row: the band above it already ends on one and the row's
+        // travelling bottom rule closes it underneath.
+        borders: { left: false, right: false, top: false, bottom: false },
+        columns: PURPOSE_RULES,
+        line: {
+          left: PURPOSE_LEFT, width: PURPOSE_WIDTH,
+          baselineOffset: 10.08, ruleThickness: PURPOSE_RULE_THICKNESS
+        }
+      },
       sourceReplacement: {
         firstBlock: range.block, lastBlock: range.block,
         expectedBlockCount: 1, expectedPageBlockCount: 10,
@@ -201,7 +263,21 @@
             underline: true, minWidth: PURPOSE_BLANK_WIDTH,
             thickness: 0.48, offset: 1.20
           } },
-        { type: 'static', text: ' дата__. ' + market }
+        // «дата» keeps its own value the same way «№» keeps the reference: the
+        // label and the date are one group, and the date is one token.
+        { type: 'static', text: PURPOSE_DATE_LABEL, keepWithNext: true },
+        { type: 'fieldRef', fieldId: 'paymentPurposeAgreementDate',
+          keepTogether: true,
+          decoration: {
+            underline: true, minWidth: PURPOSE_DATE_BLANK_WIDTH,
+            thickness: 0.48, offset: 1.20
+          } },
+        // A full stop attaches to whatever precedes it, so the sentence ends
+        // on the date rather than opening a line with a stray point.
+        { type: 'static', text: '.' },
+        // «ФОНДОВЫЙ» and «РЫНОК» name one market between them: one token, never
+        // split across two lines.
+        { type: 'static', text: ' ' + market, keepTogether: true }
       ]
     };
   }
@@ -239,6 +315,27 @@
         bottomClearance: 2.0,
         compaction: [],
         anchors: ['account-opening-broker-introduction', 'clientName']
+      },
+      // Page 2. Its movable body ends at 738.92 — «Подпись ответственного
+      // лица …» — and the sheet is 841.92 pt tall with no page number of its
+      // own, so 103.00 pt sit unused beneath it. The three payment-purpose
+      // rows may each open one 12.60 pt line: 37.80 pt of the 97.00 pt this
+      // budget allows once the 6 pt bottom clearance is taken off. Anchors are
+      // listed top to bottom, which is the order they are paid for in, so a
+      // lower row's insertion point already accounts for the rows above it.
+      //   python static-uikit/tools/qa/measure_page_layout.py --doc account-opening-notice
+      1: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 738.92,
+        fixedFooterFrom: null,
+        shiftToTop: 835.92,
+        bottomClearance: 6.0,
+        compaction: [],
+        anchors: [
+          'account-opening-payment-purpose-stock',
+          'account-opening-payment-purpose-currency',
+          'account-opening-payment-purpose-derivatives'
+        ]
       }
     },
 
@@ -305,15 +402,15 @@
       // page's table rules are separate blocks that are never touched, so the
       // borders stay where the form drew them.
       purposeBlock('account-opening-payment-purpose-stock', 'paymentPurposeStock',
-                   46.68, 'ФОНДОВЫЙ РЫНОК', 'INV0000X',
+                   46.68, 'ФОНДОВЫЙ РЫНОК', 'INV0000X', 74.40,
                    { block: 2, sha256: '8d508405d9190a64921835d973104e4b7ee9010a000e4e6952ced5dd7d725738' }),
       purposeBlock('account-opening-payment-purpose-currency', 'paymentPurposeCurrency',
-                   85.22, 'ВАЛЮТНЫЙ РЫНОК', 'INV0000X',
+                   85.22, 'ВАЛЮТНЫЙ РЫНОК', 'INV0000X', 112.94,
                    { block: 4, sha256: '0cc104761d1b66bdc93f286bd0a80cefac3a04e726ec61fb67ab80115dfae191' }),
       // The derivatives row samples the code differently: six Latin X and one
       // Cyrillic Х. Declared exactly as printed.
       purposeBlock('account-opening-payment-purpose-derivatives', 'paymentPurposeDerivatives',
-                   123.62, 'СРОЧНЫЙ РЫНОК', 'XXXXXXХ',
+                   123.62, 'СРОЧНЫЙ РЫНОК', 'XXXXXXХ', 151.34,
                    { block: 6, sha256: '81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd' })
     ],
 
@@ -382,8 +479,7 @@
       // ── Page 2: §5 «Назначение платежа» ──────────────────────────────────
       //
       // The brokerage agreement reference, repeated in each payment-purpose
-      // row — one operator input drives all three. The adjacent 11.04 pt
-      // «дата__» rule is still too small to fill and stays blank.
+      // row — one operator input drives all three.
       //
       // These are flow references: the reviewed Word-flow row above draws each
       // one inside the sentence that introduces it, immediately after «№», so a
@@ -407,6 +503,27 @@
              required: true,
              fontSize: PURPOSE_SIZE,
              minFontSize: PURPOSE_SIZE,
+             layoutMode: 'flow-reference',
+             flowBlockId: [
+               'account-opening-payment-purpose-stock',
+               'account-opening-payment-purpose-currency',
+               'account-opening-payment-purpose-derivatives'
+             ],
+             allowMultipleFlowReferences: true
+           }),
+
+      // The date of that same brokerage agreement, printed where the source
+      // reserves «дата__». One value for all three rows, from the same wizard
+      // input that fills «Дата» of the §2 table on page 1 — the form records
+      // one brokerage agreement, so a second date here could only ever
+      // contradict it. Formatted as §2 formats it, dd.mm.yyyy.
+      text('paymentPurposeAgreementDate', 'extra.extra-brokerage-contract-date',
+           1, PURPOSE_LEFT, 46.68, PURPOSE_DATE_BLANK_WIDTH, {
+             required: true,
+             format: 'dateRu',
+             fontSize: PURPOSE_SIZE,
+             minFontSize: PURPOSE_SIZE,
+             tokenBreak: 'none',
              layoutMode: 'flow-reference',
              flowBlockId: [
                'account-opening-payment-purpose-stock',
