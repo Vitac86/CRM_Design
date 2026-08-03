@@ -155,6 +155,22 @@
     if (/registration-number|identifier/i.test(key)) {
       return long ? 'REG-GB-2026-00000000007789' : '1217700011256';
     }
+    // The internal accession table prints the client code, the brokerage
+    // agreement and the depository agreement in three stacked rows. The generic
+    // identifier below would give all three the same string, and a reviewer
+    // reading three identical values cannot tell a correct map from one that
+    // bound the same source three times. Each gets its own shape.
+    if (/client-code|clientcode/i.test(key)) {
+      return long ? 'INV-2026-00000000017' : 'INV-1006';
+    }
+    // Cyrillic is wider than Latin at the same point size, so the long
+    // depository number is the longest one that still fits the printed cell —
+    // 107.8 pt of the 126 pt the narrower of the two internal tables allows.
+    // Lengthening it further would only manufacture an overflow no registrar
+    // will ever type.
+    if (/depository|depositary|depo-contract/i.test(key)) {
+      return long ? 'ДЕПО-2026/000417-СПБ-01' : 'ДЕПО-2026/0417';
+    }
     if (/account|portfolio|contract|agreement|number|code/i.test(key)) {
       return long ? 'BR-2026/00444-INTL-00000017' : 'AB-7789';
     }

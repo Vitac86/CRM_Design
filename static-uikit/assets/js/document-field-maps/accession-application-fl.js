@@ -33,6 +33,30 @@
   var SIZE_9_5 = 9.5;       // measured room: 9.56 pt
   var SIZE_9 = 9;         // measured room: 8.89, 8.89, 8.89 pt
 
+  // ── Typography that belongs to the source form, not to the client value ───
+  //
+  // Two blocks on this form print INTO type the template already set, so the
+  // generic 12 pt dynamic size is wrong for them however readable it is:
+  //
+  //   the signature date   `"_____"__________" 20____ г.` is one printed span
+  //                        in TimesNewRomanPSMT at 8.52 pt on baseline 732.82;
+  //                        drawing the day, month and year at 12 pt made them
+  //                        41 % larger than the form's own quotes, "20" and
+  //                        "г." sitting on the same line;
+  //   the internal table   «Заполняется ООО «Инвестика»» is set throughout in
+  //                        TimesNewRomanPSMT at 9.00 pt.
+  //
+  // The readability floor is 9 pt and the source is 8.52 pt, so 9 pt is used
+  // for the date: the closest size to the printed original that the policy
+  // allows, 0.48 pt from it instead of 3.48 pt. Liberation Serif is
+  // metric-compatible with Times New Roman, so the glyphs occupy the same
+  // advance widths as the printed characters beside them.
+  var SOURCE_FONT = 'legalSerif';
+  var SOURCE_DATE_SIZE = 9;    // template prints 8.52 pt; 9 pt is the floor
+  var SOURCE_DATE_GROUP = 'accession-fl-source-date';
+  var SOURCE_TABLE_SIZE = 9;   // template prints 9.00 pt exactly
+  var SOURCE_TABLE_GROUP = 'accession-fl-internal-table';
+
   // ── The three tariff plans are one visual group ───────────────────────────
   //
   // Same policy as the legal-entity form (1В): one face, one size, one leading,
@@ -104,6 +128,37 @@
       left: left,
       baselineTop: baselineTop,
       glyphSize: CHECK_GLYPH
+    };
+  }
+
+  // One value cell of the internal «Заполняется ООО «Инвестика»» table.
+  //
+  // The cell is addressed by the centre of its column and the baseline the
+  // row's own printed label sits on, so a value lines up with the label beside
+  // it instead of floating in the box. `width` is the reviewed text width
+  // inside the cell — narrower than the ruled cell, so a value that grows can
+  // never reach a vertical border.
+  function internalCell(id, label, source, centreX, baselineTop, width,
+                        format) {
+    var w = width == null ? 128 : width;
+    return {
+      id: id,
+      label: label,
+      source: source,
+      optional: true,
+      typographyGroup: SOURCE_TABLE_GROUP,
+      page: 2,
+      left: centreX - w / 2,
+      baselineTop: baselineTop,
+      width: w,
+      font: SOURCE_FONT,
+      fontSize: SOURCE_TABLE_SIZE,
+      minFontSize: MIN,
+      align: 'center',
+      maxLines: 1,
+      // Dates arrive ISO from the wizard's date input and RU from the
+      // CRM payload; `dateRu` accepts both and prints дд.мм.гггг.
+      format: format
     };
   }
 
@@ -505,62 +560,106 @@
       },
 
       // ── Page 2 — signature block ──────────────────────────────────────────
-      // Printed as:  "_____"__________" 20____ г.
+      // Printed as one span:  "_____"__________" 20____ г.
+      // Measured underscore runs (baseline 732.82, TimesNewRomanPSMT 8.52 pt):
+      //   day    309.77 .. 331.05   (21.28)
+      //   month  334.46 .. 376.96   (42.50)
+      //   year   391.05 .. 408.02   (16.97)   — "20" is printed at 382.54
+      // All three share SOURCE_DATE_GROUP so the day, month and year can never
+      // again be set in three different sizes, and none of them may drift back
+      // to the generic client-value size.
       {
         id: 'signDay',
         source: 'field.documentDateRu', format: 'dateDay',
+        typographyGroup: SOURCE_DATE_GROUP,
         page: 1, left: 309.8, baselineTop: 732.82, width: 21.3,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
+        align: 'center'
       },
       {
         // The template already prints "20", so only the month name belongs
         // here; the two remaining year digits go in the next slot.
         id: 'signMonth',
         source: 'field.documentDateRu', format: 'monthOnly',
+        typographyGroup: SOURCE_DATE_GROUP,
         page: 1, left: 334.5, baselineTop: 732.82, width: 42.5,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
+        align: 'center'
       },
       {
         id: 'signYear',
         source: 'field.documentDateRu', format: 'dateYear2',
+        typographyGroup: SOURCE_DATE_GROUP,
         page: 1, left: 391.0, baselineTop: 732.82, width: 17.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center'
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
+        align: 'center'
       },
       // The long rule before the parentheses is where the client signs by hand
       // and is deliberately left empty. Only the printed name is drawn.
       {
-        // Only 46.68 pt between the printed parentheses (measured: 400.28 to
-        // 446.96), which at the 9 pt readability floor holds about ten Cyrillic
-        // characters — the printed convention here is "Фамилия И.О." anyway.
+        // The signature transcript is ONE field on ONE baseline.
         //
-        // A long hyphenated surname needs more than that, and the area directly
-        // under the parentheses is blank down to the page margin («Подпись»
-        // ends at 764.06 and «М.П.» sits to the right, from x 453.34). One
-        // reviewed continuation line therefore sits under the parentheses, the
-        // same width and centred the same way, so the transcript continues
-        // inside the signature block instead of failing. The surname keeps its
-        // own hyphen as the break, so nothing is abbreviated or invented.
+        // It used to be mapped to the 46.71 pt between the printed parentheses
+        // (measured: interior 400.31 .. 447.02) at 12 pt, with a continuation
+        // line 25.6 pt lower. No realistic transcript fits 46.71 pt at a legible
+        // size — "Соколов А.М." is 53.87 pt at 9 pt — so every name split, and
+        // the second half landed *below* the signature rule, beside «М.П.»:
+        // manual review saw "Соколов" inside the parentheses and "А.М." on its
+        // own baseline underneath. A reader cannot tell that is one name.
+        //
+        // Measured blank on baseline 752.38: nothing is printed to the right of
+        // the closing parenthesis (449.79) at all. «Подпись» is on the next
+        // baseline down (762.22) and «М.П.» two below (771.58, from x 453.34),
+        // so neither is touched by a 9 pt line whose descender reaches 754.3.
+        // The reviewed region therefore starts just inside the "(" and runs to
+        // the page's right text margin (538.68) — the real printed width, not
+        // the width of the decoration.
+        //
+        // Left-aligned so a short name still reads as "(Соколов А.М." against
+        // the printed "(": growth happens on the right, where the page is
+        // blank, never on the left, where the hand-signature rule is.
+        //
+        // No `surname` fallback: dropping the initials to make a name fit is a
+        // silent shortening, and with the real width it is never needed.
         id: 'signatureName',
         label: 'Расшифровка подписи',
-        source: 'field.clientFullName', format: 'initials', fallbacks: ['surname'],
-        page: 1, left: 400.3, baselineTop: 752.38, width: 46.7,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN, align: 'center',
-        overflowStrategy: 'flow',
-        flowRegions: [
-          { page: 1, left: 400.3, baselineTop: 752.38, width: 46.7, maxLines: 1 },
-          {
-            page: 1, left: 400.3, baselineTop: 778.00, width: 46.7, maxLines: 1,
-            align: 'center', maxFontSize: 9.5,
-            generated: true, reviewStatus: 'approved',
-            drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
-          }
-        ]
-      }
+        source: 'field.clientFullName', format: 'initials',
+        page: 1, left: 400.31, baselineTop: 752.38, width: 138.37,
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
+        align: 'left', maxLines: 1
+      },
 
       // ── Page 3 — "Заполняется ООО «Инвестика»" ────────────────────────────
-      // Registration number, contract numbers/dates, internal client code and
-      // the officer's position/name/signature are completed by Investica staff
-      // after printing. Left blank by design — see docs/document-pdf-generation.md.
+      //
+      // Table grid measured from the template (page index 2):
+      //   columns   57.12 | 271.37 | 405.43 | 542.98
+      //   rows      56.16 header · 77.04 registration · 101.90 brokerage
+      //             123.14 depository · 147.02 client code · 168.50 employee
+      //             header · 189.86 employee row · 211.34 bottom
+      // The vertical rule at 405.43 is absent between 147.50 and 168.50, so the
+      // client-code row is one merged cell spanning both value columns.
+      //
+      // Everything the document itself knows is now printed. Three cells stay
+      // blank on purpose and a test proves it (see run_expansion_tests.py):
+      // Должность, ФИО and Подпись belong to the Investica officer who signs
+      // after printing, and must never be filled from client data.
+      //
+      // The registration number and date of the application also stay blank:
+      // «Front Заявление о присоединении» has no field that is proven to hold
+      // them (`mask` is a generic required string), so the row is completed by
+      // staff rather than bound to a guess. See docs/umi-variable-registry.md.
+      internalCell('brokerageContractNumber', 'Номер договора на брокерское обслуживание',
+                   'field.extra-contract-number', 338.64, 110.78),
+      internalCell('brokerageContractDate', 'Дата договора на брокерское обслуживание',
+                   'field.extra-contract-date', 474.44, 110.78, null, 'dateRu'),
+      internalCell('depositoryContractNumber', 'Номер депозитарного договора',
+                   'extra.extra-depository-contract', 338.64, 132.02),
+      internalCell('depositoryContractDate', 'Дата депозитарного договора',
+                   'extra.extra-depository-contract-date', 474.44, 132.02, null, 'dateRu'),
+      // The merged cell: ruled 271.85 .. 542.97, centred on 407.41. The
+      // reviewed text width stays 3 pt clear of both vertical rules.
+      internalCell('internalClientCode', 'Код клиента в системе внутреннего учета',
+                   'field.client-code', 407.41, 156.02, 265)
     ]
   };
 

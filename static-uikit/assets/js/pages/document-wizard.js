@@ -276,7 +276,15 @@
         },
         { key: 'tariff-stock', label: 'Тарифный план — фондовый рынок', type: 'text' },
         { key: 'tariff-derivatives', label: 'Тарифный план — срочный рынок', type: 'text' },
-        { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' }
+        { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' },
+        // Page 3, «Заполняется ООО «Инвестика»». The brokerage pair is the
+        // client's own agreement (umi.bo_num / umi.datesign); the depository
+        // pair has no UMI field that is proven to hold a printable number or
+        // date, so it is typed here — see docs/umi-variable-registry.md.
+        { key: 'extra-contract-number', label: 'Номер договора на брокерское обслуживание', type: 'text' },
+        { key: 'extra-contract-date', label: 'Дата договора на брокерское обслуживание', type: 'date' },
+        { key: 'extra-depository-contract', label: 'Номер депозитарного договора (счёта ДЕПО)', type: 'text' },
+        { key: 'extra-depository-contract-date', label: 'Дата депозитарного договора', type: 'date' }
       ],
       checkFields: [
         { key: 'accession-brokerage', label: 'Присоединение к Регламенту брокерского обслуживания', defaultChecked: true },
@@ -347,6 +355,11 @@
         { key: 'tariff-stock', label: 'Тарифный план — фондовый рынок', type: 'text' },
         { key: 'tariff-derivatives', label: 'Тарифный план — срочный рынок', type: 'text' },
         { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' },
+        // Page 2, «Заполняется ООО «Инвестика»» — same pairing as the ФЛ form.
+        { key: 'extra-contract-number', label: 'Номер договора на брокерское обслуживание', type: 'text' },
+        { key: 'extra-contract-date', label: 'Дата договора на брокерское обслуживание', type: 'date' },
+        { key: 'extra-depository-contract', label: 'Номер депозитарного договора (счёта ДЕПО)', type: 'text' },
+        { key: 'extra-depository-contract-date', label: 'Дата депозитарного договора', type: 'date' },
         GENERAL_DIRECTOR_REPRESENTATIVE_FIELD
       ],
       checkGroupLabel: 'Отметки заявления:',
@@ -3433,14 +3446,21 @@
   }
 
   // Resolve a payload path to its raw value. Supported namespaces:
+  //   umi.*     -> the exact UMI names, via document-engine/umi-adapter.js
   //   subject.* -> payload.subject       (e.g. subject.displayName)
   //   field.*   -> payload.fields        (e.g. field.clientFullName)
   //   extra.*   -> payload.extraValues   (e.g. extra.extra-document-date)
   //   check.*   -> payload.checks        (e.g. check.notice-scope-all)
   // Unknown namespace or missing key -> undefined. The resolver does NOT coerce
   // to '' / false; callers (applyPdfFieldValue) apply defaults after resolution.
+  //
+  // The UMI adapter is the single normalization layer, so this path and the
+  // renderer's cannot disagree about what a source name means. The inline
+  // fallback below only runs if the adapter script is missing from the page.
   function resolvePdfValue(ref, payload) {
-    if (!ref || typeof ref !== 'string') return undefined;
+    if (!ref || typeof ref !== 'string' || !payload) return undefined;
+    var adapter = window.CRMDocumentEngine && window.CRMDocumentEngine.umiAdapter;
+    if (adapter) return adapter.resolve(ref, payload);
     var dot = ref.indexOf('.');
     if (dot === -1) return undefined;
     var ns  = ref.slice(0, dot);

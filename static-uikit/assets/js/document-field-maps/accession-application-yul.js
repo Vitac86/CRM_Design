@@ -23,6 +23,53 @@
   var SIZE_10_5 = 10.5;      // measured room: 10.64 pt
   var SIZE_10 = 10;        // measured room: 10.08 pt
   var SIZE_9 = 9;         // measured room: 9.43, 8.98, 8.98, 7.60 pt
+
+  // ── Typography that belongs to the source form, not to the client value ───
+  //
+  // Same policy as the ФЛ form (1А), measured on this template:
+  //   signature date   one printed span `"_____"__________" 20____ г.` in
+  //                    TimesNewRomanPSMT 8.52 pt on baseline 496.39;
+  //   internal table   «Заполняется ООО «Инвестика»» set in TimesNewRomanPSMT
+  //                    at 9.00 pt throughout.
+  // The 9 pt readability floor keeps the date 0.48 pt from the printed original
+  // instead of the 3.48 pt the generic 12 pt client size produced.
+  var SOURCE_FONT = 'legalSerif';
+  var SOURCE_DATE_SIZE = 9;    // template prints 8.52 pt; 9 pt is the floor
+  var SOURCE_DATE_GROUP = 'accession-yul-source-date';
+  var SOURCE_TABLE_SIZE = 9;   // template prints 9.00 pt exactly
+  var SOURCE_TABLE_GROUP = 'accession-yul-internal-table';
+
+  // One value cell of the internal «Заполняется ООО «Инвестика»» table
+  // (page index 1). Grid measured from the template:
+  //   columns  57.12 | 268.25 | 400.39 | 536.02
+  //   rows     575.83 header · 596.83 registration · 621.58 brokerage
+  //            642.82 depository · 666.70 client code · 688.18 employee header
+  //            709.54 employee row · 731.02 bottom
+  // The vertical rule at 400.39 is absent between 667.18 and 688.18, so the
+  // client-code row is one merged cell.
+  function internalCell(id, label, source, centreX, baselineTop, width,
+                        format) {
+    var w = width == null ? 126 : width;
+    return {
+      id: id,
+      label: label,
+      source: source,
+      optional: true,
+      typographyGroup: SOURCE_TABLE_GROUP,
+      page: 1,
+      left: centreX - w / 2,
+      baselineTop: baselineTop,
+      width: w,
+      font: SOURCE_FONT,
+      fontSize: SOURCE_TABLE_SIZE,
+      minFontSize: MIN,
+      align: 'center',
+      maxLines: 1,
+      // Dates arrive ISO from the wizard's date input and RU from the
+      // CRM payload; `dateRu` accepts both and prints дд.мм.гггг.
+      format: format
+    };
+  }
   // The source's own line pitch inside the market table's tariff column
   // (measured label baselines 502.00 → 511.72 → 521.56). An added tariff line —
   // and the table row that has to grow to hold it — uses exactly that step.
@@ -460,40 +507,76 @@
 
       // ── Page 2 — client date and printed signer name ─────────────────────
       {
+        // Measured underscore runs (baseline 496.39, TimesNewRomanPSMT
+        // 8.52 pt): day 60.12..81.40, month 84.81..127.31, year 141.40..158.37.
         id: 'signDay',
         source: 'field.documentDateRu', format: 'dateDay',
+        typographyGroup: SOURCE_DATE_GROUP,
         page: 1, left: 60.1, baselineTop: 496.39, width: 21.3,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
         align: 'center', required: true
       },
       {
         id: 'signMonth',
         source: 'field.documentDateRu', format: 'monthOnly',
+        typographyGroup: SOURCE_DATE_GROUP,
         page: 1, left: 84.8, baselineTop: 496.39, width: 42.5,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
         align: 'center', required: true
       },
       {
         id: 'signYear',
         source: 'field.documentDateRu', format: 'dateYear2',
+        typographyGroup: SOURCE_DATE_GROUP,
         page: 1, left: 141.4, baselineTop: 496.39, width: 17.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
         align: 'center', required: true
       },
       {
-        // The long rule is for a handwritten signature. Only the short name
-        // inside parentheses is typed. The source hard-codes the adjacent role
-        // as "Генеральный директор" and is preserved verbatim.
+        // One transcript, one baseline — the same fix as the ФЛ form.
+        //
+        // The long rule (311.69..388.13) is for a handwritten signature and
+        // stays empty. The printed parentheses give only 46.71 pt of interior
+        // (393.09..439.80), which no legible "Фамилия И.О." fits, so the
+        // reviewed region runs from just inside the "(" to the page's right
+        // text margin, where baseline 535.51 is measured blank. «Подпись» is on
+        // the next baseline (545.23) and «М.П.» below that (554.59, x 446.14),
+        // so a 9 pt line reaching 537.4 touches neither.
+        //
+        // The source hard-codes the adjacent role as «Генеральный директор» and
+        // it is preserved verbatim. No `surname` fallback: with the real width
+        // the initials never have to be dropped.
         id: 'signatureName',
-        source: 'field.representativeFullName', format: 'initials', fallbacks: ['surname'],
-        page: 1, left: 393.1, baselineTop: 535.51, width: 46.7,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'center', required: true
-      }
+        label: 'Расшифровка подписи',
+        source: 'field.representativeFullName', format: 'initials',
+        page: 1, left: 393.09, baselineTop: 535.51, width: 145.59,
+        font: SOURCE_FONT, fontSize: SOURCE_DATE_SIZE, minFontSize: MIN,
+        align: 'left', maxLines: 1, required: true
+      },
+
+      // ── Page 2 — "Заполняется ООО «Инвестика»" ────────────────────────────
+      //
+      // Populated from what the document knows. Должность, ФИО and Подпись
+      // stay blank: they belong to the Investica officer who signs after
+      // printing and must never be filled from client data.
+      //
+      // The application's registration number and date also stay blank — no
+      // UMI field is proven to hold them. See docs/umi-variable-registry.md.
+      internalCell('brokerageContractNumber', 'Номер договора на брокерское обслуживание',
+                   'field.extra-contract-number', 334.56, 630.46),
+      internalCell('brokerageContractDate', 'Дата договора на брокерское обслуживание',
+                   'field.extra-contract-date', 468.44, 630.46, null, 'dateRu'),
+      // The depository label wraps onto two lines (651.70, 662.02); the value
+      // sits on the row's first baseline, level with «Депозитарный договор».
+      internalCell('depositoryContractNumber', 'Номер депозитарного договора',
+                   'extra.extra-depository-contract', 334.56, 651.70),
+      internalCell('depositoryContractDate', 'Дата депозитарного договора',
+                   'extra.extra-depository-contract-date', 468.44, 651.70, null, 'dateRu'),
+      // The merged cell: ruled 268.73 .. 536.01, centred on 402.37.
+      internalCell('internalClientCode', 'Код клиента в системе внутреннего учета',
+                   'field.client-code', 402.37, 675.70, 261)
 
       // The checkbox at (212.0, 361.25) is explanatory prose, not a control.
-      // The entire "Заполняется ООО «Инвестика»" table (page 2, y >= 575.83)
-      // is completed later by staff and intentionally remains blank.
     ]
   };
 

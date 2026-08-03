@@ -20,3 +20,7 @@ static-uikit/manual-smoke/ordinary-substitution-review/
 # Final all-document visual-review pack — regenerated locally by
 # static-uikit/tools/qa/build_final_review_pack.py, never committed.
 static-uikit/manual-smoke/final-document-review/
+
+# Focused pack for the manual-review findings — same builder, --only/--out.
+# Local evidence for a reviewer; the PDFs and screenshots are never committed.
+static-uikit/manual-smoke/manual-findings-fix/
