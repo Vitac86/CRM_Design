@@ -133,9 +133,16 @@ The final status of all 22 templates — which are generated, which are offered
 as a static download, which are hidden or unexposed, and why — is
 [document-full-template-audit.md](document-full-template-audit.md), which is
 generated from the executable maps and the wizard catalogue rather than
-maintained by hand. In summary: 18 dynamic production-ready, 2 static by
-design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model) and 1
-unexposed by decision (`transfer-requisites`).
+maintained by hand. In summary: 17 dynamic production-ready, 2 static by
+design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model), 1
+unexposed by decision (`transfer-requisites`) and 1 blocked on incomplete
+mapping (`order-forms`).
+
+`order-forms` was counted as production-ready until manual review found it
+generating almost entirely blank: 80 of its 93 printed fields have no source
+and every field is optional, so nothing objected. It is no longer offered.
+Every printed row, with the exact UMI name where one exists, is in
+[order-forms-mapping-gap.md](order-forms-mapping-gap.md).
 
 Static by design, issued unchanged because neither carries a client-specific
 blank anywhere: `brokerage-key-information` (a disclosure sheet about the
@@ -221,11 +228,13 @@ under «Основание для перевода», and the company seal image
 twice: in the «Код клиента» cell of §1, and inside all three payment-purpose
 sentences on page 2, where the source form prints a sample code instead of a
 blank.
-**Operator:** formation date, signing officer, both agreement numbers and dates,
-three internal market accounts, счёт депо. One agreement-number input drives
-four overlays.
-**Blank:** «Подпись ответственного лица», the 8.18 pt gap after «Доверенности №»,
-and the 11.04 pt «дата__» rules.
+**Operator:** formation date, both agreement numbers and dates, three internal
+market accounts, счёт депо. One agreement-number input drives four overlays.
+The signing officer is **no longer asked for**: the updated authoritative
+template (sha256 5ca829a6…) prints «в лице Генерального Директора Козырева
+Александра Юрьвеича, действующего на основании Устава» itself, so there is no
+blank to fill and the overlay that filled it was removed.
+**Blank:** «Подпись ответственного лица» and the 11.04 pt «дата__» rules.
 
 ### `power-of-attorney` — ПРИЛОЖЕНИЕ 6, 4 pages, both subject kinds
 
@@ -419,7 +428,7 @@ standalone card.
 | Приложение 11 Уведомление риски | The broker's e-mail rule in clause 3 is **20.64 pt** wide — no address fits. The broker's own address is also not held in the CRM. Left blank. |
 | ПРИЛОЖЕНИЕ 4 | The broker's own payment details (ИНН, Р/сч, Банк, К/сч, БИК) and the whole торговый/неторговый раздел table are blank in the authoritative source. |
 | ПРИЛОЖЕНИЕ 3 | Same blank broker requisites. The «Код INV0000X» / «Код XXXXXXХ» sample codes in the payment-purpose rows are **no longer left as printed**: each row is a reviewed Word-flow block that replaces the source paragraph and puts the CRM client code where the sample stood. The one dropped token per row is declared in `sourcePlaceholders`; every other token still has to match the authoritative PDF. |
-| ПРИЛОЖЕНИЕ 3 | The gap after «на основании Доверенности №» is 8.18 pt and the «дата__» rules in the payment-purpose rows are 11.04 pt — neither can hold a value. Left blank. |
+| ПРИЛОЖЕНИЕ 3 | Superseded. The updated template replaced «на основании Доверенности № ,» with the fixed «на основании Устава» and prints the representative itself, so the 8.18 pt gap no longer exists. The «дата__» rules in the payment-purpose rows are still 11.04 pt and still left blank. |
 | ПРИЛОЖЕНИЕ 6 (ЮЛ) | «серии» ends its line with no rule after it, so series and number share the «№» rule; «дата выдачи _,» reserves 4.56 pt and stays blank. |
 | ПРИЛОЖЕНИЕ 6 (ФЛ) | «выданный» reserves 50.2 pt against 114.5 pt for the same value in the legal-entity variant, so a normal issuing authority needs three wrapped lines. |
 | ПРИЛОЖЕНИЕ 7 | Only the «Первичная подача заявки» row has underlined blanks; the «Отмена ранее поданной заявки» row has none, so its number and date go in the adjacent value column. |
