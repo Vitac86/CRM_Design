@@ -949,6 +949,78 @@
       });
       assert(expandable >= 10, 'expected expandable fields across the maps: ' + expandable);
     });
+    add('Reviewed source placeholders survive both round trips', function () {
+      // A placeholder is the one licence a map has to drop printed wording, so
+      // losing it on import would silently re-introduce the sample text — or,
+      // worse, keep dropping a token with nothing declared to replace it.
+      var declared = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var exported = ns.schema.toProduction(imported);
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (!block.sourcePlaceholders) return;
+          declared += block.sourcePlaceholders.length;
+          var round = (exported.wordFlowBlocks || []).filter(function (item) {
+            return item.id === block.id;
+          })[0];
+          assert(round, 'placeholder owner was lost: ' + map.id + '/' + block.id);
+          assert(ns.io.semanticEqual(round.sourcePlaceholders, block.sourcePlaceholders),
+            'sourcePlaceholders changed for ' + map.id + '/' + block.id);
+          block.sourcePlaceholders.forEach(function (placeholder) {
+            equal(placeholder.reviewStatus, 'approved',
+              map.id + '/' + block.id + ': placeholder is not approved');
+            var replaced = (block.runs || []).filter(function (run) {
+              return run.type === 'fieldRef' && run.fieldId === placeholder.fieldId;
+            });
+            assert(replaced.length === 1, map.id + '/' + block.id +
+              ': nothing replaces placeholder «' + placeholder.text + '»');
+          });
+        });
+      });
+      assert(declared >= 3, 'expected reviewed placeholders: ' + declared);
+    });
+    add('Paragraph-continuing rows and shared references survive both round trips', function () {
+      // Both say where a value is allowed to appear. `continuesParagraph` makes
+      // a grown row keep the sentence's leading instead of the row's pitch;
+      // `allowMultipleFlowReferences` lets one value print in several reviewed
+      // paragraphs. Dropping either changes the layout without changing a
+      // coordinate, which is exactly the class of defect this branch is closing.
+      var continuing = 0;
+      var shared = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var exported = ns.schema.toProduction(imported);
+        (map.fields || []).forEach(function (field) {
+          var round = (exported.fields || []).filter(function (item) {
+            return item.id === field.id;
+          })[0];
+          if (field.expansion && field.expansion.line &&
+              field.expansion.line.continuesParagraph) {
+            continuing += 1;
+            assert(round && round.expansion && round.expansion.line &&
+                   round.expansion.line.continuesParagraph === true,
+              'continuesParagraph lost for ' + map.id + '/' + field.id);
+          }
+          if (field.allowMultipleFlowReferences) {
+            shared += 1;
+            assert(round && round.allowMultipleFlowReferences === true,
+              'allowMultipleFlowReferences lost for ' + map.id + '/' + field.id);
+            var owners = Array.isArray(round.flowBlockId)
+              ? round.flowBlockId : [round.flowBlockId];
+            assert(owners.length > 1, map.id + '/' + field.id +
+              ': a shared reference names one block only');
+            assert(ns.io.semanticEqual(round.flowBlockId, field.flowBlockId),
+              'flowBlockId list changed for ' + map.id + '/' + field.id);
+          }
+        });
+      });
+      assert(continuing >= 1, 'expected a paragraph-continuing row: ' + continuing);
+      assert(shared >= 1, 'expected a shared flow reference: ' + shared);
+    });
     add('Every committed expansion is already visually approved', function () {
       var pending = [];
       app.catalog.forEach(function (entry) {
