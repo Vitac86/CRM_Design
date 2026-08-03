@@ -23,6 +23,16 @@ from headless_browser import Chrome, Server
 INDIVIDUAL = "c-006"
 COMPANY = "c-011"
 
+DEPOSITORY_NUMBER_KEY = "extra-depository-contract"
+DEPOSITORY_DATE_KEY = "extra-depository-contract-date"
+DEPOSITORY_NUMBER = "ДЕПО-QA/0417"
+DEPOSITORY_DATE = "2026-08-02"
+DEPOSITORY_DOCUMENTS = (
+    ("accession-application-fl", INDIVIDUAL),
+    ("accession-application-yul", COMPANY),
+    ("account-opening-notice", COMPANY),
+)
+
 LONG_RU_NAME = "Александров-Смирнов Константин Владиславович"
 LONG_RU_ADDRESS = ("125009, Российская Федерация, город Москва, улица Большая "
                    "Никитская, дом 128, корпус 4, строение 7, квартира 385")
@@ -96,6 +106,12 @@ def fill_extra_fields(browser, value_map=None, long_text=None):
     script = """
     (function (overrides, longText) {
       function plausible(key, el) {
+        if (/depositor|depositar|depo/i.test(key) && /date/i.test(key)) {
+          return '2026-08-02';
+        }
+        if (/depositor|depositar|depo/i.test(key) && /contract/i.test(key)) {
+          return 'ДЕПО-QA/0417';
+        }
         if (el.type === 'date') return '2026-07-29';
         if (/tariff/i.test(key)) return 'Стандартный';
         if (/amount|sum|price|rate|quantity|lots/i.test(key)) return '150 000,00';
@@ -174,7 +190,8 @@ def generate(browser, timeout_ms=60000):
                   document.activeElement.getAttribute('data-field-key') : null,
                 highlighted: Array.prototype.map.call(
                   document.querySelectorAll('#docwiz-extra-fields .crm-input-overflow'),
-                  function (el) { return el.getAttribute('data-field-key'); })
+                  function (el) { return el.getAttribute('data-field-key'); }),
+                renderCalls: window.__docwizQaOverlayRenderCalls || 0
               });
               return;
             }
@@ -183,6 +200,55 @@ def generate(browser, timeout_ms=60000):
         })
         """.replace("__TIMEOUT__", str(timeout_ms)),
         await_promise=True,
+    )
+
+
+def depository_control_snapshot(browser, doc_id):
+    """Catalog policy and rendered controls for the legal agreement pair."""
+    script = r"""
+    (function (docId, keys) {
+      var docs = (window.CRMDocumentCatalog || {}).documents || [];
+      var doc = docs.find(function (item) { return item.id === docId; });
+      var configured = (doc && doc.fields) || [];
+      var out = {};
+      keys.forEach(function (key) {
+        var field = configured.find(function (item) { return item.key === key; });
+        var input = document.querySelector(
+          '#docwiz-extra-fields [data-field-key="' + key + '"]');
+        out[key] = {
+          config: field ? {
+            label: field.label,
+            type: field.type,
+            required: field.required === true,
+            sourceKind: field.sourceKind || null,
+            hasDefault: Object.prototype.hasOwnProperty.call(field, 'default') ||
+              Object.prototype.hasOwnProperty.call(field, 'defaultValue')
+          } : null,
+          control: input ? {
+            type: input.type,
+            required: input.required,
+            sourceKind: input.getAttribute('data-source-kind'),
+            value: input.value
+          } : null
+        };
+      });
+      return out;
+    }(__DOC__, __KEYS__))
+    """
+    return browser.eval(
+        script.replace("__DOC__", json.dumps(doc_id))
+        .replace("__KEYS__", json.dumps(
+            [DEPOSITORY_NUMBER_KEY, DEPOSITORY_DATE_KEY]))
+    )
+
+
+def depository_values(browser):
+    return browser.eval(
+        "(function (keys) { var out = {}; keys.forEach(function (key) {"
+        " var el = document.querySelector('#docwiz-extra-fields "
+        "[data-field-key=\"' + key + '\"]'); out[key] = el ? el.value : null;"
+        " }); return out; }(" + json.dumps(
+            [DEPOSITORY_NUMBER_KEY, DEPOSITORY_DATE_KEY]) + "))"
     )
 
 
@@ -341,6 +407,196 @@ def main() -> int:
                         "Поле:" in debug_result["overflowText"],
                         json.dumps(debug_result, ensure_ascii=False),
                     )
+
+        # ── Company qualification uses exact legal name/address payload ─────
+        # This exercises the Wizard payload itself. Builder fixtures carry a
+        # fallback registration key, so a fixture-only render cannot prove the
+        # production page preserves exact UMI/legal values.
+        open_wizard(browser, server, COMPANY)
+        qualification_id = "qualification-notice"
+        qualification_offered = qualification_id in document_ids(browser)
+        checks.check("company qualification notice is offered",
+                     qualification_offered, str(document_ids(browser)))
+        if qualification_offered and click_document(browser, qualification_id):
+            fill_extra_fields(browser, value_map={
+                "extra-document-date": "2026-08-03",
+                "extra-qualification-scope": "all",
+            }, long_text="РўРµСЃС‚")
+            browser.eval(
+                """
+                (function () {
+                  var renderer = window.CRMDocumentEngine.overlayRenderer;
+                  var adapter = window.CRMDocumentEngine.umiAdapter;
+                  var original = renderer.render;
+                  renderer.render = function (template, payload, options) {
+                    window.__docwizQaQualificationPayload = {
+                      subjectDisplayName: payload.subject.displayName,
+                      subjectFullLegalName: payload.subject.fullLegalName,
+                      fieldFullName: payload.fields['client-full-name'],
+                      fieldLegalAddress: payload.fields['client-legal-address'],
+                      fieldRegistrationAddress:
+                        payload.fields['client-registration-address'],
+                      umiOrigname: payload.umi && payload.umi.company &&
+                        payload.umi.company.origname,
+                      exactUmiName: adapter.resolve('umi.origname', payload),
+                      exactRegistrationAddress:
+                        adapter.resolve('umi.address.registration', payload)
+                    };
+                    return original.call(this, template, payload, options);
+                  };
+                }())
+                """
+            )
+            qualification_result = generate(browser)
+            qualification_payload = browser.eval(
+                "window.__docwizQaQualificationPayload || null")
+            checks.check(
+                "company qualification notice generates from Wizard payload",
+                qualification_result["downloads"] == 1 and
+                "is-error" not in qualification_result["kind"] and
+                not qualification_result["overflowShown"],
+                json.dumps(qualification_result, ensure_ascii=False),
+            )
+            q = qualification_payload or {}
+            checks.check(
+                "company qualification uses full legal name, not display caption",
+                bool(q.get("subjectFullLegalName")) and
+                q.get("fieldFullName") == q.get("subjectFullLegalName") and
+                q.get("fieldFullName") != q.get("subjectDisplayName"),
+                json.dumps(q, ensure_ascii=False),
+            )
+            checks.check(
+                "Wizard preserves exact company origname through UMI adapter",
+                q.get("umiOrigname") == q.get("subjectFullLegalName") and
+                q.get("exactUmiName") == q.get("subjectFullLegalName"),
+                json.dumps(q, ensure_ascii=False),
+            )
+            checks.check(
+                "company registration address resolves once from legal address",
+                bool(q.get("fieldLegalAddress")) and
+                q.get("fieldRegistrationAddress") == q.get("fieldLegalAddress") and
+                q.get("exactRegistrationAddress") == q.get("fieldLegalAddress"),
+                json.dumps(q, ensure_ascii=False),
+            )
+
+        # ── Depository pair policy and rendered controls ───────────────────
+        expected_depository_controls = {
+            DEPOSITORY_NUMBER_KEY: ("Номер депозитарного договора", "text"),
+            DEPOSITORY_DATE_KEY: ("Дата депозитарного договора", "date"),
+        }
+        for doc_id, subject_id in DEPOSITORY_DOCUMENTS:
+            open_wizard(browser, server, subject_id)
+            offered = doc_id in document_ids(browser)
+            checks.check(f"{doc_id}: depository document is offered", offered,
+                         str(document_ids(browser)))
+            if not offered or not click_document(browser, doc_id):
+                continue
+            snapshot = depository_control_snapshot(browser, doc_id)
+            for key, (label, control_type) in expected_depository_controls.items():
+                item = snapshot.get(key) or {}
+                config = item.get("config") or {}
+                control = item.get("control") or {}
+                checks.check(
+                    f"{doc_id}: {key} has the exact operator-input policy",
+                    config.get("label") == label and
+                    config.get("type") == control_type and
+                    config.get("required") is True and
+                    config.get("sourceKind") == "operator-input",
+                    json.dumps(item, ensure_ascii=False),
+                )
+                checks.check(
+                    f"{doc_id}: {key} has no configured or rendered default",
+                    config.get("hasDefault") is False and control.get("value") == "",
+                    json.dumps(item, ensure_ascii=False),
+                )
+                checks.check(
+                    f"{doc_id}: {key} renders as a required operator control",
+                    control.get("type") == control_type and
+                    control.get("required") is True and
+                    control.get("sourceKind") == "operator-input",
+                    json.dumps(item, ensure_ascii=False),
+                )
+
+        # ── Depository values survive Back / document switches ─────────────
+        open_wizard(browser, server, COMPANY)
+        state_docs = document_ids(browser)
+        yul_id = "accession-application-yul"
+        account_id = "account-opening-notice"
+        if yul_id in state_docs and account_id in state_docs and click_document(browser, yul_id):
+            yul_pair = {
+                DEPOSITORY_NUMBER_KEY: "ДЕПО-QA/YUL-0417",
+                DEPOSITORY_DATE_KEY: "2026-08-02",
+            }
+            account_pair = {
+                DEPOSITORY_NUMBER_KEY: "ДЕПО-QA/ACCOUNT-0518",
+                DEPOSITORY_DATE_KEY: "2026-08-03",
+            }
+            fill_extra_fields(browser, value_map=yul_pair, long_text="Тест")
+            browser.eval("document.getElementById('docwiz-back-btn').click()")
+            click_document(browser, account_id)
+            fresh_account = depository_values(browser)
+            checks.check(
+                "depository pair does not leak into another document",
+                fresh_account == {
+                    DEPOSITORY_NUMBER_KEY: "", DEPOSITORY_DATE_KEY: ""
+                },
+                json.dumps(fresh_account, ensure_ascii=False),
+            )
+            fill_extra_fields(browser, value_map=account_pair, long_text="Тест")
+            browser.eval("document.getElementById('docwiz-back-btn').click()")
+            click_document(browser, yul_id)
+            restored_yul = depository_values(browser)
+            checks.check("depository pair survives Back and reselect",
+                         restored_yul == yul_pair,
+                         json.dumps(restored_yul, ensure_ascii=False))
+            browser.eval("document.getElementById('docwiz-back-btn').click()")
+            click_document(browser, account_id)
+            restored_account = depository_values(browser)
+            checks.check("each document restores its own depository pair",
+                         restored_account == account_pair,
+                         json.dumps(restored_account, ensure_ascii=False))
+
+        # ── Either missing depository value blocks generation ──────────────
+        for doc_id, subject_id in DEPOSITORY_DOCUMENTS:
+            open_wizard(browser, server, subject_id)
+            if not click_document(browser, doc_id):
+                continue
+            browser.eval(
+                "(function () { var renderer = window.CRMDocumentEngine.overlayRenderer;"
+                " var original = renderer.render;"
+                " window.__docwizQaOverlayRenderCalls = 0;"
+                " renderer.render = function () {"
+                "  window.__docwizQaOverlayRenderCalls += 1;"
+                "  return original.apply(this, arguments);"
+                " }; }())"
+            )
+            fill_extra_fields(browser, value_map={
+                DEPOSITORY_NUMBER_KEY: "",
+                DEPOSITORY_DATE_KEY: DEPOSITORY_DATE,
+            }, long_text="Тест")
+            missing_number = generate(browser, timeout_ms=5000)
+            checks.check(
+                f"{doc_id}: missing depository number refuses generation",
+                missing_number["downloads"] == 0 and
+                missing_number["renderCalls"] == 0 and
+                "is-error" in missing_number["kind"] and
+                missing_number["focused"] == DEPOSITORY_NUMBER_KEY,
+                json.dumps(missing_number, ensure_ascii=False),
+            )
+
+            fill_extra_fields(browser, value_map={
+                DEPOSITORY_NUMBER_KEY: DEPOSITORY_NUMBER,
+                DEPOSITORY_DATE_KEY: "",
+            }, long_text="Тест")
+            missing_date = generate(browser, timeout_ms=5000)
+            checks.check(
+                f"{doc_id}: missing depository date refuses generation",
+                missing_date["downloads"] == 0 and
+                missing_date["renderCalls"] == 0 and
+                "is-error" in missing_date["kind"] and
+                missing_date["focused"] == DEPOSITORY_DATE_KEY,
+                json.dumps(missing_date, ensure_ascii=False),
+            )
 
         # ── Back / reselect ─────────────────────────────────────────────────
         open_wizard(browser, server, COMPANY)

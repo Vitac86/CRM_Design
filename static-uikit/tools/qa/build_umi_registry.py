@@ -1,8 +1,10 @@
 """Build the exact UMI variable registry from the supplied workbook.
 
     python static-uikit/tools/qa/build_umi_registry.py \
-        --workbook "D:/.../Переменные UMI.xlsx" \
-        --maps static-uikit/tools/qa/maps.json
+        --workbook "D:/.../Переменные UMI.xlsx"
+
+By default the usage bookkeeping comes from the live JavaScript maps. Pass
+--maps only when intentionally rebuilding against an explicit JSON snapshot.
 
 Why this exists
 ---------------
@@ -174,13 +176,15 @@ ALIASES = {
     "extra.extra-contract-date": {"kind": "umi", "umi": "umi.datesign"},
     "extra.extra-brokerage-contract": {"kind": "umi", "umi": "umi.bo_num"},
     "extra.extra-brokerage-contract-date": {"kind": "umi", "umi": "umi.datesign"},
-    "extra.extra-depository-contract": {"kind": "unresolved-business", "note":
+    "extra.extra-depository-contract": {"kind": "workflow", "operatorInput": True, "note":
         "No printable depository agreement number exists in the workbook. "
         "`id_depo_dogovora_lk` is an internal LK object ID and "
-        "`depozitarnyj_dogovor` is a checkbox. Operator input until the "
-        "business names the field."},
-    "extra.extra-depository-contract-date": {"kind": "unresolved-business", "note":
-        "No printable depository agreement date exists in the workbook."},
+        "`depozitarnyj_dogovor` is a checkbox. Required Document Wizard "
+        "operator input for every document that prints the agreement."},
+    "extra.extra-depository-contract-date": {"kind": "workflow", "operatorInput": True, "note":
+        "No printable depository agreement date exists in the workbook. "
+        "Required validated Document Wizard operator input for every document "
+        "that prints the agreement."},
     # Internal-accounting account numbers. The workbook has no field for them —
     # FrontClientCompany/Front Client Phys carry the agreement, not the ledger
     # accounts opened under it — so they stay operator input.
@@ -491,13 +495,19 @@ def emit_js(registry: dict) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--workbook", required=True)
-    ap.add_argument("--maps", default=os.path.join(HERE, "maps.json"))
+    ap.add_argument(
+        "--maps",
+        help="explicit JSON map snapshot; omitted executes the live JS maps")
     ap.add_argument("--out", default=OUT_JS)
     args = ap.parse_args()
 
     structures = parse_workbook(args.workbook)
-    with open(args.maps, encoding="utf-8") as fh:
-        maps = json.load(fh)
+    if args.maps:
+        with open(args.maps, encoding="utf-8") as fh:
+            maps = json.load(fh)
+    else:
+        from dump_field_maps import dump
+        maps = dump()
 
     registry = build(structures, maps)
     with open(args.out, "w", encoding="utf-8", newline="\n") as fh:

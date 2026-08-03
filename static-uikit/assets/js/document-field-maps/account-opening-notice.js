@@ -185,6 +185,17 @@
   // the space between them and `keepWithNext` refuses to break there.
   var PURPOSE_DATE_LABEL = ' дата ';
 
+  // Page 2, §7, item 2. Word exported items 2 and 3 as one outer page block,
+  // but each printed word is still its own balanced depth-2 q…Q operator unit.
+  // The reviewed nested span removes exactly those two visible lines; item 2
+  // is rebuilt with the client's operator-entered depository agreement pair
+  // and item 3 is redrawn verbatim underneath it. This is real content-stream
+  // suppression, not a white rectangle, so extraction contains no empty
+  // «№ от» sentence behind the requested value.
+  var TRANSFER_BASIS_SIZE = 11.04;
+  var TRANSFER_BASIS_LINE_HEIGHT = 12.96;
+  var TRANSFER_BASIS_INDENT = 24.504;
+
   // One row.
   //   `market`      the sentence's closing designation, as the source prints it
   //   `placeholder` the sample client code that row prints
@@ -369,7 +380,77 @@
       // Cyrillic Х. Declared exactly as printed.
       purposeBlock('account-opening-payment-purpose-derivatives', 'paymentPurposeDerivatives',
                    123.62, 'СРОЧНЫЙ РЫНОК', 'XXXXXXХ', 151.34,
-                   { block: 6, sha256: '81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd' })
+                   { block: 6, sha256: '81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd' }),
+      {
+        id: 'account-opening-transfer-basis',
+        type: 'wordFlowBlock',
+        page: 1,
+        frame: {
+          left: 41.40, baselineTop: 628.42, width: 511.42,
+          initialLineCount: 2
+        },
+        font: 'legalSerif',
+        fontSize: TRANSFER_BASIS_SIZE,
+        minFontSize: TRANSFER_BASIS_SIZE,
+        fontSizeLocked: true,
+        lineHeight: TRANSFER_BASIS_LINE_HEIGHT,
+        firstLineIndent: 0,
+        hangingIndent: TRANSFER_BASIS_INDENT,
+        alignment: 'left',
+        maxAdditionalLines: 3,
+        overflowStrategy: 'flow',
+        sourceReplacement: {
+          operatorScope: 'all-balanced',
+          operatorDepth: 2,
+          parentTopLevelBlock: 7,
+          firstBlock: 250,
+          lastBlock: 292,
+          expectedBlockCount: 43,
+          expectedPageBlockCount: 312,
+          expectedParentSha256: '38de8f2ffc2d14f3322a31faf44a0a70098471242a7fbcec3ccdcfe1c079fe60',
+          expectedSha256: '1a33b2e34ffd9d96dd21744ca0869602d96d0e65a89d1228476d26fb50956235',
+          expectedTemplateSha256: '8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: '2. Депозитарный договор клиента с ООО «ИНВЕСТИКА» ' +
+          '(Заявление о присоединении) № от «__» г. 3. Договор купли-продажи, ' +
+          'займа и т.п. (в случае перевода со сменой права собственности).',
+        runs: [
+          { type: 'static', text: '2.' },
+          { type: 'spacer', width: 16.224 },
+          {
+            type: 'static', keepWithNext: true,
+            text: 'Депозитарный договор клиента с ООО «ИНВЕСТИКА» ' +
+              '(Заявление о присоединении) № '
+          },
+          {
+            type: 'fieldRef', fieldId: 'transferBasisDepositoryNumber',
+            keepTogether: true
+          },
+          { type: 'static', text: ' от «', keepWithNext: true },
+          {
+            type: 'fieldRef', fieldId: 'transferBasisDepositoryDate',
+            keepTogether: true, keepWithNext: true,
+            decoration: {
+              underline: true, minWidth: 11.04, thickness: 0.48, offset: 1.20
+            }
+          },
+          { type: 'static', text: '» г.', keepTogether: true },
+          { type: 'paragraphBreak' },
+          { type: 'static', text: '3.' },
+          { type: 'spacer', width: 16.224 },
+          {
+            type: 'static',
+            text: 'Договор купли-продажи, займа и т.п. ' +
+              '(в случае перевода со сменой права собственности).'
+          }
+        ],
+        semanticGroup: {
+          kind: 'depository-transfer-basis',
+          boundary: { left: 41.40, top: 618.58, right: 552.82, bottom: 683.26 },
+          reviewStatus: 'approved'
+        }
+      }
     ],
 
     fields: [
@@ -480,6 +561,29 @@
                'account-opening-payment-purpose-derivatives'
              ],
              allowMultipleFlowReferences: true
+           }),
+
+      // Page 2, §7 «Основание для перевода». Separate field IDs preserve one
+      // card per printed occurrence while both values resolve from the exact
+      // same required operator inputs as the page-1 agreement table.
+      text('transferBasisDepositoryNumber', 'extra.extra-depository-contract',
+           1, 471.10, 628.42, 70.0, {
+             required: true,
+             fontSize: TRANSFER_BASIS_SIZE,
+             minFontSize: TRANSFER_BASIS_SIZE,
+             tokenBreak: 'none',
+             layoutMode: 'flow-reference',
+             flowBlockId: 'account-opening-transfer-basis'
+           }),
+      text('transferBasisDepositoryDate', 'extra.extra-depository-contract-date',
+           1, 497.16, 628.42, 55.0, {
+             required: true,
+             format: 'dateRu',
+             fontSize: TRANSFER_BASIS_SIZE,
+             minFontSize: TRANSFER_BASIS_SIZE,
+             tokenBreak: 'none',
+             layoutMode: 'flow-reference',
+             flowBlockId: 'account-opening-transfer-basis'
            })
     ]
   };

@@ -4228,19 +4228,27 @@
    ]
   },
   "extra.extra-depository-contract": {
-   "kind": "unresolved-business",
-   "note": "No printable depository agreement number exists in the workbook. `id_depo_dogovora_lk` is an internal LK object ID and `depozitarnyj_dogovor` is a checkbox. Operator input until the business names the field.",
+   "kind": "workflow",
+   "operatorInput": true,
+   "note": "No printable depository agreement number exists in the workbook. `id_depo_dogovora_lk` is an internal LK object ID and `depozitarnyj_dogovor` is a checkbox. Required Document Wizard operator input for every document that prints the agreement.",
    "path": "extra.extra-depository-contract",
    "usedBy": [
-    "account-opening-notice/depositaryContractNumber"
+    "accession-application-fl/depositoryContractNumber",
+    "accession-application-yul/depositoryContractNumber",
+    "account-opening-notice/depositaryContractNumber",
+    "account-opening-notice/transferBasisDepositoryNumber"
    ]
   },
   "extra.extra-depository-contract-date": {
-   "kind": "unresolved-business",
-   "note": "No printable depository agreement date exists in the workbook.",
+   "kind": "workflow",
+   "operatorInput": true,
+   "note": "No printable depository agreement date exists in the workbook. Required validated Document Wizard operator input for every document that prints the agreement.",
    "path": "extra.extra-depository-contract-date",
    "usedBy": [
-    "account-opening-notice/depositaryContractDate"
+    "accession-application-fl/depositoryContractDate",
+    "accession-application-yul/depositoryContractDate",
+    "account-opening-notice/depositaryContractDate",
+    "account-opening-notice/transferBasisDepositoryDate"
    ]
   },
   "extra.extra-landline-phone": {
@@ -4345,6 +4353,8 @@
    "note": "Код клиента в системе внутреннего учета. The same exact name `num_investika` is titled «Код клиента» in Front - заявка на закрытие договора (field 635), and the CRM payload already carries it as the subject code (INV-1006 / INV-1011). `nomer_klienta` was rejected: it belongs to «Текущий Номер Клиента Глобально», a single global allocator object, not a per-client attribute.",
    "path": "field.client-code",
    "usedBy": [
+    "accession-application-fl/internalClientCode",
+    "accession-application-yul/internalClientCode",
     "account-opening-notice/clientCode",
     "account-opening-notice/paymentPurposeClientCode"
    ]
@@ -4517,8 +4527,7 @@
    "usedBy": [
     "anketa-fl/postalAddress",
     "anketa-ip-sz/postalAddress",
-    "anketa-yul/postalAddress",
-    "qualification-notice/recipientAddress"
+    "anketa-yul/postalAddress"
    ]
   },
   "field.client-registration-address": {
@@ -4682,6 +4691,8 @@
    "umi": "umi.datesign",
    "path": "field.extra-contract-date",
    "usedBy": [
+    "accession-application-fl/brokerageContractDate",
+    "accession-application-yul/brokerageContractDate",
     "broker-use-refusal-request/contractDate",
     "regulation-full-refusal-notice/contractDate",
     "regulation-partial-refusal-notice/contractDate"
@@ -4692,6 +4703,8 @@
    "umi": "umi.bo_num",
    "path": "field.extra-contract-number",
    "usedBy": [
+    "accession-application-fl/brokerageContractNumber",
+    "accession-application-yul/brokerageContractNumber",
     "broker-use-refusal-request/contractNumber",
     "regulation-full-refusal-notice/contractNumber",
     "regulation-partial-refusal-notice/contractNumber"
@@ -5012,7 +5025,6 @@
   "extra.extra-attorney-passport",
   "extra.extra-attorney-passport-number",
   "extra.extra-attorney-passport-series",
-  "extra.extra-authorized-signer",
   "extra.extra-beneficial-owner",
   "extra.extra-beneficial-owner-basis",
   "extra.extra-beneficiary-basis",
@@ -5163,7 +5175,8 @@
   "extra.tariff-stock",
   "extra.tax-registration-date",
   "extra.tax-residency-countries",
-  "extra.trading-depo-account-type"
+  "extra.trading-depo-account-type",
+  "umi.address.registration"
  ],
  "danglingAliasTargets": [],
  "subjectStructures": {

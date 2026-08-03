@@ -1,10 +1,12 @@
 """Gate: the blocks manual review rejected cannot come back.
 
     python static-uikit/tools/qa/check_accession_blocks.py
+    python static-uikit/tools/qa/check_accession_blocks.py --maps path/to/maps.json
     python static-uikit/tools/qa/check_accession_blocks.py --self-test
 
-Reads the committed maps (maps.json) and the committed source PDFs, so every
-number below is measured, not asserted.
+Executes the live JavaScript maps through dump_field_maps and reads the
+committed source PDFs, so every number below is measured, not asserted.
+--maps remains available for an explicit diagnostic JSON snapshot.
 
 The three blocks
 ----------------
@@ -124,6 +126,14 @@ MAX_SOURCE_DATE_SIZE = READABILITY_FLOOR
 # Sources that carry client data. None of them may be bound inside the employee
 # rows — that is the whole point of leaving those cells blank.
 CLIENT_SOURCE_PREFIXES = ("subject.", "field.", "umi.")
+
+
+def load_maps(path: str | None = None) -> dict:
+    if path:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    from dump_field_maps import dump
+    return dump()
 
 
 def regions_of(field: dict) -> list[dict]:
@@ -347,7 +357,7 @@ def run(maps: dict) -> tuple[int, list[str]]:
     for map_id, spec in FORMS.items():
         template = maps.get(map_id)
         if not template:
-            failures.append(f"{map_id}: not in maps.json")
+            failures.append(f"{map_id}: not in loaded production maps")
             continue
         checks += 1
         failures.extend(check_pdf_unchanged(spec))
@@ -417,12 +427,13 @@ def self_test(maps: dict) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--maps", default=os.path.join(HERE, "maps.json"))
+    ap.add_argument(
+        "--maps",
+        help="explicit JSON map snapshot; omitted executes the live JS maps")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
 
-    with open(args.maps, encoding="utf-8") as fh:
-        maps = json.load(fh)
+    maps = load_maps(args.maps)
 
     if args.self_test:
         return self_test(maps)

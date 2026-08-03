@@ -158,6 +158,12 @@
     }
   };
 
+  // Step 1/Step 2 navigation re-renders the selected document. Keep operator
+  // inputs in memory for this wizard session so Back/reselect never discards a
+  // legal agreement number or date the operator has already entered. Nothing
+  // is written to localStorage and no value is defaulted to today.
+  var wizardInputState = Object.create(null);
+
   // ── Document configuration ─────────────────────────────────────────────────
   var DOCUMENTS = [
     {
@@ -283,8 +289,16 @@
         // date, so it is typed here — see docs/umi-variable-registry.md.
         { key: 'extra-contract-number', label: 'Номер договора на брокерское обслуживание', type: 'text' },
         { key: 'extra-contract-date', label: 'Дата договора на брокерское обслуживание', type: 'date' },
-        { key: 'extra-depository-contract', label: 'Номер депозитарного договора (счёта ДЕПО)', type: 'text' },
-        { key: 'extra-depository-contract-date', label: 'Дата депозитарного договора', type: 'date' }
+        {
+          key: 'extra-depository-contract',
+          label: 'Номер депозитарного договора',
+          type: 'text', required: true, sourceKind: 'operator-input'
+        },
+        {
+          key: 'extra-depository-contract-date',
+          label: 'Дата депозитарного договора',
+          type: 'date', required: true, sourceKind: 'operator-input'
+        }
       ],
       checkFields: [
         { key: 'accession-brokerage', label: 'Присоединение к Регламенту брокерского обслуживания', defaultChecked: true },
@@ -358,8 +372,16 @@
         // Page 2, «Заполняется ООО «Инвестика»» — same pairing as the ФЛ form.
         { key: 'extra-contract-number', label: 'Номер договора на брокерское обслуживание', type: 'text' },
         { key: 'extra-contract-date', label: 'Дата договора на брокерское обслуживание', type: 'date' },
-        { key: 'extra-depository-contract', label: 'Номер депозитарного договора (счёта ДЕПО)', type: 'text' },
-        { key: 'extra-depository-contract-date', label: 'Дата депозитарного договора', type: 'date' },
+        {
+          key: 'extra-depository-contract',
+          label: 'Номер депозитарного договора',
+          type: 'text', required: true, sourceKind: 'operator-input'
+        },
+        {
+          key: 'extra-depository-contract-date',
+          label: 'Дата депозитарного договора',
+          type: 'date', required: true, sourceKind: 'operator-input'
+        },
         GENERAL_DIRECTOR_REPRESENTATIVE_FIELD
       ],
       checkGroupLabel: 'Отметки заявления:',
@@ -1675,15 +1697,17 @@
         },
         {
           key: 'extra-depository-contract',
-          label: 'Номер депозитарного договора (договора счёта ДЕПО)',
+          label: 'Номер депозитарного договора',
           type: 'text',
-          required: true
+          required: true,
+          sourceKind: 'operator-input'
         },
         {
           key: 'extra-depository-contract-date',
           label: 'Дата депозитарного договора',
           type: 'date',
-          required: true
+          required: true,
+          sourceKind: 'operator-input'
         },
         {
           key: 'extra-stock-market-account',
@@ -2193,6 +2217,17 @@
     return m ? (m[3] + '.' + m[2] + '.' + m[1]) : val;
   }
 
+  function isValidIsoDate(val) {
+    var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(val || ''));
+    if (!match) return false;
+    var year = Number(match[1]);
+    var month = Number(match[2]);
+    var day = Number(match[3]);
+    var date = new Date(Date.UTC(year, month - 1, day));
+    return date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+  }
+
   // ── Selected representative (legal-entity signatory) ──────────────────────
 
   function getSelectedRepresentative(subject, extraValues) {
@@ -2213,11 +2248,36 @@
       .join(' ');
   }
 
+  // Preserve exact UMI values when the subject lookup supplies them, and give
+  // the static demo company the two exact workbook names it can prove from its
+  // card. The overlay engine still resolves every source through umi-adapter;
+  // this merely keeps the Wizard from discarding the canonical payload layer.
+  function buildUmi(subject) {
+    var supplied = subject && subject.umi;
+    var out = supplied && typeof supplied === 'object'
+      ? JSON.parse(JSON.stringify(supplied)) : {};
+    if (subject && subject.kind === 'company') {
+      out.company = out.company && typeof out.company === 'object'
+        ? out.company : {};
+      if (!String(out.company.origname || '').trim()) {
+        out.company.origname = subject.fullLegalName || subject.displayName || '';
+      }
+      if (!String(out.company.basicname || '').trim()) {
+        out.company.basicname = subject.shortName || subject.displayName || '';
+      }
+    }
+    return out;
+  }
+
   function buildFields(subject, extraValues) {
     var f = {};
 
     // Common
-    f['client-full-name'] = subject.displayName;
+    // The registry defines this compatibility source as exact company
+    // `origname`, while an individual keeps the composed personal display
+    // name. Do not let a short company caption leak into legal forms.
+    f['client-full-name'] = subject.kind === 'company'
+      ? (subject.fullLegalName || subject.displayName) : subject.displayName;
     f['client-inn']       = subject.inn;
     f['client-code']      = subject.code;
     f['client-email']     = subject.email;
@@ -2249,6 +2309,10 @@
       f['client-registration-date']     = subject.registrationDate;
       f['client-registration-authority']= subject.registrationAuthority;
       f['client-legal-address']         = subject.legalAddress;
+      // `umi.address.registration` deliberately falls back to this normalized
+      // key when the CRM payload has one formatted address rather than exact
+      // component fields. A company registration address is its legal address.
+      f['client-registration-address']  = subject.legalAddress;
       f['client-postal-address']        = subject.postalAddress;
       f['client-website']               = subject.website;
       f['client-charter-capital']       = subject.charterCapital;
@@ -2494,6 +2558,9 @@
     var container = document.getElementById('docwiz-extra-fields');
     if (!container) return;
 
+    var savedState = wizardInputState[doc.id] ||
+      (wizardInputState[doc.id] = { fields: Object.create(null), checks: Object.create(null) });
+
     container.innerHTML = '';
 
     if (isPackageBlocked(doc, subject)) {
@@ -2590,6 +2657,19 @@
 
       input.id = 'docwiz-field-' + field.key;
       input.setAttribute('data-field-key', field.key);
+      input.setAttribute('data-field-type', field.type || 'text');
+      if (field.sourceKind === 'operator-input') {
+        input.setAttribute('data-source-kind', 'operator-input');
+      }
+      if (Object.prototype.hasOwnProperty.call(savedState.fields, field.key)) {
+        input.value = savedState.fields[field.key];
+      }
+      input.addEventListener('input', function () {
+        savedState.fields[field.key] = input.value;
+      });
+      input.addEventListener('change', function () {
+        savedState.fields[field.key] = input.value;
+      });
       if (field.required) input.required = true;
       wrap.appendChild(dateField || input);
       grid.appendChild(wrap);
@@ -2617,7 +2697,11 @@
         cb.type = 'checkbox';
         cb.id = 'docwiz-check-' + cf.key;
         cb.setAttribute('data-check-key', cf.key);
-        cb.checked = !!cf.defaultChecked;
+        cb.checked = Object.prototype.hasOwnProperty.call(savedState.checks, cf.key)
+          ? !!savedState.checks[cf.key] : !!cf.defaultChecked;
+        cb.addEventListener('change', function () {
+          savedState.checks[cf.key] = cb.checked;
+        });
 
         var span = document.createElement('span');
         span.textContent = cf.label;
@@ -3080,10 +3164,15 @@
       var val = (el.value || '').trim();
       extraValues[key] = val;
       if (el.disabled) return;
-      if (el.required && !val) {
+      var invalidDate = el.getAttribute('data-field-type') === 'date' &&
+        !!val && !isValidIsoDate(val);
+      if ((el.required && !val) || invalidDate) {
         el.classList.add('crm-input-error');
         valid = false;
         if (!firstInvalid) firstInvalid = el;
+        if (invalidDate && !validationMessage) {
+          validationMessage = 'Введите корректную дату.';
+        }
       } else {
         el.classList.remove('crm-input-error');
       }
@@ -3122,6 +3211,7 @@
       validationMessage: validationMessage,
       extraValues:  extraValues,
       checkValues:  checkValues,
+      umi:          buildUmi(subject),
       fields:       buildFields(subject, extraValues),
       checks:       buildChecks(doc, checkValues, extraValues, subject),
       // Print-only wording the operator supplied for this generation. Never
@@ -3609,6 +3699,7 @@
     }
     return engine.overlayRenderer.render(template, {
       subject:        payload.subject,
+      umi:            payload.umi || {},
       fields:         payload.fields,
       extraValues:    payload.extraValues,
       checks:         payload.checks,
@@ -3840,9 +3931,11 @@
       var childPayload = {
         doc:         child,
         subject:     payload.subject,
+        umi:         payload.umi,
         fields:      payload.fields,
         checks:      payload.checks,
         extraValues: payload.extraValues,
+        printOverrides: payload.printOverrides,
         pdfFilename: child.pdfOutputFilename || (child.id + '.pdf')
       };
       return generatePdfFromTemplate(childPayload).then(function (blob) {

@@ -48,13 +48,15 @@
   // The vertical rule at 400.39 is absent between 667.18 and 688.18, so the
   // client-code row is one merged cell.
   function internalCell(id, label, source, centreX, baselineTop, width,
-                        format) {
+                        format, options) {
     var w = width == null ? 126 : width;
+    var o = options || {};
     return {
       id: id,
       label: label,
       source: source,
-      optional: true,
+      required: !!o.required,
+      optional: !o.required,
       typographyGroup: SOURCE_TABLE_GROUP,
       page: 1,
       left: centreX - w / 2,
@@ -569,9 +571,11 @@
       // The depository label wraps onto two lines (651.70, 662.02); the value
       // sits on the row's first baseline, level with «Депозитарный договор».
       internalCell('depositoryContractNumber', 'Номер депозитарного договора',
-                   'extra.extra-depository-contract', 334.56, 651.70),
+                   'extra.extra-depository-contract', 334.56, 651.70, null, null,
+                   { required: true }),
       internalCell('depositoryContractDate', 'Дата депозитарного договора',
-                   'extra.extra-depository-contract-date', 468.44, 651.70, null, 'dateRu'),
+                   'extra.extra-depository-contract-date', 468.44, 651.70, null, 'dateRu',
+                   { required: true }),
       // The merged cell: ruled 268.73 .. 536.01, centred on 402.37.
       internalCell('internalClientCode', 'Код клиента в системе внутреннего учета',
                    'field.client-code', 402.37, 675.70, 261)

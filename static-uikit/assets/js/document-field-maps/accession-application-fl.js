@@ -139,13 +139,15 @@
   // inside the cell — narrower than the ruled cell, so a value that grows can
   // never reach a vertical border.
   function internalCell(id, label, source, centreX, baselineTop, width,
-                        format) {
+                        format, options) {
     var w = width == null ? 128 : width;
+    var o = options || {};
     return {
       id: id,
       label: label,
       source: source,
-      optional: true,
+      required: !!o.required,
+      optional: !o.required,
       typographyGroup: SOURCE_TABLE_GROUP,
       page: 2,
       left: centreX - w / 2,
@@ -653,9 +655,11 @@
       internalCell('brokerageContractDate', 'Дата договора на брокерское обслуживание',
                    'field.extra-contract-date', 474.44, 110.78, null, 'dateRu'),
       internalCell('depositoryContractNumber', 'Номер депозитарного договора',
-                   'extra.extra-depository-contract', 338.64, 132.02),
+                   'extra.extra-depository-contract', 338.64, 132.02, null, null,
+                   { required: true }),
       internalCell('depositoryContractDate', 'Дата депозитарного договора',
-                   'extra.extra-depository-contract-date', 474.44, 132.02, null, 'dateRu'),
+                   'extra.extra-depository-contract-date', 474.44, 132.02, null, 'dateRu',
+                   { required: true }),
       // The merged cell: ruled 271.85 .. 542.97, centred on 407.41. The
       // reviewed text width stays 3 pt clear of both vertical rules.
       internalCell('internalClientCode', 'Код клиента в системе внутреннего учета',

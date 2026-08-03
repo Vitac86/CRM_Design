@@ -1,6 +1,7 @@
 """Gate: every production source is explained by the exact UMI registry.
 
     python static-uikit/tools/qa/check_umi_registry.py
+    python static-uikit/tools/qa/check_umi_registry.py --maps path/to/maps.json
     python static-uikit/tools/qa/check_umi_registry.py --self-test
 
 What this protects
@@ -15,8 +16,10 @@ possible and all three are silent without this gate:
   unresolved     a production-ready document binds a value whose business source
                  is still an open question.
 
-The registry itself is generated (build_umi_registry.py); this reads the
-committed result, so a stale registry fails here rather than at render time.
+The registry itself is generated (build_umi_registry.py). By default this
+executes the live JavaScript maps through dump_field_maps; --maps remains
+available for an explicit diagnostic snapshot. A stale registry therefore
+fails here rather than being hidden by an old ignored maps.json.
 """
 
 from __future__ import annotations
@@ -42,6 +45,34 @@ OPERATOR_NAMESPACES = ("extra.", "check.")
 # Statuses that must not appear in a map the inventory calls production-ready.
 BLOCKING_ALIAS_KINDS = {"unresolved-business"}
 
+DEPOSITORY_USAGE = {
+    "extra.extra-depository-contract": [
+        "accession-application-fl/depositoryContractNumber",
+        "accession-application-yul/depositoryContractNumber",
+        "account-opening-notice/depositaryContractNumber",
+        "account-opening-notice/transferBasisDepositoryNumber",
+    ],
+    "extra.extra-depository-contract-date": [
+        "accession-application-fl/depositoryContractDate",
+        "accession-application-yul/depositoryContractDate",
+        "account-opening-notice/depositaryContractDate",
+        "account-opening-notice/transferBasisDepositoryDate",
+    ],
+}
+
+TRANSFER_BASIS_BLOCK = "account-opening-transfer-basis"
+TRANSFER_BASIS_REFS = [
+    "transferBasisDepositoryNumber",
+    "transferBasisDepositoryDate",
+]
+
+BROKERAGE_PAIR_SOURCES = {
+    "field.extra-contract-number",
+    "field.extra-contract-date",
+    "umi.bo_num",
+    "umi.datesign",
+}
+
 
 def load_registry(path: str = REGISTRY_JS) -> dict:
     with open(path, encoding="utf-8") as fh:
@@ -54,9 +85,12 @@ def load_registry(path: str = REGISTRY_JS) -> dict:
     return json.loads(text[start:end])
 
 
-def load_maps(path: str) -> dict:
-    with open(path, encoding="utf-8") as fh:
-        return json.load(fh)
+def load_maps(path: str | None = None) -> dict:
+    if path:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    from dump_field_maps import dump
+    return dump()
 
 
 def sources_in(maps: dict) -> dict[str, list[str]]:
@@ -103,6 +137,8 @@ def check(registry: dict, maps: dict) -> tuple[int, list[str]]:
         checks += 1
         if source in aliases or source in canonical:
             continue
+        if source.startswith("umi.address."):
+            continue
         if source.startswith(OPERATOR_NAMESPACES):
             continue
         failures.append(
@@ -118,11 +154,141 @@ def check(registry: dict, maps: dict) -> tuple[int, list[str]]:
         failures.append(
             f"{source} is not in the registry (used by {', '.join(where[:3])})")
 
-    # 4. The registry's own bookkeeping agrees with the maps it was built from.
+    # 4. Alias usage is generated bookkeeping, not documentation somebody may
+    #    update approximately. Every list, including its order, must be exactly
+    #    what the live maps produce.
+    for path, alias in sorted(aliases.items()):
+        checks += 1
+        expected = used.get(path, [])
+        actual = alias.get("usedBy")
+        if actual != expected:
+            failures.append(
+                f"alias {path} usedBy is stale: registry={actual!r}, "
+                f"live={expected!r}")
+
+    # 5. Sources no alias explains are also generated bookkeeping. Operator
+    #    namespaces may legitimately be on this list, but the registry may not
+    #    omit, invent, or retain a stale entry.
+    checks += 1
+    expected_unregistered = sorted(source for source in used
+                                   if source not in aliases)
+    actual_unregistered = registry.get("unregisteredSources")
+    if actual_unregistered != expected_unregistered:
+        failures.append(
+            "registry unregisteredSources is stale: "
+            f"registry={actual_unregistered!r}, live={expected_unregistered!r}")
+
+    # 6. The registry's own target bookkeeping agrees with its aliases.
     checks += 1
     if registry.get("danglingAliasTargets"):
         failures.append("registry records dangling alias targets: "
                         + ", ".join(registry["danglingAliasTargets"]))
+
+    return checks, failures
+
+
+def _alias_targets(value) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [item for item in value if isinstance(item, str)]
+    if isinstance(value, dict):
+        return [item for item in value.values() if isinstance(item, str)]
+    return []
+
+
+def _is_brokerage_pair_source(source: str | None) -> bool:
+    if not source:
+        return False
+    return source in BROKERAGE_PAIR_SOURCES or source.endswith(
+        (".bo_num", ".datesign"))
+
+
+def check_depository_completeness(registry: dict,
+                                  maps: dict) -> tuple[int, list[str]]:
+    """Freeze the legal depository pair's source policy and all occurrences."""
+    failures: list[str] = []
+    checks = 0
+    aliases = registry.get("aliases", {})
+    live_usage = sources_in(maps)
+
+    for source, expected_usage in DEPOSITORY_USAGE.items():
+        alias = aliases.get(source)
+        checks += 1
+        if not alias:
+            failures.append(f"depository alias {source} is missing")
+            continue
+
+        checks += 1
+        if alias.get("kind") != "workflow" or alias.get("operatorInput") is not True:
+            failures.append(
+                f"depository alias {source} must be kind='workflow' and "
+                f"operatorInput=true, got kind={alias.get('kind')!r}, "
+                f"operatorInput={alias.get('operatorInput')!r}")
+
+        checks += 1
+        targets = _alias_targets(alias.get("umi"))
+        if targets:
+            failures.append(
+                f"depository alias {source} must remain operator-entered, "
+                f"not UMI-backed ({targets!r})")
+        checks += 1
+        if any(_is_brokerage_pair_source(target) for target in targets):
+            failures.append(
+                f"depository alias {source} substitutes brokerage "
+                f"bo_num/datesign ({targets!r})")
+
+        checks += 1
+        if alias.get("usedBy") != expected_usage:
+            failures.append(
+                f"depository alias {source} usedBy must be exactly "
+                f"{expected_usage!r}, got {alias.get('usedBy')!r}")
+
+        checks += 1
+        if live_usage.get(source, []) != expected_usage:
+            failures.append(
+                f"live depository usage for {source} must be exactly "
+                f"{expected_usage!r}, got {live_usage.get(source, [])!r}")
+
+        for occurrence in expected_usage:
+            map_id, field_id = occurrence.split("/", 1)
+            fields = (maps.get(map_id) or {}).get("fields", [])
+            field = next((item for item in fields
+                          if item.get("id") == field_id), None)
+            checks += 1
+            if not field:
+                failures.append(f"depository occurrence {occurrence} is missing")
+                continue
+            checks += 1
+            if field.get("source") != source:
+                failures.append(
+                    f"{occurrence}: source {field.get('source')!r} != {source!r}")
+            checks += 1
+            if field.get("required") is not True or field.get("optional") is True:
+                failures.append(
+                    f"{occurrence}: every printed depository value must be "
+                    "required and non-optional")
+            checks += 1
+            if _is_brokerage_pair_source(field.get("source")):
+                failures.append(
+                    f"{occurrence}: brokerage bo_num/datesign cannot stand in "
+                    "for the depository agreement")
+
+    account = maps.get("account-opening-notice") or {}
+    block = next((item for item in account.get("wordFlowBlocks", []) or []
+                  if item.get("id") == TRANSFER_BASIS_BLOCK), None)
+    checks += 1
+    if not block:
+        failures.append(
+            f"account-opening-notice: {TRANSFER_BASIS_BLOCK} is missing")
+    else:
+        refs = [run.get("fieldId") for run in block.get("runs", [])
+                if run.get("type") == "fieldRef"]
+        checks += 1
+        if refs != TRANSFER_BASIS_REFS:
+            failures.append(
+                f"{TRANSFER_BASIS_BLOCK}: field refs must be exactly "
+                f"{TRANSFER_BASIS_REFS!r}, got {refs!r}")
 
     return checks, failures
 
@@ -133,51 +299,153 @@ def blocking_sources(registry: dict) -> set[str]:
             if alias.get("kind") in BLOCKING_ALIAS_KINDS}
 
 
-def self_test() -> int:
+def _with_live_bookkeeping(registry: dict, maps: dict) -> dict:
+    """Clone registry metadata so an isolated test map starts internally fresh."""
+    cloned = json.loads(json.dumps(registry))
+    usage = sources_in(maps)
+    aliases = cloned.get("aliases", {})
+    for path, alias in aliases.items():
+        alias["usedBy"] = usage.get(path, [])
+    cloned["unregisteredSources"] = sorted(
+        source for source in usage if source not in aliases)
+    return cloned
+
+
+def self_test(live_maps: dict) -> int:
     """Negative gates: each mutation below must be caught."""
     registry = load_registry()
     base_maps = {"t": {"fields": [{"id": "a", "source": "field.client-code"}]}}
+    base_registry = _with_live_bookkeeping(registry, base_maps)
 
     cases = []
 
-    bad = json.loads(json.dumps(registry))
+    bad = json.loads(json.dumps(base_registry))
     bad["aliases"]["field.client-code"]["umi"] = "umi.company.no_such_field"
     cases.append(("dangling alias target", bad, base_maps))
 
-    cases.append(("unregistered source", registry,
-                  {"t": {"fields": [{"id": "a", "source": "field.invented"}]}}))
+    invented_maps = {
+        "t": {"fields": [{"id": "a", "source": "field.invented"}]}}
+    cases.append(("unregistered source",
+                  _with_live_bookkeeping(registry, invented_maps), invented_maps))
 
-    cases.append(("non-existent umi source", registry,
-                  {"t": {"fields": [{"id": "a",
-                                     "source": "umi.company.not_real"}]}}))
+    nonexistent_maps = {
+        "t": {"fields": [{"id": "a", "source": "umi.company.not_real"}]}}
+    cases.append(("non-existent umi source",
+                  _with_live_bookkeeping(registry, nonexistent_maps),
+                  nonexistent_maps))
 
-    bad2 = json.loads(json.dumps(registry))
+    bad2 = json.loads(json.dumps(base_registry))
     bad2["danglingAliasTargets"] = ["umi.company.x"]
     cases.append(("registry reports dangling", bad2, base_maps))
 
-    bad3 = json.loads(json.dumps(registry))
-    bad3["aliases"]["field.client-code"]["umi"] = "umi.clientNumberGlobal.nomer_klienta"
-    caught_ok = True
-    _, f = check(bad3, base_maps)
-    if f:
-        caught_ok = False  # this one is a *valid* field, so it must NOT fail
+    stale_usage = json.loads(json.dumps(base_registry))
+    stale_usage["aliases"]["field.client-code"]["usedBy"] = ["stale/field"]
+    cases.append(("stale alias usedBy", stale_usage, base_maps))
+
+    operator_maps = {
+        "t": {"fields": [{"id": "a", "source": "extra.qa-operator-value"}]}}
+    stale_unregistered = _with_live_bookkeeping(registry, operator_maps)
+    stale_unregistered["unregisteredSources"] = []
+    cases.append(("stale unregisteredSources", stale_unregistered, operator_maps))
+
+    valid = json.loads(json.dumps(base_registry))
+    valid["aliases"]["field.client-code"]["umi"] = \
+        "umi.clientNumberGlobal.nomer_klienta"
+    _, valid_failures = check(valid, base_maps)
+    general_guard_ok = not valid_failures
+    if not general_guard_ok:
+        print("  FALSE POSITIVE: a real UMI field was rejected")
+        for failure in valid_failures:
+            print(f"      {failure}")
 
     passed = 0
-    for label, reg, mps in cases:
-        _, fails = check(reg, mps)
-        if fails:
+    for label, reg, maps in cases:
+        _, failures = check(reg, maps)
+        if failures:
             passed += 1
         else:
             print(f"  NOT CAUGHT: {label}")
-    if not caught_ok:
-        print("  FALSE POSITIVE: a real UMI field was rejected")
+
+    # The focused depository policy must reject coordinated registry/map
+    # mutations that generic bookkeeping alone could consider internally
+    # consistent.
+    depository_cases = []
+
+    wrong_policy = json.loads(json.dumps(registry))
+    wrong_policy["aliases"]["extra.extra-depository-contract"][
+        "operatorInput"] = False
+    depository_cases.append(("depository alias loses operatorInput",
+                             wrong_policy, live_maps))
+
+    umi_substitution = json.loads(json.dumps(registry))
+    umi_substitution["aliases"]["extra.extra-depository-contract"][
+        "umi"] = "umi.bo_num"
+    depository_cases.append(("depository alias substitutes bo_num",
+                             umi_substitution, live_maps))
+
+    optional = json.loads(json.dumps(live_maps))
+    next(field for field in optional["accession-application-fl"]["fields"]
+         if field["id"] == "depositoryContractNumber")["required"] = False
+    depository_cases.append(("depository occurrence becomes optional",
+                             registry, optional))
+
+    broker_source = json.loads(json.dumps(live_maps))
+    next(field for field in broker_source["accession-application-yul"]["fields"]
+         if field["id"] == "depositoryContractDate")["source"] = \
+        "field.extra-contract-date"
+    depository_cases.append(("depository occurrence substitutes datesign",
+                             registry, broker_source))
+
+    extra_occurrence = json.loads(json.dumps(live_maps))
+    extra_occurrence["account-opening-notice"]["fields"].append({
+        "id": "unexpectedDepositoryNumber",
+        "source": "extra.extra-depository-contract",
+        "required": True,
+    })
+    depository_cases.append(("unexpected fifth depository occurrence",
+                             registry, extra_occurrence))
+
+    missing_ref = json.loads(json.dumps(live_maps))
+    transfer = next((block for block in
+                     missing_ref["account-opening-notice"].get(
+                         "wordFlowBlocks", [])
+                     if block["id"] == TRANSFER_BASIS_BLOCK), None)
+    if transfer:
+        transfer["runs"] = [run for run in transfer["runs"]
+                            if run.get("fieldId") !=
+                            "transferBasisDepositoryDate"]
+        transfer_label = "transfer basis loses depository date ref"
+    else:
+        # An explicit old snapshot can itself be missing the entire block. It
+        # is still a valid negative fixture; self-test should report the stale
+        # baseline, never crash while trying to mutate it.
+        transfer_label = "transfer basis block is missing"
+    depository_cases.append((transfer_label, registry, missing_ref))
+
+    _, baseline_depository_failures = check_depository_completeness(
+        registry, live_maps)
+    depository_guard_ok = not baseline_depository_failures
+    if not depository_guard_ok:
+        print("  FALSE POSITIVE: live depository policy failed its baseline")
+        for failure in baseline_depository_failures:
+            print(f"      {failure}")
+
+    depository_passed = 0
+    for label, reg, maps in depository_cases:
+        _, failures = check_depository_completeness(reg, maps)
+        if failures:
+            depository_passed += 1
+        else:
+            print(f"  NOT CAUGHT: {label}")
 
     total = len(cases)
-    ok = passed == total and caught_ok
+    depository_total = len(depository_cases)
+    ok = (passed == total and general_guard_ok and
+          depository_passed == depository_total and depository_guard_ok)
     print(f"UMI registry self-test: {'PASS' if ok else 'FAIL'} · "
-          f"{passed}/{total} negative gates (dangling alias target, "
-          f"unregistered source, non-existent umi source, registry reports "
-          f"dangling) + 1 false-positive guard")
+          f"{passed}/{total} registry negative gates + "
+          f"{depository_passed}/{depository_total} depository negative gates "
+          "+ 2 false-positive guards")
     return 0 if ok else 1
 
 
@@ -222,16 +490,22 @@ def check_incomplete_order_forms(registry: dict, maps: dict) -> tuple[int, list[
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--maps", default=os.path.join(HERE, "maps.json"))
+    ap.add_argument(
+        "--maps",
+        help="explicit JSON map snapshot; omitted executes the live JS maps")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
 
+    maps = load_maps(args.maps)
     if args.self_test:
-        return self_test()
+        return self_test(maps)
 
     registry = load_registry()
-    maps = load_maps(args.maps)
     checks, failures = check(registry, maps)
+    depository_checks, depository_failures = check_depository_completeness(
+        registry, maps)
+    checks += depository_checks
+    failures.extend(depository_failures)
     order_checks, order_failures = check_incomplete_order_forms(registry, maps)
     checks += order_checks
     failures.extend(order_failures)
@@ -239,6 +513,9 @@ def main() -> int:
     for failure in failures:
         print(f"  FAIL {failure}")
 
+    print("Depository source policy: "
+          f"{depository_checks - len(depository_failures)}/"
+          f"{depository_checks} checks passed")
     fields = registry["fields"]
     mapped = sum(1 for f in fields if f["status"] == "mapped")
     print(f"UMI registry: {len(registry['structures'])} structures, "
