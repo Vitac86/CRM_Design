@@ -1017,6 +1017,49 @@
   function fitText(font, text, opts) {
     var result = layoutValue(font, text, {
       size: opts.size,
+  // ── Reviewed source placeholders ───────────────────────────────────────────
+  //
+  // A blank the source prints as underscores disappears from the token
+  // sequence on its own — `_+` is already normalised away above. A few forms
+  // instead print a *sample value* where a real one belongs: the account-opening
+  // notice prints «Код INV0000X» and «Код XXXXXXХ» in its payment-purpose rows.
+  // That is a placeholder in exactly the same sense, but it is made of ordinary
+  // letters and digits, so nothing in the tokenizer can tell it apart from the
+  // legal wording around it.
+  //
+  // Such a token is only ever dropped when the map names it explicitly and a
+  // reviewer approved it. Everything else in the paragraph still has to match
+  // the authoritative PDF token for token, so this cannot become a general
+  // licence to edit printed wording.
+  //
+  // Returns null when a declared placeholder is not actually present, so the
+  // caller can report drift instead of silently accepting a stale declaration.
+  function removePlaceholderTokens(tokens, placeholders) {
+    var out = (tokens || []).slice();
+    var list = placeholders || [];
+    for (var i = 0; i < list.length; i += 1) {
+      var wanted = staticTokenSequence(
+        list[i] && list[i].text != null ? list[i].text : list[i]);
+      if (!wanted.length) return null;
+      var at = indexOfSubsequence(out, wanted);
+      if (at === -1) return null;
+      out.splice(at, wanted.length);
+    }
+    return out;
+  }
+  Layout.removePlaceholderTokens = removePlaceholderTokens;
+
+  function indexOfSubsequence(haystack, needle) {
+    for (var i = 0; i + needle.length <= haystack.length; i += 1) {
+      var hit = true;
+      for (var j = 0; j < needle.length; j += 1) {
+        if (haystack[i + j] !== needle[j]) { hit = false; break; }
+      }
+      if (hit) return i;
+    }
+    return -1;
+  }
+
       minSize: opts.minSize == null ? opts.size : opts.minSize,
       step: opts.step,
       tokenBreak: opts.tokenBreak,

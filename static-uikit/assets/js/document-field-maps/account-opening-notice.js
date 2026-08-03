@@ -29,12 +29,20 @@
 //   * «на основании Доверенности № , настоящим…» — measured against real glyph
 //     boxes the gap between «№» and the following comma is 8.18 pt. No
 //     document number fits, so the source reserves no usable space.
-//   * «…№_________ дата__» on page 2 — the date rule is 11.04 pt wide; no date
-//     fits even at the 6 pt floor. The contract number beside it (49.56 pt)
-//     *is* filled.
-//   * «Код INV0000X» / «Код XXXXXXХ» in the payment-purpose rows are printed
-//     placeholder text, not blanks. Overwriting them would mean drawing over
-//     existing content, so they are left exactly as the source prints them.
+//   * «дата__» in the page 2 payment-purpose rows — the rule is 11.04 pt wide;
+//     no date fits even at the 6 pt floor. The «№» blank beside it *is* filled,
+//     by the reviewed Word-flow rows below.
+//
+// PRINTED SAMPLE CONTENT, REPLACED BY A REAL VALUE:
+//   * «Код INV0000X» (stock, currency) and «Код XXXXXXХ» (derivatives) in the
+//     payment-purpose rows are not blanks — the source prints a sample client
+//     code where the client's own belongs. They cannot be overlaid, because
+//     that would mean drawing on top of existing glyphs. Each row is instead a
+//     reviewed Word-flow block that replaces the printed paragraph and puts the
+//     CRM client code (`field.client-code`, the same source the «Код клиента»
+//     cell on page 1 uses) where the sample stood. The one dropped token per
+//     row is declared in `sourcePlaceholders`; every other token still has to
+//     match the authoritative PDF exactly.
 //
 // Column geometry (page 1), from the drawn table rules:
 //   label column        41.4 → 323.8
@@ -56,11 +64,11 @@
 
   // Rows that physically cannot take BODY. Each value is the largest
   // half-point step the measured room allows, floored at MIN.
+  // The payment-purpose rows are not here: they are reviewed Word-flow blocks
+  // that print at the source's own locked 11.04 pt, not overlays sized against
+  // the room left over in a printed blank.
   var ROW_SIZE = {
     brokerRepresentative: 11.5,      // 11.60 pt of room
-    paymentPurposeCurrency: 11,      // 11.47 pt of room
-    paymentPurposeDerivatives: 11,   // 11.47 pt of room
-    paymentPurposeStock: 11.5,       // 11.60 pt of room
   };
 
   function text(id, source, page, left, baselineTop, width, options) {
@@ -94,7 +102,8 @@
       label: o.label,
       showWhen: o.showWhen,
       layoutMode: o.layoutMode,
-      flowBlockId: o.flowBlockId
+      flowBlockId: o.flowBlockId,
+      allowMultipleFlowReferences: o.allowMultipleFlowReferences
     };
   }
 
@@ -103,31 +112,113 @@
     return text(id, source, 0, VALUE_LEFT, baselineTop, VALUE_WIDTH, options);
   }
 
-  // The agreement reference on a payment-purpose row: the printed «№» blank,
-  // and the reviewed continuation line on the row's own third printed line.
-  var PURPOSE_LEFT = 389.0;
-  var PURPOSE_BLANK_WIDTH = 48.5;
-  var PURPOSE_CONTINUATION_WIDTH = 160.0;
+  // ── Page 2 payment-purpose rows ────────────────────────────────────────────
+  //
+  // Each of the three rows prints one paragraph in the right-hand cell of a
+  // bordered table, measured from the committed template:
+  //
+  //   column rules      41.40 | 246.77 | 553.30
+  //   row bands         36.48–74.40, 74.88–112.94, 113.42–151.34
+  //   cell text starts  x 252.41, three printed lines per row
+  //   first baselines   46.68 (stock), 85.22 (currency), 123.62 (derivatives)
+  //   leading           12.60 pt; the size the source prints is 11.04 pt
+  //
+  // Why these are Word-flow blocks and not overlays on the printed blank:
+  //
+  //   1. The sentence names a client code the source only *samples*
+  //      («Код INV0000X»). A real code cannot be overlaid onto printed glyphs,
+  //      so the paragraph has to be re-flowed to hold it.
+  //   2. The agreement reference belongs in the same sentence. Filling only the
+  //      printed «№_________» blank cannot work — the blank is 49.68 pt and a
+  //      real reference such as «БД-2026/000417-СПБ» is 101.17 pt at this size —
+  //      and moving the reference alone to the row's third line put it beside
+  //      «ФОНДОВЫЙ РЫНОК», 95 pt to the right of a still-empty «№» blank. That
+  //      is geometrically inside the cell and reads as a stray caption.
+  //
+  // Re-flowing the whole paragraph keeps both values inside the sentence that
+  // introduces them, and the row still ends on the third printed line the source
+  // itself uses: the longest reviewed reference with the longest client code
+  // measures three lines, so no row grows and nothing below it moves.
+  var PURPOSE_LEFT = 252.41;
+  var PURPOSE_WIDTH = 295.25;       // 553.30 right rule − 252.41 − 5.64 padding
+  var PURPOSE_SIZE = 11.04;         // the size the source itself prints
+  var PURPOSE_LINE_HEIGHT = 12.60;
+  var PURPOSE_BLANK_WIDTH = 49.68;  // «_________» at 11.04 pt
 
-  function paymentPurpose(id, page, baselineTop, continuationTop) {
-    return text(id, 'extra.extra-brokerage-contract',
-                page, PURPOSE_LEFT, baselineTop, PURPOSE_BLANK_WIDTH, {
-      required: true,
-      fontSize: 10.0,
-      tokenBreak: 'none',
-      overflowStrategy: 'flow',
-      flowRegions: [
+  var PURPOSE_LEAD = 'Код ';
+  var PURPOSE_BODY = '. Перевод денежных средств по Договору на брокерское ' +
+    'обслуживание №';
+
+  // One row. `market` is the sentence's closing designation as the source
+  // prints it; `placeholder` is the sample client code that row prints.
+  function purposeBlock(blockId, fieldId, baselineTop, market, placeholder,
+                        range) {
+    return {
+      id: blockId,
+      type: 'wordFlowBlock',
+      page: 1,
+      frame: {
+        left: PURPOSE_LEFT, baselineTop: baselineTop, width: PURPOSE_WIDTH,
+        initialLineCount: 3
+      },
+      font: 'legalSerif',
+      fontSize: PURPOSE_SIZE, minFontSize: PURPOSE_SIZE, fontSizeLocked: true,
+      lineHeight: PURPOSE_LINE_HEIGHT,
+      // The source's own three lines are ragged, not justified.
+      alignment: 'left',
+      sourceReplacement: {
+        firstBlock: range.block, lastBlock: range.block,
+        expectedBlockCount: 1, expectedPageBlockCount: 10,
+        expectedSha256: range.sha256,
+        expectedTemplateSha256: 'd46681cf43b357112a73a83bc01d1668036daceedc0ef9881ad63994a6f8a834',
+        reviewStatus: 'approved'
+      },
+      // The printed sample code. Declared so the legal-text gate drops exactly
+      // this one token and still holds every other token to the source.
+      sourcePlaceholders: [
         {
-          page: page, left: PURPOSE_LEFT, baselineTop: baselineTop,
-          width: PURPOSE_BLANK_WIDTH, maxLines: 1
-        },
-        {
-          page: page, left: PURPOSE_LEFT, baselineTop: continuationTop,
-          width: PURPOSE_CONTINUATION_WIDTH, maxLines: 1, maxFontSize: 10.0,
-          generated: true, reviewStatus: 'approved',
-          drawUnderline: true, underlineThickness: 0.48, underlineOffset: 1.6
+          text: placeholder,
+          fieldId: 'paymentPurposeClientCode',
+          reviewStatus: 'approved',
+          note: 'sample client code printed by the source form'
         }
+      ],
+      sourceStaticText: PURPOSE_LEAD + placeholder + PURPOSE_BODY +
+        '_________ дата__. ' + market,
+      runs: [
+        { type: 'static', text: PURPOSE_LEAD },
+        // The CRM client code, where the form printed its sample.
+        { type: 'fieldRef', fieldId: 'paymentPurposeClientCode',
+          keepTogether: true },
+        // `keepWithNext` keeps «№» on the same line as the reference it
+        // introduces; a break between them would read as a dangling number
+        // sign at the end of a line.
+        { type: 'static', text: PURPOSE_BODY, keepWithNext: true },
+        // The exact agreement reference: one token, never split, carrying the
+        // rule the source prints for this blank.
+        { type: 'fieldRef', fieldId: fieldId, keepTogether: true,
+          decoration: {
+            underline: true, minWidth: PURPOSE_BLANK_WIDTH,
+            thickness: 0.48, offset: 1.20
+          } },
+        { type: 'static', text: ' дата__. ' + market }
       ]
+    };
+  }
+
+  // The reference field itself. It is never drawn on its own — the block above
+  // draws it — but it keeps its own id, source and printed-blank geometry so the
+  // wizard, the review pack and the Template Builder still name one field per
+  // market row.
+  function purposeReference(id, blockId, baselineTop) {
+    return text(id, 'extra.extra-brokerage-contract',
+                1, 389.0, baselineTop, PURPOSE_BLANK_WIDTH, {
+      required: true,
+      fontSize: PURPOSE_SIZE,
+      minFontSize: PURPOSE_SIZE,
+      tokenBreak: 'none',
+      layoutMode: 'flow-reference',
+      flowBlockId: blockId
     });
   }
 
@@ -207,7 +298,23 @@
             text: ', действующего на основании Доверенности № , настоящим извещает Клиента о заключении Договора о брокерском обслуживании и о заключении Депозитарного договора (договора счета ДЕПО)'
           }
         ]
-      }
+      },
+
+      // Page 2, §5 «Назначение платежа». One block per market row; each
+      // replaces exactly one top-level q…Q block of the source page, and the
+      // page's table rules are separate blocks that are never touched, so the
+      // borders stay where the form drew them.
+      purposeBlock('account-opening-payment-purpose-stock', 'paymentPurposeStock',
+                   46.68, 'ФОНДОВЫЙ РЫНОК', 'INV0000X',
+                   { block: 2, sha256: '8d508405d9190a64921835d973104e4b7ee9010a000e4e6952ced5dd7d725738' }),
+      purposeBlock('account-opening-payment-purpose-currency', 'paymentPurposeCurrency',
+                   85.22, 'ВАЛЮТНЫЙ РЫНОК', 'INV0000X',
+                   { block: 4, sha256: '0cc104761d1b66bdc93f286bd0a80cefac3a04e726ec61fb67ab80115dfae191' }),
+      // The derivatives row samples the code differently: six Latin X and one
+      // Cyrillic Х. Declared exactly as printed.
+      purposeBlock('account-opening-payment-purpose-derivatives', 'paymentPurposeDerivatives',
+                   123.62, 'СРОЧНЫЙ РЫНОК', 'XXXXXXХ',
+                   { block: 6, sha256: '81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd' })
     ],
 
     fields: [
@@ -272,30 +379,42 @@
       // ── 4. Счёт депо клиента ─────────────────────────────────────────────
       cell('depoAccount', 'extra.extra-depo-account', 675.10, { required: true }),
 
-      // ── Page 2: the brokerage agreement number repeated in each
-      //    payment-purpose row. One operator input drives all three; the
-      //    adjacent 11.04 pt "дата__" rule is too small to fill.
+      // ── Page 2: §5 «Назначение платежа» ──────────────────────────────────
       //
-      // The printed «№_________» blank is nine underscores, 48.5 pt. A real
-      // agreement reference — «БД-2026/000417-СПБ» — is 82.47 pt at the 9 pt
-      // floor, and this is an exact identifier: printing «БД-2026/» on the
-      // blank and «000417-СПБ» underneath reads as two different references,
-      // even though the value does contain a slash and hyphens the ordinary
-      // wrapper would happily break at. `tokenBreak: 'none'` forbids that, and
-      // the engine then moves the whole token to the next wider approved line
-      // instead of splitting it.
+      // The brokerage agreement reference, repeated in each payment-purpose
+      // row — one operator input drives all three. The adjacent 11.04 pt
+      // «дата__» rule is still too small to fill and stays blank.
       //
-      // That line is real and belongs to the same cell: each purpose row is
-      // three printed lines high (36.48–74.40, 74.88–112.94, 113.42–151.34) and
-      // the third one ends at «РЫНОК» / x 294.05, leaving the cell blank from
-      // there to its right rule at 553.30. The continuation sits directly under
-      // the «№» blank, 389.0 → 549.0, and carries the same 0.48 pt rule the
-      // source prints for a blank, so the reference reads as written on a
-      // second line of the same cell. A reference that fits the printed blank
-      // never reaches it and nothing extra is drawn.
-      paymentPurpose('paymentPurposeStock', 1, 59.40, 72.00),
-      paymentPurpose('paymentPurposeCurrency', 1, 97.82, 110.42),
-      paymentPurpose('paymentPurposeDerivatives', 1, 136.22, 148.82)
+      // These are flow references: the reviewed Word-flow row above draws each
+      // one inside the sentence that introduces it, immediately after «№», so a
+      // reference wider than the printed blank pushes the wording along instead
+      // of landing on its own line. `tokenBreak: 'none'` records that the value
+      // is one exact identifier: «БД-2026/» on one line and «000417-СПБ» on the
+      // next would read as two different references.
+      purposeReference('paymentPurposeStock',
+                       'account-opening-payment-purpose-stock', 59.40),
+      purposeReference('paymentPurposeCurrency',
+                       'account-opening-payment-purpose-currency', 97.82),
+      purposeReference('paymentPurposeDerivatives',
+                       'account-opening-payment-purpose-derivatives', 136.22),
+
+      // The client code the payment-purpose sentences print. Same source as the
+      // «Код клиента» cell of §1 above — one CRM value, shown in both places —
+      // but a separate field, because §1 is an ordinary overlay into a printed
+      // blank and these three are flow references into replaced paragraphs.
+      text('paymentPurposeClientCode', 'field.client-code',
+           1, PURPOSE_LEFT, 46.68, PURPOSE_WIDTH, {
+             required: true,
+             fontSize: PURPOSE_SIZE,
+             minFontSize: PURPOSE_SIZE,
+             layoutMode: 'flow-reference',
+             flowBlockId: [
+               'account-opening-payment-purpose-stock',
+               'account-opening-payment-purpose-currency',
+               'account-opening-payment-purpose-derivatives'
+             ],
+             allowMultipleFlowReferences: true
+           })
     ]
   };
 

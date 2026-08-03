@@ -1154,10 +1154,20 @@
       });
 
       if (block.sourceStaticText != null) {
-        var expected = Layout.staticTokenSequence(block.sourceStaticText);
         var actual = Layout.staticTokenSequence(Layout.staticTextOfRuns(block.runs || []));
+      var placeholders = validateSourcePlaceholders(block, id, blockRefs, problems);
+
         if (expected.join('\u0001') !== actual.join('\u0001')) {
           problems.push(id + ': configured static token sequence differs from the source block');
+        }
+        // A reviewed placeholder — a sample value the source prints where a
+        // real one belongs — is removed from the source side before the
+        // comparison. Everything else still has to match token for token.
+        var expected = Layout.removePlaceholderTokens(
+          Layout.staticTokenSequence(block.sourceStaticText), placeholders);
+        if (expected === null) {
+          problems.push(id + ': a declared sourcePlaceholder is not in sourceStaticText');
+          expected = actual;
         }
       } else {
         problems.push(id + ': sourceStaticText is required for legal-text equivalence QA');
@@ -1181,6 +1191,52 @@
   // Validate one template definition against the loaded PDF. Returns an array
   // of human-readable problems; empty means the map is usable.
   function validateTemplate(template, pages, payload) {
+  // A reviewed source placeholder: printed sample content that the CRM value
+  // replaces. Underscored blanks need no declaration — the tokenizer already
+  // treats them as geometry — but a sample made of ordinary letters and digits,
+  // such as the account-opening notice's «Код INV0000X», is indistinguishable
+  // from legal wording and must be named here to be droppable.
+  //
+  // Every one of these has to be approved, has to say which field takes its
+  // place, and that field has to be a reference this very block resolves. A
+  // placeholder can therefore never remove wording that no value replaces.
+  function validateSourcePlaceholders(block, id, blockRefs, problems) {
+    var declared = block.sourcePlaceholders;
+    if (declared == null) return null;
+    if (!Array.isArray(declared) || !declared.length) {
+      problems.push(id + ': sourcePlaceholders must be a non-empty array when present');
+      return null;
+    }
+    var usable = [];
+    declared.forEach(function (entry, index) {
+      var where = id + '.sourcePlaceholders[' + index + ']';
+      if (!entry || typeof entry !== 'object') {
+        problems.push(where + ': must be an object');
+        return;
+      }
+      if (!entry.text || !String(entry.text).trim()) {
+        problems.push(where + ': text is required — the printed sample it drops');
+        return;
+      }
+      if (entry.reviewStatus !== 'approved') {
+        problems.push(where + ': printed wording may only be dropped once approved');
+        return;
+      }
+      if (!entry.fieldId) {
+        problems.push(where + ': fieldId is required — the value that replaces it');
+        return;
+      }
+      if (!blockRefs[entry.fieldId]) {
+        problems.push(where + ': field "' + entry.fieldId +
+          '" is not referenced by this block, so nothing replaces the placeholder');
+        return;
+      }
+      usable.push(entry);
+    });
+    return usable.length ? usable : null;
+  }
+  Renderer.validateSourcePlaceholders = validateSourcePlaceholders;
+
     var problems = [];
     var seen = {};
     var fields = template.fields || [];

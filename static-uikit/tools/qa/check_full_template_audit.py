@@ -517,10 +517,25 @@ def override_index() -> dict[tuple[str, str], dict[str, Any]]:
     return index
 
 
+def owners_of(field: dict[str, Any]) -> set[str]:
+    """The Word-flow blocks a field declares itself part of.
+
+    `flowBlockId` is normally one id. It may be a list when one value belongs
+    to several reviewed paragraphs — mirrors the renderer, which accepts both
+    shapes and gates the list on `allowMultipleFlowReferences`.
+    """
+    declared = field.get("flowBlockId")
+    if declared is None:
+        return set()
+    if isinstance(declared, (list, tuple)):
+        return {str(item) for item in declared}
+    return {str(declared)}
+
+
 def word_flow_index(
     maps: dict[str, Any]
-) -> tuple[dict[tuple[str, str], dict[str, Any]], list[str]]:
-    index: dict[tuple[str, str], dict[str, Any]] = {}
+) -> tuple[dict[tuple[str, str], list[dict[str, Any]]], list[str]]:
+    index: dict[tuple[str, str], list[dict[str, Any]]] = {}
     errors: list[str] = []
     for map_id, template in maps.items():
         fields_by_id = {
@@ -551,33 +566,40 @@ def word_flow_index(
                         f"word-flow reference lacks layoutMode=flow-reference: "
                         f"{map_id}/{block_id}/{field_id}"
                     )
-                if field.get("flowBlockId") != block_id:
+                if block_id not in owners_of(field):
                     errors.append(
                         f"word-flow reference has mismatched flowBlockId: "
                         f"{map_id}/{field_id}: {field.get('flowBlockId')!r} != {block_id!r}"
                     )
                 key = (map_id, field_id)
-                if key in index:
+                # One value may appear in several reviewed paragraphs when the
+                # map says so — the account-opening notice prints one client
+                # code in all three payment-purpose rows. The renderer requires
+                # the same opt-in (`allowMultipleFlowReferences`), so silence
+                # here can never be wider than what production accepts.
+                if key in index and not field.get("allowMultipleFlowReferences"):
                     errors.append(
                         f"field occurs in multiple word-flow blocks: {map_id}/{field_id}"
                     )
-                index[key] = block
+                index.setdefault(key, []).append(block)
         for field_id, field in fields_by_id.items():
             marked = field.get("layoutMode") == "flow-reference" or bool(field.get("flowBlockId"))
             if not marked:
                 continue
-            block = index.get((map_id, field_id))
-            if block is None:
+            blocks = index.get((map_id, field_id))
+            if not blocks:
                 errors.append(
                     f"flow-reference field is absent from wordFlowBlocks: {map_id}/{field_id}"
                 )
                 continue
             if field.get("layoutMode") != "flow-reference":
                 errors.append(f"flowBlockId without flow-reference mode: {map_id}/{field_id}")
-            if field.get("flowBlockId") != block.get("id"):
+            declared = owners_of(field)
+            drawn_by = {str(block.get("id")) for block in blocks}
+            if declared != drawn_by:
                 errors.append(
                     f"flow-reference marker points to another block: {map_id}/{field_id}: "
-                    f"{field.get('flowBlockId')!r} != {block.get('id')!r}"
+                    f"{sorted(declared)!r} != {sorted(drawn_by)!r}"
                 )
     return index, errors
 
@@ -942,7 +964,9 @@ def build_field_and_section_rows(
             field_id = str(field.get("id") or "")
             page = int(field.get("page", 0)) + 1
             key = (map_id, field_id)
-            block = word_flows.get(key)
+            # A value repeated across identical reviewed rows classifies the
+            # same way in each, so the first block answers for all of them.
+            block = (word_flows.get(key) or [None])[0]
             override = target_overrides.get(key)
             effective_override = override
             if block and not effective_override:

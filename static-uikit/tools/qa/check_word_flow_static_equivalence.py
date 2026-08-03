@@ -34,6 +34,39 @@ def tokens(value: str) -> list[str]:
     return WORD_OR_PUNCTUATION.findall(normal)
 
 
+def strip_placeholders(
+    sequence: list[str], placeholders: list[dict]
+) -> list[str] | None:
+    """Mirror pdf-text-layout.js removePlaceholderTokens.
+
+    A blank printed as underscores already vanishes in ``tokens``.  A few forms
+    instead print a *sample value* — the account-opening notice prints
+    «Код INV0000X» — which is made of ordinary letters and digits and is
+    therefore indistinguishable from the legal wording around it.  Such a token
+    is dropped only where the map names it and a reviewer approved it.
+
+    Returns None when a declared placeholder is not present, so a stale
+    declaration is reported as drift instead of quietly widening the licence.
+    """
+    out = list(sequence)
+    for entry in placeholders or []:
+        wanted = tokens(entry.get("text", "") if isinstance(entry, dict) else entry)
+        if not wanted:
+            return None
+        at = next(
+            (
+                i
+                for i in range(len(out) - len(wanted) + 1)
+                if out[i : i + len(wanted)] == wanted
+            ),
+            None,
+        )
+        if at is None:
+            return None
+        del out[at : at + len(wanted)]
+    return out
+
+
 def static_text_of_runs(runs: list[dict]) -> str:
     parts: list[str] = []
     for run in runs:
@@ -119,16 +152,28 @@ def main() -> int:
             run_tokens = tokens(static_text_of_runs(block.get("runs", [])))
             checked += 1
 
+            # The PDF and the configured copy of it stay locked together with
+            # the placeholder still in place: that is the proof the map really
+            # transcribed this block.  Only the runs — what the document will
+            # actually print — are allowed to drop the reviewed sample.
             if source_tokens != configured_tokens:
                 failures.append(
                     f"{template_id}/{block['id']}: source/config tokens differ\n"
                     f"  source: {context(source_tokens)}\n"
                     f"  config: {context(configured_tokens)}"
                 )
-            if configured_tokens != run_tokens:
+            placeholders = block.get("sourcePlaceholders") or []
+            expected_tokens = strip_placeholders(configured_tokens, placeholders)
+            if expected_tokens is None:
+                failures.append(
+                    f"{template_id}/{block['id']}: a declared sourcePlaceholder "
+                    f"is not in sourceStaticText\n"
+                    f"  config: {context(configured_tokens)}"
+                )
+            elif expected_tokens != run_tokens:
                 failures.append(
                     f"{template_id}/{block['id']}: config/run tokens differ\n"
-                    f"  config: {context(configured_tokens)}\n"
+                    f"  config: {context(expected_tokens)}\n"
                     f"  runs:   {context(run_tokens)}"
                 )
 
