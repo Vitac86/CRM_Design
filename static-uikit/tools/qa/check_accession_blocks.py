@@ -88,20 +88,22 @@ FORMS = {
 }
 
 # The account-opening notice: what the replaced template must and must not say.
-# Taken verbatim from the supplied PDF, including its straight quotes, its
-# doubled spaces around «в лице», and its spelling of the patronymic.
+# Taken verbatim from the supplied corrected PDF, including its straight quotes
+# and doubled spaces around «в лице».
 ACCOUNT_OPENING = {
     "pdf": "account-opening-notice.pdf",
-    "sha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
+    "sha256": "8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294",
     "mapId": "account-opening-notice",
     "required": [
         'Общество с ограниченной ответственностью "Инвестика",  в  лице '
         'Генерального Директора Козырева',
+        'Козырева Александра Юрьевича',
         'действующего на основании Устава, настоящим извещает Клиента',
     ],
     # Checked against the whole document.
     "forbidden": [
         "Тестовое значение",       # a printed sample nobody replaced
+        "Козырева Александра Юрьвеича",  # rejected patronymic transposition
         "Доверенности №",          # the superseded representative wording
     ],
     # Checked against the introduction paragraph only. The rest of the form is

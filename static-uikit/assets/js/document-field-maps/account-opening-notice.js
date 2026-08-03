@@ -5,8 +5,8 @@
 // Source Word   : Z:\6. Управление по работе с клиентами\Формы документов\
 //                 для оцифровки\ПРИЛОЖЕНИЕ 3 К РЕГЛАМЕНТУ. УВЕДОМЛЕНИЕ ОБ
 //                 ОТКРЫТИИ БРОКЕРСКОГО-ДЕПОЗИТАРНОГО СЧЕТА.docx
-// Source SHA-256: 600f6fb134bd0117093ccec690d979a4b54e26475bc93c736d3557c609d56edc
-// PDF SHA-256   : 5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a
+// Source SHA-256: 39e0df89471e07bb40a055fe6aa5f0f4c25c65af2062da53029d172b5128c699
+// PDF SHA-256   : 8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294
 // Pages         : 2 (A4, 595.32 × 841.92 pt; 0 AcroForm fields/widgets/annots)
 //
 // Not to be confused with «Приложение № 3» of the qualification regulation
@@ -233,7 +233,7 @@
         firstBlock: range.block, lastBlock: range.block,
         expectedBlockCount: 1, expectedPageBlockCount: 10,
         expectedSha256: range.sha256,
-        expectedTemplateSha256: '5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a',
+        expectedTemplateSha256: '8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294',
         reviewStatus: 'approved'
       },
       // The printed sample code. Declared so the legal-text gate drops exactly
@@ -350,7 +350,7 @@
       // The introduction paragraph used to be replaced here. The updated
       // authoritative template prints it itself —
       //   «Общество с ограниченной ответственностью "Инвестика",  в  лице
-      //    Генерального Директора Козырева Александра Юрьвеича, действующего
+      //    Генерального Директора Козырева Александра Юрьевича, действующего
       //    на основании Устава, настоящим извещает Клиента …»
       // — so there is no blank to fill and no rule to draw. Drawing anything
       // over it would print the representative twice.

@@ -13766,8 +13766,8 @@
       "templatePath": "static-uikit/assets/document-pdf-templates/account-opening-notice.pdf",
       "documentRole": "dynamic-overlay",
       "productionStatus": "dynamic-production-ready",
-      "byteLength": 285412,
-      "sha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
+      "byteLength": 285435,
+      "sha256": "8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294",
       "pageCount": 2,
       "pages": [
         {
@@ -13775,7 +13775,7 @@
           "widthPt": 595.32,
           "heightPt": 841.92,
           "sourceTextLineCount": 42,
-          "sourceTextSha256": "e986e9cdadcd33d82c55629a3476905b41fb24c1e1d8655c3214f6914c21c0e5",
+          "sourceTextSha256": "4b03aa532c89bbd32c8f91c835b1d5a34628e6f37c1ef9b37c85c2773d7fe38a",
           "imageCount": 0,
           "drawingCount": 288,
           "sourceTextLines": [
@@ -13911,7 +13911,7 @@
               "bbox": [
                 41.4,
                 123.263,
-                565.052,
+                564.981,
                 135.485
               ],
               "spans": [
@@ -13924,7 +13924,7 @@
                   "bbox": [
                     41.4,
                     123.263,
-                    565.052,
+                    564.981,
                     135.485
                   ]
                 }
@@ -13932,13 +13932,13 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "f18c99c1e375e92d704f21e919e56ec5620e385514c5ce0560b420ca9fff3926"
+              "lineSha256": "57fbfe664688cf902df161465036afe584b90df04cf327921de349696a5b8433"
             },
             {
               "lineNumber": 6,
               "sourceBlockNumber": 4,
               "sourceLineNumber": 2,
-              "text": "Александра Юрьвеича, действующего на основании Устава, настоящим извещает Клиента о заключении",
+              "text": "Александра Юрьевича, действующего на основании Устава, настоящим извещает Клиента о заключении",
               "bbox": [
                 41.4,
                 135.863,
@@ -13947,7 +13947,7 @@
               ],
               "spans": [
                 {
-                  "text": "Александра Юрьвеича, действующего на основании Устава, настоящим извещает Клиента о заключении ",
+                  "text": "Александра Юрьевича, действующего на основании Устава, настоящим извещает Клиента о заключении ",
                   "fontFamily": "TimesNewRomanPSMT",
                   "fontSizePt": 11.04,
                   "flags": 4,
@@ -13963,7 +13963,7 @@
               "currentRenderingModel": "source-pdf-static-text",
               "intendedLayoutCategory": "preserved-source-static-line",
               "reviewStatus": "source-line-inventoried",
-              "lineSha256": "38c08823b1920602a498099627141110f62c57fa659974d450217f3cac409dab"
+              "lineSha256": "e4a31bc89f9687c69ccbfd563e092822e6c5ca904f0ad0b8a3c17cffa9bfe709"
             },
             {
               "lineNumber": 7,
@@ -143054,7 +143054,7 @@
             "expectedBlockCount": 1,
             "expectedPageBlockCount": 10,
             "expectedSha256": "8d508405d9190a64921835d973104e4b7ee9010a000e4e6952ced5dd7d725738",
-            "expectedTemplateSha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
+            "expectedTemplateSha256": "8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294",
             "reviewStatus": "approved"
           },
           "sourcePlaceholders": [
@@ -143170,7 +143170,7 @@
             "expectedBlockCount": 1,
             "expectedPageBlockCount": 10,
             "expectedSha256": "0cc104761d1b66bdc93f286bd0a80cefac3a04e726ec61fb67ab80115dfae191",
-            "expectedTemplateSha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
+            "expectedTemplateSha256": "8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294",
             "reviewStatus": "approved"
           },
           "sourcePlaceholders": [
@@ -143286,7 +143286,7 @@
             "expectedBlockCount": 1,
             "expectedPageBlockCount": 10,
             "expectedSha256": "81b7fd45a974ee6b5667fe1558c6526919b7cac5aacb183529700d391cf258cd",
-            "expectedTemplateSha256": "5ca829a6284b5de9bfffb602a0dffc89b908bdb433d5d5ac361fa1dce7183a5a",
+            "expectedTemplateSha256": "8e6a39227c5ec62d1d0cefea1b194d823e17065e82e6c382db174c37f48ca294",
             "reviewStatus": "approved"
           },
           "sourcePlaceholders": [
@@ -153042,7 +153042,7 @@
       "intendedLayoutCategory": "preserved-source-static",
       "staticTextInvolved": {
         "lineCount": 42,
-        "lineTextSha256": "e986e9cdadcd33d82c55629a3476905b41fb24c1e1d8655c3214f6914c21c0e5"
+        "lineTextSha256": "4b03aa532c89bbd32c8f91c835b1d5a34628e6f37c1ef9b37c85c2773d7fe38a"
       },
       "fontFamily": [
         "TimesNewRomanPS-BoldMT",
