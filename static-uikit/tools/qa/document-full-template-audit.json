@@ -141669,6 +141669,7 @@
       "wordFlowBlocksAdded": [],
       "activeIndependentExpansionFields": [
         "foreignName",
+        "fullLegalName",
         "pre2002RegistrationAuthority",
         "pre2002RegistrationDocument",
         "stateRegistrationAuthority",
@@ -145149,6 +145150,7 @@
           "bottomClearance": 28,
           "compaction": [],
           "anchors": [
+            "fullLegalName",
             "foreignName",
             "stateRegistrationAuthority",
             "pre2002RegistrationDocument",
@@ -165509,7 +165511,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "bounded-multiline-overlay"
+        "inserted-table-row"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -165528,7 +165530,7 @@
         "left"
       ],
       "underlineBorderStyle": [
-        "source-pdf-table-cell-border"
+        "generated-table-row"
       ],
       "normalFixtureResult": "pass",
       "realisticLongFixtureResult": "pass",
@@ -201451,7 +201453,7 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "bounded-multiline-overlay",
+      "currentRenderingModel": "inserted-table-row",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 1",
@@ -201461,7 +201463,7 @@
       "lineHeightPt": null,
       "lineHeightModel": "renderer-auto",
       "alignment": "left",
-      "underlineBorderStyle": "source-pdf-table-cell-border",
+      "underlineBorderStyle": "generated-table-row",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
       "realisticLongFixtureResult": "pass (zero realistic-long-class failures in audited baseline)",
       "currentVisualDefect": "none in audited ordinary or realistic-long fixture classes",
@@ -201485,8 +201487,44 @@
         "required": true,
         "optional": false,
         "multiline": true,
+        "maxLines": 1,
         "maxHeight": 11.920000000000016,
-        "lineHeightRatio": 0.95
+        "lineHeightRatio": 0.95,
+        "expansion": {
+          "page": 0,
+          "insertionTop": 196.22,
+          "shiftFromTop": 196.22,
+          "rowHeight": 13.44,
+          "maxExtraRows": 2,
+          "maxFontSize": 10.5,
+          "lineStyle": "table-row",
+          "reviewStatus": "approved",
+          "rowLeft": 63.74,
+          "rowWidth": 496.88,
+          "borders": {
+            "left": false,
+            "right": false,
+            "top": false,
+            "bottom": false
+          },
+          "columns": [
+            63.74,
+            64.7,
+            84.62,
+            85.58,
+            326.11,
+            559.66,
+            560.62
+          ],
+          "line": {
+            "left": 331.5,
+            "width": 222.9,
+            "continuesParagraph": true,
+            "baselineOffset": 10.44,
+            "ruleThickness": 0.48
+          }
+        },
+        "overflowStrategy": "expand-layout"
       }
     },
     {

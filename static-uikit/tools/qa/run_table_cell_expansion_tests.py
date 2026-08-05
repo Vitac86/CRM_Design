@@ -139,6 +139,12 @@ CASES = (
          "extra.extra-beneficial-owner", "beneficialOwnerName", 2,
          366.53, 13.44,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
+    # Row 1, «Полное фирменное наименование». Its single printed band holds one
+    # line, so a real full firm name opens one — and at most two — under the
+    # 196.46 rule, exactly where the row's own verticals stop at 196.22.
+    Case("anketa-yul", "anketa-yul.pdf", "ru-company-normal",
+         "field.client-full-legal-name", "fullLegalName", 0, 196.22, 13.44,
+         (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 8),
     Case("anketa-yul", "anketa-yul.pdf", "en-company-normal",
          "field.client-english-name", "foreignName", 0, 234.02, 13.44,
          (63.74, 64.70, 84.62, 85.58, 326.11, 559.66, 560.62), 11),

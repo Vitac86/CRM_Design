@@ -379,6 +379,10 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("anketa-ip-sz", "representativeName"),
     ("anketa-ip-sz", "beneficiaryName"),
     ("anketa-ip-sz", "beneficialOwnerName"),
+    # Row 1's single printed band holds one line, which is short of the full
+    # firm name the register carries; it opens up to two reviewed bands, and
+    # row 3 keeps its own one.
+    ("anketa-yul", "fullLegalName"),
     ("anketa-yul", "foreignName"),
     ("anketa-yul", "stateRegistrationAuthority"),
     ("anketa-yul", "pre2002RegistrationDocument"),

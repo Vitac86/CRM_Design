@@ -63,6 +63,12 @@ SUITES = [
     ("passport issuing authority", "run_passport_authority_tests.py", []),
     ("passport issuing authority gates", "run_passport_authority_tests.py",
      ["--self-test"]),
+    # The longest routine value on a legal-entity form: the full firm name the
+    # register carries. Enumerated from the exact UMI registry, so any other
+    # field printing `umi.company.origname` is audited automatically.
+    ("legal-entity full name row", "run_legal_name_row_tests.py", []),
+    ("legal-entity full name row gates", "run_legal_name_row_tests.py",
+     ["--self-test"]),
     ("visual geometry and cross-page flow", "run_visual_geometry_tests.py", []),
     # Geometry says the value is inside its box. This says the result still
     # reads as one field: an exact reference stays in its sentence, a grown row

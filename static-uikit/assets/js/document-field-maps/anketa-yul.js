@@ -188,7 +188,10 @@
       // Page 1 is one continuous table from 182 pt to its last rule at 780.10,
       // and its own bottom margin is 61.82 pt.  Keeping a reviewed 28 pt print
       // margin leaves 33.82 pt: either one 19.92 pt registration continuation,
-      // or that continuation together with foreignName's 13.44 pt row.
+      // or that continuation together with a 13.44 pt name row, or the two
+      // 13.44 pt name rows of rows 1 and 3 together. Three 13.44 pt bands
+      // (40.32 pt) do not fit, and the page refuses the third rather than
+      // spending the print margin.
       0: {
         fixedHeaderUntil: 0,
         bodyBottom: 780.10,
@@ -196,7 +199,7 @@
         shiftToTop: 800.0,
         bottomClearance: 28.0,
         compaction: [],
-        anchors: ['foreignName', 'stateRegistrationAuthority',
+        anchors: ['fullLegalName', 'foreignName', 'stateRegistrationAuthority',
           'pre2002RegistrationDocument', 'pre2002RegistrationAuthority']
       },
       2: {
@@ -223,8 +226,51 @@
       check('modeChange', 'check.anketa-mode-change', true, 0, 281.8, 148.10),
 
       // Page 1 — names, tax and state registration, principal addresses.
+      //
+      // Row 1 is a single 13.44 pt band (rules 183.02 → 196.46) and holds ONE
+      // line at its reviewed 10.5 pt. That is enough for «АО «Тестовые
+      // инвестиции»» (125.70 pt) and for very little else: «Акционерное
+      // общество «Специализированный депозитарий инвестиционных фондов»» is
+      // 389.80 pt and wraps to two lines in this 222.9 pt cell, and the full
+      // firm name a real EGRUL entry carries — «Акционерное общество
+      // «Международные инвестиционные технологии и инфраструктурные решения»»
+      // — is 463.30 pt and wraps to three. A bigger `maxHeight` cannot be the
+      // answer: the cell has 11.92 pt and two lines need 17.10 pt even at the
+      // 9 pt floor, so it would only reach into row 2.
+      //
+      // The анкета is a table, so the answer is the same real inserted row that
+      // row 3 already uses: the rows below move down by whole 13.44 pt pitches,
+      // the printed bottom rule travels with them to close the grown cell, and
+      // the row's seven vertical centre-lines are continued exactly where the
+      // printed ones stop. 196.22 is the clean cut — row 1's verticals end
+      // there (183.38 → 196.22) and its bottom rule sits just under them.
+      //
+      // Two extra rows is the reviewed maximum: three printed lines take the
+      // longest realistic company name, and 26.88 pt still leaves page 1's
+      // 33.82 pt budget able to pay for row 3's own 13.44 pt band alongside it.
       cell('fullLegalName', 'field.client-full-legal-name', 0, 182.54, 196.46, {
-        required: true, ownershipTop: 183.02, ownershipRuleTop: 182.78
+        required: true, ownershipTop: 183.02, ownershipRuleTop: 182.78,
+        multiline: true,
+        maxLines: 1,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 196.22, shiftFromTop: 196.22,
+          rowHeight: 13.44, maxExtraRows: 2, maxFontSize: 10.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 496.88,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: TABLE_COLUMNS.slice(),
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            // Each grown row is a full 13.44 pt source pitch tall, but the name
+            // inside it is the next line of one legal name and keeps the cell's
+            // own 0.95 leading — exactly as row 3 does. Placed at the row's
+            // pitch the continuation sat a whole step low and read as a second,
+            // unrelated entry rather than as the rest of the name.
+            continuesParagraph: true,
+            baselineOffset: 10.44, ruleThickness: 0.48
+          }
+        }
       }),
       cell('shortName', 'field.client-short-name', 0, 196.46, 209.90, { required: true }),
       // Row 3 is already a double-height row (rules 209.66 → 234.02, 24.36 pt)

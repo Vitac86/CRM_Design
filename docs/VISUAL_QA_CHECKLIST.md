@@ -104,15 +104,16 @@
 
 ## Document correction review — implementation complete, manual approval pending
 
-Recorded 2026-08-03. The previously open document findings are implemented and
-have dedicated fail-closed automated checks. They are **not yet manually
-accepted**: the remaining release action is to inspect the synthetic
+Recorded 2026-08-03, refreshed 2026-08-05 with the legal-entity full-name row.
+The previously open document findings are implemented and have dedicated
+fail-closed automated checks. They are **not yet manually accepted**: the
+remaining release action is to inspect the synthetic
 `static-uikit/manual-smoke/manual-findings-fix` review pack at high zoom and
 sign off the items below. The completed pack covers 9 affected documents and
-33 scenarios: 33 PDFs, 33 fixture JSON files, 118 full-page PNGs and 103 block
-close-ups. Its automated pack gates report zero failures; all 143 manual
+37 scenarios: 37 PDFs, 37 fixture JSON files, 138 full-page PNGs and 127 block
+close-ups. Its automated pack gates report zero failures; all 171 manual
 checklist items remain deliberately unchecked. `review.json` SHA-256 is
-`ebbaec9731abd6428b37353348d27e1f9d0bbab616c6fa0332000a8535108ca7`
+`e41b540cd1ef5e5c1b7f5da36434cf6e29516bb7625b60e74d6c6f76b109a404`
 — rebuilding the pack from the same tree reproduces that byte exactly, so the
 fingerprint identifies the pack a reviewer is looking at.
 A green automated run does not mark these boxes.
@@ -194,6 +195,26 @@ page appearance, not whether those declarations exist.
 
 Compare `authority-ordinary` against `authority-long`, and each questionnaire's
 `ru-normal` against its `passport-authority-long` card.
+
+### Full legal name — «Полное фирменное наименование», row 1 of `anketa-yul`
+
+- [ ] A short name («АО «Тестовые инвестиции»») leaves the printed row exactly
+  as the form drew it: one line, no empty extra band, nothing below it moved.
+- [ ] A long Russian firm name opens one 13.44 pt band and a long foreign one
+  opens two, and each reads as one name at one pitch — not as a caption under
+  a second entry.
+- [ ] Row 2 «Сокращенное наименование» and row 3 «Наименование на иностранном
+  языке» are neither overlapped nor clipped; both have travelled down by the
+  whole added height, together with rows 4 and 5.
+- [ ] The seven vertical centre-lines run unbroken from the printed row into
+  the grown bands, and the row's bottom rule closes the enlarged cell.
+- [ ] The printed row numbers 1–5 and their left-hand labels are untouched, and
+  nothing above the table has moved.
+- [ ] Rows 1 and 3 growing in the same render still leave the page's reviewed
+  bottom margin intact.
+
+Compare `legal-name-short` against `legal-name-long-ru`,
+`legal-name-long-foreign` and `legal-name-with-foreign-row`.
 
 ### Final gate
 

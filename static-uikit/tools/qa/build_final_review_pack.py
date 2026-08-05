@@ -80,6 +80,19 @@ LONG_AUTHORITY = (
     "Главного управления МВД России по городу Москве"
 )
 
+# «Полное фирменное наименование» — the four fixtures the reviewer has to look
+# at for the questionnaire's row 1. The gates belong to
+# `run_legal_name_row_tests.py`; these exist so the same names can be seen.
+SHORT_COMPANY_NAME = "АО «Тестовые инвестиции»"
+LONG_RU_COMPANY_NAME = (
+    "Акционерное общество «Специализированный депозитарий инвестиционных фондов»"
+)
+LONG_FOREIGN_COMPANY_NAME = (
+    "Interregional Investment, Industrial and Infrastructure Company "
+    "for Technological Development, Joint-Stock Company"
+)
+SHORT_FOREIGN_NAME_ROW3 = "Test Investments JSC"
+
 OTHER_INSTRUMENTS = (
     "акций и облигаций иностранных эмитентов, паев международных "
     "инвестиционных фондов, депозитарных расписок, структурных облигаций и "
@@ -241,8 +254,14 @@ DOCUMENTS: dict[str, dict[str, Any]] = {
             "otherInformation",
         ],
         "focusRegions": [
+            # Row 1 alone, and rows 1–4 together. The clip reaches 300 pt so it
+            # still shows the whole name block when row 1 has opened its two
+            # reviewed bands and row 3 has opened its own.
+            {"id": "full-legal-name",
+             "title": "Строка 1 — полное фирменное наименование", "page": 0,
+             "clip": [45, 176, 575, 245], "fields": ["fullLegalName"]},
             {"id": "names", "title": "Полное и иностранное наименование", "page": 0,
-             "clip": [45, 170, 575, 275],
+             "clip": [45, 170, 575, 300],
              "fields": ["fullLegalName", "foreignName"]},
             {"id": "registration", "title": "Регистрация и адрес ЕГРЮЛ", "page": 0,
              "clip": [45, 495, 575, 825],
@@ -438,6 +457,34 @@ def authority_scenarios(doc_id: str) -> list[dict[str, Any]]:
     return scenarios
 
 
+def legal_name_scenarios() -> list[dict[str, Any]]:
+    """Row 1 short, long in Russian, long in Latin, and rows 1 and 3 together."""
+    def scenario(identifier: str, name: str, row_three: str,
+                 profile: str = "ru-company-normal") -> dict[str, Any]:
+        return {
+            "id": identifier,
+            "profile": profile,
+            "requiredFocusFields": ["fullLegalName", "foreignName"],
+            "overrides": {
+                "field.client-full-legal-name": name,
+                "field.client-english-name": row_three,
+                "field.client-short-name": SHORT_COMPANY_NAME,
+                "subject.email": "client@example.test",
+            },
+        }
+
+    return [
+        scenario("legal-name-short", SHORT_COMPANY_NAME, SHORT_FOREIGN_NAME_ROW3),
+        scenario("legal-name-long-ru", LONG_RU_COMPANY_NAME, SHORT_FOREIGN_NAME_ROW3),
+        scenario("legal-name-long-foreign", LONG_FOREIGN_COMPANY_NAME,
+                 SHORT_FOREIGN_NAME_ROW3, profile="en-company-normal"),
+        # Rows 1 and 3 open a reviewed band each in the same render: 26.88 pt
+        # of page 1's 33.82 pt reserve.
+        scenario("legal-name-with-foreign-row", LONG_RU_COMPANY_NAME,
+                 LONG_FOREIGN_COMPANY_NAME),
+    ]
+
+
 def scenarios_for(doc_id: str) -> list[dict[str, Any]]:
     if doc_id in ("accession-application-fl", "client-notifications",
                   "power-of-attorney"):
@@ -468,10 +515,12 @@ def scenarios_for(doc_id: str) -> list[dict[str, Any]]:
             "requiredFocusFields": list(DOCUMENTS[doc_id]["focusFields"]),
             "overrides": questionnaire_overrides(doc_id, language, is_long)}
            for identifier, profile, language, is_long in matrix]
-    # The grown issuer row on its own. The combined long fixtures already spend
-    # this page's reviewed reserve on the name and bank rows, so asking for the
-    # issuer band there would only prove the budget refuses — which is a
-    # different question, and one `run_table_ownership_tests.py` already pins.
+    # Row 1 of the legal-entity questionnaire on its own: the four cases the
+    # correction exists for. Kept as scenarios of their own because the generic
+    # long fixtures spend page 1's reviewed reserve on the registration rows,
+    # so a long company name there would only prove that the budget refuses.
+    if doc_id == "anketa-yul":
+        out.extend(legal_name_scenarios())
     if doc_id in AUTHORITY_SOURCES:
         source = AUTHORITY_SOURCES[doc_id][0]
         out.append({
