@@ -57,6 +57,10 @@ SUITES = [
     ("Word flow", "run_word_flow_renderer_tests.py", []),
     ("page expansion", "run_expansion_tests.py", []),
     ("table-cell expansion", "run_table_cell_expansion_tests.py", []),
+    ("accession market/tariff geometry",
+     "run_accession_market_tariff_geometry_tests.py", []),
+    ("accession market/tariff geometry gates",
+     "run_accession_market_tariff_geometry_tests.py", ["--self-test"]),
     ("questionnaire table ownership", "run_table_ownership_tests.py", []),
     # The longest routine value on an identity form. Enumerated from the live
     # maps, so a new «кем выдан» field anywhere is audited automatically.

@@ -236,6 +236,10 @@
         expansion: {
           page: 0, insertionTop: 171.4, shiftFromTop: 171.4,
           rowHeight: 9.72, maxExtraRows: 4, lineStyle: 'none',
+          // The market-table rules are top-level PDF paths, while their text is
+          // emitted in balanced blocks. Applicant growth sits above both and
+          // must translate the complete visual table through the same plan.
+          moveTopLevelPaths: true,
           reviewStatus: 'approved'
         },
         sourceReplacement: {

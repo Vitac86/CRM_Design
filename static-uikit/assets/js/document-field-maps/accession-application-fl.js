@@ -77,7 +77,11 @@
   var TARIFF_ROW_LEFT = 437.7;
   var TARIFF_ROW_WIDTH = 119.9;
   var TARIFF_RULE_THICKNESS = 0.36;
-  var TARIFF_RULE_OFFSET = 1.6;
+  // Liberation Serif's 9 pt descender reaches 1.76 pt below the PDF baseline.
+  // A 1.6 pt centre-line therefore crossed the glyph box before stroke width
+  // was even counted. 2.8 pt leaves a reviewed 0.86 pt clear band while
+  // keeping the continuation on the source's own 10.5 pt row pitch.
+  var TARIFF_RULE_OFFSET = 2.8;
 
   // One tariff value: the printed slot after «Тарифный план:», plus the
   // reviewed continuation line beneath it. The arguments are the measured
@@ -228,6 +232,10 @@
         expansion: {
           page: 0, insertionTop: 143.82, shiftFromTop: 143.82,
           rowHeight: 19.56, maxExtraRows: 1, lineStyle: 'none',
+          // Word exported the market-table separators as top-level paths while
+          // its headings and descriptions are balanced text blocks. They are
+          // one visual table, so the identity-row expansion must move both.
+          moveTopLevelPaths: true,
           reviewStatus: 'approved'
         },
         sourceReplacement: {
