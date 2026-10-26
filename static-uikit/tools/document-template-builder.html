@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CRM · PDF Template Builder</title>
+  <link rel="icon" href="../assets/icons/favicon_blue.ico"/>
+  <link rel="stylesheet" href="../assets/css/crm-static.bundle.css"/>
+  <link rel="stylesheet" href="../assets/css/pages/document-template-builder.css"/>
+</head>
+<body data-page="document-template-builder">
+  <div class="dtb-protocol-blocker" id="dtb-protocol-blocker" hidden role="alert">
+    <div>
+      <h1>Нужен локальный HTTP-сервер</h1>
+      <p>Конструктор должен быть открыт через локальный HTTP-сервер.</p>
+      <p>Запустите <code>static-uikit/start-template-builder.cmd</code>.</p>
+    </div>
+  </div>
+
+  <main class="dtb-app" id="dtb-app">
+    <header class="dtb-toolbar">
+      <div class="dtb-brand">
+        <span class="dtb-brand-mark">PDF</span>
+        <div><strong>Template Builder</strong><small>dynamic overlay mapping</small></div>
+      </div>
+      <div class="dtb-toolbar-group" aria-label="Проект">
+        <button class="dtb-button" type="button" id="dtb-new-project">Новый шаблон</button>
+        <button class="dtb-button" type="button" id="dtb-import-project">Импорт проекта</button>
+        <button class="dtb-button" type="button" id="dtb-save-draft">Сохранить черновик</button>
+        <button class="dtb-button" type="button" id="dtb-clear-draft">Очистить черновик</button>
+      </div>
+      <div class="dtb-toolbar-group dtb-toolbar-main-actions">
+        <button class="dtb-button" type="button" id="dtb-undo" title="Ctrl+Z">Undo</button>
+        <button class="dtb-button" type="button" id="dtb-redo" title="Ctrl+Shift+Z / Ctrl+Y">Redo</button>
+        <button class="dtb-button is-primary" type="button" id="dtb-preview-pdf">Сформировать тестовый PDF</button>
+        <button class="dtb-button" type="button" id="dtb-validate">Проверить</button>
+        <button class="dtb-button" type="button" id="dtb-export-project">Экспорт проекта</button>
+      </div>
+      <div class="dtb-local-indicator" title="Только файлы текущего origin">Локальный режим — данные и документы не отправляются на сервер.</div>
+    </header>
+
+    <div class="dtb-workspace">
+      <aside class="dtb-left-panel" aria-label="Проект и страницы">
+        <section class="dtb-panel-section">
+          <h2>Existing templates <span class="dtb-count" id="dtb-catalog-count">0</span></h2>
+          <label class="dtb-label" for="dtb-existing-template">Committed overlay map</label>
+          <select class="dtb-control" id="dtb-existing-template"><option value="">Выберите документ…</option></select>
+          <p class="dtb-help" id="dtb-catalog-status">Каталог загружается…</p>
+        </section>
+
+        <section class="dtb-panel-section">
+          <h2>Project</h2>
+          <label class="dtb-label">Template ID<input class="dtb-control" id="dtb-meta-id" type="text"/></label>
+          <p class="dtb-identifier-warning" id="dtb-meta-id-warning" hidden>Идентификатор существующей переменной используется production-формами и не может быть изменён.</p>
+          <label class="dtb-label">Название<input class="dtb-control" id="dtb-meta-title" type="text"/></label>
+          <label class="dtb-label">Описание<textarea class="dtb-control" id="dtb-meta-description" rows="2"></textarea></label>
+          <label class="dtb-label">Категория<input class="dtb-control" id="dtb-meta-category" type="text"/></label>
+          <div class="dtb-inline-checks">
+            <label><input id="dtb-applies-individual" type="checkbox"/> ФЛ</label>
+            <label><input id="dtb-applies-company" type="checkbox"/> ЮЛ</label>
+          </div>
+          <label class="dtb-label">Ожидаемо страниц<input class="dtb-control" id="dtb-meta-pages" type="number" min="1" step="1"/></label>
+          <label class="dtb-label">Имя результата<input class="dtb-control" id="dtb-meta-output" type="text"/></label>
+          <label class="dtb-label">QA status
+            <select class="dtb-control" id="dtb-qa-status">
+              <option>Draft</option><option>Mapped</option><option>Automatic validation passed</option>
+              <option>Visual review passed</option><option>Approved</option><option>Published</option>
+            </select>
+          </label>
+          <div class="dtb-hash" id="dtb-pdf-hash">SHA-256: —</div>
+          <button class="dtb-button dtb-full" type="button" id="dtb-select-new-pdf">Выбрать PDF для нового шаблона</button>
+          <button class="dtb-button dtb-full" type="button" id="dtb-replace-pdf">Заменить базовый PDF</button>
+        </section>
+
+        <section class="dtb-panel-section dtb-pages-section">
+          <h2>Pages</h2>
+          <div id="dtb-page-list" class="dtb-page-list"></div>
+        </section>
+
+        <section class="dtb-panel-section dtb-fields-section">
+          <h2>Fields <span class="dtb-count" id="dtb-field-count">0</span></h2>
+          <input class="dtb-control" id="dtb-field-filter" type="search" placeholder="ID или source"/>
+          <div id="dtb-field-list" class="dtb-field-list"></div>
+        </section>
+
+        <section class="dtb-panel-section dtb-word-flow-section">
+          <h2>Word-flow blocks <span class="dtb-count" id="dtb-word-flow-count">0</span></h2>
+          <p class="dtb-help">Static wording и ссылки на существующие business fields переносятся как один Word-подобный блок. ID и source полей не изменяются.</p>
+          <button class="dtb-button dtb-full" type="button" id="dtb-create-word-flow">Создать Word-подобный блок заполнения</button>
+          <div id="dtb-word-flow-list" class="dtb-word-flow-list"></div>
+        </section>
+      </aside>
+
+      <section class="dtb-canvas-panel" aria-label="PDF canvas">
+        <div class="dtb-canvas-toolbar">
+          <div class="dtb-tool-group" role="toolbar" aria-label="Инструменты">
+            <button class="dtb-tool is-active" data-tool="select" type="button">Выбор</button>
+            <button class="dtb-tool" data-tool="pan" type="button">Панорама</button>
+            <button class="dtb-tool" data-tool="text" type="button">Текст</button>
+            <button class="dtb-tool" data-tool="multiline" type="button">Multiline</button>
+            <button class="dtb-tool" data-tool="check" type="button">Checkbox</button>
+            <button class="dtb-tool" data-tool="static" type="button">Static overlay</button>
+          </div>
+          <div class="dtb-tool-group">
+            <button class="dtb-tool" type="button" id="dtb-prev-page" aria-label="Предыдущая страница">←</button>
+            <span id="dtb-page-readout">— / —</span>
+            <button class="dtb-tool" type="button" id="dtb-next-page" aria-label="Следующая страница">→</button>
+            <button class="dtb-tool" type="button" id="dtb-zoom-out">−</button>
+            <span id="dtb-zoom-readout">100%</span>
+            <button class="dtb-tool" type="button" id="dtb-zoom-in">+</button>
+            <button class="dtb-tool" type="button" id="dtb-fit-width">По ширине</button>
+            <button class="dtb-tool" type="button" id="dtb-fit-page">Страница</button>
+          </div>
+          <div class="dtb-tool-group">
+            <label><input id="dtb-snap" type="checkbox" checked/> Snap</label>
+            <label><input id="dtb-mm" type="checkbox"/> mm</label>
+            <label><input id="dtb-outlines" type="checkbox" checked/> Outlines</label>
+          </div>
+        </div>
+        <div class="dtb-canvas-status">
+          <span id="dtb-pdf-status">PDF не открыт</span>
+          <span>Fast canvas preview · только позиционирование</span>
+          <span id="dtb-coordinate-readout">x — · y —</span>
+        </div>
+        <div class="dtb-canvas-scroll" id="dtb-canvas-scroll">
+          <div class="dtb-page-stage" id="dtb-page-stage">
+            <canvas id="dtb-pdf-canvas"></canvas>
+            <svg id="dtb-overlay" class="dtb-overlay" aria-label="Редактор overlay-полей"></svg>
+          </div>
+        </div>
+      </section>
+
+      <aside class="dtb-right-panel" aria-label="Настройки поля">
+        <div id="dtb-inspector" class="dtb-inspector"></div>
+        <div id="dtb-word-flow-editor" class="dtb-inspector" hidden></div>
+      </aside>
+    </div>
+
+    <section class="dtb-bottom-panel" id="dtb-bottom-panel">
+      <div class="dtb-bottom-toolbar">
+        <label>Test profile <select class="dtb-control" id="dtb-profile"></select></label>
+        <input class="dtb-control" id="dtb-payload-filter" type="search" placeholder="Поиск payload path"/>
+        <button class="dtb-button" type="button" id="dtb-run-all">Запустить все тестовые профили</button>
+        <button class="dtb-button" type="button" id="dtb-import-fixtures">Импорт fixtures</button>
+        <button class="dtb-button" type="button" id="dtb-toggle-preview">Final PDF</button>
+        <span id="dtb-validation-summary">Проверка не запускалась</span>
+      </div>
+      <div class="dtb-bottom-content">
+        <div class="dtb-payload-editor" id="dtb-payload-editor"></div>
+        <div class="dtb-validation-results">
+          <div id="dtb-issues" class="dtb-issues"></div>
+          <div id="dtb-fit-table" class="dtb-fit-table"></div>
+        </div>
+        <div class="dtb-export-panel">
+          <h3>Review exports</h3>
+          <button class="dtb-button" id="dtb-export-map" type="button">Production field map JS</button>
+          <button class="dtb-button" id="dtb-export-registry" type="button">Registry fragment</button>
+          <button class="dtb-button" id="dtb-export-fixtures" type="button">Fixtures JSON</button>
+          <button class="dtb-button" id="dtb-export-qa" type="button">QA report</button>
+          <a class="dtb-button is-disabled" id="dtb-download-preview" download>Generated PDF</a>
+        </div>
+      </div>
+      <div class="dtb-final-preview" id="dtb-final-preview" hidden>
+        <iframe id="dtb-final-frame" title="Финальный PDF preview"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <div class="dtb-toast" id="dtb-toast" hidden role="status"></div>
+  <datalist id="dtb-source-options"></datalist>
+  <datalist id="dtb-word-flow-field-options"></datalist>
+  <input id="dtb-new-pdf-input" type="file" accept="application/pdf,.pdf" hidden/>
+  <input id="dtb-replace-pdf-input" type="file" accept="application/pdf,.pdf" hidden/>
+  <input id="dtb-project-input" type="file" accept="application/json,.json,.builder.json" hidden/>
+  <input id="dtb-fixtures-input" type="file" accept="application/json,.json" hidden/>
+
+  <script src="../assets/vendor/pdf-lib.min.js"></script>
+  <script src="../assets/vendor/fontkit.umd.min.js"></script>
+  <script src="../assets/js/document-engine/pdf-text-layout.js"></script>
+  <script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+  <script src="../assets/js/document-engine/pdf-page-expander.js"></script>
+  <script src="../assets/js/document-engine/umi-registry.js"></script>
+  <script src="../assets/js/document-engine/umi-adapter.js"></script>
+  <script src="../assets/js/document-engine/table-ownership.js"></script>
+  <script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
+  <script src="../assets/js/document-field-maps/accession-application-fl.js"></script>
+  <script src="../assets/js/document-field-maps/accession-application-yul.js"></script>
+  <script src="../assets/js/document-field-maps/account-opening-notice.js"></script>
+  <script src="../assets/js/document-field-maps/anketa-fl.js"></script>
+  <script src="../assets/js/document-field-maps/anketa-fl-simplified-id.js"></script>
+  <script src="../assets/js/document-field-maps/anketa-ip-sz.js"></script>
+  <script src="../assets/js/document-field-maps/anketa-yul.js"></script>
+  <script src="../assets/js/document-field-maps/broker-use-refusal-request.js"></script>
+  <script src="../assets/js/document-field-maps/client-notifications.js"></script>
+  <script src="../assets/js/document-field-maps/code-word-request.js"></script>
+  <script src="../assets/js/document-field-maps/order-forms.js"></script>
+  <script src="../assets/js/document-field-maps/power-of-attorney.js"></script>
+  <script src="../assets/js/document-field-maps/qualification-consequences-notice.js"></script>
+  <script src="../assets/js/document-field-maps/qualification-notice.js"></script>
+  <script src="../assets/js/document-field-maps/qualification-request-fl.js"></script>
+  <script src="../assets/js/document-field-maps/qualification-request-yul.js"></script>
+  <script src="../assets/js/document-field-maps/regulation-full-refusal-notice.js"></script>
+  <script src="../assets/js/document-field-maps/regulation-partial-refusal-notice.js"></script>
+  <script src="../assets/js/document-wizard/instrument-catalog.js"></script>
+  <script src="../assets/js/document-wizard/order-forms-model.js"></script>
+  <script src="../assets/js/pages/document-wizard.js"></script>
+  <script src="../assets/js/document-builder/project-schema.js"></script>
+  <script src="../assets/js/document-builder/identifier-protection.js"></script>
+  <script src="../assets/js/document-builder/builder-state.js"></script>
+  <script src="../assets/js/document-builder/source-catalog.js"></script>
+  <script src="../assets/js/document-builder/test-fixtures.js"></script>
+  <script src="../assets/js/document-builder/project-import-export.js"></script>
+  <script src="../assets/js/document-builder/builder-validation.js"></script>
+  <script src="../assets/js/document-builder/pdf-viewer.js"></script>
+  <script src="../assets/js/document-builder/field-overlay-editor.js"></script>
+  <script src="../assets/js/document-builder/property-inspector.js"></script>
+  <script src="../assets/js/document-builder/word-flow-editor.js"></script>
+  <script src="../assets/js/document-builder/builder-app.js"></script>
+</body>
+</html>

@@ -16,14 +16,75 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.48;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 11;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
   var VALUE_LEFT = 324.4;
   var VALUE_WIDTH = 237.0;
 
+  var TABLE_COLUMNS = [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60];
+  var CELL_OWNERSHIP = [];
+  var OWNERSHIP_EXEMPTIONS = [];
+
+  function tableId(page) {
+    return 'anketa-fl-p' + (page + 1) + '-main';
+  }
+
+  function ownershipFor(field, geometry, options) {
+    var o = options || {};
+    var id = o.tableId || tableId(field.page);
+    CELL_OWNERSHIP.push({
+      fieldId: field.id, source: field.source, page: field.page,
+      tableId: id, rowId: o.rowId || ('p' + (field.page + 1) + '-' + field.id),
+      bounds: { top: geometry.top, bottom: geometry.bottom,
+        left: o.left != null ? o.left : 319.03,
+        right: o.right != null ? o.right : 567.60 },
+      maxReviewedLines: o.maxReviewedLines || geometry.lines || 1,
+      canGrow: !!field.expansion,
+      nextRowId: geometry.nextRowId || o.nextRowId || null,
+      affectedBorders: { horizontal: [geometry.ruleTop, geometry.ruleBottom],
+        vertical: o.vertical || TABLE_COLUMNS.slice() },
+      budgetId: o.budgetId || id, reviewStatus: 'approved', inkInset: 0
+    });
+  }
+
+  function exempt(field, reason) {
+    OWNERSHIP_EXEMPTIONS.push({ fieldId: field.id, source: field.source,
+      page: field.page, reason: reason, reviewStatus: 'approved' });
+  }
+
+  function finishOwnership() {
+    CELL_OWNERSHIP.forEach(function (owner, index) {
+      if (owner.nextRowId) return;
+      for (var i = index + 1; i < CELL_OWNERSHIP.length; i += 1) {
+        var next = CELL_OWNERSHIP[i];
+        if (next.tableId === owner.tableId && next.page === owner.page &&
+            next.bounds.top >= owner.bounds.bottom - 0.05) {
+          owner.nextRowId = next.rowId;
+          return;
+        }
+      }
+    });
+  }
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    citizenshipCountries: 12,        // 25.62 pt of room
+    financialGoalOtherDetails: 11.5, // 11.98 pt of room
+    fullName: 10.5,                  // 10.75 pt of room
+    purposeOtherDetails: 11.5,       // 11.85 pt of room
+    questionnaireDate: 12,           // 27.07 pt of room
+    signaturePrintedName: 12,        // 34.48 pt of room
+    taxResidencyCountries: 12,       // 25.59 pt of room
+  };
+
   function text(id, source, page, left, baselineTop, width, options) {
     var o = options || {};
-    return {
+    var field = {
       id: id,
       source: source,
       page: page,
@@ -31,7 +92,7 @@
       baselineTop: baselineTop,
       width: width,
       font: o.font || 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
@@ -40,19 +101,43 @@
       maxLines: o.maxLines,
       maxHeight: o.maxHeight,
       lineHeight: o.lineHeight,
+      lineHeightRatio: o.lineHeightRatio,
       format: o.format,
       fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      expansion: o.expansion,
+      overflowStrategy: o.overflowStrategy,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
       showWhen: o.showWhen
     };
+    if (o.ownership) ownershipFor(field, o.ownership, o.ownershipOptions);
+    else exempt(field, o.exemptionReason || 'reviewed non-table or inline value region');
+    return field;
   }
 
+  // A value cell is a printed box of a measured height, not a single rule, so
+  // every cell may use as many lines as its own box holds at the chosen size.
+  // Wrapping inside the cell is what the form was designed for and is always
+  // preferable to shrinking the text: a long address or issuing authority now
+  // runs onto the second line of its own row instead of being squeezed.
   function cell(id, source, page, top, bottom, options) {
     var o = options || {};
-    o.multiline = !!o.multiline;
-    if (o.multiline) {
-      o.maxHeight = o.maxHeight || (bottom - top - 2.0);
-      o.lineHeight = o.lineHeight || 10.8;
-    }
+    o.multiline = o.multiline !== false;
+    o.maxHeight = o.maxHeight || (bottom - top - 2.0);
+    o.lineHeightRatio = o.lineHeightRatio || 0.95;
+    o.ownership = {
+      top: o.ownershipTop != null ? o.ownershipTop : top,
+      bottom: o.ownershipBottom != null ? o.ownershipBottom : bottom,
+      ruleTop: o.ownershipRuleTop != null ? o.ownershipRuleTop
+        : Math.round((top - 0.24) * 100) / 100,
+      ruleBottom: o.ownershipRuleBottom != null ? o.ownershipRuleBottom
+        : Math.round((bottom - 0.24) * 100) / 100,
+      lines: o.maxLines || Math.max(1,
+        Math.floor((bottom - top - 2.0) / (MIN * o.lineHeightRatio))) };
     return text(id, source, page, VALUE_LEFT, top + 10.3, VALUE_WIDTH, o);
   }
 
@@ -68,6 +153,7 @@
     };
     if (equals !== undefined) f.equals = equals;
     if (optional) f.optional = true;
+    exempt(f, 'reviewed source checkbox glyph; no text cell is drawn');
     return f;
   }
 
@@ -78,6 +164,43 @@
     outputFilename: 'anketa-fl.pdf',
     expectedPages: 4,
     appliesTo: ['individual'],
+
+    tableOwnershipRequired: true,
+    cellOwnership: CELL_OWNERSHIP,
+    ownershipExemptions: OWNERSHIP_EXEMPTIONS,
+    tableBudgets: [
+      { id: tableId(0), tableId: tableId(0), page: 0, top: 203.90,
+        bottom: 781.42, maxGrowth: 30.50, reviewStatus: 'approved' },
+      { id: tableId(1), tableId: tableId(1), page: 1, top: 56.88,
+        bottom: 777.58, maxGrowth: 34.34, reviewStatus: 'approved' },
+      { id: tableId(2), tableId: tableId(2), page: 2, top: 56.88,
+        bottom: 667.66, maxGrowth: 0, reviewStatus: 'approved' }
+    ],
+
+    // The bank block sits on page 2. The table's last row ends at 777.10 with
+    // its border at 777.58, and the page carries no footer, so 841.92 − 777.58
+    // = 64.34 pt is free below it. Keeping a 30 pt margin still leaves 34.34 pt
+    // — two inserted 13.44 pt rows.
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 781.42,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        anchors: ['passportIssuedBy']
+      },
+      1: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 777.58,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 30.0,
+        compaction: [],
+        anchors: ['bankName', 'bankAddress']
+      }
+    },
 
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
@@ -93,7 +216,9 @@
       check('modeChange', 'check.anketa-mode-change', true, 0, 281.8, 148.70),
 
       // Page 1 — identity (rows 1–12).
-      cell('fullName', 'field.client-full-name', 0, 203.90, 217.82, { required: true }),
+      cell('fullName', 'field.client-full-name', 0, 203.90, 217.82, {
+        required: true, ownershipTop: 204.38, ownershipRuleTop: 204.14
+      }),
       cell('birthDate', 'field.client-birth-date', 0, 217.82, 231.26, { required: true, align: 'center' }),
       cell('birthPlace', 'field.client-birth-place', 0, 231.26, 244.70, { required: true }),
 
@@ -101,6 +226,9 @@
       check('citizenshipOther', 'check.citizenship-other', true, 0, 324.4, 281.21),
       text('citizenshipCountries', 'field.client-citizenship', 0, 339.0, 281.21, 222.4, {
         optional: true,
+        multiline: true, maxLines: 3, maxHeight: 40.99, lineHeightRatio: 0.95,
+        ownership: { top: 258.14, bottom: 301.13,
+          ruleTop: 257.90, ruleBottom: 300.89, lines: 3 },
         showWhen: { source: 'check.citizenship-other', equals: true }
       }),
 
@@ -108,6 +236,9 @@
       check('taxResidentOther', 'check.tax-resident-rf-no', true, 0, 324.4, 337.61),
       text('taxResidencyCountries', 'extra.tax-residency-countries', 0, 339.0, 337.61, 222.4, {
         optional: true,
+        multiline: true, maxLines: 4, maxHeight: 49.60, lineHeightRatio: 0.95,
+        ownership: { top: 301.13, bottom: 352.73,
+          ruleTop: 300.89, ruleBottom: 352.49, lines: 4 },
         showWhen: { source: 'check.tax-resident-rf-no', equals: true }
       }),
 
@@ -130,7 +261,33 @@
         align: 'center',
         format: 'dateRu'
       }),
-      cell('passportIssuedBy', 'field.client-passport-issued-by', 0, 490.39, 503.83, { required: true }),
+      // Issuing authority is a value cell in the questionnaire table.  The
+      // source row is 13.44 pt high (border tops 490.15 -> 503.59), with 0.48 pt
+      // rules.  Continue every source vertical at its measured centre; the
+      // horizontal border at 503.59 moves down and closes the expanded cell.
+      //
+      // Two reviewed bands, not one. A full department name — «Отделом по
+      // вопросам миграции ОМВД России по … району Главного управления МВД
+      // России по городу Москве» — is 111 characters and needs three lines in
+      // this 237 pt column; one band left «городу Москве» unplaced and the
+      // engine refused the whole document. 2 × 13.44 = 26.88 pt still fits the
+      // page's own 30.50 pt reserve, and every band keeps the 13.44 pt pitch.
+      cell('passportIssuedBy', 'field.client-passport-issued-by', 0, 490.39, 503.83, {
+        required: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 503.59, shiftFromTop: 503.59,
+          rowHeight: 13.44, maxExtraRows: 2, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 503.86,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.54, ruleOffset: 13.44, ruleThickness: 0.48
+          }
+        }
+      }),
       cell('passportDepartmentCode', 'field.client-passport-dept-code', 0, 503.83, 517.27, {
         required: true,
         align: 'center'
@@ -171,7 +328,9 @@
         multiline: true,
         maxLines: 2,
         maxHeight: 32.0,
-        lineHeight: 10.8
+        lineHeight: 10.8,
+        ownership: { top: 80.28, bottom: 160.70,
+          ruleTop: 80.04, ruleBottom: 160.46, lines: 2 }
       }),
       cell('pepRelation', 'extra.extra-pep-relation', 1, 174.14, 211.46, {
         optional: true,
@@ -183,8 +342,65 @@
       cell('landlinePhone', 'extra.landline-phone', 1, 238.22, 251.66, { optional: true }),
       cell('email', 'subject.email', 1, 251.66, 266.69, { required: true }),
 
-      cell('bankName', 'extra.bank-name', 1, 292.13, 305.45, { optional: true }),
-      cell('bankAddress', 'extra.bank-address', 1, 305.45, 318.89, { optional: true }),
+      // A full Russian bank name — «Акционерное общество «Северо-Западный
+      // инвестиционно-коммерческий банк»» — does not fit this 12.84 pt row at a
+      // readable size, and the 16.22 pt under it is the bank-ADDRESS row, not
+      // this one's. So the row grows, exactly as its neighbour already does:
+      // same 13.44 pt pitch, same seven centre-lines, cut at 305.21 where this
+      // row's verticals end and its bottom rule sits.
+      //
+      // One row, not two. Page 2 has 34.34 pt of reserve and this anchor is
+      // above the bank-address one, so a payload that needs both still leaves
+      // the address 20.90 pt — its own first row.
+      cell('bankName', 'extra.bank-name', 1, 292.13, 305.45, {
+        optional: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 1, insertionTop: 305.21, shiftFromTop: 305.21,
+          rowHeight: 13.44, maxExtraRows: 1, maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 503.86,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.30, ruleThickness: 0.48
+          }
+        }
+      }),
+      // A foreign bank address is an ordinary value for a nonresident and does
+      // not fit this 237 pt cell at a readable size: «27 King George the Fifth
+      // Avenue, London, United Kingdom, SW1A 2AA» needs 267.71 pt at 9 pt.
+      //
+      // The анкета is a table, so the Word-like answer is a real inserted row.
+      // Geometry measured from the printed table on page 2: cells are 12.96 pt
+      // tall with a 0.48 pt border and a 13.44 pt pitch.  Rule centre-lines are
+      // 63.74/64.70/84.62/85.58, the value boundary is 319.03, and the double
+      // right edge is 566.63/567.60.
+      //
+      // 318.65 is the one clean cut: the row's own verticals end there and its
+      // bottom border sits just under them, so inserting above the border lets
+      // that border travel down and close the new row. The inserted row
+      // therefore needs only its verticals, continuing exactly where the
+      // printed ones stop — which is what a row inserted in Word looks like.
+      cell('bankAddress', 'extra.bank-address', 1, 305.45, 318.89, {
+        optional: true,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 1, insertionTop: 318.65,
+          shiftFromTop: 318.65,
+          rowHeight: 13.44, maxExtraRows: 2,
+          maxFontSize: 9.5,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 63.74, rowWidth: 503.86,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [63.74, 64.70, 84.62, 85.58, 319.03, 566.63, 567.60],
+          line: {
+            left: VALUE_LEFT, width: VALUE_WIDTH,
+            baselineOffset: 10.54, ruleOffset: 13.44, ruleThickness: 0.48
+          }
+        }
+      }),
       cell('bankInn', 'extra.bank-inn', 1, 318.89, 332.33, { optional: true }),
       cell('bankBicSwift', 'extra.bank-bic-swift', 1, 332.33, 345.77, { optional: true }),
       cell('bankCorrespondentAccount', 'extra.bank-correspondent-account', 1, 345.77, 359.21, { optional: true }),
@@ -283,6 +499,8 @@
       // Page 4 — explanatory notes and employee-only block: no overlays.
     ]
   };
+
+  finishOwnership();
 
   global.CRMDocumentEngine = global.CRMDocumentEngine || {};
   global.CRMDocumentEngine.fieldMaps = global.CRMDocumentEngine.fieldMaps || {};

@@ -1,0 +1,1712 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Document Template Builder · QA</title>
+  <link rel="icon" href="../assets/icons/favicon_blue.ico"/>
+  <style>
+    body { margin: 20px; color: #1e293b; font: 13px/1.4 system-ui, sans-serif; }
+    h1 { font-size: 20px; }
+    #summary { margin: 10px 0; padding: 10px; border-radius: 5px; background: #eef2f7; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #d7dee8; padding: 5px 7px; text-align: left; }
+    .pass { color: #087443; } .fail { color: #b42318; }
+    iframe { position: fixed; left: -20000px; width: 1440px; height: 900px; border: 0; }
+    #qa-output { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Document Template Builder · automated browser QA</h1>
+  <p>Runs against the actual builder, local PDF.js worker, production renderer and all committed maps.</p>
+  <div id="summary">Starting…</div>
+  <table><thead><tr><th>#</th><th>Test</th><th>Result</th><th>Details</th></tr></thead><tbody id="results"></tbody></table>
+  <pre id="qa-output"></pre>
+  <iframe id="builder" src="document-template-builder.html?embeddedQa=1" title="Builder under test"></iframe>
+  <script>
+  (function () {
+    'use strict';
+    var tests = [];
+    var results = [];
+    var frame;
+    var app;
+    var ns;
+
+    function add(name, fn) { tests.push({ name: name, fn: fn }); }
+    function assert(value, message) { if (!value) throw new Error(message || 'Assertion failed'); }
+    function equal(a, b, message) { if (a !== b) throw new Error((message || 'Values differ') + ': ' + a + ' !== ' + b); }
+    function pdfFile(bytes, name) { return new frame.File([bytes], name || 'replacement.pdf', { type: 'application/pdf' }); }
+    function makePdf(sizes) {
+      return frame.PDFLib.PDFDocument.create().then(function (doc) {
+        sizes.forEach(function (size) { doc.addPage(frame.Array.of(Number(size.width), Number(size.height))); });
+        return doc.save();
+      });
+    }
+    function currentField() { return app.state.field(); }
+    function expansionOwners(project) {
+      return (project.fields || []).concat(project.wordFlowBlocks || []).filter(function (owner) {
+        return !!owner.expansion;
+      });
+    }
+    function layoutOwner(project, id) {
+      return (project.fields || []).concat(project.wordFlowBlocks || []).find(function (owner) {
+        return owner.id === id;
+      });
+    }
+    function identifierError(fn) {
+      var caught = null;
+      try { fn(); } catch (error) { caught = error; }
+      assert(caught, 'Identifier protection error expected');
+      equal(caught.name, 'IdentifierProtectionError');
+      equal(caught.message, ns.identifierProtection.WARNING);
+      return caught;
+    }
+
+    add('Builder opens through HTTP', function () { assert(/^https?:$/.test(frame.location.protocol)); assert(app.ready); });
+    add('file:// blocker has the required message', function () { equal(ns.constants.protocolMessage, 'Конструктор должен быть открыт через локальный HTTP-сервер.'); });
+    add('Existing template catalog loads', function () { assert(app.catalogAudit && !app.catalogAudit.pdfFailures.length); });
+    add('All 18 maps are discoverable and open', function () {
+      equal(app.catalog.length, 18); equal(Object.keys(frame.CRMDocumentEngine.fieldMaps).length, 18);
+      var opened = [];
+      var chain = Promise.resolve();
+      app.catalog.forEach(function (entry) {
+        chain = chain.then(function () { return app.openExisting(entry.overlayTemplateId); })
+          .then(function () {
+            assert(!app.state.validation.warnings.some(function (warning) { return warning.code === 'unused-wizard'; }), 'False unused wizard source: ' + entry.overlayTemplateId);
+            assert(!app.state.validation.errors.length,
+              entry.overlayTemplateId + ' has structural errors: ' +
+              app.state.validation.errors.slice(0, 4).map(function (error) {
+                return error.code + ' (' + error.message + ')';
+              }).join('; '));
+            opened.push(entry.overlayTemplateId);
+          });
+      });
+      return chain.then(function () { equal(opened.length, 18); });
+    });
+    add('A multi-page PDF renders', function () { return app.openExisting('accession-application-fl').then(function () { equal(app.viewer.pages.length, 3); assert(app.viewer.canvas.width > 0); }); });
+    add('A mixed-page-size PDF renders correctly', function () {
+      return makePdf([{width: 595, height: 842}, {width: 842, height: 595}]).then(function (bytes) { return app.viewer.load(bytes, 'mixed-size.pdf'); })
+        .then(function (info) { equal(info.pageCount, 2); assert(info.pages[0].width !== info.pages[1].width); return app.openExisting('accession-application-fl'); });
+    });
+    add('Selecting a field opens its properties', function () { var id = app.state.project.fields[0].id; app.state.selectField(id); equal(currentField().id, id); assert(frame.document.querySelector('#dtb-inspector h2')); });
+    add('Moving a field changes PDF-point coordinates', function () { var field = currentField(); var before = field.left; app.state.updateField(field.id, { left: before + 1 }, 'qa move'); equal(currentField().left, before + 1); });
+    add('Undo restores old coordinates', function () { var after = currentField().left; app.state.undo(); equal(currentField().left, after - 1); });
+    add('Redo reapplies the move', function () { var before = currentField().left; app.state.redo(); equal(currentField().left, before + 1); });
+    add('Keyboard nudge works at 0.25 pt', function () { var before = currentField().left; frame.document.body.dispatchEvent(new frame.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); equal(currentField().left, before + 0.25); });
+    add('Field resize works from keyboard', function () { var before = currentField().width; frame.document.body.dispatchEvent(new frame.KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true, bubbles: true })); equal(currentField().width, before + 0.25); });
+    add('Text baseline editing works', function () { var field = currentField(); var before = field.baselineTop; app.state.updateField(field.id, { baselineTop: before + 0.25 }, 'qa baseline'); equal(currentField().baselineTop, before + 0.25); });
+    add('Checkbox editing works', function () { var check = app.state.project.fields.find(function (field) { return field.type === 'check'; }); assert(check); app.state.selectField(check.id); app.state.updateField(check.id, { markStyle: 'cross', boxSize: 7.5 }, 'qa checkbox'); equal(currentField().markStyle, 'cross'); });
+    add('Existing field IDs and sources are frozen and read-only', function () {
+      var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'static' && item.source; });
+      var originalId = field.id;
+      var originalSource = field.source;
+      var beforeCount = app.state.project.fields.length;
+      app.state.selectField(originalId);
+      var idControl = frame.document.querySelector('[data-identifier-role="field-id"]');
+      var sourceControl = frame.document.querySelector('[data-identifier-role="field-source"]');
+      assert(idControl && idControl.readOnly, 'existing field ID must be read-only');
+      assert(sourceControl && sourceControl.readOnly, 'existing field source must be read-only');
+      assert(Array.from(frame.document.querySelectorAll('#dtb-inspector .dtb-identifier-warning')).some(function (node) {
+        return node.textContent.trim() === ns.identifierProtection.WARNING;
+      }), 'exact identifier warning is missing');
+      equal(app.state.updateField(originalId, { id: originalId + '-renamed' }, 'qa forbidden id'), false);
+      assert(app.state.field(originalId), 'original field ID must survive a rejected rename');
+      equal(app.state.updateField(originalId, { source: originalSource + '.renamed' }, 'qa forbidden source'), false);
+      equal(app.state.field(originalId).source, originalSource);
+      app.state.selectField(originalId);
+      equal(app.state.deleteSelected(), false);
+      equal(app.state.project.fields.length, beforeCount);
+    });
+    add('Template, wizard and check keys are frozen and read-only', function () {
+      var project = app.state.project;
+      var originalTemplateId = project.templateId;
+      var templateControl = frame.document.querySelector('#dtb-meta-id');
+      assert(templateControl.readOnly, 'existing template ID must be read-only');
+      equal(frame.document.querySelector('#dtb-meta-id-warning').textContent.trim(), ns.identifierProtection.WARNING);
+      equal(app.state.update({ templateId: originalTemplateId + '-renamed' }, 'qa forbidden template id'), false);
+      equal(app.state.project.templateId, originalTemplateId);
+
+      [['fields', 'extra.'], ['checkFields', 'check.']].forEach(function (definition) {
+        var group = definition[0];
+        var prefix = definition[1];
+        var match = null;
+        (app.state.project.wizard[group] || []).some(function (control, index) {
+          var field = app.state.project.fields.find(function (item) { return item.source === prefix + control.key; });
+          if (!field) return false;
+          match = { control: control, index: index, field: field };
+          return true;
+        });
+        assert(match, 'mapped ' + group + ' control expected');
+        app.state.selectField(match.field.id);
+        var keyControl = frame.document.querySelector('[data-identifier-role="wizard-key"]');
+        assert(keyControl && keyControl.readOnly, group + ' key must be read-only');
+        var originalKey = match.control.key;
+        var changed = app.state.commit('qa forbidden ' + group + ' key', function (candidate) {
+          candidate.wizard[group][match.index].key = originalKey + '-renamed';
+        });
+        equal(changed, false);
+        equal(app.state.project.wizard[group][match.index].key, originalKey);
+      });
+    });
+    add('New field identifiers remain editable', function () {
+      var seed = ns.schema.clone(app.state.project.fields.find(function (field) {
+        return (field.type || 'text') !== 'check' && (field.type || 'text') !== 'static';
+      }));
+      var originalSelection = seed.id;
+      seed.id = app.state.uniqueFieldId('qa-added-field');
+      seed.source = 'subject.displayName';
+      equal(app.state.addField(seed), true);
+      var renamed = seed.id + '-renamed';
+      equal(app.state.updateField(seed.id, { id: renamed }, 'qa rename new id'), true);
+      equal(app.state.updateField(renamed, { source: 'subject.email' }, 'qa change new source'), true);
+      equal(app.state.field(renamed).source, 'subject.email');
+      var entry = app.catalog.find(function (item) { return item.overlayTemplateId === app.state.project.templateId; });
+      var productionRoundTrip = ns.schema.fromProduction(ns.schema.toProduction(app.state.project), entry);
+      var reloaded = new ns.BuilderState();
+      reloaded.setProject(productionRoundTrip);
+      assert(reloaded.field(renamed), 'new field must survive production import');
+      assert(!ns.identifierProtection.isFieldProtected(reloaded.project, renamed),
+        'an additive field must not become a frozen production identifier');
+      app.state.selectField(renamed);
+      equal(app.state.deleteSelected(), true);
+      assert(!app.state.field(renamed));
+      app.state.selectField(originalSelection);
+    });
+    add('showWhen editing works', function () { var field = app.state.project.fields.find(function (item) { return (item.type || 'text') !== 'static'; }); app.state.selectField(field.id); app.state.updateField(field.id, { showWhen: { source: 'subject.kind', equals: 'individual' } }, 'qa condition'); equal(currentField().showWhen.equals, 'individual'); });
+    add('Russian test data renders', function () { app.state.profileId = 'ru-resident-normal'; app.state.payloadOverrides = {}; return app.openExisting('accession-application-fl').then(function () { app.state.profileId = 'ru-resident-normal'; return app.generatePreview(); }).then(function (result) { assert(result.blob.size > 1000); }); });
+    add('English test data renders', function () { app.state.profileId = 'en-nonresident-normal'; app.state.payloadOverrides = {}; return app.generatePreview().then(function (result) { assert(result.blob.size > 1000); }); });
+    add('Long values use production fit logic', function () { return ns.validation.analyzeProfile(app.state.project, 'ru-resident-long', {}).then(function (fit) { assert(fit.fields.length === app.state.project.fields.length); assert(frame.CRMDocumentEngine.textLayout.fitText); }); });
+    add('Unsupported glyph produces a clear error', function () {
+      var payload = ns.fixtures.payloadFor('ru-resident-normal', app.state.project, {});
+      var field = app.state.project.fields.find(function (item) {
+        return (item.type || 'text') !== 'check' && item.source &&
+          item.layoutMode !== 'flow-reference' && ns.validation.visible(item, payload);
+      });
+      var overrides = {}; overrides[field.source] = '测试';
+      return ns.validation.analyzeProfile(app.state.project, 'ru-resident-normal', overrides).then(function (fit) {
+        var result = fit.fields.find(function (entry) { return entry.fieldId === field.id; }).result;
+        equal(result.status, 'unsupported-glyph'); assert(/^U\+/.test(result.unsupported[0].unicode));
+      });
+    });
+    add('Real PDF preview generates', function () { app.state.profileId = 'ru-resident-normal'; app.state.payloadOverrides = {}; return app.generatePreview().then(function (result) { assert(result.blob instanceof frame.Blob); }); });
+    add('Preview has the correct page count', function () { equal(app.previewInspection.pageCount, app.state.project.expectedPages); assert(app.previewInspection.noAppendedPages); });
+    add('Preview has zero AcroForm fields', function () { equal(app.previewInspection.acroFormFields, 0); });
+    add('Preview has zero widgets', function () { equal(app.previewInspection.widgets, 0); });
+    add('Stale Blob URLs are revoked', function () { var old = app.previewUrl; return app.generatePreview().then(function () { assert(app.revokedUrls.indexOf(old) !== -1); }); });
+    add('Builder JSON export/import round-trips', function () { var text = ns.io.exportProject(app.state.project); var imported = ns.io.importProjectText(text).project; assert(ns.io.semanticEqual(app.state.project, imported)); });
+    add('Tampered identifiers are rejected by validation and every export path', function () {
+      var tampered = ns.schema.clone(app.state.project);
+      var protectedField = tampered.identifierProtection.fields.find(function (field) { return field.source !== null; });
+      tampered.fields.find(function (field) { return field.id === protectedField.id; }).source += '.renamed';
+      identifierError(function () { ns.io.exportProject(tampered); });
+      identifierError(function () { ns.schema.toProduction(tampered); });
+      identifierError(function () { ns.io.registryFragment(tampered); });
+      identifierError(function () { ns.io.exportFixtures(tampered); });
+      identifierError(function () { ns.io.exportQa(tampered, null, null); });
+      assert(ns.validation.structural(tampered).errors.some(function (error) {
+        return error.code === 'protected-field-source';
+      }), 'structural validation must expose the protected source error');
+      var legacy = ns.schema.clone(app.state.project);
+      delete legacy.identifierProtection;
+      ns.identifierProtection.attach(legacy);
+      assert(legacy.identifierProtection, 'known legacy project must receive the runtime baseline');
+      var legacyTamper = ns.schema.clone(tampered);
+      delete legacyTamper.identifierProtection;
+      identifierError(function () { ns.identifierProtection.attach(legacyTamper); });
+    });
+    add('Production JS export is deterministic', function () { var a = ns.io.productionJs(app.state.project); var b = ns.io.productionJs(app.state.project); equal(a, b); assert(!/function\s*\(/.test(a.replace(/\(function \(global\)/, ''))); });
+    add('Existing-map semantic round-trip succeeds for 18 maps', function () {
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var exported = ns.schema.toProduction(project);
+        assert(ns.io.semanticEqual(map, exported), 'Round-trip failed: ' + map.id);
+      });
+    });
+    add('Layout contracts and semantic metadata remain first-class through both round trips', function () {
+      var rootContracts = 0;
+      var semanticGroups = 0;
+      var movedPaths = 0;
+      var underlineMetadata = 0;
+      var typographyMetadata = 0;
+      var ownershipExtensionKeys = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var production = ns.schema.toProduction(imported);
+        ns.schema.ROOT_LAYOUT_KEYS.forEach(function (key) {
+          if (!Object.prototype.hasOwnProperty.call(map, key)) return;
+          rootContracts += 1;
+          assert(Object.prototype.hasOwnProperty.call(project, key),
+            map.id + ': ' + key + ' was not promoted into the Builder project');
+          assert(!Object.prototype.hasOwnProperty.call(project.productionProperties, key),
+            map.id + ': ' + key + ' remained opaque');
+          assert(ns.io.semanticEqual(imported[key], map[key]),
+            map.id + ': Builder JSON changed ' + key);
+          assert(ns.io.semanticEqual(production[key], map[key]),
+            map.id + ': production export changed ' + key);
+        });
+        (map.cellOwnership || []).forEach(function (owner) {
+          if (owner.sourceRepeatGroup) ownershipExtensionKeys += 1;
+        });
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (block.semanticGroup) semanticGroups += 1;
+          if (block.expansion && block.expansion.moveTopLevelPaths === true) movedPaths += 1;
+          (block.runs || []).forEach(function (run) {
+            if (run.decoration && run.decoration.underline) underlineMetadata += 1;
+          });
+        });
+        (map.fields || []).forEach(function (field) {
+          if (field.typographyGroup) typographyMetadata += 1;
+          (field.flowRegions || []).forEach(function (region) {
+            if (region.drawUnderline || region.underlineTop != null ||
+                region.underlineOffset != null) underlineMetadata += 1;
+          });
+        });
+      });
+      assert(rootContracts >= 15, 'too few first-class root layout contracts: ' + rootContracts);
+      assert(semanticGroups >= 3, 'semantic groups were not discovered');
+      assert(movedPaths >= 3, 'moveTopLevelPaths decisions were not discovered');
+      assert(underlineMetadata > 0, 'underline metadata was not discovered');
+      assert(typographyMetadata >= 3, 'typography groups were not discovered');
+      assert(ownershipExtensionKeys >= 2,
+        'arbitrary cellOwnership extension keys were not discovered');
+
+      var entry = app.catalog.find(function (item) {
+        return item.overlayTemplateId === 'account-opening-notice';
+      });
+      var operatorProject = ns.schema.fromProduction(
+        frame.CRMDocumentEngine.fieldMaps['account-opening-notice'], entry);
+      var operatorField = operatorProject.fields.find(function (field) {
+        return field.source === 'extra.extra-depository-contract';
+      });
+      operatorField.sourceKind = 'operator-input';
+      var builderRound = ns.io.importProjectText(
+        ns.io.exportProject(operatorProject)).project;
+      equal(builderRound.fields.find(function (field) {
+        return field.id === operatorField.id;
+      }).sourceKind, 'operator-input', 'Builder JSON lost field sourceKind');
+      var productionRound = ns.schema.toProduction(builderRound);
+      equal(productionRound.fields.find(function (field) {
+        return field.id === operatorField.id;
+      }).sourceKind, 'operator-input', 'production export lost field sourceKind');
+    });
+    add('All 18 identifier sets survive Builder JSON and production round-trips', function () {
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var before = ns.identifierProtection.currentProjectIdentifiers(project);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var after = ns.identifierProtection.currentProjectIdentifiers(imported);
+        assert(ns.io.semanticEqual(before, after), 'Builder JSON changed identifiers: ' + map.id);
+        var production = ns.schema.toProduction(imported);
+        project.identifierProtection.fields.forEach(function (required) {
+          var actual = production.fields.find(function (field) { return field.id === required.id; });
+          assert(actual, 'Production round-trip removed field: ' + map.id + '/' + required.id);
+          equal(actual.source == null ? null : String(actual.source), required.source,
+            'Production round-trip changed source: ' + map.id + '/' + required.id);
+        });
+      });
+    });
+    add('UMI registry classifies exact sources and depository operator aliases', function () {
+      ['extra.extra-depository-contract',
+        'extra.extra-depository-contract-date'].forEach(function (source) {
+        var info = ns.sourceCatalog.infoFor(source);
+        assert(info.known, source + ' is absent from the registry catalog');
+        equal(info.registryKind, 'workflow', source + ' has the wrong registry kind');
+        equal(info.sourceKind, 'operator-input', source + ' is not an operator input');
+        equal(info.operatorInput, true, source + ' lost operatorInput metadata');
+      });
+      assert(ns.sourceCatalog.isKnownUmi('umi.address.registration'),
+        'reviewed composed address alias is unknown');
+      assert(ns.sourceCatalog.isKnownUmi('umi.company.origname'),
+        'exact company UMI field is unknown');
+      assert(!ns.sourceCatalog.isKnownUmi('umi.company.qa_not_a_real_variable'),
+        'invented exact UMI source was accepted');
+    });
+    add('An unknown exact UMI path blocks export', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var project = cloneProject(app.state.project);
+        var field = cloneProject(project.fields.find(function (candidate) {
+          return candidate.id === 'clientName';
+        }));
+        field.id = 'qa-unknown-exact-umi';
+        field.source = 'umi.company.qa_not_a_real_variable';
+        field.sourceKind = 'umi';
+        field.left = 60;
+        field.baselineTop = 100;
+        field.width = 180;
+        field.required = false;
+        field.optional = true;
+        delete field.layoutMode;
+        delete field.flowBlockId;
+        project.fields.push(field);
+        var report = ns.validation.structural(project, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-normal', project));
+        assert(report.errors.some(function (error) {
+          return error.code === 'unknown-umi-source' &&
+            error.fieldId === field.id;
+        }), 'invented exact UMI path did not block export');
+      });
+    });
+    // ── Reviewed Word-like blocks ────────────────────────────────────────
+    add('Word-flow blocks are first-class and round-trip every production map', function () {
+      var blockCount = 0;
+      var referenceCount = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        blockCount += (map.wordFlowBlocks || []).length;
+        referenceCount += (map.fields || []).filter(function (field) {
+          return field.layoutMode === 'flow-reference';
+        }).length;
+        assert(ns.io.semanticEqual(project.wordFlowBlocks, map.wordFlowBlocks || []),
+          'first-class import changed blocks: ' + map.id);
+        assert(!Object.prototype.hasOwnProperty.call(project.productionProperties, 'wordFlowBlocks'),
+          'blocks remained opaque: ' + map.id);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        assert(ns.io.semanticEqual(imported.wordFlowBlocks, project.wordFlowBlocks),
+          'Builder JSON changed blocks: ' + map.id);
+        var production = ns.schema.toProduction(imported);
+        assert(ns.io.semanticEqual(production.wordFlowBlocks || [], map.wordFlowBlocks || []),
+          'production export changed blocks: ' + map.id);
+        (production.wordFlowBlocks || []).forEach(function (block) {
+          assert(block.fontSizeLocked, map.id + '/' + block.id + ': font is not locked');
+          equal(Number(block.minFontSize), Number(block.fontSize),
+            map.id + '/' + block.id + ': locked size changed');
+        });
+      });
+      assert(blockCount > 0, 'no production Word-flow blocks discovered');
+      assert(referenceCount > 0, 'no flow-reference fields discovered');
+    });
+    add('Legacy opaque Word-flow metadata migrates into the Builder schema', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['power-of-attorney'];
+      var entry = app.catalog.find(function (item) { return item.overlayTemplateId === map.id; });
+      var legacy = ns.schema.fromProduction(map, entry);
+      legacy.productionProperties.wordFlowBlocks = ns.schema.clone(legacy.wordFlowBlocks);
+      delete legacy.wordFlowBlocks;
+      var migrated = ns.io.importProjectText(JSON.stringify(legacy)).project;
+      assert(ns.io.semanticEqual(migrated.wordFlowBlocks, map.wordFlowBlocks),
+        'legacy Word-flow metadata was lost');
+      assert(!Object.prototype.hasOwnProperty.call(migrated.productionProperties, 'wordFlowBlocks'),
+        'legacy metadata was not promoted');
+    });
+    add('Legacy opaque ownership and path contracts migrate into first-class schema', function () {
+      ['anketa-yul', 'qualification-notice'].forEach(function (templateId) {
+        var map = frame.CRMDocumentEngine.fieldMaps[templateId];
+        var entry = app.catalog.find(function (candidate) {
+          return candidate.overlayTemplateId === templateId;
+        });
+        var legacy = ns.schema.fromProduction(map, entry);
+        ns.schema.ROOT_LAYOUT_KEYS.forEach(function (key) {
+          if (!Object.prototype.hasOwnProperty.call(legacy, key)) return;
+          legacy.productionProperties[key] = cloneProject(legacy[key]);
+          delete legacy[key];
+        });
+        var migrated = ns.io.importProjectText(JSON.stringify(legacy)).project;
+        ns.schema.ROOT_LAYOUT_KEYS.forEach(function (key) {
+          if (!Object.prototype.hasOwnProperty.call(map, key)) return;
+          assert(ns.io.semanticEqual(migrated[key], map[key]),
+            templateId + ': migration changed ' + key);
+          assert(!Object.prototype.hasOwnProperty.call(
+            migrated.productionProperties, key),
+            templateId + ': migration left ' + key + ' opaque');
+        });
+      });
+    });
+    add('Word-flow editor exposes frame, typography, expansion, range and run controls', function () {
+      return app.openExisting('power-of-attorney').then(function () {
+        var block = app.state.project.wordFlowBlocks.find(function (candidate) {
+          return !!candidate.expansion;
+        }) || app.state.project.wordFlowBlocks[0];
+        assert(block, 'power-of-attorney Word-flow block expected');
+        app.state.selectWordFlowBlock(block.id);
+        var editor = frame.document.getElementById('dtb-word-flow-editor');
+        assert(!editor.hidden, 'Word-flow editor is hidden');
+        assert(frame.document.getElementById('dtb-inspector').hidden,
+          'field inspector must yield to block editor');
+        ['id', 'frame-left', 'frame-baselineTop', 'frame-width',
+          'fontSize', 'fontSizeLocked', 'lineHeight', 'paragraphSpacingAfter',
+          'semanticGroup', 'expansion-moveTopLevelPaths',
+          'sourceReplacement-firstBlock', 'sourceReplacement-lastBlock',
+          'sourceReplacement-expectedSha256', 'sourceReplacement-expectedTemplateSha256']
+          .forEach(function (name) {
+            assert(editor.querySelector('[data-word-flow-control="' + name + '"]'),
+              'missing Word-flow control: ' + name);
+          });
+        var addTypes = Array.from(editor.querySelector('[data-word-flow-control="add-run-type"]').options)
+          .map(function (option) { return option.value; });
+        ['static', 'fieldRef', 'space', 'lineBreak', 'paragraphBreak', 'spacer']
+          .forEach(function (type) { assert(addTypes.indexOf(type) !== -1, 'missing run type: ' + type); });
+        assert(frame.document.querySelector('#dtb-word-flow-field-options option[value="ulCity"]'),
+          'existing field ID search is not populated');
+        assert(frame.document.querySelector('[data-word-flow-block-id="' + block.id + '"]'),
+          'block list/canvas selection target is missing');
+
+        var originalBlockId = block.id;
+        var renamedId = originalBlockId + '-qa-rename';
+        var referenced = block.runs.find(function (run) { return run.type === 'fieldRef'; });
+        equal(app.state.updateWordFlowBlock(originalBlockId, { id: renamedId },
+          'qa rename Word-flow block'), true);
+        assert(app.state.wordFlowBlock(renamedId), 'renamed Word-flow block was lost');
+        assert(app.state.project.pageLayout[block.page].anchors.indexOf(renamedId) !== -1,
+          'page-budget anchor did not follow the block rename');
+        assert(app.state.project.pageLayout[block.page].anchors.indexOf(originalBlockId) === -1,
+          'stale page-budget anchor survived the block rename');
+        var referencedField = app.state.field(referenced.fieldId);
+        assert((Array.isArray(referencedField.flowBlockId) ? referencedField.flowBlockId :
+          [referencedField.flowBlockId]).indexOf(renamedId) !== -1,
+          'field flowBlockId did not follow the block rename');
+        app.state.undo();
+        assert(app.state.wordFlowBlock(originalBlockId), 'undo did not restore the block ID');
+        app.state.selectWordFlowBlock(originalBlockId);
+        equal(app.state.deleteSelectedWordFlowBlock(), true);
+        assert(app.state.project.pageLayout[block.page].anchors.indexOf(originalBlockId) === -1,
+          'deleting a block left a stale page-budget anchor');
+        assert(!ns.schema.isWordFlowReferenced(app.state.project, referenced.fieldId),
+          'deleting a block left its field reference active');
+        app.state.undo();
+        assert(app.state.wordFlowBlock(originalBlockId), 'undo did not restore the deleted block');
+        app.state.selectWordFlowBlock(originalBlockId);
+      });
+    });
+    add('Inspectors expose ownership, suppression, semantics and source kind', function () {
+      return app.openExisting('anketa-yul').then(function () {
+        var owner = app.state.project.cellOwnership.find(function (entry) {
+          return entry.canGrow && entry.budgetId;
+        });
+        assert(owner, 'no growing owned questionnaire field found');
+        app.state.selectField(owner.fieldId);
+        var ownership = frame.document.querySelector(
+          '[data-ownership-inspector="' + owner.fieldId + '"]');
+        assert(ownership, 'field inspector hides cell ownership');
+        ['bounds.left', 'bounds.top', 'bounds.right', 'bounds.bottom',
+          'affectedBorders', 'reviewStatus'].forEach(function (name) {
+          assert(ownership.querySelector('[data-ownership-control="' + name + '"]'),
+            'missing ownership control: ' + name);
+        });
+        assert(ownership.querySelector('[data-table-budget="' + owner.budgetId + '"]'),
+          'shared table budget is hidden');
+        assert(frame.document.querySelector(
+          '[data-expansion-control="moveTopLevelPaths"]'),
+          'field expansion hides moveTopLevelPaths');
+      }).then(function () {
+        return app.openExisting('qualification-notice');
+      }).then(function () {
+        app.state.selectField('clientName');
+        assert(frame.document.querySelector('[data-source-path-suppression]'),
+          'exact source-path suppression is hidden from its replacement field');
+        app.state.selectWordFlowBlock('qualification-notice-recipient');
+        var editor = frame.document.getElementById('dtb-word-flow-editor');
+        assert(editor.querySelector('[data-word-flow-control="semanticGroup"]'),
+          'semantic group editor is missing');
+        var movePaths = editor.querySelector(
+          '[data-word-flow-control="expansion-moveTopLevelPaths"]');
+        assert(movePaths && movePaths.checked,
+          'reviewed moveTopLevelPaths decision is not shown');
+      }).then(function () {
+        return app.openExisting('account-opening-notice');
+      }).then(function () {
+        app.state.selectField('depositaryContractNumber');
+        equal(frame.document.querySelector(
+          '[data-field-control="sourceKind"]').value, 'operator-input',
+          'field inspector did not derive the registry source kind');
+        equal(frame.document.querySelector(
+          '[data-wizard-control="sourceKind"]').value, 'operator-input',
+          'wizard inspector hid the operator source kind');
+      });
+    });
+    add('Styled-run editing links existing fields without renaming business identifiers', function () {
+      var originalProtection = ns.schema.clone(app.state.project.identifierProtection);
+      var seed = ns.schema.clone(app.state.project.fields.find(function (field) {
+        return field.layoutMode !== 'flow-reference' && (field.type || 'text') !== 'check';
+      }));
+      seed.id = app.state.uniqueFieldId('qa-word-flow-field');
+      seed.source = 'subject.displayName';
+      delete seed.layoutMode; delete seed.flowBlockId;
+      equal(app.state.addField(seed), true);
+      var blockId = app.state.uniqueWordFlowBlockId('qa-word-flow-block');
+      var block = ns.schema.suggestWordFlowBlock(app.state.project, seed.page, blockId);
+      block.sourceStaticText = 'Префикс значение.';
+      block.runs = [
+        { type: 'static', text: 'Префикс ' },
+        { type: 'space' },
+        { type: 'fieldRef', fieldId: seed.id, keepTogether: true,
+          decoration: { underline: true, minWidth: 40, thickness: 0.36, offset: 1.2 } },
+        { type: 'lineBreak' },
+        { type: 'paragraphBreak' },
+        { type: 'spacer', width: 12 },
+        { type: 'static', text: 'значение.' }
+      ];
+      equal(app.state.addWordFlowBlock(block), true);
+      var linked = app.state.field(seed.id);
+      equal(linked.layoutMode, 'flow-reference');
+      equal(linked.flowBlockId, blockId);
+      equal(app.state.updateField(seed.id, { id: seed.id + '-renamed' }, 'qa forbidden ref rename'), false);
+      equal(app.state.updateField(seed.id, { source: 'subject.email' }, 'qa editable new source'), true);
+      equal(app.state.field(seed.id).source, 'subject.email');
+      app.state.selectField(seed.id);
+      equal(app.state.deleteSelected(), false);
+      assert(ns.io.semanticEqual(app.state.project.identifierProtection, originalProtection),
+        'Word-flow edit changed identifier protection metadata');
+      var builderRound = ns.io.importProjectText(ns.io.exportProject(app.state.project)).project;
+      assert(ns.io.semanticEqual(builderRound.wordFlowBlocks, app.state.project.wordFlowBlocks),
+        'styled runs changed in Builder JSON');
+      var entry = app.catalog.find(function (item) { return item.overlayTemplateId === app.state.project.templateId; });
+      var productionRound = ns.schema.fromProduction(ns.schema.toProduction(app.state.project), entry);
+      assert(ns.io.semanticEqual(productionRound.wordFlowBlocks, app.state.project.wordFlowBlocks),
+        'styled runs changed in production round-trip');
+      app.state.selectWordFlowBlock(blockId);
+      equal(app.state.deleteSelectedWordFlowBlock(), true);
+      assert(!app.state.field(seed.id).layoutMode, 'deleted block left a flow-reference marker');
+      equal(app.state.updateField(seed.id, { id: seed.id + '-renamed' }, 'qa rename unlinked field'), true);
+      app.state.selectField(seed.id + '-renamed');
+      equal(app.state.deleteSelected(), true);
+      return app.openExisting('accession-application-fl');
+    });
+    add('Word-flow validation rejects unlocked, missing and double-rendered references', function () {
+      var base = cloneProject(app.state.project);
+      var block = base.wordFlowBlocks[0];
+      assert(block, 'validation fixture has no Word-flow block');
+      var unlocked = cloneProject(base);
+      unlocked.wordFlowBlocks[0].fontSizeLocked = false;
+      var unlockedResult = ns.validation.structural(unlocked, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', unlocked));
+      assert(unlockedResult.errors.some(function (error) {
+        return error.code === 'word-flow' && /lock/.test(error.message);
+      }), 'unlocked source font was accepted');
+
+      var missing = cloneProject(base);
+      var missingRun = missing.wordFlowBlocks[0].runs.find(function (run) { return run.type === 'fieldRef'; });
+      missingRun.fieldId = 'qa-missing-field';
+      var missingResult = ns.validation.structural(missing, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', missing));
+      assert(missingResult.errors.some(function (error) {
+        return error.code === 'word-flow' && /missing field/.test(error.message);
+      }), 'missing fieldRef was accepted');
+
+      var doubled = cloneProject(base);
+      var fieldId = doubled.wordFlowBlocks[0].runs.find(function (run) { return run.type === 'fieldRef'; }).fieldId;
+      var doubledField = doubled.fields.find(function (field) { return field.id === fieldId; });
+      delete doubledField.layoutMode; delete doubledField.flowBlockId;
+      var doubledResult = ns.validation.structural(doubled, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', doubled));
+      assert(doubledResult.errors.some(function (error) {
+        return error.code === 'word-flow' && /independently/.test(error.message);
+      }), 'double rendering was accepted');
+    });
+    // ── Readability policy and continuation lines ─────────────────────────
+    add('New text fields default to 12 pt preferred and 9 pt minimum', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var before = app.state.project.fields.length;
+        app.editor._up({
+          pointerId: 1,
+          preventDefault: function () {}
+        });
+        // Draw a region tall enough for two 12 pt lines.
+        app.editor.interaction = {
+          kind: 'draw', tool: 'text',
+          start: { left: 60, top: 300 }, current: { left: 260, top: 340 }
+        };
+        app.editor._up({ pointerId: 1 });
+        var field = app.state.project.fields[app.state.project.fields.length - 1];
+        equal(app.state.project.fields.length, before + 1, 'field added');
+        equal(field.fontSize, 12, 'preferred size');
+        equal(field.minFontSize, 9, 'minimum size');
+        assert(field.lineHeight >= 12, 'line height suits 12 pt text: ' + field.lineHeight);
+        assert(field.multiline, 'a two-line region wraps by default');
+        app.state.deleteSelected();
+      });
+    });
+    add('A minimum below 9 pt is rejected with the required message', function () {
+      var project = cloneProject(app.state.project);
+      project.fields.push({
+        id: 'qa-below-floor', type: 'text', source: 'field.clientFullName',
+        page: 0, left: 60, top: 300, height: 12, baselineTop: 310, width: 120,
+        font: 'legalSerif', fontSize: 12, minFontSize: 6
+      });
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      var found = result.errors.filter(function (error) {
+        return error.code === 'min-font-size';
+      })[0];
+      assert(found, 'no min-font-size error raised');
+      equal(found.message, 'Минимальный размер ниже допустимых 9 pt');
+    });
+    add('Every imported production map already satisfies the 9 pt floor', function () {
+      var offenders = [];
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        (map.fields || []).forEach(function (field) {
+          if ((field.type || 'text') === 'check' || field.layoutMode === 'flow-reference') return;
+          if (Number(field.minFontSize) < 9 || Number(field.fontSize) < 9) {
+            offenders.push(map.id + '/' + field.id);
+          }
+        });
+      });
+      equal(offenders.length, 0, 'below the floor: ' + offenders.slice(0, 5).join(', '));
+    });
+    add('Adding a continuation line builds ordered flow regions', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        // Deliberately the first field that still has only its own printed
+        // slot: this map also carries fields that already flow through a
+        // reviewed continuation, and picking one of those would test nothing.
+        var field = app.state.project.fields.filter(function (item) {
+          return (item.type || 'text') !== 'check' &&
+            item.layoutMode !== 'flow-reference' &&
+            ns.schema.flowRegions(item).length === 1;
+        })[0];
+        assert(field, 'no single-slot field to extend');
+        app.state.selectField(field.id);
+        var regions = ns.schema.flowRegions(field);
+        equal(regions.length, 1, 'starts with its own slot');
+        app.inspector.render();
+        var suggestion = ns.schema.suggestContinuation(field, regions, { withUnderline: true });
+        assert(suggestion.baselineTop > field.baselineTop, 'the next line sits below');
+        equal(suggestion.reviewStatus, 'suggested', 'never approved automatically');
+        equal(suggestion.drawUnderline, true, 'a full line carries its rule');
+        assert(suggestion.underlineThickness > 0, 'rule thickness suggested');
+      });
+    });
+    add('An unconfirmed generated line blocks production export', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) {
+        return (item.type || 'text') !== 'check' && item.layoutMode !== 'flow-reference';
+      })[0];
+      field.overflowStrategy = 'flow';
+      field.flowRegions = [
+        { page: 0, left: field.left, baselineTop: field.baselineTop, width: field.width, maxLines: 1 },
+        { page: 0, left: 56.6, baselineTop: 300, width: 400, maxLines: 1,
+          generated: true, drawUnderline: true, underlineThickness: 0.36,
+          reviewStatus: 'suggested' }
+      ];
+      var blocked = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(blocked.errors.some(function (error) {
+        return error.code === 'flow-region-unreviewed';
+      }), 'unconfirmed line did not block export');
+
+      field.flowRegions[1].reviewStatus = 'approved';
+      var allowed = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(!allowed.errors.some(function (error) {
+        return error.code === 'flow-region-unreviewed';
+      }), 'approved line still blocked');
+    });
+    add('Overlapping continuation lines are rejected', function () {
+      var project = cloneProject(app.state.project);
+      var field = project.fields.filter(function (item) {
+        return (item.type || 'text') !== 'check' && item.layoutMode !== 'flow-reference';
+      })[0];
+      field.overflowStrategy = 'flow';
+      field.flowRegions = [
+        { page: 0, left: 60, baselineTop: 300, width: 200, maxLines: 1 },
+        { page: 0, left: 60, baselineTop: 301, width: 200, maxLines: 1,
+          reviewStatus: 'approved' }
+      ];
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'flow-region-overlap';
+      }), 'overlap not detected');
+    });
+    add('A kept printed blank is configurable and survives both round trips', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var block = app.state.project.wordFlowBlocks.filter(function (candidate) {
+          return (candidate.runs || []).some(function (run) {
+            return run.blankWhenEmpty;
+          });
+        })[0];
+        assert(block, 'no production block keeps a printed blank');
+        var run = block.runs.filter(function (item) { return item.blankWhenEmpty; })[0];
+        assert(run.decoration && Number(run.decoration.minWidth) > 0,
+          'a kept blank must carry the measured width of the printed one');
+
+        app.state.selectWordFlowBlock(block.id);
+        var editor = frame.document.getElementById('dtb-word-flow-editor');
+        var controls = Array.prototype.map.call(
+          editor.querySelectorAll('[data-word-flow-run-control]'),
+          function (node) { return node.dataset.wordFlowRunControl; });
+        assert(controls.indexOf('blankWhenEmpty') !== -1,
+          'the Word-flow editor does not expose the kept blank');
+
+        var imported = ns.io.importProjectText(ns.io.exportProject(app.state.project)).project;
+        assert(ns.io.semanticEqual(imported.wordFlowBlocks, app.state.project.wordFlowBlocks),
+          'Builder JSON lost the kept blank');
+        var entry = app.catalog.filter(function (item) {
+          return item.overlayTemplateId === app.state.project.templateId;
+        })[0];
+        var production = ns.schema.fromProduction(
+          ns.schema.toProduction(app.state.project), entry);
+        assert(ns.io.semanticEqual(production.wordFlowBlocks, app.state.project.wordFlowBlocks),
+          'production export lost the kept blank');
+      });
+    });
+    add('An exact-reference slot is configurable and survives both round trips', function () {
+      return app.openExisting('account-opening-notice').then(function () {
+        var exact = app.state.project.fields.filter(function (field) {
+          return field.tokenBreak === 'none';
+        });
+        assert(exact.length >= 3, 'no production field forbids breaking its value');
+
+        app.state.selectField(exact[0].id);
+        var inspector = frame.document.getElementById('dtb-inspector');
+        var control = inspector.querySelector('[data-field-control="tokenBreak"]');
+        assert(control, 'the inspector does not expose the token-break rule');
+        equal(control.value, 'none', 'the inspector shows the wrong rule');
+
+        var imported = ns.io.importProjectText(ns.io.exportProject(app.state.project)).project;
+        exact.forEach(function (field) {
+          var round = imported.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(round.tokenBreak, 'none', 'Builder JSON lost tokenBreak for ' + field.id);
+        });
+        var production = ns.schema.toProduction(app.state.project);
+        exact.forEach(function (field) {
+          var round = production.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(round.tokenBreak, 'none', 'production export lost tokenBreak for ' + field.id);
+        });
+      });
+    });
+    // ── Values a reader compares side by side ───────────────────────────────
+    add('A typography group is configurable and survives both round trips', function () {
+      return app.openExisting('accession-application-yul').then(function () {
+        var members = app.state.project.fields.filter(function (field) {
+          return field.typographyGroup === 'accession-tariff-plans';
+        });
+        equal(members.length, 3, 'the three tariff plans are not one group');
+
+        app.state.selectField(members[0].id);
+        var inspector = frame.document.getElementById('dtb-inspector');
+        var control = inspector.querySelector('[data-field-control="typographyGroup"]');
+        assert(control, 'the inspector does not expose the typography group');
+        equal(control.value, 'accession-tariff-plans',
+          'the inspector shows the wrong group');
+        // The other members are shown beside the field being edited: a group
+        // whose difference is only visible by opening two panels is not one.
+        assert(inspector.textContent.indexOf(members[1].id) !== -1,
+          'the inspector does not show the rest of the group');
+
+        var imported = ns.io.importProjectText(
+          ns.io.exportProject(app.state.project)).project;
+        var production = ns.schema.toProduction(app.state.project);
+        members.forEach(function (field) {
+          var builderRound = imported.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(builderRound.typographyGroup, 'accession-tariff-plans',
+            'Builder JSON lost the group for ' + field.id);
+          var productionRound = production.fields.filter(function (item) {
+            return item.id === field.id; })[0];
+          equal(productionRound.typographyGroup, 'accession-tariff-plans',
+            'production export lost the group for ' + field.id);
+          equal(productionRound.fontSize, field.fontSize,
+            'production export changed the size of ' + field.id);
+        });
+      });
+    });
+    add('Production export refuses a group set two ways', function () {
+      return app.openExisting('accession-application-yul').then(function () {
+        var members = app.state.project.fields.filter(function (field) {
+          return field.typographyGroup === 'accession-tariff-plans';
+        });
+        var sizes = members.map(function (field) { return field.fontSize; });
+        assert(sizes.every(function (size) { return size === sizes[0]; }),
+          'the committed map already sets one group two ways: ' + sizes);
+
+        // Make one row larger than its neighbours — the 12 / 9 / 12 the form
+        // must not print — and require the gate to name it.
+        var broken = ns.schema.clone(app.state.project);
+        broken.fields.filter(function (field) {
+          return field.id === members[0].id;
+        })[0].fontSize = 12;
+        var report = ns.validation.structural(broken, app.sourceInfo,
+                                              app.getPayload());
+        var mismatch = report.errors.filter(function (entry) {
+          return entry.code === 'typography-group-mismatch';
+        });
+        assert(mismatch.length > 0,
+          'a group with two different sizes was accepted');
+        assert(mismatch.some(function (entry) {
+          return String(entry.message).indexOf(members[0].id) !== -1;
+        }), 'the error does not name the field that differs');
+
+        // The clean project still passes, so the gate is about the difference
+        // and not about the group merely existing.
+        var clean = ns.validation.structural(app.state.project, app.sourceInfo,
+                                             app.getPayload());
+        assert(!clean.errors.some(function (entry) {
+          return String(entry.code).indexOf('typography-group') === 0;
+        }), 'the committed map fails its own group gate');
+      });
+    });
+    add('A grown table row inside a reviewed paragraph round-trips', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['account-opening-notice'];
+      var bordered = (map.wordFlowBlocks || []).filter(function (block) {
+        return (block.expansion || {}).lineStyle === 'table-row';
+      });
+      equal(bordered.length, 3,
+        'the three payment-purpose rows no longer grow a bordered row');
+      var project = ns.schema.fromProduction(map, app.catalog.filter(function (entry) {
+        return entry.overlayTemplateId === 'account-opening-notice';
+      })[0]);
+      var exported = ns.schema.toProduction(project);
+      bordered.forEach(function (block) {
+        var round = (exported.wordFlowBlocks || []).filter(function (item) {
+          return item.id === block.id; })[0];
+        assert(round, 'production export lost ' + block.id);
+        assert(ns.io.semanticEqual(round.expansion, block.expansion),
+          'the row geometry changed for ' + block.id);
+        // The rules the row is continued with are the whole point of a
+        // bordered growth; losing them would leave a hole in the table.
+        assert(ns.io.semanticEqual(round.expansion.columns, block.expansion.columns),
+          'the column rules changed for ' + block.id);
+      });
+      var pageLayout = (exported.pageLayout || {})[1] || {};
+      assert(ns.io.semanticEqual(pageLayout, (map.pageLayout || {})[1] || {}),
+        'the page budget that pays for those rows changed');
+    });
+    add('The payment-purpose sentence keeps its date binding', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['account-opening-notice'];
+      var project = ns.schema.fromProduction(map, app.catalog.filter(function (entry) {
+        return entry.overlayTemplateId === 'account-opening-notice';
+      })[0]);
+      var exported = ns.schema.toProduction(project);
+      var blocks = (exported.wordFlowBlocks || []).filter(function (block) {
+        return block.id.indexOf('payment-purpose') !== -1;
+      });
+      equal(blocks.length, 3, 'the three market rows did not survive');
+      blocks.forEach(function (block) {
+        var refs = (block.runs || []).filter(function (run) {
+          return run.type === 'fieldRef';
+        }).map(function (run) { return run.fieldId; });
+        assert(refs.indexOf('paymentPurposeAgreementDate') !== -1,
+          block.id + ' no longer binds the agreement date');
+        assert(refs.indexOf('paymentPurposeClientCode') !== -1,
+          block.id + ' no longer binds the client code');
+        // «дата» has to keep the value it labels, and the value has to stay
+        // one token, or the sentence comes apart at a line break.
+        var labels = (block.runs || []).filter(function (run) {
+          return (run.type || 'static') === 'static' &&
+            /(№|дата)\s*$/i.test(String(run.text || ''));
+        });
+        assert(labels.length >= 2, block.id + ' lost a bound label');
+        labels.forEach(function (run) {
+          assert(run.keepWithNext,
+            block.id + ': ' + JSON.stringify(run.text) + ' lost keepWithNext');
+        });
+      });
+      var date = (exported.fields || []).filter(function (field) {
+        return field.id === 'paymentPurposeAgreementDate';
+      })[0];
+      assert(date, 'the agreement-date field did not survive the round trip');
+      equal(date.source, 'extra.extra-brokerage-contract-date',
+        'the agreement date changed source');
+      equal(date.format, 'dateRu', 'the agreement date lost its formatter');
+    });
+    add('Depository workflow pair, defaults and semantic boundary gate export', function () {
+      return app.openExisting('account-opening-notice').then(function () {
+        var base = cloneProject(app.state.project);
+        function report(project) {
+          return ns.validation.structural(project, app.sourceInfo,
+            ns.fixtures.payloadFor('ru-resident-normal', project));
+        }
+        function requires(project, code, message) {
+          assert(report(project).errors.some(function (error) {
+            return error.code === code;
+          }), message);
+        }
+        function control(project, key) {
+          var groups = ['fields', 'companyFields'];
+          for (var i = 0; i < groups.length; i += 1) {
+            var found = (project.wizard[groups[i]] || []).find(function (entry) {
+              return entry.key === key;
+            });
+            if (found) return found;
+          }
+          return null;
+        }
+
+        var missing = cloneProject(base);
+        missing.fields = missing.fields.filter(function (field) {
+          return field.source !== 'extra.extra-depository-contract-date';
+        });
+        requires(missing, 'depository-pair',
+          'printed depository number without its date was accepted');
+
+        var optional = cloneProject(base);
+        optional.fields.find(function (field) {
+          return field.source === 'extra.extra-depository-contract';
+        }).required = false;
+        requires(optional, 'depository-field-required',
+          'optional printed depository reference was accepted');
+
+        var format = cloneProject(base);
+        format.fields.find(function (field) {
+          return field.source === 'extra.extra-depository-contract-date';
+        }).format = 'dateIso';
+        requires(format, 'depository-date-format',
+          'misformatted depository date was accepted');
+
+        var fieldKind = cloneProject(base);
+        fieldKind.fields.find(function (field) {
+          return field.source === 'extra.extra-depository-contract';
+        }).sourceKind = 'umi';
+        requires(fieldKind, 'source-kind',
+          'operator field misclassified as UMI was accepted');
+
+        var wizard = cloneProject(base);
+        control(wizard, 'extra-depository-contract-date').type = 'text';
+        requires(wizard, 'depository-wizard-control',
+          'depository date using a text wizard control was accepted');
+
+        var withDefault = cloneProject(base);
+        control(withDefault, 'extra-depository-contract').default = '';
+        requires(withDefault, 'depository-operator-default',
+          'explicit wizard default was accepted for an operator value');
+
+        var withDefaultValue = cloneProject(base);
+        control(withDefaultValue, 'extra-depository-contract-date').defaultValue = '';
+        requires(withDefaultValue, 'depository-operator-default',
+          'explicit wizard defaultValue was accepted for an operator value');
+
+        var duplicate = cloneProject(base);
+        duplicate.wizard.fields.push(cloneProject(
+          control(duplicate, 'extra-depository-contract')));
+        requires(duplicate, 'depository-wizard-pair',
+          'duplicate operator wizard control was accepted');
+
+        var semanticPair = cloneProject(base);
+        var transfer = semanticPair.wordFlowBlocks.find(function (block) {
+          return block.semanticGroup &&
+            block.semanticGroup.kind === 'depository-transfer-basis';
+        });
+        assert(transfer, 'reviewed depository semantic block is missing');
+        transfer.runs.find(function (run) {
+          return run.fieldId === 'transferBasisDepositoryDate';
+        }).fieldId = 'paymentPurposeAgreementDate';
+        requires(semanticPair, 'depository-semantic-pair',
+          'transfer-basis sentence lost its exact depository date unnoticed');
+
+        var incompleteBoundary = cloneProject(base);
+        delete incompleteBoundary.wordFlowBlocks.find(function (block) {
+          return block.semanticGroup &&
+            block.semanticGroup.kind === 'depository-transfer-basis';
+        }).semanticGroup.boundary.bottom;
+        requires(incompleteBoundary, 'semantic-group-boundary',
+          'incomplete depository semantic boundary was accepted');
+      });
+    });
+    add('Continuation lines survive a builder JSON round trip', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var text = ns.io.exportProject(app.state.project);
+        var imported = ns.io.importProjectText(text).project;
+        assert(ns.io.semanticEqual(app.state.project, imported), 'project changed');
+        var source = app.state.project.fields.filter(function (item) {
+          return Array.isArray(item.flowRegions);
+        });
+        assert(source.length > 0, 'the fixture map has no continuation lines to test');
+        source.forEach(function (field) {
+          var round = imported.fields.filter(function (item) { return item.id === field.id; })[0];
+          assert(ns.io.semanticEqual(round.flowRegions, field.flowRegions),
+            'flowRegions changed for ' + field.id);
+          equal(round.overflowStrategy, field.overflowStrategy, 'strategy changed');
+        });
+      });
+    });
+    add('Continuation lines survive a production JS round trip', function () {
+      var map = frame.CRMDocumentEngine.fieldMaps['accession-application-fl'];
+      var project = ns.schema.fromProduction(map, app.catalog.filter(function (entry) {
+        return entry.overlayTemplateId === 'accession-application-fl';
+      })[0]);
+      var exported = ns.schema.toProduction(project);
+      var withFlow = (map.fields || []).filter(function (field) {
+        return Array.isArray(field.flowRegions);
+      });
+      assert(withFlow.length >= 3, 'expected continuation lines in the fixture map');
+      withFlow.forEach(function (field) {
+        var round = exported.fields.filter(function (item) { return item.id === field.id; })[0];
+        assert(ns.io.semanticEqual(round.flowRegions, field.flowRegions),
+          'flowRegions changed for ' + field.id);
+      });
+    });
+    add('Deleting a continuation line keeps the logical field', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        var before = app.state.project.fields.length;
+        var field = app.state.project.fields.filter(function (item) {
+          return Array.isArray(item.flowRegions);
+        })[0];
+        assert(Array.isArray(field.flowRegions), 'fixture field has no continuation');
+        app.state.updateField(field.id, { flowRegions: undefined, overflowStrategy: undefined },
+          'qa remove continuation');
+        var after = app.state.project.fields.filter(function (item) {
+          return item.id === 'registrationAddress';
+        })[0];
+        assert(after, 'the field was removed with its continuation line');
+        equal(app.state.project.fields.length, before, 'field count changed');
+      });
+    });
+
+    // ── Page-section expansion ────────────────────────────────────────────
+    add('Malformed or unreviewed table ownership blocks export', function () {
+      return app.openExisting('anketa-yul').then(function () {
+        var base = cloneProject(app.state.project);
+        var growing = base.cellOwnership.find(function (owner) {
+          return owner.canGrow;
+        });
+        assert(growing, 'no growing ownership contract found');
+        function report(project) {
+          return ns.validation.structural(project, app.sourceInfo,
+            ns.fixtures.payloadFor('ru-company-long', project));
+        }
+        function requires(project, code, message) {
+          assert(report(project).errors.some(function (error) {
+            return error.code === code;
+          }), message);
+        }
+
+        var unreviewed = cloneProject(base);
+        unreviewed.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        }).reviewStatus = 'suggested';
+        requires(unreviewed, 'table-ownership',
+          'unreviewed owning cell was accepted');
+
+        var malformed = cloneProject(base);
+        var malformedOwner = malformed.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        });
+        malformedOwner.bounds.right = malformedOwner.bounds.left;
+        requires(malformed, 'table-ownership',
+          'reversed owning-cell bounds were accepted');
+
+        var uncovered = cloneProject(base);
+        uncovered.cellOwnership = uncovered.cellOwnership.filter(function (owner) {
+          return owner.fieldId !== growing.fieldId;
+        });
+        requires(uncovered, 'table-ownership',
+          'dynamic field without ownership or exemption was accepted');
+
+        var borders = cloneProject(base);
+        borders.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        }).affectedBorders.vertical = [];
+        requires(borders, 'table-ownership-borders',
+          'growing cell without moved vertical borders was accepted');
+
+        var outside = cloneProject(base);
+        var outsideOwner = outside.cellOwnership.find(function (owner) {
+          return owner.fieldId === growing.fieldId;
+        });
+        outside.fields.find(function (field) {
+          return field.id === growing.fieldId;
+        }).left = outsideOwner.bounds.right + 1;
+        requires(outside, 'table-ownership-region',
+          'value region outside its owning cell was accepted');
+
+        var budget = cloneProject(base);
+        budget.tableBudgets.find(function (entry) {
+          return entry.id === growing.budgetId;
+        }).reviewStatus = 'suggested';
+        requires(budget, 'table-ownership',
+          'unreviewed shared table budget was accepted');
+
+        var exemption = cloneProject(base);
+        assert(exemption.ownershipExemptions.length,
+          'questionnaire has no ownership exemption to test');
+        exemption.ownershipExemptions[0].reviewStatus = 'suggested';
+        requires(exemption, 'table-ownership',
+          'unreviewed ownership exemption was accepted');
+      });
+    });
+    add('A suggested expansion is never approved automatically', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var field = app.state.project.fields.filter(function (item) {
+          return item.id === 'recognitionDate';
+        })[0];
+        var suggestion = ns.schema.suggestExpansion(field, { width: 595.32, height: 841.92 }, {});
+        equal(suggestion.reviewStatus, 'suggested', 'review status');
+        equal(suggestion.page, field.page, 'page');
+        assert(suggestion.insertionTop > field.baselineTop, 'anchor sits below the field');
+        assert(suggestion.line.width > 0, 'the row has a width');
+        assert(suggestion.line.ruleThickness > 0, 'the row has a rule');
+      });
+    });
+    add('Recipient semantics and exact source-path suppression mutations block export', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var base = cloneProject(app.state.project);
+        function report(project) {
+          return ns.validation.structural(project, app.sourceInfo,
+            ns.fixtures.payloadFor('ru-company-long', project));
+        }
+        function requires(project, code, message) {
+          assert(report(project).errors.some(function (error) {
+            return error.code === code;
+          }), message);
+        }
+        function block(project, id) {
+          return project.wordFlowBlocks.find(function (entry) {
+            return entry.id === id;
+          });
+        }
+
+        var unreviewed = cloneProject(base);
+        block(unreviewed, 'qualification-notice-recipient')
+          .semanticGroup.reviewStatus = 'suggested';
+        requires(unreviewed, 'semantic-group-unreviewed',
+          'unreviewed recipient semantics were accepted');
+
+        var boundary = cloneProject(base);
+        block(boundary, 'qualification-notice-recipient').hangingIndent = 0;
+        requires(boundary, 'recipient-boundary',
+          'recipient continuation escaped the reviewed right-hand block');
+
+        var repeated = cloneProject(base);
+        block(repeated, 'qualification-notice-recipient')
+          .semanticGroup.address.renderOnce = false;
+        requires(repeated, 'recipient-render-once',
+          'address without renderOnce semantics was accepted');
+
+        var wrongSource = cloneProject(base);
+        block(wrongSource, 'qualification-notice-recipient')
+          .semanticGroup.address.source = 'subject.registrationAddress';
+        requires(wrongSource, 'semantic-group-source',
+          'recipient semantic source drift was accepted');
+
+        var missingUnderline = cloneProject(base);
+        delete block(missingUnderline, 'qualification-notice-recipient')
+          .runs.find(function (run) {
+            return run.fieldId === 'recipientAddress';
+          }).decoration;
+        requires(missingUnderline, 'semantic-underline',
+          'recipient field without its measured underline was accepted');
+
+        var collision = cloneProject(base);
+        var decorated = block(collision, 'qualification-notice-recognition')
+          .runs.find(function (run) {
+            return run.type === 'fieldRef' && run.decoration &&
+              run.decoration.underline;
+          });
+        decorated.decoration.offset = 0;
+        requires(collision, 'semantic-underline-intersection',
+          'underline crossing the configured text ink was accepted');
+
+        var dateRule = cloneProject(base);
+        block(dateRule, 'qualification-notice-recognition')
+          .semanticGroup.date.rule.width = 0;
+        requires(dateRule, 'semantic-date-rule',
+          'incomplete organization/date rule was accepted');
+
+        var movement = cloneProject(base);
+        block(movement, 'qualification-notice-recipient')
+          .expansion.moveTopLevelPaths = 'yes';
+        requires(movement, 'expansion-path-movement',
+          'non-boolean top-level path movement was accepted');
+
+        var suppressionReview = cloneProject(base);
+        suppressionReview.sourcePathSuppressions[0].reviewStatus = 'suggested';
+        requires(suppressionReview, 'source-path-suppression',
+          'unreviewed exact path suppression was accepted');
+
+        var suppressionHash = cloneProject(base);
+        suppressionHash.sourcePathSuppressions[0].expectedSha256 = '';
+        requires(suppressionHash, 'source-path-suppression',
+          'unfrozen exact path suppression was accepted');
+
+        var suppressionOwner = cloneProject(base);
+        suppressionOwner.sourcePathSuppressions[0].ownerBlockId = 'qa-missing-owner';
+        requires(suppressionOwner, 'source-path-suppression',
+          'path suppression without its semantic owner was accepted');
+
+        var suppressionBoundary = cloneProject(base);
+        delete suppressionBoundary.sourcePathSuppressions[0].geometry.right;
+        requires(suppressionBoundary, 'source-path-suppression-boundary',
+          'incomplete reviewed path boundary was accepted');
+      });
+    });
+    add('An unreviewed expansion blocks production export', function () {
+      var project = cloneProject(app.state.project);
+      var owner = expansionOwners(project)[0];
+      assert(owner, 'the fixture map has no expansion to test');
+      owner.expansion.reviewStatus = 'suggested';
+      var blocked = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(blocked.errors.some(function (error) {
+        return error.code === 'expansion-unreviewed';
+      }), 'unreviewed expansion did not block export');
+      owner.expansion.reviewStatus = 'approved';
+      var allowed = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(!allowed.errors.some(function (error) {
+        return error.code === 'expansion-unreviewed';
+      }), 'approved expansion still blocked');
+    });
+    add('The inspector edits the page budget where it belongs', function () {
+      return app.openExisting('power-of-attorney').then(function () {
+        app.state.selectWordFlowBlock('power-of-attorney-ul-intro');
+        var inspector = frame.document.getElementById('dtb-word-flow-editor');
+        var titles = Array.prototype.map.call(
+          inspector.querySelectorAll('.dtb-inspector-section h3'),
+          function (node) { return node.textContent; });
+        assert(titles.some(function (t) { return /Запас страницы/.test(t); }),
+               'no page-budget section for an anchor field');
+        assert(titles.some(function (t) { return /Расширение/.test(t); }),
+               'no expansion section for an anchor field');
+        var hints = Array.prototype.map.call(
+          inspector.querySelectorAll('.dtb-inspector-hint'),
+          function (node) { return node.textContent; }).join(' ');
+        assert(/0 строк/.test(hints) && /максимум/.test(hints),
+               'no zero/one/maximum row preview');
+        assert(/Доступно/.test(hints),
+               'the shared page capacity is not shown');
+        assert(/просветы/.test(hints),
+               'the recoverable white space is not shown');
+
+        // Editing it goes to the page, not to the field.
+        var before = app.state.project.pageLayout[0].bottomClearance;
+        app.state.update({
+          pageLayout: Object.assign({}, app.state.project.pageLayout, {
+            0: Object.assign({}, app.state.project.pageLayout[0],
+                             { bottomClearance: before + 1 })
+          })
+        }, 'qa page budget');
+        equal(app.state.project.pageLayout[0].bottomClearance, before + 1,
+              'page budget did not change');
+        assert(app.state.wordFlowBlock('power-of-attorney-ul-intro').expansion.bottomReserve === undefined,
+               'the anchor grew a reserve of its own');
+        app.state.undo();
+        equal(app.state.project.pageLayout[0].bottomClearance, before,
+              'undo did not restore the page budget');
+      }).then(function () { return app.openExisting('qualification-notice'); });
+    });
+    add('A row taller than the whole page budget is rejected', function () {
+      var project = cloneProject(app.state.project);
+      // Leave the page just under one row of room.
+      project.pageLayout[0].bottomClearance =
+        841.92 - project.pageLayout[0].bodyBottom - 10;
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'page-layout-reserve';
+      }), 'a row the page cannot pay for was accepted');
+    });
+    add('A page budget is stated once, not per field', function () {
+      var project = cloneProject(app.state.project);
+      var anchorId = project.pageLayout[0].anchors[0];
+      var owner = layoutOwner(project, anchorId);
+      assert(owner && owner.expansion, 'page anchor has no expansion');
+      owner.expansion.bottomReserve = 250;
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-reserve-duplicated';
+      }), 'a per-field reserve shadowed the page budget');
+    });
+    add('An anchor missing from the page budget is rejected', function () {
+      var project = cloneProject(app.state.project);
+      var anchorId = project.pageLayout[0].anchors[0];
+      project.pageLayout[0].anchors = project.pageLayout[0].anchors.filter(
+        function (id) { return id !== anchorId; });
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-not-anchored';
+      }), 'an unlisted anchor was accepted');
+    });
+    add('A movable block reaching the fixed footer is rejected', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].fixedFooterFrom = 700;
+      project.pageLayout[0].shiftToTop = 780;
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'page-layout-footer';
+      }), 'a page number would have moved');
+    });
+    add('An unreviewed compaction zone blocks production export', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].compaction = [
+        { top: 100, originalGap: 20, minGap: 8, reviewStatus: 'suggested' }
+      ];
+      var blocked = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(blocked.errors.some(function (error) {
+        return error.code === 'compaction-unreviewed';
+      }), 'unreviewed whitespace recovery did not block export');
+      project.pageLayout[0].compaction[0].reviewStatus = 'approved';
+      var allowed = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(!allowed.errors.some(function (error) {
+        return error.code === 'compaction-unreviewed';
+      }), 'approved whitespace recovery still blocked');
+    });
+    add('A compaction minimum larger than its gap is rejected', function () {
+      var project = cloneProject(app.state.project);
+      project.pageLayout[0].compaction = [
+        { top: 100, originalGap: 8, minGap: 20, reviewStatus: 'approved' }
+      ];
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'compaction-minimum';
+      }), 'an impossible compaction minimum was accepted');
+    });
+    add('The page budget survives export, import and production export', function () {
+      var text = ns.io.exportProject(app.state.project);
+      var imported = ns.io.importProjectText(text).project;
+      assert(ns.io.semanticEqual(imported.pageLayout, app.state.project.pageLayout),
+             'builder JSON lost the page budget');
+      var production = ns.schema.toProduction(app.state.project);
+      assert(ns.io.semanticEqual(production.pageLayout, app.state.project.pageLayout),
+             'production export lost the page budget');
+      var back = ns.schema.fromProduction(production, null);
+      assert(ns.io.semanticEqual(back.pageLayout, app.state.project.pageLayout),
+             'reimport lost the page budget');
+      assert(!Object.prototype.hasOwnProperty.call(back.productionProperties, 'pageLayout'),
+             'the page budget is a project property, not an opaque passenger');
+    });
+    add('Reviewed cross-page flow is editable, validated and round-trips', function () {
+      return app.openExisting('power-of-attorney').then(function () {
+        app.state.selectWordFlowBlock('power-of-attorney-ul-intro');
+        var flow = app.state.project.pageLayout[0].crossPageFlow;
+        assert(flow && flow.reviewStatus === 'approved',
+               'the production cross-page rule was not imported');
+        var inspector = frame.document.getElementById('dtb-word-flow-editor');
+        var text = inspector.textContent;
+        assert(/Перенос между страницами/.test(text) &&
+               /Исходный блок/.test(text) && /Целевая страница/.test(text),
+               'the cross-page boundaries are not editable in the inspector');
+
+        var project = cloneProject(app.state.project);
+        project.pageLayout[0].crossPageFlow.reviewStatus = 'suggested';
+        var unreviewed = ns.validation.structural(project, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', project));
+        assert(unreviewed.errors.some(function (error) {
+          return error.code === 'cross-page-unreviewed';
+        }), 'an unreviewed cross-page move did not block export');
+
+        delete project.pageLayout[0].crossPageFlow.sourceFromTop;
+        var incomplete = ns.validation.structural(project, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', project));
+        assert(incomplete.errors.some(function (error) {
+          return error.code === 'cross-page-incomplete';
+        }), 'incomplete operator-block boundaries were accepted');
+
+        var skippedPage = cloneProject(app.state.project);
+        skippedPage.pageLayout[0].crossPageFlow.targetPage = 2;
+        var invalidTarget = ns.validation.structural(skippedPage, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', skippedPage));
+        assert(invalidTarget.errors.some(function (error) {
+          return error.code === 'cross-page-target';
+        }), 'a transfer that skips the following page was accepted');
+
+        var undocumented = cloneProject(app.state.project);
+        undocumented.pageLayout[0].crossPageFlow.note = '';
+        var missingNote = ns.validation.structural(undocumented, app.sourceInfo,
+          ns.fixtures.payloadFor('ru-company-long', undocumented));
+        assert(missingNote.errors.some(function (error) {
+          return error.code === 'cross-page-note';
+        }), 'an undocumented cross-page move was accepted');
+
+        var exported = ns.schema.toProduction(app.state.project);
+        var back = ns.schema.fromProduction(exported, null);
+        assert(ns.io.semanticEqual(back.pageLayout[0].crossPageFlow, flow),
+               'cross-page flow changed in production round trip');
+      }).then(function () { return app.openExisting('qualification-notice'); });
+    });
+    add('An insertion point inside printed source content blocks export', function () {
+      // Declared numbers alone cannot see this: the page's own content stream
+      // has to be read. Seven Word-flow anchors shipped sitting inside printed
+      // blocks because nothing in the builder or the gates ever looked.
+      return app.openExisting('accession-application-fl').then(function () {
+        var project = app.state.project;
+        var block = (project.wordFlowBlocks || []).filter(function (item) {
+          return item.id === 'accession-application-fl-identity';
+        })[0];
+        assert(block && block.expansion, 'the identity block has no expansion');
+        assert(Math.abs(block.expansion.insertionTop - 143.82) < 0.01,
+               'the identity anchor is not at its re-cut boundary');
+
+        return ns.validation.anchorGeometry(project, app.state.runtimePdfUrl)
+          .then(function (clean) {
+            assert(clean.errors.length === 0,
+                   'the corrected anchor was reported as straddling: ' +
+                   (clean.errors[0] || {}).message);
+
+            // 164.00 pt is inside the block that paints «1. Присоединяется
+            // согласно ст. 428 ГК РФ», whose ink runs 159.95–169.38 pt and
+            // whose baseline is at 167.54.
+            //
+            // The value that shipped, and that this used to probe with, was
+            // 159.95 — the top of that same ink. It stopped being a straddle
+            // when the shift analysis started taking a line's height from the
+            // page's own font descriptors instead of assuming a whole em:
+            // 159.95 is now exactly the block's boundary rather than 0.93 pt
+            // inside a phantom. The gate is about cutting printed content, so
+            // it is probed with a point that really is printed on.
+            var broken = cloneProject(project);
+            broken.wordFlowBlocks.filter(function (item) {
+              return item.id === 'accession-application-fl-identity';
+            })[0].expansion.insertionTop = 164.00;
+            return ns.validation.anchorGeometry(broken, app.state.runtimePdfUrl);
+          }).then(function (bad) {
+            assert(bad.errors.some(function (error) {
+              return error.code === 'anchor-straddles-source';
+            }), 'an insertion point inside printed content was accepted');
+            assert(/Точка вставки пересекает исходный блок PDF/.test(
+              bad.errors[0].message), 'the message does not name the problem');
+          });
+      }).then(function () { return app.openExisting('qualification-notice'); });
+    });
+    add('Every production map round-trips its page budget', function () {
+      var flowCount = 0;
+      app.catalog.forEach(function (entry) {
+        var template = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(template, entry);
+        var back = ns.schema.toProduction(project, template.templateUrl);
+        assert(ns.io.semanticEqual(back.pageLayout || null, template.pageLayout || null),
+               'page budget lost for ' + template.id);
+        if (template.pageLayout) {
+          Object.keys(template.pageLayout).forEach(function (page) {
+            if (template.pageLayout[page].crossPageFlow) flowCount += 1;
+            (template.pageLayout[page].anchors || []).forEach(function (id) {
+              assert((back.fields || []).some(function (f) { return f.id === id; }) ||
+                     (back.wordFlowBlocks || []).some(function (block) { return block.id === id; }),
+                     template.id + ': anchor ' + id + ' lost');
+            });
+          });
+        }
+      });
+      equal(flowCount, 3, 'not every reviewed production cross-page rule was audited');
+    });
+    add('An incomplete expansion is rejected rather than guessed', function () {
+      var project = cloneProject(app.state.project);
+      var owner = expansionOwners(project)[0];
+      assert(owner, 'the fixture map has no expansion to test');
+      owner.overflowStrategy = 'expand-layout';
+      owner.expansion = { page: 0, insertionTop: 400, reviewStatus: 'approved' };
+      var result = ns.validation.structural(project, app.sourceInfo,
+        ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.errors.some(function (error) {
+        return error.code === 'expansion-incomplete';
+      }), 'incomplete expansion accepted');
+    });
+    add('Expansion definitions survive a builder JSON round trip', function () {
+      return app.openExisting('qualification-notice').then(function () {
+        var text = ns.io.exportProject(app.state.project);
+        var imported = ns.io.importProjectText(text).project;
+        assert(ns.io.semanticEqual(app.state.project, imported), 'project changed');
+        var source = expansionOwners(app.state.project);
+        assert(source.length > 0, 'the fixture map has no expansion to test');
+        source.forEach(function (owner) {
+          var round = layoutOwner(imported, owner.id);
+          assert(round, 'expansion owner was lost: ' + owner.id);
+          assert(ns.io.semanticEqual(round.expansion, owner.expansion),
+            'expansion changed for ' + owner.id);
+          equal(round.overflowStrategy, 'expand-layout', 'strategy changed');
+        });
+      });
+    });
+    add('Expansion definitions survive a production JS round trip', function () {
+      var expandable = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var exported = ns.schema.toProduction(project);
+        (map.fields || []).forEach(function (field) {
+          if (!field.expansion) return;
+          expandable += 1;
+          var round = exported.fields.filter(function (item) { return item.id === field.id; })[0];
+          assert(ns.io.semanticEqual(round.expansion, field.expansion),
+            'expansion changed for ' + map.id + '/' + field.id);
+        });
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (!block.expansion) return;
+          expandable += 1;
+          var round = (exported.wordFlowBlocks || []).filter(function (item) {
+            return item.id === block.id;
+          })[0];
+          assert(round, 'Word-flow expansion owner was lost: ' + map.id + '/' + block.id);
+          assert(ns.io.semanticEqual(round.expansion, block.expansion),
+            'expansion changed for ' + map.id + '/' + block.id);
+        });
+      });
+      assert(expandable >= 10, 'expected expandable fields across the maps: ' + expandable);
+    });
+    add('Reviewed source placeholders survive both round trips', function () {
+      // A placeholder is the one licence a map has to drop printed wording, so
+      // losing it on import would silently re-introduce the sample text — or,
+      // worse, keep dropping a token with nothing declared to replace it.
+      var declared = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var exported = ns.schema.toProduction(imported);
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (!block.sourcePlaceholders) return;
+          declared += block.sourcePlaceholders.length;
+          var round = (exported.wordFlowBlocks || []).filter(function (item) {
+            return item.id === block.id;
+          })[0];
+          assert(round, 'placeholder owner was lost: ' + map.id + '/' + block.id);
+          assert(ns.io.semanticEqual(round.sourcePlaceholders, block.sourcePlaceholders),
+            'sourcePlaceholders changed for ' + map.id + '/' + block.id);
+          block.sourcePlaceholders.forEach(function (placeholder) {
+            equal(placeholder.reviewStatus, 'approved',
+              map.id + '/' + block.id + ': placeholder is not approved');
+            var replaced = (block.runs || []).filter(function (run) {
+              return run.type === 'fieldRef' && run.fieldId === placeholder.fieldId;
+            });
+            assert(replaced.length === 1, map.id + '/' + block.id +
+              ': nothing replaces placeholder «' + placeholder.text + '»');
+          });
+        });
+      });
+      assert(declared >= 3, 'expected reviewed placeholders: ' + declared);
+    });
+    add('Paragraph-continuing rows and shared references survive both round trips', function () {
+      // Both say where a value is allowed to appear. `continuesParagraph` makes
+      // a grown row keep the sentence's leading instead of the row's pitch;
+      // `allowMultipleFlowReferences` lets one value print in several reviewed
+      // paragraphs. Dropping either changes the layout without changing a
+      // coordinate, which is exactly the class of defect this branch is closing.
+      var continuing = 0;
+      var shared = 0;
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        var project = ns.schema.fromProduction(map, entry);
+        var imported = ns.io.importProjectText(ns.io.exportProject(project)).project;
+        var exported = ns.schema.toProduction(imported);
+        (map.fields || []).forEach(function (field) {
+          var round = (exported.fields || []).filter(function (item) {
+            return item.id === field.id;
+          })[0];
+          if (field.expansion && field.expansion.line &&
+              field.expansion.line.continuesParagraph) {
+            continuing += 1;
+            assert(round && round.expansion && round.expansion.line &&
+                   round.expansion.line.continuesParagraph === true,
+              'continuesParagraph lost for ' + map.id + '/' + field.id);
+          }
+          if (field.allowMultipleFlowReferences) {
+            shared += 1;
+            assert(round && round.allowMultipleFlowReferences === true,
+              'allowMultipleFlowReferences lost for ' + map.id + '/' + field.id);
+            var owners = Array.isArray(round.flowBlockId)
+              ? round.flowBlockId : [round.flowBlockId];
+            assert(owners.length > 1, map.id + '/' + field.id +
+              ': a shared reference names one block only');
+            assert(ns.io.semanticEqual(round.flowBlockId, field.flowBlockId),
+              'flowBlockId list changed for ' + map.id + '/' + field.id);
+          }
+        });
+      });
+      assert(continuing >= 1, 'expected a paragraph-continuing row: ' + continuing);
+      assert(shared >= 1, 'expected a shared flow reference: ' + shared);
+    });
+    add('Every committed expansion is already visually approved', function () {
+      var pending = [];
+      app.catalog.forEach(function (entry) {
+        var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
+        (map.fields || []).forEach(function (field) {
+          if (field.expansion && field.expansion.reviewStatus !== 'approved') {
+            pending.push(map.id + '/' + field.id);
+          }
+        });
+        (map.wordFlowBlocks || []).forEach(function (block) {
+          if (block.expansion && block.expansion.reviewStatus !== 'approved') {
+            pending.push(map.id + '/' + block.id);
+          }
+        });
+      });
+      equal(pending.length, 0, 'unreviewed: ' + pending.join(', '));
+    });
+
+    add('Replacement PDF comparison works', function () {
+      return app.openExisting('accession-application-fl').then(function () {
+        return makePdf(app.sourceInfo.pages.map(function (page) { return { width: page.width, height: page.height }; }));
+      }).then(function (bytes) { return app.replacePdf(pdfFile(bytes, 'replacement-same-size.pdf')); })
+        .then(function (summary) { assert(summary.oldHash !== summary.newHash); equal(summary.oldPageCount, summary.newPageCount); assert(summary.pagesRequiringReview.length > 0); });
+    });
+    add('Out-of-bounds replacement fields block export', function () {
+      return makePdf([{width: 100,height:100},{width:100,height:100},{width:100,height:100}])
+        .then(function (bytes) { return app.replacePdf(pdfFile(bytes, 'replacement-small.pdf')); })
+        .then(function () {
+          assert(app.state.validation.errors.some(function (error) { return error.code === 'out-of-bounds'; }));
+          var expectedErrorIndex = frame.__qaConsoleErrors.length;
+          assert(!app.productionExportAllowed());
+          frame.__qaConsoleErrors.splice(expectedErrorIndex);
+        });
+    });
+    add('Unused wizard field is reported', function () {
+      var project = cloneProject(app.state.project); project.wizard.fields.push({ key: 'qa-unused', label: 'Unused', type: 'text' });
+      var result = ns.validation.structural(project, app.sourceInfo, ns.fixtures.payloadFor('ru-resident-normal', project));
+      assert(result.warnings.some(function (warning) { return warning.code === 'unused-wizard'; }));
+    });
+    add('Missing required source is reported', function () {
+      var project = cloneProject(app.state.project); project.fields.push({ id: 'qa-missing', type: 'text', source: 'extra.qa-missing-provider', page: 0, left: 1, top: 1, height: 10, baselineTop: 9, width: 20, font: 'legalSerif', fontSize: 8, minFontSize: 6, required: true });
+      var result = ns.validation.structural(project, app.sourceInfo, { subject: {}, fields: {}, extraValues: {}, checks: {} });
+      assert(result.errors.some(function (error) { return error.code === 'unresolved-wizard-source' || error.code === 'missing-required'; }));
+    });
+    add('No external network requests are allowed', function () {
+      var project = cloneProject(app.state.project);
+      project.fonts.externalQaFont = 'https://example.com/private.ttf';
+      return app.safeFetch('https://example.com/private.pdf')
+        .then(function () { throw new Error('External fetch was allowed'); }, function (error) { assert(/запрещены/.test(error.message)); })
+        .then(function () {
+          return ns.validation.loadProjectFonts(project)
+            .then(function () { throw new Error('External font fetch was allowed'); }, function (error) { assert(/Внешний URL шрифта запрещён/.test(error.message)); });
+        });
+    });
+    add('No console errors occur in a successful run', function () { equal(frame.__qaConsoleErrors.length, 0, 'console.error calls'); });
+
+    function cloneProject(project) { return ns.schema.clone(project); }
+
+    function run() {
+      var chain = Promise.resolve();
+      tests.forEach(function (test, index) {
+        chain = chain.then(function () {
+          return Promise.resolve().then(test.fn).then(function () {
+            results.push({ number: index + 1, name: test.name, pass: true, details: 'OK' });
+          }, function (error) {
+            results.push({ number: index + 1, name: test.name, pass: false, details: error && error.message || String(error) });
+          }).then(render);
+        });
+      });
+      return chain.then(finish);
+    }
+
+    function render() {
+      var body = document.getElementById('results'); body.textContent = '';
+      results.forEach(function (result) {
+        var row = body.insertRow(); row.insertCell().textContent = result.number; row.insertCell().textContent = result.name;
+        var status = row.insertCell(); status.textContent = result.pass ? 'PASS' : 'FAIL'; status.className = result.pass ? 'pass' : 'fail';
+        row.insertCell().textContent = result.details;
+      });
+      var passed = results.filter(function (result) { return result.pass; }).length;
+      document.getElementById('summary').textContent = passed + '/' + results.length + ' passed';
+    }
+
+    function finish() {
+      var passed = results.filter(function (result) { return result.pass; }).length;
+      var report = { total: results.length, passed: passed, failed: results.length - passed, results: results };
+      document.getElementById('qa-output').textContent = 'QA_JSON_START' + JSON.stringify(report) + 'QA_JSON_END';
+      document.documentElement.dataset.qaComplete = 'true';
+      document.title = passed === results.length ? 'DONE · Builder QA' : 'FAILED · Builder QA';
+    }
+
+    document.getElementById('builder').addEventListener('load', function () {
+      frame = this.contentWindow;
+      ns = frame.CRMDocumentBuilder;
+      if (!ns || !ns.app) { document.getElementById('summary').textContent = 'Builder did not initialize.'; return; }
+      var originalError = frame.console.error.bind(frame.console);
+      frame.__qaConsoleErrors = [];
+      frame.console.error = function () { frame.__qaConsoleErrors.push(Array.prototype.join.call(arguments, ' ')); originalError.apply(null, arguments); };
+      ns.app.readyPromise.then(function () { app = ns.app; run(); }, function (error) { document.getElementById('summary').textContent = error.message; });
+    });
+  }());
+  </script>
+</body>
+</html>

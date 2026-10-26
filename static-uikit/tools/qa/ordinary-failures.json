@@ -1,0 +1,117 @@
+{
+ "baseline": "generated from document-regression.json",
+ "ordinaryProfiles": [
+  "ru-resident-short",
+  "ru-resident-normal",
+  "ru-company-normal",
+  "en-nonresident-normal",
+  "en-company-normal",
+  "mixed-ru-en",
+  "missing-optional",
+  "maximum-checkboxes",
+  "minimum-required"
+ ],
+ "longProfiles": [
+  "ru-resident-long",
+  "ru-company-long",
+  "en-nonresident-long",
+  "en-company-long"
+ ],
+ "ordinaryFailures": [],
+ "realisticLongFailures": [],
+ "stressOnlyFailures": [
+  {
+   "documentId": "accession-application-fl",
+   "fieldId": "accession-application-fl-identity"
+  },
+  {
+   "documentId": "accession-application-fl",
+   "fieldId": "clientEmail"
+  },
+  {
+   "documentId": "accession-application-fl",
+   "fieldId": "signatureName"
+  },
+  {
+   "documentId": "accession-application-yul",
+   "fieldId": "clientEmail"
+  },
+  {
+   "documentId": "account-opening-notice",
+   "fieldId": "paymentPurposeCurrency"
+  },
+  {
+   "documentId": "account-opening-notice",
+   "fieldId": "paymentPurposeDerivatives"
+  },
+  {
+   "documentId": "account-opening-notice",
+   "fieldId": "paymentPurposeStock"
+  },
+  {
+   "documentId": "anketa-fl",
+   "fieldId": "otherInformation"
+  },
+  {
+   "documentId": "anketa-fl-simplified-id",
+   "fieldId": "pdlDetails"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "email"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "licensedActivities"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "managementStructure"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "otherInformation"
+  },
+  {
+   "documentId": "broker-use-refusal-request",
+   "fieldId": "clientPrintedName"
+  },
+  {
+   "documentId": "broker-use-refusal-request",
+   "fieldId": "contractNumber"
+  },
+  {
+   "documentId": "order-forms",
+   "fieldId": "otherInformation"
+  },
+  {
+   "documentId": "qualification-request-fl",
+   "fieldId": "signatureName"
+  },
+  {
+   "documentId": "qualification-request-yul",
+   "fieldId": "supportingDocument1"
+  },
+  {
+   "documentId": "regulation-full-refusal-notice",
+   "fieldId": "clientPrintedName"
+  },
+  {
+   "documentId": "regulation-full-refusal-notice",
+   "fieldId": "contractNumber"
+  },
+  {
+   "documentId": "regulation-partial-refusal-notice",
+   "fieldId": "clientPrintedName"
+  },
+  {
+   "documentId": "regulation-partial-refusal-notice",
+   "fieldId": "contractNumber"
+  }
+ ],
+ "counts": {
+  "ordinary": 0,
+  "realisticLong": 0,
+  "stressOnly": 22
+ }
+}

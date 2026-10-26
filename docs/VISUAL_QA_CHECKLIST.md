@@ -101,3 +101,125 @@
 - [ ] `/trust-management`
 - [ ] `/archives`
 - [ ] `/agents`
+
+## Document correction review — implementation complete, manual approval pending
+
+Recorded 2026-08-03, refreshed 2026-08-05 with the legal-entity full-name row.
+The previously open document findings are implemented and have dedicated
+fail-closed automated checks. They are **not yet manually accepted**: the
+remaining release action is to inspect the synthetic
+`static-uikit/manual-smoke/manual-findings-fix` review pack at high zoom and
+sign off the items below. The completed pack covers 9 affected documents and
+37 scenarios: 37 PDFs, 37 fixture JSON files, 138 full-page PNGs and 127 block
+close-ups. Its automated pack gates report zero failures; all 171 manual
+checklist items remain deliberately unchecked. `review.json` SHA-256 is
+`e41b540cd1ef5e5c1b7f5da36434cf6e29516bb7625b60e74d6c6f76b109a404`
+— rebuilding the pack from the same tree reproduces that byte exactly, so the
+fingerprint identifies the pack a reviewer is looking at.
+A green automated run does not mark these boxes.
+
+### Account-opening notice and depository agreement pair
+
+- [ ] Page 1 prints «Козырева Александра Юрьевича» exactly; the former
+  `Юрьвеича` spelling is absent and no surrounding text moved.
+- [ ] The depository agreement number and date shown in both accession forms
+  and the account-opening notice match the two requested operator values.
+- [ ] Page 2 item 2 «Основание для перевода» reads as one sentence with the
+  number and date; item 3 remains present once; no empty source sentence is
+  visible behind the replacement.
+- [ ] The number/date inputs start empty, have no current-date default, survive
+  Back/reselection for the same document, and do not leak to another document.
+
+No printable depository agreement number/date exists in UMI. These are
+required workflow inputs only for `accession-application-fl`,
+`accession-application-yul`, and `account-opening-notice`; that limitation is
+intentional and must remain visible during review.
+
+### `qualification-notice`
+
+- [ ] Short and long recipient names stay in the reviewed right-hand column;
+  every continuation begins at the same hanging indent.
+- [ ] Russian and foreign formatted registration addresses appear exactly once
+  and remain attached to «Адрес:».
+- [ ] The body organization name, its caption, the recognition wording, and the
+  date remain in reading order when the name wraps.
+- [ ] Underlines sit below glyphs and travel with their owning block; none
+  strikes through the organization name or date.
+- [ ] The `other` instrument branch has enough reviewed underlined lines and
+  the unused source rule is absent only in that branch.
+
+Review short, long-name, Russian-address, foreign-address, combined-long,
+body/date, and long-`other` scenarios separately.
+
+### Four questionnaires — physical table ownership
+
+- [ ] `anketa-fl-simplified-id`, `anketa-ip-sz`, `anketa-fl`, and `anketa-yul`
+  keep every rendered value inside its declared owning row/cell.
+- [ ] Full name, registration/address, bank, licence/authority, and free-text
+  stress cases do not enter the next row or cross a horizontal/vertical rule.
+- [ ] When an owning row grows, every lower row and each declared table border
+  moves by the same delta; vertical borders continue through the inserted row.
+- [ ] A formatted address or other one-logical-value group is rendered once;
+  no duplicated address components remain.
+- [ ] The review metadata identifies the field/source, owner row/cell, line
+  count, expansion count, cumulative shift, font size, and render fingerprint.
+
+The renderer and Template Builder now reject missing/unreviewed ownership,
+wrong field/source links, overlapping cells, ink outside the reviewed cell,
+border intersections, discontinuous grown borders, duplicate logical values,
+and shared table-budget overruns. Manual approval therefore checks the actual
+page appearance, not whether those declarations exist.
+
+### Transfer basis — «Основание для перевода», page 2 of the notice
+
+- [ ] Item 2 reads as one paragraph: the step from printed item 1 into it, and
+  every step inside it, matches the pitch the form prints its list at. It must
+  not sit under a gap that detaches it from item 1.
+- [ ] `№` stays on the number's line, `от` on the date's, and item 3 follows on
+  the same pitch with clear space before the signature line.
+- [ ] The same holds with three payment-purpose rows inserted above it, which
+  is the arrangement the earlier review rejected.
+
+### Passport issuing authority — «кем выдан», eight fields, five documents
+
+- [ ] `accession-application-fl`, `client-notifications` and all three
+  `power-of-attorney` slots print a full department name in their paragraph
+  without a rule through the letters and without covering printed text.
+- [ ] `anketa-fl`, `anketa-fl-simplified-id` and `anketa-ip-sz` grow their
+  issuer row for a full department name — two bands in the full questionnaire,
+  one in each simplified one — and the wrapped value keeps a single line pitch
+  across the grown band rather than stepping onto the row grid.
+- [ ] An ordinary district office leaves the printed table exactly as drawn.
+- [ ] Rows above the issuer have not moved; the department code and
+  registration address below have moved together, by the whole band.
+
+Compare `authority-ordinary` against `authority-long`, and each questionnaire's
+`ru-normal` against its `passport-authority-long` card.
+
+### Full legal name — «Полное фирменное наименование», row 1 of `anketa-yul`
+
+- [ ] A short name («АО «Тестовые инвестиции»») leaves the printed row exactly
+  as the form drew it: one line, no empty extra band, nothing below it moved.
+- [ ] A long Russian firm name opens one 13.44 pt band and a long foreign one
+  opens two, and each reads as one name at one pitch — not as a caption under
+  a second entry.
+- [ ] Row 2 «Сокращенное наименование» and row 3 «Наименование на иностранном
+  языке» are neither overlapped nor clipped; both have travelled down by the
+  whole added height, together with rows 4 and 5.
+- [ ] The seven vertical centre-lines run unbroken from the printed row into
+  the grown bands, and the row's bottom rule closes the enlarged cell.
+- [ ] The printed row numbers 1–5 and their left-hand labels are untouched, and
+  nothing above the table has moved.
+- [ ] Rows 1 and 3 growing in the same render still leave the page's reviewed
+  bottom margin intact.
+
+Compare `legal-name-short` against `legal-name-long-ru`,
+`legal-name-long-foreign` and `legal-name-with-foreign-row`.
+
+### Final gate
+
+- [ ] Run the canonical `python static-uikit/tools/qa/run_all_qa.py` after all
+  branch changes are assembled; record its result in the final handoff rather
+  than copying a mutable check count into this file.
+- [ ] Inspect every affected ordinary and realistic-long close-up in the review
+  pack and record manual visual approval.

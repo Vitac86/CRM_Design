@@ -28,8 +28,19 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9.96;
-  var MIN = 6.0;
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 11;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+
+  // Rows that physically cannot take BODY. Each value is the largest
+  // half-point step the measured room allows, floored at MIN.
+  var ROW_SIZE = {
+    acknowledgementName: 12,         // 65.51 pt of room
+    applicantFullName: 12,           // 33.01 pt of room
+  };
 
   function text(id, source, left, baselineTop, width, options) {
     var o = options || {};
@@ -41,13 +52,23 @@
       baselineTop: baselineTop,
       width: width,
       font: 'legalSerif',
-      fontSize: o.fontSize || BODY,
+      fontSize: o.fontSize || ROW_SIZE[id] || BODY,
       minFontSize: o.minFontSize != null ? o.minFontSize : MIN,
       align: o.align || 'left',
       required: !!o.required,
       optional: !!o.optional,
       format: o.format,
-      fallbacks: o.fallbacks
+      fallbacks: o.fallbacks,
+      // Continuation regions and print-override permission are part of the
+      // production schema; the helper must not drop them.
+      flowRegions: o.flowRegions,
+      expansion: o.expansion,
+      overflowStrategy: o.overflowStrategy,
+      layoutMode: o.layoutMode,
+      flowBlockId: o.flowBlockId,
+      allowPrintOverride: o.allowPrintOverride,
+      tokenBreak: o.tokenBreak,
+      label: o.label,
     };
   }
 
@@ -59,9 +80,72 @@
     expectedPages: 1,
     appliesTo: ['individual'],
 
+    // Content ends at 585.69 on an 841.92 pt page. Keeping the form's own
+    // 56.7 pt bottom margin still leaves 199.53 pt — seventeen of its rows.
+    pageLayout: {
+      0: {
+        fixedHeaderUntil: 0,
+        bodyBottom: 585.69,
+        fixedFooterFrom: null,
+        shiftToTop: 830.0,
+        bottomClearance: 56.7,
+        compaction: [],
+        anchors: ['qualification-consequences-applicant']
+      }
+    },
+
     fonts: {
       legalSerif: '../assets/fonts/pdf/LiberationSerif-Regular.ttf'
     },
+
+    // The applicant blank is part of the notification sentence, not an
+    // independent form row.  The exact reviewed source operators are replaced
+    // by one locked-size paragraph; the numbered consequences below move only
+    // in complete 11.52 pt source-line increments.
+    wordFlowBlocks: [
+      {
+        id: 'qualification-consequences-applicant',
+        type: 'wordFlowBlock',
+        page: 0,
+        frame: {
+          left: 63.62, baselineTop: 198.74, width: 481.31,
+          initialLineCount: 2
+        },
+        font: 'legalSerif', fontSize: 9.96, minFontSize: 9.96,
+        fontSizeLocked: true, lineHeight: 11.52,
+        alignment: 'justify', justifyMinRatio: 0.55,
+        firstLineIndent: 14.16,
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 210.49, shiftFromTop: 210.49,
+          rowHeight: 11.52, maxExtraRows: 2, lineStyle: 'none',
+          reviewStatus: 'approved'
+        },
+        sourceReplacement: {
+          firstBlock: 38, lastBlock: 38,
+          expectedBlockCount: 1, expectedPageBlockCount: 87,
+          expectedSha256: 'c2244833ddc4c0a02ef884e1e965a607811a18d7961712c1aa4fd51435dbea19',
+          expectedTemplateSha256: '471b08285a154b04cf4d1702852171f2ed4e0b3fc7478084be5058899d8836b0',
+          reviewStatus: 'approved'
+        },
+        sourceStaticText: 'Настоящим ООО «Инвестика» уведомляет Заявителя ' +
+          '________ (ФИО физического лица) о последствиях признания Вас ' +
+          'квалифицированным инвестором:',
+        runs: [
+          { type: 'static', text: 'Настоящим ООО «Инвестика» уведомляет Заявителя ' },
+          {
+            type: 'fieldRef', fieldId: 'applicantFullName',
+            decoration: {
+              underline: true, minWidth: 72, thickness: 0.48, offset: 1.08
+            }
+          },
+          {
+            type: 'static',
+            text: ' (ФИО физического лица) о последствиях признания Вас квалифицированным инвестором:'
+          }
+        ]
+      }
+    ],
 
     fields: [
       // «__» ________ 20__ — the quotes span 303.43..325.48, the month rule is
@@ -78,8 +162,20 @@
 
       // "уведомляет Заявителя ______ (ФИО физического лица)" — a 74.54 pt rule,
       // so a full name usually shrinks or falls back to initials.
+      //
+      // A long double surname exhausts even the initials fallback, and this was
+      // one of six anchors previously reported as having no clean cut. It has
+      // one: 210.49 is immediately below the *complete* two-line sentence
+      // «Настоящим ООО «Инвестика» уведомляет Заявителя ____ (ФИО физического
+      // лица) о последствиях признания Вас квалифицированным инвестором:», and
+      // above the numbered list that follows. The row therefore continues a
+      // finished sentence instead of splitting one, and the page has 256 pt of
+      // reserve to give it.
       text('applicantFullName', 'field.clientFullName', 331.0, 198.74, 72.0, {
-        required: true, fallbacks: ['initials', 'surname']
+        required: true, fallbacks: ['initials', 'surname'],
+        label: 'Ф.И.О. заявителя',
+        layoutMode: 'flow-reference',
+        flowBlockId: 'qualification-consequences-applicant'
       }),
 
       // "ОЗНАКОМЛЕН: Клиент ____ / ____" — the first rule is the handwritten

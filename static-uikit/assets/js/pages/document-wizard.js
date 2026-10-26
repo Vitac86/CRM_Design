@@ -5,7 +5,8 @@
 (function () {
   'use strict';
 
-  if (!document.body || document.body.dataset.page !== 'document-wizard') return;
+  var isDocumentWizardPage = document.body &&
+    document.body.dataset.page === 'document-wizard';
 
   // ── Static subject registry ────────────────────────────────────────────────
   // Static demo data. UMI.CMS should replace with server-side subject lookup.
@@ -30,7 +31,35 @@
       passportDeptCode: '770-001',
       registrationAddress: '125009, Россия, г. Москва, ул. Тверская, д. 14, кв. 38',
       postalAddress: '125009, г. Москва, ул. Тверская, д. 14, кв. 38',
-      qualificationStatus: 'Неквалифицированный'
+      qualificationStatus: 'Неквалифицированный',
+  // Bank requisites, per client and per currency. Static demo data standing in
+  // for `Front Реквизиты`: every field below has an exact UMI name (see
+  // docs/umi-variable-registry.md and the mapping in
+  // document-wizard/order-forms-model.js), and a backend replaces this array
+  // with the real record without the payout form changing.
+  //
+  //   primary   umi.requisites.osnovnoj_rekvizit — the card's default record
+  //
+  // A rouble route has no intermediary bank, so `correspondentSwift` and
+  // `correspondentBankName` are empty on it by nature rather than by omission;
+  // `correspondentAccount` is the recipient bank's own к/с and is always there.
+      bankRequisites: [
+        {
+          id: 'req-fl-rub',
+          currency: 'RUB',
+          primary: true,
+          recipient: 'Ковалёв Даниил Олегович',
+          bankName: 'ПАО Сбербанк, г. Москва',
+          bic: '044525225',
+          correspondentSwift: '',
+          correspondentBankName: '',
+          correspondentAccount: '30101810400000000225',
+          account: '40817810500000078901',
+          inn: '772201234567',
+          personalAccount: '',
+          notation: ''
+        }
+      ]
     },
     'c-011': {
       id: 'c-011',
@@ -57,6 +86,68 @@
       repPosition: 'Генеральный директор',
       repAuthority: 'Устав общества',
       qualificationStatus: 'Квалифицированный',
+  // Bank requisites, per client and per currency. Static demo data standing in
+  // for `Front Реквизиты`: every field below has an exact UMI name (see
+  // docs/umi-variable-registry.md and the mapping in
+  // document-wizard/order-forms-model.js), and a backend replaces this array
+  // with the real record without the payout form changing.
+  //
+  //   primary   umi.requisites.osnovnoj_rekvizit — the card's default record
+  //
+  // A rouble route has no intermediary bank, so `correspondentSwift` and
+  // `correspondentBankName` are empty on it by nature rather than by omission;
+  // `correspondentAccount` is the recipient bank's own к/с and is always there.
+      bankRequisites: [
+        {
+          id: 'req-ul-rub',
+          currency: 'RUB',
+          primary: true,
+          recipient: 'АО «Восток Майнинг Системс»',
+          bankName: 'Банк ВТБ (ПАО), г. Санкт-Петербург',
+          bic: '044525187',
+          correspondentSwift: '',
+          correspondentBankName: '',
+          correspondentAccount: '30101810700000000187',
+          account: '40702810100000012345',
+          inn: '2721123456',
+          personalAccount: '40702810100000012345',
+          notation: ''
+        },
+        {
+          id: 'req-ul-usd',
+          currency: 'USD',
+          primary: false,
+          recipient: 'VOSTOK MINING SYSTEMS JSC',
+          bankName: 'VTB BANK (PJSC), SAINT PETERSBURG',
+          bic: 'VTBRRUMM',
+          correspondentSwift: 'RZBAATWW',
+          correspondentBankName: 'RAIFFEISEN BANK INTERNATIONAL AG, VIENNA',
+          correspondentAccount: '70-55.070.229',
+          account: '40702840700000012345',
+          inn: '2721123456',
+          personalAccount: '',
+          notation: 'Charges: OUR'
+        },
+        {
+          // A record the client has opened but not finished: the intermediary
+          // bank is agreed, its account is not on file yet. A payout in EURO
+          // is therefore refused by name rather than printed half-filled —
+          // which is the case the whole requisites check exists for.
+          id: 'req-ul-eur',
+          currency: 'EURO',
+          primary: false,
+          recipient: 'VOSTOK MINING SYSTEMS JSC',
+          bankName: 'VTB BANK (PJSC), SAINT PETERSBURG',
+          bic: 'VTBRRUMM',
+          correspondentSwift: 'RZBAATWW',
+          correspondentBankName: 'RAIFFEISEN BANK INTERNATIONAL AG, VIENNA',
+          correspondentAccount: '',
+          account: '40702978300000012345',
+          inn: '2721123456',
+          personalAccount: '',
+          notation: ''
+        }
+      ],
       // Static demo signatories. Names/roles reuse the subject card
       // (subject-card.html → "Представители"). Future UMI integration will
       // load representatives from the subject card / backend.
@@ -128,6 +219,101 @@
     optionsFrom: 'subject.representatives',
     representativeRole: 'Генеральный директор'
   };
+
+  // ── Order-form branch conditions ──────────────────────────────────────────
+  //
+  // Приложение 7 is three forms in one file and, inside the trade form, four
+  // markets whose instrument blocks are mutually exclusive. Naming the
+  // conditions once keeps every field pointing at the same rule, and keeps the
+  // rule readable: the security block belongs to the фондовый рынок and to an
+  // внебиржевая ценная бумага, and to nothing else.
+  //
+  // Each branch condition re-states «this is a trade order». A hidden control
+  // keeps its DOM value, so a market chosen before the order type was switched
+  // must not go on showing its instrument block.
+  var ORDER_TRADE = { source: 'extra.extra-order-type', equals: 'trade' };
+  var ORDER_TRANSFER = { source: 'extra.extra-order-type', equals: 'transfer' };
+  var ORDER_WITHDRAWAL = { source: 'extra.extra-order-type', equals: 'withdrawal' };
+
+  var ORDER_SECURITY_BRANCH = {
+    allOf: [ORDER_TRADE, { anyOf: [
+      { source: 'extra.extra-order-market', equals: 'stock' },
+      { allOf: [
+        { source: 'extra.extra-order-market', equals: 'otc' },
+        { source: 'extra.extra-otc-instrument-type', equals: 'security' }
+      ] }
+    ] }]
+  };
+  var ORDER_FX_BRANCH = {
+    allOf: [ORDER_TRADE, { anyOf: [
+      { source: 'extra.extra-order-market', equals: 'currency' },
+      { allOf: [
+        { source: 'extra.extra-order-market', equals: 'otc' },
+        { source: 'extra.extra-otc-instrument-type', equals: 'currency' }
+      ] }
+    ] }]
+  };
+  // Срочный рынок only. OTC never offers a derivative.
+  var ORDER_DERIVATIVE_BRANCH = {
+    allOf: [ORDER_TRADE, { source: 'extra.extra-order-market', equals: 'derivatives' }]
+  };
+
+  // A price is entered only on a limit order; a market order prints «Рыночная».
+  var ORDER_LIMIT = { source: 'extra.extra-order-kind', equals: 'limit' };
+  var ORDER_SECURITY_LIMIT = { allOf: [ORDER_SECURITY_BRANCH, ORDER_LIMIT] };
+  var ORDER_FX_LIMIT = { allOf: [ORDER_FX_BRANCH, ORDER_LIMIT] };
+  var ORDER_DERIVATIVE_LIMIT = { allOf: [ORDER_DERIVATIVE_BRANCH, ORDER_LIMIT] };
+
+  // Declarative dependency metadata for builder/QA consumers. The production
+  // payload normalizer below remains authoritative; this describes which
+  // normalized PDF sources are supplied by wizard controls so a direct
+  // source-name comparison does not mislabel operational inputs as unused.
+  var NORMALIZED_SOURCE_PROVIDERS = {
+    extraPassThroughToField: true,
+    providers: {
+      'subject.citizenship': ['check.citizenship-rf', 'check.citizenship-other'],
+      'extra.extra-document-date': ['field.documentDateRu'],
+      'extra.extra-representative-id': [
+        'field.clientFullName', 'field.passportSeries', 'field.passportNumber',
+        'field.passportIssuedBy', 'field.passportIssueDate',
+        'field.registrationAddress', 'field.passportSeriesNumber',
+        'field.representativeFullName', 'field.representativeRole',
+        'field.representativeAuthority', 'field.representativeSignerLine'
+      ],
+      'extra.extra-questionnaire-role': [
+        'check.anketa-role-client', 'check.anketa-role-representative',
+        'check.anketa-role-beneficiary', 'check.anketa-role-beneficial-owner'
+      ],
+      'extra.extra-questionnaire-mode': ['check.anketa-mode-first', 'check.anketa-mode-change'],
+      'extra.extra-tax-residency': ['check.tax-resident-rf-yes', 'check.tax-resident-rf-no'],
+      'extra.extra-foreign-taxpayer': ['check.fatca-yes', 'check.fatca-no'],
+      'extra.extra-strategic-company': ['check.strategic-company-yes', 'check.strategic-company-no'],
+      'extra.extra-licensed-activity': ['check.licensed-activity-yes', 'check.licensed-activity-no'],
+
+      // Order forms: an instrument is picked once and every master-data row it
+      // prints is built from that one selection, so these controls are used by
+      // the PDF even though no map field names them.
+      'extra.extra-security-asset-id': [
+        'extra.extra-security-issuer', 'extra.extra-security-type'
+      ],
+      'extra.extra-fx-instrument-id': ['extra.extra-fx-instrument'],
+      'extra.extra-derivative-id': [
+        'extra.extra-derivative-kind', 'extra.extra-derivative-name',
+        'extra.extra-derivative-strike', 'extra.extra-derivative-expiry'
+      ],
+      'extra.extra-order-validity-mode': ['extra.extra-order-validity'],
+      'extra.extra-order-validity-date': ['extra.extra-order-validity'],
+      'extra.extra-otc-instrument-type': [
+        'extra.extra-security-type', 'extra.extra-fx-instrument'
+      ]
+    }
+  };
+
+  // Step 1/Step 2 navigation re-renders the selected document. Keep operator
+  // inputs in memory for this wizard session so Back/reselect never discards a
+  // legal agreement number or date the operator has already entered. Nothing
+  // is written to localStorage and no value is defaulted to today.
+  var wizardInputState = Object.create(null);
 
   // ── Document configuration ─────────────────────────────────────────────────
   var DOCUMENTS = [
@@ -247,7 +433,23 @@
         },
         { key: 'tariff-stock', label: 'Тарифный план — фондовый рынок', type: 'text' },
         { key: 'tariff-derivatives', label: 'Тарифный план — срочный рынок', type: 'text' },
-        { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' }
+        { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' },
+        // Page 3, «Заполняется ООО «Инвестика»». The brokerage pair is the
+        // client's own agreement (umi.bo_num / umi.datesign); the depository
+        // pair has no UMI field that is proven to hold a printable number or
+        // date, so it is typed here — see docs/umi-variable-registry.md.
+        { key: 'extra-contract-number', label: 'Номер договора на брокерское обслуживание', type: 'text' },
+        { key: 'extra-contract-date', label: 'Дата договора на брокерское обслуживание', type: 'date' },
+        {
+          key: 'extra-depository-contract',
+          label: 'Номер депозитарного договора',
+          type: 'text', required: true, sourceKind: 'operator-input'
+        },
+        {
+          key: 'extra-depository-contract-date',
+          label: 'Дата депозитарного договора',
+          type: 'date', required: true, sourceKind: 'operator-input'
+        }
       ],
       checkFields: [
         { key: 'accession-brokerage', label: 'Присоединение к Регламенту брокерского обслуживания', defaultChecked: true },
@@ -318,6 +520,19 @@
         { key: 'tariff-stock', label: 'Тарифный план — фондовый рынок', type: 'text' },
         { key: 'tariff-derivatives', label: 'Тарифный план — срочный рынок', type: 'text' },
         { key: 'tariff-currency', label: 'Тарифный план — валютный рынок', type: 'text' },
+        // Page 2, «Заполняется ООО «Инвестика»» — same pairing as the ФЛ form.
+        { key: 'extra-contract-number', label: 'Номер договора на брокерское обслуживание', type: 'text' },
+        { key: 'extra-contract-date', label: 'Дата договора на брокерское обслуживание', type: 'date' },
+        {
+          key: 'extra-depository-contract',
+          label: 'Номер депозитарного договора',
+          type: 'text', required: true, sourceKind: 'operator-input'
+        },
+        {
+          key: 'extra-depository-contract-date',
+          label: 'Дата депозитарного договора',
+          type: 'date', required: true, sourceKind: 'operator-input'
+        },
         GENERAL_DIRECTOR_REPRESENTATIVE_FIELD
       ],
       checkGroupLabel: 'Отметки заявления:',
@@ -1615,13 +1830,10 @@
           type: 'date',
           required: true
         },
-        {
-          key: 'extra-authorized-signer',
-          label: 'Уполномоченное лицо ООО «Инвестика» (в лице …)',
-          type: 'text',
-          required: true,
-          placeholder: 'ФИО в родительном падеже'
-        },
+        // «Уполномоченное лицо ООО «Инвестика»» was asked for here while the
+        // template left a blank for it. The updated authoritative template
+        // prints the representative itself, so asking would put a value on
+        // screen that the document no longer has anywhere to print.
         {
           key: 'extra-brokerage-contract',
           label: 'Номер договора на брокерское обслуживание',
@@ -1636,15 +1848,17 @@
         },
         {
           key: 'extra-depository-contract',
-          label: 'Номер депозитарного договора (договора счёта ДЕПО)',
+          label: 'Номер депозитарного договора',
           type: 'text',
-          required: true
+          required: true,
+          sourceKind: 'operator-input'
         },
         {
           key: 'extra-depository-contract-date',
           label: 'Дата депозитарного договора',
           type: 'date',
-          required: true
+          required: true,
+          sourceKind: 'operator-input'
         },
         {
           key: 'extra-stock-market-account',
@@ -1753,9 +1967,7 @@
           key: 'extra-attorney-issue-date',
           label: 'Поверенный — дата выдачи паспорта',
           type: 'date',
-          required: true,
-          // The legal-entity variant reserves only 4.56 pt after «дата выдачи».
-          showWhen: { source: 'subject.kind', equals: 'individual' }
+          required: true
         },
         {
           key: 'extra-attorney-address',
@@ -1771,6 +1983,23 @@
       // duplicate cards. «Тип поручения» selects which of the three is filled;
       // the other two stay blank and all four pages are always emitted.
       // The order-type names are taken verbatim from the source.
+      //
+      // Every value a mistake would make expensive comes from a fixed option or
+      // from the instrument catalog: the trade side, the market, the order
+      // kind, validity, settlement, REPO/SWAP and the traded instrument itself.
+      // What stays free text is what the form itself leaves free — counterparty
+      // and «иная информация» — plus the bank requisites of a payout, which are
+      // the rows waiting for their exact UMI binding.
+      //
+      // Four payload values are never typed and never editable. They are built
+      // in CRMOrderForms.normalize() from the selected instrument and the fixed
+      // options, and the fields that carry them are declared `derived` so the
+      // payload contract still names them:
+      //   extra-submission-kind   always «primary» — see below
+      //   extra-order-validity    «До отмены» or the chosen date, RU-formatted
+      //   extra-security-issuer   Assets.EmitentFirm_ID → Firms
+      //   extra-security-type     the compact legal description of the asset
+      // and the same for the FX instrument name and the derivative master data.
       id: 'order-forms',
       title: 'Поручение (формы поручений)',
       description: 'Приложение 7 к Регламенту брокерского обслуживания.',
@@ -1780,14 +2009,22 @@
       pdfOutputFilename: 'poruchenie.pdf',
       downloadLabel: 'Скачать поручение',
       extraGroupLabel: 'Параметры поручения',
-      checkGroupLabel: 'Дополнительные отметки:',
-      aliases: ['приложение 7', 'заявка', 'сделка', 'вывод средств', 'перевод средств'],
+      aliases: ['приложение 7', 'заявка', 'сделка', 'вывод средств', 'перевод средств',
+                'ценные бумаги', 'репо', 'валюта', 'пфи', 'срочный рынок'],
+      // What the form's read-only rows resolve against. The wizard only walks
+      // the `valueFrom` path; what a requisite is, and which one a payout in a
+      // given currency uses, is the payload model's business.
+      resolveContext: function (subject, values) {
+        return window.CRMOrderForms
+          ? window.CRMOrderForms.context(subject, values) : {};
+      },
       fields: [
         {
           key: 'extra-order-type',
           label: 'Тип поручения',
           type: 'select',
           required: true,
+          fullWidth: true,
           options: [
             { value: 'trade', label: 'Поручение на совершение сделки' },
             { value: 'transfer', label: 'Поручение на операции с денежными средствами (перевод между торговыми площадками)' },
@@ -1795,20 +2032,22 @@
           ]
         },
         {
+          // Every order this process produces is a primary submission. The
+          // form's «Отмена ранее поданной заявки» box exists in the source and
+          // stays mapped, but a manager may not reach it: an order is cancelled
+          // through the operational flow, not by printing a different tick on
+          // the same form. The value is fixed in the payload, not in the map,
+          // so the map keeps describing the paper form exactly.
           key: 'extra-submission-kind',
           label: 'Вид подачи',
-          type: 'select',
-          required: true,
-          defaultValue: 'primary',
-          options: [
-            { value: 'primary', label: 'Первичная подача заявки' },
-            { value: 'cancellation', label: 'Отмена ранее поданной заявки' }
-          ]
+          type: 'derived',
+          staticText: 'Вид подачи: первичная подача заявки (устанавливается автоматически).'
         },
         {
           key: 'extra-order-number-date',
-          label: 'Номер и дата заявки (при отмене — ранее поданной)',
-          type: 'text'
+          label: 'Номер и дата заявки',
+          type: 'text',
+          placeholder: '12 от 02.09.2026'
         },
         {
           key: 'extra-contract-number-date',
@@ -1828,110 +2067,257 @@
           key: 'extra-trade-kind',
           label: 'Вид сделки',
           type: 'select',
+          required: true,
           options: [
             { value: 'buy', label: 'Покупка' },
             { value: 'sell', label: 'Продажа' },
             { value: 'other', label: 'Иной вид сделки' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+          showWhen: ORDER_TRADE
         },
         {
           key: 'extra-trade-kind-other',
           label: 'Иной вид сделки (указать)',
           type: 'text',
-          showWhen: { source: 'extra.extra-trade-kind', equals: 'other' }
+          required: true,
+          showWhen: { allOf: [ORDER_TRADE, { source: 'extra.extra-trade-kind', equals: 'other' }] }
         },
         {
           key: 'extra-order-market',
           label: 'Вид рынка',
           type: 'select',
+          required: true,
           options: [
             { value: 'stock', label: 'Фондовый' },
             { value: 'currency', label: 'Валютный' },
             { value: 'derivatives', label: 'Срочный' },
             { value: 'otc', label: 'Внебиржевой' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+          showWhen: ORDER_TRADE
         },
         {
+          // The business rule that makes OTC different from every other market:
+          // it carries securities and currency instruments and nothing else.
+          // Derivatives are the срочный рынок and are never offered here.
+          key: 'extra-otc-instrument-type',
+          label: 'Вид инструмента (внебиржевой рынок)',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'security', label: 'Ценная бумага' },
+            { value: 'currency', label: 'Валютный инструмент' }
+          ],
+          showWhen: { allOf: [ORDER_TRADE, { source: 'extra.extra-order-market', equals: 'otc' }] }
+        },
+        {
+          // «Условное» is in the source form and stays in the map, but this
+          // process does not accept conditional orders, so the option is not
+          // offered and `extra-order-kind` can only ever be market or limit.
           key: 'extra-order-kind',
           label: 'Вид поручения',
           type: 'select',
+          required: true,
           options: [
             { value: 'market', label: 'Рыночное' },
-            { value: 'limit', label: 'Лимитированное' },
-            { value: 'conditional', label: 'Условное' }
+            { value: 'limit', label: 'Лимитированное' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+          showWhen: ORDER_TRADE
         },
         {
+          // Unreachable by construction — «Условное» is not offered above. Kept
+          // so the legacy payload key stays part of the contract.
           key: 'extra-order-kind-conditional',
           label: 'Условное поручение (указать)',
           type: 'text',
-          showWhen: { source: 'extra.extra-order-kind', equals: 'conditional' }
+          showWhen: { allOf: [ORDER_TRADE, { source: 'extra.extra-order-kind', equals: 'conditional' }] }
         },
-        { key: 'extra-order-validity', label: 'Срок действия заявки', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-settlement-period', label: 'Срок расчётов', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        {
+          key: 'extra-order-validity-mode',
+          label: 'Срок действия заявки',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'cancelled', label: 'До отмены' },
+            { value: 'date', label: 'До определённой даты' }
+          ],
+          showWhen: ORDER_TRADE
+        },
+        {
+          key: 'extra-order-validity-date',
+          label: 'Действительна по (включительно)',
+          type: 'date',
+          required: true,
+          showWhen: { allOf: [ORDER_TRADE, { source: 'extra.extra-order-validity-mode', equals: 'date' }] }
+        },
+        { key: 'extra-order-validity', label: 'Срок действия заявки (для печати)', type: 'derived' },
+        {
+          key: 'extra-settlement-period',
+          label: 'Срок расчётов',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'T+0', label: 'T+0' },
+            { value: 'T+1', label: 'T+1' },
+            { value: 'T+2', label: 'T+2' }
+          ],
+          showWhen: ORDER_TRADE
+        },
         { key: 'extra-counterparty', label: 'Информация о контрагенте', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+          showWhen: ORDER_TRADE },
         { key: 'extra-order-other-info', label: 'Иная информация', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+          showWhen: ORDER_TRADE },
 
-        { key: 'extra-security-issuer', label: 'Наименование эмитента', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-security-type', label: 'Вид, категория (тип), выпуск, транш, серия, ISIN/CFI', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-security-quantity', label: 'Количество ценных бумаг', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-security-price', label: 'Цена одной ценной бумаги / НКД / валюта цены', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        // ─── Ценная бумага: фондовый рынок и внебиржевая ценная бумага ────
+        //
+        // One selector for both. A security is an Asset; which trading section
+        // it happens to have a Securities row in is not an order parameter.
+        {
+          key: 'extra-security-asset-id',
+          label: 'Ценная бумага',
+          type: 'autocomplete',
+          catalog: 'securities',
+          placeholder: 'Наименование, тикер, ISIN или эмитент',
+          required: true,
+          fullWidth: true,
+          showWhen: ORDER_SECURITY_BRANCH
+        },
+        { key: 'extra-security-issuer', label: 'Наименование эмитента', type: 'derived' },
+        { key: 'extra-security-type', label: 'Вид, категория (тип), выпуск, серия, ISIN', type: 'derived' },
+        {
+          key: 'extra-security-quantity',
+          label: 'Количество ценных бумаг, шт.',
+          type: 'number',
+          min: 1,
+          step: 1,
+          positive: true,
+          required: true,
+          showWhen: ORDER_SECURITY_BRANCH
+        },
+        {
+          // A market order takes the price the market gives; the form prints
+          // «Рыночная» and there is nothing for a manager to enter.
+          key: 'extra-security-price',
+          label: 'Цена одной ценной бумаги',
+          type: 'number',
+          step: 'any',
+          positive: true,
+          required: true,
+          showWhen: ORDER_SECURITY_LIMIT
+        },
         {
           key: 'extra-repo-ccp',
           label: 'Сделка РЕПО с ЦК',
           type: 'select',
+          required: true,
           options: [
             { value: 'yes', label: 'Да' },
             { value: 'no', label: 'Нет' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+          showWhen: ORDER_SECURITY_BRANCH
         },
-        { key: 'extra-trade-amount', label: 'Сумма сделки в валюте сделки', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        {
+          // Blank on a market order by the form's own design: the amount is not
+          // known when the price is not. Optional even on a limit order.
+          key: 'extra-trade-amount',
+          label: 'Сумма сделки в валюте сделки',
+          type: 'number',
+          step: 'any',
+          positive: true,
+          showWhen: ORDER_SECURITY_LIMIT
+        },
 
-        { key: 'extra-derivative-kind', label: 'Вид инструмента срочного рынка', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-derivative-name', label: 'Наименование ПФИ', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-derivative-quantity', label: 'Количество ПФИ, шт. (лотов)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-derivative-premium', label: 'Цена ПФИ (премия)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-derivative-strike', label: 'Цена исполнения страйк (для опционов)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-derivative-expiry', label: 'Дата исполнения (экспирации)', type: 'date',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-derivative-amount', label: 'Сумма сделки (ПФИ)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-
-        { key: 'extra-fx-instrument', label: 'Наименование валютного инструмента / инструмента драг. металлов', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-fx-lots', label: 'Количество лотов валютного инструмента', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-fx-rate', label: 'Курс валюты / цена сделки с драг. металлами', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
-        { key: 'extra-fx-amount', label: 'Сумма сделки в валюте котировки', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' } },
+        // ─── Валютный инструмент: валютный рынок и внебиржевая валюта ─────
+        {
+          key: 'extra-fx-instrument-id',
+          label: 'Валютный инструмент / инструмент драг. металлов',
+          type: 'autocomplete',
+          catalog: 'fx',
+          placeholder: 'Код инструмента, наименование или валютная пара',
+          required: true,
+          fullWidth: true,
+          showWhen: ORDER_FX_BRANCH
+        },
+        { key: 'extra-fx-instrument', label: 'Наименование валютного инструмента', type: 'derived' },
+        {
+          key: 'extra-fx-lots',
+          label: 'Количество лотов',
+          type: 'number',
+          min: 1,
+          step: 1,
+          positive: true,
+          required: true,
+          showWhen: ORDER_FX_BRANCH
+        },
+        {
+          key: 'extra-fx-rate',
+          label: 'Курс валюты / цена сделки с драг. металлами',
+          type: 'number',
+          step: 'any',
+          positive: true,
+          required: true,
+          showWhen: ORDER_FX_LIMIT
+        },
+        {
+          key: 'extra-fx-amount',
+          label: 'Сумма сделки в валюте котировки',
+          type: 'number',
+          step: 'any',
+          positive: true,
+          showWhen: ORDER_FX_BRANCH
+        },
         {
           key: 'extra-fx-swap-ccp',
           label: 'Сделка валютный СВОП с ЦК',
           type: 'select',
+          required: true,
           options: [
             { value: 'yes', label: 'Да' },
             { value: 'no', label: 'Нет' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'trade' }
+          showWhen: ORDER_FX_BRANCH
+        },
+
+        // ─── Срочный рынок ────────────────────────────────────────────────
+        {
+          key: 'extra-derivative-id',
+          label: 'Инструмент срочного рынка',
+          type: 'autocomplete',
+          catalog: 'derivatives',
+          placeholder: 'Код контракта, наименование или базовый актив',
+          required: true,
+          fullWidth: true,
+          showWhen: ORDER_DERIVATIVE_BRANCH
+        },
+        { key: 'extra-derivative-kind', label: 'Вид инструмента срочного рынка', type: 'derived' },
+        { key: 'extra-derivative-name', label: 'Наименование ПФИ', type: 'derived' },
+        { key: 'extra-derivative-strike', label: 'Цена исполнения страйк (для опционов)', type: 'derived' },
+        { key: 'extra-derivative-expiry', label: 'Дата исполнения (экспирации)', type: 'derived' },
+        {
+          key: 'extra-derivative-quantity',
+          label: 'Количество ПФИ, шт. (лотов)',
+          type: 'number',
+          min: 1,
+          step: 1,
+          positive: true,
+          required: true,
+          showWhen: ORDER_DERIVATIVE_BRANCH
+        },
+        {
+          key: 'extra-derivative-premium',
+          label: 'Цена ПФИ (премия)',
+          type: 'number',
+          step: 'any',
+          positive: true,
+          required: true,
+          showWhen: ORDER_DERIVATIVE_LIMIT
+        },
+        {
+          key: 'extra-derivative-amount',
+          label: 'Сумма сделки (ПФИ)',
+          type: 'number',
+          step: 'any',
+          positive: true,
+          showWhen: ORDER_DERIVATIVE_BRANCH
         },
 
         // ─── Перевод между торговыми площадками ───────────────────────────
@@ -1939,34 +2325,40 @@
           key: 'extra-move-from',
           label: 'С торговой площадки',
           type: 'select',
+          required: true,
           options: [
             { value: 'stock', label: 'ПАО Московская Биржа (фондовый рынок и рынок депозитов)' },
             { value: 'currency', label: 'ПАО Московская Биржа (валютный рынок и рынок драг. металлов)' },
             { value: 'derivatives', label: 'ПАО Московская Биржа (срочный рынок)' },
             { value: 'otc', label: 'Внебиржевой рынок' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' }
+          showWhen: ORDER_TRANSFER
         },
         {
           key: 'extra-move-to',
           label: 'На торговую площадку',
           type: 'select',
+          required: true,
           options: [
             { value: 'stock', label: 'ПАО Московская Биржа (фондовый рынок и рынок депозитов)' },
             { value: 'currency', label: 'ПАО Московская Биржа (валютный рынок и рынок драг. металлов)' },
             { value: 'derivatives', label: 'ПАО Московская Биржа (срочный рынок)' },
             { value: 'otc', label: 'Внебиржевой рынок' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' }
+          showWhen: ORDER_TRANSFER
         },
-        { key: 'extra-move-amount', label: 'Сумма (цифрами)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' } },
-        { key: 'extra-move-amount-words', label: 'Сумма (прописью)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' } },
+        { key: 'extra-move-amount', label: 'Сумма (цифрами)', type: 'number',
+          step: 'any', positive: true, required: true, showWhen: ORDER_TRANSFER },
+        // Spelled out from the figure and the currency above it. Never typed:
+        // an amount a manager writes twice is an amount they can write two
+        // ways. The printed blank holds one narrow line, so a long wording
+        // continues onto the reviewed line the map opens beneath it.
+        { key: 'extra-move-amount-words', label: 'Сумма (прописью)', type: 'derived' },
         {
           key: 'extra-move-currency',
           label: 'Валюта перевода',
           type: 'select',
+          required: true,
           options: [
             { value: 'RUB', label: 'RUB' },
             { value: 'USD', label: 'USD' },
@@ -1974,7 +2366,7 @@
             { value: 'CNY', label: 'CNY' },
             { value: 'other', label: 'Иная валюта' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'transfer' }
+          showWhen: ORDER_TRANSFER
         },
 
         // ─── Вывод на банковский счёт ─────────────────────────────────────
@@ -1982,6 +2374,7 @@
           key: 'extra-payout-currency',
           label: 'Валюта вывода',
           type: 'select',
+          required: true,
           options: [
             { value: 'RUB', label: 'RUB' },
             { value: 'USD', label: 'USD' },
@@ -1989,59 +2382,91 @@
             { value: 'CNY', label: 'CNY' },
             { value: 'other', label: 'Иная валюта' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' }
+          showWhen: ORDER_WITHDRAWAL
         },
         {
           key: 'extra-payout-amount-mode',
           label: 'Сумма вывода',
           type: 'select',
+          required: true,
           options: [
             { value: 'whole', label: 'В размере свободного остатка' },
             { value: 'amount', label: 'В сумме' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' }
+          showWhen: ORDER_WITHDRAWAL
         },
-        { key: 'extra-payout-amount', label: 'Сумма вывода (цифрами)', type: 'text',
-          showWhen: { source: 'extra.extra-payout-amount-mode', equals: 'amount' } },
-        { key: 'extra-payout-amount-words', label: 'Сумма вывода (прописью)', type: 'text',
-          showWhen: { source: 'extra.extra-payout-amount-mode', equals: 'amount' } },
+        { key: 'extra-payout-amount', label: 'Сумма вывода (цифрами)', type: 'number',
+          step: 'any', positive: true, required: true,
+          showWhen: { allOf: [ORDER_WITHDRAWAL, { source: 'extra.extra-payout-amount-mode', equals: 'amount' }] } },
+        // Spelled out from the figure, exactly as on the transfer form. «В
+        // размере свободного остатка» has no figure, so it produces no wording.
+        { key: 'extra-payout-amount-words', label: 'Сумма вывода (прописью)', type: 'derived' },
         {
           key: 'extra-payout-from',
           label: 'С торговой площадки',
           type: 'select',
+          required: true,
           options: [
             { value: 'stock', label: 'ПАО Московская Биржа (фондовый рынок и рынок депозитов)' },
             { value: 'currency', label: 'ПАО Московская Биржа (валютный рынок и рынок драг. металлов)' },
             { value: 'derivatives', label: 'ПАО Московская Биржа (срочный рынок)' },
             { value: 'otc', label: 'Внебиржевой рынок' }
           ],
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' }
+          showWhen: ORDER_WITHDRAWAL
         },
-        { key: 'extra-bank-recipient', label: 'Получатель (наименование/ФИО)', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-bic', label: 'БИК/SWIFT банка получателя', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-name', label: 'Наименование банка получателя', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-corr-swift', label: 'SWIFT банка-корреспондента', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-corr-name', label: 'Наименование банка-корреспондента', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-corr-account', label: 'Корреспондентский счёт банка получателя', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-account', label: 'Счёт получателя', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-inn', label: 'ИНН получателя', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-personal-account', label: 'Лицевой счёт', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } },
-        { key: 'extra-bank-other', label: 'Прочее', type: 'text',
-          showWhen: { source: 'extra.extra-order-type', equals: 'withdrawal' } }
+        // The bank block is CRM-owned data, shown for checking and not for
+        // typing. Every row has an exact UMI name in Front Реквизиты
+        // (docs/umi-variable-registry.md); today they resolve from the subject
+        // card's static mock through the document's context provider, and the
+        // backend points the same keys at the real record without this list
+        // changing. Which requisite a payout uses follows the currency chosen
+        // above, so these refresh when it changes.
+        //
+        // The rows a payout cannot be executed without are validated by
+        // CRMOrderForms.validate(): missing CRM data refuses the document and
+        // names what is missing, rather than printing a half-filled order.
+        { key: 'extra-bank-recipient', label: 'Получатель (наименование/ФИО)',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-recipient',
+          emptyHint: 'нет данных в карточке субъекта', showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-bic', label: 'БИК/SWIFT банка получателя',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-bic',
+          emptyHint: 'нет данных в карточке субъекта', showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-name', label: 'Наименование банка получателя',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-name',
+          emptyHint: 'нет данных в карточке субъекта', showWhen: ORDER_WITHDRAWAL },
+        // Intermediary-bank rows: a domestic rouble route has none, and empty
+        // is the right answer there rather than a missing one.
+        { key: 'extra-bank-corr-swift', label: 'SWIFT банка-корреспондента',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-corr-swift',
+          emptyHint: 'не применимо для этого маршрута', showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-corr-name', label: 'Наименование банка-корреспондента',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-corr-name',
+          emptyHint: 'не применимо для этого маршрута', showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-corr-account', label: 'Корреспондентский счёт банка получателя',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-corr-account',
+          emptyHint: 'нет данных в карточке субъекта', showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-account', label: 'Счёт получателя',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-account',
+          emptyHint: 'нет данных в карточке субъекта', showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-inn', label: 'ИНН получателя',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-inn',
+          showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-personal-account', label: 'Лицевой счёт',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-personal-account',
+          showWhen: ORDER_WITHDRAWAL },
+        { key: 'extra-bank-other', label: 'Прочее',
+          type: 'readonly', valueFrom: 'requisites.extra-bank-other',
+          showWhen: ORDER_WITHDRAWAL }
       ],
       checkFields: [
         {
+          // The form's own wording, and not a question: a trade order always
+          // carries the acknowledgement, so it is set rather than asked. The
+          // map prints it on the trade form only.
           key: 'order-uncovered-ack',
-          label: 'Я проинформирован, что данная сделка может привести к открытию непокрытой позиции (для клиентов с начальным уровнем риска)'
+          label: 'Я проинформирован, что данная сделка может привести к открытию непокрытой позиции (для клиентов с начальным уровнем риска)',
+          defaultChecked: true,
+          hidden: true
         }
       ]
     },
@@ -2090,6 +2515,40 @@
     }
   ];
 
+  // The visual template builder consumes the real production registry without
+  // mounting the wizard UI or maintaining a second hand-written catalog. The
+  // exposed value is a detached, recursively frozen clone so builder code can
+  // never mutate the configuration used by this page.
+  function cloneCatalogValue(value) {
+    if (Array.isArray(value)) return value.map(cloneCatalogValue);
+    if (!value || typeof value !== 'object') return value;
+    var clone = {};
+    Object.keys(value).forEach(function (key) {
+      clone[key] = cloneCatalogValue(value[key]);
+    });
+    return clone;
+  }
+
+  function freezeCatalogValue(value) {
+    if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+    Object.keys(value).forEach(function (key) { freezeCatalogValue(value[key]); });
+    return Object.freeze(value);
+  }
+
+  // `blockedIncompleteMapping` on an entry means the map is a starting point
+  // rather than a finished document: the wizard's document list drops it while
+  // the Template Builder — the tool that finishes a mapping — still sees it.
+  // No entry carries the flag today; the gate stays because the next
+  // half-mapped form should be held back the same way rather than by deleting
+  // the work in progress.
+  window.CRMDocumentCatalog = freezeCatalogValue({
+    schemaVersion: 1,
+    documents: cloneCatalogValue(DOCUMENTS),
+    normalization: cloneCatalogValue(NORMALIZED_SOURCE_PROVIDERS)
+  });
+
+  if (!isDocumentWizardPage) return;
+
   // ── HTML escaping helpers ─────────────────────────────────────────────────
 
   function escHtml(s) {
@@ -2113,6 +2572,17 @@
     return m ? (m[3] + '.' + m[2] + '.' + m[1]) : val;
   }
 
+  function isValidIsoDate(val) {
+    var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(val || ''));
+    if (!match) return false;
+    var year = Number(match[1]);
+    var month = Number(match[2]);
+    var day = Number(match[3]);
+    var date = new Date(Date.UTC(year, month - 1, day));
+    return date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+  }
+
   // ── Selected representative (legal-entity signatory) ──────────────────────
 
   function getSelectedRepresentative(subject, extraValues) {
@@ -2133,11 +2603,36 @@
       .join(' ');
   }
 
+  // Preserve exact UMI values when the subject lookup supplies them, and give
+  // the static demo company the two exact workbook names it can prove from its
+  // card. The overlay engine still resolves every source through umi-adapter;
+  // this merely keeps the Wizard from discarding the canonical payload layer.
+  function buildUmi(subject) {
+    var supplied = subject && subject.umi;
+    var out = supplied && typeof supplied === 'object'
+      ? JSON.parse(JSON.stringify(supplied)) : {};
+    if (subject && subject.kind === 'company') {
+      out.company = out.company && typeof out.company === 'object'
+        ? out.company : {};
+      if (!String(out.company.origname || '').trim()) {
+        out.company.origname = subject.fullLegalName || subject.displayName || '';
+      }
+      if (!String(out.company.basicname || '').trim()) {
+        out.company.basicname = subject.shortName || subject.displayName || '';
+      }
+    }
+    return out;
+  }
+
   function buildFields(subject, extraValues) {
     var f = {};
 
     // Common
-    f['client-full-name'] = subject.displayName;
+    // The registry defines this compatibility source as exact company
+    // `origname`, while an individual keeps the composed personal display
+    // name. Do not let a short company caption leak into legal forms.
+    f['client-full-name'] = subject.kind === 'company'
+      ? (subject.fullLegalName || subject.displayName) : subject.displayName;
     f['client-inn']       = subject.inn;
     f['client-code']      = subject.code;
     f['client-email']     = subject.email;
@@ -2169,6 +2664,10 @@
       f['client-registration-date']     = subject.registrationDate;
       f['client-registration-authority']= subject.registrationAuthority;
       f['client-legal-address']         = subject.legalAddress;
+      // `umi.address.registration` deliberately falls back to this normalized
+      // key when the CRM payload has one formatted address rather than exact
+      // component fields. A company registration address is its legal address.
+      f['client-registration-address']  = subject.legalAddress;
       f['client-postal-address']        = subject.postalAddress;
       f['client-website']               = subject.website;
       f['client-charter-capital']       = subject.charterCapital;
@@ -2408,11 +2907,251 @@
       !(subject.representatives && subject.representatives.length);
   }
 
+  // ── Instrument picker (searchable selector over a reference catalog) ──────
+  //
+  // The wizard needs one control a manager can type into but cannot type a
+  // value into: an order may name only an instrument the reference data really
+  // holds. Typing searches; only picking a result produces a value.
+  //
+  // The catalog is `window.CRMInstrumentCatalog` — the single static mock the
+  // backend replaces with QORT data. This control knows nothing about
+  // securities, currencies or derivatives; it asks the named catalog to search
+  // and to describe what was found.
+  //
+  // Shape:
+  //   <div class="crm-docwiz-picker">
+  //     <input data-autocomplete-for="<key>">        what the manager types
+  //     <input type="hidden" data-field-key="<key>"> the selected id
+  //     <div class="crm-docwiz-picker-menu" role="listbox">
+  //   <div class="crm-docwiz-picker-card">           the read-only summary
+  //
+  // The typed text is deliberately NOT a payload key: nothing a manager types
+  // here can reach the PDF. Only the id does, and only the payload normalizer
+  // turns that id into printed values.
+  function buildInstrumentPicker(field) {
+    var reference = window.CRMInstrumentCatalog;
+    var catalog = reference && reference.catalog(field.catalog);
+    var minLength = (reference && reference.MIN_QUERY_LENGTH) || 2;
+    var maxResults = (reference && reference.MAX_RESULTS) || 20;
+
+    var root = document.createElement('div');
+    root.className = 'crm-docwiz-picker';
+
+    var box = document.createElement('div');
+    box.className = 'crm-docwiz-picker-box';
+
+    var search = document.createElement('input');
+    search.className = 'uk-input crm-input crm-docwiz-picker-input';
+    search.type = 'text';
+    search.id = 'docwiz-field-' + field.key + '-search';
+    search.setAttribute('autocomplete', 'off');
+    search.setAttribute('role', 'combobox');
+    search.setAttribute('aria-autocomplete', 'list');
+    search.setAttribute('aria-expanded', 'false');
+    search.setAttribute('data-autocomplete-for', field.key);
+    if (field.placeholder) search.placeholder = field.placeholder;
+
+    var value = document.createElement('input');
+    value.type = 'hidden';
+
+    var menu = document.createElement('div');
+    menu.className = 'crm-docwiz-picker-menu';
+    menu.id = 'docwiz-field-' + field.key + '-menu';
+    menu.setAttribute('role', 'listbox');
+    menu.hidden = true;
+    search.setAttribute('aria-controls', menu.id);
+
+    var card = document.createElement('div');
+    card.className = 'crm-docwiz-picker-card';
+    card.hidden = true;
+
+    box.appendChild(search);
+    box.appendChild(value);
+    box.appendChild(menu);
+    root.appendChild(box);
+    root.appendChild(card);
+
+    var results = [];
+    var activeIndex = -1;
+
+    if (!catalog) {
+      // A missing catalog module is a deployment fault, not a manager's
+      // problem: say so once and leave the control unusable rather than let an
+      // order be produced with no real instrument behind it.
+      console.error('Document Wizard: reference catalog "' + field.catalog +
+        '" is not loaded. Check that assets/js/document-wizard/' +
+        'instrument-catalog.js is included before document-wizard.js.');
+      search.disabled = true;
+      search.placeholder = 'Справочник инструментов не загружен';
+    }
+
+    function closeMenu() {
+      menu.hidden = true;
+      menu.textContent = '';
+      search.setAttribute('aria-expanded', 'false');
+      results = [];
+      activeIndex = -1;
+    }
+
+    // The read-only face of the selection. Its rows come from the catalog, so
+    // what a manager verifies here is exactly what the order will print.
+    function renderCard(item) {
+      card.textContent = '';
+      if (!item) { card.hidden = true; return; }
+      catalog.summary(item).forEach(function (row) {
+        var line = document.createElement('div');
+        line.className = 'crm-docwiz-picker-card-row';
+        var name = document.createElement('span');
+        name.className = 'crm-docwiz-picker-card-label';
+        name.textContent = row.label;
+        var val = document.createElement('strong');
+        val.textContent = row.value;
+        line.appendChild(name);
+        line.appendChild(val);
+        card.appendChild(line);
+      });
+      card.hidden = false;
+    }
+
+    function highlight() {
+      Array.prototype.forEach.call(
+        menu.querySelectorAll('.crm-docwiz-picker-item'),
+        function (el, index) {
+          var on = index === activeIndex;
+          el.classList.toggle('is-active', on);
+          el.setAttribute('aria-selected', on ? 'true' : 'false');
+        }
+      );
+    }
+
+    function select(item) {
+      if (!item) return;
+      value.value = String(item[catalog.idKey]);
+      search.value = catalog.resultTitle(item);
+      search.classList.remove('crm-input-error');
+      renderCard(item);
+      closeMenu();
+      // Branch visibility and the saved wizard state both listen for this.
+      value.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function renderMenu() {
+      menu.textContent = '';
+      if (!results.length) {
+        var empty = document.createElement('div');
+        empty.className = 'crm-docwiz-picker-item crm-docwiz-picker-item-empty';
+        empty.textContent = search.value.trim().length < minLength
+          ? 'Введите не менее ' + minLength + ' символов'
+          : 'Ничего не найдено';
+        menu.appendChild(empty);
+      } else {
+        results.forEach(function (item, index) {
+          var row = document.createElement('div');
+          row.className = 'crm-docwiz-picker-item';
+          row.setAttribute('role', 'option');
+          row.setAttribute('data-index', String(index));
+          var title = document.createElement('span');
+          title.className = 'crm-docwiz-picker-item-title';
+          title.textContent = catalog.resultTitle(item);
+          var meta = document.createElement('span');
+          meta.className = 'crm-docwiz-picker-item-meta';
+          meta.textContent = catalog.resultMeta(item);
+          row.appendChild(title);
+          row.appendChild(meta);
+          menu.appendChild(row);
+        });
+      }
+      menu.hidden = false;
+      search.setAttribute('aria-expanded', 'true');
+      highlight();
+    }
+
+    function runSearch() {
+      if (!catalog) return;
+      var query = search.value.trim();
+      results = query.length < minLength ? [] : catalog.search(query, maxResults);
+      activeIndex = results.length ? 0 : -1;
+      renderMenu();
+    }
+
+    search.addEventListener('input', function () {
+      // Editing the text after a selection invalidates it: the id is dropped so
+      // a stale instrument can never survive a changed search string.
+      if (value.value) {
+        value.value = '';
+        renderCard(null);
+        value.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      runSearch();
+    });
+
+    search.addEventListener('focus', function () {
+      if (!value.value && search.value.trim()) runSearch();
+    });
+
+    // The menu suppresses its own pointer default below, so a blur here always
+    // means the manager really left the control.
+    search.addEventListener('blur', closeMenu);
+
+    search.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (menu.hidden) runSearch();
+        if (!results.length) return;
+        event.preventDefault();
+        activeIndex = event.key === 'ArrowDown'
+          ? (activeIndex + 1) % results.length
+          : (activeIndex - 1 + results.length) % results.length;
+        highlight();
+        return;
+      }
+      if (event.key === 'Enter') {
+        if (!menu.hidden && activeIndex >= 0) {
+          event.preventDefault();
+          select(results[activeIndex]);
+        }
+        return;
+      }
+      if (event.key === 'Escape' && !menu.hidden) {
+        event.preventDefault();
+        closeMenu();
+      }
+    });
+
+    // Keep the focus on the input so blur never races the click.
+    menu.addEventListener('mousedown', function (event) { event.preventDefault(); });
+    menu.addEventListener('click', function (event) {
+      var row = event.target.closest('.crm-docwiz-picker-item');
+      if (!row || row.classList.contains('crm-docwiz-picker-item-empty')) return;
+      select(results[Number(row.getAttribute('data-index'))]);
+    });
+
+    return {
+      root: root,
+      search: search,
+      value: value,
+      // Re-render the visible half from whatever id the hidden input carries.
+      // Used after the saved wizard state is restored on Back/reselect.
+      syncFromValue: function () {
+        var item = catalog && value.value ? catalog.get(value.value) : null;
+        if (item) {
+          search.value = catalog.resultTitle(item);
+          renderCard(item);
+        } else {
+          value.value = '';
+          renderCard(null);
+        }
+      }
+    };
+  }
+
   // ── Render extra fields ───────────────────────────────────────────────────
 
   function renderExtraFields(doc, subject) {
     var container = document.getElementById('docwiz-extra-fields');
     if (!container) return;
+
+    var savedState = wizardInputState[doc.id] ||
+      (wizardInputState[doc.id] = { fields: Object.create(null), checks: Object.create(null) });
 
     container.innerHTML = '';
 
@@ -2447,11 +3186,27 @@
     var grid = document.createElement('div');
     grid.className = 'crm-docwiz-fields-grid';
     var conditionalFields = [];
+    var resolvedControls = [];
 
     effectiveFields.forEach(function (field) {
+      // A derived value belongs to the payload contract but is never typed: it
+      // is built by the document's payload normalizer from the fixed choices
+      // and the selected instrument. Nothing is rendered for it beyond the
+      // optional one-line note that tells the manager it is set for them.
+      if (field.type === 'derived') {
+        if (!field.staticText) return;
+        var derivedNote = document.createElement('p');
+        derivedNote.className = 'crm-docwiz-derived-note';
+        derivedNote.textContent = field.staticText;
+        grid.appendChild(derivedNote);
+        return;
+      }
+
       var wrap = document.createElement('div');
       wrap.className = 'crm-docwiz-field-wrap';
-      if (field.type === 'textarea' || field.fullWidth) wrap.classList.add('crm-docwiz-field-wrap-full');
+      if (field.type === 'textarea' || field.type === 'autocomplete' || field.fullWidth) {
+        wrap.classList.add('crm-docwiz-field-wrap-full');
+      }
 
       var label = document.createElement('label');
       label.className = 'crm-document-form-label';
@@ -2461,6 +3216,7 @@
 
       var input;
       var dateField;
+      var picker;
       if (field.type === 'select') {
         input = document.createElement('select');
         input.className = 'uk-select crm-input';
@@ -2500,6 +3256,39 @@
 
         dateField.appendChild(input);
         dateField.appendChild(dateTrigger);
+      } else if (field.type === 'number') {
+        // A quantity, a price or an amount. The form asks for a number, so the
+        // control accepts a number: «100 шт.» and «сто» are not values an order
+        // can carry, and neither is a negative one.
+        input = document.createElement('input');
+        input.className = 'uk-input crm-input';
+        input.type = 'number';
+        input.setAttribute('inputmode', 'decimal');
+        if (field.min != null) input.min = String(field.min);
+        else if (field.positive) input.min = '0';
+        if (field.max != null) input.max = String(field.max);
+        input.step = field.step != null ? String(field.step) : 'any';
+        if (field.placeholder) input.placeholder = field.placeholder;
+        if (field.defaultValue) input.value = field.defaultValue;
+      } else if (field.type === 'readonly') {
+        // A value the CRM already holds. It is shown so the manager can check
+        // it before generating, and it is not editable because retyping CRM
+        // data is how a document ends up disagreeing with the record it came
+        // from. `valueFrom` names where it comes from; the document's own
+        // context provider resolves it, and it is refreshed on every change
+        // because a payout's requisites depend on the currency chosen above.
+        input = document.createElement('input');
+        input.className = 'uk-input crm-input crm-input-readonly';
+        input.type = 'text';
+        input.readOnly = true;
+        input.tabIndex = -1;
+        if (field.emptyHint) input.placeholder = field.emptyHint;
+      } else if (field.type === 'autocomplete') {
+        picker = buildInstrumentPicker(field);
+        input = picker.value;
+        // The label belongs to the box the manager types in, not to the hidden
+        // input that carries the chosen id.
+        label.setAttribute('for', picker.search.id);
       } else {
         input = document.createElement('input');
         input.className = 'uk-input crm-input';
@@ -2510,17 +3299,56 @@
 
       input.id = 'docwiz-field-' + field.key;
       input.setAttribute('data-field-key', field.key);
-      if (field.required) input.required = true;
-      wrap.appendChild(dateField || input);
+      input.setAttribute('data-field-type', field.type || 'text');
+      if (field.positive) input.setAttribute('data-field-positive', '1');
+      if (field.sourceKind === 'operator-input') {
+        input.setAttribute('data-source-kind', 'operator-input');
+      }
+      // A resolved value is re-read from the CRM on every render; restoring a
+      // remembered one would show yesterday's requisite after the record moved.
+      if (field.type !== 'readonly' &&
+          Object.prototype.hasOwnProperty.call(savedState.fields, field.key)) {
+        input.value = savedState.fields[field.key];
+      }
+      input.addEventListener('input', function () {
+        savedState.fields[field.key] = input.value;
+      });
+      input.addEventListener('change', function () {
+        savedState.fields[field.key] = input.value;
+      });
+      // A hidden input cannot be focused or reported by the browser, so a
+      // required instrument is enforced by the document's own validation and
+      // announced on the box the manager can actually see.
+      if (field.required && field.type === 'autocomplete') {
+        input.setAttribute('data-field-required', '1');
+      } else if (field.required) {
+        input.required = true;
+      }
+      if (picker) picker.syncFromValue();
+      if (field.type === 'readonly') resolvedControls.push({ field: field, input: input });
+      wrap.appendChild(picker ? picker.root : (dateField || input));
       grid.appendChild(wrap);
-      if (field.showWhen && field.showWhen.source) {
-        conditionalFields.push({ wrap: wrap, input: input, condition: field.showWhen });
+      if (field.showWhen) {
+        conditionalFields.push({
+          wrap: wrap,
+          input: input,
+          // A picker is three controls in one wrap; every one of them has to
+          // go inert with the branch, or a disabled-only check would still
+          // read a value out of the search box.
+          controls: Array.prototype.slice.call(
+            wrap.querySelectorAll('input, select, textarea')),
+          condition: field.showWhen
+        });
       }
     });
 
     container.appendChild(grid);
 
-    if (doc.checkFields && doc.checkFields.length) {
+    // A check the form always carries is not a question. `hidden` marks such a
+    // mark: it keeps its registry entry and its default, and is not offered.
+    var visibleChecks = (doc.checkFields || []).filter(function (cf) { return !cf.hidden; });
+
+    if (visibleChecks.length) {
       var checkGroup = document.createElement('div');
       checkGroup.className = 'crm-docwiz-check-group';
 
@@ -2529,7 +3357,7 @@
       checkLabel.textContent = doc.checkGroupLabel || 'Отметки:';
       checkGroup.appendChild(checkLabel);
 
-      doc.checkFields.forEach(function (cf) {
+      visibleChecks.forEach(function (cf) {
         var row = document.createElement('label');
         row.className = 'crm-check-row';
 
@@ -2537,7 +3365,11 @@
         cb.type = 'checkbox';
         cb.id = 'docwiz-check-' + cf.key;
         cb.setAttribute('data-check-key', cf.key);
-        cb.checked = !!cf.defaultChecked;
+        cb.checked = Object.prototype.hasOwnProperty.call(savedState.checks, cf.key)
+          ? !!savedState.checks[cf.key] : !!cf.defaultChecked;
+        cb.addEventListener('change', function () {
+          savedState.checks[cf.key] = cb.checked;
+        });
 
         var span = document.createElement('span');
         span.textContent = cf.label;
@@ -2563,7 +3395,20 @@
       return namespace === 'check' ? !!control.checked : control.value;
     }
 
+    // A condition is either a leaf — one source compared with `equals` /
+    // `notEquals` — or a combination of conditions. Order forms need the
+    // combination: an внебиржевая ценная бумага is «trade AND (stock OR (otc
+    // AND security))», and expressing that as one flat comparison is what
+    // would put security fields on a currency order.
     function conditionMatches(condition) {
+      if (!condition) return true;
+      if (Array.isArray(condition.allOf)) {
+        return condition.allOf.every(function (part) { return conditionMatches(part); });
+      }
+      if (Array.isArray(condition.anyOf)) {
+        return condition.anyOf.some(function (part) { return conditionMatches(part); });
+      }
+      if (!condition.source) return true;
       var value = currentControlValue(condition.source);
       if (Object.prototype.hasOwnProperty.call(condition, 'equals')) {
         return Array.isArray(condition.equals)
@@ -2578,21 +3423,58 @@
       return !!value;
     }
 
+    // Everything the document's context provider may need to answer with:
+    // the values on screen right now, whatever branch they belong to.
+    function currentExtraValues() {
+      var values = {};
+      container.querySelectorAll('[data-field-key]').forEach(function (control) {
+        values[control.getAttribute('data-field-key')] = control.value || '';
+      });
+      return values;
+    }
+
+    function readPath(root, path) {
+      var value = root;
+      String(path || '').split('.').forEach(function (part) {
+        value = (value && typeof value === 'object') ? value[part] : undefined;
+      });
+      return value == null ? '' : String(value);
+    }
+
+    function syncResolvedControls() {
+      if (!resolvedControls.length) return;
+      var context = typeof doc.resolveContext === 'function'
+        ? (doc.resolveContext(subject, currentExtraValues()) || {}) : {};
+      resolvedControls.forEach(function (entry) {
+        var value = readPath(context, entry.field.valueFrom);
+        if (entry.input.value === value) return;
+        entry.input.value = value;
+        savedState.fields[entry.field.key] = value;
+      });
+    }
+
     function syncConditionalFields() {
       conditionalFields.forEach(function (entry) {
         var visible = conditionMatches(entry.condition);
         entry.wrap.hidden = !visible;
-        entry.input.disabled = !visible;
-        if (!visible) entry.input.classList.remove('crm-input-error');
+        (entry.controls || [entry.input]).forEach(function (control) {
+          control.disabled = !visible;
+          if (!visible) control.classList.remove('crm-input-error');
+        });
       });
     }
 
-    if (conditionalFields.length) {
-      container.querySelectorAll('[data-field-key], [data-check-key]').forEach(function (control) {
-        control.addEventListener('change', syncConditionalFields);
-        control.addEventListener('input', syncConditionalFields);
-      });
+    function syncFields() {
+      syncResolvedControls();
       syncConditionalFields();
+    }
+
+    if (conditionalFields.length || resolvedControls.length) {
+      container.querySelectorAll('[data-field-key], [data-check-key]').forEach(function (control) {
+        control.addEventListener('change', syncFields);
+        control.addEventListener('input', syncFields);
+      });
+      syncFields();
     }
   }
 
@@ -2859,6 +3741,10 @@
   // ── Handle document selection ─────────────────────────────────────────────
 
   function selectDoc(doc, subject) {
+    // A print-only wording belongs to one generation of one document; picking
+    // another document must never carry it over.
+    clearPrintOverrides();
+
     // Highlight selected card
     document.querySelectorAll('.crm-docwiz-doc-card').forEach(function (c) {
       c.classList.toggle('crm-docwiz-doc-card-selected', c.getAttribute('data-doc-id') === doc.id);
@@ -2981,6 +3867,51 @@
 
   // ── Shared payload builder (local PDF flow) ───────────────────────────────
 
+  // An instrument picker keeps its value in a hidden input, which cannot be
+  // focused and cannot show an error. Both belong on the box the manager typed
+  // into, so every message about a picker is routed here first.
+  function pickerSearchInput(el) {
+    var key = el.getAttribute('data-field-key');
+    return document.querySelector(
+      '#docwiz-extra-fields [data-autocomplete-for="' + escAttr(key) + '"]');
+  }
+
+  // A numeric control the browser accepted may still hold a value the business
+  // does not: a quantity or a price has to be a real number above zero.
+  function numberProblem(el, value) {
+    if (el.validity.badInput) return 'Введите число.';
+    if (!value) return '';
+    var parsed = Number(String(value).replace(',', '.'));
+    if (!isFinite(parsed)) return 'Введите число.';
+    if (el.getAttribute('data-field-positive') === '1' && parsed <= 0) {
+      return 'Значение должно быть больше нуля.';
+    }
+    if (el.validity.rangeUnderflow) return 'Значение должно быть не меньше ' + el.min + '.';
+    if (el.validity.rangeOverflow) return 'Значение должно быть не больше ' + el.max + '.';
+    if (el.validity.stepMismatch) {
+      return el.step === '1' ? 'Введите целое число.' : 'Проверьте точность введённого числа.';
+    }
+    var key = el.getAttribute('data-field-key');
+    if ((key === 'extra-move-amount' || key === 'extra-payout-amount') && window.CRMOrderForms) {
+      return window.CRMOrderForms.moneyProblem(value);
+    }
+    return '';
+  }
+
+  // Typing into a picker is a search, not an answer. Text with no selection
+  // behind it is the case this exists for: it looks filled in and is not.
+  function pickerProblem(el, value) {
+    if (value) return '';
+    var search = pickerSearchInput(el);
+    if (search && String(search.value || '').trim()) {
+      return 'Выберите значение из списка — введённый текст не является выбранным значением.';
+    }
+    if (el.getAttribute('data-field-required') === '1') {
+      return 'Выберите значение из справочника.';
+    }
+    return '';
+  }
+
   // Validates visible required fields, collects extra/check values and builds
   // the normalized field/check maps consumed by the local PDF generation flow.
   function buildDocumentPayload(doc, subject) {
@@ -2990,18 +3921,29 @@
     var firstInvalid = null;
     var validationMessage = '';
 
-    // Collect text/date/select field values from [data-field-key].
+    // Collect text/date/select/number/picker values from [data-field-key].
     document.querySelectorAll('#docwiz-extra-fields [data-field-key]').forEach(function (el) {
       var key = el.getAttribute('data-field-key');
       var val = (el.value || '').trim();
+      var type = el.getAttribute('data-field-type');
       extraValues[key] = val;
       if (el.disabled) return;
-      if (el.required && !val) {
-        el.classList.add('crm-input-error');
+      var invalidDate = type === 'date' && !!val && !isValidIsoDate(val);
+      var problem = type === 'number' ? numberProblem(el, val)
+        : type === 'autocomplete' ? pickerProblem(el, val) : '';
+      // A picker's error belongs on its search box; everything else marks
+      // itself.
+      var marker = type === 'autocomplete' ? (pickerSearchInput(el) || el) : el;
+      if ((el.required && !val) || invalidDate || problem) {
+        marker.classList.add('crm-input-error');
         valid = false;
-        if (!firstInvalid) firstInvalid = el;
+        if (!firstInvalid) firstInvalid = marker;
+        if (!validationMessage) {
+          if (invalidDate) validationMessage = 'Введите корректную дату.';
+          else if (problem) validationMessage = problem;
+        }
       } else {
-        el.classList.remove('crm-input-error');
+        marker.classList.remove('crm-input-error');
       }
     });
 
@@ -3009,6 +3951,36 @@
     document.querySelectorAll('#docwiz-extra-fields [data-check-key]').forEach(function (el) {
       checkValues[el.getAttribute('data-check-key')] = el.checked;
     });
+
+    // Order forms: three forms in one file, and four mutually exclusive
+    // instrument blocks inside the trade form. Only the branch the manager
+    // filled may contribute values, and the values a manager must not type are
+    // derived here rather than collected. See document-wizard/order-forms-model.js.
+    if (doc.id === 'order-forms') {
+      if (window.CRMOrderForms) {
+        // The bank requisites a payout needs are CRM data, so a gap in them is
+        // reported the way a missing input is: against the exact rows, by
+        // name. A half-filled payout order is not something to hand a client.
+        window.CRMOrderForms.validate(subject, extraValues).forEach(function (problem) {
+          var control = document.querySelector(
+            '#docwiz-extra-fields [data-field-key="' + escAttr(problem.key) + '"]');
+          if (control) control.classList.add('crm-input-error');
+          valid = false;
+          if (!firstInvalid && control) firstInvalid = control;
+          if (!validationMessage) validationMessage = problem.message;
+        });
+
+        var normalized = window.CRMOrderForms.normalize(extraValues, checkValues, subject);
+        extraValues = normalized.extraValues;
+        checkValues = normalized.checkValues;
+      } else {
+        console.error('Document Wizard: order-forms payload model is not loaded. ' +
+          'Check that assets/js/document-wizard/order-forms-model.js is included ' +
+          'before document-wizard.js.');
+        valid = false;
+        validationMessage = 'Модуль поручений не загружен — обратитесь в поддержку.';
+      }
+    }
 
     (doc.validationRules || []).forEach(function (rule) {
       if (rule.type !== 'atLeastOneCheck') return;
@@ -3038,8 +4010,12 @@
       validationMessage: validationMessage,
       extraValues:  extraValues,
       checkValues:  checkValues,
+      umi:          buildUmi(subject),
       fields:       buildFields(subject, extraValues),
       checks:       buildChecks(doc, checkValues, extraValues, subject),
+      // Print-only wording the operator supplied for this generation. Never
+      // written back to the subject; only fields whose map allows it are used.
+      printOverrides: printOverrides,
       pdfFilename:  doc.pdfOutputFilename || (doc.id + '.pdf')
     };
   }
@@ -3078,10 +4054,24 @@
     statusEl.className = 'crm-docwiz-pdf-status' + (kind ? (' is-' + kind) : '');
   }
 
+  // ── Print overrides ────────────────────────────────────────────────────────
+  //
+  // An operator-editable print representation for the current document only.
+  // The CRM record is never touched, and only fields whose map sets
+  // `allowPrintOverride: true` can have one — never a name, an identifier, a
+  // passport or tax number, or any other exact legal value.
+  var printOverrides = {};
+
+  function clearPrintOverrides() {
+    printOverrides = {};
+  }
+
   // Clear status and revoke every tracked Object URL so selecting another
   // document never leaks blobs from a previous generation.
   function resetPdfStatus() {
     setPdfStatus('');
+    clearOverflowReport();
+    clearExpansionNotice();
     var box = document.getElementById('docwiz-pdf-downloads');
     if (!box) return;
     box.querySelectorAll('a[data-object-url]').forEach(function (a) {
@@ -3090,6 +4080,226 @@
     });
     box.innerHTML = '';
     box.hidden = true;
+  }
+
+  // ── Layout expansion notice ───────────────────────────────────────────────
+  //
+  // Purely informational, and neutral: the document grew a line, the manager
+  // has nothing to choose and nothing to fix. Never ask them to shorten a legal
+  // name, drop part of an address or pick a smaller font.
+  var expansionNotes = [];
+
+  // Layout internals are useful to document developers, but field IDs, font
+  // limits and shift counts are not manager-facing information.  They are
+  // exposed only after an explicit opt-in (`?document-debug=1` or the matching
+  // global flag) and never appear in the normal workflow.
+  function documentDebugEnabled() {
+    if (window.CRM_DOCUMENT_DEBUG === true) return true;
+    try {
+      return new URLSearchParams(window.location.search).get('document-debug') === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function noteExpansion(doc, notes) {
+    expansionNotes = (notes || []).map(function (note) {
+      return { documentTitle: doc.title, label: note.label, rows: note.rows };
+    });
+  }
+
+  function clearExpansionNotice() {
+    expansionNotes = [];
+    var box = document.getElementById('docwiz-pdf-expansion');
+    if (!box) return;
+    box.innerHTML = '';
+    box.hidden = true;
+  }
+
+  function renderExpansionNotice() {
+    var box = document.getElementById('docwiz-pdf-expansion');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!expansionNotes.length) { box.hidden = true; return; }
+
+    var head = document.createElement('p');
+    head.className = 'crm-docwiz-expansion-head';
+    // Neutral and factual: the manager is told what happened, never asked to
+    // shorten a legal identity value or to pick a template variant.
+    head.textContent = 'Длинные реквизиты будут автоматически перенесены на ' +
+      'дополнительные строки с сохранением структуры документа.';
+    box.appendChild(head);
+
+    if (documentDebugEnabled()) {
+      var details = document.createElement('details');
+      details.className = 'crm-docwiz-expansion-debug';
+      var summary = document.createElement('summary');
+      summary.textContent = 'Технические сведения';
+      details.appendChild(summary);
+      var list = document.createElement('ul');
+      list.className = 'crm-docwiz-expansion-list';
+      expansionNotes.forEach(function (note) {
+        var item = document.createElement('li');
+        item.textContent = note.label + ' — ' + note.rows + ' ' +
+          rowsWord(note.rows) + ' в «' + note.documentTitle + '»';
+        list.appendChild(item);
+      });
+      details.appendChild(list);
+      box.appendChild(details);
+    }
+    box.hidden = false;
+  }
+
+  // Russian plural for "строка" (1 строка / 3 строки / 5 строк).
+  function rowsWord(n) {
+    var d = n % 10, dd = n % 100;
+    if (d === 1 && dd !== 11) return 'дополнительная строка';
+    if (d >= 2 && d <= 4 && (dd < 10 || dd >= 20)) return 'дополнительные строки';
+    return 'дополнительных строк';
+  }
+
+  // ── Layout preflight result ───────────────────────────────────────────────
+
+  function clearOverflowReport() {
+    var box = document.getElementById('docwiz-pdf-overflow');
+    if (!box) return;
+    box.innerHTML = '';
+    box.hidden = true;
+    document.querySelectorAll('#docwiz-extra-fields .crm-input-overflow')
+      .forEach(function (el) { el.classList.remove('crm-input-overflow'); });
+  }
+
+  // The wizard input behind an `extra.*` source, so the manager can be sent
+  // straight to the value that needs correcting.
+  function inputForSource(source) {
+    if (!source || source.indexOf('extra.') !== 0) return null;
+    var key = source.slice(6);
+    return document.querySelector('#docwiz-extra-fields [data-field-key="' +
+      key.replace(/"/g, '\\"') + '"]');
+  }
+
+  function focusOverflowField(source) {
+    var input = inputForSource(source);
+    if (!input) return false;
+    document.querySelectorAll('#docwiz-extra-fields .crm-input-overflow')
+      .forEach(function (el) { el.classList.remove('crm-input-overflow'); });
+    input.classList.add('crm-input-overflow');
+    setActiveStep(2);
+    try { input.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    input.focus();
+    return true;
+  }
+
+  // Render one actionable entry per value the production engine could not
+  // print. Normal users see only business-facing guidance. Exact field IDs,
+  // font limits and line capacities are available in explicit debug mode.
+  function renderOverflowReport(error, doc, onRetry) {
+    var box = document.getElementById('docwiz-pdf-overflow');
+    if (!box) return;
+    box.innerHTML = '';
+
+    var head = document.createElement('p');
+    head.className = 'crm-docwiz-overflow-head';
+    head.textContent = 'Документ «' + (error.documentTitle || doc.title) +
+      '» не сформирован: значения не помещаются в отведённые места формы.';
+    box.appendChild(head);
+
+    (error.overflows || []).forEach(function (item) {
+      var entry = document.createElement('div');
+      entry.className = 'crm-docwiz-overflow-item';
+
+      var title = document.createElement('p');
+      title.className = 'crm-docwiz-overflow-field';
+      title.textContent = item.label && item.label !== item.fieldId
+        ? item.label : 'Значение документа';
+      entry.appendChild(title);
+
+      var why = document.createElement('p');
+      why.className = 'crm-docwiz-overflow-why';
+      why.textContent = item.editable
+        ? 'Значение слишком длинное для утверждённой области формы. Проверьте введённые данные.'
+        : 'Значение не помещается в утверждённую область формы.';
+      entry.appendChild(why);
+
+      if (documentDebugEnabled()) {
+        var debug = document.createElement('details');
+        debug.className = 'crm-docwiz-overflow-debug';
+        var debugSummary = document.createElement('summary');
+        debugSummary.textContent = 'Технические сведения';
+        debug.appendChild(debugSummary);
+        var meta = document.createElement('p');
+        meta.className = 'crm-docwiz-overflow-meta';
+        meta.textContent = 'Поле: ' + item.fieldId +
+          (item.valueLength != null ? ' · длина значения: ' + item.valueLength + ' симв.' : '') +
+          (item.minFontSize != null ? ' · минимальный кегль: ' + item.minFontSize + ' pt' : '') +
+          (item.lineCapacity != null ? ' · доступно строк: ' + item.lineCapacity : '') +
+          (item.message ? ' · ' + item.message : '');
+        debug.appendChild(meta);
+        entry.appendChild(debug);
+      }
+
+      if (item.editable && inputForSource(item.source)) {
+        // Operator-entered value: send them back to it, keeping everything
+        // else they have already filled in.
+        var fix = document.createElement('button');
+        fix.type = 'button';
+        fix.className = 'crm-docwiz-overflow-action';
+        fix.textContent = 'Перейти к полю и исправить значение';
+        fix.addEventListener('click', function () { focusOverflowField(item.source); });
+        entry.appendChild(fix);
+      } else if (item.allowPrintOverride) {
+        // Explicitly permitted by the field map: the manager may supply a
+        // shorter printed wording. The CRM value stays exactly as it is.
+        entry.appendChild(buildPrintOverrideControl(item, onRetry));
+      } else {
+        // CRM legal or identity data: never silently altered, and the manager
+        // is not asked to shorten it.
+        var note = document.createElement('p');
+        note.className = 'crm-docwiz-overflow-note';
+        note.textContent = 'Значение получено из карточки субъекта и не может ' +
+          'быть сокращено при печати. Обратитесь в поддержку — для этого поля ' +
+          'нужно расширить разметку документа.';
+        entry.appendChild(note);
+      }
+
+      box.appendChild(entry);
+    });
+
+    box.hidden = false;
+  }
+
+  function buildPrintOverrideControl(item, onRetry) {
+    var wrap = document.createElement('div');
+    wrap.className = 'crm-docwiz-overflow-override';
+
+    var label = document.createElement('label');
+    label.className = 'crm-docwiz-overflow-override-label';
+    label.textContent = 'Текст только для печати этого документа ' +
+      '(значение в карточке субъекта не меняется)';
+    var id = 'docwiz-override-' + item.fieldId;
+    label.setAttribute('for', id);
+    wrap.appendChild(label);
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.id = id;
+    input.className = 'crm-input';
+    input.value = printOverrides[item.fieldId] || item.value || '';
+    wrap.appendChild(input);
+
+    var apply = document.createElement('button');
+    apply.type = 'button';
+    apply.className = 'crm-docwiz-overflow-action';
+    apply.textContent = 'Применить и сформировать заново';
+    apply.addEventListener('click', function () {
+      var value = (input.value || '').trim();
+      if (!value) { input.focus(); return; }
+      printOverrides[item.fieldId] = value;
+      if (typeof onRetry === 'function') onRetry();
+    });
+    wrap.appendChild(apply);
+
+    return wrap;
   }
 
   // Render one compact download link per generated PDF. Uses the document's
@@ -3137,14 +4347,21 @@
   }
 
   // Resolve a payload path to its raw value. Supported namespaces:
+  //   umi.*     -> the exact UMI names, via document-engine/umi-adapter.js
   //   subject.* -> payload.subject       (e.g. subject.displayName)
   //   field.*   -> payload.fields        (e.g. field.clientFullName)
   //   extra.*   -> payload.extraValues   (e.g. extra.extra-document-date)
   //   check.*   -> payload.checks        (e.g. check.notice-scope-all)
   // Unknown namespace or missing key -> undefined. The resolver does NOT coerce
   // to '' / false; callers (applyPdfFieldValue) apply defaults after resolution.
+  //
+  // The UMI adapter is the single normalization layer, so this path and the
+  // renderer's cannot disagree about what a source name means. The inline
+  // fallback below only runs if the adapter script is missing from the page.
   function resolvePdfValue(ref, payload) {
-    if (!ref || typeof ref !== 'string') return undefined;
+    if (!ref || typeof ref !== 'string' || !payload) return undefined;
+    var adapter = window.CRMDocumentEngine && window.CRMDocumentEngine.umiAdapter;
+    if (adapter) return adapter.resolve(ref, payload);
     var dot = ref.indexOf('.');
     if (dot === -1) return undefined;
     var ns  = ref.slice(0, dot);
@@ -3280,11 +4497,18 @@
       return Promise.reject(new Error('Карта полей документа не загружена.'));
     }
     return engine.overlayRenderer.render(template, {
-      subject:     payload.subject,
-      fields:      payload.fields,
-      extraValues: payload.extraValues,
-      checks:      payload.checks
-    }, { validatePayload: true });
+      subject:        payload.subject,
+      umi:            payload.umi || {},
+      fields:         payload.fields,
+      extraValues:    payload.extraValues,
+      checks:         payload.checks,
+      printOverrides: payload.printOverrides || {}
+    }, {
+      validatePayload: true,
+      // Expansion is automatic: the manager picks no template variant and no
+      // mode. They are simply told that a value moved onto an added line.
+      onExpansion: function (notes) { noteExpansion(doc, notes); }
+    });
   }
 
   // Load the local PDF template, fill mapped AcroForm fields and return a Blob.
@@ -3448,15 +4672,31 @@
 
         // No endpoint configured: never upload, local download only.
         setPdfStatus('PDF сформирован: 1 файл. Файл не отправлялся.', 'ok');
+        renderExpansionNotice();
       })
       .catch(function (err) {
-        console.error('PDF generation failed:', err);
-        setPdfStatus((err && err.message) ? err.message : 'Не удалось сформировать PDF.', 'error');
-        setActiveStep(2);
+        handleGenerationError(err, doc, function () { generateSinglePdf(doc, subject); });
       })
       .finally(function () {
         if (btn) { btn.disabled = false; btn.textContent = original || 'Сформировать PDF'; }
       });
+  }
+
+  // A layout overflow is not a generic failure: the preflight knows exactly
+  // which values could not be printed and why, so show that instead.
+  function handleGenerationError(err, doc, onRetry, fallbackMessage) {
+    console.error('PDF generation failed:', err);
+    if (err && err.name === 'DocumentOverflowError') {
+      setPdfStatus('Проверка размещения не пройдена — см. подробности ниже.', 'error');
+      renderOverflowReport(err, doc, onRetry);
+      setActiveStep(2);
+      var first = (err.overflows || [])[0];
+      if (first && first.editable) focusOverflowField(first.source);
+      return;
+    }
+    setPdfStatus((err && err.message) ? err.message :
+      (fallbackMessage || 'Не удалось сформировать PDF.'), 'error');
+    setActiveStep(2);
   }
 
   function generatePdfPackage(doc, subject) {
@@ -3490,9 +4730,11 @@
       var childPayload = {
         doc:         child,
         subject:     payload.subject,
+        umi:         payload.umi,
         fields:      payload.fields,
         checks:      payload.checks,
         extraValues: payload.extraValues,
+        printOverrides: payload.printOverrides,
         pdfFilename: child.pdfOutputFilename || (child.id + '.pdf')
       };
       return generatePdfFromTemplate(childPayload).then(function (blob) {
@@ -3523,11 +4765,11 @@
 
         // No endpoint configured: never upload, local downloads only.
         setPdfStatus(head + ' Файлы не отправлялись.', 'ok');
+        renderExpansionNotice();
       })
       .catch(function (err) {
-        console.error('PDF package generation failed:', err);
-        setPdfStatus((err && err.message) ? err.message : 'Не удалось сформировать PDF-комплект.', 'error');
-        setActiveStep(2);
+        handleGenerationError(err, doc, function () { generatePdfPackage(doc, subject); },
+          'Не удалось сформировать PDF-комплект.');
       })
       .finally(function () {
         if (btn) { btn.disabled = false; btn.textContent = original || 'Сформировать комплект PDF'; }
@@ -3562,6 +4804,7 @@
     // flows (account closure). Legacy HTML-only documents are hidden from the
     // user-facing list; their configs/templates remain in the repo for reference.
     var filteredDocs = DOCUMENTS.filter(function (doc) {
+      if (doc.blockedIncompleteMapping) return false;
       if (doc.appliesTo.indexOf(subject.kind) === -1) return false;
       return !!resolveRenderStrategy(doc) || !!doc.closure;
     });

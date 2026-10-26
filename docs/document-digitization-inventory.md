@@ -17,6 +17,12 @@ Verified this survey: all 22 files are byte-distinct from one another, and
 every migrated field map records the SHA-256 of the document it was built
 from — all 11 recorded hashes match the authoritative file.
 
+The committed browser-PDF inventory is independently locked by the
+[full PDF-template audit](document-full-template-audit.md). Its QA gate verifies
+the filename, byte length, page count and SHA-256 of all 22 source PDFs, checks
+all 77 pages and every extracted source text line, and requires classification
+coverage for every field in all 18 executable maps.
+
 ## Two regulations, colliding appendix numbers
 
 Documents must be matched by **content**, not filename. Two different
@@ -42,9 +48,11 @@ Consequences, both verified:
 
 | Status | Meaning |
 | --- | --- |
-| ✅ migrated | PDF base template committed, in-place field map complete, visually QA'd, generates from the real wizard |
-| ◐ static | Shipped as-is; correct pages, no dynamic values drawn |
+| ✅ migrated / dynamic production-ready | PDF base template committed, in-place field map complete, automated layout/structural QA covered, generates from the real wizard |
+| ◐ static | Shipped as-is by design; correct pages, no dynamic values drawn |
 | ▣ template only | Clean base template committed and verified, but no field map and not offered |
+| ◌ hidden | Deliberately has no subject/catalogue exposure; reason recorded below |
+| ◒ unexposed | Deliberately not offered; client-specific mapping would be required before exposure |
 | ⛔ blocked | Cannot proceed; the exact reason is recorded below |
 | ☐ pending | Not yet migrated; not offered in the wizard |
 
@@ -60,7 +68,7 @@ without an overlay map cannot appear even by accident.
 | 1 | ПРИЛОЖЕНИЕ 1А … ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ (ФЛ).docx | `accession-application-fl` | ФЛ | 3 | legacy | ✅ | ✅ | ✅ migrated |
 | 2 | ПРИЛОЖЕНИЕ 1В … ЗАЯВЛЕНИЕ О ПРИСОЕДИНЕНИИ (ЮЛ).docx | `accession-application-yul` | ЮЛ | 2 | — | ✅ | ✅ | ✅ migrated |
 | 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | ✅ | ✅ | ✅ migrated |
-| 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | ✅ | — | ◐ static, not exposed |
+| 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | ✅ | — | ◒ unexposed by decision; mapping required before exposure |
 | 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
 | 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
 | 7 | ПРИЛОЖЕНИЕ 9 … ОТКАЗ ОТ ПРЕДОСТАВЛЕНИЯ БРОКЕРУ ПРАВА ….docx | `broker-use-refusal-request` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
@@ -85,13 +93,13 @@ without an overlay map cannot appear even by accident.
 | 16 | Анкета ЮЛ.docx | `anketa-yul` | ЮЛ | 5 | ✔ | ✅ | ✅ | ✅ migrated |
 | 17 | АНКЕТА ФЛ Упр. идент..docx | `anketa-fl-simplified-id` | ФЛ | 2 | — | ✅ | ✅ | ✅ migrated |
 | 18 | Анкета ФЛ - ИП и СЗ.docx | `anketa-ip-sz` | ФЛ (ИП / частная практика) | 5 | — | ✅ | ✅ | ✅ migrated |
-| 19 | Анкета ИСБЮЛ.docx | `anketa-isbyul` | ИСБЮЛ | 4 | — | ✅ | — | ⛔ blocked — mapping |
+| 19 | Анкета ИСБЮЛ.docx | `anketa-isbyul` | ИСБЮЛ | 4 | — | ✅ | — | ◌ hidden by decision — no CRM subject model |
 
 ## Source PDFs (no DOCX supplied)
 
 | # | Source file | Document ID | Client type | Pages | PDF tpl | In wizard | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 20 | УВЕДОМЛЕНИЯ.pdf | `client-notifications` | оба | 10 | ✅ | ✅ | ◐ static |
+| 20 | УВЕДОМЛЕНИЯ.pdf | `client-notifications` | оба | 10 | ✅ | ✅ | ✅ migrated |
 | 21 | Ключевая_информация_о_договоре_….pdf | `brokerage-key-information` | оба | 3 | ✅ | ✅ | ◐ static |
 
 ## Totals
@@ -99,20 +107,63 @@ without an overlay map cannot appear even by accident.
 | Metric | Count |
 | --- | --- |
 | Distinct source documents | **21** |
-| ✅ migrated (in-place values, QA'd, generates from the real wizard) | **18** |
-| ◐ static | **2** (1 exposed, 1 not) |
-| ⛔ blocked, intentionally hidden | **1** |
+| ✅ dynamic production-ready and offered | **18** |
+| ◐ static by design | **2** |
+| ◌ hidden by decision | **1** |
+| ◒ unexposed by decision | **1** |
 
-**Every dynamic source document is migrated.** All 18 generate through the real
-Document Wizard and have passed structural, visual and browser QA. Nothing is
-left template-only, map-only or registry-only.
+The last four rows are the **22 committed PDF-template statuses**. The source
+directory has 21 distinct documents because `Risks.pdf`, one of the two static
+templates, is an additional committed package asset with no source-directory
+counterpart. The non-production-dynamic classifications are not
+interchangeable: `anketa-isbyul` is hidden because the CRM has no subject
+model, and `transfer-requisites` is unexposed because its client-specific
+blanks have no map.
 
-The only documents not offered are the two intentional cases below:
-`anketa-isbyul` (no CRM subject model) and `transfer-requisites` (a broker
-requisites sheet whose requisites are blank in the authoritative source).
+Per-suite totals are deliberately **not** restated here. They moved with every
+change and were quietly wrong for several phases — the stress-only count read
+23 against a matrix of 22, and two suite figures were hundreds of checks out of
+date. The current numbers come from one place:
 
-Static: `brokerage-key-information` — a disclosure sheet with no client-specific
-blanks, issued unchanged.
+```bash
+python static-uikit/tools/qa/run_all_qa.py
+```
+
+For the assembled correction branch that command reports **27 of 27 suites
+passed**, including zero unexpected cases in the regression denominator. Only
+that suite-level verdict is recorded here; the per-suite check counts stay
+where the runner prints them. The release classification comes from
+`static-uikit/tools/qa/ordinary-failures.json`.
+
+The final status of all 22 templates — which are generated, which are offered
+as a static download, which are hidden or unexposed, and why — is
+[document-full-template-audit.md](document-full-template-audit.md), which is
+generated from the executable maps and the wizard catalogue rather than
+maintained by hand. In summary: 18 dynamic production-ready, 2 static by
+design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model) and 1
+unexposed by decision (`transfer-requisites`).
+
+`order-forms` spent one release blocked: it generated almost entirely blank
+because 80 of its 93 printed fields had no source and every field was optional,
+so nothing objected. It is offered again now that the values a mistake would
+make expensive come from fixed options or from the instrument reference data,
+that the branch a manager did not fill cannot contribute to the paper, and that
+its own suite drives every branch and reads the result back out of the PDF. The
+per-row inventory and the exact UMI name for every row that has one are in
+[order-forms-mapping-gap.md](order-forms-mapping-gap.md).
+
+Static by design, issued unchanged because neither carries a client-specific
+blank anywhere: `brokerage-key-information` (a disclosure sheet about the
+product) and `Risks.pdf` (a 17-page declaration). Both are delivered with the
+brokerage starter package.
+
+`transfer-requisites` is a different case and is **not** one of the two static
+by-design documents. It repeats the three payment-purpose sentences of the
+account-opening notice — the same sample client codes and brokerage-agreement
+number/date blanks — and also contains empty client deposit-account and
+depository transfer-basis rows. Those values are client-specific. If the sheet
+is ever offered, they must be mapped and validated first; until that separate
+business decision it remains unexposed, with its PDF byte baseline locked.
 
 ## Manually exported templates
 
@@ -128,7 +179,7 @@ two regulations — then copied into the repository byte-identically.
 
 | Template | Source SHA-256 (docx) | PDF SHA-256 | Pages |
 | --- | --- | --- | --- |
-| `account-opening-notice` | `600f6fb1…` | `3e26d753…` | 2 |
+| `account-opening-notice` | `39e0df89…` | `8e6a3922…` | 2 |
 | `transfer-requisites` | `5ce12f3b…` | `7a4317aa…` | 1 |
 | `power-of-attorney` | `e2138404…` | `a7bcaf8d…` | 4 |
 | `order-forms` | `adf2f86d…` | `24e593d1…` | 4 |
@@ -150,8 +201,9 @@ is intended to appear on every generated document.
 That is consistent with "signature areas blank": the seal is a printed part of
 the form, while the «Подпись ответственного лица ______ /______» rules beside
 it stay empty, as do all other signature and employee-completion areas. The
-document's only page-2 overlays are the three agreement numbers in the
-payment-purpose rows at y ≈ 59–136 pt, far above the seal.
+three payment-purpose Word-flow rows and the reviewed transfer-basis block are
+laid out independently; the generated overlay neither duplicates nor covers
+the seal.
 
 > **Observation, not corrected:** these hand-exported PDFs retain a `/Author`
 > value from whoever exported them. That is metadata only — nothing is visible
@@ -159,35 +211,70 @@ payment-purpose rows at y ≈ 59–136 pt, far above the seal.
 > `accession-application-fl.pdf` and `Risks.pdf`. Left as supplied so the
 > committed template stays byte-identical to the approved export.
 
-## Blocked documents and the exact reason
+## Hidden and blocked documents — exact reason
 
 | Document | Reason |
 | --- | --- |
-| Анкета ИСБЮЛ (`anketa-isbyul`) | **Blocked — authoritative template available, but the CRM has no ИСБЮЛ subject model or required data sources. Intentionally not exposed.** The clean 4-page template is committed and verified, but none of the ~50 values the form asks for (код КИО, место присвоения, состав имущества в управлении, протектор, учредители) exist in any CRM record, and there is no «иностранная структура без образования юридического лица» subject type. It has no wizard card, no company applicability and no default values; ordinary Russian-company fields are deliberately *not* mapped onto it. |
+| Анкета ИСБЮЛ (`anketa-isbyul`) | **Hidden by decision — authoritative template available, but the CRM has no ИСБЮЛ subject model or required data sources.** The clean 4-page template is committed and verified, but none of the ~50 values the form asks for (код КИО, место присвоения, состав имущества в управлении, протектор, учредители) exist in any CRM record, and there is no «иностранная структура без образования юридического лица» subject type. It has no wizard card, no company applicability and no default values; ordinary Russian-company fields are deliberately *not* mapped onto it. |
 
 ## Per-document detail for the documents completed last
 
 ### `account-opening-notice` — ПРИЛОЖЕНИЕ 3, 2 pages, both subject kinds
 
 Map `assets/js/document-field-maps/account-opening-notice.js`; output
-`uvedomlenie-ob-otkrytii-scheta.pdf`; PDF SHA-256 `d46681cf…` (the source was
-re-supplied with constants printed in and the template replaced).
+`uvedomlenie-ob-otkrytii-scheta.pdf`; PDF SHA-256 `8e6a3922…`. The corrected
+authoritative Z: DOCX is `39e0df89…`; the committed PDF is byte-identical to
+its paired corrected Z: PDF.
 
 **Static template content — never overlaid, verified to appear exactly once:**
 §5 requisites (Получатель «ООО «Инвестика»», ИНН `7802953900`, Р/сч
 `40701810700000002900`, Банк `АО "Райффайзенбанк"`, К/сч
 `30101810200000000700`, БИК `044525700`), the whole page-2 депо table
 (`HL2509080091`, `ML2508290147`, `MC0742000000`, `36MC0742000000F00`,
-«НКО АО НРД», «№7420/ДНД от 29 августа 2025 г.»), the same agreement repeated
-under «Основание для перевода», and the company seal image on page 2 at
-(200.65, 647.30)–(329.25, 805.65).
+«НКО АО НРД», «№7420/ДНД от 29 августа 2025 г.»), transfer-basis items 1 and
+3, and the company seal image on page 2 at
+(200.65, 647.30)–(329.25, 805.65). Transfer-basis item 2 is dynamic, not static
+template content.
 
-**CRM:** client name, ИНН/document number, client code.
-**Operator:** formation date, signing officer, both agreement numbers and dates,
-three internal market accounts, счёт депо. One agreement-number input drives
-four overlays.
-**Blank:** «Подпись ответственного лица», the 8.18 pt gap after «Доверенности №»,
-the 11.04 pt «дата__» rules, and the printed «Код INV0000X» placeholders.
+**CRM:** client name, ИНН/document number, client code. The client code prints
+four times: in the «Код клиента» cell of §1, and inside all three payment-purpose
+sentences on page 2, where the source form prints a sample code instead of a
+blank.
+
+**Operator:** formation date, brokerage agreement number/date, depository
+agreement number/date, three internal market accounts, счёт депо. The one
+brokerage pair drives the page-1 cells and all three payment-purpose sentences;
+the one depository pair drives the page-1 cells and page-2 transfer-basis item
+2. Both depository values are required, have no defaults and are not guessed
+from UMI.
+
+The signing officer is **no longer asked for**: the updated authoritative
+template prints «в лице Генерального Директора Козырева Александра
+Юрьевича, действующего на основании Устава» itself, so there is no blank to
+fill and the former spelling `Юрьвеича` is absent.
+
+**Blank:** «Подпись ответственного лица» and all other employee-completion
+signature areas.
+
+### `qualification-notice` — reviewed recipient, body/date and instrument flow
+
+Map `…/qualification-notice.js`; output
+`uvedomlenie-o-priznanii-kvalinvestorom.pdf`; PDF SHA-256
+`2a9fab02…`.
+
+The recipient name and `umi.address.registration` are one reviewed Word-flow
+block with a right-column first/hanging indent, so Russian and foreign
+component-formatted addresses stay attached to «Адрес:» and render once. A
+second semantic block owns the full organization name, its caption,
+recognition wording and date. The `other` instrument branch has its own
+reviewed multi-line underlined capacity.
+
+Obsolete Word rules are removed as exact source-PDF paths with ordinal,
+operator hash, template hash, owner block and approval proof — never with a
+white rectangle. `moveTopLevelPaths` moves the surviving rules with their
+owning expanded block. Focused scenarios cover short/long names, Russian and
+foreign addresses, their combined case, body/date flow and long `other` text;
+manual review-pack approval remains required.
 
 ### `power-of-attorney` — ПРИЛОЖЕНИЕ 6, 4 pages, both subject kinds
 
@@ -197,6 +284,12 @@ The file holds **two** powers of attorney — «от юридического л
 and «от физического лица» (pages 3–4). The variant matching the subject is
 filled and the other verified byte-for-byte blank. Page sizes are mixed
 (595.56 × 842.04 and 595.32 × 841.92) and are preserved.
+
+Both variants now pass ordinary and supported realistic-long fixtures. When
+local reserve is exhausted, reviewed one-page flow moves a complete trailing
+power from page 1 to page 2 or the final two lines of a power from page 3 to
+page 4. The authoritative four-page PDF, fixed wording and page count do not
+change; original content-stream operators are transferred exactly once.
 
 **The powers are not selectable:** zero checkbox glyphs anywhere in the
 document, no "other powers" line, no validity blank and no substitution option
@@ -210,15 +303,74 @@ individuals name, citizenship, passport, issuing authority, issue date, address.
 
 Map `…/order-forms.js`; output `poruchenie.pdf`; PDF SHA-256 `24e593d1…`.
 
+**Status: `dynamic-production-ready`; offered to both subject kinds.**
+
 Three separate order forms in one file, one registry entry. «Тип поручения»
 selects one; the other two stay blank and all four pages are always emitted.
 
-**Mutually exclusive groups:** primary/cancellation, вид сделки, вид рынка, вид
-поручения, РЕПО с ЦК, валютный СВОП с ЦК, both trading-venue lists, both
-currency rows, payout amount mode. **Independent:** the непокрытая-позиция
-acknowledgement. **Explanatory, never marked:** the «(указать)» captions.
+**Fixed rather than typed.** Вид сделки, вид рынка, вид поручения, срок
+действия, срок расчётов, РЕПО с ЦК and валютный СВОП с ЦК are closed choices.
+Вид подачи is not a choice at all — every order this process produces is a
+primary submission, so `extra-submission-kind` is fixed to `primary` in the
+payload and the cancellation box can never be marked. Условное поручение is not
+offered either: the map keeps the box and the «(указать)» slot, and the wizard
+never produces `conditional`. The непокрытая-позиция acknowledgement is set for
+every trade order rather than asked.
+
+**The traded instrument comes from reference data**, never from typing. A
+security is an Asset — `assets/js/document-wizard/instrument-catalog.js`, the
+static mock a backend replaces with QORT — found by ticker, short name, full
+name, ISIN or issuer, and offered once however many `Securities` rows it has.
+Selecting one stores its `AssetID` and derives the issuer and the compact
+printed description («Акции обыкновенные, ISIN RU0009029540»); neither can be
+edited by hand, `SecurityName` is never used and CFI is never printed. Currency
+instruments and derivatives work the same way through their own catalogs.
+
+**Only the branch that was filled reaches the paper.** The trade form carries
+four mutually exclusive instrument blocks, and the map draws a trade-form row
+whenever the order is a trade — so the payload is rebuilt per branch in
+`assets/js/document-wizard/order-forms-model.js` and a security abandoned by a
+switch to the currency market cannot be printed on it. OTC is the one market
+that carries two kinds of instrument, and it carries securities and currency
+instruments only: derivatives are the срочный рынок and are never offered under
+it.
+
+**Mutually exclusive groups:** вид сделки, вид рынка, вид поручения, РЕПО с ЦК,
+валютный СВОП с ЦК, both trading-venue lists, both currency rows, payout amount
+mode. **Always marked:** primary submission, and the непокрытая-позиция
+acknowledgement on a trade order. **Never marked:** cancellation, and условное.
+**Explanatory, never marked:** the «(указать)» captions.
+
+**The amount is written once.** Both money forms print it twice — «цифрами»
+and «прописью» — and the second is derived from the first, never typed: a
+manager who writes a sum twice can write it two ways. The wording is spelled
+out in the currency selected above it, with the Russian agreement that goes
+with it («один рубль», «два рубля», «одна тысяча»), and kopecks as digits, the
+convention on Russian payment documents. «В размере свободного остатка» has no
+figure, so it spells nothing.
+
+The printed «прописью» blank is a single ~106 pt line — handwriting width — and
+a full Russian amount does not fit it at the 9 pt readability floor. It is not
+left blank for that: the map opens a reviewed continuation line in the measured
+empty band beneath the row, the way the accession form's tariff plans
+continue, and the value drops to 9 pt the moment it needs that line. The
+largest amount either form can carry is 493.7 pt against 571 pt of capacity.
 
 **Blank:** every «Заполняется ООО «Инвестика»» block and every signature rule.
+
+**The payout bank block is CRM data, not a form to fill.** All ten rows resolve
+from the subject card — the static `bankRequisites` mock standing in for
+`Front Реквизиты`, where each row already has an exact UMI name — and are shown
+read-only so a manager can check them and cannot retype them. A client may hold
+several records; the one a payout uses follows the currency selected above it,
+so the block refreshes when that changes.
+
+What a payout cannot be executed without is validated: получатель, банк
+получателя, БИК/SWIFT, корреспондентский счёт and счёт получателя always, plus
+the intermediary bank's SWIFT and name on a route that has one. A domestic
+rouble route has no intermediary, and empty is the right answer there rather
+than a missing one. Missing CRM data refuses the document and names the rows,
+rather than printing a half-filled payout order.
 
 ### `anketa-ip-sz` — Приложение 18, 5 pages, individuals only
 
@@ -249,18 +401,38 @@ of which may be ticked.
 **Blank:** «(подпись клиента)», «МП (при наличии)» and the entire page-5
 «Для служебных отметок» block — verified zero overlay tokens on page 5.
 
-## `transfer-requisites` (ПРИЛОЖЕНИЕ 4) — static, deliberately not exposed
+### Questionnaire row ownership — all four offered questionnaire maps
 
-This resolves an inventory question that was previously open. The appendix is a
-reference sheet of the **broker's own** payment details, and it contains no
-client-specific values at all. Its cells — Получатель, ИНН, Р/сч, Банк, К/сч,
-БИК — plus the whole торговый/неторговый раздел table are **blank in the
-authoritative source**.
+`anketa-fl-simplified-id`, `anketa-ip-sz`, `anketa-fl`, and `anketa-yul` now
+declare `tableOwnershipRequired`, an approved owning cell (or an explicit
+approved exemption) for every dynamic field, and one measured table budget per
+page/table. An owner locks the exact field/source/page, table and row IDs,
+physical cell bounds, reviewed line count, next row, moved horizontal/vertical
+borders and the growth budget.
 
-So it needs no overlay and no wizard inputs, and it is not offered as a card:
-issuing a client a requisites sheet whose requisites are empty would be worse
-than not issuing one. The template is committed and ready should the broker
-constants be supplied.
+The production renderer audits the planned ink, not only the declared field
+box. It refuses text outside the owner cell, a baseline through a horizontal
+border, overlapping dynamic ink, unreviewed extra lines, a broken vertical
+border after growth, a duplicate one-logical-value group, or cumulative growth
+above the table budget. Growing a row therefore moves every lower row and the
+declared border set by the same delta. This closes the reported full-name,
+bank-address, registration/OKVED and duplicated-address failures without
+changing the authoritative PDF or reducing text below the 9 pt floor.
+
+## `transfer-requisites` (ПРИЛОЖЕНИЕ 4) — unexposed, not static by design
+
+The authoritative sheet has blank broker bank-requisite cells, but it also
+contains client-specific content: three sample-code payment-purpose sentences
+with brokerage agreement number/date blanks, empty trading/non-trading deposit
+account rows, and an empty client depository agreement number/date in the
+transfer-basis section. Calling it a pure static reference sheet was incorrect.
+
+It has no field map and no wizard card. That is an intentional **unexposed**
+status, not approval to issue the blank PDF and not a promotion to the two
+static-by-design package documents. If product owners decide to offer it, the
+client code, brokerage agreement pair, account rows and depository agreement
+pair must first receive reviewed mappings and the same completeness gates as
+the account-opening notice.
 
 ## Migrated document detail
 
@@ -276,10 +448,12 @@ constants be supplied.
 `field.passportIssuedBy`, `field.passportIssueDate`,
 `field.registrationAddress`, `subject.phone`, `subject.email`.
 
-**User-entered (transaction-specific only):** signing date; счёт депо type;
-торговый счёт депо type; report delivery method; income payout destination;
-three tariff plan names. Every one of these has a corresponding position or
-checkbox in the PDF — the wizard shows no input that generation ignores.
+**User-entered (transaction-specific only):** signing date; depository
+agreement number and date; счёт депо type; торговый счёт депо type; report
+delivery method; income payout destination; three tariff plan names. The
+depository pair is required and starts empty because the workbook has no
+printable UMI number/date. Every input has a corresponding position or checkbox
+in the PDF — the wizard shows no input that generation ignores.
 
 The e-mail address on the "По электронной почте ______" line is conditional
 (`showWhen`): it prints only when e-mail delivery is selected.
@@ -321,7 +495,6 @@ and maintained aliases sits above the list.
 | Анкета (досье) ИП или лица, занимающегося частной практикой | — |
 | Доверенность | Доверенность |
 | Уведомление об открытии брокерского/депозитарного счета | Уведомление об открытии брокерского/депозитарного счета |
-| Поручение (формы поручений) | Поручение (формы поручений) |
 | Заявление о признании ФЛ квалифицированным инвестором | Заявление о признании ЮЛ квалифицированным инвестором |
 | Уведомление о признании лица квалифицированным инвестором | Уведомление о признании лица квалифицированным инвестором |
 | Уведомление о последствиях признания квалифицированным инвестором | — |
@@ -347,9 +520,10 @@ standalone card.
    DOCX**. Should they be dropped, or is a source document expected?
 3. **`client-notifications`** (УВЕДОМЛЕНИЯ.pdf) — which values, if any, must be
    drawn into the original 10 pages? It is currently issued unmodified.
-4. **`transfer-requisites`** (ПРИЛОЖЕНИЕ 4) appears to be a pure reference sheet
-   of the broker's bank details with no client-specific values. Confirm whether
-   it needs any dynamic data at all.
+4. ~~**`transfer-requisites` classification.**~~ **Resolved for this release.**
+   It contains client-specific sample-code/agreement blanks and deposit-account
+   rows, so it is not static by design. It remains unexposed until a separate
+   product decision and complete mapping are supplied.
 5. ~~**Passport issue date format.**~~ **Resolved.** The date now prints as
    `«20» апреля 2008 г.` — day in the quotes, genitive month and four-digit
    year on the printed line. Exact glyph measurement of the 38.24 pt slot
@@ -370,12 +544,12 @@ standalone card.
 | ПРИЛОЖЕНИЕ 14 | The body carries unresolved mail-merge tokens — `$FULLNAME$` (twice), `$INN$`, `$CLIENT_CODEWORD$` — instead of blank rules. Reported, not corrected in the source. |
 | ПРИЛОЖЕНИЕ 14 | Prints `202__ г.`, i.e. three fixed year digits, so only the final digit can be filled. Writing a two-digit year would produce a five-digit year, so the renderer fills one digit and leaves the defect visible. |
 | АНКЕТА ФЛ Упр. идент. | §11 reads «Укажите статус **бубличного** должностного лица» — "бубличного" should be "публичного". Left exactly as written. |
-| УВЕДОМЛЕНИЕ о признании | Extracted text contains stray digit runs (`810768208285`, `11537152896293122689289629`) where merge fields sit, rather than blank rules. |
+| УВЕДОМЛЕНИЕ о признании | The source PDF contains stray digit runs (`810768208285`, `11537152896293122689289629`) and obsolete vector rules where merge fields sat. The source stays unchanged; generated output removes only the reviewed, ordinal-and-SHA-locked operator paths owned by the recipient/body/instrument Word-flow blocks. |
 | УВЕДОМЛЕНИЕ о признании | The register-entry date slot after «признанных квалифицированными инвесторами» is **10.86 pt** wide, measured from real glyph boxes. No date fits even at the 6 pt floor, so the slot is left blank rather than overprinted onto the "(дата)" caption. |
 | Приложение 11 Уведомление риски | The broker's e-mail rule in clause 3 is **20.64 pt** wide — no address fits. The broker's own address is also not held in the CRM. Left blank. |
 | ПРИЛОЖЕНИЕ 4 | The broker's own payment details (ИНН, Р/сч, Банк, К/сч, БИК) and the whole торговый/неторговый раздел table are blank in the authoritative source. |
-| ПРИЛОЖЕНИЕ 3 | Same blank broker requisites, plus «Код INV0000X» / «Код XXXXXXХ» placeholder codes left in the payment-purpose rows. |
-| ПРИЛОЖЕНИЕ 3 | The gap after «на основании Доверенности №» is 8.18 pt and the «дата__» rules in the payment-purpose rows are 11.04 pt — neither can hold a value. Left blank. |
+| ПРИЛОЖЕНИЕ 3 | Same blank broker requisites. The «Код INV0000X» / «Код XXXXXXХ» sample-code paragraphs are **no longer left as printed**: each reviewed Word-flow row prints the CRM client code and the complete brokerage agreement number/date pair. The one dropped sample token per row is declared in `sourcePlaceholders`; every other token still has to match the authoritative PDF. |
+| ПРИЛОЖЕНИЕ 3 | Resolved in the re-supplied authoritative template: «на основании Доверенности № ,» became fixed «на основании Устава», and the representative is printed as «Козырева Александра Юрьевича». The former `Юрьвеича` typo and obsolete 8.18 pt gap are absent. Transfer-basis item 2 is a separate nested Word-flow replacement for the required depository number/date pair. |
 | ПРИЛОЖЕНИЕ 6 (ЮЛ) | «серии» ends its line with no rule after it, so series and number share the «№» rule; «дата выдачи _,» reserves 4.56 pt and stays blank. |
 | ПРИЛОЖЕНИЕ 6 (ФЛ) | «выданный» reserves 50.2 pt against 114.5 pt for the same value in the legal-entity variant, so a normal issuing authority needs three wrapped lines. |
 | ПРИЛОЖЕНИЕ 7 | Only the «Первичная подача заявки» row has underlined blanks; the «Отмена ранее поданной заявки» row has none, so its number and date go in the adjacent value column. |

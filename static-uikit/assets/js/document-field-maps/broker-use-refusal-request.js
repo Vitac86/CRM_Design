@@ -15,18 +15,15 @@
 (function (global) {
   'use strict';
 
-  var BODY = 9;
-  var MIN = 6;
-
-  function contractNumber(value) {
-    value = String(value || '').trim();
-    return value ? '№ ' + value : '';
-  }
-
-  function contractDate(value) {
-    value = String(value || '').trim();
-    return value ? 'от ' + value : '';
-  }
+  // Readability policy (docs/document-pdf-generation.md): dynamic text is
+  // never drawn below 9 pt, and prefers 12 pt wherever the form's own
+  // geometry allows it. Vertical room per row was measured from the
+  // committed template with tools/qa/measure_field_room.py.
+  var BODY = 12;          // preferred dynamic size for this form
+  var MIN = 9;             // hard readability floor — never draw smaller
+  var SIZE_10_5 = 10.5;      // measured room: 10.91, 10.91 pt
+  var SIZE_10 = 10;        // measured room: 10.37 pt
+  var SIZE_9_5 = 9.5;       // measured room: 9.61 pt
 
   var TEMPLATE = {
     id: 'broker-use-refusal-request',
@@ -42,37 +39,55 @@
 
     fields: [
       // Client-information table. The value cells are 297.17 pt wide. A long
-      // client name/account may wrap to two lines inside the original row;
-      // the renderer still fails visibly if two lines at 6 pt are insufficient.
+      // client name may wrap inside the row and extend it; it must never become
+      // an unrelated full-width underline.  In the committed PDF this row runs
+      // from border top 175.58 to bottom-border top 195.86 (20.28 pt), using
+      // 0.48 pt rules centred at 56.76 / 248.21 / 545.86.  Inserting exactly at
+      // 195.86 moves the existing bottom border and the remaining table rows.
       {
         id: 'clientName',
+        overflowStrategy: 'expand-layout',
+        expansion: {
+          page: 0, insertionTop: 195.86,
+          rowHeight: 20.28, maxExtraRows: 2,
+          shiftFromTop: 195.86, shiftToTop: 516.05,
+          bottomReserve: 323.87,
+          lineStyle: 'table-row', reviewStatus: 'approved',
+          rowLeft: 56.76, rowWidth: 489.10,
+          borders: { left: false, right: false, top: false, bottom: false },
+          columns: [56.76, 248.21, 545.86],
+          line: {
+            left: 252.0, width: 289.0,
+            baselineOffset: 9.72, ruleOffset: 20.28, ruleThickness: 0.48
+          }
+        },
         source: 'field.client-full-name',
         page: 0, left: 252.0, baselineTop: 185.3, width: 289.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', multiline: true, lineHeight: 8.5,
-        maxHeight: 17, maxLines: 2, required: true
+        font: 'legalSerif', fontSize: SIZE_10, minFontSize: MIN,
+        align: 'left', multiline: true, lineHeightRatio: 0.95,
+        maxHeight: 17, required: true
       },
       {
         id: 'contractNumber',
-        source: 'field.extra-contract-number', format: contractNumber,
+        source: 'field.extra-contract-number', format: 'prefixNumber',
         page: 0, left: 252.0, baselineTop: 206.06, width: 175.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'contractDate',
-        source: 'field.extra-contract-date', format: contractDate,
+        source: 'field.extra-contract-date', format: 'prefixFrom',
         page: 0, left: 432.0, baselineTop: 206.06, width: 109.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
+        font: 'legalSerif', fontSize: SIZE_10_5, minFontSize: MIN,
         align: 'left', required: true
       },
       {
         id: 'accountPortfolio',
         source: 'field.extra-account-portfolio',
         page: 0, left: 252.0, baselineTop: 225.3, width: 289.0,
-        font: 'legalSerif', fontSize: BODY, minFontSize: MIN,
-        align: 'left', multiline: true, lineHeight: 8.5,
-        maxHeight: 17, maxLines: 2, required: true
+        font: 'legalSerif', fontSize: SIZE_9_5, minFontSize: MIN,
+        align: 'left', multiline: true, lineHeightRatio: 0.95,
+        maxHeight: 17, required: true
       },
 
       // Client side only. The handwritten signature and stamp remain blank.

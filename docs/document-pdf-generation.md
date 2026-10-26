@@ -60,7 +60,10 @@ Internet Explorer is not supported. The engine is ES5-style and uses only
 | --- | --- |
 | `document-engine/pdf-text-layout.js` | measuring, word wrapping, shrink-to-fit, alignment |
 | `document-engine/pdf-checkbox-renderer.js` | vector marks inside existing checkboxes |
+| `document-engine/pdf-page-expander.js` | reviewed content-stream suppression and page/row movement |
+| `document-engine/table-ownership.js` | fail-closed owning-cell metadata validation and planned-ink audit |
 | `document-engine/pdf-overlay-renderer.js` | orchestration, coordinate conversion, formatters, validation, errors |
+| `document-engine/umi-registry.js` | exact UMI fields plus explicit workflow/operator aliases |
 | `document-field-maps/<doc-id>.js` | one document's coordinates — **no rendering logic** |
 | `pages/document-wizard.js` | wizard UI, payload normalisation, download/upload |
 
@@ -150,24 +153,120 @@ rule, which is what "typed on the line" means.
   left: 114.0,
   baselineTop: 99.26,
   width: 203.9,
+  label: 'Адрес регистрации',      // shown to the manager on an overflow
   font: 'legalSerif',
-  fontSize: 8.52,
-  minFontSize: 6.0,                // shrink-to-fit floor
+  fontSize: 12,                    // preferred size — 12 pt unless the form
+                                   // physically cannot take it
+  minFontSize: 9,                  // hard floor, never below 9
   align: 'left',                   // 'left' | 'center' | 'right'
   multiline: false,
-  lineHeight: 10,                  // multiline only
-  maxLines: 2,                     // multiline only
+  lineHeight: 13.5,                // fixed leading, in points
+  lineHeightRatio: 0.95,           // …or leading as a ratio of the size, for a
+                                   // printed cell of fixed height
+  maxLines: 2,
+  maxHeight: 27,                   // the height of the printed box
   format: 'dateRu',                // optional formatter
   fallbacks: ['surname'],          // shorter renderings to try if too wide
   required: true,                  // fail if empty
   optional: true,                  // suppress "source missing" validation
   baselineShift: 0,                // fine vertical nudge
+  tokenBreak: 'anywhere',          // reviewed mid-token split, identifiers only
+  allowPrintOverride: false,       // see §12
+  overflowStrategy: 'flow',        // 'flow' when flowRegions are declared
+  flowRegions: [ /* see below */ ],
   showWhen: {                      // draw only when a condition holds
     source: 'extra.report-delivery',
     equals: 'email'
   }
 }
 ```
+
+### Readable size policy
+
+Dynamic text at 7 pt is not acceptably readable on a printed form, so two
+numbers govern every field this engine draws:
+
+| Constant | Value | Meaning |
+| --- | --- | --- |
+| `MIN_DYNAMIC_FONT_SIZE` | 9 pt | never draw dynamic text below this |
+| `PREFERRED_DYNAMIC_FONT_SIZE` | 12 pt | default for a new field |
+
+Both live in `assets/js/document-engine/pdf-text-layout.js` and are the single
+source of truth: the renderer's validation rejects a map that configures a
+smaller minimum, the layout engine clamps one that slips through, and the
+Template Builder refuses to save one.
+
+The floor applies only to text the engine draws. **Static legal text already
+embedded in the base PDF is never touched.**
+
+New fields default to 12 pt. Existing fields use 12 pt wherever the form's own
+geometry allows it; a smaller preferred size survives only where the row is
+physically shorter, and the measurement is recorded next to the value in the
+map. No field has a minimum below 9 pt.
+
+### Continuation regions (`flowRegions`)
+
+One logical value may flow through several explicitly mapped regions, so a long
+address continues on an approved line instead of shrinking:
+
+```js
+{
+  id: 'registrationAddress',
+  source: 'field.registrationAddress',
+  overflowStrategy: 'flow',
+  flowRegions: [
+    { page: 0, left: 217.7, baselineTop: 138.38, width: 339.9, maxLines: 1 },
+    {
+      page: 0, left: 56.6, baselineTop: 148.70, width: 501.0, maxLines: 1,
+      maxFontSize: 9.5,            // this band cannot hold more
+      generated: true,             // no printed rule here — we draw one
+      reviewStatus: 'approved',    // and a human has looked at it
+      drawUnderline: true, underlineThickness: 0.36, underlineOffset: 1.6
+    }
+  ]
+}
+```
+
+Regions are rendered in order. Each one carries its own `page`, `left`,
+`baselineTop`, `width` and line capacity, and the widths may differ. Word
+distribution is deterministic: the same value always produces the same lines.
+
+A field **without** `flowRegions` keeps working unchanged — its own geometry is
+treated as an implicit first region, so no existing map had to be rewritten to
+retain its behaviour.
+
+Region properties beyond the geometry above:
+
+| Property | Meaning |
+| --- | --- |
+| `maxFontSize` | largest size this region can physically hold |
+| `lineHeightRatio` | leading as a ratio of the size, for a fixed-height cell |
+| `firstLineIndent` | indent applied to the region's first line only |
+| `drawUnderline` | draw a rule under the lines that receive text |
+| `underlineLeft` / `underlineWidth` / `underlineTop` | explicit rule geometry |
+| `underlineThickness` / `underlineOffset` / `underlineColor` | rule appearance |
+| `generated` | this line does not exist in the authoritative PDF |
+| `reviewStatus` | `'approved'` is required before a generated line may print |
+
+### Word-like continuation lines
+
+Where the authoritative form has no printed rule to continue on, a region may
+declare one. Use this order:
+
+1. an existing printed line in the authoritative PDF;
+2. an existing blank table row or approved empty cell;
+3. an explicitly mapped and visually approved generated continuation line;
+4. a field-specific overflow error, only when none of the above is possible.
+
+A generated line is ordinary PDF vector page content — never an AcroForm
+control, an annotation, an image, or a run of `_` glyphs. It is drawn only
+under the lines that actually receive text, so a short value leaves the form
+exactly as printed. Match the weight and the drop of the form's own rules: on
+Appendix 1A those were measured at **0.36 pt thick, 1.5 pt below the baseline**
+from a 1200 dpi rendering, and those numbers are in the map.
+
+`tools/qa/measure_field_room.py --gaps <doc> <page> <left> <right> <top> <bottom>`
+lists the blank bands on a page, which is where a continuation line may go.
 
 ### Conditional values (`showWhen`)
 
@@ -222,15 +321,431 @@ the full 8.52 pt and the longest name, "сентября 2018", at 6.02 pt.
 
 ## 6. Text fitting
 
-The renderer tries, in order:
+`assets/js/document-engine/pdf-text-layout.js` owns this decision completely.
+The overlay renderer, the Document Wizard preflight and the Template Builder
+all call it; none of them re-implements wrapping.
 
-1. the primary `format` at `fontSize`, shrinking in 0.25 pt steps to `minFontSize`;
-2. each entry in `fallbacks`, same shrink range;
-3. if nothing fits → **a visible error naming the document, the field, the
-   required width and the available width.**
+An extra approved line is always better than smaller text, so for one logical
+value the order is:
+
+1. apply the primary `format`;
+2. start at the configured preferred size, normally 12 pt;
+3. attempt wrapping across **all** approved regions at that size;
+4. preserve words and explicit line breaks;
+5. if the complete value still does not fit, reduce the size by 0.25 pt;
+6. recalculate the **entire** wrapping layout at every size;
+7. stop at 9 pt;
+8. try each declared legally safe `fallbacks` formatter, repeating the same
+   process;
+9. only then raise a field-specific overflow error.
+
+Never "shrink first, then try multiline".
+
+The result carries explicit region assignments, and the renderer draws exactly
+those:
+
+```js
+{
+  fits: true, size: 11.5, strategy: 'flow', shrunk: true,
+  lines: [
+    { regionIndex: 0, page: 0, text: '125009, Россия, г. Москва,' },
+    { regionIndex: 1, page: 0, text: 'ул. Тверская, д. 14, кв. 38' }
+  ]
+}
+```
+
+### Wrapping Russian and English
+
+Values wrap on whitespace. Repeated whitespace collapses, explicit newlines
+survive, and a value can never start or end with an empty printed line.
+Punctuation, apostrophes and hyphens stay with their word, so
+`Александров-Смирнов`, `O'Connor` and `Smith-Jones` are kept whole wherever
+they fit. A token made only of punctuation is merged into the word before it,
+so no line ever holds punctuation alone.
+
+A token wider than its line is handled deterministically, in this order:
+
+1. move it to a wider approved region, if one exists further down;
+2. split it at a separator it already contains — a hyphen in a double surname,
+   a slash in a contract number, a dot in a domain — keeping the separator on
+   the first line;
+3. if the field declares `tokenBreak: 'anywhere'`, split at an arbitrary
+   character. This is a reviewed decision for machine identifiers, never for
+   legal wording;
+4. otherwise report that the token itself cannot fit at 9 pt.
+
+Step 2 is skipped entirely when the field declares `tokenBreak: 'none'`. That
+is for a slot holding one exact reference the document owner's format does not
+allow to be broken *anywhere* — `БД-2026/000417-СПБ` contains a slash and two
+hyphens the wrapper would gladly use, but «БД-2026/» on the printed blank and
+«000417-СПБ» underneath reads as two different references. Such a token goes
+whole to a wider approved line, or the field overflows and says so.
+
+There is no dictionary hyphenation, and nothing is ever invented.
 
 Long names, addresses, issuing authorities and contract numbers are **never
-silently clipped**. Empty optional values simply leave the printed line blank.
+silently clipped or truncated**. Empty optional values simply leave the printed
+line blank.
+
+## 6b. Dynamic page-section expansion
+
+Some values cannot fit however carefully the field is mapped, and some pages
+have no blank band to put a continuation line in. Rather than refusing the
+document, the generated file can grow the row it needs — the way the row would
+have been inserted in Word before the PDF was exported.
+
+**There is still exactly one authoritative PDF per document.** No
+`…-short.pdf` / `…-long.pdf`, no resident/non-resident variants, no
+company-name-length templates. The variation exists only inside the output
+Blob, and the committed template is never modified.
+
+### The two continuation mechanisms
+
+| | When | What moves |
+| --- | --- | --- |
+| **A. Existing empty space** — `flowRegions` | the form already leaves a printed rule or a blank cell | nothing; the text simply continues there |
+| **B. Inserted layout row** — `expansion` | there is no blank line, but the page has vertical reserve | the page section below the anchor moves down and a real row opens |
+
+Both are declarative. Use A wherever the form allows it; B only when it does
+not.
+
+### C. Reflowing the printed line itself
+
+There is a third answer, and where it applies it is the best one: replace the
+reviewed source blocks that paint the line and lay the same wording out again
+with the value in it. A printed blank is usually not the width the *line* has —
+«По электронной почте ______(необходимо указать адрес электронной почты)» gives
+an address 93.4 pt of underscores on a text column running to 557 pt, and the
+instruction after it can simply move right, exactly as it would in Word.
+
+Prefer this when the space under a slot belongs to something else. On both
+accession forms the paper below that line is the «По системе ЭДО» row: writing
+there would attach the address to a different delivery method, and one form has
+no page reserve left anyway. Reflowing costs no budget, moves nothing and keeps
+the value on the line the form drew for it.
+
+A reference inside such a block may set `blankWhenEmpty: true`. The printed
+blank belongs to the form's wording, not to the value, so an empty — or
+`showWhen`-hidden — reference then keeps its rule at the measured width from
+`decoration.minWidth` instead of deleting it from the document. Validation
+refuses the flag without that width.
+
+### Exact source suppression: balanced operators and vector paths
+
+A Word-flow replacement removes source drawing operators; it never paints a
+white rectangle over old text or rules. The common case names a top-level
+balanced `q … Q` range. A reviewed nested paragraph such as account-opening
+transfer-basis items 2–3 can instead set `operatorScope: 'all-balanced'` and
+pin the nested-unit ordinals, depth, parent hash, unit hash, page block count
+and template SHA-256. The engine suppresses exactly those bytes and proves the
+parent stream stays balanced.
+
+Some Word exports paint an obsolete underline as a top-level vector path rather
+than inside the text block. `sourcePathSuppressions` handles that separate
+case. Every entry declares the page/path ordinal and page path count, operator
+SHA-256, template SHA-256, owner Word-flow block, exact field IDs, geometry,
+approval and optional `showWhen`. A stale hash, wrong owner, unreviewed path or
+conditional path without its mapped replacement blocks preflight. The
+qualification notice uses this to remove only the rules replaced by its
+recipient, recognition/date, register-entry and `other` flows.
+
+### Which fields may expand
+
+Not many. The candidates are long client data:
+
+* full legal company name, and an abbreviated or foreign name where used;
+* legal, registration, residential, postal and foreign addresses;
+* a registration or passport issuing authority where ordinary realistic values
+  demonstrate a real need.
+
+Identifiers and normally short values — ИНН, КПП, ОГРН, passport series and
+number, account number, dates, citizenship, client code — should fit through
+correct field mapping and the 9 pt minimum. Audit them, but do not open a
+continuation area without evidence. `tools/qa/measure_slot_widths.py` compares
+every mapped width against the printed blank it sits in and is the first thing
+to run when a short value does not fit: the map may simply be wrong.
+
+Power-of-attorney is the exception that proves the rule. Its ИНН, ОГРН,
+citizenship, authority and date slots are genuinely 20–54 pt wide, the map is
+correct, and the values are exact — so each takes an inserted row, printing the
+complete value unbroken on the ruled line directly beneath its label. A 10-digit
+ИНН is never split.
+
+It is also the form that exhausts its local page reserve. A foreign-individual
+variant needs six rows where the page itself funds four. Its reviewed
+`crossPageFlow` transfers a complete trailing power to the following page and
+recovers the remaining room; all six exact values then print at or above 9 pt.
+See `docs/document-text-layout-audit.md` §5b for the measured boundaries.
+
+### The schema — the field's row
+
+```js
+{
+  id: 'clientName',
+  source: 'field.client-full-name',
+  overflowStrategy: 'expand-layout',
+  expansion: {
+    page: 0,
+    insertionTop: 297.6,      // where a row opens
+    shiftFromTop: 297.6,      // top of the movable block
+    rowHeight: 11.5,          // measured from the form, NOT a standard 14
+    maxExtraRows: 2,          // the most THIS field may insert
+    maxFontSize: 9.5,         // the size the form itself is set in
+    lineStyle: 'underline',   // 'underline' | 'table-row'
+    reviewStatus: 'approved', // production refuses anything else
+    line: {
+      left: 99.3, width: 435.7,
+      baselineOffset: 8.9,    // text baseline inside the row
+      ruleOffset: 9.98,       // baseline + the measured rule offset
+      ruleThickness: 0.48     // matched to a printed rule nearby
+    }
+  }
+}
+```
+
+A `table-row` additionally takes `rowLeft`, `rowWidth`, `borders`, `columns`
+and optional `bottomSegments` / `topSegments`, so an inserted row reproduces
+the table it joins — including rules that break at column boundaries.
+
+Nothing is inferred at runtime. Every one of those numbers must be present, and
+validation rejects the field if any is missing.
+
+### Physical table-cell ownership
+
+An expansion box is not proof that it is the **right** table cell. The four
+offered questionnaires (`anketa-fl-simplified-id`, `anketa-ip-sz`, `anketa-fl`,
+`anketa-yul`) therefore set `tableOwnershipRequired: true` and declare three
+root registries:
+
+```js
+cellOwnership: [{
+  fieldId: 'bankAddress', source: 'extra.extra-bank-address', page: 1,
+  tableId: 'anketa-fl-p2-main', rowId: 'p2-bank-address',
+  bounds: { left: MEASURED_LEFT, top: MEASURED_TOP,
+            right: MEASURED_RIGHT, bottom: MEASURED_BOTTOM },
+  maxReviewedLines: 2, canGrow: true, nextRowId: 'p2-bank-inn',
+  affectedBorders: { horizontal: MEASURED_HORIZONTAL_RULES,
+                     vertical: MEASURED_COLUMN_RULES },
+  budgetId: 'anketa-fl-p2-main', reviewStatus: 'approved'
+}],
+tableBudgets: [{
+  id: 'anketa-fl-p2-main', tableId: 'anketa-fl-p2-main', page: 1,
+  top: MEASURED_TABLE_TOP, bottom: MEASURED_TABLE_BOTTOM,
+  maxGrowth: MEASURED_PAGE_RESERVE,
+  reviewStatus: 'approved'
+}],
+ownershipExemptions: [/* exact field/source/page + reviewed reason */]
+```
+
+The numbers above illustrate the schema; the maps are the geometry authority.
+Every dynamic field must have exactly one owner or approved exemption. A
+growing owner must name its next row, approved `table-row` expansion, insertion
+cut, every affected vertical/horizontal border and one table budget. The
+vertical list must exactly equal the row expansion's columns.
+
+After layout planning, `table-ownership.js` measures the **actual line ink** in
+shifted coordinates. It rejects ink outside the owner, horizontal-border
+intersection, dynamic ink overlap, a line count above review, discontinuous
+verticals in a grown row, duplicate one-logical-value/source rendering and
+cumulative growth above the shared table budget. `ownershipAudit` metrics and
+violations enter the preflight result and deterministic fingerprint, so render
+cannot disagree with the ownership decision.
+
+### The schema — the page's budget
+
+A page has one amount of room, not one per field. It is stated once, on the
+template, and every anchor on that page shares it:
+
+```js
+pageLayout: {
+  0: {
+    fixedHeaderUntil: 0,        // nothing above this ever moves
+    bodyBottom: 756.96,         // lowest movable content, measured
+    fixedFooterFrom: 789.97,    // the page number. Never moves, ever.
+    shiftToTop: 783.0,          // bottom of the movable band; excludes the footer
+    bottomClearance: 6.0,       // white space kept between the two
+    compaction: [               // reviewed gaps between two COMPLETE blocks
+      { top: 62.60, originalGap: 63.85, minGap: 42.5,
+        reviewStatus: 'approved', note: 'верхнее поле, 2.25 → 1.5 см' }
+    ],
+    anchors: ['ulOgrn', 'ulInn', 'ulAttorneyCitizenship']
+  }
+}
+```
+
+```
+bottomCapacity = fixedFooterFrom - bottomClearance - bodyBottom
+recoverable    = sum over compaction zones of (originalGap - minGap)
+budget         = bottomCapacity + recoverable
+```
+
+If those two sources are insufficient, an approved `crossPageFlow` may add one
+more measured term:
+
+```js
+crossPageFlow: {
+  targetPage: 3,
+  sourceFromTop: 725.90, sourceToTop: 788.00,
+  sourceContentTop: 731.02, retainedBodyBottom: 725.86,
+  targetInsertionTop: 55.92,
+  targetShiftFromTop: 55.90, targetShiftToTop: 788.00,
+  targetShift: 36.24, maxCumulativeShift: 36.24,
+  maxCascadeDepth: 1,
+  reviewStatus: 'approved'
+}
+```
+
+The source band must contain only complete balanced drawing blocks. The engine
+removes those original operator bytes from the source page once, merges any
+required page resources without name collisions, and prepends the same bytes to
+the target page under a translation matrix. It then moves the target page's
+existing content by the declared amount. No block is copied, reconstructed or
+rasterised. Cascading beyond one following page and unreviewed rules are
+rejected.
+
+`measure_page_layout.py` produces every one of those numbers from the committed
+PDF, including detecting the fixed footer: a trailing block separated from the
+body by several line pitches and narrower than 120 pt is a page number, and a
+page number never moves.
+
+A field may not also state a `bottomReserve` of its own beside a page budget —
+that is the duplication the page budget replaced, and validation rejects it. A
+map written before the page budget existed keeps working: its anchors all
+described the same page, so the smallest of their reserves is that page's
+budget.
+
+### Recovering reviewed white space
+
+A compaction zone names the gap between two **complete** blocks, the minimum a
+human approved for it, and therefore how much it may release. It is spent
+lazily, in declaration order, and only as far as the inserted rows actually
+need — a document that expands by nothing never compacts anything.
+
+A page's own top margin is a compaction zone whose upper block is the sheet
+edge. That is how the доверенность pays for its rows: 2.25 cm → 1.5 cm on the
+legal-entity page, 2.0 cm → 1.5 cm on the individual one.
+
+What may never be recovered: line height inside a paragraph, the font size, the
+vertical scale of anything, an individual table cell without a row rule, or a
+gap below the first insertion point — the planner refuses that last one, because
+recovering it would move the anchor's own row.
+
+### Only the scenario being printed pays
+
+Rows are asked for by values that are really going to be drawn. A field switched
+off by `showWhen`, an empty optional value and a missing required value cost the
+page nothing. This matters most where one file carries two documents: the
+доверенность holds a legal-entity variant on pages 1–2 and an individual one on
+pages 3–4, and a доверенность for a company must spend nothing on page 3.
+
+Anchors are then allocated top to bottom against the one budget, so capacity an
+anchor does not use is left to the ones below it, and the plan reports where the
+room went:
+
+```
+ulOgrn                 1 row × 12 pt   cumulative 12   remaining 49.36
+ulInn                  1 row × 12 pt   cumulative 24   remaining 37.36
+ulAttorneyCitizenship  1 row × 12 pt   cumulative 36   remaining 25.36
+```
+
+### How the page actually moves
+
+`pdf-page-expander.js` rewrites the page's own content stream. Word writes each
+drawing as a self-contained balanced `q … Q` block with an absolute text
+matrix, so a block is moved by wrapping it — and nothing else — in
+`q 1 0 0 1 0 dy cm … Q`. Every operator still appears exactly once.
+
+Text stays text, rules stay rules, images stay images. Nothing is rasterised,
+no page or section becomes a screenshot, and no legal block is whited out and
+redrawn.
+
+The alternative — embedding the page as a Form XObject and drawing it once per
+band with different clips — was implemented, measured and rejected: it renders
+correctly and pymupdf reads it correctly, but any extractor that ignores clip
+paths sees every operator once per band. On Appendix 1A that produced six
+occurrences of a phrase that appears twice, at 1.68× the file size. Rewriting
+the stream gives two occurrences at 0.98×, with the page's extracted text
+identical to the base character for character.
+
+Content that would straddle an insertion line cannot be split, so the expander
+reports it instead of guessing. `tools/qa/check_expansion_anchors.py` asks the
+production expander to try every declared anchor and scans nearby for a clean
+one; run it after changing any anchor.
+
+### One plan for static content and overlays
+
+```js
+{ page: 0, shifts: [ { fromTop: 297.6, toTop: 830, delta: 14 } ] }
+```
+
+The same plan moves the page content and every dynamic element below the
+anchor: text fields, checkbox marks, generated underlines, printed signature
+transcripts, further continuation regions and conditional fields. Field maps
+stay written in the template's own coordinates; the transformation is applied
+at render time, never baked into the map.
+
+Top-level PDF vector paths are conservative by default: they move only for a
+reviewed table-row insertion whose columns/borders own them. A Word-flow block
+whose standalone rules must travel with its body sets
+`expansion.moveTopLevelPaths: true`. The qualification recipient,
+recognition/date and register-entry blocks use that explicit proof so a rule
+cannot stay behind and strike through text after expansion.
+
+Several expandable fields may share a page. Anchors are processed top to bottom,
+shifts accumulate, a later anchor's rows open below what an earlier one already
+opened, and a coordinate's total shift is the sum of every band containing it:
+
+```
+company name inserts 1 row   → +14 pt
+legal address inserts 2 rows → +28 pt
+content below the address    → +42 pt
+```
+
+### Reserve, and the footer
+
+Expansion is allowed only while `cumulative shift ≤ page budget`. `shiftToTop`
+bounds the movable block and may not reach `fixedFooterFrom`, so a page with a
+fixed footer keeps it fixed: top section fixed, middle section expandable,
+footer fixed. Signature blocks and footer spacing are never moved or compressed
+unless the map says so explicitly. When the budget runs out the field that could
+not be paid for gets a field-specific error naming it and the reason — and only
+that field: the anchors already granted rows keep them.
+
+### When the value fits
+
+Nothing happens. No shift, no inserted row, no rule. The output matches the
+non-expanded baseline apart from the normal dynamic text — verified in QA by
+comparing the drawn vector rules against the base template.
+
+## 6a. Preflight
+
+Loading the committed template, checking the map against it and embedding the
+fonts is `Renderer.open`. Deciding which fields need rows, what each page's plan
+is and where every line of every value lands is `Renderer.decide`.
+
+`Renderer.preflight` runs both and stops. `render` runs both and draws. There is
+no second implementation of the decision for them to disagree over, so a
+preflight that succeeds cannot be followed by a generation that fails for the
+same payload.
+
+`decide` also returns a **fingerprint**: a deterministic, readable summary of
+every page shift, every inserted row and every line of every value with the size
+and region it landed in. Reviewed source-range/path proofs and table-ownership
+metrics are part of the same preflight decision; ownership violations block it.
+`render` hands the fingerprint to `onPlan`, and the preflight/render agreement
+suite compares both paths across the supported synthetic profiles.
+
+If any value cannot be printed, `render` throws a `DocumentOverflowError`
+carrying every diagnostic at once, and no Blob is produced for a document that
+cannot be printed.
+
+Each diagnostic carries the document, the user-facing label, the field id, the
+length of the value, the minimum size, the number of approved lines available
+and the exact reason. The Document Wizard turns that into an actionable panel:
+an operator-entered `extra.*` value gets a button back to its input with every
+other entered value preserved, while CRM legal or identity data is never
+silently altered and the manager is told the map needs widening instead of
+being asked to shorten a legal name.
 
 ## 7. Checkboxes
 
@@ -270,6 +785,200 @@ Only step 5 makes the document visible to users — do it last.
 
 ## 9. Visual QA
 
+### Three kinds of valid
+
+A layout can be right in one of these senses and wrong in another. Keep them
+apart, because a document that passes the first two can still be unacceptable:
+
+| | asks | proved by |
+|---|---|---|
+| **structural** | is the value complete, is the PDF sound, is nothing below the readability floor, is any source content lost? | `run_structural_pdf_tests.py`, `audit_ordinary_equality.py` |
+| **geometric** | does it overlap, cross a rule, leave its cell, or land outside a reviewed band? | `run_visual_geometry_tests.py`, `run_preflight_render_agreement_tests.py` |
+| **reading flow** | does the result still read as one field a person typed? | `run_visual_flow_tests.py` |
+
+The third one exists because visible defects reached manual review while the
+older structural/geometric questions were still green.
+
+**The payment reference.** The account-opening notice prints
+«…брокерское обслуживание №\_\_\_\_\_\_\_\_\_ дата\_\_. ФОНДОВЫЙ РЫНОК» in a
+bordered cell. The printed blank is 49.68 pt; a real reference is 101.17 pt, so
+the reference was moved whole to the row's third printed line — approved,
+inside the cell, at a legal size, and 95 pt to the right of a still-empty «№»,
+underneath the market name. It read as a caption someone had dropped in.
+
+**The grown row.** A foreign legal name needs three lines in a two-line cell,
+so the row grows. The third line was placed at the row's own 13.44 pt pitch
+while the two above it kept the cell's 9.975 pt leading. One value, two
+rhythms: a paragraph that stops and a second entry that starts.
+
+**The half-filled sentence.** The same three rows then named a real client code
+and a real agreement number and printed «дата\_\_» after them. Every gate was
+green, because every value the map produced was correct — the map simply did
+not produce one for the date. A sentence that gets that far and stops reads as
+a form nobody finished.
+
+Both are now rules rather than opinions:
+
+- an exact reference is **one whole token** — a slash or a hyphen inside it is
+  not a break opportunity (`tokenBreak: 'none'`, `keepTogether`);
+- it stays on the same line as the token that **introduces** it, with no gap
+  (`keepWithNext` after «№»), and the sentence continues after it;
+- where a form prints **«№ …» and «дата …» in one sentence**, a template that
+  fills one fills the other. `check_production_completeness.py` searches the
+  source PDFs, not the maps, so a sentence nobody mapped is still found, and
+  joins each page's lines first because the two blanks are not always on the
+  same one;
+- a value's own printed lines keep **one step**. A continuation may start
+  further left than the first line — Word does that when the first line began
+  after a printed label — but never further right;
+- a row grown to finish a sentence keeps the sentence's leading, not the row's
+  pitch (`expansion.line.continuesParagraph`); its height, borders and rules do
+  not move;
+- printed **sample** content is replaced by the CRM value it stands for, and
+  the swap is declared (`sourcePlaceholders`), not assumed.
+
+### The payment-purpose sentence
+
+Page 2 of the account-opening notice prints one sentence per market, three
+times. Composed, it reads:
+
+```
+Код {clientCode}. Перевод денежных средств по Договору на брокерское
+обслуживание №{agreementNumber} дата {agreementDate}. {MARKET} РЫНОК
+```
+
+Where each value comes from:
+
+| value | source | note |
+|---|---|---|
+| client code | `field.client-code` | the same CRM value the «Код клиента» cell of §1 prints |
+| agreement number | `extra.extra-brokerage-contract` | the same wizard input as the §2 «Номер договора» cell |
+| agreement date | `extra.extra-brokerage-contract-date` | the same wizard input as the §2 «Дата» cell, `format: 'dateRu'` |
+| market | printed wording | one unbreakable token, so «ФОНДОВЫЙ» never leaves «РЫНОК» |
+
+The form records **one** brokerage agreement and quotes it three times, so
+there is one number and one date, not three copies of each. A second date here
+could only ever contradict §2.
+
+Adding the date makes 28 of 72 fixture combinations need a fourth line, so each
+row may grow **one** complete bordered table row at the source's own 12.60 pt
+pitch. The widest reference this form can hold — «№» plus 45 characters — is
+272.40 pt of a 295.25 pt line, so a fifth line is not reachable.
+
+Growing a row inside a table means the table grows with it. Page expansion
+moves the rules it can, but it cannot lengthen the column rules that end at the
+cut, so a Word-flow block with `expansion.lineStyle: 'table-row'` redraws them
+across the inserted row — the same `drawTableRow` a field-level anchor already
+uses, and only for the rows its value really filled.
+
+### The depository agreement number/date
+
+The UMI workbook has no printable depository agreement number or date.
+`extra.extra-depository-contract` and
+`extra.extra-depository-contract-date` are therefore registry-classified
+workflow operator inputs, not aliases to an internal LK ID, accession checkbox
+or unrelated date. They are required only by the two accession applications
+and `account-opening-notice`, start empty, and may not declare a default.
+
+The account-opening notice prints the same pair in its page-1 agreement table
+and page-2 transfer-basis item 2. The latter is a nested balanced Word-flow
+replacement that redraws item 2 with the requested pair and item 3 verbatim;
+the empty source «№ от» sentence is removed as content-stream operators, not
+covered. Strict ISO/calendar validation and independent missing-number/date
+preflight prevent a half-filled legal pair.
+
+### Qualification notice semantic blocks
+
+The qualification notice treats its recipient, recognition name/date and
+register-entry/instrument regions as reviewed Word-flow units. `semanticGroup`
+pins exact field/source links and approved bounds for the recipient and body:
+the recipient uses one right-column first/hanging indent and renders
+`umi.address.registration` once; the body keeps the full legal name, its
+caption, recognition clause and date in order; each underline has measured
+clearance below glyph ink. Exact owner/path proofs cover the remaining source
+rules. The `other` instrument branch owns multiple reviewed underlined lines
+and conditionally suppresses only its obsolete source rule.
+
+Validation refuses an unapproved semantic group, a wrong source, a detached
+label/caption/reference, an incomplete date rule, a continuation outside the
+recipient column, or an underline entering the configured text ink box.
+
+### Questionnaire ownership close-ups
+
+For all four offered questionnaires, visual review is paired with the
+declarative `cellOwnership` audit described above. Review long full names,
+Russian/foreign registration addresses, bank name/address rows,
+licence/authority rows and free text. The acceptance question is no longer
+only “inside the map's box”; it is “inside the measured owning cell, clear of
+its borders, with every lower row and vertical rule moved by the same growth
+delta, and rendered once.” `run_table_ownership_tests.py` carries the mutation
+gates; the final screenshot approval remains manual.
+
+### Values a reader compares side by side
+
+Some values are not read one at a time. The three tariff plans of an accession
+application are a column of answers to the same question, and a row set larger
+than the row above it does not read as emphasis — it reads as a defect in the
+form. A map declares the group and the production validator holds it to it:
+
+```js
+{ id: 'tariffStock', typographyGroup: 'accession-tariff-plans', … }
+```
+
+Members must agree on face, size, minimum size, leading and alignment, and on
+what happens to a value that wraps — the size of the continuation line, the
+clearance of the rule under it, the height of a grown row. Where the value
+sits, how wide its slot is and how many lines its own printed row has room for
+are geometry the source decided per row and are not part of the group.
+
+**The size a group can be is decided by its tightest member.** For the
+legal-entity application the three rows measure 13.86, 7.60 and 12.22 pt of
+headroom (`measure_field_room.py`: the largest size whose ascender still clears
+whatever is printed above the baseline), so 12 pt is available to two of them
+and not the third — the 12 / 9 / 12 the form used to print. 10 and 11 pt fail
+on the same row: «срочный» sets its printed label on one line instead of two
+and leaves its value 6.77 pt, and a 10 pt ascender is 8.91 pt.
+
+Row growth does not buy it, because growth adds room *below* the baseline and
+what is missing is *above* it, against a printed label. Taking it would mean
+moving that value's baseline down as well and spending a 9.72 pt row on every
+legal-entity application that names a срочный tariff, printed long or short.
+Distorting the table on every document to gain 3 pt on one value is the wrong
+trade, so the group is set at the 9 pt readability floor — which is what the
+individual form already prints.
+
+### Reviewed source placeholders
+
+A blank printed as underscores is geometry: `_+` normalises away and the
+legal-text gates never see it. A few forms instead print a *sample value* where
+a real one belongs — the account-opening notice prints «Код INV0000X» in two
+payment-purpose rows and «Код XXXXXXХ» in the third. Those are ordinary letters
+and digits, indistinguishable from the wording around them, so they can only be
+dropped where the map says so:
+
+```js
+sourcePlaceholders: [
+  { text: 'INV0000X', fieldId: 'paymentPurposeClientCode',
+    reviewStatus: 'approved',
+    note: 'sample client code printed by the source form' }
+]
+```
+
+The placeholder must be approved and must name a field the block actually
+resolves, so it can never remove wording that no value replaces. Everything
+else in the paragraph still has to match the authoritative PDF token for token
+— `sourceStaticText` keeps the sample verbatim, which is the proof the map
+transcribed the block rather than edited it.
+
+One CRM value may print in several reviewed paragraphs. The field declares
+every owner and opts in explicitly:
+
+```js
+layoutMode: 'flow-reference',
+flowBlockId: ['…-stock', '…-currency', '…-derivatives'],
+allowMultipleFlowReferences: true
+```
+
 ```bash
 cd static-uikit && python -m http.server 8000
 # http://localhost:8000/tools/document-qa-harness.html
@@ -281,7 +990,17 @@ issuing authority, long registration address, missing optional values, all
 checkboxes on, all off. All fixture data is obviously fictional; **never commit
 generated PDFs containing real personal data.**
 
-For every page of every migrated document, confirm at 100 % zoom:
+`run_visual_geometry_tests.py --keep out/` writes the synthetic examples this
+checklist is meant to be applied to: no expansion, one inserted row, the maximum
+approved rows, two anchors on one page, both доверенность variants, a company
+name in a table, an address in a table row and an activated cross-page transfer.
+The same run also *measures* the
+claims below that can be measured — rule weight and measure, text sitting on the
+rule with its descenders clear, one pitch per anchor, no rule without text, and
+no printed glyph covered.
+
+For every page of every migrated document, confirm at high zoom, at normal
+viewing scale and at print scale:
 
 - [ ] dynamic text looks manually typed into the original form
 - [ ] page count unchanged; no page added or lost
@@ -292,9 +1011,33 @@ For every page of every migrated document, confirm at 100 % zoom:
 - [ ] the original blank underline is still visible beneath inserted text
 - [ ] no blue fields, borders, focus rectangles, labels or form styling
 - [ ] no appended data/confirmation sheet
+- [ ] an inserted row looks like a row the form printed itself
+- [ ] page numbers, headers and footers are where the template put them
+- [ ] no unexplained empty row
+- [ ] every line of one value is the same distance from the last
+- [ ] a continuation reads as the rest of the sentence, not as a new entry
+- [ ] an exact reference sits where the wording introduces it, whole
+- [ ] no sample value the form printed survives next to a real one
+- [ ] no printed blank is left empty beside a label whose neighbour was filled —
+      «дата» has a date wherever «№» has a number
+- [ ] values a reader compares side by side are the same size: the three tariff
+      plans are one column of answers, not three decisions
+- [ ] a market designation, a name and any other two-word label that means one
+      thing is on one line
+- [ ] a grown table row has its side rules, and they meet the rules above and
+      below it without a step
 
 Test the output in the Chrome/Edge viewer, the Firefox viewer, and Adobe Reader
 where available.
+
+For this correction branch, `build_ordinary_review_pack.py` wrote the local,
+git-excluded `manual-smoke/manual-findings-fix` pack for the 6 affected
+documents and 24 focused scenarios. It contains 24 PDFs and fixture JSON files,
+73 full-page PNGs and 84 close-ups; its automated gates are zero and its 115
+manual checklist items remain unchecked until a reviewer signs them off. Each
+card records the exact requested/rendered source, owner cell/row where
+applicable, line/expansion/shift/font metrics, deterministic fingerprint and
+structural/equality verdict.
 
 ### Testing Cyrillic
 
@@ -310,7 +1053,11 @@ python -c "from pypdf import PdfReader; print(PdfReader('out.pdf').pages[0].extr
 Before drawing, every template is validated for: duplicate field ids, missing
 template file, missing/unknown field sources, invalid page indexes, rectangles
 outside the page, unsupported field types, unknown fonts, `minFontSize` greater
-than `fontSize`, and an unexpected page count (`expectedPages`).
+than `fontSize`, an unexpected page count (`expectedPages`), **a preferred or
+minimum size below the 9 pt readability floor**, and, for every continuation
+region: a valid page, a positive width, geometry inside the page, adequate
+leading, no duplicate positions, sane underline geometry and — for a generated
+line — an `approved` review status.
 
 Problems are logged to the console in full and surfaced in the wizard as a
 readable message. Required fields are never silently skipped.
@@ -322,3 +1069,86 @@ Unchanged and still optional. With no `CRM_DOCUMENT_UPLOAD_ENDPOINT` (or
 browser** and are only offered as a download. When an internal endpoint is
 configured, files are posted in one multipart request. Nothing is ever sent to
 an external service.
+
+
+## 12. Print overrides
+
+A field map may set `allowPrintOverride: true` to let an operator supply a
+different **printed** wording for one generation. Use it only where manual
+abbreviation is legally and operationally acceptable.
+
+  - the CRM value is never changed;
+  - the override affects only the document being generated, and is dropped when
+    another document is selected;
+  - it is never enabled by default for names, identifiers, passport numbers,
+    tax numbers or any other exact legal value;
+  - the wizard labels the input as text used only for printing;
+  - the override travels in the generated document payload as
+    `payload.printOverrides[fieldId]`;
+  - nothing is ever shortened automatically.
+
+Do not add print overrides broadly to paper over a mapping defect. If a value
+does not fit, the document map is the thing to fix.
+
+## 13. Migrating an existing map
+
+1. Set `minFontSize` to 9 for every dynamic text field.
+2. Measure the row with `tools/qa/measure_field_room.py --maps maps.json` and
+   raise `fontSize` to the largest half-point step the room allows, capped at
+   12 pt and never below what the document already used in production.
+3. Record the measurement in a comment next to any field that cannot reach
+   12 pt.
+4. Where the value can genuinely be longer than the slot, add continuation
+   regions in this order: printed line → blank cell → reviewed generated line.
+5. Keep existing safe formatter `fallbacks`; add one where a shorter rendering
+   is legally equivalent (a numeric date for a spelled-out month, for example).
+6. Decouple `glyphSize` on checkboxes from the body-size constant — a checkbox
+   mark is geometry over a printed box, not dynamic text.
+7. Bound every multiline cell with the `maxHeight`
+   `measure_field_room.py` reports for it. A cell with no bound is not
+   generous — it is unbounded, and a long value runs through whatever the form
+   prints below it.
+8. Where a page needs inserted rows, measure it once with
+   `measure_page_layout.py` and give the template a `pageLayout` entry rather
+   than a `bottomReserve` per field.
+9. Take the row height from `measure_page_layout.py --row`, not from habit.
+10. Re-run `tools/qa/run_document_regression.py`,
+    `check_expansion_anchors.py`, `run_structural_pdf_tests.py` and
+    `run_visual_geometry_tests.py`, and check the reports.
+
+## 14. QA entry points
+
+| Command | What it proves |
+| --- | --- |
+| `run_layout_specs.py` | the layout engine, against the real embedded font |
+| `run_document_regression.py` | every map × every RU/EN profile, plus PDF structure |
+| `run_expansion_tests.py` | page budgets, scenario allocation, white-space recovery, preflight/render agreement |
+| `run_qualification_notice_layout_tests.py` | recipient/address boundaries, semantic body/date flow, rule clearance and long `other` branch |
+| `run_table_ownership_tests.py` | all four questionnaire ownership registries, planned ink, moved borders, budgets and negative mutations |
+| `run_structural_pdf_tests.py` | every original operator exactly once, read by pymupdf *and* pypdf |
+| `run_visual_geometry_tests.py` | what a generated row looks like, measured; writes the QA examples with `--keep` |
+| `run_wizard_tests.py` | the Document Wizard end to end |
+| `run_order_forms_tests.py` | every branch of Приложение 7, read back out of the generated PDF, plus the slot geometry of its map |
+| `run_builder_qa.py` | the Template Builder |
+| `check_expansion_anchors.py` | every anchor and compaction zone sits on a clean operator cut |
+| `measure_page_layout.py` | a page's reserve, its fixed footer, its block gaps and its row geometry |
+| `audit_ordinary_failures.py` | the failure matrix, split into ordinary / realistic-long / stress |
+| `audit_ordinary_equality.py` | no ordinary payload is shortened, and every value it draws comes back out of the PDF character for character |
+| `check_full_template_audit.py` | every one of the 22 PDFs has exactly one final production status, and the declaration matches what the code does; `--self-test` exercises its negative gates |
+| `check_production_completeness.py` | a half-filled labelled sentence, a typography group set two ways, or a printed sample nobody replaces; `--self-test` exercises its negative gates |
+| `build_ordinary_review_pack.py` | writes the local, git-excluded ordinary/long and focused `manual-findings-fix` visual-review pack |
+
+All under `static-uikit/tools/qa/`.
+
+`run_all_qa.py` is the canonical combined run and the one that has to be green;
+a suite that passes alone and fails in the combined run has failed. For the
+assembled correction branch it reports **36 of 36 suites passed**. Only that
+verdict is repeated here; the per-suite counts stay where the runner prints
+them.
+
+There is no Node on the target workstation, so these drive Chrome over the
+DevTools protocol. The same pages open by hand in any browser over
+`python -m http.server` if you want to watch.
+
+Known source-layout limitations are recorded in
+[document-text-layout-audit.md](document-text-layout-audit.md).

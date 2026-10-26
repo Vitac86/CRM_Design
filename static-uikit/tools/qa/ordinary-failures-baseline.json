@@ -1,0 +1,706 @@
+{
+ "baseline": "generated from document-regression.json",
+ "ordinaryProfiles": [
+  "ru-resident-short",
+  "ru-resident-normal",
+  "ru-company-normal",
+  "en-nonresident-normal",
+  "en-company-normal",
+  "mixed-ru-en",
+  "missing-optional",
+  "maximum-checkboxes",
+  "minimum-required"
+ ],
+ "longProfiles": [
+  "ru-resident-long",
+  "ru-company-long",
+  "en-nonresident-long",
+  "en-company-long"
+ ],
+ "ordinaryFailures": [
+  {
+   "documentId": "anketa-fl",
+   "documentTitle": "Анкета физического лица",
+   "subjectKinds": [
+    "individual"
+   ],
+   "variant": null,
+   "page": 1,
+   "fieldId": "bankAddress",
+   "label": "bankAddress",
+   "source": "extra.bank-address",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "en-company-normal",
+    "en-nonresident-normal"
+   ],
+   "value": "27 King George the Fifth Avenue, London, United Kingdom, SW1A 2AA",
+   "valueLength": 65,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 11,
+   "minFontSize": 9,
+   "printedSlotWidth": 237,
+   "printedRuleWidth": 247.1,
+   "primaryRegion": {
+    "page": 1,
+    "left": 324.4,
+    "baselineTop": 315.75,
+    "width": 237
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 64.34,
+   "pageFixedFooterFrom": null,
+   "pageBodyBottom": 777.58,
+   "pageTopMargin": 56.64,
+   "pageBlockGaps": [],
+   "recoverableBlockGap": 0,
+   "sourceLinePitch": 13.44,
+   "sourceRowGeometry": {
+    "baselineTop": 315.75,
+    "linePitch": 13.44,
+    "sourceFontSize": 9.48,
+    "inkHeight": 10.5,
+    "ruleTop": 318.65,
+    "ruleBelowBaseline": 2.9,
+    "ruleThickness": 0.48,
+    "ruleLeft": 319.27,
+    "ruleWidth": 247.1,
+    "minRowHeight": 10.5
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (65 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «SW1A 2AA»",
+   "classification": "suitable for dynamic inserted row",
+   "note": "A foreign bank address is an ordinary value for a nonresident and the printed cell holds one line. The анкета is a table, so the Word-like answer is a real inserted table row, as anketa-yul/bankAddress already has."
+  },
+  {
+   "documentId": "anketa-fl",
+   "documentTitle": "Анкета физического лица",
+   "subjectKinds": [
+    "individual"
+   ],
+   "variant": null,
+   "page": 0,
+   "fieldId": "birthPlace",
+   "label": "birthPlace",
+   "source": "field.client-birth-place",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "en-company-normal",
+    "en-nonresident-normal"
+   ],
+   "value": "27 King George the Fifth Avenue, London, United Kingdom, SW1A 2AA",
+   "valueLength": 65,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 11,
+   "minFontSize": 9,
+   "printedSlotWidth": 237,
+   "printedRuleWidth": 247.1,
+   "primaryRegion": {
+    "page": 0,
+    "left": 324.4,
+    "baselineTop": 241.56,
+    "width": 237
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 60.5,
+   "pageFixedFooterFrom": null,
+   "pageBodyBottom": 781.42,
+   "pageTopMargin": 69.02,
+   "pageBlockGaps": [],
+   "recoverableBlockGap": 0,
+   "sourceLinePitch": 10.92,
+   "sourceRowGeometry": {
+    "baselineTop": 241.56,
+    "linePitch": 10.92,
+    "sourceFontSize": 9.48,
+    "inkHeight": 10.5,
+    "ruleTop": 244.46,
+    "ruleBelowBaseline": 2.9,
+    "ruleThickness": 0.48,
+    "ruleLeft": 319.27,
+    "ruleWidth": 247.1,
+    "minRowHeight": 10.5
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (65 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «SW1A 2AA»",
+   "classification": "fixture defect",
+   "note": "The fixture fed a full street address into a place of birth because its source key ends in «place». A place of birth is «London, United Kingdom» (93.24 pt at 9 pt) and fits the 237 pt cell four times over."
+  },
+  {
+   "documentId": "power-of-attorney",
+   "documentTitle": "Доверенность",
+   "subjectKinds": [
+    "individual",
+    "company"
+   ],
+   "variant": "individual",
+   "page": 2,
+   "fieldId": "flAttorneyCitizenship",
+   "label": "flAttorneyCitizenship",
+   "source": "extra.extra-attorney-citizenship",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "en-nonresident-normal"
+   ],
+   "value": "United Kingdom",
+   "valueLength": 14,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 12,
+   "minFontSize": 9,
+   "printedSlotWidth": 28,
+   "printedRuleWidth": 29.76,
+   "primaryRegion": {
+    "page": 2,
+    "left": 243,
+    "baselineTop": 216.38,
+    "width": 28
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 32.79,
+   "pageFixedFooterFrom": 794.77,
+   "pageBodyBottom": 761.98,
+   "pageTopMargin": 57.13,
+   "pageBlockGaps": [],
+   "recoverableBlockGap": 0,
+   "sourceLinePitch": 18.12,
+   "sourceRowGeometry": {
+    "baselineTop": 216.38,
+    "linePitch": 18.12,
+    "sourceFontSize": 10.56,
+    "inkHeight": 11.69,
+    "ruleTop": 217.58,
+    "ruleBelowBaseline": 1.2,
+    "ruleThickness": 0.48,
+    "ruleLeft": 241.61,
+    "ruleWidth": 29.76,
+    "minRowHeight": 12.0
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (14 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «Kingdom»",
+   "classification": "suitable for dynamic inserted row",
+   "note": "«United Kingdom» needs 60.75 pt at 9 pt; the printed blank between «паспорт гражданина» and «, серии» is 29.76 pt and is bounded by printed text on both sides. No printed rule continues it."
+  },
+  {
+   "documentId": "power-of-attorney",
+   "documentTitle": "Доверенность",
+   "subjectKinds": [
+    "individual",
+    "company"
+   ],
+   "variant": "company",
+   "page": 0,
+   "fieldId": "ulAttorneyCitizenship",
+   "label": "ulAttorneyCitizenship",
+   "source": "extra.extra-attorney-citizenship",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "en-company-normal"
+   ],
+   "value": "United Kingdom",
+   "valueLength": 14,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 12,
+   "minFontSize": 9,
+   "printedSlotWidth": 28,
+   "printedRuleWidth": 30.72,
+   "primaryRegion": {
+    "page": 0,
+    "left": 462,
+    "baselineTop": 229.34,
+    "width": 28
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 33.01,
+   "pageFixedFooterFrom": 789.97,
+   "pageBodyBottom": 756.96,
+   "pageTopMargin": 63.85,
+   "pageBlockGaps": [
+    {
+     "from": 74.87,
+     "to": 88.58,
+     "gap": 13.71
+    },
+    {
+     "from": 113.52,
+     "to": 126.81,
+     "gap": 13.29
+    }
+   ],
+   "recoverableBlockGap": 11.0,
+   "sourceLinePitch": 18.12,
+   "sourceRowGeometry": {
+    "baselineTop": 229.34,
+    "linePitch": 18.12,
+    "sourceFontSize": 10.56,
+    "inkHeight": 11.69,
+    "ruleTop": 230.54,
+    "ruleBelowBaseline": 1.2,
+    "ruleThickness": 0.48,
+    "ruleLeft": 460.66,
+    "ruleWidth": 30.72,
+    "minRowHeight": 12.0
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (14 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «Kingdom»",
+   "classification": "suitable for dynamic inserted row",
+   "note": "The ЮЛ variant of the same blank: 30.72 pt printed, 60.75 pt needed."
+  },
+  {
+   "documentId": "power-of-attorney",
+   "documentTitle": "Доверенность",
+   "subjectKinds": [
+    "individual",
+    "company"
+   ],
+   "variant": "company",
+   "page": 0,
+   "fieldId": "ulAttorneyName",
+   "label": "ulAttorneyName",
+   "source": "extra.extra-attorney-name",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "ru-company-normal"
+   ],
+   "value": "Соколов Алексей Михайлович",
+   "valueLength": 26,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 12,
+   "minFontSize": 9,
+   "printedSlotWidth": 107,
+   "printedRuleWidth": 109.94,
+   "primaryRegion": {
+    "page": 0,
+    "left": 383,
+    "baselineTop": 211.22,
+    "width": 107
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 33.01,
+   "pageFixedFooterFrom": 789.97,
+   "pageBodyBottom": 756.96,
+   "pageTopMargin": 63.85,
+   "pageBlockGaps": [
+    {
+     "from": 74.87,
+     "to": 88.58,
+     "gap": 13.71
+    },
+    {
+     "from": 113.52,
+     "to": 126.81,
+     "gap": 13.29
+    }
+   ],
+   "recoverableBlockGap": 11.0,
+   "sourceLinePitch": 18.12,
+   "sourceRowGeometry": {
+    "baselineTop": 211.22,
+    "linePitch": 18.12,
+    "sourceFontSize": 10.56,
+    "inkHeight": 11.69,
+    "ruleTop": 212.42,
+    "ruleBelowBaseline": 1.2,
+    "ruleThickness": 0.48,
+    "ruleLeft": 381.43,
+    "ruleWidth": 109.94,
+    "minRowHeight": 12.0
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (26 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «Михайлович»",
+   "classification": "mapping-width defect",
+   "note": "The sentence «уполномочивает гр. ____» wraps: the 109.94 pt rule is followed by a second printed rule of 99.36 pt on the next line, before «, далее именуемого «Поверенный»». The map used only the first, so 206 pt of printed room was reported as 107."
+  },
+  {
+   "documentId": "power-of-attorney",
+   "documentTitle": "Доверенность",
+   "subjectKinds": [
+    "individual",
+    "company"
+   ],
+   "variant": "company",
+   "page": 0,
+   "fieldId": "ulAuthorityBasis",
+   "label": "ulAuthorityBasis",
+   "source": "field.client-rep-authority",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "en-company-normal",
+    "ru-company-normal"
+   ],
+   "value": "ГУ МВД России по г. Москве",
+   "valueLength": 26,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 12,
+   "minFontSize": 9,
+   "printedSlotWidth": 96,
+   "printedRuleWidth": 99.36,
+   "primaryRegion": {
+    "page": 0,
+    "left": 58,
+    "baselineTop": 211.22,
+    "width": 96
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 33.01,
+   "pageFixedFooterFrom": 789.97,
+   "pageBodyBottom": 756.96,
+   "pageTopMargin": 63.85,
+   "pageBlockGaps": [
+    {
+     "from": 74.87,
+     "to": 88.58,
+     "gap": 13.71
+    },
+    {
+     "from": 113.52,
+     "to": 126.81,
+     "gap": 13.29
+    }
+   ],
+   "recoverableBlockGap": 11.0,
+   "sourceLinePitch": 18.12,
+   "sourceRowGeometry": {
+    "baselineTop": 211.22,
+    "linePitch": 18.12,
+    "sourceFontSize": 10.56,
+    "inkHeight": 11.69,
+    "ruleTop": 212.42,
+    "ruleBelowBaseline": 1.2,
+    "ruleThickness": 0.48,
+    "ruleLeft": 56.54,
+    "ruleWidth": 99.36,
+    "minRowHeight": 12.0
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (26 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «Москве»",
+   "classification": "fixture defect + mapping-width defect",
+   "note": "The fixture supplied an *issuing authority* because the source key contains «authority»; the field holds the document a representative acts under («Устава»). The map also used only the second of the two printed rules — 39.50 pt on the first line, 99.36 pt on the second."
+  },
+  {
+   "documentId": "qualification-notice",
+   "documentTitle": "Уведомление о признании лица квалифицированным инвестором",
+   "subjectKinds": [
+    "individual",
+    "company"
+   ],
+   "variant": "company",
+   "page": 0,
+   "fieldId": "registerEntryOrgName",
+   "label": "registerEntryOrgName",
+   "source": "field.client-full-name",
+   "formatter": null,
+   "fallbacks": [],
+   "profiles": [
+    "en-company-normal",
+    "ru-company-normal"
+   ],
+   "value": "АО «Тестовые инвестиции»",
+   "valueLength": 24,
+   "hasSpaces": true,
+   "hasHyphen": false,
+   "unbreakableToken": false,
+   "preferredFontSize": 12,
+   "minFontSize": 9,
+   "printedSlotWidth": 89,
+   "printedRuleWidth": 93.14,
+   "primaryRegion": {
+    "page": 0,
+    "left": 232,
+    "baselineTop": 472.03,
+    "width": 89
+   },
+   "continuationRegions": [],
+   "lineCapacity": 1,
+   "rowHeight": null,
+   "maxExtraRows": null,
+   "pageBottomReserve": 287.58,
+   "pageFixedFooterFrom": null,
+   "pageBodyBottom": 554.34,
+   "pageTopMargin": 60.49,
+   "pageBlockGaps": [
+    {
+     "from": 133.45,
+     "to": 145.23,
+     "gap": 11.78
+    },
+    {
+     "from": 156.25,
+     "to": 168.15,
+     "gap": 11.9
+    },
+    {
+     "from": 179.17,
+     "to": 191.55,
+     "gap": 12.38
+    },
+    {
+     "from": 202.57,
+     "to": 225.87,
+     "gap": 23.3
+    },
+    {
+     "from": 248.41,
+     "to": 283.62,
+     "gap": 35.21
+    },
+    {
+     "from": 294.64,
+     "to": 311.03,
+     "gap": 16.39
+    },
+    {
+     "from": 358.12,
+     "to": 370.62,
+     "gap": 12.5
+    },
+    {
+     "from": 381.64,
+     "to": 388.06,
+     "gap": 6.42
+    },
+    {
+     "from": 410.68,
+     "to": 416.98,
+     "gap": 6.3
+    },
+    {
+     "from": 428.08,
+     "to": 463.16,
+     "gap": 35.08
+    },
+    {
+     "from": 485.7,
+     "to": 531.42,
+     "gap": 45.72
+    }
+   ],
+   "recoverableBlockGap": 132.26,
+   "sourceLinePitch": 11.52,
+   "sourceRowGeometry": {
+    "baselineTop": 472.03,
+    "linePitch": 11.52,
+    "sourceFontSize": 9.96,
+    "inkHeight": 11.03,
+    "ruleTop": 473.11,
+    "ruleBelowBaseline": 1.08,
+    "ruleThickness": 0.48,
+    "ruleLeft": 229.01,
+    "ruleWidth": 93.14,
+    "minRowHeight": 11.5
+   },
+   "engineReason": "no-space",
+   "engineMessage": "значение (24 симв.) не помещается при минимальном кегле 9 pt: доступно строк — 1 (областей: 1), не размещено: «инвестиции»»",
+   "classification": "suitable for a larger complete operator-block cut",
+   "note": "An ordinary company name needs 107.78 pt at 9 pt in an 89 pt blank. The anchor was previously rejected as having no clean cut; the cut it was probed with ran to the page's own content bottom, which splits the trailing block. Probing to the full movable band finds a clean cut at 484.95 — just under the complete printed line the field sits on — with 13 blocks moving."
+  }
+ ],
+ "realisticLongFailures": [
+  {
+   "documentId": "accession-application-fl",
+   "fieldId": "clientFullName"
+  },
+  {
+   "documentId": "anketa-fl",
+   "fieldId": "fullName"
+  },
+  {
+   "documentId": "anketa-fl",
+   "fieldId": "passportIssuedBy"
+  },
+  {
+   "documentId": "anketa-fl-simplified-id",
+   "fieldId": "clientFullName"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "licenceAuthority"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "signatoryPosition"
+  },
+  {
+   "documentId": "client-notifications",
+   "fieldId": "clientFullName"
+  },
+  {
+   "documentId": "client-notifications",
+   "fieldId": "passportIssuedBy"
+  },
+  {
+   "documentId": "code-word-request",
+   "fieldId": "clientFullName"
+  },
+  {
+   "documentId": "order-forms",
+   "fieldId": "tradeClientName"
+  },
+  {
+   "documentId": "power-of-attorney",
+   "fieldId": "flPrincipalIssuedBy"
+  },
+  {
+   "documentId": "power-of-attorney",
+   "fieldId": "ulAttorneyIssuedBy"
+  },
+  {
+   "documentId": "power-of-attorney",
+   "fieldId": "ulCity"
+  },
+  {
+   "documentId": "power-of-attorney",
+   "fieldId": "ulExecutiveName"
+  }
+ ],
+ "stressOnlyFailures": [
+  {
+   "documentId": "accession-application-fl",
+   "fieldId": "clientEmail"
+  },
+  {
+   "documentId": "accession-application-fl",
+   "fieldId": "signatureName"
+  },
+  {
+   "documentId": "accession-application-yul",
+   "fieldId": "clientEmail"
+  },
+  {
+   "documentId": "account-opening-notice",
+   "fieldId": "paymentPurposeCurrency"
+  },
+  {
+   "documentId": "account-opening-notice",
+   "fieldId": "paymentPurposeDerivatives"
+  },
+  {
+   "documentId": "account-opening-notice",
+   "fieldId": "paymentPurposeStock"
+  },
+  {
+   "documentId": "anketa-fl",
+   "fieldId": "otherInformation"
+  },
+  {
+   "documentId": "anketa-fl-simplified-id",
+   "fieldId": "pdlDetails"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "email"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "licensedActivities"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "managementStructure"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "otherInformation"
+  },
+  {
+   "documentId": "anketa-yul",
+   "fieldId": "taxResidenceCountry"
+  },
+  {
+   "documentId": "broker-use-refusal-request",
+   "fieldId": "clientPrintedName"
+  },
+  {
+   "documentId": "broker-use-refusal-request",
+   "fieldId": "contractNumber"
+  },
+  {
+   "documentId": "order-forms",
+   "fieldId": "otherInformation"
+  },
+  {
+   "documentId": "order-forms",
+   "fieldId": "securityIssuer"
+  },
+  {
+   "documentId": "power-of-attorney",
+   "fieldId": "flAttorneyName"
+  },
+  {
+   "documentId": "power-of-attorney",
+   "fieldId": "ulAttorneyPassport"
+  },
+  {
+   "documentId": "qualification-consequences-notice",
+   "fieldId": "applicantFullName"
+  },
+  {
+   "documentId": "qualification-request-fl",
+   "fieldId": "contractNumber"
+  },
+  {
+   "documentId": "qualification-request-fl",
+   "fieldId": "signatureName"
+  },
+  {
+   "documentId": "qualification-request-yul",
+   "fieldId": "supportingDocument1"
+  },
+  {
+   "documentId": "regulation-full-refusal-notice",
+   "fieldId": "clientPrintedName"
+  },
+  {
+   "documentId": "regulation-full-refusal-notice",
+   "fieldId": "contractNumber"
+  },
+  {
+   "documentId": "regulation-partial-refusal-notice",
+   "fieldId": "clientPrintedName"
+  },
+  {
+   "documentId": "regulation-partial-refusal-notice",
+   "fieldId": "contractNumber"
+  }
+ ],
+ "counts": {
+  "ordinary": 7,
+  "realisticLong": 14,
+  "stressOnly": 27
+ }
+}

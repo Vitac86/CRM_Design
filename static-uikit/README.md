@@ -73,7 +73,7 @@ Page-specific scripts (active only when the matching HTML file explicitly links 
 - `404.html` → `assets/js/pages/404.js`
 - `account-closure-request.html` → `assets/js/pages/account-closure-request.js`
 - `contract-edit.html` → `assets/js/pages/contract-edit.js`
-- `document-wizard.html` → `assets/js/pages/document-wizard.js`
+- `document-wizard.html` → `assets/js/document-wizard/instrument-catalog.js` + `assets/js/document-wizard/order-forms-model.js` + `assets/js/pages/document-wizard.js` (the first two are reference data and the order-form payload contract; both load before the page script)
 - `middle-office-clients.html` → `assets/js/pages/middle-office.js`
 - `middle-office-reports.html` → `assets/js/pages/middle-office.js`
 - `subject-card.html` → `assets/js/pages/subject-card.js`
@@ -211,7 +211,7 @@ Direct high-quality PDF download should be implemented by UMI.CMS/backend using 
 
 **The Document Wizard is now PDF-template-oriented.** Documents are generated from **local PDF templates** with [pdf-lib](https://pdf-lib.js.org/). The old HTML print flow (fetch template → fill → open print dialog → "Save as PDF") is **removed from the active wizard**. There is no `html2pdf`, `html2canvas`, screenshot/rasterization, CDN, or external conversion service. Local pdf-lib is the only PDF library.
 
-The active wizard shows only documents that produce a PDF (a single `pdfTemplateUrl` or a `packageDocuments` package) plus the operational, non-document account-closure flow. Legacy HTML-only documents (анкеты, заявления о признании квал. инвестором, уведомления, заявление о кодовом слове) are **hidden** from the user-facing list; their configs and HTML templates remain in the repo for reference but are not used by the active wizard. It also excludes "Заявление о присоединении": that document remains part of the contract flow only (`contract-wizard.html` / `contract-edit.html`) through the existing "Выгрузить заявление" button.
+The active wizard uses one rendering-strategy dispatch for authoritative overlay maps, unchanged static package PDFs, the legacy AcroForm fallback, and the operational account-closure flow. All 18 dynamic production-ready documents are offered to the applicable subject kind, including the questionnaires, qualification documents, code-word request, both accession applications and the order forms. `anketa-isbyul` remains hidden and `transfer-requisites` remains unexposed. Legacy HTML templates are reference material and are not used by the active wizard.
 
 The wizard uses static demo subject data and client-side field binding only. Future UMI.CMS integration should replace this with backend subject data binding and, if needed, server-side PDF finalization.
 
@@ -219,7 +219,7 @@ The wizard uses static demo subject data and client-side field binding only. Fut
 
 The starter package is represented as **one** wizard row (`brokerage-starter-package`), not several selectable cards. Selecting it generates **three** PDFs together from local templates in `assets/document-pdf-templates/`:
 
-- `client-notifications.pdf` — Уведомления клиента (has AcroForm fields on the confirmation page: `client_full_name`, `client_passport_series`, `client_passport_number`, `client_passport_issued_by`, `client_passport_issue_date`, `client_registration_address`, `client_signature_full_name`, `document_date`).
+- `client-notifications.pdf` — Уведомления клиента (authoritative 10-page source; the production overlay map fills the reviewed identity/confirmation blocks on pages 9–10, with no appended page, AcroForm or widget).
 - `Risks.pdf` — Декларация о рисках (static, no AcroForm fields; returned as-is).
 - `brokerage-key-information.pdf` — Ключевая информация о договоре (static, no AcroForm fields; returned as-is).
 
@@ -234,9 +234,9 @@ For `client-notifications.pdf`, `clientFullName` is the physical person confirmi
 
 - Runtime PDF templates live **only** in `assets/document-pdf-templates/`. `assets/document-templates/` is for legacy HTML templates and must not hold runtime PDFs. Do not use `assets/document-templates/document-pdf-templates/`.
 - pdf-lib is bundled **locally** at `assets/vendor/pdf-lib.min.js` and `@pdf-lib/fontkit` at `assets/vendor/fontkit.umd.min.js`, both loaded before `document-wizard.js`. **No CDN** (unpkg / jsdelivr / cdnjs), **no external converter/service**, and **no external runtime dependencies** are used. The UIKit works fully offline.
-- "Сформировать комплект PDF" (package) / "Сформировать PDF" (single) generates the PDFs **in the browser**. The payload is built once from the parent fields and reused for every child PDF; each child config can carry its own `pdfFieldMap`. A child PDF with no AcroForm fields is returned as its original bytes.
-- Field filling uses the explicit `pdfFieldMap` first, then a direct field-name fallback: any remaining AcroForm field whose name is a payload path (`subject.*`, `field.*`, `extra.*`, `check.*`) is filled automatically, so future templates often need no custom map. New documents are config-only — no HTML template required.
-- **Visible Cyrillic rendering (real font embedding, not viewer-dependent).** A local Unicode/Cyrillic-capable font, `assets/fonts/pdf/Inter-Regular.ttf` (the project Inter typeface, merged Cyrillic + Latin coverage), is embedded with fontkit. The flow is: load → `registerFontkit` → `embedFont` → fill → `form.updateFieldAppearances(font)` → (default) `form.flatten()`. `PDF_FLATTEN_FORM = true`, so generated client-facing files are flattened and final; appearances are baked in and render identically in every viewer (not a screenshot/canvas — still a real PDF). Flatten leaves the flattened widgets' refs dangling in each page's `/Annots`; the wizard prunes non-resolving refs so the output PDF is clean. The font is never fetched from a CDN or external domain.
+- "Сформировать комплект PDF" (package) / "Сформировать PDF" (single) generates the PDFs **in the browser**. The payload is built once from exact UMI values plus normalized compatibility fields and reused for every child PDF. Production overlay maps resolve every source through `umi-adapter.js`; static package children are returned byte-for-byte.
+- Production documents use explicit overlay field maps, reviewed Word-flow/source suppression and table-row ownership. The older `pdfFieldMap`/AcroForm path remains only as a compatibility fallback for a prepared form that explicitly selects that rendering strategy; it is not the production-ready default.
+- **Visible Cyrillic rendering (real font embedding, not viewer-dependent).** Overlay documents embed the local Liberation Serif family used by the source forms. The legacy AcroForm fallback embeds local Inter and flattens its fields. Both paths create selectable PDF text, never a screenshot/canvas; the font files are never fetched from a CDN or external domain.
 - **Dates** are inserted Russian-formatted as `DD.MM.YYYY` via the normalized `field.documentDateRu`; raw ISO (`YYYY-MM-DD`) values are never written into a PDF.
 - After generation the UI is compact: a one-line status (e.g. «PDF-комплект сформирован: 3 файла. Файлы не отправлялись.»), three short download links («Скачать уведомления», «Скачать декларацию о рисках», «Скачать ключевую информацию»), a short privacy note, and a collapsed `<details>Технические детали` block. All Object URLs are revoked when another document is selected, so blobs never leak.
 - Upload happens **only** when an internal endpoint is explicitly configured via `window.CRM_DOCUMENT_UPLOAD_ENDPOINT` or `<body data-document-upload-endpoint="…">`. When no endpoint is configured, sensitive data never leaves the browser: the PDFs are generated locally and offered as download links only. When configured, all generated files are POSTed in **one** `multipart/form-data` request — each blob under `files[]`, plus a `documentsManifest` (JSON array of `{id, title, filename}`) and `subjectId` / `subjectCode` / `subjectName` / `documentType` / `documentTitle` / `source` fields (`credentials: 'include'`, no manually set `Content-Type`).
@@ -250,9 +250,32 @@ To avoid asking the user to retype data that already exists, every document conf
 
 New wizard configs must keep this split: list only document-specific entries in `fields` / `checkFields`, and resolve everything else from subject/representative data.
 
+#### Wizard control types
+
+`fields[].type` selects the control step 2 renders. Beyond `text`, `textarea`, `date` and `select`:
+
+- **`number`** — a numeric control for a quantity, a price or an amount. With `positive: true` a value of zero or less is refused, so «100 шт.» or «сто» cannot reach a form that asked for a number. `min`, `max` and `step` are passed through.
+- **`autocomplete`** — a searchable selector over a reference catalog named by `catalog`. The manager types to search, but only picking a result produces a value: the typed text is not a payload key and never reaches a PDF, while the chosen item's id lands in the field's key and a read-only summary card shows what was selected. Generation is refused when text is present with no selection behind it, which is the case this control exists for.
+- **`derived`** — a payload key that belongs to the contract but is never typed. Nothing is rendered (beyond an optional `staticText` note) and the document's own payload step fills it. Used for values a manager must not be able to contradict: an issuer taken from the selected security, a fixed submission kind, a printable validity built from a mode plus a date, an amount spelled out from the figure beside it.
+- **`readonly`** — a value the CRM already owns, shown so it can be checked and not so it can be retyped. `valueFrom` is a dotted path into the context the document's `resolveContext(subject, values)` returns, re-resolved on every change: a payout's bank requisites depend on the currency chosen above them. The key still reaches the payload exactly as a typed field would.
+
+`showWhen` accepts a leaf condition (`{ source, equals | notEquals }`) or a combination — `{ allOf: [...] }` / `{ anyOf: [...] }`, nested freely. A hidden control keeps its DOM value, so a branch condition should re-state its parent rather than assume it.
+
+A `checkFields` entry marked `hidden: true` keeps its registry entry and its `defaultChecked` value and is not offered: a mark the form always carries is not a question.
+
+#### Instrument reference data (order forms)
+
+`assets/js/document-wizard/instrument-catalog.js` is the single static mock for everything a manager can pick as a traded instrument — securities, currency instruments and derivatives — and the file a backend replaces with QORT calls. Nothing else hardcodes an instrument.
+
+It is shaped after the model it stands in for: a security is an **Asset**, its stable id is `AssetID`, the issuer is `Assets.EmitentFirm_ID → Firms`, and the `Securities` rows of the T+, РПС, РЕПО and OTC sections are search **aliases** — results are deduplicated by `AssetID`, so one share is offered once however many sections it trades in. A selected security is deliberately not bound to a trading section: the order carries the Asset, and REPO/SWAP are separate order parameters. `Securities.SecurityName` is never displayed and never printed, and CFI is never printed.
+
+`assets/js/document-wizard/order-forms-model.js` is the payload contract of Приложение 7. It derives the values a manager must not type (issuer, the compact printed security description, the FX instrument name, derivative master data, the printable validity, «Рыночная» for a market order, the fixed primary submission) and rebuilds the outgoing payload from an allow-list per branch, so a security abandoned by a switch to the currency market cannot be printed on the order.
+
+It also owns the two values the money forms must not ask twice for. The **amount in words** is spelled out from the figure and the currency, with full Russian agreement and kopecks as digits; the printed blank holds one narrow line, so the map opens a reviewed continuation line beneath it for a long wording. The **payout bank requisites** resolve from the subject card's `bankRequisites` record for the currency being withdrawn — the mock standing in for `Front Реквизиты` — and the rows a payout cannot be executed without are validated before generation, so missing CRM data refuses the document by name instead of printing a half-filled order.
+
 #### Word-source templates (DOCX)
 
-Word templates are **source/reference** materials only and live in `reference/document-source-docx/` (not runtime). The active wizard consumes prepared, fillable **PDF** templates from `assets/document-pdf-templates/`. Runtime DOCX → PDF conversion in the browser is intentionally not implemented (not reliable enough for final financial/legal documents). To activate a DOCX document: prepare a fillable PDF (AcroForm fields named per the convention), drop it in `assets/document-pdf-templates/`, and add a config entry. A DOCX-only document is not shown in the wizard until its PDF template exists. See `reference/document-source-docx/README.md` for the full workflow and field-naming convention.
+Word templates are **source/reference** materials only and live in `reference/document-source-docx/` (not runtime). The active wizard consumes authoritative PDFs from `assets/document-pdf-templates/`; production field maps add selectable text directly to reviewed source geometry and do not require AcroForm fields. Runtime DOCX → PDF conversion in the browser is intentionally not implemented. To activate a document, prepare and audit its final source PDF, add its production field map and catalogue entry, then pass the canonical structural, layout and visual-review gates. See `reference/document-source-docx/README.md` for the source workflow.
 
 ## Client-side demo pagination
 Registry list pages (subjects, requests, compliance, trading, agents, etc.) include client-side demo pagination driven by `crm-static.js`.

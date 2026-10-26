@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <title>Document engine — QA harness</title>
+<link rel="icon" href="../assets/icons/favicon_blue.ico"/>
 <!--
   Visual-QA harness for the PDF overlay engine.
 
@@ -43,6 +44,10 @@
 <script src="../assets/vendor/fontkit.umd.min.js"></script>
 <script src="../assets/js/document-engine/pdf-text-layout.js"></script>
 <script src="../assets/js/document-engine/pdf-checkbox-renderer.js"></script>
+<script src="../assets/js/document-engine/pdf-page-expander.js"></script>
+<script src="../assets/js/document-engine/umi-registry.js"></script>
+<script src="../assets/js/document-engine/umi-adapter.js"></script>
+<script src="../assets/js/document-engine/table-ownership.js"></script>
 <script src="../assets/js/document-engine/pdf-overlay-renderer.js"></script>
 <script src="../assets/js/document-field-maps/accession-application-fl.js"></script>
 <script src="../assets/js/document-field-maps/accession-application-yul.js"></script>
@@ -83,6 +88,8 @@
         documentDateRu: '28.07.2026'
       },
       extraValues: {
+        'extra-depository-contract': 'ДЕПО-QA/0417',
+        'extra-depository-contract-date': '2026-08-02',
         'depo-account-type': 'owner',
         'trading-depo-account-type': 'owner',
         'report-delivery': 'email',
