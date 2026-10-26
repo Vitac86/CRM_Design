@@ -89,6 +89,10 @@ SUITES = [
     ("reviewed operator ranges", "run_reviewed_operator_range_tests.py", []),
     ("preflight/render agreement", "run_preflight_render_agreement_tests.py", []),
     ("Document Wizard", "run_wizard_tests.py", []),
+    # Приложение 7 is three forms in one file and four mutually exclusive
+    # instrument blocks inside one of them. Its own suite drives each
+    # branch through the real page and reads the result out of the PDF.
+    ("order forms", "run_order_forms_tests.py", []),
     ("Template Builder", "run_builder_qa.py", []),
     ("identifier manifest", "check_identifier_manifest.py", []),
     ("Word-flow static equivalence", "check_word_flow_static_equivalence.py", []),

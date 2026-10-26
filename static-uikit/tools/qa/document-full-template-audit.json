@@ -27,8 +27,8 @@
   },
   "productionStatusCounts": {
     "blocked": 0,
-    "blocked-incomplete-mapping": 1,
-    "dynamic-production-ready": 17,
+    "blocked-incomplete-mapping": 0,
+    "dynamic-production-ready": 18,
     "hidden-by-decision": 1,
     "static-download-by-design": 2,
     "unexposed-by-decision": 1
@@ -275,7 +275,7 @@
       "documentId": "order-forms",
       "templateFilename": "order-forms.pdf",
       "title": "Поручение (формы поручений)",
-      "productionStatus": "blocked-incomplete-mapping",
+      "productionStatus": "dynamic-production-ready",
       "pageCount": 4,
       "catalogueEntry": "order-forms",
       "cataloguePackage": null,
@@ -284,13 +284,13 @@
         "company"
       ],
       "fieldMap": "order-forms",
-      "generationMode": "not-offered",
-      "exposure": "not-offered",
-      "qaStatus": "source SHA-256 / page-count byte baseline only",
-      "reason": "Приложение 7 carries three order forms across four pages. The map places 93 fields, but 89 of them read `extra.*` — values an operator types — and every one is optional, so the form generates almost entirely blank unless a manager fills a form the wizard does not really ask. Only the client name is bound to CRM data. Amount, currency, venue, recipient, bank name, BIK/SWIFT, correspondent and settlement accounts, intermediary bank, personal identifiers, the initiator block and the representative's authority are all unbound, and the bank details among them exist in UMI (Front Реквизиты) and simply are not wired. Calling that production-ready would put a mostly empty order in front of a client. The per-row inventory and the exact UMI name for every row that has one are in docs/order-forms-mapping-gap.md; finishing it is a separate task.",
-      "userCanDownload": false,
-      "futureMappingRequired": true,
-      "excludedFromCurrentRelease": true
+      "generationMode": "browser-overlay",
+      "exposure": "offered",
+      "qaStatus": "ordinary + realistic-long fixtures, structural and visual QA",
+      "reason": null,
+      "userCanDownload": true,
+      "futureMappingRequired": false,
+      "excludedFromCurrentRelease": false
     },
     {
       "documentId": "power-of-attorney",
@@ -86814,7 +86814,7 @@
       "templateFilename": "order-forms.pdf",
       "templatePath": "static-uikit/assets/document-pdf-templates/order-forms.pdf",
       "documentRole": "dynamic-overlay",
-      "productionStatus": "blocked-incomplete-mapping",
+      "productionStatus": "dynamic-production-ready",
       "byteLength": 253605,
       "sha256": "24e593d1df7f5438252814d31a64e1b8516cce61c76127dd468606f829de17b1",
       "pageCount": 4,
@@ -142058,6 +142058,7 @@
             "rowHeight": 19.56,
             "maxExtraRows": 1,
             "lineStyle": "none",
+            "moveTopLevelPaths": true,
             "reviewStatus": "approved"
           },
           "sourceReplacement": {
@@ -142580,6 +142581,7 @@
             "rowHeight": 9.72,
             "maxExtraRows": 4,
             "lineStyle": "none",
+            "moveTopLevelPaths": true,
             "reviewStatus": "approved"
           },
           "sourceReplacement": {
@@ -174683,7 +174685,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "multi-region-field-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -174696,7 +174698,7 @@
         12
       ],
       "lineHeightPt": [
-        null
+        10.98
       ],
       "alignment": [
         "center"
@@ -176344,7 +176346,7 @@
       ],
       "existingVariableNamesPreserved": true,
       "currentRenderingModel": [
-        "fixed-field-overlay"
+        "multi-region-field-overlay"
       ],
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
@@ -176357,7 +176359,7 @@
         12
       ],
       "lineHeightPt": [
-        null
+        10.98
       ],
       "alignment": [
         "center"
@@ -184400,7 +184402,7 @@
             "reviewStatus": "approved",
             "drawUnderline": true,
             "underlineThickness": 0.36,
-            "underlineOffset": 1.6
+            "underlineOffset": 2.8
           }
         ]
       }
@@ -184481,7 +184483,7 @@
             "reviewStatus": "approved",
             "drawUnderline": true,
             "underlineThickness": 0.36,
-            "underlineOffset": 1.6
+            "underlineOffset": 2.8
           }
         ]
       }
@@ -184562,7 +184564,7 @@
             "reviewStatus": "approved",
             "drawUnderline": true,
             "underlineThickness": 0.36,
-            "underlineOffset": 1.6
+            "underlineOffset": 2.8
           }
         ]
       }
@@ -208640,6 +208642,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Информация о контрагенте",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -208702,6 +208705,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Вид инструмента срочного рынка",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -208764,6 +208768,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Наименование ПФИ",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -208826,6 +208831,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Цена ПФИ (премия)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -208888,6 +208894,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Количество ПФИ, шт. (лотов)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209230,9 +209237,9 @@
         "id": "orderKindConditionalText",
         "source": "extra.extra-order-kind-conditional",
         "page": 0,
-        "left": 438,
+        "left": 431,
         "baselineTop": 382.97,
-        "width": 82,
+        "width": 74,
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
@@ -209240,6 +209247,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Условное поручение (указать)",
         "showWhen": {
           "source": "extra.extra-order-kind",
           "equals": "conditional"
@@ -209418,6 +209426,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Срок действия заявки",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209480,6 +209489,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Иная информация",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209658,6 +209668,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Наименование эмитента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209720,6 +209731,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Цена одной ценной бумаги / НКД / валюта цены",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209782,6 +209794,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Количество ценных бумаг",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209846,6 +209859,7 @@
         "multiline": true,
         "maxLines": 2,
         "lineHeight": 9.5,
+        "label": "Вид, категория (тип), выпуск, транш, серия, ISIN",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209908,6 +209922,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Срок расчётов",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -209970,6 +209985,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Сумма сделки в валюте сделки",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210032,6 +210048,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Брокерский счёт №",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210183,6 +210200,7 @@
           }
         },
         "overflowStrategy": "expand-layout",
+        "label": "Наименование/ФИО клиента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210245,6 +210263,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Номер и дата договора с клиентом",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210413,9 +210432,9 @@
         "id": "tradeKindOtherText",
         "source": "extra.extra-trade-kind-other",
         "page": 0,
-        "left": 404,
+        "left": 424,
         "baselineTop": 325.25,
-        "width": 96,
+        "width": 56.5,
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
@@ -210423,6 +210442,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Иной вид сделки (указать)",
         "showWhen": {
           "source": "extra.extra-trade-kind",
           "equals": "other"
@@ -210543,6 +210563,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Номер и дата заявки",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210663,6 +210684,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Сумма сделки (ПФИ)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210726,6 +210748,7 @@
         "optional": true,
         "multiline": false,
         "format": "dateRu",
+        "label": "Дата исполнения (экспирации)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210788,6 +210811,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Цена исполнения страйк (для опционов)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210850,6 +210874,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Сумма сделки в валюте котировки",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210914,6 +210939,7 @@
         "multiline": true,
         "maxLines": 2,
         "lineHeight": 9.5,
+        "label": "Наименование валютного инструмента / инструмента драг. металлов",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -210976,6 +211002,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Количество лотов валютного инструмента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -211038,6 +211065,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Курс валюты / цена сделки с драг. металлами",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "trade"
@@ -211264,9 +211292,9 @@
         "id": "moveAmountFigures",
         "source": "extra.extra-move-amount",
         "page": 2,
-        "left": 160,
+        "left": 194.5,
         "baselineTop": 433.63,
-        "width": 88,
+        "width": 52.5,
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
@@ -211274,6 +211302,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Сумма перевода (цифрами)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "transfer"
@@ -211302,15 +211331,15 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "multi-region-field-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 3",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 12,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 10.98,
+      "lineHeightModel": "explicit",
       "alignment": "center",
       "underlineBorderStyle": "source-pdf-table-cell-border",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -211326,9 +211355,9 @@
         "id": "moveAmountWords",
         "source": "extra.extra-move-amount-words",
         "page": 2,
-        "left": 252,
+        "left": 253,
         "baselineTop": 433.63,
-        "width": 112,
+        "width": 106.5,
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
@@ -211336,6 +211365,38 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "lineHeight": 10.98,
+        "flowRegions": [
+          {
+            "page": 2,
+            "left": 253,
+            "baselineTop": 433.63,
+            "width": 106.5,
+            "maxLines": 1
+          },
+          {
+            "page": 2,
+            "left": 74.18,
+            "baselineTop": 454.2,
+            "width": 472.42,
+            "maxLines": 1,
+            "maxFontSize": 9,
+            "generated": true,
+            "reviewStatus": "approved"
+          },
+          {
+            "page": 2,
+            "left": 74.18,
+            "baselineTop": 465.18,
+            "width": 472.42,
+            "maxLines": 1,
+            "maxFontSize": 9,
+            "generated": true,
+            "reviewStatus": "approved"
+          }
+        ],
+        "overflowStrategy": "flow",
+        "label": "Сумма перевода (прописью)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "transfer"
@@ -211398,6 +211459,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Брокерский счёт №",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "transfer"
@@ -211518,6 +211580,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Наименование/ФИО клиента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "transfer"
@@ -211580,6 +211643,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Номер и дата договора с клиентом",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "transfer"
@@ -212164,6 +212228,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Номер и дата заявки",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "transfer"
@@ -212516,6 +212581,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "БИК/SWIFT банка получателя",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212578,6 +212644,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Корреспондентский счёт банка получателя",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212640,6 +212707,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Наименование банка-корреспондента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212702,6 +212770,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "SWIFT банка-корреспондента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212764,6 +212833,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Наименование банка получателя",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212826,6 +212896,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Прочее",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212888,6 +212959,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Лицевой счёт",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -212950,6 +213022,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Получатель (наименование/ФИО)",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -213012,6 +213085,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Счёт получателя",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -213074,6 +213148,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "ИНН получателя",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -213126,9 +213201,9 @@
         "id": "payoutAmount",
         "source": "extra.extra-payout-amount",
         "page": 3,
-        "left": 150,
+        "left": 134,
         "baselineTop": 273.29,
-        "width": 110,
+        "width": 112.5,
         "font": "legalSerif",
         "fontSize": 11,
         "minFontSize": 9,
@@ -213136,6 +213211,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Сумма вывода (цифрами)",
         "showWhen": {
           "source": "extra.extra-payout-amount-mode",
           "equals": "amount"
@@ -213164,15 +213240,15 @@
         "format": null,
         "fallbacks": []
       },
-      "currentRenderingModel": "fixed-field-overlay",
+      "currentRenderingModel": "multi-region-field-overlay",
       "targetRenderingModel": "bounded-table-cell-with-reviewed-row-growth",
       "intendedLayoutCategory": "multiline-table-cell",
       "staticTextInvolved": "source PDF underlay on page 4",
       "fontFamily": "Liberation Serif",
       "fontKey": "legalSerif",
       "fontSizePt": 12,
-      "lineHeightPt": null,
-      "lineHeightModel": "renderer-auto",
+      "lineHeightPt": 10.98,
+      "lineHeightModel": "explicit",
       "alignment": "center",
       "underlineBorderStyle": "source-pdf-table-cell-border",
       "normalFixtureResult": "pass (zero ordinary-class failures in audited baseline)",
@@ -213188,9 +213264,9 @@
         "id": "payoutAmountWords",
         "source": "extra.extra-payout-amount-words",
         "page": 3,
-        "left": 268,
+        "left": 253,
         "baselineTop": 273.29,
-        "width": 130,
+        "width": 106.5,
         "font": "legalSerif",
         "fontSize": 12,
         "minFontSize": 9,
@@ -213198,6 +213274,28 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "lineHeight": 10.98,
+        "flowRegions": [
+          {
+            "page": 3,
+            "left": 253,
+            "baselineTop": 273.29,
+            "width": 106.5,
+            "maxLines": 1
+          },
+          {
+            "page": 3,
+            "left": 81.98,
+            "baselineTop": 293.97,
+            "width": 464.62,
+            "maxLines": 1,
+            "maxFontSize": 9,
+            "generated": true,
+            "reviewStatus": "approved"
+          }
+        ],
+        "overflowStrategy": "flow",
+        "label": "Сумма вывода (прописью)",
         "showWhen": {
           "source": "extra.extra-payout-amount-mode",
           "equals": "amount"
@@ -213260,6 +213358,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Брокерский счёт №",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -213380,6 +213479,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Наименование/ФИО клиента",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -213442,6 +213542,7 @@
         "required": true,
         "optional": true,
         "multiline": false,
+        "label": "Номер и дата договора с клиентом",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"
@@ -214084,6 +214185,7 @@
         "required": false,
         "optional": true,
         "multiline": false,
+        "label": "Номер и дата заявки",
         "showWhen": {
           "source": "extra.extra-order-type",
           "equals": "withdrawal"

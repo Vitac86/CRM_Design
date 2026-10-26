@@ -70,7 +70,7 @@ without an overlay map cannot appear even by accident.
 | 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | ✅ | ✅ | ✅ migrated |
 | 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | ✅ | — | ◒ unexposed by decision; mapping required before exposure |
 | 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
-| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | — | ⛔ blocked — incomplete mapping |
+| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
 | 7 | ПРИЛОЖЕНИЕ 9 … ОТКАЗ ОТ ПРЕДОСТАВЛЕНИЯ БРОКЕРУ ПРАВА ….docx | `broker-use-refusal-request` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 8 | ПРИЛОЖЕНИЕ 10 … ОТКАЗ ИСПОЛНЕНИЯ РЕГЛАМЕНТА В ЦЕЛОМ.docx | `regulation-full-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 9 | ПРИЛОЖЕНИЕ 11 … ОТКАЗ ОТ ЧАСТИ УСЛУГ ПО РЕГЛАМЕНТУ.docx | `regulation-partial-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
@@ -107,20 +107,18 @@ without an overlay map cannot appear even by accident.
 | Metric | Count |
 | --- | --- |
 | Distinct source documents | **21** |
-| ✅ dynamic production-ready and offered | **17** |
+| ✅ dynamic production-ready and offered | **18** |
 | ◐ static by design | **2** |
 | ◌ hidden by decision | **1** |
 | ◒ unexposed by decision | **1** |
-| ⛔ blocked — incomplete mapping | **1** |
 
-The last five rows are the **22 committed PDF-template statuses**. The source
+The last four rows are the **22 committed PDF-template statuses**. The source
 directory has 21 distinct documents because `Risks.pdf`, one of the two static
 templates, is an additional committed package asset with no source-directory
 counterpart. The non-production-dynamic classifications are not
 interchangeable: `anketa-isbyul` is hidden because the CRM has no subject
-model, `transfer-requisites` is unexposed because its client-specific blanks
-have no map, and `order-forms` is blocked because its retained map is
-incomplete.
+model, and `transfer-requisites` is unexposed because its client-specific
+blanks have no map.
 
 Per-suite totals are deliberately **not** restated here. They moved with every
 change and were quietly wrong for several phases — the stress-only count read
@@ -141,15 +139,17 @@ The final status of all 22 templates — which are generated, which are offered
 as a static download, which are hidden or unexposed, and why — is
 [document-full-template-audit.md](document-full-template-audit.md), which is
 generated from the executable maps and the wizard catalogue rather than
-maintained by hand. In summary: 17 dynamic production-ready, 2 static by
-design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model), 1
-unexposed by decision (`transfer-requisites`) and 1 blocked on incomplete
-mapping (`order-forms`).
+maintained by hand. In summary: 18 dynamic production-ready, 2 static by
+design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model) and 1
+unexposed by decision (`transfer-requisites`).
 
-`order-forms` was counted as production-ready until manual review found it
-generating almost entirely blank: 80 of its 93 printed fields have no source
-and every field is optional, so nothing objected. It is no longer offered.
-Every printed row, with the exact UMI name where one exists, is in
+`order-forms` spent one release blocked: it generated almost entirely blank
+because 80 of its 93 printed fields had no source and every field was optional,
+so nothing objected. It is offered again now that the values a mistake would
+make expensive come from fixed options or from the instrument reference data,
+that the branch a manager did not fill cannot contribute to the paper, and that
+its own suite drives every branch and reads the result back out of the PDF. The
+per-row inventory and the exact UMI name for every row that has one are in
 [order-forms-mapping-gap.md](order-forms-mapping-gap.md).
 
 Static by design, issued unchanged because neither carries a client-specific
@@ -216,7 +216,6 @@ the seal.
 | Document | Reason |
 | --- | --- |
 | Анкета ИСБЮЛ (`anketa-isbyul`) | **Hidden by decision — authoritative template available, but the CRM has no ИСБЮЛ subject model or required data sources.** The clean 4-page template is committed and verified, but none of the ~50 values the form asks for (код КИО, место присвоения, состав имущества в управлении, протектор, учредители) exist in any CRM record, and there is no «иностранная структура без образования юридического лица» subject type. It has no wizard card, no company applicability and no default values; ordinary Russian-company fields are deliberately *not* mapped onto it. |
-| Формы поручений (`order-forms`) | **Blocked — incomplete mapping.** The retained 4-page map places 93 optional fields, but 90 are still operator workflow sources and only the three client-name occurrences reach normalized CRM data. It is explicitly `blockedIncompleteMapping`, not offered, and requires the separate field-by-field decisions in [order-forms-mapping-gap.md](order-forms-mapping-gap.md). |
 
 ## Per-document detail for the documents completed last
 
@@ -304,18 +303,74 @@ individuals name, citizenship, passport, issuing authority, issue date, address.
 
 Map `…/order-forms.js`; output `poruchenie.pdf`; PDF SHA-256 `24e593d1…`.
 
-**Status: `blocked-incomplete-mapping`; not offered.** The behavior below
-describes the retained implementation scaffold, not a client-ready document.
+**Status: `dynamic-production-ready`; offered to both subject kinds.**
 
 Three separate order forms in one file, one registry entry. «Тип поручения»
 selects one; the other two stay blank and all four pages are always emitted.
 
-**Mutually exclusive groups:** primary/cancellation, вид сделки, вид рынка, вид
-поручения, РЕПО с ЦК, валютный СВОП с ЦК, both trading-venue lists, both
-currency rows, payout amount mode. **Independent:** the непокрытая-позиция
-acknowledgement. **Explanatory, never marked:** the «(указать)» captions.
+**Fixed rather than typed.** Вид сделки, вид рынка, вид поручения, срок
+действия, срок расчётов, РЕПО с ЦК and валютный СВОП с ЦК are closed choices.
+Вид подачи is not a choice at all — every order this process produces is a
+primary submission, so `extra-submission-kind` is fixed to `primary` in the
+payload and the cancellation box can never be marked. Условное поручение is not
+offered either: the map keeps the box and the «(указать)» slot, and the wizard
+never produces `conditional`. The непокрытая-позиция acknowledgement is set for
+every trade order rather than asked.
+
+**The traded instrument comes from reference data**, never from typing. A
+security is an Asset — `assets/js/document-wizard/instrument-catalog.js`, the
+static mock a backend replaces with QORT — found by ticker, short name, full
+name, ISIN or issuer, and offered once however many `Securities` rows it has.
+Selecting one stores its `AssetID` and derives the issuer and the compact
+printed description («Акции обыкновенные, ISIN RU0009029540»); neither can be
+edited by hand, `SecurityName` is never used and CFI is never printed. Currency
+instruments and derivatives work the same way through their own catalogs.
+
+**Only the branch that was filled reaches the paper.** The trade form carries
+four mutually exclusive instrument blocks, and the map draws a trade-form row
+whenever the order is a trade — so the payload is rebuilt per branch in
+`assets/js/document-wizard/order-forms-model.js` and a security abandoned by a
+switch to the currency market cannot be printed on it. OTC is the one market
+that carries two kinds of instrument, and it carries securities and currency
+instruments only: derivatives are the срочный рынок and are never offered under
+it.
+
+**Mutually exclusive groups:** вид сделки, вид рынка, вид поручения, РЕПО с ЦК,
+валютный СВОП с ЦК, both trading-venue lists, both currency rows, payout amount
+mode. **Always marked:** primary submission, and the непокрытая-позиция
+acknowledgement on a trade order. **Never marked:** cancellation, and условное.
+**Explanatory, never marked:** the «(указать)» captions.
+
+**The amount is written once.** Both money forms print it twice — «цифрами»
+and «прописью» — and the second is derived from the first, never typed: a
+manager who writes a sum twice can write it two ways. The wording is spelled
+out in the currency selected above it, with the Russian agreement that goes
+with it («один рубль», «два рубля», «одна тысяча»), and kopecks as digits, the
+convention on Russian payment documents. «В размере свободного остатка» has no
+figure, so it spells nothing.
+
+The printed «прописью» blank is a single ~106 pt line — handwriting width — and
+a full Russian amount does not fit it at the 9 pt readability floor. It is not
+left blank for that: the map opens a reviewed continuation line in the measured
+empty band beneath the row, the way the accession form's tariff plans
+continue, and the value drops to 9 pt the moment it needs that line. The
+largest amount either form can carry is 493.7 pt against 571 pt of capacity.
 
 **Blank:** every «Заполняется ООО «Инвестика»» block and every signature rule.
+
+**The payout bank block is CRM data, not a form to fill.** All ten rows resolve
+from the subject card — the static `bankRequisites` mock standing in for
+`Front Реквизиты`, where each row already has an exact UMI name — and are shown
+read-only so a manager can check them and cannot retype them. A client may hold
+several records; the one a payout uses follows the currency selected above it,
+so the block refreshes when that changes.
+
+What a payout cannot be executed without is validated: получатель, банк
+получателя, БИК/SWIFT, корреспондентский счёт and счёт получателя always, plus
+the intermediary bank's SWIFT and name on a route that has one. A domestic
+rouble route has no intermediary, and empty is the right answer there rather
+than a missing one. Missing CRM data refuses the document and names the rows,
+rather than printing a half-filled payout order.
 
 ### `anketa-ip-sz` — Приложение 18, 5 pages, individuals only
 

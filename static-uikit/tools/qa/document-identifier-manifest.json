@@ -6,7 +6,7 @@
     "fields": 636,
     "registryDocuments": 22,
     "overlayBindings": 18,
-    "wizardKeys": 304,
+    "wizardKeys": 310,
     "checkKeys": 59,
     "formatterNames": 13
   },
@@ -3803,6 +3803,11 @@
     {
       "documentId": "order-forms",
       "group": "fields",
+      "key": "extra-derivative-id"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
       "key": "extra-derivative-kind"
     },
     {
@@ -3834,6 +3839,11 @@
       "documentId": "order-forms",
       "group": "fields",
       "key": "extra-fx-instrument"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-fx-instrument-id"
     },
     {
       "documentId": "order-forms",
@@ -3913,6 +3923,21 @@
     {
       "documentId": "order-forms",
       "group": "fields",
+      "key": "extra-order-validity-date"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-order-validity-mode"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-otc-instrument-type"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
       "key": "extra-payout-amount"
     },
     {
@@ -3939,6 +3964,11 @@
       "documentId": "order-forms",
       "group": "fields",
       "key": "extra-repo-ccp"
+    },
+    {
+      "documentId": "order-forms",
+      "group": "fields",
+      "key": "extra-security-asset-id"
     },
     {
       "documentId": "order-forms",

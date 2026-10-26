@@ -73,7 +73,7 @@ Page-specific scripts (active only when the matching HTML file explicitly links 
 - `404.html` → `assets/js/pages/404.js`
 - `account-closure-request.html` → `assets/js/pages/account-closure-request.js`
 - `contract-edit.html` → `assets/js/pages/contract-edit.js`
-- `document-wizard.html` → `assets/js/pages/document-wizard.js`
+- `document-wizard.html` → `assets/js/document-wizard/instrument-catalog.js` + `assets/js/document-wizard/order-forms-model.js` + `assets/js/pages/document-wizard.js` (the first two are reference data and the order-form payload contract; both load before the page script)
 - `middle-office-clients.html` → `assets/js/pages/middle-office.js`
 - `middle-office-reports.html` → `assets/js/pages/middle-office.js`
 - `subject-card.html` → `assets/js/pages/subject-card.js`
@@ -211,7 +211,7 @@ Direct high-quality PDF download should be implemented by UMI.CMS/backend using 
 
 **The Document Wizard is now PDF-template-oriented.** Documents are generated from **local PDF templates** with [pdf-lib](https://pdf-lib.js.org/). The old HTML print flow (fetch template → fill → open print dialog → "Save as PDF") is **removed from the active wizard**. There is no `html2pdf`, `html2canvas`, screenshot/rasterization, CDN, or external conversion service. Local pdf-lib is the only PDF library.
 
-The active wizard uses one rendering-strategy dispatch for authoritative overlay maps, unchanged static package PDFs, the legacy AcroForm fallback, and the operational account-closure flow. All 17 dynamic production-ready documents are offered to the applicable subject kind, including the questionnaires, qualification documents, code-word request and both accession applications. `order-forms` remains `blocked-incomplete-mapping`; `anketa-isbyul` remains hidden and `transfer-requisites` remains unexposed. Legacy HTML templates are reference material and are not used by the active wizard.
+The active wizard uses one rendering-strategy dispatch for authoritative overlay maps, unchanged static package PDFs, the legacy AcroForm fallback, and the operational account-closure flow. All 18 dynamic production-ready documents are offered to the applicable subject kind, including the questionnaires, qualification documents, code-word request, both accession applications and the order forms. `anketa-isbyul` remains hidden and `transfer-requisites` remains unexposed. Legacy HTML templates are reference material and are not used by the active wizard.
 
 The wizard uses static demo subject data and client-side field binding only. Future UMI.CMS integration should replace this with backend subject data binding and, if needed, server-side PDF finalization.
 
@@ -249,6 +249,29 @@ To avoid asking the user to retype data that already exists, every document conf
 - **User-entered (shown in step 2):** only document-specific values — signing/confirmation date, selected representative (legal entities), operation type, reason, contract number when not known from context, code-word action, qualification basis, specific declarations/checkboxes.
 
 New wizard configs must keep this split: list only document-specific entries in `fields` / `checkFields`, and resolve everything else from subject/representative data.
+
+#### Wizard control types
+
+`fields[].type` selects the control step 2 renders. Beyond `text`, `textarea`, `date` and `select`:
+
+- **`number`** — a numeric control for a quantity, a price or an amount. With `positive: true` a value of zero or less is refused, so «100 шт.» or «сто» cannot reach a form that asked for a number. `min`, `max` and `step` are passed through.
+- **`autocomplete`** — a searchable selector over a reference catalog named by `catalog`. The manager types to search, but only picking a result produces a value: the typed text is not a payload key and never reaches a PDF, while the chosen item's id lands in the field's key and a read-only summary card shows what was selected. Generation is refused when text is present with no selection behind it, which is the case this control exists for.
+- **`derived`** — a payload key that belongs to the contract but is never typed. Nothing is rendered (beyond an optional `staticText` note) and the document's own payload step fills it. Used for values a manager must not be able to contradict: an issuer taken from the selected security, a fixed submission kind, a printable validity built from a mode plus a date, an amount spelled out from the figure beside it.
+- **`readonly`** — a value the CRM already owns, shown so it can be checked and not so it can be retyped. `valueFrom` is a dotted path into the context the document's `resolveContext(subject, values)` returns, re-resolved on every change: a payout's bank requisites depend on the currency chosen above them. The key still reaches the payload exactly as a typed field would.
+
+`showWhen` accepts a leaf condition (`{ source, equals | notEquals }`) or a combination — `{ allOf: [...] }` / `{ anyOf: [...] }`, nested freely. A hidden control keeps its DOM value, so a branch condition should re-state its parent rather than assume it.
+
+A `checkFields` entry marked `hidden: true` keeps its registry entry and its `defaultChecked` value and is not offered: a mark the form always carries is not a question.
+
+#### Instrument reference data (order forms)
+
+`assets/js/document-wizard/instrument-catalog.js` is the single static mock for everything a manager can pick as a traded instrument — securities, currency instruments and derivatives — and the file a backend replaces with QORT calls. Nothing else hardcodes an instrument.
+
+It is shaped after the model it stands in for: a security is an **Asset**, its stable id is `AssetID`, the issuer is `Assets.EmitentFirm_ID → Firms`, and the `Securities` rows of the T+, РПС, РЕПО and OTC sections are search **aliases** — results are deduplicated by `AssetID`, so one share is offered once however many sections it trades in. A selected security is deliberately not bound to a trading section: the order carries the Asset, and REPO/SWAP are separate order parameters. `Securities.SecurityName` is never displayed and never printed, and CFI is never printed.
+
+`assets/js/document-wizard/order-forms-model.js` is the payload contract of Приложение 7. It derives the values a manager must not type (issuer, the compact printed security description, the FX instrument name, derivative master data, the printable validity, «Рыночная» for a market order, the fixed primary submission) and rebuilds the outgoing payload from an allow-list per branch, so a security abandoned by a switch to the currency market cannot be printed on the order.
+
+It also owns the two values the money forms must not ask twice for. The **amount in words** is spelled out from the figure and the currency, with full Russian agreement and kopecks as digits; the printed blank holds one narrow line, so the map opens a reviewed continuation line beneath it for a long wording. The **payout bank requisites** resolve from the subject card's `bankRequisites` record for the currency being withdrawn — the mock standing in for `Front Реквизиты` — and the rows a payout cannot be executed without are validated before generation, so missing CRM data refuses the document by name instead of printing a half-filled order.
 
 #### Word-source templates (DOCX)
 

@@ -11,6 +11,7 @@ by the deployed CRM** — production users only need a modern browser.
 | `probe-pdf-coords.py` | measure overlay coordinates from a converted template | Python + `pymupdf` |
 | `probe-pdf-table-cells.py` | measure value cells in table-shaped forms (анкеты) | Python + `pymupdf` |
 | `document-qa-harness.html` | render document fixtures with the production engine for visual QA | a browser + a static server |
+| `qa/run_order_forms_tests.py` | drive every branch of Приложение 7 through the real wizard and read the result back out of the PDF | Python + `pymupdf` + Chrome |
 
 See [docs/document-pdf-generation.md](../../docs/document-pdf-generation.md) for
 the full document workflow.

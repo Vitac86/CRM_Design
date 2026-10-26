@@ -153,8 +153,13 @@ Known limitations that are deliberate and must stay visible during that review:
   internal LK object ID and `depozitarnyj_dogovor` is a checkbox. Both inputs
   are required and validated for the three documents that print them, are never
   defaulted to today, and block generation when absent.
-- `order-forms` stays `blocked-incomplete-mapping` and is not offered. See
-  `docs/order-forms-mapping-gap.md`.
+- `order-forms` was `blocked-incomplete-mapping` when this pass was written
+  and is now offered: the values that a mistake would make expensive come from
+  closed option lists or from the instrument reference data, the branch a
+  manager did not fill cannot reach the paper, and every branch is driven
+  through the real page by `tools/qa/run_order_forms_tests.py`. See
+  `docs/order-forms-mapping-gap.md` for the rows still waiting for an exact UMI
+  source — the payout bank block above all.
 - Three regression cases refuse to render because the reviewed page reserve is
   spent, not because a value is wrong. They are pinned by name in
   `run_table_ownership_tests.py` so a silent “pass” cannot replace them.

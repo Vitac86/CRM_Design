@@ -50,8 +50,9 @@ telemetry, analytics, CDN, external font, external API, or backend PDF service.
 3. Select a field on the canvas or in the field list, edit it, and run validation.
 4. Generate the real PDF and inspect it visually before exporting review files.
 
-All 18 executable overlay maps are available for inspection, including the
-retained blocked `order-forms` scaffold. `anketa-isbyul` remains hidden and
+All 18 executable overlay maps are available for inspection. `order-forms` is
+no longer a blocked scaffold: it is offered by the wizard and covered by
+`tools/qa/run_order_forms_tests.py`. `anketa-isbyul` remains hidden and
 `transfer-requisites` remains unexposed; the latter is not static by design and
 would need a complete client-specific map before product exposure.
 

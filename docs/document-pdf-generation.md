@@ -1128,6 +1128,7 @@ does not fit, the document map is the thing to fix.
 | `run_structural_pdf_tests.py` | every original operator exactly once, read by pymupdf *and* pypdf |
 | `run_visual_geometry_tests.py` | what a generated row looks like, measured; writes the QA examples with `--keep` |
 | `run_wizard_tests.py` | the Document Wizard end to end |
+| `run_order_forms_tests.py` | every branch of Приложение 7, read back out of the generated PDF, plus the slot geometry of its map |
 | `run_builder_qa.py` | the Template Builder |
 | `check_expansion_anchors.py` | every anchor and compaction zone sits on a clean operator cut |
 | `measure_page_layout.py` | a page's reserve, its fixed footer, its block gaps and its row geometry |
@@ -1141,7 +1142,7 @@ All under `static-uikit/tools/qa/`.
 
 `run_all_qa.py` is the canonical combined run and the one that has to be green;
 a suite that passes alone and fails in the combined run has failed. For the
-assembled correction branch it reports **27 of 27 suites passed**. Only that
+assembled correction branch it reports **36 of 36 suites passed**. Only that
 verdict is repeated here; the per-suite counts stay where the runner prints
 them.
 

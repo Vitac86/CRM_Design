@@ -118,7 +118,7 @@ DOCUMENT_SPECS: dict[str, dict[str, str]] = {
     "code-word-request.pdf": {"id": "code-word-request", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
     "order-forms.pdf": {"id": "order-forms", "role": "dynamic-overlay",
-        "status": "blocked-incomplete-mapping"},
+        "status": "dynamic-production-ready"},
     "power-of-attorney.pdf": {"id": "power-of-attorney", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
     "qualification-consequences-notice.pdf": {"id": "qualification-consequences-notice", "role": "dynamic-overlay",
@@ -192,27 +192,6 @@ PRODUCTION_STATUSES = {
 # for that to change. Recorded here rather than in prose so the release report
 # cannot describe a template the gate does not also account for.
 NON_DYNAMIC_RATIONALE = {
-    "order-forms": {
-        "reason": (
-            "Приложение 7 carries three order forms across four pages. The map "
-            "places 93 fields, but 89 of them read `extra.*` — values an "
-            "operator types — and every one is optional, so the form generates "
-            "almost entirely blank unless a manager fills a form the wizard "
-            "does not really ask. Only the client name is bound to CRM data. "
-            "Amount, currency, venue, recipient, bank name, BIK/SWIFT, "
-            "correspondent and settlement accounts, intermediary bank, "
-            "personal identifiers, the initiator block and the "
-            "representative's authority are all unbound, and the bank details "
-            "among them exist in UMI (Front Реквизиты) and simply are not "
-            "wired. Calling that production-ready would put a mostly empty "
-            "order in front of a client. The per-row inventory and the exact "
-            "UMI name for every row that has one are in "
-            "docs/order-forms-mapping-gap.md; finishing it is a separate task."
-        ),
-        "userCanDownload": False,
-        "futureMappingRequired": True,
-        "excludedFromRelease": True,
-    },
     "anketa-isbyul": {
         "reason": (
             "Анкета ИСБОЮЛ is for a foreign structure without a legal entity. "

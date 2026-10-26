@@ -1,45 +1,95 @@
-# Order forms — mapping gap
+# Order forms — sources and the rows still waiting for one
 
-**Production status: `blocked-incomplete-mapping` — separate implementation required.**
+**Production status: `dynamic-production-ready` — offered by the wizard.**
 
 ПРИЛОЖЕНИЕ 7 К РЕГЛАМЕНТУ. ФОРМЫ ПОРУЧЕНИЙ · `order-forms.pdf` · 4 pages
 
-## Why it is not production-ready
+## What changed
 
-The retained incomplete map places **93 printed fields**. Its current sources
-are:
+This document was the record of why the form was **not** offered: the map
+placed 93 fields, 89 of them read an `extra.*` value an operator typed, every
+one was optional, and the form generated almost entirely blank. That is fixed
+in the wizard rather than in the map — the coordinates below are unchanged
+except for four slots that were measured to sit over the form's own printed
+words, and for the two «сумма прописью» rows, which gained a reviewed
+continuation line in the measured empty band beneath them so a full Russian
+amount in words can be printed rather than dropped. The geometry is gated by
+`run_order_forms_tests.py`.
 
-- **89** `extra.*` operator values;
-- **1** `check.*` operator acknowledgement;
-- **3** normalized client-name values.
+What an operator can still type freely is now only what the form itself leaves
+free. Everything else is a closed choice or comes from reference data:
 
-Every mapped field is currently declared `optional`, so nothing refuses to
-generate when an amount, market, contract, recipient, bank requisite or
-signature-side value is absent: the form simply prints blank. Only the three
-form variants' client-name occurrences reach normalized CRM data. The table
-below identifies **13 rows for which an exact UMI source is available** (the
-three names and ten bank rows); those availability notes are the target mapping,
-not a claim that the current map already uses those UMI paths.
+| Row | Where its value comes from now |
+| --- | --- |
+| Вид подачи | fixed — always «Первичная подача заявки»; cancellation is unreachable |
+| Вид сделки / рынка / поручения | closed option lists; «Условное» is not offered |
+| Срок действия заявки | «До отмены» or a picked date, formatted for print |
+| Срок расчётов | closed list: `T+0` / `T+1` / `T+2` |
+| Наименование эмитента | the selected Asset's issuer — not editable |
+| Вид, категория, выпуск, серия, ISIN | built from the selected Asset — not editable, no CFI |
+| Количество / цена / сумма | numeric controls; a market order prints «Рыночная» |
+| Сумма прописью | spelled out from the figure and the currency — never typed |
+| Банковские реквизиты вывода | the subject card's requisite for the chosen currency |
+| РЕПО с ЦК, СВОП с ЦК | Да/Нет |
+| Наименование валютного инструмента | the selected FX instrument — not editable |
+| Вид и наименование ПФИ, страйк, экспирация | the selected derivative — not editable |
+| Непокрытая позиция | always marked on a trade order |
 
-That is why the form remains `blocked-incomplete-mapping`, is not offered by
-the wizard, and is excluded from the 17 dynamic production-ready templates.
-The catalogue entry and map remain only as a measured starting point for the
-separate implementation.
+The instrument reference data is a static mock in
+`static-uikit/assets/js/document-wizard/instrument-catalog.js`, shaped after the
+QORT model it will be replaced by: the master object is `Assets`, the stable id
+is `AssetID`, `Securities` rows are search aliases, and results are
+deduplicated by `AssetID` so one share is offered once however many trading
+sections it has. `Securities.SecurityName` is never displayed and never
+printed. The branch-aware payload is assembled in
+`static-uikit/assets/js/document-wizard/order-forms-model.js`.
 
-The bank rows are the clearest case: `Front Реквизиты` holds every one of
-them under an exact UMI name (see docs/umi-variable-registry.md), and the map
-reads an operator-typed `extra.*` instead.
+## The bank block of a payout
+
+All ten rows are CRM-owned and resolve from the subject card's
+`bankRequisites` record for the currency being withdrawn — the static mock
+standing in for `Front Реквизиты`, whose exact UMI name for every row is in the
+table below. The map still reads the same `extra.bank-*` keys: only where they
+are filled from has changed, so pointing them at the real record is a change in
+one resolver.
+
+Required to execute a payout, and validated before anything is generated:
+получатель, наименование банка получателя, БИК/SWIFT, корреспондентский счёт
+банка получателя, счёт получателя — plus SWIFT и наименование
+банка-корреспондента on a route that has an intermediary. A domestic rouble
+route has none, so those two are empty by nature rather than by omission. ИНН,
+лицевой счёт and «прочее» are optional. Missing CRM data refuses the document
+and names the rows.
+
+## Still operator-entered, on purpose
+
+- **Информация о контрагенте** and **иная информация** — free by the form's own
+  design.
+- **Номер и дата заявки**, and every «Заполняется ООО «Инвестика»» block —
+  question 4 below.
 
 ## Open business questions
 
-1. Which order types must the release actually offer? The single file holds four.
-2. Is the recipient always ООО «Инвестика», or client-selectable per order?
-3. Which requisite of a client with several is the default for a payout —
+These are unchanged: the wizard now produces a complete order, but these are
+decisions about where a value should come from, not about whether the form
+works.
+
+1. Is the recipient of a payout always ООО «Инвестика», or client-selectable
+   per order?
+2. Which requisite of a client with several is the default for a payout —
    `umi.requisites.osnovnoj_rekvizit`, or chosen per order?
-4. Where do the order registration number and date come from? The same
+3. Where do the order registration number and date come from? The same
    question as the accession application, and still unanswered.
-5. Does the initiator block print the client, the representative, or the
+4. Does the initiator block print the client, the representative, or the
    Investika operator who accepted the order?
+
+## The table below
+
+It lists every printed row with the exact UMI name where one exists. The
+«Current source» column still describes the map, which is what the backend
+binds against; «Availability» is the target. Rows now derived by the wizard
+from a selected instrument still read their `extra.*` key — that is the point
+of the contract: the key stays, and only what fills it changes.
 
 ## Every printed field
 
