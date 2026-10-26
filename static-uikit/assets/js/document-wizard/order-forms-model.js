@@ -86,7 +86,7 @@
 
   function parseAmount(raw) {
     var value = text(raw).replace(/\s/g, '').replace(',', '.');
-    if (!value || !/^-?\d*\.?\d+$/.test(value)) return null;
+    if (!value || !/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value)) return null;
     var parsed = Number(value);
     return isFinite(parsed) ? parsed : null;
   }
@@ -100,6 +100,40 @@
     var parts = String(Math.abs(parsed)).split('.');
     var whole = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     return (parsed < 0 ? '-' : '') + whole + (parts[1] ? ',' + parts[1] : '');
+  }
+
+  // Parse money into exact integer minor units before any Number conversion.
+  // Multiplying a floating-point major amount by 100 can change the last
+  // kopeck. Number inputs also accept exponent notation (for example 1e3).
+  function parseMoney(raw) {
+    var value = text(raw).replace(/\s/g, '').replace(',', '.');
+    var match = /^(-?)(\d*)(?:\.(\d*))?(?:e([+-]?\d+))?$/i.exec(value);
+    if (!match || !(match[2] || match[3])) return { error: 'Введите сумму числом.' };
+    var fraction = match[3] || '';
+    var digits = (match[2] + fraction).replace(/^0+/, '') || '0';
+    var exponent = Number(match[4] || 0);
+    var rangeError = 'Сумма слишком велика для точного расчёта копеек.';
+    if (!Number.isSafeInteger(exponent)) return { error: rangeError };
+    var shift = 2 + exponent - fraction.length;
+    if (digits === '0') return { minorTotal: 0, negative: false, error: '' };
+    if (shift < 0) {
+      var end = digits.length + shift;
+      if (end < 0 || /[1-9]/.test(digits.slice(Math.max(0, end)))) {
+        return { error: 'Укажите сумму с точностью до двух знаков после запятой.' };
+      }
+      digits = digits.slice(0, end) || '0';
+    } else {
+      // Bound allocation before expanding an exponent, even for invalid input.
+      if (digits.length + shift > 16) return { error: rangeError };
+      digits += '0'.repeat(shift);
+    }
+    var minorTotal = Number(digits);
+    if (!Number.isSafeInteger(minorTotal)) return { error: rangeError };
+    return { minorTotal: minorTotal, negative: match[1] === '-', error: '' };
+  }
+
+  function moneyProblem(raw) {
+    return parseMoney(raw).error;
   }
 
   // ── Amount in words ───────────────────────────────────────────────────────
@@ -133,7 +167,8 @@
   var SCALES = [
     { gender: 'f', forms: ['тысяча', 'тысячи', 'тысяч'] },
     { gender: 'm', forms: ['миллион', 'миллиона', 'миллионов'] },
-    { gender: 'm', forms: ['миллиард', 'миллиарда', 'миллиардов'] }
+    { gender: 'm', forms: ['миллиард', 'миллиарда', 'миллиардов'] },
+    { gender: 'm', forms: ['триллион', 'триллиона', 'триллионов'] }
   ];
 
   // The currencies the two forms offer as a fixed choice. «Иная валюта» has no
@@ -198,11 +233,10 @@
 
   // «125000.50 RUB» → «Сто двадцать пять тысяч рублей 50 копеек».
   function amountInWords(raw, currency) {
-    var amount = parseAmount(raw);
-    if (amount === null) return '';
+    var amount = parseMoney(raw);
+    if (amount.error) return '';
     var unit = CURRENCIES[text(currency)] || null;
-    // Work in minor units so 0.1 + 0.2 arithmetic can never lose a kopeck.
-    var minorTotal = Math.round(Math.abs(amount) * 100);
+    var minorTotal = amount.minorTotal;
     var major = Math.floor(minorTotal / 100);
     var minor = minorTotal % 100;
     var words = integerWords(major, unit ? unit.gender : 'm');
@@ -210,7 +244,7 @@
     var minorDigits = (minor < 10 ? '0' : '') + minor;
     words.push(unit ? (minorDigits + ' ' + plural(minor, unit.minor))
       : (minorDigits + '/100'));
-    var sentence = words.join(' ');
+    var sentence = (amount.negative ? 'минус ' : '') + words.join(' ');
     return sentence.charAt(0).toLocaleUpperCase('ru-RU') + sentence.slice(1);
   }
 
@@ -218,13 +252,13 @@
   // «… 50 копеек», and «125 000,5» beside it would be the same figure written
   // two different ways on one line.
   function formatMoney(raw) {
-    var parsed = parseAmount(raw);
-    if (parsed === null) return text(raw);
-    var minorTotal = Math.round(Math.abs(parsed) * 100);
+    var parsed = parseMoney(raw);
+    if (parsed.error) return '';
+    var minorTotal = parsed.minorTotal;
     var whole = String(Math.floor(minorTotal / 100))
       .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     var minor = minorTotal % 100;
-    return (parsed < 0 ? '-' : '') + whole + ',' + (minor < 10 ? '0' : '') + minor;
+    return (parsed.negative ? '-' : '') + whole + ',' + (minor < 10 ? '0' : '') + minor;
   }
 
   function isoToRu(value) {
@@ -528,6 +562,7 @@
     instrumentBranch: instrumentBranch,
     formatAmount: formatAmount,
     formatMoney: formatMoney,
+    moneyProblem: moneyProblem,
     amountInWords: amountInWords,
     payoutRequisite: payoutRequisite,
     context: context,

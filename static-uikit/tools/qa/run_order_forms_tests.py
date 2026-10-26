@@ -884,6 +884,12 @@ def main() -> int:  # noqa: C901 — one linear scenario list reads better whole
         checks.check("a non-positive quantity blocks generation",
                      blocked["downloads"] == 0 and "is-error" in blocked["kind"],
                      json.dumps(blocked, ensure_ascii=False))
+        for quantity, message in [("0.5", "не меньше 1"), ("1.5", "целое число")]:
+            set_field(browser, "extra-security-quantity", quantity)
+            blocked = generate(browser)
+            checks.check(f"quantity {quantity}: numeric constraints block generation",
+                         blocked["downloads"] == 0 and message in blocked["status"],
+                         json.dumps(blocked, ensure_ascii=False))
         checks.check("…and a free-text quantity cannot even be entered",
                      set_field(browser, "extra-security-quantity", "100 шт.")["value"] == "",
                      "the numeric control accepted a string")
@@ -950,6 +956,10 @@ def main() -> int:  # noqa: C901 — one linear scenario list reads better whole
              "Сто двадцать пять тысяч рублей 50 копеек", "125 000,50"),
             ("round million", "RUB", "1500000",
              "Один миллион пятьсот тысяч рублей 00 копеек", "1 500 000,00"),
+            ("round trillion", "RUB", "1000000000000",
+             "Один триллион рублей 00 копеек", "1 000 000 000 000,00"),
+            ("exponent", "RUB", "1e3",
+             "Одна тысяча рублей 00 копеек", "1 000,00"),
             ("foreign currency", "USD", "1234.56",
              "Одна тысяча двести тридцать четыре доллара США 56 центов", "1 234,56"),
             ("longest realistic", "USD", "999999999.99",
@@ -978,6 +988,29 @@ def main() -> int:  # noqa: C901 — one linear scenario list reads better whole
             checks.check(f"words/{name}: nothing is drawn below the 9 pt floor",
                          pdf.min_font_size() >= 8.99, str(pdf.min_font_size()))
             pdf.close()
+
+        # The largest exact integer number of minor units must not round one
+        # kopeck into another, or silently lose an unsupported thousand group.
+        for amount, expected in [
+            ("90071992547409.90", "90 071 992 547 409,90"),
+            ("90071992547409.91", "90 071 992 547 409,91"),
+            ("0.29", "0,29"),
+        ]:
+            actual = browser.eval("CRMOrderForms.formatMoney(" + json.dumps(amount) + ")")
+            checks.check(f"money {amount}: exact minor units", actual == expected, actual)
+
+        open_document(browser, server, COMPANY)
+        fill_common(browser, "withdrawal")
+        set_field(browser, "extra-payout-currency", "RUB")
+        set_field(browser, "extra-payout-amount-mode", "amount")
+        set_field(browser, "extra-payout-from", "stock")
+        for amount, message in [("1.001", "двух знаков"),
+                                ("90071992547409.92", "слишком велика")]:
+            set_field(browser, "extra-payout-amount", amount)
+            blocked = generate(browser)
+            checks.check(f"money {amount}: invalid precision blocks generation",
+                         blocked["downloads"] == 0 and message in blocked["status"],
+                         json.dumps(blocked, ensure_ascii=False))
 
         # Changing the figure changes the wording: they are one value.
         open_document(browser, server, COMPANY)

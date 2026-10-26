@@ -3879,11 +3879,21 @@
   // A numeric control the browser accepted may still hold a value the business
   // does not: a quantity or a price has to be a real number above zero.
   function numberProblem(el, value) {
+    if (el.validity.badInput) return 'Введите число.';
     if (!value) return '';
     var parsed = Number(String(value).replace(',', '.'));
     if (!isFinite(parsed)) return 'Введите число.';
     if (el.getAttribute('data-field-positive') === '1' && parsed <= 0) {
       return 'Значение должно быть больше нуля.';
+    }
+    if (el.validity.rangeUnderflow) return 'Значение должно быть не меньше ' + el.min + '.';
+    if (el.validity.rangeOverflow) return 'Значение должно быть не больше ' + el.max + '.';
+    if (el.validity.stepMismatch) {
+      return el.step === '1' ? 'Введите целое число.' : 'Проверьте точность введённого числа.';
+    }
+    var key = el.getAttribute('data-field-key');
+    if ((key === 'extra-move-amount' || key === 'extra-payout-amount') && window.CRMOrderForms) {
+      return window.CRMOrderForms.moneyProblem(value);
     }
     return '';
   }
