@@ -75,10 +75,10 @@ EXPECTED_FIELDS = {
     ("power-of-attorney", "flAttorneyIssuedBy"): "ru-resident-normal",
 }
 
-# `order-forms/securityIssuer` matches an issuer-shaped name but is the issuer
+# `order-trade/securityIssuer` matches an issuer-shaped name but is the issuer
 # of a security, not of a passport, and the form is blocked-incomplete-mapping.
 # Named here so the enumeration gate below can prove it was considered.
-NOT_A_PASSPORT_AUTHORITY = {("order-forms", "securityIssuer")}
+NOT_A_PASSPORT_AUTHORITY = {("order-trade", "securityIssuer")}
 
 VALUES = {
     "ru-ordinary": "ОВД Пресненского района города Москвы",

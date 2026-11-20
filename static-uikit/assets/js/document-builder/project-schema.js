@@ -18,7 +18,7 @@
     'baselineShift', 'showWhen', 'equals', 'invert', 'glyphSize', 'markStyle',
     'offsetX', 'offsetY', 'boxSize', 'thickness', 'inset', 'text',
     // Continuation regions and the properties that travel with them.
-    'flowRegions', 'overflowStrategy', 'allowPrintOverride', 'tokenBreak',
+    'flowRegions', 'alignToLastRegion', 'overflowStrategy', 'allowPrintOverride', 'tokenBreak',
     'firstLineIndent', 'expansion',
     // A Word-flow block consumes the same business field by reference. These
     // are production properties, never replacement variable names.

@@ -65,8 +65,8 @@
     add('Builder opens through HTTP', function () { assert(/^https?:$/.test(frame.location.protocol)); assert(app.ready); });
     add('file:// blocker has the required message', function () { equal(ns.constants.protocolMessage, 'Конструктор должен быть открыт через локальный HTTP-сервер.'); });
     add('Existing template catalog loads', function () { assert(app.catalogAudit && !app.catalogAudit.pdfFailures.length); });
-    add('All 18 maps are discoverable and open', function () {
-      equal(app.catalog.length, 18); equal(Object.keys(frame.CRMDocumentEngine.fieldMaps).length, 18);
+    add('All 20 maps are discoverable and open', function () {
+      equal(app.catalog.length, 20); equal(Object.keys(frame.CRMDocumentEngine.fieldMaps).length, 20);
       var opened = [];
       var chain = Promise.resolve();
       app.catalog.forEach(function (entry) {
@@ -81,7 +81,7 @@
             opened.push(entry.overlayTemplateId);
           });
       });
-      return chain.then(function () { equal(opened.length, 18); });
+      return chain.then(function () { equal(opened.length, 20); });
     });
     add('A multi-page PDF renders', function () { return app.openExisting('accession-application-fl').then(function () { equal(app.viewer.pages.length, 3); assert(app.viewer.canvas.width > 0); }); });
     add('A mixed-page-size PDF renders correctly', function () {
@@ -215,7 +215,7 @@
       identifierError(function () { ns.identifierProtection.attach(legacyTamper); });
     });
     add('Production JS export is deterministic', function () { var a = ns.io.productionJs(app.state.project); var b = ns.io.productionJs(app.state.project); equal(a, b); assert(!/function\s*\(/.test(a.replace(/\(function \(global\)/, ''))); });
-    add('Existing-map semantic round-trip succeeds for 18 maps', function () {
+    add('Existing-map semantic round-trip succeeds for 20 maps', function () {
       app.catalog.forEach(function (entry) {
         var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
         var project = ns.schema.fromProduction(map, entry);
@@ -292,7 +292,7 @@
         return field.id === operatorField.id;
       }).sourceKind, 'operator-input', 'production export lost field sourceKind');
     });
-    add('All 18 identifier sets survive Builder JSON and production round-trips', function () {
+    add('All 20 identifier sets survive Builder JSON and production round-trips', function () {
       app.catalog.forEach(function (entry) {
         var map = frame.CRMDocumentEngine.fieldMaps[entry.overlayTemplateId];
         var project = ns.schema.fromProduction(map, entry);

@@ -169,9 +169,9 @@ CASES = (
     Case("broker-use-refusal-request", "broker-use-refusal-request.pdf",
          "ru-company-normal", "field.client-full-name", "clientName", 0,
          195.86, 20.28, (56.76, 248.21, 545.86), 8),
-    Case("order-forms", "order-forms.pdf", "ru-company-normal",
-         "field.client-full-name", "tradeClientName", 0, 228.02, 20.40,
-         (56.78, 248.21, 545.88), 8),
+    Case("order-trade", "order-trade.pdf", "ru-company-normal",
+         "field.client-full-name", "tradeClientName", 0, 208.63, 20.42,
+         (56.66, 248.02, 545.98), 8),
     Case("regulation-full-refusal-notice",
          "regulation-full-refusal-notice.pdf", "ru-company-normal",
          "field.client-full-name", "clientName", 0, 202.70, 20.40,
@@ -364,9 +364,10 @@ def main() -> int:
                      drawing == BORDERED_BLOCKS,
                      json.dumps(sorted(drawing), ensure_ascii=False))
         checks.check("every other reviewed Word-flow anchor stays lineStyle none",
-                     # 18 until the updated account-opening notice made its
-                     # introduction paragraph static and removed that block.
-                     len(inventory["blocks"]) == 17 and
+                     len(inventory["blocks"]) == 19 and
+                     {("order-venue-transfer", "transfer-words-line"),
+                      ("order-bank-withdrawal", "withdrawal-words-line")}.issubset(
+                         {(entry["document"], entry["id"]) for entry in inventory["blocks"]}) and
                      all(entry["lineStyle"] == "none"
                          for entry in inventory["blocks"]
                          if (entry["document"], entry["id"]) not in BORDERED_BLOCKS),

@@ -327,7 +327,32 @@
   Fixtures.profile = function (id) { return PROFILES.find(function (item) { return item.id === id; }) || PROFILES[1]; };
   Fixtures.payloadFor = function (profileId, project, overrides) {
     var profile = Fixtures.profile(profileId);
-    return applyOverrides(ensureProjectSources(basePayload(profile), profile, project), overrides || {});
+    var payload = ensureProjectSources(basePayload(profile), profile, project);
+    var id = project.templateId || project.id;
+    if (global.CRMOrderForms && global.CRMOrderForms.kinds[id]) {
+      var s = payload.subject;
+      s.umi = {bo_num:payload.fields['extra-contract-number'], datesign:'2026-07-29'};
+      var raw;
+      if (id === 'order-trade') {
+        raw = {'extra-trade-kind':'buy','extra-order-market':'stock','extra-order-kind':'limit',
+          'extra-order-validity-mode':'cancelled','extra-settlement-period':'T+1','extra-security-asset-id':'A-100001',
+          'extra-security-quantity':'10','extra-security-price':'272.50','extra-repo-ccp':'no'};
+      } else if (id === 'order-venue-transfer') {
+        raw = {'extra-move-from':'stock','extra-move-to':'spb-stock','extra-move-currency':'RUB',
+          'extra-move-amount':profile.length === 'long' ? '99999999.99' : '1000.50'};
+      } else {
+        s.bankRequisites = [{id:'fixture-rub',currency:'RUB',recipient:s.displayName,bankName:'Демонстрационный банк',
+          bic:'044500001',account:'40702810000000000001',correspondentAccount:'30101810000000000001'}];
+        raw = {selectedRequisiteId:'fixture-rub','extra-payout-from':'stock','extra-payout-currency':'RUB',
+          'extra-payout-amount-mode':'amount','extra-payout-amount':'1000.50'};
+      }
+      var order = global.CRMOrderForms.prepare(id,s,raw);
+      if (order.errors.length) throw new Error(order.errors[0].message);
+      payload.orderInput = order.input;
+      payload.extraValues = order.extraValues;
+      payload.checks = order.checkValues;
+    }
+    return applyOverrides(payload, overrides || {});
   };
   Fixtures.assignPath = assignPath;
   Fixtures.defaultValue = defaultValue;

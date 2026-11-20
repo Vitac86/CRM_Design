@@ -181,7 +181,7 @@ CASES = [
     ("two anchors on one page", "power-of-attorney", "en-company-normal", {}),
     ("power of attorney, ЮЛ", "power-of-attorney", "ru-company-normal", {}),
     ("power of attorney, ФЛ", "power-of-attorney", "ru-resident-normal", {}),
-    ("company name in a table", "order-forms", "ru-company-normal",
+    ("company name in a table", "order-trade", "ru-company-normal",
      {"field.client-full-name": RU_COMPANY}),
     ("address in a table row", "anketa-fl", "en-nonresident-normal",
      {"extra.bank-address": EN_ADDRESS}),

@@ -50,15 +50,15 @@ telemetry, analytics, CDN, external font, external API, or backend PDF service.
 3. Select a field on the canvas or in the field list, edit it, and run validation.
 4. Generate the real PDF and inspect it visually before exporting review files.
 
-All 18 executable overlay maps are available for inspection. `order-forms` is
-no longer a blocked scaffold: it is offered by the wizard and covered by
+All 20 executable overlay maps are available for inspection. The three Appendix 7
+maps are offered separately by the wizard and covered by
 `tools/qa/run_order_forms_tests.py`. `anketa-isbyul` remains hidden and
 `transfer-requisites` remains unexposed; the latter is not static by design and
 would need a complete client-specific map before product exposure.
 
 Template coverage is closed by `tools/qa/check_full_template_audit.py`. The
-checked-in JSON/Markdown matrices cover all 22 PDFs and 77 pages, preserve the
-621 original field ID/source pairs as a compatibility floor, and require every
+checked-in JSON/Markdown matrices cover all 24 PDFs and 77 pages, preserve the
+643 baseline field ID/source pairs as a compatibility floor, and require every
 additive runtime field to receive a section and layout classification. The same
 gate refuses source-PDF byte or SHA-256 changes.
 
@@ -542,7 +542,7 @@ Two things to know before concluding that a page has no clean cut:
 Expansion definitions and the page budget survive builder JSON and production JS
 export unchanged, alongside flow regions, overflow strategy, sizes, line height,
 maximum lines and print-override permission. `pageLayout` is a first-class
-project property, not an opaque passenger in `productionProperties`. All 18 maps
+project property, not an opaque passenger in `productionProperties`. All 20 maps
 still round-trip semantically, budget and anchors included, and no property is
 silently discarded. The three production `crossPageFlow` rules also round-trip
 exactly; editing one to incomplete or unreviewed blocks export. The same
@@ -659,7 +659,7 @@ prefixes in three refusal documents and the final year digit in
 `code-word-request`. They were migrated without behavior change to named
 renderer formatters `prefixNumber`, `prefixFrom`, and `dateYearLastDigit`.
 
-After migration, all 18 maps contain only JSON-compatible primitives, arrays,
+After migration, all 20 maps contain only JSON-compatible primitives, arrays,
 and plain objects. No inline condition functions, computed map values without a
 source path, custom prototypes, cycles, or unsupported objects remain. The
 browser QA harness performs a semantic map → builder → map round-trip for every

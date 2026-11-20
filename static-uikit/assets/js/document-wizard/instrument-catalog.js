@@ -215,6 +215,25 @@
       strike: '95000', expiry: '2026-12-18' }
   ];
 
+  // Demonstration specifications only. Live QORT must provide the quotation,
+  // settlement basis and steps for the particular traded instrument.
+  function demoSpec(formula, quantityUnit, detail) {
+    return Object.assign({source:'demo-spec-2026-11', formula:formula, quantityUnit:quantityUnit,
+      priceStep:'0.01', quantityStep:'1', currency:'RUB', minorDigits:2, rounding:'half-up'},detail);
+  }
+  SECURITY_ASSETS.forEach(function (item) {
+    if (['share-ordinary','share-preferred','fund-unit'].includes(item.kind))
+      item.calculation = demoSpec('unit','pieces');
+    else if (item.kind.indexOf('bond-') === 0)
+      item.calculation = demoSpec('bond-percent','pieces'); // Nominal and settlement basis are not supplied.
+  });
+  FX_INSTRUMENTS.filter(function (x) { return ['FX-1001','FX-1004'].includes(x.fxId); }).forEach(function (x) {
+    x.calculation = demoSpec('fx','lots',{lotSize:'1000',quoteScale:'1',priceStep:'0.0001'});
+  });
+  DERIVATIVE_INSTRUMENTS.filter(function (x) { return x.kind === 'option-call'; }).forEach(function (x) {
+    x.calculation = demoSpec('premium','contracts',{premiumMultiplier:'10'});
+  });
+
   var DERIVATIVE_KIND_LABELS = {
     future: 'Фьючерсный контракт',
     'option-call': 'Опцион call',
@@ -312,8 +331,15 @@
     }, query, limit);
   }
 
-  function searchDerivatives(query, limit) {
-    return searchList(DERIVATIVE_INSTRUMENTS, function (item) {
+  function supportsDerivative(item, market) {
+    return !!item && (item.markets || ['derivatives']).includes(market);
+  }
+
+  function searchDerivatives(query, limit, market) {
+    var eligible = market ? DERIVATIVE_INSTRUMENTS.filter(function (item) {
+      return supportsDerivative(item, market);
+    }) : DERIVATIVE_INSTRUMENTS;
+    return searchList(eligible, function (item) {
       return [item.code, item.name, item.underlying,
               DERIVATIVE_KIND_LABELS[item.kind] || ''];
     }, query, limit);
@@ -469,6 +495,7 @@
     searchSecurities: searchSecurities,
     searchFxInstruments: searchFxInstruments,
     searchDerivatives: searchDerivatives,
+    supportsDerivative: supportsDerivative,
 
     getSecurity: getSecurity,
     getFxInstrument: getFxInstrument,

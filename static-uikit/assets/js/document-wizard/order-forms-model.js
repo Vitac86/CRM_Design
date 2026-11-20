@@ -1,78 +1,6 @@
-// Order forms (ПРИЛОЖЕНИЕ 7) — the payload contract of the three order forms.
-//
-// The Document Wizard collects what a manager chose; this module turns that
-// into the `extra.*` / `check.*` values the field map prints, and is the only
-// place that decides what an order actually contains.
-//
-// It does two things the wizard cannot do generically:
-//
-//   1. DERIVES the values a manager must not type. The issuer, the security
-//      description, the FX instrument name, the derivative master data, the
-//      printable validity, the market price wording, the submission kind, the
-//      amount in words and the payout bank requisites are all built here from
-//      the selected instrument, the fixed choices and the subject card.
-//
-//   2. DROPS every value that does not belong to the branch the manager
-//      actually filled. This is not tidiness: the file holds three forms and
-//      the trade form holds four mutually exclusive instrument blocks, and the
-//      map draws a trade-form row whenever the order is a trade. A security
-//      left behind by a market that has since been switched away from would be
-//      printed on a currency order. The outgoing payload is therefore built
-//      from an allow-list per branch rather than filtered after the fact.
-//
-// The payload key names are the ones the map and the backend already know.
-// Internal selections (`extra-security-asset-id`, `extra-fx-instrument-id`,
-// `extra-derivative-id`) travel with the active branch as well: the AssetID is
-// the value a real QORT integration will want, and it is nothing the map reads.
-
+// Appendix 7. Resolve order data from the selected document, instrument and CRM subject.
 (function (global) {
   'use strict';
-
-  // ── The keys each branch may contribute ───────────────────────────────────
-
-  var COMMON_KEYS = [
-    'extra-order-type', 'extra-submission-kind', 'extra-order-number-date',
-    'extra-contract-number-date', 'extra-brokerage-account'
-  ];
-
-  var TRADE_KEYS = [
-    'extra-trade-kind', 'extra-trade-kind-other',
-    'extra-order-market', 'extra-otc-instrument-type',
-    'extra-order-kind', 'extra-order-kind-conditional',
-    'extra-order-validity-mode', 'extra-order-validity-date', 'extra-order-validity',
-    'extra-settlement-period', 'extra-counterparty', 'extra-order-other-info'
-  ];
-
-  var SECURITY_KEYS = [
-    'extra-security-asset-id', 'extra-security-issuer', 'extra-security-type',
-    'extra-security-quantity', 'extra-security-price', 'extra-repo-ccp',
-    'extra-trade-amount'
-  ];
-
-  var FX_KEYS = [
-    'extra-fx-instrument-id', 'extra-fx-instrument', 'extra-fx-lots',
-    'extra-fx-rate', 'extra-fx-amount', 'extra-fx-swap-ccp'
-  ];
-
-  var DERIVATIVE_KEYS = [
-    'extra-derivative-id', 'extra-derivative-kind', 'extra-derivative-name',
-    'extra-derivative-quantity', 'extra-derivative-premium',
-    'extra-derivative-strike', 'extra-derivative-expiry', 'extra-derivative-amount'
-  ];
-
-  var TRANSFER_KEYS = [
-    'extra-move-from', 'extra-move-to', 'extra-move-amount',
-    'extra-move-amount-words', 'extra-move-currency'
-  ];
-
-  var WITHDRAWAL_KEYS = [
-    'extra-payout-currency', 'extra-payout-amount-mode', 'extra-payout-amount',
-    'extra-payout-amount-words', 'extra-payout-from',
-    'extra-bank-recipient', 'extra-bank-bic', 'extra-bank-name',
-    'extra-bank-corr-swift', 'extra-bank-corr-name', 'extra-bank-corr-account',
-    'extra-bank-account', 'extra-bank-inn', 'extra-bank-personal-account',
-    'extra-bank-other'
-  ];
 
   // Printed where the form asks for a price a market order does not have.
   var MARKET_PRICE = 'Рыночная';
@@ -84,25 +12,16 @@
     return String(value == null ? '' : value).trim();
   }
 
-  function parseAmount(raw) {
-    var value = text(raw).replace(/\s/g, '').replace(',', '.');
-    if (!value || !/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value)) return null;
-    var parsed = Number(value);
-    return isFinite(parsed) ? parsed : null;
-  }
-
-  // 1234.5 → «1 234,5». An ordinary space groups the thousands: these rows are
-  // drawn into narrow slots that the layout may have to shrink, and a
-  // non-breaking space would take a wrap opportunity away from it.
   function formatAmount(raw) {
-    var parsed = parseAmount(raw);
-    if (parsed === null) return text(raw);
-    var parts = String(Math.abs(parsed)).split('.');
-    var whole = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    return (parsed < 0 ? '-' : '') + whole + (parts[1] ? ',' + parts[1] : '');
+    var value = text(raw).replace(/\s/g, '').replace(',', '.');
+    if (!/^\d+(?:\.\d+)?$/.test(value)) return text(raw);
+    var parts = value.split('.');
+    var whole = parts[0].replace(/^0+(?=\d)/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    var fraction = (parts[1] || '').replace(/0+$/, '');
+    return whole + (fraction ? ',' + fraction : '');
   }
 
-  // Parse money into exact integer minor units before any Number conversion.
+  // Monetary arithmetic stays in integer minor units, including large manual trade totals.
   // Multiplying a floating-point major amount by 100 can change the last
   // kopeck. Number inputs also accept exponent notation (for example 1e3).
   function parseMoney(raw) {
@@ -115,7 +34,7 @@
     var rangeError = 'Сумма слишком велика для точного расчёта копеек.';
     if (!Number.isSafeInteger(exponent)) return { error: rangeError };
     var shift = 2 + exponent - fraction.length;
-    if (digits === '0') return { minorTotal: 0, negative: false, error: '' };
+    if (digits === '0') return { minorTotal: 0n, negative: false, error: '' };
     if (shift < 0) {
       var end = digits.length + shift;
       if (end < 0 || /[1-9]/.test(digits.slice(Math.max(0, end)))) {
@@ -124,11 +43,11 @@
       digits = digits.slice(0, end) || '0';
     } else {
       // Bound allocation before expanding an exponent, even for invalid input.
-      if (digits.length + shift > 16) return { error: rangeError };
+      if (digits.length + shift > 17) return { error: rangeError };
       digits += '0'.repeat(shift);
     }
-    var minorTotal = Number(digits);
-    if (!Number.isSafeInteger(minorTotal)) return { error: rangeError };
+    if (digits.length > 17) return { error: rangeError };
+    var minorTotal = BigInt(digits);
     return { minorTotal: minorTotal, negative: match[1] === '-', error: '' };
   }
 
@@ -137,11 +56,6 @@
   }
 
   // ── Amount in words ───────────────────────────────────────────────────────
-  //
-  // Both money forms print the amount twice — «цифрами» and «прописью» — and
-  // the second is not a second thing to type: it is the first one spelled out.
-  // A manager retyping it is a manager who can disagree with the figure they
-  // just entered, so it is derived and never offered.
   //
   // Russian agreement is the whole job here. The numeral takes the gender of
   // the noun that follows it, and that noun is different in each group: рубль
@@ -179,7 +93,7 @@
            minor: ['копейка', 'копейки', 'копеек'] },
     USD: { gender: 'm', major: ['доллар США', 'доллара США', 'долларов США'],
            minor: ['цент', 'цента', 'центов'] },
-    EURO: { gender: 'm', major: ['евро', 'евро', 'евро'],
+    EUR: { gender: 'm', major: ['евро', 'евро', 'евро'],
             minor: ['евроцент', 'евроцента', 'евроцентов'] },
     CNY: { gender: 'm', major: ['юань', 'юаня', 'юаней'],
            minor: ['фэнь', 'фэня', 'фэней'] }
@@ -213,12 +127,12 @@
   }
 
   function integerWords(value, gender) {
-    if (value === 0) return ['ноль'];
+    if (value === 0n) return ['ноль'];
     var groups = [];
     var rest = value;
-    while (rest > 0) {
-      groups.push(rest % 1000);
-      rest = Math.floor(rest / 1000);
+    while (rest > 0n) {
+      groups.push(Number(rest % 1000n));
+      rest /= 1000n;
     }
     var out = [];
     for (var i = groups.length - 1; i >= 0; i -= 1) {
@@ -237,10 +151,10 @@
     if (amount.error) return '';
     var unit = CURRENCIES[text(currency)] || null;
     var minorTotal = amount.minorTotal;
-    var major = Math.floor(minorTotal / 100);
-    var minor = minorTotal % 100;
+    var major = minorTotal / 100n;
+    var minor = Number(minorTotal % 100n);
     var words = integerWords(major, unit ? unit.gender : 'm');
-    if (unit) words.push(plural(major, unit.major));
+    if (unit) words.push(plural(Number(major % 100n), unit.major));
     var minorDigits = (minor < 10 ? '0' : '') + minor;
     words.push(unit ? (minorDigits + ' ' + plural(minor, unit.minor))
       : (minorDigits + '/100'));
@@ -255,15 +169,21 @@
     var parsed = parseMoney(raw);
     if (parsed.error) return '';
     var minorTotal = parsed.minorTotal;
-    var whole = String(Math.floor(minorTotal / 100))
+    var whole = String(minorTotal / 100n)
       .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    var minor = minorTotal % 100;
+    var minor = Number(minorTotal % 100n);
     return (parsed.negative ? '-' : '') + whole + ',' + (minor < 10 ? '0' : '') + minor;
   }
 
   function isoToRu(value) {
     var match = text(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
     return match ? (match[3] + '.' + match[2] + '.' + match[1]) : text(value);
+  }
+
+  function calendarDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
+    var date = new Date(value + 'T00:00:00Z');
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0,10) === value;
   }
 
   function catalog() {
@@ -283,7 +203,7 @@
     if (market === 'otc') {
       var otc = text(values['extra-otc-instrument-type']);
       if (otc === 'security') return 'security';
-      if (otc === 'currency') return 'fx';
+      if (otc === 'derivative') return 'derivative';
     }
     return null;
   }
@@ -341,233 +261,300 @@
     values['extra-derivative-amount'] = formatAmount(values['extra-derivative-amount']);
   }
 
-  // ── Payout bank requisites ────────────────────────────────────────────────
-  //
-  // The withdrawal form's bank block is CRM-owned data, not something a
-  // manager should retype from a screen they already have open. Each row here
-  // has an exact UMI name in `Front Реквизиты` (docs/umi-variable-registry.md);
-  // the wizard reads them from the subject card's static mock today and the
-  // backend will point the same keys at the real record.
-  //
-  //   recipient              umi.requisites.recipient
-  //   bankName               umi.requisites.bank_name
-  //   bic                    umi.requisites.bik_dlya_rublevyh_rekvizitov
-  //   correspondentSwift     umi.requisites.inter_swift_code
-  //   correspondentBankName  umi.requisites.inter_bank_name
-  //   correspondentAccount   umi.requisites.corr_account
-  //   account                umi.requisites.payment_account
-  //   inn                    umi.requisites.inn
-  //   personalAccount        umi.requisites.payment_account (лицевой счёт row)
-  //   notation               umi.requisites.notation
-  //
-  // A client may hold several requisites. Which one a payout uses is one of
-  // the open questions in docs/order-forms-mapping-gap.md; until it is
-  // answered the rule is the one the form itself implies — the requisite whose
-  // currency is the currency being withdrawn, falling back to the record the
-  // card marks primary (`umi.requisites.osnovnoj_rekvizit`) when it is for
-  // that same currency.
-  function payoutRequisite(subject, values) {
-    var currency = text(values['extra-payout-currency']);
-    var records = (subject && subject.bankRequisites) || [];
-    if (!currency) return null;
-    var matching = records.filter(function (record) {
-      return text(record.currency) === currency;
+  var KINDS = {
+    'order-trade': 'trade', 'order-venue-transfer': 'transfer', 'order-bank-withdrawal': 'withdrawal'
+  };
+  var VENUES = [
+    ['stock', 'ПАО Московская Биржа — фондовый рынок и рынок депозитов'],
+    ['currency', 'ПАО Московская Биржа — валютный рынок и рынок драгоценных металлов'],
+    ['derivatives', 'ПАО Московская Биржа — срочный рынок'],
+    ['spb-stock', 'ПАО СПБ биржа — фондовый рынок'],
+    ['spb-derivatives', 'ПАО СПБ биржа — срочный рынок'],
+    ['otc', 'Внебиржевой рынок']
+  ];
+  function venues(subject) {
+    var list = VENUES.map(function (v) { return { value: v[0], label: v[1], box: v[0] }; });
+    (subject.additionalOrderVenues || []).forEach(function (venue) {
+      if (venue.id && venue.label && venue.id !== 'other' && !list.some(function (v) { return v.value === venue.id; })) {
+        list.push({ value: venue.id, label: venue.label, box: 'other' });
+      }
     });
-    if (!matching.length) return null;
-    var primary = matching.filter(function (record) { return !!record.primary; });
-    return (primary[0] || matching[0]);
+    return list;
   }
 
-  // The `extra-bank-*` payload keys, filled from one requisite record. The key
-  // names are the ones the map and the backend already know; only where the
-  // value comes from has changed.
-  function requisiteFields(record) {
+  function identity(subject) {
+    var adapter = global.CRMDocumentEngine.umiAdapter;
+    var payload = { subject: subject, umi: subject.umi || {} };
+    function exact(name) { return text(adapter.resolve('umi.' + name, payload)); }
+    var number = exact('bo_num'), date = exact('datesign');
     return {
-      'extra-bank-recipient': text(record && record.recipient),
-      'extra-bank-bic': text(record && record.bic),
-      'extra-bank-name': text(record && record.bankName),
-      'extra-bank-corr-swift': text(record && record.correspondentSwift),
-      'extra-bank-corr-name': text(record && record.correspondentBankName),
-      'extra-bank-corr-account': text(record && record.correspondentAccount),
-      'extra-bank-account': text(record && record.account),
-      'extra-bank-inn': text(record && record.inn),
-      'extra-bank-personal-account': text(record && record.personalAccount),
-      'extra-bank-other': text(record && record.notation)
+      code: exact('num_investika') || text(subject.code),
+      contract: number && date ? number + ' от ' + isoToRu(date) : ''
     };
   }
 
-  // What a payout cannot be executed without. The correspondent BANK — its
-  // SWIFT and its name — is an intermediary that a domestic rouble route
-  // simply does not have, so it is required only where the route needs one.
-  // The correspondent ACCOUNT is a different row: a rouble payment carries the
-  // recipient bank's own к/с, so it is always required.
-  var REQUISITE_LABELS = {
-    'extra-bank-recipient': 'получатель',
-    'extra-bank-name': 'наименование банка получателя',
-    'extra-bank-bic': 'БИК/SWIFT банка получателя',
-    'extra-bank-corr-account': 'корреспондентский счёт банка получателя',
-    'extra-bank-account': 'счёт получателя',
-    'extra-bank-corr-swift': 'SWIFT банка-корреспондента',
-    'extra-bank-corr-name': 'наименование банка-корреспондента'
+  function currencyCode(value) { return value === 'EURO' ? 'EUR' : text(value); }
+  function eligibleRequisites(subject, currency) {
+    return (subject.bankRequisites || []).filter(function (r) {
+      return r.id && (!r.subjectId || r.subjectId === subject.id) &&
+        currencyCode(r.currency) === currency && r.active !== false && r.archived !== true &&
+        !['archived', 'inactive', 'deleted', 'blocked'].includes(r.status) && r.usableForPayout !== false;
+    });
+  }
+  function payoutRequisite(subject, values) {
+    var id = values.selectedRequisiteId;
+    var matches = eligibleRequisites(subject, values['extra-payout-currency']).filter(function (r) { return r.id === id; });
+    return matches.length === 1 ? matches[0] : null;
+  }
+  function requisiteFields(r) {
+    r = r || {};
+    return {
+      'extra-bank-recipient': text(r.recipient), 'extra-bank-bic': text(r.bic),
+      'extra-bank-name': text(r.bankName), 'extra-bank-corr-swift': text(r.correspondentSwift),
+      'extra-bank-corr-name': text(r.correspondentBankName), 'extra-bank-corr-account': text(r.correspondentAccount),
+      'extra-bank-account': text(r.account), 'extra-bank-inn': text(r.inn),
+      'extra-bank-personal-account': text(r.personalAccount), 'extra-bank-other': text(r.notation)
+    };
+  }
+
+  var BRANCH = {
+    security: ['extra-security-asset-id', 'extra-security-quantity', 'extra-security-price', 'extra-trade-amount', 'getSecurity'],
+    fx: ['extra-fx-instrument-id', 'extra-fx-lots', 'extra-fx-rate', 'extra-fx-amount', 'getFxInstrument'],
+    derivative: ['extra-derivative-id', 'extra-derivative-quantity', 'extra-derivative-premium', 'extra-derivative-amount', 'getDerivative']
   };
 
-  var REQUISITE_CORE = [
-    'extra-bank-recipient', 'extra-bank-name', 'extra-bank-bic',
-    'extra-bank-corr-account', 'extra-bank-account'
-  ];
-  var REQUISITE_CORRESPONDENT = ['extra-bank-corr-swift', 'extra-bank-corr-name'];
-
-  function requiredRequisiteKeys(currency) {
-    return text(currency) === 'RUB'
-      ? REQUISITE_CORE.slice()
-      : REQUISITE_CORE.concat(REQUISITE_CORRESPONDENT);
+  function tradeCalculation(v) {
+    var branch = instrumentBranch(v), keys = BRANCH[branch];
+    var item = keys && catalog() && catalog()[keys[4]](v[keys[0]]);
+    if (branch === 'derivative' && item && !catalog().supportsDerivative(item,v['extra-order-market'])) item = null;
+    var spec = item && item.calculation;
+    var priceCurrency = branch === 'security' && v['extra-security-currency'] != null
+      ? text(v['extra-security-currency']).toUpperCase() : (spec && spec.currency || '');
+    var math = global.CRMOrderCalculation;
+    var result;
+    if (v['extra-order-kind'] !== 'limit') result = math.unavailable('Сумма рыночного поручения не определена.');
+    else if (branch === 'security' && v['extra-repo-ccp'] === 'yes' || branch === 'fx' && v['extra-fx-swap-ccp'] === 'yes')
+      result = math.unavailable('Для РЕПО и СВОП нужны условия обеих частей.');
+    else if (v['extra-trade-kind'] === 'other') result = math.unavailable('Для иного вида сделки требуется подтверждённая сумма.');
+    else if (!keys || !item) result = math.unavailable('Выберите инструмент из справочника.');
+    else if (branch === 'security' && spec && priceCurrency !== spec.currency)
+      result = math.unavailable('Для выбранной валюты цены отсутствует спецификация расчёта.');
+    else result = math.calculate(spec, v[keys[1]], v[keys[2]]);
+    return { branch: branch, keys: keys, item: item, spec: spec, result: result, currency: priceCurrency };
   }
 
-  // The read-only context the wizard's `valueFrom` controls resolve against.
-  // Returned as plain data so the renderer never learns what a requisite is.
-  function context(subject, values) {
-    var record = payoutRequisite(subject, values);
-    return { requisites: requisiteFields(record) };
+  function reviewKey(id, s, v) {
+    if (id === 'order-trade') {
+      var trade = tradeCalculation(v), keys = trade.keys || [];
+      return JSON.stringify([id, s.id, v['extra-trade-kind'], v['extra-order-market'], v['extra-order-kind'],
+        v['extra-settlement-period'], v[keys[0]], v[keys[1]], v[keys[2]], trade.branch === 'security' ? text(v['extra-repo-ccp']) : trade.branch === 'fx' ? text(v['extra-fx-swap-ccp']) : '',
+        trade.currency, trade.result.value, trade.spec || null, v['extra-amount-mode'], v['extra-manual-amount'], v['extra-amount-reason']]);
+    }
+    var p = id === 'order-venue-transfer' ? 'extra-move-' : 'extra-payout-';
+    return JSON.stringify([id, s.id, v[p + 'amount-mode'] || '', formatMoney(v[p+'amount']), v[p+'currency'],
+      v['extra-words-mode'], v['extra-manual-words']]);
   }
 
-  // Missing CRM data is not a blank row on a client's payout order: it is a
-  // refusal that names what is missing. Returned as wizard field keys so the
-  // caller can mark the exact controls.
-  function validate(subject, values) {
-    var problems = [];
-    if (text(values['extra-order-type']) !== 'withdrawal') return problems;
-    var currency = text(values['extra-payout-currency']);
-    if (!currency) return problems;
-
-    var record = payoutRequisite(subject, values);
-    var resolved = requisiteFields(record);
-    var missing = requiredRequisiteKeys(currency).filter(function (key) {
-      return !resolved[key];
-    });
-    if (!missing.length) return problems;
-
-    var names = missing.map(function (key) { return REQUISITE_LABELS[key]; });
-    var reason = record
-      ? 'В карточке субъекта не заполнены реквизиты для вывода в ' + currency + ': '
-      : 'В карточке субъекта нет банковских реквизитов для вывода в ' + currency +
-        '. Недоступны: ';
-    missing.forEach(function (key) {
-      problems.push({ key: key, message: reason + names.join(', ') + '.' });
-    });
-    return problems;
+  function difference(manual, calculated) {
+    var a = parseMoney(manual), b = parseMoney(calculated);
+    if (a.error || a.negative || b.error || b.negative || !calculated) return '';
+    var delta = a.minorTotal - b.minorTotal;
+    var magnitude = delta < 0n ? -delta : delta;
+    return (delta < 0n ? '−' : delta > 0n ? '+' : '') + String(magnitude / 100n) + ',' +
+      String(magnitude % 100n).padStart(2,'0');
   }
 
-  // ── The public step ───────────────────────────────────────────────────────
-
-  function pick(source, keys, target) {
-    keys.forEach(function (key) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) target[key] = source[key];
-    });
-    return target;
+  function formatDecimalInput(value, group) {
+    var parts = String(value || '').split('.');
+    if (group) parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return parts.join(',');
   }
 
-  // Returns fresh `extraValues` / `checkValues` maps. The caller's originals
-  // are not modified: the DOM still holds what the manager typed, and a value
-  // dropped from one generation must come back if the branch is chosen again.
-  function normalize(extraValues, checkValues, subject) {
-    var values = {};
-    Object.keys(extraValues || {}).forEach(function (key) {
-      values[key] = extraValues[key];
-    });
-    var checks = {};
-    Object.keys(checkValues || {}).forEach(function (key) {
-      checks[key] = checkValues[key];
-    });
+  function context(id, subject, values) {
+    var v = values, key = id === 'order-venue-transfer' ? 'extra-move-' : 'extra-payout-';
+    var trade = id === 'order-trade' ? tradeCalculation(v) : null;
+    var info = trade && trade.result;
+    return {
+      identity: identity(subject), requisites: requisiteFields(payoutRequisite(subject, v)),
+      words: v[key + 'amount'] && CURRENCIES[v[key+'currency']] ? amountInWords(v[key+'amount'], v[key+'currency']) : '',
+      discrepancy: info ? difference(v['extra-manual-amount'],info.value) : '',
+      estimate: info ? info.value ? formatDecimalInput(info.value, true) + ' ' + info.currency : info.reason : ''
+    };
+  }
 
-    // Always a primary submission. The «Отмена ранее поданной заявки» box of
-    // the source form is mapped and stays mapped; nothing can set it.
-    values['extra-submission-kind'] = 'primary';
-    // Never generated: this process does not accept conditional orders.
-    values['extra-order-kind-conditional'] = '';
-
-    var orderType = text(values['extra-order-type']);
-    var allowed = COMMON_KEYS.slice();
-
-    if (orderType === 'trade') {
-      var isLimit = text(values['extra-order-kind']) === 'limit';
-      values['extra-order-validity'] = deriveValidity(values);
-      // Answers to questions this order no longer asks. The map guards each of
-      // them with its own condition, so none of these could print; they are
-      // cleared because the payload is also read by people and by the backend.
-      if (text(values['extra-trade-kind']) !== 'other') {
-        values['extra-trade-kind-other'] = '';
-      }
-      if (text(values['extra-order-market']) !== 'otc') {
-        values['extra-otc-instrument-type'] = '';
-      }
-      if (text(values['extra-order-validity-mode']) !== 'date') {
-        values['extra-order-validity-date'] = '';
-      }
-      allowed = allowed.concat(TRADE_KEYS);
-
-      var branch = instrumentBranch(values);
-      if (branch === 'security') {
-        deriveSecurity(values, isLimit);
-        allowed = allowed.concat(SECURITY_KEYS);
-      } else if (branch === 'fx') {
-        deriveFx(values, isLimit);
-        allowed = allowed.concat(FX_KEYS);
-      } else if (branch === 'derivative') {
-        deriveDerivative(values, isLimit);
-        allowed = allowed.concat(DERIVATIVE_KEYS);
-      }
-
-      // The form's own wording, and not a question the manager answers: a
-      // trade order always carries the uncovered-position acknowledgement.
-      checks['order-uncovered-ack'] = true;
-    } else {
-      checks['order-uncovered-ack'] = false;
-      if (orderType === 'transfer') {
-        values['extra-move-amount'] = formatMoney(values['extra-move-amount']);
-        values['extra-move-amount-words'] = amountInWords(
-          values['extra-move-amount'], values['extra-move-currency']);
-        allowed = allowed.concat(TRANSFER_KEYS);
-      } else if (orderType === 'withdrawal') {
-        if (text(values['extra-payout-amount-mode']) === 'amount') {
-          values['extra-payout-amount'] = formatMoney(values['extra-payout-amount']);
-          values['extra-payout-amount-words'] = amountInWords(
-            values['extra-payout-amount'], values['extra-payout-currency']);
-        } else {
-          // «В размере свободного остатка»: there is no figure, so there is
-          // nothing to spell out. Both amount rows stay blank by design.
-          values['extra-payout-amount'] = '';
-          values['extra-payout-amount-words'] = '';
-        }
-        // The bank block comes from the subject card, not from the screen.
-        // Taken here rather than from the read-only controls so the payload is
-        // right even if a control was never rendered.
-        var requisites = requisiteFields(payoutRequisite(subject, values));
-        Object.keys(requisites).forEach(function (key) {
-          values[key] = requisites[key];
-        });
-        allowed = allowed.concat(WITHDRAWAL_KEYS);
+  function prepare(id, subject, input) {
+    var kind = KINDS[id], v = Object.assign({}, input), errors = [], out = {}, checks = {}, raw = {};
+    var metadata = { documentId: id, subjectId: subject.id }, ident = identity(subject);
+    function issue(key, message) { errors.push({ key: key, message: message }); }
+    function keep(keys) {
+      keys.forEach(function (k) { if (v[k] != null) raw[k] = v[k]; });
+    }
+    function copy(keys) {
+      keep(keys);
+      keys.forEach(function (k) { if (v[k] != null) out[k] = v[k]; });
+    }
+    function oneOf(key, choices) {
+      if (!choices.includes(v[key])) issue(key, 'Выберите допустимое значение поля.');
+    }
+    function positive(key) {
+      var m = parseMoney(v[key]);
+      if (m.error || m.negative || !m.minorTotal) issue(key, m.error || 'Сумма должна быть больше нуля.');
+    }
+    function safeText(s) { return !!text(s) && !/[<>\u0000-\u001f\u007f]/.test(s); }
+    function confirm() {
+      var against = reviewKey(id, subject, v);
+      if (v.confirmedAgainst !== against) issue('order-review', 'Проверьте и подтвердите ручную редакцию для текущих значений.');
+      metadata.lastValidatedAgainst = v.confirmedAgainst === against ? against : null;
+      keep(['confirmedAgainst']);
+    }
+    if (!kind) issue('extra-order-type', 'Неизвестное поручение.');
+    if (!/^INV[^\s]+$/i.test(ident.code)) issue('extra-brokerage-account', 'В карточке клиента отсутствует корректный код INV.');
+    if (!ident.contract) issue('extra-contract-number-date', 'В карточке клиента не заполнены номер или дата брокерского договора.');
+    out['extra-brokerage-account'] = ident.code;
+    out['extra-contract-number-date'] = ident.contract;
+    out['extra-submission-kind'] = 'primary';
+    copy(['extra-order-number','extra-order-date']);
+    var date = text(v['extra-order-date']);
+    if (date || text(v['extra-order-number'])) {
+      var match = /^(20\d{2})-(\d{2})-(\d{2})$/.exec(date);
+      if (!match || !calendarDate(date))
+        issue('extra-order-date', 'Укажите корректную дату первичной заявки.');
+      else {
+        out['extra-order-day'] = match[3]; out['extra-order-month'] = match[2]; out['extra-order-year'] = match[1].slice(2);
       }
     }
-
-    return {
-      extraValues: pick(values, allowed, {}),
-      checkValues: checks
-    };
+    if (kind === 'trade') {
+      var trade = tradeCalculation(v), keys = trade.keys, result = trade.result;
+      oneOf('extra-trade-kind', ['buy','sell','other']); oneOf('extra-order-kind', ['limit','market']);
+      oneOf('extra-order-validity-mode', ['cancelled','date']); oneOf('extra-settlement-period', ['T+0','T+1','T+2']);
+      if (!keys || !trade.item) issue(keys ? keys[0] : 'extra-order-market', 'Выберите инструмент активного рынка из справочника.');
+      if (v['extra-trade-kind'] === 'other' && !safeText(v['extra-trade-kind-other'])) issue('extra-trade-kind-other','Укажите вид сделки.');
+      if (v['extra-order-validity-mode'] === 'date' && !calendarDate(v['extra-order-validity-date']))
+        issue('extra-order-validity-date','Укажите дату окончания поручения.');
+      copy(['extra-trade-kind','extra-order-market','extra-order-kind','extra-order-validity-mode','extra-settlement-period','extra-counterparty','extra-order-other-info']);
+      if (v['extra-trade-kind']==='other') copy(['extra-trade-kind-other']);
+      if (v['extra-order-market']==='otc') copy(['extra-otc-instrument-type']);
+      if (v['extra-order-validity-mode']==='date') copy(['extra-order-validity-date']);
+      out['extra-order-validity'] = deriveValidity(v);
+      if (keys) {
+        var limit = v['extra-order-kind'] === 'limit';
+        copy([keys[0],keys[1]]); if (limit) copy([keys[2]]);
+        if (!/^[1-9]\d*$/.test(String(v[keys[1]] || '').replace(/ /g,''))) issue(keys[1], 'Укажите положительное целое количество.');
+        if (limit) {
+          var price = global.CRMOrderCalculation.decimal(v[keys[2]]);
+          if (!price || !price.n) issue(keys[2], 'Укажите положительную лимитную цену.');
+        }
+        if (trade.branch==='security') {
+          oneOf('extra-repo-ccp',['yes','no']); copy(['extra-repo-ccp']); deriveSecurity(out,limit);
+          if ((trade.currency && !/^[A-Z]{3}$/.test(trade.currency)) || (limit && !trade.currency))
+            issue('extra-security-currency', 'Введите трёхбуквенный код валюты цены.');
+          out['extra-security-currency'] = trade.currency;
+          keep(['extra-security-currency']);
+          if (trade.spec) {
+            if (limit && trade.spec.formula==='bond-percent') out['extra-security-price'] += ' %';
+            if (limit && trade.spec.amountBasis==='dirty' && trade.spec.accruedFor && trade.spec.accruedFor===trade.spec.settlementDate)
+              out['extra-security-accrued'] = formatAmount(trade.spec.accrued);
+          }
+        } else if (trade.branch==='fx') {
+          oneOf('extra-fx-swap-ccp',['yes','no']); copy(['extra-fx-swap-ccp']); deriveFx(out,limit);
+        } else deriveDerivative(out,limit);
+        var mode = v['extra-amount-mode'] || 'auto';
+        metadata.amount = { mode: limit ? (mode === 'manual' ? mode : result.mode) : 'unavailable',
+          source: trade.spec && trade.spec.source || null, sourceRecordId: v[keys[0]], calculated: result.value, reason: result.reason || '' };
+        out[keys[3]] = '';
+        if (limit) {
+          if (!['manual','auto'].includes(mode)) issue('extra-manual-amount', 'Недопустимый режим суммы.');
+          if (result.invalid) issue(keys[2],result.reason);
+          keep(['extra-amount-mode']);
+          if (mode === 'manual') {
+            positive('extra-manual-amount'); keep(['extra-manual-amount','extra-amount-reason']);
+            if (!safeText(v['extra-amount-reason'])) issue('extra-amount-reason','Укажите основание ручной суммы.');
+            confirm();
+            out[keys[3]] = formatMoney(v['extra-manual-amount']);
+            metadata.amount.reason = text(v['extra-amount-reason']);
+            metadata.amount.difference = difference(v['extra-manual-amount'],result.value);
+            metadata.amount.currency = trade.currency || (trade.item && trade.item.quote) || '';
+          } else if (result.value) out[keys[3]] = formatAmount(result.value);
+          else issue('extra-manual-amount',result.reason + ' Введите сумму сделки.');
+        }
+        metadata.amount.value = out[keys[3]];
+      }
+      checks['order-uncovered-ack'] = true;
+    } else if (kind) {
+      var move = kind === 'transfer', p = move ? 'extra-move-' : 'extra-payout-';
+      var currency = currencyCode(v[p+'currency']); v[p+'currency'] = currency;
+      oneOf(p+'currency',Object.keys(CURRENCIES));
+      copy([p+'currency']);
+      var list = venues(subject);
+      (move ? [p+'from',p+'to'] : [p+'from']).forEach(function (k) {
+        var venue = list.find(function (o) { return o.value === v[k]; });
+        if (!venue) issue(k,'Выберите торговую площадку из справочника.');
+        else { out[k]=venue.box; if(venue.box==='other') out[k+'-other-name']=venue.label; }
+        keep([k]);
+      });
+      if (move && v[p+'from'] && v[p+'from']===v[p+'to']) issue(p+'to','Перевод на ту же торговую площадку невозможен.');
+      if (!move) {
+        oneOf(p+'amount-mode',['amount','whole']); copy([p+'amount-mode']);
+        keep(['selectedRequisiteId']); var rec = payoutRequisite(subject,v);
+        if (!rec) issue('selectedRequisiteId','Выберите сохранённые реквизиты клиента для валюты '+currency+'. При отсутствии записи откройте карточку клиента.');
+        else {
+          var required = ['recipient','bankName','bic','account'];
+          if (currency==='RUB' || rec.requiresCorrespondentAccount || rec.requiresIntermediary) required.push('correspondentAccount');
+          if (rec.requiresIntermediary) required.push('correspondentBankName','correspondentSwift');
+          var missing = required.filter(function (k) { return !text(rec[k]); });
+          if (missing.length) issue('selectedRequisiteId','Не заполнены реквизиты банковского маршрута: '+missing.map(function(k){return BANK_LABELS[k];}).join(', ')+'.');
+          var bic = text(rec.bic);
+          var swift = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+          if (bic && !(currency === 'RUB' || rec.routingType === 'domestic' ? /^\d{9}$/.test(bic) : swift.test(bic)))
+            issue('selectedRequisiteId','Проверьте БИК/SWIFT банка в сохранённых реквизитах.');
+          if (rec.correspondentSwift && !swift.test(rec.correspondentSwift))
+            issue('selectedRequisiteId','Проверьте SWIFT банка-корреспондента.');
+          Object.assign(out,requisiteFields(rec));
+          metadata.selectedRequisiteId = rec.id; metadata.bankSource = 'Front Реквизиты';
+        }
+      }
+      if (move || v[p+'amount-mode']==='amount') {
+        positive(p+'amount'); keep([p+'amount','extra-words-mode']);
+        out[p+'amount']=formatMoney(v[p+'amount']);
+        var manual=v['extra-words-mode']==='manual';
+        if (v['extra-words-mode'] && !['manual','auto'].includes(v['extra-words-mode'])) issue('extra-words-mode','Недопустимый режим прописи.');
+        var words=manual ? text(v['extra-manual-words']) : amountInWords(v[p+'amount'],currency);
+        if (manual) {
+          keep(['extra-manual-words']);
+          if (!safeText(v['extra-manual-words'])) issue('extra-manual-words','Введите пропись обычным текстом, без разметки и управляющих символов.');
+          confirm();
+        }
+        out[p+'amount-words']=words;
+        metadata.words={mode:manual?'manual':'auto',value:words,source:manual?'operator':'amountInWords',
+          confirmed:manual && !!metadata.lastValidatedAgainst,confirmedAgainstAmount:out[p+'amount'],confirmedAgainstCurrency:currency};
+      }
+    }
+    return { extraValues: out, checkValues: checks, input: raw, metadata: metadata, errors: errors };
   }
 
-  global.CRMOrderForms = {
-    DOCUMENT_ID: 'order-forms',
-    MARKET_PRICE: MARKET_PRICE,
-    VALIDITY_UNTIL_CANCELLED: VALIDITY_UNTIL_CANCELLED,
-    instrumentBranch: instrumentBranch,
-    formatAmount: formatAmount,
-    formatMoney: formatMoney,
-    moneyProblem: moneyProblem,
-    amountInWords: amountInWords,
-    payoutRequisite: payoutRequisite,
-    context: context,
-    validate: validate,
-    normalize: normalize
-  };
+  // Final boundary shared by preflight and PDF rendering, including callers outside the wizard.
+  function printable(id, payload) {
+    var displayed = payload.extraValues || {};
+    if (id === 'order-venue-transfer' && displayed['extra-move-from'] &&
+        displayed['extra-move-from'] === displayed['extra-move-to'] &&
+        (displayed['extra-move-from'] !== 'other' || !payload.orderInput)) {
+      throw new Error('Перевод на ту же торговую площадку невозможен.');
+    }
+    var input = payload.orderInput || displayed;
+    var subject = payload.subject || {};
+    if (payload.umi && !subject.umi) subject = Object.assign({},subject,{umi:payload.umi});
+    var order = prepare(id,subject,input);
+    if (order.errors.length) throw new Error(order.errors[0].message);
+    return Object.assign({},payload,{extraValues:order.extraValues,checks:order.checkValues,
+      orderMetadata:order.metadata,orderInput:order.input});
+  }
 
+  var BANK_LABELS={recipient:'получатель',bankName:'наименование банка',bic:'БИК/SWIFT',account:'счёт получателя',
+    correspondentAccount:'корреспондентский счёт',correspondentBankName:'банк-корреспондент',correspondentSwift:'SWIFT корреспондента'};
+
+  global.CRMOrderForms = {
+    kinds: KINDS, printable: printable, venues: venues, eligibleRequisites: eligibleRequisites, payoutRequisite: payoutRequisite,
+    instrumentBranch: instrumentBranch, formatAmount: formatAmount, formatMoney: formatMoney, moneyProblem: moneyProblem,
+    amountInWords: amountInWords, formatDecimalInput: formatDecimalInput, tradeCalculation: tradeCalculation, context: context, reviewKey: reviewKey, prepare: prepare
+  };
 }(typeof window !== 'undefined' ? window : this));

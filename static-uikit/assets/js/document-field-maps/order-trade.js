@@ -1,0 +1,67 @@
+// Official regulation effective 19 November 2026, physical pages 122–123.
+// Coordinates are points from the top left of the extracted pages.
+(function (engine) {
+  'use strict';
+  var slot = engine.orderMap.slot;
+  var mark = engine.orderMap.mark;
+  engine.orderMap.register({
+    id: "order-trade",
+    title: "Поручение на совершение сделки",
+    templateUrl: "../assets/document-pdf-templates/order-trade.pdf",
+    outputFilename: "poruchenie-na-sdelku.pdf",
+    expectedPages: 2,
+    appliesTo: ["individual", "company"],
+    fonts: {legalSerif: "../assets/fonts/pdf/LiberationSerif-Regular.ttf"},
+    pageLayout: {"0":{fixedHeaderUntil: 0, bodyBottom: 773.98, fixedFooterFrom: null, shiftToTop: 831, bottomClearance: 25, compaction: [], anchors: ["tradeClientName"]}},
+    fields: [
+      mark("tradePrimary", "extra.extra-submission-kind", "primary", "Первичная подача заявки", 0, 81.44, 78.11, 8.6),
+      mark("tradeCancellation", "extra.extra-submission-kind", "cancellation", "Отмена ранее поданной заявки", 0, 81.44, 92.99, 7.7),
+      slot("tradeOrderNumber", "extra.extra-order-number", "Первичная подача заявки №", 0, 215.7, 77.56, 32, {fontSize: 9}),
+      slot("tradeOrderDay", "extra.extra-order-day", "от «____» (день)", 0, 266.3, 77.56, 18, {fontSize: 9}),
+      slot("tradeOrderMonth", "extra.extra-order-month", "месяц", 0, 293.4, 77.56, 26, {fontSize: 9}),
+      slot("tradeOrderYear", "extra.extra-order-year", "20______г. (год)", 0, 332.5, 77.56, 27, {fontSize: 9}),
+      slot("tradeClientName", "field.client-full-name", "Наименование", 0, 250.78, 201.91, 292.46, {required: true, fontSize: 10, overflowStrategy: "expand-layout", expansion: {page: 0, insertionTop: 208.63, shiftFromTop: 208.63, rowHeight: 20.42, maxExtraRows: 2, maxFontSize: 10, lineStyle: "table-row", reviewStatus: "approved", rowLeft: 56.66, rowWidth: 489.32, borders: {left: false, right: false, top: false, bottom: false}, columns: [56.66, 248.02, 545.98], line: {left: 250.78, width: 292.46, baselineOffset: 13.7, ruleOffset: 20.42, ruleThickness: 0.48}}}),
+      slot("tradeContractNumberDate", "extra.extra-contract-number-date", "Номер и дата договора с клиентом", 0, 250.78, 222.33, 292.46, {required: true, fontSize: 10}),
+      slot("tradeBrokerageAccount", "extra.extra-brokerage-account", "Брокерский счет №", 0, 250.78, 242.49, 292.46, {required: true, fontSize: 10}),
+      mark("tradeKindBuy", "extra.extra-trade-kind", "buy", "Покупка", 0, 256.24, 304.75, 8.6),
+      mark("tradeKindSell", "extra.extra-trade-kind", "sell", "Продажа", 0, 301.86, 304.75, 7.7),
+      mark("tradeKindOther", "extra.extra-trade-kind", "other", "Иной вид сделки", 0, 347, 304.75, 8.6),
+      mark("orderMarketStock", "extra.extra-order-market", "stock", "Фондовый", 0, 256.24, 335.71, 8.6),
+      mark("orderMarketCurrency", "extra.extra-order-market", "currency", "Валютный", 0, 310.5, 335.71, 8.6),
+      mark("orderMarketDerivatives", "extra.extra-order-market", "derivatives", "Срочный", 0, 364.76, 335.71, 8.6),
+      mark("orderMarketOtc", "extra.extra-order-market", "otc", "Внебиржевой", 0, 415.91, 335.71, 8.6),
+      mark("orderKindMarket", "extra.extra-order-kind", "market", "Рыночное", 0, 256.24, 362.59, 8.6),
+      mark("orderKindLimit", "extra.extra-order-kind", "limit", "Лимитированное", 0, 306.9, 362.59, 7.7),
+      mark("orderKindConditional", "extra.extra-order-kind", "conditional", "Условное", 0, 382.52, 362.59, 7.7),
+      slot("tradeKindOtherText", "extra.extra-trade-kind-other", "Иной вид сделки (указать)", 0, 424, 304, 55, {showWhen: {source: "extra.extra-trade-kind", equals: "other"}}),
+      slot("orderKindConditionalText", "extra.extra-order-kind-conditional", "Условное (указать)", 0, 430.2, 362, 73, {showWhen: {source: "extra.extra-order-kind", equals: "conditional"}}),
+      slot("orderValidity", "extra.extra-order-validity", "Срок действия заявки", 0, 250.8, 384.67, 292.5),
+      slot("settlementPeriod", "extra.extra-settlement-period", "Срок расчетов", 0, 250.8, 411.56, 292.5),
+      slot("counterparty", "extra.extra-counterparty", "Информация о контрагенте", 0, 250.8, 438.44, 292.5),
+      slot("otherInformation", "extra.extra-order-other-info", "Иная информация", 0, 250.8, 465.33, 292.5),
+      slot("securityIssuer", "extra.extra-security-issuer", "Наименование эмитента", 0, 249.1, 523.06, 294.2),
+      slot("securityType", "extra.extra-security-type", "Вид, категория (тип), выпуск, транш, серия ценной бумаги, ISIN/CFI", 0, 249.1, 539.66, 294.2, {multiline: true, maxLines: 2, lineHeight: 10, fontSize: 9}),
+      slot("securityQuantity", "extra.extra-security-quantity", "Количество ценных бумаг", 0, 249.1, 566.41, 294.2),
+      slot("tradeAmount", "extra.extra-trade-amount", "Сумма сделки в валюте сделки **", 0, 249.1, 632.78, 294.2),
+      slot("derivativeKind", "extra.extra-derivative-kind", "Вид инструмента срочного рынка", 0, 249.1, 677.43, 294.2),
+      slot("derivativeName", "extra.extra-derivative-name", "Наименование производного финансового инструмента", 0, 249.1, 699.03, 294.2),
+      slot("derivativeQuantity", "extra.extra-derivative-quantity", "Количество производного финансового инструмента, шт.(лотов)", 0, 249.1, 721.85, 294.2),
+      slot("derivativePremium", "extra.extra-derivative-premium", "Цена производного финансового инструмента (премия)", 0, 249.1, 744.78, 294.2),
+      slot("derivativeStrike", "extra.extra-derivative-strike", "Цена исполнения страйк (для опционов)", 0, 249.1, 766.5, 294.2),
+      slot("securityPrice", "extra.extra-security-price", "Цена одной ценной бумаги", 0, 257, 586.5, 80),
+      slot("securityAccrued", "extra.extra-security-accrued", "НКД", 0, 342.5, 586.5, 94),
+      slot("securityCurrency", "extra.extra-security-currency", "Валюта цены", 0, 442, 586.5, 101),
+      mark("repoYes", "extra.extra-repo-ccp", "yes", "Сделка РЕПО с ЦК — Да", 0, 252.4, 615.14, 8.6),
+      mark("repoNo", "extra.extra-repo-ccp", "no", "Сделка РЕПО с ЦК — Нет", 0, 278.34, 615.14, 7.7),
+      slot("derivativeExpiry", "extra.extra-derivative-expiry", "Дата исполнения (экспирации)", 1, 249.1, 55.9, 294.2, {format: "dateRu"}),
+      slot("derivativeAmount", "extra.extra-derivative-amount", "Сумма сделки", 1, 249.1, 76.3, 294.2),
+      slot("fxInstrument", "extra.extra-fx-instrument", "Наименование валютного инструмента/Наименование инструмента рынка драгоценных металлов", 1, 249.1, 122.76, 294.2),
+      slot("fxLots", "extra.extra-fx-lots", "Количество Лотов валютного инструмента/Лотов инструмента рынка драгоценных металлов", 1, 249.1, 154.33, 294.2),
+      slot("fxRate", "extra.extra-fx-rate", "Курс валюты/Цена сделки с драгоценными металлами", 1, 249.1, 181.57, 294.2),
+      slot("fxAmount", "extra.extra-fx-amount", "Сумма сделки в валюте котировки", 1, 249.1, 205.34, 294.2),
+      mark("fxSwapYes", "extra.extra-fx-swap-ccp", "yes", "Сделка валютный СВОП с ЦК — Да", 1, 252.4, 235.12, 7.7),
+      mark("fxSwapNo", "extra.extra-fx-swap-ccp", "no", "Сделка валютный СВОП с ЦК — Нет", 1, 276.42, 235.12, 7.7),
+      mark("uncoveredAck", "check.order-uncovered-ack", null, "Я проинформирован, что данная сделка может привести к открытию непокрытой позиции.***", 1, 57.2, 256.48, 8.6)
+    ]
+  });
+}(window.CRMDocumentEngine));

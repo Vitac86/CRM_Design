@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "generatedBy": "static-uikit/tools/qa/check_identifier_manifest.py --write",
   "counts": {
-    "maps": 18,
-    "fields": 636,
-    "registryDocuments": 22,
-    "overlayBindings": 18,
-    "wizardKeys": 310,
-    "checkKeys": 59,
+    "maps": 20,
+    "fields": 659,
+    "registryDocuments": 24,
+    "overlayBindings": 20,
+    "wizardKeys": 349,
+    "checkKeys": 58,
     "formatterNames": 13
   },
   "maps": [
@@ -1778,7 +1778,7 @@
       ]
     },
     {
-      "id": "order-forms",
+      "id": "order-bank-withdrawal",
       "fields": [
         {
           "id": "bankBic",
@@ -1820,6 +1820,115 @@
           "id": "bankRecipientInn",
           "source": "extra.extra-bank-inn"
         },
+        {
+          "id": "payout-from-currency",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payout-from-derivatives",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payout-from-otc",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payout-from-other",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payout-from-other-name",
+          "source": "extra.extra-payout-from-other-name"
+        },
+        {
+          "id": "payout-from-spb-derivatives",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payout-from-spb-stock",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payout-from-stock",
+          "source": "extra.extra-payout-from"
+        },
+        {
+          "id": "payoutAmountFigures",
+          "source": "extra.extra-payout-amount"
+        },
+        {
+          "id": "payoutAmountWords",
+          "source": "extra.extra-payout-amount-words"
+        },
+        {
+          "id": "payoutBrokerageAccount",
+          "source": "extra.extra-brokerage-account"
+        },
+        {
+          "id": "payoutCancellation",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "payoutClientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "payoutContractNumberDate",
+          "source": "extra.extra-contract-number-date"
+        },
+        {
+          "id": "payoutCurrencyCNY",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurrencyEUR",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurrencyRUB",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurrencyUSD",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutCurrencyother",
+          "source": "extra.extra-payout-currency"
+        },
+        {
+          "id": "payoutModeamount",
+          "source": "extra.extra-payout-amount-mode"
+        },
+        {
+          "id": "payoutModewhole",
+          "source": "extra.extra-payout-amount-mode"
+        },
+        {
+          "id": "payoutOrderDay",
+          "source": "extra.extra-order-day"
+        },
+        {
+          "id": "payoutOrderMonth",
+          "source": "extra.extra-order-month"
+        },
+        {
+          "id": "payoutOrderNumber",
+          "source": "extra.extra-order-number"
+        },
+        {
+          "id": "payoutOrderYear",
+          "source": "extra.extra-order-year"
+        },
+        {
+          "id": "payoutPrimary",
+          "source": "extra.extra-submission-kind"
+        }
+      ]
+    },
+    {
+      "id": "order-trade",
+      "fields": [
         {
           "id": "counterparty",
           "source": "extra.extra-counterparty"
@@ -1877,106 +1986,6 @@
           "source": "extra.extra-fx-swap-ccp"
         },
         {
-          "id": "marketCurrency",
-          "source": "extra.extra-order-market"
-        },
-        {
-          "id": "marketDerivatives",
-          "source": "extra.extra-order-market"
-        },
-        {
-          "id": "marketOtc",
-          "source": "extra.extra-order-market"
-        },
-        {
-          "id": "marketStock",
-          "source": "extra.extra-order-market"
-        },
-        {
-          "id": "moveAmountFigures",
-          "source": "extra.extra-move-amount"
-        },
-        {
-          "id": "moveAmountWords",
-          "source": "extra.extra-move-amount-words"
-        },
-        {
-          "id": "moveBrokerageAccount",
-          "source": "extra.extra-brokerage-account"
-        },
-        {
-          "id": "moveCancellation",
-          "source": "extra.extra-submission-kind"
-        },
-        {
-          "id": "moveClientName",
-          "source": "field.client-full-name"
-        },
-        {
-          "id": "moveContractNumberDate",
-          "source": "extra.extra-contract-number-date"
-        },
-        {
-          "id": "moveCurCny",
-          "source": "extra.extra-move-currency"
-        },
-        {
-          "id": "moveCurEur",
-          "source": "extra.extra-move-currency"
-        },
-        {
-          "id": "moveCurOther",
-          "source": "extra.extra-move-currency"
-        },
-        {
-          "id": "moveCurRub",
-          "source": "extra.extra-move-currency"
-        },
-        {
-          "id": "moveCurUsd",
-          "source": "extra.extra-move-currency"
-        },
-        {
-          "id": "moveFromCurrency",
-          "source": "extra.extra-move-from"
-        },
-        {
-          "id": "moveFromDerivatives",
-          "source": "extra.extra-move-from"
-        },
-        {
-          "id": "moveFromOtc",
-          "source": "extra.extra-move-from"
-        },
-        {
-          "id": "moveFromStock",
-          "source": "extra.extra-move-from"
-        },
-        {
-          "id": "moveOrderNumberDate",
-          "source": "extra.extra-order-number-date"
-        },
-        {
-          "id": "movePrimary",
-          "source": "extra.extra-submission-kind"
-        },
-        {
-          "id": "moveToCurrency",
-          "source": "extra.extra-move-to"
-        },
-        {
-          "id": "moveToDerivatives",
-          "source": "extra.extra-move-to"
-        },
-        {
-          "id": "moveToOtc",
-          "source": "extra.extra-move-to"
-        },
-        {
-          "id": "moveToStock",
-          "source": "extra.extra-move-to"
-        },
-        {
           "id": "orderKindConditional",
           "source": "extra.extra-order-kind"
         },
@@ -1993,6 +2002,22 @@
           "source": "extra.extra-order-kind"
         },
         {
+          "id": "orderMarketCurrency",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "orderMarketDerivatives",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "orderMarketOtc",
+          "source": "extra.extra-order-market"
+        },
+        {
+          "id": "orderMarketStock",
+          "source": "extra.extra-order-market"
+        },
+        {
           "id": "orderValidity",
           "source": "extra.extra-order-validity"
         },
@@ -2001,88 +2026,20 @@
           "source": "extra.extra-order-other-info"
         },
         {
-          "id": "payoutAmount",
-          "source": "extra.extra-payout-amount"
-        },
-        {
-          "id": "payoutAmountWords",
-          "source": "extra.extra-payout-amount-words"
-        },
-        {
-          "id": "payoutBrokerageAccount",
-          "source": "extra.extra-brokerage-account"
-        },
-        {
-          "id": "payoutCancellation",
-          "source": "extra.extra-submission-kind"
-        },
-        {
-          "id": "payoutClientName",
-          "source": "field.client-full-name"
-        },
-        {
-          "id": "payoutContractNumberDate",
-          "source": "extra.extra-contract-number-date"
-        },
-        {
-          "id": "payoutCurCny",
-          "source": "extra.extra-payout-currency"
-        },
-        {
-          "id": "payoutCurEur",
-          "source": "extra.extra-payout-currency"
-        },
-        {
-          "id": "payoutCurOther",
-          "source": "extra.extra-payout-currency"
-        },
-        {
-          "id": "payoutCurRub",
-          "source": "extra.extra-payout-currency"
-        },
-        {
-          "id": "payoutCurUsd",
-          "source": "extra.extra-payout-currency"
-        },
-        {
-          "id": "payoutFixedAmount",
-          "source": "extra.extra-payout-amount-mode"
-        },
-        {
-          "id": "payoutFromCurrency",
-          "source": "extra.extra-payout-from"
-        },
-        {
-          "id": "payoutFromDerivatives",
-          "source": "extra.extra-payout-from"
-        },
-        {
-          "id": "payoutFromOtc",
-          "source": "extra.extra-payout-from"
-        },
-        {
-          "id": "payoutFromStock",
-          "source": "extra.extra-payout-from"
-        },
-        {
-          "id": "payoutOrderNumberDate",
-          "source": "extra.extra-order-number-date"
-        },
-        {
-          "id": "payoutPrimary",
-          "source": "extra.extra-submission-kind"
-        },
-        {
-          "id": "payoutWholeBalance",
-          "source": "extra.extra-payout-amount-mode"
-        },
-        {
           "id": "repoNo",
           "source": "extra.extra-repo-ccp"
         },
         {
           "id": "repoYes",
           "source": "extra.extra-repo-ccp"
+        },
+        {
+          "id": "securityAccrued",
+          "source": "extra.extra-security-accrued"
+        },
+        {
+          "id": "securityCurrency",
+          "source": "extra.extra-security-currency"
         },
         {
           "id": "securityIssuer",
@@ -2141,16 +2098,161 @@
           "source": "extra.extra-trade-kind"
         },
         {
-          "id": "tradeOrderNumberDate",
-          "source": "extra.extra-order-number-date"
+          "id": "tradeOrderDay",
+          "source": "extra.extra-order-day"
+        },
+        {
+          "id": "tradeOrderMonth",
+          "source": "extra.extra-order-month"
+        },
+        {
+          "id": "tradeOrderNumber",
+          "source": "extra.extra-order-number"
+        },
+        {
+          "id": "tradeOrderYear",
+          "source": "extra.extra-order-year"
         },
         {
           "id": "tradePrimary",
           "source": "extra.extra-submission-kind"
         },
         {
-          "id": "uncoveredPositionAck",
+          "id": "uncoveredAck",
           "source": "check.order-uncovered-ack"
+        }
+      ]
+    },
+    {
+      "id": "order-venue-transfer",
+      "fields": [
+        {
+          "id": "move-from-currency",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-from-derivatives",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-from-otc",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-from-other",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-from-other-name",
+          "source": "extra.extra-move-from-other-name"
+        },
+        {
+          "id": "move-from-spb-derivatives",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-from-spb-stock",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-from-stock",
+          "source": "extra.extra-move-from"
+        },
+        {
+          "id": "move-to-currency",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "move-to-derivatives",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "move-to-otc",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "move-to-other",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "move-to-other-name",
+          "source": "extra.extra-move-to-other-name"
+        },
+        {
+          "id": "move-to-spb-derivatives",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "move-to-spb-stock",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "move-to-stock",
+          "source": "extra.extra-move-to"
+        },
+        {
+          "id": "moveAmountFigures",
+          "source": "extra.extra-move-amount"
+        },
+        {
+          "id": "moveAmountWords",
+          "source": "extra.extra-move-amount-words"
+        },
+        {
+          "id": "moveBrokerageAccount",
+          "source": "extra.extra-brokerage-account"
+        },
+        {
+          "id": "moveCancellation",
+          "source": "extra.extra-submission-kind"
+        },
+        {
+          "id": "moveClientName",
+          "source": "field.client-full-name"
+        },
+        {
+          "id": "moveContractNumberDate",
+          "source": "extra.extra-contract-number-date"
+        },
+        {
+          "id": "moveCurrencyCNY",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurrencyEUR",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurrencyRUB",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurrencyUSD",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveCurrencyother",
+          "source": "extra.extra-move-currency"
+        },
+        {
+          "id": "moveOrderDay",
+          "source": "extra.extra-order-day"
+        },
+        {
+          "id": "moveOrderMonth",
+          "source": "extra.extra-order-month"
+        },
+        {
+          "id": "moveOrderNumber",
+          "source": "extra.extra-order-number"
+        },
+        {
+          "id": "moveOrderYear",
+          "source": "extra.extra-order-year"
+        },
+        {
+          "id": "movePrimary",
+          "source": "extra.extra-submission-kind"
         }
       ]
     },
@@ -2660,7 +2762,9 @@
     "brokerage-starter-package",
     "client-notifications",
     "code-word-request",
-    "order-forms",
+    "order-bank-withdrawal",
+    "order-trade",
+    "order-venue-transfer",
     "power-of-attorney",
     "qualification-consequences-notice",
     "qualification-notice",
@@ -2712,8 +2816,16 @@
       "overlayTemplateId": "code-word-request"
     },
     {
-      "documentId": "order-forms",
-      "overlayTemplateId": "order-forms"
+      "documentId": "order-bank-withdrawal",
+      "overlayTemplateId": "order-bank-withdrawal"
+    },
+    {
+      "documentId": "order-trade",
+      "overlayTemplateId": "order-trade"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "overlayTemplateId": "order-venue-transfer"
     },
     {
       "documentId": "power-of-attorney",
@@ -3726,294 +3838,489 @@
       "key": "extra-new-code-word"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
+      "group": "fields",
+      "key": "extra-auto-words"
+    },
+    {
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-account"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-bic"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-corr-account"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-corr-name"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-corr-swift"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-inn"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-name"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-other"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-personal-account"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-bank-recipient"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-brokerage-account"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-contract-number-date"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-counterparty"
+      "key": "extra-manual-words"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-derivative-amount"
+      "key": "extra-order-date"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-derivative-expiry"
+      "key": "extra-order-day"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-derivative-id"
+      "key": "extra-order-month"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-derivative-kind"
+      "key": "extra-order-number"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-derivative-name"
+      "key": "extra-order-year"
     },
     {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-derivative-premium"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-derivative-quantity"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-derivative-strike"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-fx-amount"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-fx-instrument"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-fx-instrument-id"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-fx-lots"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-fx-rate"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-fx-swap-ccp"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-move-amount"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-move-amount-words"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-move-currency"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-move-from"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-move-to"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-kind"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-kind-conditional"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-market"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-number-date"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-other-info"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-type"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-validity"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-validity-date"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-order-validity-mode"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-otc-instrument-type"
-    },
-    {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-payout-amount"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-payout-amount-mode"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-payout-amount-words"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-payout-currency"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-payout-from"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
-      "key": "extra-repo-ccp"
+      "key": "extra-payout-from-other-name"
     },
     {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-security-asset-id"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-security-issuer"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-security-price"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-security-quantity"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-security-type"
-    },
-    {
-      "documentId": "order-forms",
-      "group": "fields",
-      "key": "extra-settlement-period"
-    },
-    {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
       "group": "fields",
       "key": "extra-submission-kind"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-bank-withdrawal",
+      "group": "fields",
+      "key": "extra-words-mode"
+    },
+    {
+      "documentId": "order-bank-withdrawal",
+      "group": "fields",
+      "key": "order-review"
+    },
+    {
+      "documentId": "order-bank-withdrawal",
+      "group": "fields",
+      "key": "selectedRequisiteId"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-amount-mode"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-amount-reason"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-brokerage-account"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-contract-number-date"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-counterparty"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-amount"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-expiry"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-id"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-kind"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-name"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-premium"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-quantity"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-derivative-strike"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-discrepancy"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-estimate"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-fx-amount"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-fx-instrument"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-fx-instrument-id"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-fx-lots"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-fx-rate"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-fx-swap-ccp"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-manual-amount"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-date"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-day"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-kind"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-kind-conditional"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-market"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-month"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-number"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-other-info"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-validity"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-validity-date"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-validity-mode"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-order-year"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-otc-instrument-type"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-repo-ccp"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-accrued"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-asset-id"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-currency"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-issuer"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-price"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-quantity"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-security-type"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-settlement-period"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-submission-kind"
+    },
+    {
+      "documentId": "order-trade",
       "group": "fields",
       "key": "extra-trade-amount"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-trade",
       "group": "fields",
       "key": "extra-trade-kind"
     },
     {
-      "documentId": "order-forms",
+      "documentId": "order-trade",
       "group": "fields",
       "key": "extra-trade-kind-other"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "order-review"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-auto-words"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-brokerage-account"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-contract-number-date"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-manual-words"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-amount"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-amount-words"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-currency"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-from"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-from-other-name"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-to"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-move-to-other-name"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-order-date"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-order-day"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-order-month"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-order-number"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-order-year"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-submission-kind"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "extra-words-mode"
+    },
+    {
+      "documentId": "order-venue-transfer",
+      "group": "fields",
+      "key": "order-review"
     },
     {
       "documentId": "power-of-attorney",
@@ -4488,10 +4795,6 @@
     {
       "documentId": "anketa-yul",
       "key": "reputation-other"
-    },
-    {
-      "documentId": "order-forms",
-      "key": "order-uncovered-ack"
     },
     {
       "documentId": "qualification-request-fl",

@@ -19,9 +19,9 @@ from — all 11 recorded hashes match the authoritative file.
 
 The committed browser-PDF inventory is independently locked by the
 [full PDF-template audit](document-full-template-audit.md). Its QA gate verifies
-the filename, byte length, page count and SHA-256 of all 22 source PDFs, checks
+the filename, byte length, page count and SHA-256 of all 24 source PDFs, checks
 all 77 pages and every extracted source text line, and requires classification
-coverage for every field in all 18 executable maps.
+coverage for every field in all 20 executable maps.
 
 ## Two regulations, colliding appendix numbers
 
@@ -70,7 +70,9 @@ without an overlay map cannot appear even by accident.
 | 3 | ПРИЛОЖЕНИЕ 3 … УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ … СЧЕТА.docx | `account-opening-notice` | оба | 2 | ✔ | ✅ | ✅ | ✅ migrated |
 | 4 | ПРИЛОЖЕНИЕ 4 … РЕКВИЗИТЫ ДЛЯ ПЕРЕЧИСЛЕНИЯ ….docx | `transfer-requisites` | оба | 1 | — | ✅ | — | ◒ unexposed by decision; mapping required before exposure |
 | 5 | ПРИЛОЖЕНИЕ 6 … ДОВЕРЕННОСТЬ.docx | `power-of-attorney` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
-| 6 | ПРИЛОЖЕНИЕ 7 … ФОРМЫ ПОРУЧЕНИЙ_____[1].docx | `order-forms` | оба | 4 | — | ✅ | ✅ | ✅ migrated |
+| 6а | Приложение 7, регламент 2026/11, с. 122–123 | `order-trade` | оба | 2 | — | ✅ | ✅ | ✅ migrated |
+| 6б | Приложение 7, с. 124 | `order-venue-transfer` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
+| 6в | Приложение 7, с. 125 | `order-bank-withdrawal` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 7 | ПРИЛОЖЕНИЕ 9 … ОТКАЗ ОТ ПРЕДОСТАВЛЕНИЯ БРОКЕРУ ПРАВА ….docx | `broker-use-refusal-request` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 8 | ПРИЛОЖЕНИЕ 10 … ОТКАЗ ИСПОЛНЕНИЯ РЕГЛАМЕНТА В ЦЕЛОМ.docx | `regulation-full-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
 | 9 | ПРИЛОЖЕНИЕ 11 … ОТКАЗ ОТ ЧАСТИ УСЛУГ ПО РЕГЛАМЕНТУ.docx | `regulation-partial-refusal-notice` | оба | 1 | — | ✅ | ✅ | ✅ migrated |
@@ -107,15 +109,15 @@ without an overlay map cannot appear even by accident.
 | Metric | Count |
 | --- | --- |
 | Distinct source documents | **21** |
-| ✅ dynamic production-ready and offered | **18** |
+| ✅ dynamic production-ready and offered | **20** |
 | ◐ static by design | **2** |
 | ◌ hidden by decision | **1** |
 | ◒ unexposed by decision | **1** |
 
-The last four rows are the **22 committed PDF-template statuses**. The source
+The last four rows are the **24 committed PDF-template statuses**. The source
 directory has 21 distinct documents because `Risks.pdf`, one of the two static
 templates, is an additional committed package asset with no source-directory
-counterpart. The non-production-dynamic classifications are not
+counterpart. Appendix 7 of the November regulation supplies three independent templates. The non-production-dynamic classifications are not
 interchangeable: `anketa-isbyul` is hidden because the CRM has no subject
 model, and `transfer-requisites` is unexposed because its client-specific
 blanks have no map.
@@ -129,28 +131,9 @@ date. The current numbers come from one place:
 python static-uikit/tools/qa/run_all_qa.py
 ```
 
-For the assembled correction branch that command reports **27 of 27 suites
-passed**, including zero unexpected cases in the regression denominator. Only
-that suite-level verdict is recorded here; the per-suite check counts stay
-where the runner prints them. The release classification comes from
-`static-uikit/tools/qa/ordinary-failures.json`.
-
-The final status of all 22 templates — which are generated, which are offered
-as a static download, which are hidden or unexposed, and why — is
-[document-full-template-audit.md](document-full-template-audit.md), which is
-generated from the executable maps and the wizard catalogue rather than
-maintained by hand. In summary: 18 dynamic production-ready, 2 static by
-design, 1 hidden by decision (`anketa-isbyul`, no CRM subject model) and 1
-unexposed by decision (`transfer-requisites`).
-
-`order-forms` spent one release blocked: it generated almost entirely blank
-because 80 of its 93 printed fields had no source and every field was optional,
-so nothing objected. It is offered again now that the values a mistake would
-make expensive come from fixed options or from the instrument reference data,
-that the branch a manager did not fill cannot contribute to the paper, and that
-its own suite drives every branch and reads the result back out of the PDF. The
-per-row inventory and the exact UMI name for every row that has one are in
-[order-forms-mapping-gap.md](order-forms-mapping-gap.md).
+The full-template audit covers 24 PDFs, including 20 dynamic templates. The
+current Appendix 7 test commands and suite results are in the
+[local QA handoff](../handoff/order-forms-2026-11/TEST_REPORT.md).
 
 Static by design, issued unchanged because neither carries a client-specific
 blank anywhere: `brokerage-key-information` (a disclosure sheet about the
@@ -182,7 +165,7 @@ two regulations — then copied into the repository byte-identically.
 | `account-opening-notice` | `39e0df89…` | `8e6a3922…` | 2 |
 | `transfer-requisites` | `5ce12f3b…` | `7a4317aa…` | 1 |
 | `power-of-attorney` | `e2138404…` | `a7bcaf8d…` | 4 |
-| `order-forms` | `adf2f86d…` | `24e593d1…` | 4 |
+| Historical Appendix 7 Word export (retired in November) | `adf2f86d…` | `24e593d1…` | 4 |
 | `qualification-consequences-notice` | `13b4d6e0…` | `471b0828…` | 1 |
 | `qualification-notice` | `a097d95d…` | `2a9fab02…` | 1 |
 
@@ -299,78 +282,15 @@ document, no "other powers" line, no validity blank and no substitution option
 individuals name, citizenship, passport, issuing authority, issue date, address.
 **Operator:** the поверенный only.
 
-### `order-forms` — ПРИЛОЖЕНИЕ 7, 4 pages, both subject kinds
+### Appendix 7 orders
 
-Map `…/order-forms.js`; output `poruchenie.pdf`; PDF SHA-256 `24e593d1…`.
-
-**Status: `dynamic-production-ready`; offered to both subject kinds.**
-
-Three separate order forms in one file, one registry entry. «Тип поручения»
-selects one; the other two stay blank and all four pages are always emitted.
-
-**Fixed rather than typed.** Вид сделки, вид рынка, вид поручения, срок
-действия, срок расчётов, РЕПО с ЦК and валютный СВОП с ЦК are closed choices.
-Вид подачи is not a choice at all — every order this process produces is a
-primary submission, so `extra-submission-kind` is fixed to `primary` in the
-payload and the cancellation box can never be marked. Условное поручение is not
-offered either: the map keeps the box and the «(указать)» slot, and the wizard
-never produces `conditional`. The непокрытая-позиция acknowledgement is set for
-every trade order rather than asked.
-
-**The traded instrument comes from reference data**, never from typing. A
-security is an Asset — `assets/js/document-wizard/instrument-catalog.js`, the
-static mock a backend replaces with QORT — found by ticker, short name, full
-name, ISIN or issuer, and offered once however many `Securities` rows it has.
-Selecting one stores its `AssetID` and derives the issuer and the compact
-printed description («Акции обыкновенные, ISIN RU0009029540»); neither can be
-edited by hand, `SecurityName` is never used and CFI is never printed. Currency
-instruments and derivatives work the same way through their own catalogs.
-
-**Only the branch that was filled reaches the paper.** The trade form carries
-four mutually exclusive instrument blocks, and the map draws a trade-form row
-whenever the order is a trade — so the payload is rebuilt per branch in
-`assets/js/document-wizard/order-forms-model.js` and a security abandoned by a
-switch to the currency market cannot be printed on it. OTC is the one market
-that carries two kinds of instrument, and it carries securities and currency
-instruments only: derivatives are the срочный рынок and are never offered under
-it.
-
-**Mutually exclusive groups:** вид сделки, вид рынка, вид поручения, РЕПО с ЦК,
-валютный СВОП с ЦК, both trading-venue lists, both currency rows, payout amount
-mode. **Always marked:** primary submission, and the непокрытая-позиция
-acknowledgement on a trade order. **Never marked:** cancellation, and условное.
-**Explanatory, never marked:** the «(указать)» captions.
-
-**The amount is written once.** Both money forms print it twice — «цифрами»
-and «прописью» — and the second is derived from the first, never typed: a
-manager who writes a sum twice can write it two ways. The wording is spelled
-out in the currency selected above it, with the Russian agreement that goes
-with it («один рубль», «два рубля», «одна тысяча»), and kopecks as digits, the
-convention on Russian payment documents. «В размере свободного остатка» has no
-figure, so it spells nothing.
-
-The printed «прописью» blank is a single ~106 pt line — handwriting width — and
-a full Russian amount does not fit it at the 9 pt readability floor. It is not
-left blank for that: the map opens a reviewed continuation line in the measured
-empty band beneath the row, the way the accession form's tariff plans
-continue, and the value drops to 9 pt the moment it needs that line. The
-largest amount either form can carry is 493.7 pt against 571 pt of capacity.
-
-**Blank:** every «Заполняется ООО «Инвестика»» block and every signature rule.
-
-**The payout bank block is CRM data, not a form to fill.** All ten rows resolve
-from the subject card — the static `bankRequisites` mock standing in for
-`Front Реквизиты`, where each row already has an exact UMI name — and are shown
-read-only so a manager can check them and cannot retype them. A client may hold
-several records; the one a payout uses follows the currency selected above it,
-so the block refreshes when that changes.
-
-What a payout cannot be executed without is validated: получатель, банк
-получателя, БИК/SWIFT, корреспондентский счёт and счёт получателя always, plus
-the intermediary bank's SWIFT and name on a route that has one. A domestic
-rouble route has no intermediary, and empty is the right answer there rather
-than a missing one. Missing CRM data refuses the document and names the rows,
-rather than printing a half-filled payout order.
+The effective regulation supplies a two-page trade order, a one-page venue transfer
+and a one-page bank withdrawal. Each has its own wizard entry, template, map
+and output filename. Both client kinds can select all three.
+The published page ranges, template hashes and comparison with the previous
+combined PDF are recorded in the [source audit](../handoff/order-forms-2026-11/SOURCE_AUDIT.md).
+The [coordinate ledger](../handoff/order-forms-2026-11/FIELD_MAPPING.md)
+covers each printed field and the areas reserved for paper processing.
 
 ### `anketa-ip-sz` — Приложение 18, 5 pages, individuals only
 
@@ -493,6 +413,9 @@ and maintained aliases sits above the list.
 | Анкета физического лица | Анкета юридического лица |
 | Анкета ФЛ (упрощённая идентификация) | — |
 | Анкета (досье) ИП или лица, занимающегося частной практикой | — |
+| Поручение на совершение сделки | Поручение на совершение сделки |
+| Перевод средств между торговыми площадками | Перевод средств между торговыми площадками |
+| Вывод средств на банковский счёт | Вывод средств на банковский счёт |
 | Доверенность | Доверенность |
 | Уведомление об открытии брокерского/депозитарного счета | Уведомление об открытии брокерского/депозитарного счета |
 | Заявление о признании ФЛ квалифицированным инвестором | Заявление о признании ЮЛ квалифицированным инвестором |
@@ -552,6 +475,6 @@ standalone card.
 | ПРИЛОЖЕНИЕ 3 | Resolved in the re-supplied authoritative template: «на основании Доверенности № ,» became fixed «на основании Устава», and the representative is printed as «Козырева Александра Юрьевича». The former `Юрьвеича` typo and obsolete 8.18 pt gap are absent. Transfer-basis item 2 is a separate nested Word-flow replacement for the required depository number/date pair. |
 | ПРИЛОЖЕНИЕ 6 (ЮЛ) | «серии» ends its line with no rule after it, so series and number share the «№» rule; «дата выдачи _,» reserves 4.56 pt and stays blank. |
 | ПРИЛОЖЕНИЕ 6 (ФЛ) | «выданный» reserves 50.2 pt against 114.5 pt for the same value in the legal-entity variant, so a normal issuing authority needs three wrapped lines. |
-| ПРИЛОЖЕНИЕ 7 | Only the «Первичная подача заявки» row has underlined blanks; the «Отмена ранее поданной заявки» row has none, so its number and date go in the adjacent value column. |
+| ПРИЛОЖЕНИЕ 7 | С. 122, 124 и 125 содержат отдельные бланковые строки отмены. Действующий мастер оформляет первичную заявку. |
 | Анкета ФЛ - ИП и СЗ | п. 13 prints **«Должностного лица публичной международной Организации.» twice** — as both the second and third ПДЛ category. By 115-ФЗ the third should be the Russian state-official category. Left exactly as written; the third box is mapped by position. |
 | Анкета ФЛ - ИП и СЗ | The filename says «ИП и СЗ», but the form's own wording is «Лицо, занимающееся частной практикой» — never «самозанятый». The form wording is used. |

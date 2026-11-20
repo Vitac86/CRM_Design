@@ -146,7 +146,7 @@
       transferRequisitesUnexposed: !ids['transfer-requisites'],
       pdfFailures: []
     };
-    if (duplicate.length || missingMaps.length || unreferencedMaps.length || entries.length !== 18) {
+    if (duplicate.length || missingMaps.length || unreferencedMaps.length || entries.length !== 20) {
       throw new Error('Нарушена целостность каталога: production=' + entries.length + ', missing maps=' + missingMaps.join(', ') + ', unreferenced=' + unreferencedMaps.join(', ') + '.');
     }
     if (!this.catalogAudit.hiddenIsbyul || !this.catalogAudit.transferRequisitesUnexposed) {
@@ -179,7 +179,7 @@
       if (self.catalogAudit.pdfFailures.length) {
         throw new Error('Не найдены PDF для карт: ' + self.catalogAudit.pdfFailures.map(function (failure) { return failure.id; }).join(', ') + '.');
       }
-      byId('dtb-catalog-status').textContent = '18/18 maps · 18/18 PDFs · registry synchronized';
+      byId('dtb-catalog-status').textContent = '20/20 maps · 20/20 PDFs · registry synchronized';
       return self.catalogAudit;
     });
   };

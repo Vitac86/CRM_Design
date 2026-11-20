@@ -73,7 +73,7 @@ Page-specific scripts (active only when the matching HTML file explicitly links 
 - `404.html` → `assets/js/pages/404.js`
 - `account-closure-request.html` → `assets/js/pages/account-closure-request.js`
 - `contract-edit.html` → `assets/js/pages/contract-edit.js`
-- `document-wizard.html` → `assets/js/document-wizard/instrument-catalog.js` + `assets/js/document-wizard/order-forms-model.js` + `assets/js/pages/document-wizard.js` (the first two are reference data and the order-form payload contract; both load before the page script)
+- `document-wizard.html` loads the Appendix 7 catalog, decimal calculations, domain model and controls from `assets/js/document-wizard/` before `assets/js/pages/document-wizard.js`.
 - `middle-office-clients.html` → `assets/js/pages/middle-office.js`
 - `middle-office-reports.html` → `assets/js/pages/middle-office.js`
 - `subject-card.html` → `assets/js/pages/subject-card.js`
@@ -263,15 +263,25 @@ New wizard configs must keep this split: list only document-specific entries in 
 
 A `checkFields` entry marked `hidden: true` keeps its registry entry and its `defaultChecked` value and is not offered: a mark the form always carries is not a question.
 
-#### Instrument reference data (order forms)
+#### Appendix 7 orders
 
-`assets/js/document-wizard/instrument-catalog.js` is the single static mock for everything a manager can pick as a traded instrument — securities, currency instruments and derivatives — and the file a backend replaces with QORT calls. Nothing else hardcodes an instrument.
+For both client kinds the wizard offers three cards in «Операционные заявки».
+The trade order downloads two pages. Venue transfer and bank withdrawal each
+download one page. The code, underlying agreement and selected payout record
+come from the client card. The form revalidates route, currency, manual choices
+and instrument data at PDF generation.
 
-It is shaped after the model it stands in for: a security is an **Asset**, its stable id is `AssetID`, the issuer is `Assets.EmitentFirm_ID → Firms`, and the `Securities` rows of the T+, РПС, РЕПО and OTC sections are search **aliases** — results are deduplicated by `AssetID`, so one share is offered once however many sections it trades in. A selected security is deliberately not bound to a trading section: the order carries the Asset, and REPO/SWAP are separate order parameters. `Securities.SecurityName` is never displayed and never printed, and CFI is never printed.
+The instrument picker keeps the selected AssetID, FX instrument ID or derivative
+series. The calculation module uses decimal ratios and checks the quotation
+basis, precision, steps and lot size supplied by the specification. Synthetic
+specifications in the demo catalog carry the source `demo-spec-2026-11`.
+A limit-order override records the amount, reason and confirmation. Cash
+orders support confirmed manual wording and explicit choice among saved banks.
 
-`assets/js/document-wizard/order-forms-model.js` is the payload contract of Приложение 7. It derives the values a manager must not type (issuer, the compact printed security description, the FX instrument name, derivative master data, the printable validity, «Рыночная» for a market order, the fixed primary submission) and rebuilds the outgoing payload from an allow-list per branch, so a security abandoned by a switch to the currency market cannot be printed on the order.
-
-It also owns the two values the money forms must not ask twice for. The **amount in words** is spelled out from the figure and the currency, with full Russian agreement and kopecks as digits; the printed blank holds one narrow line, so the map opens a reviewed continuation line beneath it for a long wording. The **payout bank requisites** resolve from the subject card's `bankRequisites` record for the currency being withdrawn — the mock standing in for `Front Реквизиты` — and the rows a payout cannot be executed without are validated before generation, so missing CRM data refuses the document by name instead of printing a half-filled order.
+Run `python static-uikit/tools/qa/run_order_forms_tests.py` from the repository
+root. The [source audit](../handoff/order-forms-2026-11/SOURCE_AUDIT.md) and
+[field ledger](../handoff/order-forms-2026-11/FIELD_MAPPING.md) identify the
+approved pages and all measured slots.
 
 #### Word-source templates (DOCX)
 

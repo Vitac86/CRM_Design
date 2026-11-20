@@ -3994,6 +3994,14 @@
   }
  ],
  "aliases": {
+  "check.order-uncovered-ack": {
+   "kind": "workflow",
+   "note": "Always checked when printing a trade order.",
+   "path": "check.order-uncovered-ack",
+   "usedBy": [
+    "order-trade/uncoveredAck"
+   ]
+  },
   "extra.bank-additional-details": {
    "kind": "umi",
    "umi": "umi.requisites.notation",
@@ -4088,7 +4096,7 @@
    "usedBy": [
     "anketa-fl-simplified-id/bankSettlementAccount",
     "anketa-ip-sz/bankSettlementAccount",
-    "order-forms/bankRecipientAccount"
+    "order-bank-withdrawal/bankRecipientAccount"
    ]
   },
   "extra.extra-bank-additional": {
@@ -4110,13 +4118,16 @@
    ]
   },
   "extra.extra-bank-bic": {
-   "kind": "umi",
-   "umi": "umi.requisites.bik_dlya_rublevyh_rekvizitov",
+   "kind": "conditional",
+   "umi": [
+    "umi.requisites.bik_dlya_rublevyh_rekvizitov",
+    "umi.requisites.swift_code"
+   ],
    "path": "extra.extra-bank-bic",
    "usedBy": [
     "anketa-fl-simplified-id/bankBic",
     "anketa-ip-sz/bankBic",
-    "order-forms/bankBic"
+    "order-bank-withdrawal/bankBic"
    ]
   },
   "extra.extra-bank-corr-account": {
@@ -4126,7 +4137,7 @@
    "usedBy": [
     "anketa-fl-simplified-id/bankCorrespondentAccount",
     "anketa-ip-sz/bankCorrAccount",
-    "order-forms/bankCorrAccount"
+    "order-bank-withdrawal/bankCorrAccount"
    ]
   },
   "extra.extra-bank-corr-name": {
@@ -4134,7 +4145,7 @@
    "umi": "umi.requisites.inter_bank_name",
    "path": "extra.extra-bank-corr-name",
    "usedBy": [
-    "order-forms/bankCorrName"
+    "order-bank-withdrawal/bankCorrName"
    ]
   },
   "extra.extra-bank-corr-swift": {
@@ -4142,7 +4153,7 @@
    "umi": "umi.requisites.inter_swift_code",
    "path": "extra.extra-bank-corr-swift",
    "usedBy": [
-    "order-forms/bankCorrSwift"
+    "order-bank-withdrawal/bankCorrSwift"
    ]
   },
   "extra.extra-bank-inn": {
@@ -4152,7 +4163,7 @@
    "usedBy": [
     "anketa-fl-simplified-id/bankInn",
     "anketa-ip-sz/bankInn",
-    "order-forms/bankRecipientInn"
+    "order-bank-withdrawal/bankRecipientInn"
    ]
   },
   "extra.extra-bank-name": {
@@ -4162,7 +4173,7 @@
    "usedBy": [
     "anketa-fl-simplified-id/bankName",
     "anketa-ip-sz/bankName",
-    "order-forms/bankName"
+    "order-bank-withdrawal/bankName"
    ]
   },
   "extra.extra-bank-other": {
@@ -4170,15 +4181,15 @@
    "umi": "umi.requisites.notation",
    "path": "extra.extra-bank-other",
    "usedBy": [
-    "order-forms/bankOther"
+    "order-bank-withdrawal/bankOther"
    ]
   },
   "extra.extra-bank-personal-account": {
-   "kind": "umi",
-   "umi": "umi.requisites.payment_account",
+   "kind": "workflow",
+   "note": "Explicit separate personal-account value on the selected CRM record.",
    "path": "extra.extra-bank-personal-account",
    "usedBy": [
-    "order-forms/bankPersonalAccount"
+    "order-bank-withdrawal/bankPersonalAccount"
    ]
   },
   "extra.extra-bank-recipient": {
@@ -4186,7 +4197,17 @@
    "umi": "umi.requisites.recipient",
    "path": "extra.extra-bank-recipient",
    "usedBy": [
-    "order-forms/bankRecipient"
+    "order-bank-withdrawal/bankRecipient"
+   ]
+  },
+  "extra.extra-brokerage-account": {
+   "kind": "umi",
+   "umi": "umi.num_investika",
+   "path": "extra.extra-brokerage-account",
+   "usedBy": [
+    "order-bank-withdrawal/payoutBrokerageAccount",
+    "order-trade/tradeBrokerageAccount",
+    "order-venue-transfer/moveBrokerageAccount"
    ]
   },
   "extra.extra-brokerage-contract": {
@@ -4225,6 +4246,19 @@
    "usedBy": [
     "qualification-request-fl/contractNumber",
     "qualification-request-yul/contractNumber"
+   ]
+  },
+  "extra.extra-contract-number-date": {
+   "kind": "composed",
+   "umi": [
+    "umi.bo_num",
+    "umi.datesign"
+   ],
+   "path": "extra.extra-contract-number-date",
+   "usedBy": [
+    "order-bank-withdrawal/payoutContractNumberDate",
+    "order-trade/tradeContractNumberDate",
+    "order-venue-transfer/moveContractNumberDate"
    ]
   },
   "extra.extra-depository-contract": {
@@ -4394,9 +4428,9 @@
     "anketa-fl/signaturePrintedName",
     "anketa-fl-simplified-id/signatureName",
     "broker-use-refusal-request/clientName",
-    "order-forms/tradeClientName",
-    "order-forms/moveClientName",
-    "order-forms/payoutClientName",
+    "order-bank-withdrawal/payoutClientName",
+    "order-trade/tradeClientName",
+    "order-venue-transfer/moveClientName",
     "qualification-notice/recipientName",
     "qualification-notice/clientName",
     "qualification-notice/registerEntryPersonName",
@@ -4990,7 +5024,6 @@
   "check.market-currency",
   "check.market-derivatives",
   "check.market-stock",
-  "check.order-uncovered-ack",
   "check.partial-refusal-currency",
   "check.partial-refusal-derivatives",
   "check.partial-refusal-esignature",
@@ -5029,12 +5062,10 @@
   "extra.extra-beneficial-owner-basis",
   "extra.extra-beneficiary-basis",
   "extra.extra-beneficiary-name",
-  "extra.extra-brokerage-account",
   "extra.extra-business-purpose",
   "extra.extra-business-reputation",
   "extra.extra-citizenship-countries",
   "extra.extra-citizenship-kind",
-  "extra.extra-contract-number-date",
   "extra.extra-controlling-persons",
   "extra.extra-counterparty",
   "extra.extra-currency-market-account",
@@ -5076,16 +5107,20 @@
   "extra.extra-move-amount-words",
   "extra.extra-move-currency",
   "extra.extra-move-from",
+  "extra.extra-move-from-other-name",
   "extra.extra-move-to",
+  "extra.extra-move-to-other-name",
   "extra.extra-new-code-word",
   "extra.extra-ogrnip",
+  "extra.extra-order-day",
   "extra.extra-order-kind",
   "extra.extra-order-kind-conditional",
   "extra.extra-order-market",
-  "extra.extra-order-number-date",
+  "extra.extra-order-month",
+  "extra.extra-order-number",
   "extra.extra-order-other-info",
-  "extra.extra-order-type",
   "extra.extra-order-validity",
+  "extra.extra-order-year",
   "extra.extra-other-info",
   "extra.extra-other-information",
   "extra.extra-payout-amount",
@@ -5093,6 +5128,7 @@
   "extra.extra-payout-amount-words",
   "extra.extra-payout-currency",
   "extra.extra-payout-from",
+  "extra.extra-payout-from-other-name",
   "extra.extra-pdl-details",
   "extra.extra-pdl-relation",
   "extra.extra-pdl-status",
@@ -5115,6 +5151,8 @@
   "extra.extra-residence-permit-number",
   "extra.extra-residence-permit-to",
   "extra.extra-securities-value-millions",
+  "extra.extra-security-accrued",
+  "extra.extra-security-currency",
   "extra.extra-security-issuer",
   "extra.extra-security-price",
   "extra.extra-security-quantity",

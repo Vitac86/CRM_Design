@@ -472,7 +472,18 @@
     var last = null;
     for (var i = 0; i < sizes.length; i += 1) {
       var attempt = flowAtSize(font, text, sizes[i], regions, spec);
-      if (attempt.fits && exceedsRegionCap(attempt, regions, sizes[i])) {
+      // Some printed underlines have room for continuation immediately above them.
+      // Use the shortest suffix that fits, so the last line lands on the underline.
+      if (spec.alignToLastRegion && attempt.fits) {
+        for (var start = regions.length - 1; start > 0; start -= 1) {
+          var suffix = flowAtSize(font, text, sizes[i], regions.slice(start), spec);
+          if (suffix.fits && !exceedsRegionCap(suffix, suffix.regions, sizes[i])) {
+            attempt = suffix;
+            break;
+          }
+        }
+      }
+      if (attempt.fits && exceedsRegionCap(attempt, attempt.regions, sizes[i])) {
         // The text fits, but it landed in a region that cannot hold this size.
         // Keep stepping down rather than drawing over the printed form.
         continue;
@@ -629,6 +640,11 @@
         pieces[indices[indices.length - 1]].slotWidth += extra;
       }
 
+      // In an amount written in words the last pair is typically «44 копейки».
+      // Keep the digits and their unit on one line without changing either token.
+      if (run.keepTrailingNumberWithUnit && words.length >= 2 && /^\d+$/.test(words[words.length - 2])) {
+        pieces[indices[indices.length - 2]].keepWithNext = true;
+      }
       if (indices.length && run.keepWithNext) {
         pieces[indices[indices.length - 1]].keepWithNext = true;
       }
@@ -666,7 +682,8 @@
           fontSize: Number(run.fontSize != null ? run.fontSize : spec.fontSize),
           textWidth: 0, slotWidth: Math.max(0, Number(run.width) || 0),
           spaceBefore: pendingSpace.value, sourceFieldId: null,
-          decoration: null, emergencyBreak: false, keepTogether: true,
+          decoration: run.decoration ? copyOwn(run.decoration) : null,
+          emergencyBreak: false, keepTogether: true,
           keepWithNext: !!run.keepWithNext, attachPrevious: false,
           runIndex: runIndex
         });
@@ -912,6 +929,11 @@
         size: fontSize,
         fontSizeLocked: !!spec.fontSizeLocked
       };
+    }
+
+    // A bottom-aligned writable band ends on the printed underline, even for one line.
+    if (frame.alignToBottom && rawLines.length < initialLineCount) {
+      baselineTop += (initialLineCount - rawLines.length) * lineHeight;
     }
 
     // Produce final x assignments only after every line is known, because

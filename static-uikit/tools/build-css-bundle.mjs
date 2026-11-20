@@ -161,7 +161,9 @@ if (CHECK_MODE) {
     process.exit(1);
   }
   const currentContent = readFileSync(BUNDLE_OUT, 'utf8');
-  if (bundleContent === currentContent) {
+  // A Windows checkout may convert source styles to CRLF while generated section headers use LF.
+  const normalizeNewlines = (content) => content.replace(/\r\n/g, '\n');
+  if (normalizeNewlines(bundleContent) === normalizeNewlines(currentContent)) {
     console.log(`✓ Bundle is up to date (${sectionCount} / ${expectedSections} sections, ${sizeKB} KB)`);
     process.exit(0);
   } else {

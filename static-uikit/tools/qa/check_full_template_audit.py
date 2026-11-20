@@ -42,12 +42,12 @@ AUDIT_JSON = QA_DIR / "document-full-template-audit.json"
 AUDIT_MD = REPO_ROOT / "docs" / "document-full-template-audit.md"
 IDENTIFIER_MANIFEST = QA_DIR / "document-identifier-manifest.json"
 
-EXPECTED_MAPS = 18
+EXPECTED_MAPS = 20
 # 621 before the updated account-opening notice made its introduction
 # paragraph static: the overlay that filled the representative blank has
 # nothing left to draw, so `brokerRepresentative` is gone with it.
-EXPECTED_BASELINE_FIELDS = 620
-EXPECTED_PDFS = 22
+EXPECTED_BASELINE_FIELDS = 643
+EXPECTED_PDFS = 24
 EXPECTED_PAGES = 77
 
 FIELD_CATEGORIES = {
@@ -117,7 +117,11 @@ DOCUMENT_SPECS: dict[str, dict[str, str]] = {
         "status": "dynamic-production-ready"},
     "code-word-request.pdf": {"id": "code-word-request", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
-    "order-forms.pdf": {"id": "order-forms", "role": "dynamic-overlay",
+    "order-trade.pdf": {"id": "order-trade", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "order-venue-transfer.pdf": {"id": "order-venue-transfer", "role": "dynamic-overlay",
+        "status": "dynamic-production-ready"},
+    "order-bank-withdrawal.pdf": {"id": "order-bank-withdrawal", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
     "power-of-attorney.pdf": {"id": "power-of-attorney", "role": "dynamic-overlay",
         "status": "dynamic-production-ready"},
@@ -322,7 +326,7 @@ TARGET_SECTIONS: tuple[dict[str, Any], ...] = (
 
 TABLE_DOCUMENTS = {
     "anketa-fl", "anketa-fl-simplified-id", "anketa-ip-sz", "anketa-yul",
-    "order-forms",
+    "order-trade", "order-venue-transfer", "order-bank-withdrawal",
 }
 
 # Reviewed final continuation decision: these source sections are bordered
@@ -369,12 +373,12 @@ REVIEWED_TABLE_ROW_ANCHORS = {
     ("anketa-yul", "licenceAuthority"),
     ("anketa-yul", "bankAddress"),
     ("broker-use-refusal-request", "clientName"),
-    ("order-forms", "tradeClientName"),
+    ("order-trade", "tradeClientName"),
     ("regulation-full-refusal-notice", "clientName"),
     ("regulation-partial-refusal-notice", "clientName"),
 }
 # 18 before the same replacement removed the introduction block.
-EXPECTED_WORD_FLOW_EXPANSION_ANCHORS = 17
+EXPECTED_WORD_FLOW_EXPANSION_ANCHORS = 19
 
 # Reviewed paragraphs that grow inside a bordered table, and are therefore the
 # only Word-flow anchors allowed to draw a table row when they take an extra
@@ -524,7 +528,7 @@ def validate_runtime(
 
     for map_id, template in maps.items():
         if map_id not in floor_by_map:
-            errors.append(f"map outside the frozen 18-map scope: {map_id}")
+            errors.append(f"map outside the frozen 20-map scope: {map_id}")
         expected_pages = template.get("expectedPages")
         if not isinstance(expected_pages, int) or expected_pages < 1:
             errors.append(f"invalid expectedPages for {map_id}: {expected_pages!r}")
@@ -1833,12 +1837,12 @@ def build_snapshot(
         "generatedBy": "static-uikit/tools/qa/check_full_template_audit.py --write",
         "scope": {
             "closedTemplateSet": True,
-            "sourcePdfByteInvariance": "all-22-sha256-and-byte-length",
+            "sourcePdfByteInvariance": "all-24-sha256-and-byte-length",
             "pageCoverage": "all-77-pages",
             "sourceTextCoverage": "every-extracted-source-pdf-text-line",
-            "mapCoverage": "all-18-executable-production-maps",
+            "mapCoverage": "all-20-executable-production-maps",
             "identifierPolicy": (
-                "621 field ID/source pairs are an immutable compatibility floor; "
+                "643 field ID/source pairs are an immutable compatibility floor; "
                 "additions are allowed but must be classified and become protected once committed"
             ),
             "registryIdentifierCompanion": (
@@ -1997,7 +2001,7 @@ def markdown(snapshot: dict[str, Any]) -> str:
         "",
         "All 22 PDFs are locked by filename, byte length, page count and SHA-256. The JSON",
         "companion inventories every source text line (text, spans, font, size, bounding box",
-        "and line hash). The original 621 field ID/source pairs are immutable; additive",
+        "and line hash). The original 643 field ID/source pairs are immutable; additive",
         "fields are permitted only when they are also classified by this audit.",
         "Each JSON field row retains its full executable definition, and each map row retains",
         "page-layout and Word-flow metadata, so conditions, formatters, fallbacks, flow regions,",

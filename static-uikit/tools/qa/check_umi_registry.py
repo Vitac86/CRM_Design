@@ -469,22 +469,17 @@ def check_incomplete_order_forms(registry: dict, maps: dict) -> tuple[int, list[
     if not os.path.exists(ORDER_FORMS_GAP_DOC):
         failures.append("docs/order-forms-mapping-gap.md is missing")
 
-    template = maps.get("order-forms")
-    if not template:
-        return checks, failures
-
-    fields = template.get("fields", [])
+    expected = {"order-trade": "extra.extra-security-issuer",
+                "order-venue-transfer": "extra.extra-move-amount-words",
+                "order-bank-withdrawal": "extra.extra-bank-account"}
+    for document_id, source in expected.items():
+        checks += 1
+        fields = (maps.get(document_id) or {}).get("fields", [])
+        if source not in {field.get("source") for field in fields}:
+            failures.append(f"{document_id}: missing map or required source {source}")
     checks += 1
-    operator = [f for f in fields
-                if str(f.get("source", "")).startswith(("extra.", "check."))]
-    # If this ever drops far enough that the form really does fill itself, the
-    # threshold is what has to be revisited — deliberately, not by accident.
-    share = len(operator) / len(fields) if fields else 0
-    if share < 0.5:
-        failures.append(
-            f"order-forms: only {len(operator)}/{len(fields)} fields are still "
-            "operator input. If the mapping is finished, change the production "
-            "status and delete this gate rather than leaving it passing.")
+    if "order-forms" in maps:
+        failures.append("retired combined Appendix 7 map is active")
     return checks, failures
 
 

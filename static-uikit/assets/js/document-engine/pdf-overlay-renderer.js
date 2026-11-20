@@ -320,7 +320,8 @@
         size: size,
         minSize: minSize,
         regions: regions,
-        tokenBreak: field.tokenBreak
+        tokenBreak: field.tokenBreak,
+        alignToLastRegion: field.alignToLastRegion
       });
       attempts.push({ formatter: candidates[index] || null, value: candidate, layout: result });
       if (result.fits) {
@@ -2603,7 +2604,14 @@
   // succeeds cannot be followed by a generation that fails for the same
   // payload. `fingerprint` is a deterministic summary of the layout decided,
   // which is what QA compares against the one the render actually drew.
+  function orderPayload(template, payload) {
+    if (!template.orderDocument && !['order-trade','order-venue-transfer','order-bank-withdrawal'].includes(template.id)) return payload;
+    if (!global.CRMOrderForms) throw new Error('Модуль проверки поручений не загружен.');
+    return global.CRMOrderForms.printable(template.id, payload);
+  }
+
   function preflight(template, payload, options) {
+    try { payload = orderPayload(template, payload); } catch (error) { return Promise.reject(error); }
     var opts = options || {};
     return open(template, {
       validatePayload: opts.validatePayload, payload: payload
@@ -2643,6 +2651,7 @@
   //   id, templateUrl, expectedPages, fonts: { key: url }, fields: [...]
   // }
   function render(template, payload, options) {
+    try { payload = orderPayload(template, payload); } catch (error) { return Promise.reject(error); }
     var opts = options || {};
     var PDFLib = global.PDFLib;
     if (!PDFLib) return Promise.reject(new Error('PDF-модуль (pdf-lib) не загружен.'));
