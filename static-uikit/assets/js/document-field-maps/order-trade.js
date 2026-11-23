@@ -36,7 +36,8 @@
       slot("tradeKindOtherText", "extra.extra-trade-kind-other", "Иной вид сделки (указать)", 0, 424, 304, 55, {showWhen: {source: "extra.extra-trade-kind", equals: "other"}}),
       slot("orderKindConditionalText", "extra.extra-order-kind-conditional", "Условное (указать)", 0, 430.2, 362, 73, {showWhen: {source: "extra.extra-order-kind", equals: "conditional"}}),
       slot("orderValidity", "extra.extra-order-validity", "Срок действия заявки", 0, 250.8, 384.67, 292.5),
-      slot("settlementPeriod", "extra.extra-settlement-period", "Срок расчетов", 0, 250.8, 411.56, 292.5),
+      // Both tenor and calendar date belong in this single cell on page 122.
+      slot("settlementPeriod", "extra.extra-settlement-period", "Срок расчетов", 0, 250.8, 411.56, 292.2),
       slot("counterparty", "extra.extra-counterparty", "Информация о контрагенте", 0, 250.8, 438.44, 292.5),
       slot("otherInformation", "extra.extra-order-other-info", "Иная информация", 0, 250.8, 465.33, 292.5),
       slot("securityIssuer", "extra.extra-security-issuer", "Наименование эмитента", 0, 249.1, 523.06, 294.2),
@@ -49,7 +50,8 @@
       slot("derivativePremium", "extra.extra-derivative-premium", "Цена производного финансового инструмента (премия)", 0, 249.1, 744.78, 294.2),
       slot("derivativeStrike", "extra.extra-derivative-strike", "Цена исполнения страйк (для опционов)", 0, 249.1, 766.5, 294.2),
       slot("securityPrice", "extra.extra-security-price", "Цена одной ценной бумаги", 0, 257, 586.5, 80),
-      slot("securityAccrued", "extra.extra-security-accrued", "НКД", 0, 342.5, 586.5, 94),
+      // Interior between the original rules x=340.46 and 439.37; 3 pt clear on both sides.
+      slot("securityAccrued", "extra.extra-security-accrued", "НКД", 0, 343.46, 586.5, 92.91),
       slot("securityCurrency", "extra.extra-security-currency", "Валюта цены", 0, 442, 586.5, 101),
       mark("repoYes", "extra.extra-repo-ccp", "yes", "Сделка РЕПО с ЦК — Да", 0, 252.4, 615.14, 8.6),
       mark("repoNo", "extra.extra-repo-ccp", "no", "Сделка РЕПО с ЦК — Нет", 0, 278.34, 615.14, 7.7),

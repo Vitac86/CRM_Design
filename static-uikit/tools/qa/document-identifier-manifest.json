@@ -6,7 +6,7 @@
     "fields": 659,
     "registryDocuments": 24,
     "overlayBindings": 20,
-    "wizardKeys": 349,
+    "wizardKeys": 359,
     "checkKeys": 58,
     "formatterNames": 13
   },
@@ -3985,6 +3985,46 @@
     {
       "documentId": "order-trade",
       "group": "fields",
+      "key": "extra-accrued-confirmed"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-currency"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-date"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-manual"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-mode"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-review"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-status"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-accrued-summary"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
       "key": "extra-amount-mode"
     },
     {
@@ -4086,6 +4126,11 @@
       "documentId": "order-trade",
       "group": "fields",
       "key": "extra-fx-swap-ccp"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-is-bond"
     },
     {
       "documentId": "order-trade",
@@ -4196,6 +4241,11 @@
       "documentId": "order-trade",
       "group": "fields",
       "key": "extra-security-type"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
+      "key": "extra-settlement-date"
     },
     {
       "documentId": "order-trade",

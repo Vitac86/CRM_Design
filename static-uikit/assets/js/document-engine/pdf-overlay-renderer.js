@@ -2604,14 +2604,29 @@
   // succeeds cannot be followed by a generation that fails for the same
   // payload. `fingerprint` is a deterministic summary of the layout decided,
   // which is what QA compares against the one the render actually drew.
-  function orderPayload(template, payload) {
+  async function orderPayload(template, payload) {
     if (!template.orderDocument && !['order-trade','order-venue-transfer','order-bank-withdrawal'].includes(template.id)) return payload;
     if (!global.CRMOrderForms) throw new Error('Модуль проверки поручений не загружен.');
+    if (template.id === 'order-trade') {
+      var input = payload.orderInput || payload.extraValues || {};
+      var id = input['extra-security-asset-id'];
+      var reference = global.CRMInstrumentCatalog;
+      if (id && reference && global.CRMOrderForms.instrumentBranch(input) === 'security') {
+        var date = global.CRMOrderForms.settlement(input).settlementDateISO;
+        var card = reference.getSecurity(id);
+        if (!card) await reference.loadSecurity(id,date);
+        else if (/^bond-/.test(card.kind) && date && !reference.bondData(id,date)) {
+          try { await reference.loadSecurity(id,date); } catch (error) {
+            // A selected asset can still be printed with an explicitly confirmed manual amount.
+          }
+        }
+      }
+    }
     return global.CRMOrderForms.printable(template.id, payload);
   }
 
-  function preflight(template, payload, options) {
-    try { payload = orderPayload(template, payload); } catch (error) { return Promise.reject(error); }
+  async function preflight(template, payload, options) {
+    payload = await orderPayload(template, payload);
     var opts = options || {};
     return open(template, {
       validatePayload: opts.validatePayload, payload: payload
@@ -2650,8 +2665,8 @@
   // template: {
   //   id, templateUrl, expectedPages, fonts: { key: url }, fields: [...]
   // }
-  function render(template, payload, options) {
-    try { payload = orderPayload(template, payload); } catch (error) { return Promise.reject(error); }
+  async function render(template, payload, options) {
+    payload = await orderPayload(template, payload);
     var opts = options || {};
     var PDFLib = global.PDFLib;
     if (!PDFLib) return Promise.reject(new Error('PDF-модуль (pdf-lib) не загружен.'));

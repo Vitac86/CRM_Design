@@ -131,6 +131,49 @@
 
 /* Step 2: extra fields */
 
+.crm-docwiz-select {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.crm-docwiz-select select.uk-select {
+  width: 100%;
+  height: 44px;
+  min-height: 44px !important;
+  padding-right: 40px !important;
+  appearance: none;
+  background-image: none !important;
+}
+
+.crm-docwiz-select > [uk-icon] {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  width: 28px;
+  height: 28px;
+  transform: translateY(-50%);
+  color: #405b86;
+  pointer-events: none;
+}
+
+.crm-docwiz-select > [uk-icon] svg { width: 28px; height: 28px; }
+.crm-docwiz-select select:focus-visible { outline: 2px solid #4168ac; outline-offset: 1px; }
+.crm-docwiz-select select.crm-input-error { border-color: #bc3030; }
+.crm-docwiz-summary { display: block; color: var(--crm-text); font-weight: 600; overflow-wrap: anywhere; }
+.crm-docwiz-manual-note { font-size: 12px; color: #755520; }
+.crm-docwiz-field-wrap .uk-button-text { justify-self: start; }
+.crm-docwiz-field-wrap.crm-docwiz-review {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  column-gap: 8px;
+}
+.crm-docwiz-review > label { grid-area: 1 / 2; }
+.crm-docwiz-review > input { grid-area: 1 / 1; width: 16px; height: 16px; margin: 0; }
+.crm-docwiz-picker-action { display: block; margin: 4px 10px; }
+
+
 .crm-docwiz-step-card {
   padding: 16px;
   display: grid;
@@ -161,6 +204,8 @@
 
 .crm-docwiz-field-wrap {
   display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
   gap: 4px;
 }
 
@@ -752,7 +797,7 @@
   }
 
   .crm-docwiz-fields-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .crm-docwiz-picker-card-row {

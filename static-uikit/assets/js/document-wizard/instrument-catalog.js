@@ -1,39 +1,7 @@
-// Instrument reference data for the Document Wizard — STATIC MOCK.
-//
-// THIS FILE IS THE REPLACEMENT POINT. Everything a manager may pick as a
-// traded instrument is looked up through `window.CRMInstrumentCatalog`; no
-// page, event handler or field map hardcodes an instrument anywhere else.
-// When the backend wires QORT up, only the three arrays below and the three
-// `search*` functions have to become API calls — the wizard, the payload
-// contract and the field map stay exactly as they are.
-//
-// ── The QORT model this mock stands in for ───────────────────────────────────
-//
-// A security is an **Asset**, not a trading instrument:
-//
-//   Assets                 the master object. `AssetID` is the stable id the
-//                          wizard stores and the backend will keep.
-//   Assets.EmitentFirm_ID  → Firms — the issuer. Mocked here as `issuerName`.
-//   Securities             one row per instrument the asset trades as: the
-//                          same share exists in T+, RPS, REPO and OTC
-//                          sections, each with its own row and its own
-//                          `SecurityName`. Those rows are search ALIASES, not
-//                          separate results: search deduplicates by AssetID so
-//                          one share is offered once.
-//
-// `Securities.SecurityName` («SBER … in MOEX SM: T+ …») is a technical
-// composition of code + section. It is never shown to a manager and never
-// printed: one alias below carries a real-shaped sample only to document what
-// the production join returns, and nothing reads it. The printed description
-// is built by `describeSecurity()` from the asset's own attributes.
-//
-// A form's selected security is deliberately NOT bound to a trading section
-// (`TSSection_ID`): the order carries the Asset, and REPO / SWAP are separate
-// order parameters the manager answers Yes/No to.
-//
-// Fictional demo data. Codes and ISINs are realistic in shape so the printed
-// form can be reviewed; no market data is implied.
-
+// Reference adapter for the Document Wizard. Securities use a stable AssetID.
+// A configured HTTP endpoint serves ranked pages and selected cards. The static
+// prototype loads its small offline fixture file. FX and derivatives use the
+// existing local catalogs. QORT column mappings are deliberately left to the backend.
 (function (global) {
   'use strict';
 
@@ -47,113 +15,7 @@
   //   kind          drives the printed legal noun (see SECURITY_KIND_LABELS)
   //   series        выпуск / серия — printed only where the kind needs it
   //   aliases       Securities rows: the trading codes this asset is found by
-  var SECURITY_ASSETS = [
-    {
-      assetId: 'A-100001',
-      shortName: 'Сбербанк ао',
-      displayName: 'ПАО Сбербанк — акция обыкновенная',
-      isin: 'RU0009029540',
-      issuerName: 'ПАО Сбербанк',
-      kind: 'share-ordinary',
-      series: null,
-      // Four Securities rows, one Asset: the search must still offer it once.
-      aliases: [
-        // The only place a `SecurityName` shape appears in this repository.
-        // Kept as documentation of the production join and read by nothing.
-        { code: 'SBER', section: 'MOEX SM: T+', qortSecurityName: 'SBER, акция обыкновенная in MOEX SM: T+ (TQBR)' },
-        { code: 'SBER', section: 'MOEX SM: РПС' },
-        { code: 'SBER', section: 'MOEX SM: РЕПО' },
-        { code: 'SBER', section: 'Внебиржевой рынок' }
-      ]
-    },
-    {
-      assetId: 'A-100002',
-      shortName: 'Сбербанк ап',
-      displayName: 'ПАО Сбербанк — акция привилегированная',
-      isin: 'RU0009029557',
-      issuerName: 'ПАО Сбербанк',
-      kind: 'share-preferred',
-      series: null,
-      aliases: [
-        { code: 'SBERP', section: 'MOEX SM: T+' },
-        { code: 'SBERP', section: 'MOEX SM: РПС' }
-      ]
-    },
-    {
-      assetId: 'A-100003',
-      shortName: 'Газпром ао',
-      displayName: 'ПАО «Газпром» — акция обыкновенная',
-      isin: 'RU0007661625',
-      issuerName: 'ПАО «Газпром»',
-      kind: 'share-ordinary',
-      series: null,
-      aliases: [
-        { code: 'GAZP', section: 'MOEX SM: T+' },
-        { code: 'GAZP', section: 'MOEX SM: РЕПО' }
-      ]
-    },
-    {
-      assetId: 'A-100004',
-      shortName: 'Транснефть ап',
-      displayName: 'ПАО «Транснефть» — акция привилегированная',
-      isin: 'RU0009091573',
-      issuerName: 'ПАО «Транснефть»',
-      kind: 'share-preferred',
-      series: null,
-      aliases: [{ code: 'TRNFP', section: 'MOEX SM: T+' }]
-    },
-    {
-      // The long-value case for the printed description: a corporate bond
-      // prints kind + series + ISIN and is the row that fills both its lines.
-      assetId: 'A-200001',
-      shortName: 'КИБ-СН-ЭКВ 001Р-3',
-      displayName: 'АО «Корпоративный инвестиционный банк» — облигация',
-      isin: 'RU000A10CXA6',
-      issuerName: 'АО «Корпоративный инвестиционный банк»',
-      kind: 'bond-corporate',
-      series: 'CIB-SN-EQ-001S-3',
-      aliases: [
-        { code: 'RU000A10CXA6', section: 'MOEX SM: T+' },
-        { code: 'CIBSN3', section: 'MOEX SM: РПС' }
-      ]
-    },
-    {
-      assetId: 'A-200002',
-      shortName: 'ОФЗ 26238',
-      displayName: 'Облигация федерального займа 26238',
-      isin: 'RU000A1038V6',
-      issuerName: 'Министерство финансов Российской Федерации',
-      kind: 'bond-government',
-      series: '26238',
-      aliases: [
-        { code: 'SU26238RMFS4', section: 'MOEX SM: T+' },
-        { code: 'SU26238RMFS4', section: 'MOEX SM: РЕПО' }
-      ]
-    },
-    {
-      assetId: 'A-300001',
-      shortName: 'Фонд Российские акции',
-      displayName: 'БПИФ «Российские акции» — инвестиционный пай',
-      isin: 'RU000A101NZ2',
-      issuerName: 'АО УК «Инвестика Капитал»',
-      kind: 'fund-unit',
-      series: null,
-      aliases: [
-        { code: 'TMOS', section: 'MOEX SM: T+' },
-        { code: 'TMOS', section: 'Внебиржевой рынок' }
-      ]
-    },
-    {
-      assetId: 'A-300002',
-      shortName: 'Фонд Денежный рынок',
-      displayName: 'БПИФ «Денежный рынок» — инвестиционный пай',
-      isin: 'RU000A104172',
-      issuerName: 'АО УК «Инвестика Капитал»',
-      kind: 'fund-unit',
-      series: null,
-      aliases: [{ code: 'LQDT', section: 'MOEX SM: T+' }]
-    }
-  ];
+  var SECURITY_ASSETS = global.CRMOrderDemoSecurities || [];
 
   // The printed legal noun. The form asks for «Вид, категория (тип), выпуск,
   // транш, серия», so this is the vocabulary the description is built from.
@@ -225,7 +87,7 @@
     if (['share-ordinary','share-preferred','fund-unit'].includes(item.kind))
       item.calculation = demoSpec('unit','pieces');
     else if (item.kind.indexOf('bond-') === 0)
-      item.calculation = demoSpec('bond-percent','pieces'); // Nominal and settlement basis are not supplied.
+      item.calculation = demoSpec(null,'pieces'); // A dated detail may supply the actual quotation convention.
   });
   FX_INSTRUMENTS.filter(function (x) { return ['FX-1001','FX-1004'].includes(x.fxId); }).forEach(function (x) {
     x.calculation = demoSpec('fx','lots',{lotSize:'1000',quoteScale:'1',priceStep:'0.0001'});
@@ -273,8 +135,8 @@
     if (isin && isin === query) return RANK_ISIN_EXACT;
     if (codes.indexOf(query) !== -1) return RANK_CODE_EXACT;
     if (codes.some(function (code) { return code.indexOf(query) === 0; })) return RANK_CODE_PREFIX;
-    if (shortName.indexOf(query) === 0) return RANK_SHORT_PREFIX;
     if (isin.indexOf(query) === 0) return RANK_CODE_PREFIX;
+    if (shortName.indexOf(query) === 0) return RANK_SHORT_PREFIX;
     if (shortName.indexOf(query) !== -1 || displayName.indexOf(query) !== -1) return RANK_NAME;
     if (issuer.indexOf(query) !== -1) return RANK_ISSUER;
     if (codes.some(function (code) { return code.indexOf(query) !== -1; })) return RANK_NAME;
@@ -284,19 +146,96 @@
   // One row per Asset even when several Securities aliases match: the list is
   // built from the assets, so a match on any alias contributes a single result.
   function searchSecurities(query, limit) {
-    var q = norm(query);
-    if (q.length < MIN_QUERY_LENGTH) return [];
-    var scored = [];
-    SECURITY_ASSETS.forEach(function (asset, index) {
-      var rank = rankSecurity(asset, q);
-      if (rank === RANK_NONE) return;
-      scored.push({ asset: asset, rank: rank, index: index });
-    });
-    scored.sort(function (a, b) {
-      return a.rank !== b.rank ? a.rank - b.rank : a.index - b.index;
-    });
-    return scored.slice(0, limit || MAX_RESULTS).map(function (entry) { return entry.asset; });
+    return mockPage({q:query,limit:limit}).items.map(function (item) { return getSecurity(item.assetId); });
   }
+
+  function mockPage(parameters) {
+    var q = norm(parameters.q);
+    var type = parameters.assetClass || 'security';
+    var offset = Number(parameters.cursor || 0);
+    var limit = Math.min(MAX_RESULTS, Number(parameters.limit || MAX_RESULTS));
+    if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isInteger(limit) || limit < 1 ||
+        !['security','share','fund','bond'].includes(type)) throw new Error('Некорректные параметры поиска.');
+    if (q.length < MIN_QUERY_LENGTH) return { items: [], nextCursor: null };
+    var hits = SECURITY_ASSETS.filter(function (a) {
+      return type === 'security' || a.kind.split('-')[0] === type;
+    }).map(function (asset) {
+      return {asset:asset, rank:rankSecurity(asset,q)};
+    }).filter(function (row) { return row.rank !== RANK_NONE; });
+    hits.sort(function (a,b) {
+      return a.rank - b.rank || a.asset.assetId.localeCompare(b.asset.assetId);
+    });
+    return { items:hits.slice(offset,offset+limit).map(function (row) {
+      var a=row.asset;
+      return { assetId:a.assetId, shortName:a.shortName, displayName:a.displayName,
+        isin:a.isin, issuerName:a.issuerName, kind:a.kind, primaryCode:primaryCode(a) };
+    }), nextCursor:offset+limit < hits.length ? String(offset+limit) : null };
+  }
+
+  function mockDetail(id, date) {
+    var asset = findBy(SECURITY_ASSETS,'assetId',id);
+    if (!asset) return null;
+    return { asset:Object.assign({},asset,{aliases:asset.aliases.map(function (row) { return {code:row.code,section:row.section}; })}),
+      bondData:global.CRMOrderDemoBondData(asset,date) };
+  }
+
+  // The static UI ships only the small fixed demo. The HTTP adapter holds selected cards
+  // and a bounded search cache. An HTTP failure must never substitute a demo quotation.
+  var apiMeta = global.document && global.document.querySelector('meta[name="crm-order-reference-api"]');
+  var apiBase = apiMeta && apiMeta.content.replace(/\/$/, '');
+  var searchCache = new Map(), selectedCards = new Map(), bondCache = new Map();
+
+  async function request(path, parameters, signal) {
+    var url = new URL(apiBase + path, global.location.href);
+    Object.keys(parameters).forEach(function (key) {
+      if (parameters[key] != null && parameters[key] !== '') url.searchParams.set(key,parameters[key]);
+    });
+    var controller = new AbortController();
+    function abort() { controller.abort(); }
+    if (signal && signal.aborted) abort();
+    if (signal) signal.addEventListener('abort',abort,{once:true});
+    var timeout = setTimeout(abort,8000);
+    try {
+      var response = await fetch(url, {signal:controller.signal,credentials:'same-origin',headers:{Accept:'application/json'}});
+      if (!response.ok) throw new Error('Справочник недоступен (HTTP ' + response.status + ').');
+      return await response.json();
+    } finally {
+      clearTimeout(timeout);
+      if (signal) signal.removeEventListener('abort',abort);
+    }
+  }
+
+  function remember(map,key,value,limit) {
+    map.delete(key);
+    if (map.size >= limit) map.delete(map.keys().next().value);
+    map.set(key,value);
+  }
+
+  async function searchPage(parameters, signal) {
+    var key = JSON.stringify([norm(parameters.q),parameters.assetClass,parameters.limit,parameters.cursor]);
+    var old = searchCache.get(key);
+    if (old && old.until > Date.now()) return old.page;
+    var page = apiBase ? await request('', parameters, signal) : mockPage(parameters);
+    if (!page || !Array.isArray(page.items) || page.items.length > MAX_RESULTS) throw new Error('Некорректный ответ справочника.');
+    if (signal && signal.aborted) throw new DOMException('Отменено','AbortError');
+    remember(searchCache,key,{page:page,until:Date.now()+30000},48);
+    return page;
+  }
+
+  async function loadSecurity(id, date, signal) {
+    var detail = apiBase ? await request('/'+encodeURIComponent(id), {settlementDate:date}, signal) : mockDetail(id,date);
+    if (!detail || !detail.asset || detail.asset.assetId !== id) throw new Error('Карточка бумаги не найдена.');
+    if (signal && signal.aborted) throw new DOMException('Отменено','AbortError');
+    remember(selectedCards,id,detail.asset,32);
+    if (date) remember(bondCache,id+'|'+date,detail.bondData || {quotes:[],terms:null},64);
+    return detail.asset;
+  }
+
+  function bondData(id,date) {
+    if (!date) return null;
+    return bondCache.get(id+'|'+date) || (!apiBase && mockDetail(id,date) || {}).bondData || null;
+  }
+  function clearBondData(id,date) { bondCache.delete(id+'|'+date); }
 
   function rankSimple(haystacks, query) {
     for (var i = 0; i < haystacks.length; i += 1) {
@@ -356,7 +295,7 @@
     return null;
   }
 
-  function getSecurity(assetId) { return findBy(SECURITY_ASSETS, 'assetId', assetId); }
+  function getSecurity(assetId) { return selectedCards.get(assetId) || (!apiBase && findBy(SECURITY_ASSETS, 'assetId', assetId)) || null; }
   function getFxInstrument(fxId) { return findBy(FX_INSTRUMENTS, 'fxId', fxId); }
   function getDerivative(id) { return findBy(DERIVATIVE_INSTRUMENTS, 'derivativeId', id); }
 
@@ -449,12 +388,12 @@
   var CATALOGS = {
     securities: {
       idKey: 'assetId',
-      search: searchSecurities,
+      search: searchSecurities, searchPage:searchPage, load:loadSecurity,
       get: getSecurity,
       // What one result row shows in the dropdown.
       resultTitle: function (asset) { return asset.shortName; },
       resultMeta: function (asset) {
-        return [primaryCode(asset), asset.isin, asset.issuerName]
+        return [asset.primaryCode || primaryCode(asset), asset.isin, asset.issuerName]
           .filter(Boolean).join(' · ');
       },
       summary: summarizeSecurity
@@ -483,6 +422,7 @@
   };
 
   global.CRMInstrumentCatalog = {
+    mockPage: mockPage, mockDetail: mockDetail, loadSecurity: loadSecurity, bondData: bondData, clearBondData: clearBondData,
     MIN_QUERY_LENGTH: MIN_QUERY_LENGTH,
     MAX_RESULTS: MAX_RESULTS,
 

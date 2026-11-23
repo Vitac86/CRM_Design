@@ -93,6 +93,7 @@ SUITES = [
     # instrument blocks inside one of them. Its own suite drives each
     # branch through the real page and reads the result out of the PDF.
     ("order forms", "run_order_forms_tests.py", []),
+    ("order reference", "run_order_reference_tests.py", []),
     ("Template Builder", "run_builder_qa.py", []),
     ("identifier manifest", "check_identifier_manifest.py", []),
     ("Word-flow static equivalence", "check_word_flow_static_equivalence.py", []),

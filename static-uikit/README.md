@@ -54,6 +54,10 @@ Open via uppercase `INDEX.html`. Do not assume lowercase `index.html` works on c
 
 No `npm run build` is required for the static handoff.
 
+## Order reference preview
+
+From the repository root, run `npm run static:uikit:orders` to open the wizard with its local HTTP mock. The command prints the loopback URL. The standard static page continues to work with the bundled offline fixtures. [API contract and test data](../handoff/order-forms-qort-2026-11/QORT_FINDINGS.md).
+
 ## Folder structure
 - `INDEX.html` — launcher.
 - `pages/` — standalone HTML prototype pages.

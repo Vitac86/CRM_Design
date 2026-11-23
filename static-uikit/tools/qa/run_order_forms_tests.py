@@ -62,13 +62,15 @@ def set_field(browser, key: str, value: str) -> dict:
 
 
 TYPE_SEARCH = """
-(function (key, text) {
+(async function (key, text) {
   var el = document.querySelector(
     '#docwiz-extra-fields [data-autocomplete-for="' + key + '"]');
   if (!el) return { ok: false, reason: 'missing' };
   el.focus();
   el.value = text;
   el.dispatchEvent(new Event('input', { bubbles: true }));
+  var deadline = Date.now()+10000;
+  while (el.getAttribute('aria-busy') === 'true' && Date.now()<deadline) await new Promise(r=>setTimeout(r,20));
   var rows = Array.prototype.map.call(
     document.querySelectorAll('#docwiz-field-' + key + '-menu .crm-docwiz-picker-item'),
     function (row) { return row.textContent; });
@@ -81,12 +83,12 @@ TYPE_SEARCH = """
 def type_search(browser, key: str, text: str) -> dict:
     return browser.eval(
         TYPE_SEARCH.replace("__KEY__", json.dumps(key))
-        .replace("__TEXT__", json.dumps(text, ensure_ascii=False))
+        .replace("__TEXT__", json.dumps(text, ensure_ascii=False)),await_promise=True
     )
 
 
 PICK_RESULT = """
-(function (key, index) {
+(async function (key, index) {
   var menu = document.getElementById('docwiz-field-' + key + '-menu');
   if (!menu || menu.hidden) return { ok: false, reason: 'menu closed' };
   var rows = menu.querySelectorAll('.crm-docwiz-picker-item');
@@ -96,6 +98,8 @@ PICK_RESULT = """
   rows[index].dispatchEvent(new MouseEvent('click', { bubbles: true }));
   var value = document.querySelector(
     '#docwiz-extra-fields [data-field-key="' + key + '"]');
+  var deadline = Date.now()+10000;
+  while (value && !value.value && Date.now()<deadline) await new Promise(r=>setTimeout(r,20));
   var card = document.querySelector(
     '#docwiz-field-' + key + '-search').closest('.crm-docwiz-picker')
       .querySelector('.crm-docwiz-picker-card');
@@ -111,34 +115,21 @@ PICK_RESULT = """
 def pick_result(browser, key: str, index: int = 0) -> dict:
     return browser.eval(
         PICK_RESULT.replace("__KEY__", json.dumps(key))
-        .replace("__INDEX__", str(index))
+        .replace("__INDEX__", str(index)),await_promise=True
     )
 
 
 def keyboard_pick(browser, key: str, text: str) -> dict:
     """Type, walk down with the keyboard and commit with Enter."""
+    type_search(browser,key,text)
     return browser.eval(
-        """
-        (function (key, text) {
-          var input = document.querySelector(
-            '#docwiz-extra-fields [data-autocomplete-for="' + key + '"]');
-          if (!input) return { ok: false, reason: 'missing' };
-          input.focus();
-          input.value = text;
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          function press(name) {
-            input.dispatchEvent(new KeyboardEvent('keydown',
-              { key: name, bubbles: true, cancelable: true }));
-          }
-          press('ArrowDown');
-          press('Enter');
-          var value = document.querySelector(
-            '#docwiz-extra-fields [data-field-key="' + key + '"]');
-          return { ok: true, id: value ? value.value : null, text: input.value };
-        }(__KEY__, __TEXT__))
-        """.replace("__KEY__", json.dumps(key))
-        .replace("__TEXT__", json.dumps(text, ensure_ascii=False))
-    )
+        """(async function(key){
+          const input=document.querySelector('[data-autocomplete-for="'+key+'"]');
+          for (const name of ['ArrowDown','Enter']) input.dispatchEvent(new KeyboardEvent('keydown',{key:name,bubbles:true,cancelable:true}));
+          const selected=document.querySelector('[data-field-key="'+key+'"]'), end=Date.now()+10000;
+          while (!selected.value && Date.now()<end) await new Promise(r=>setTimeout(r,20));
+          return {ok:!!selected.value,id:selected.value,text:input.value};
+        }(__KEY__))""".replace("__KEY__",json.dumps(key)),await_promise=True)
 
 
 def field_values(browser, keys) -> dict:
@@ -288,7 +279,7 @@ def main() -> int:
         for k, v in values.items():
             key = "selectedRequisiteId" if k == "bank" else "extra-" + k.replace("_", "-")
             ret = set_field(browser,key,v)
-            decimal_keys = {"security_price", "fx_rate", "derivative_premium", "move_amount", "payout_amount", "manual_amount"}
+            decimal_keys = {"security_price", "fx_rate", "derivative_premium", "move_amount", "payout_amount", "manual_amount", "accrued_manual"}
             expected = v.replace(".", ",") if k in decimal_keys else v
             checks.check(f"{doc} control {key}", ret.get("ok") and ret.get("value") == expected, str(ret))
     def confirm():

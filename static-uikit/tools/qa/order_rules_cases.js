@@ -45,6 +45,56 @@
       check('trade acknowledgment '+kind+' '+(level || 'missing risk'),printed.checks['order-uncovered-ack'] === true);
     });
   });
+  var datedOrder = Object.assign({},tradeOrder,{'extra-settlement-period':'date','extra-settlement-date':'2026-11-23'});
+  var datedPayload = model.prepare('order-trade',s,datedOrder);
+  check('dated payload excludes tenor',datedPayload.input.settlementDateISO==='2026-11-23' &&
+    datedPayload.metadata.settlementMode==='date' && !('settlementTenor' in datedPayload.input) &&
+    datedPayload.extraValues['extra-settlement-period']==='23.11.2026');
+  ['T+0','T+1','T+2'].forEach(function (tenor) {
+    var result = model.prepare('order-trade',s,Object.assign({},datedOrder,{'extra-settlement-period':tenor}));
+    check('tenor excludes hidden date '+tenor,result.input.settlementTenor===tenor && result.metadata.settlementMode==='tenor' &&
+      !('settlementDateISO' in result.input) && !('extra-settlement-date' in result.input) && result.extraValues['extra-settlement-period']===tenor);
+  });
+  var impossible = Object.assign({},datedOrder,{'extra-settlement-date':'2026-02-30'});
+  check('rejects impossible leap date',model.prepare('order-trade',s,impossible).errors.some(function (e){return e.key==='extra-settlement-date';}));
+  var direct = Object.assign({},tradeOrder,{settlementMode:'date',settlementDateISO:'2026-11-24'});
+  delete direct['extra-settlement-period'];
+  check('structured direct caller',model.prepare('order-trade',s,direct).extraValues['extra-settlement-period']==='24.11.2026');
+  var ref=CRMInstrumentCatalog, lookup=ref.bondData;
+  var settings = {assetId:'A-200002',date:'2026-11-23',source:'QA fixture',currency:'RUB',unit:'per-security',section:'test',value:'12.34'};
+  var bondOrder=Object.assign({},datedOrder,{'extra-order-kind':'limit','extra-security-asset-id':'A-200002',
+    'extra-security-quantity':'10','extra-security-price':'98.5'});
+  function withQuote(rows,terms) {
+    ref.bondData=function () { return {quotes:rows,terms:terms}; };
+    return model.tradeCalculation(bondOrder);
+  }
+  try {
+    var terms={source:'QA fixture',date:'2026-11-23',currency:'RUB',unit:'per-security',nominal:'1000',formula:'bond-percent',amountBasis:'dirty'};
+    check('future quote must not be used',!withQuote([Object.assign({},settings,{date:'2026-11-24'})],terms).result.value);
+    check('null quote differs from zero',!withQuote([Object.assign({},settings,{value:null})],terms).result.value);
+    check('unknown accrued unit blocks total',!withQuote([Object.assign({},settings,{unit:'unknown'})],terms).result.value);
+    check('foreign-currency interest excluded',!withQuote([Object.assign({},settings,{currency:'USD'})],terms).result.value);
+    check('outdated nominal blocks percent total',!withQuote([settings],Object.assign({},terms,{date:'2026-11-22'})).result.value);
+    check('per-piece cash quotation skips percentage and nominal',withQuote([settings],Object.assign({},terms,{formula:'unit',amountBasis:'quoted'})).result.value==='985.00');
+    check('unapproved per-piece dirty convention remains manual',!withQuote([settings],Object.assign({},terms,{formula:'unit'})).result.value);
+  } finally { ref.bondData=lookup; }
+  var manualTenor=Object.assign({},bondOrder,{'extra-settlement-period':'T+1','extra-order-kind':'market',
+    'extra-accrued-mode':'manual','extra-accrued-manual':'0','extra-accrued-date':'2026-11-23','extra-accrued-currency':'RUB'});
+  manualTenor['extra-accrued-confirmed']=model.accruedReviewKey(manualTenor);
+  var confirmedZero=model.prepare('order-trade',s,manualTenor);
+  check('explicit manual zero with tenor keeps its own date',!confirmedZero.errors.length &&
+    confirmedZero.extraValues['extra-security-accrued']==='0' && confirmedZero.metadata.accruedInterest.date==='2026-11-23' &&
+    !('settlementDateISO' in confirmedZero.input));
+  var fixtures = CRMInstrumentCatalog.SECURITY_ASSETS, originalSize=fixtures.length;
+  try {
+    for (var n=0;n<28;n++) {
+      fixtures.push(Object.assign({},fixtures[0],{assetId:'QA-'+String(n).padStart(2,'0'),shortName:'QA limit '+n}));
+    }
+    var first=CRMInstrumentCatalog.mockPage({q:'QA limit',limit:900});
+    var second=CRMInstrumentCatalog.mockPage({q:'QA limit',cursor:first.nextCursor});
+    check('server hard cap and pagination',first.items.length===20 && second.items.length===8 &&
+      new Set(first.items.concat(second.items).map(function (a){return a.assetId;})).size===28);
+  } finally { fixtures.length=originalSize; }
   var v={'extra-move-from':'stock','extra-move-to':'currency','extra-move-currency':'RUB','extra-move-amount':'1000.50'};
   function prep(vv,ss) { return model.prepare('order-venue-transfer',ss||s,vv); }
   model.venues(s).forEach(function (venue) {

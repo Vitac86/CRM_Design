@@ -323,11 +323,74 @@
     derivative: ['extra-derivative-id', 'extra-derivative-quantity', 'extra-derivative-premium', 'extra-derivative-amount', 'getDerivative']
   };
 
+  function settlement(v) {
+    var choice = v['extra-settlement-period'] || (v.settlementMode === 'date' ? 'date' : v.settlementTenor);
+    if (choice === 'date') return {settlementMode:'date', settlementDateISO:text(v['extra-settlement-date'] ?? v.settlementDateISO)};
+    return {settlementMode:'tenor', settlementTenor:text(choice)};
+  }
+
+  function settlementText(s) {
+    return s.settlementMode === 'date' ? (calendarDate(s.settlementDateISO) ? isoToRu(s.settlementDateISO) : '') : s.settlementTenor;
+  }
+
+  function accruedReviewKey(v) {
+    var s = settlement(v);
+    return JSON.stringify([v['extra-security-asset-id'], s, v['extra-order-date'] || '',
+      s.settlementMode === 'date' ? '' : v['extra-accrued-date'], text(v['extra-accrued-manual']),
+      text(v['extra-accrued-currency']).toUpperCase(), text(v['extra-security-currency']).toUpperCase()]);
+  }
+
+  function accruedInterest(asset, v, data, target) {
+    var manual = v['extra-accrued-mode'] === 'manual';
+    function missing(message) { return {mode:manual?'manual':'reference', value:'', message:message}; }
+    if (manual) {
+      var amount = text(v['extra-accrued-manual']), currency = text(v['extra-accrued-currency']).toUpperCase();
+      var date = target || v['extra-accrued-date'];
+      if (!global.CRMOrderCalculation.decimal(amount)) return missing('Введите НКД от нуля и выше.');
+      if (!calendarDate(date)) return missing('Укажите дату ручного НКД.');
+      if (!/^[A-Z]{3}$/.test(currency)) return missing('Укажите валюту НКД трёхбуквенным кодом.');
+      return {mode:'manual', value:amount.replace(',','.'), currency:currency, date:date,
+        source:'Введено вручную', unit:'per-security', confirmed:v['extra-accrued-confirmed'] === accruedReviewKey(v)};
+    }
+    if (!calendarDate(target)) return missing('Для автоматического НКД нужна конкретная дата расчётов. Календарь T+N не подключён.');
+    var rows = (data && data.quotes || []).filter(function (r) { return r.assetId === asset.assetId && r.date === target; });
+    if (!rows.length) return missing('На выбранную дату НКД в справочнике отсутствует.');
+    var first = rows[0];
+    if (rows.some(function (r) { return !global.CRMOrderCalculation.decimal(r.value) || !r.source ||
+      !/^[A-Z]{3}$/.test(r.currency) || r.unit !== 'per-security'; }))
+      return missing('Источник не подтвердил значение, валюту или единицу НКД.');
+    if (rows.some(function (r) { return formatAmount(r.value) !== formatAmount(first.value) || r.currency !== first.currency; }))
+      return missing('Значения НКД в секциях расходятся: ' + rows.map(function (r) { return r.section+' — '+formatAmount(r.value)+' '+r.currency; }).join(', ') + '. Уточните значение или введите его вручную.');
+    return {mode:'reference', value:String(first.value), currency:first.currency, date:target, unit:first.unit,
+      source:Array.from(new Set(rows.map(function (r) { return r.source; }))).sort().join(', '),
+      sections:Array.from(new Set(rows.map(function (r) { return r.section; }))).sort(), confirmed:true};
+  }
+
+  function datedBondSpec(base, data, target, interest) {
+    var terms = data && data.terms;
+    if (!terms || terms.date !== target || !terms.source || !base || terms.currency !== base.currency ||
+        terms.unit !== 'per-security') return null;
+    if (terms.formula === 'unit' && !['quoted','clean'].includes(terms.amountBasis)) return null;
+    var spec = Object.assign({},base,{source:terms.source,formula:terms.formula,amountBasis:terms.amountBasis,
+      nominal:terms.nominal,settlementDate:target});
+    if (interest && interest.value !== '' && interest.currency === terms.currency && interest.date === target &&
+        interest.unit === 'per-security') {
+      spec.accrued = interest.value;
+      spec.accruedFor = target;
+    }
+    return spec;
+  }
+
   function tradeCalculation(v) {
     var branch = instrumentBranch(v), keys = BRANCH[branch];
     var item = keys && catalog() && catalog()[keys[4]](v[keys[0]]);
     if (branch === 'derivative' && item && !catalog().supportsDerivative(item,v['extra-order-market'])) item = null;
     var spec = item && item.calculation;
+    var isBond = !!(branch === 'security' && item && /^bond-/.test(item.kind));
+    var target = settlement(v).settlementDateISO;
+    var data = isBond && catalog().bondData(item.assetId,target);
+    var interest = isBond ? accruedInterest(item,v,data,target) : null;
+    var dated = isBond ? datedBondSpec(spec,data,target,interest) : spec;
     var priceCurrency = branch === 'security' && v['extra-security-currency'] != null
       ? text(v['extra-security-currency']).toUpperCase() : (spec && spec.currency || '');
     var math = global.CRMOrderCalculation;
@@ -339,15 +402,17 @@
     else if (!keys || !item) result = math.unavailable('Выберите инструмент из справочника.');
     else if (branch === 'security' && spec && priceCurrency !== spec.currency)
       result = math.unavailable('Для выбранной валюты цены отсутствует спецификация расчёта.');
-    else result = math.calculate(spec, v[keys[1]], v[keys[2]]);
-    return { branch: branch, keys: keys, item: item, spec: spec, result: result, currency: priceCurrency };
+    else if (isBond && !dated) result = math.unavailable('Нет подтверждённых единиц котировки и спецификации облигации на дату расчётов.');
+    else result = math.calculate(dated, v[keys[1]], v[keys[2]]);
+    return {branch:branch, keys:keys, item:item, spec:dated || spec, result:result, currency:priceCurrency,
+      isBond:isBond, quotation:dated && dated.formula, interest:interest};
   }
 
   function reviewKey(id, s, v) {
     if (id === 'order-trade') {
       var trade = tradeCalculation(v), keys = trade.keys || [];
       return JSON.stringify([id, s.id, v['extra-trade-kind'], v['extra-order-market'], v['extra-order-kind'],
-        v['extra-settlement-period'], v[keys[0]], v[keys[1]], v[keys[2]], trade.branch === 'security' ? text(v['extra-repo-ccp']) : trade.branch === 'fx' ? text(v['extra-fx-swap-ccp']) : '',
+        settlement(v), trade.interest, v[keys[0]], v[keys[1]], v[keys[2]], trade.branch === 'security' ? text(v['extra-repo-ccp']) : trade.branch === 'fx' ? text(v['extra-fx-swap-ccp']) : '',
         trade.currency, trade.result.value, trade.spec || null, v['extra-amount-mode'], v['extra-manual-amount'], v['extra-amount-reason']]);
     }
     var p = id === 'order-venue-transfer' ? 'extra-move-' : 'extra-payout-';
@@ -378,13 +443,19 @@
       identity: identity(subject), requisites: requisiteFields(payoutRequisite(subject, v)),
       words: v[key + 'amount'] && CURRENCIES[v[key+'currency']] ? amountInWords(v[key+'amount'], v[key+'currency']) : '',
       discrepancy: info ? difference(v['extra-manual-amount'],info.value) : '',
-      estimate: info ? info.value ? formatDecimalInput(info.value, true) + ' ' + info.currency : info.reason : ''
+      accrued: trade && trade.interest ? (trade.interest.mode !== 'manual' && v['extra-accrued-status']) || trade.interest.message || (formatAmount(trade.interest.value) + ' ' + trade.interest.currency + '/бумагу · ' + isoToRu(trade.interest.date) + ' · ' + trade.interest.source) : '',
+      estimate: info ? info.value ? formatDecimalInput(info.value, true) + ' ' + info.currency +
+        (trade.isBond && trade.spec.source ? ' · '+trade.spec.source : '') : 'Недостаточно данных для расчёта. '+info.reason : ''
     };
   }
 
   function prepare(id, subject, input) {
     var kind = KINDS[id], v = Object.assign({}, input), errors = [], out = {}, checks = {}, raw = {};
     var metadata = { documentId: id, subjectId: subject.id }, ident = identity(subject);
+    if (!v['extra-settlement-period'] && v.settlementMode) {
+      v['extra-settlement-period'] = v.settlementMode === 'date' ? 'date' : v.settlementTenor;
+      if (v.settlementMode === 'date') v['extra-settlement-date'] = v.settlementDateISO;
+    }
     function issue(key, message) { errors.push({ key: key, message: message }); }
     function keep(keys) {
       keys.forEach(function (k) { if (v[k] != null) raw[k] = v[k]; });
@@ -426,7 +497,17 @@
     if (kind === 'trade') {
       var trade = tradeCalculation(v), keys = trade.keys, result = trade.result;
       oneOf('extra-trade-kind', ['buy','sell','other']); oneOf('extra-order-kind', ['limit','market']);
-      oneOf('extra-order-validity-mode', ['cancelled','date']); oneOf('extra-settlement-period', ['T+0','T+1','T+2']);
+      oneOf('extra-order-validity-mode', ['cancelled','date']);
+      oneOf('extra-settlement-period', ['T+0','T+1','T+2','date']);
+      var s = settlement(v), target = s.settlementDateISO;
+      Object.assign(metadata,s);
+      Object.assign(raw,s);
+      if (s.settlementMode === 'date') {
+        var bounds = trade.item && trade.item.settlementBounds || {};
+        if (!calendarDate(target) || (date && target < date) || (bounds.first && target < bounds.first) || (bounds.last && target > bounds.last))
+          issue('extra-settlement-date','Проверьте дату расчётов относительно даты заявки и допустимого периода инструмента.');
+        keep(['extra-settlement-date']);
+      }
       if (!keys || !trade.item) issue(keys ? keys[0] : 'extra-order-market', 'Выберите инструмент активного рынка из справочника.');
       if (v['extra-trade-kind'] === 'other' && !safeText(v['extra-trade-kind-other'])) issue('extra-trade-kind-other','Укажите вид сделки.');
       if (v['extra-order-validity-mode'] === 'date' && !calendarDate(v['extra-order-validity-date']))
@@ -436,6 +517,7 @@
       if (v['extra-order-market']==='otc') copy(['extra-otc-instrument-type']);
       if (v['extra-order-validity-mode']==='date') copy(['extra-order-validity-date']);
       out['extra-order-validity'] = deriveValidity(v);
+      out['extra-settlement-period'] = settlementText(s);
       if (keys) {
         var limit = v['extra-order-kind'] === 'limit';
         copy([keys[0],keys[1]]); if (limit) copy([keys[2]]);
@@ -450,10 +532,20 @@
             issue('extra-security-currency', 'Введите трёхбуквенный код валюты цены.');
           out['extra-security-currency'] = trade.currency;
           keep(['extra-security-currency']);
-          if (trade.spec) {
-            if (limit && trade.spec.formula==='bond-percent') out['extra-security-price'] += ' %';
-            if (limit && trade.spec.amountBasis==='dirty' && trade.spec.accruedFor && trade.spec.accruedFor===trade.spec.settlementDate)
-              out['extra-security-accrued'] = formatAmount(trade.spec.accrued);
+          if (limit && trade.quotation==='bond-percent') out['extra-security-price'] += ' %';
+          if (trade.isBond) {
+            var interest = trade.interest;
+            metadata.accruedInterest = interest;
+            keep(['extra-accrued-mode']);
+            if (v['extra-accrued-mode'] && !['reference','manual'].includes(v['extra-accrued-mode']))
+              issue('extra-accrued-mode','Выберите источник НКД.');
+            if (interest.mode === 'manual') {
+              keep(['extra-accrued-manual','extra-accrued-currency','extra-accrued-confirmed']);
+              if (!target) keep(['extra-accrued-date']);
+              if (!interest.confirmed) issue('extra-accrued-review', interest.message || 'Подтвердите НКД для текущего инструмента и даты.');
+            }
+            if (interest.value !== '' && interest.confirmed) out['extra-security-accrued'] = formatAmount(interest.value) +
+              (interest.currency === trade.currency ? '' : ' '+interest.currency);
           }
         } else if (trade.branch==='fx') {
           oneOf('extra-fx-swap-ccp',['yes','no']); copy(['extra-fx-swap-ccp']); deriveFx(out,limit);
@@ -474,7 +566,7 @@
             metadata.amount.reason = text(v['extra-amount-reason']);
             metadata.amount.difference = difference(v['extra-manual-amount'],result.value);
             metadata.amount.currency = trade.currency || (trade.item && trade.item.quote) || '';
-          } else if (result.value) out[keys[3]] = formatAmount(result.value);
+          } else if (result.value) out[keys[3]] = formatDecimalInput(result.value,true);
           else issue('extra-manual-amount',result.reason + ' Введите сумму сделки.');
         }
         metadata.amount.value = out[keys[3]];
@@ -554,6 +646,7 @@
 
   global.CRMOrderForms = {
     kinds: KINDS, printable: printable, venues: venues, eligibleRequisites: eligibleRequisites, payoutRequisite: payoutRequisite,
+    settlement: settlement, settlementText: settlementText, accruedReviewKey: accruedReviewKey,
     instrumentBranch: instrumentBranch, formatAmount: formatAmount, formatMoney: formatMoney, moneyProblem: moneyProblem,
     amountInWords: amountInWords, formatDecimalInput: formatDecimalInput, tradeCalculation: tradeCalculation, context: context, reviewKey: reviewKey, prepare: prepare
   };

@@ -288,6 +288,11 @@
       'extra.extra-amount-mode':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
       'extra.extra-manual-amount':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
       'extra.selectedRequisiteId':['extra.extra-bank-account','extra.extra-bank-recipient','extra.extra-bank-name'],
+      'extra.extra-settlement-date': ['extra.extra-settlement-period'],
+      'extra.extra-accrued-mode': ['extra.extra-security-accrued'],
+      'extra.extra-accrued-manual': ['extra.extra-security-accrued'],
+      'extra.extra-accrued-currency': ['extra.extra-security-accrued'],
+      'extra.extra-accrued-date': ['extra.extra-security-accrued'],
       'extra.extra-order-validity-mode': ['extra.extra-order-validity'],
       'extra.extra-order-validity-date': ['extra.extra-order-validity'],
       'extra.extra-otc-instrument-type': [
@@ -306,6 +311,11 @@
   function orderField(key, label, type, extra) {
     var field = Object.assign({key: key, label: label, type: type}, extra);
     var reasons = {
+      'extra-is-bond':'Вид выбранного актива управляет доступностью НКД.',
+      'extra-accrued-summary':'Показывает происхождение и дату НКД.',
+      'extra-accrued-confirmed':'Хранит подтверждённые параметры ручного НКД.',
+      'extra-accrued-review':'Подтверждает введённый НКД на выбранную дату.',
+      'extra-accrued-status':'Состояние загрузки датированной карточки.',
       'extra-estimate':'Проверка автоматического расчёта и его спецификации.',
       'extra-discrepancy':'Сравнение ручной суммы с расчётной.',
       'extra-amount-reason':'Сохраняется в записи о ручной корректировке.',
@@ -350,6 +360,8 @@
   var ORDER_CURRENCIES = ['RUB','USD','EUR','CNY'].map(function (c) { return [c,c]; });
   var PAYOUT_FIXED = isValue('extra-payout-amount-mode','amount');
 
+  var ORDER_BOND = all(ORDER_SECURITY_BRANCH,isValue('extra-is-bond','yes'));
+  var MANUAL_ACCRUED = all(ORDER_BOND,isValue('extra-accrued-mode','manual'));
   var TRADE_DOCUMENT = orderDocument('order-trade','trade','Поручение на совершение сделки',
     'poruchenie-na-sdelku.pdf','Скачать поручение на сделку',[
         {
@@ -435,9 +447,12 @@
           options: [
             { value: 'T+0', label: 'T+0' },
             { value: 'T+1', label: 'T+1' },
-            { value: 'T+2', label: 'T+2' }
+            { value: 'T+2', label: 'T+2' },
+            { value: 'date', label: 'Конкретная дата' }
           ]
         },
+        orderField('extra-settlement-date','Дата расчётов','date',{defaultToday:true,required:true,
+          showWhen:isValue('extra-settlement-period','date')}),
         { key: 'extra-counterparty', label: 'Информация о контрагенте', type: 'text' },
         { key: 'extra-order-other-info', label: 'Иная информация', type: 'text' },
         {
@@ -474,6 +489,17 @@
         orderField('extra-security-currency','Валюта цены','text',{
           placeholder:'Код валюты, например RUB',showWhen:ORDER_SECURITY_BRANCH
         }),
+        orderField('extra-is-bond','Облигация','internal'),
+        orderField('extra-accrued-confirmed','Подтверждение НКД','internal'),
+        orderField('extra-accrued-status','Статус загрузки НКД','internal'),
+        choice('extra-accrued-mode','Источник НКД',[['reference','Получить из справочника'],['manual','Указать вручную']],
+          {defaultValue:'reference',showWhen:ORDER_BOND}),
+        orderField('extra-accrued-manual','НКД на одну бумагу','number',{step:'any',min:0,required:true,showWhen:MANUAL_ACCRUED}),
+        orderField('extra-accrued-currency','Валюта ручного НКД','text',{required:true,showWhen:MANUAL_ACCRUED}),
+        orderField('extra-accrued-date','Дата ручного НКД','date',{required:true,
+          showWhen:all(MANUAL_ACCRUED,{source:'extra.extra-settlement-period',notEquals:'date'})}),
+        orderField('extra-accrued-summary','НКД на дату расчётов','summary',{valueFrom:'accrued',fullWidth:true,showWhen:ORDER_BOND}),
+        orderField('extra-accrued-review','Подтверждаю значение, валюту и дату ручного НКД','review',{showWhen:MANUAL_ACCRUED,fullWidth:true}),
         {
           key: 'extra-repo-ccp',
           label: 'Сделка РЕПО с ЦК',
@@ -565,7 +591,7 @@
       orderField('extra-fx-amount','Сумма сделки в валюте котировки','derived'),
       orderField('extra-derivative-amount','Сумма сделки с ПФИ','derived'),
       orderField('extra-security-accrued','НКД на дату расчётов','derived'),
-      orderField('extra-estimate','Расчёт по спецификации','readonly',{valueFrom:'estimate',fullWidth:true}),
+      orderField('extra-estimate','Расчётная сумма сделки','summary',{valueFrom:'estimate',fullWidth:true}),
       orderField('extra-amount-mode','Режим расчёта','internal',{defaultValue:'auto'}),
       orderField('extra-manual-amount','Сумма сделки','number',{positive:true,step:'0.01',required:true,showWhen:ORDER_LIMIT}),
       orderField('extra-discrepancy','Отклонение от автосуммы','readonly',{valueFrom:'discrepancy',emptyHint:'Автосумма недоступна',showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual'))}),
@@ -2732,10 +2758,8 @@
   // value into: an order may name only an instrument the reference data really
   // holds. Typing searches; only picking a result produces a value.
   //
-  // The catalog is `window.CRMInstrumentCatalog` — the single static mock the
-  // backend replaces with QORT data. This control knows nothing about
-  // securities, currencies or derivatives; it asks the named catalog to search
-  // and to describe what was found.
+  // The catalog supplies result pages and selected cards. The same control works
+  // with the offline fixtures and with the local HTTP reference adapter.
   //
   // Shape:
   //   <div class="crm-docwiz-picker">
@@ -2789,9 +2813,18 @@
     box.appendChild(menu);
     root.appendChild(box);
     root.appendChild(card);
+    var changeNotice = document.createElement('span');
+    changeNotice.className = 'crm-docwiz-picker-card-label';
+    changeNotice.setAttribute('role','status');
+    root.appendChild(changeNotice);
 
-    var results = [];
-    var activeIndex = -1;
+    var results = [], activeIndex = -1, sequence = 0, timer, pending, nextCursor;
+    function cancelPending() {
+      sequence++;
+      clearTimeout(timer);
+      if (pending) pending.abort();
+      search.setAttribute('aria-busy','false');
+    }
 
     if (!catalog) {
       // A missing catalog module is a deployment fault, not a manager's
@@ -2805,6 +2838,7 @@
     }
 
     function closeMenu() {
+      cancelPending();
       menu.hidden = true;
       menu.textContent = '';
       search.setAttribute('aria-expanded', 'false');
@@ -2843,8 +2877,7 @@
       );
     }
 
-    function select(item) {
-      if (!item) return;
+    function commitItem(item) {
       value.value = String(item[catalog.idKey]);
       search.value = catalog.resultTitle(item);
       search.classList.remove('crm-input-error');
@@ -2885,9 +2918,68 @@
       highlight();
     }
 
+    function menuAction(title, action) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'uk-button uk-button-text crm-docwiz-picker-action';
+      button.textContent = title;
+      button.addEventListener('click',action);
+      menu.appendChild(button);
+    }
+
+    function message(label,retry) {
+      results = []; activeIndex = -1; nextCursor = null;
+      renderMenu();
+      menu.firstElementChild.textContent = label;
+      if (retry) menuAction('Повторить',retry);
+    }
+
+    function select(item) {
+      if (!item) return;
+      if (!catalog.load) { commitItem(item); return; }
+      cancelPending();
+      var version = sequence;
+      pending = new AbortController();
+      message('Загрузка карточки…');
+      catalog.load(String(item[catalog.idKey]),'',pending.signal).then(function (detail) {
+        if (version === sequence && root.isConnected) commitItem(detail);
+      },function () {
+        if (version === sequence && root.isConnected) message('Не удалось загрузить карточку.',function () { select(item); });
+      });
+    }
+
+    function loadPage(cursor) {
+      cancelPending();
+      var version = sequence, query = search.value.trim(), previous = cursor ? results.slice() : [];
+      pending = new AbortController();
+      var signal = pending.signal;
+      function fetchPage() {
+        if (!root.isConnected) return;
+        catalog.searchPage({q:query,assetClass:'security',limit:maxResults,cursor:cursor},signal).then(function (page) {
+          if (version !== sequence || !root.isConnected) return;
+          results = previous.concat(page.items);
+          nextCursor = page.nextCursor;
+          activeIndex = results.length ? previous.length : -1;
+          renderMenu();
+          search.setAttribute('aria-busy','false');
+          if (nextCursor) menuAction('Показать ещё',function () { loadPage(nextCursor); });
+        },function () {
+          if (version !== sequence || !root.isConnected) return;
+          search.setAttribute('aria-busy','false');
+          message('Справочник недоступен.',function () { results = previous; loadPage(cursor); });
+        });
+      }
+      search.setAttribute('aria-busy','true');
+      message('Поиск…');
+      if (cursor) fetchPage();
+      else timer = setTimeout(fetchPage,300);
+    }
+
     function runSearch() {
       if (!catalog) return;
       var query = search.value.trim();
+      if (catalog.searchPage && query.length >= minLength) { loadPage(null); return; }
+      cancelPending();
       var market = document.getElementById('docwiz-field-extra-order-market');
       results = query.length < minLength ? [] : catalog.search(query, maxResults,
         field.catalog === 'derivatives' && market ? market.value : undefined);
@@ -2899,6 +2991,9 @@
       // Editing the text after a selection invalidates it: the id is dropped so
       // a stale instrument can never survive a changed search string.
       if (value.value) {
+        var priceKey = {securities:'extra-security-price',fx:'extra-fx-rate',derivatives:'extra-derivative-premium'}[field.catalog];
+        var oldPrice = document.getElementById('docwiz-field-'+priceKey);
+        if (oldPrice && oldPrice.value) changeNotice.textContent = 'При смене инструмента цена, НКД и сумма сделки сбрасываются.';
         value.value = '';
         renderCard(null);
         value.dispatchEvent(new Event('change', { bubbles: true }));
@@ -2912,7 +3007,9 @@
 
     // The menu suppresses its own pointer default below, so a blur here always
     // means the manager really left the control.
-    search.addEventListener('blur', closeMenu);
+    root.addEventListener('focusout',function (event) {
+      if (!root.contains(event.relatedTarget)) closeMenu();
+    });
 
     search.addEventListener('keydown', function (event) {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -3033,6 +3130,7 @@
 
       var wrap = document.createElement('div');
       wrap.className = 'crm-docwiz-field-wrap';
+      if (field.type === 'review') wrap.classList.add('crm-docwiz-review');
       if (field.type === 'textarea' || field.type === 'autocomplete' || field.fullWidth) {
         wrap.classList.add('crm-docwiz-field-wrap-full');
       }
@@ -3117,6 +3215,10 @@
         input.step = field.step != null ? String(field.step) : 'any';
         if (field.placeholder) input.placeholder = field.placeholder;
         if (field.defaultValue) input.value = field.defaultValue;
+      } else if (field.type === 'summary') {
+        input = document.createElement('output');
+        input.className = 'crm-docwiz-summary';
+        input.setAttribute('aria-live','polite');
       } else if (field.type === 'readonly') {
         // A value the CRM already holds. It is shown so the manager can check
         // it before generating, and it is not editable because retyping CRM
@@ -3153,7 +3255,7 @@
       }
       // A resolved value is re-read from the CRM on every render; restoring a
       // remembered one would show yesterday's requisite after the record moved.
-      if (field.type !== 'readonly' &&
+      if (field.type !== 'readonly' && field.type !== 'summary' &&
           Object.prototype.hasOwnProperty.call(savedState.fields, field.key)) {
         input.value = savedState.fields[field.key];
       }
@@ -3172,14 +3274,32 @@
         input.required = true;
       }
       if (picker) picker.syncFromValue();
-      if (field.type === 'readonly') resolvedControls.push({ field: field, input: input });
+      if (field.type === 'readonly' || field.type === 'summary') resolvedControls.push({ field: field, input: input });
       wrap.appendChild(picker ? picker.root : (dateField || input));
+      if (field.key === 'extra-accrued-summary') {
+        var refresh = document.createElement('button');
+        refresh.type = 'button';
+        refresh.className = 'uk-button uk-button-text';
+        refresh.dataset.refreshAccrued = '';
+        refresh.textContent = 'Обновить НКД';
+        refresh.addEventListener('click', function () {
+          savedState.bondLookupKey = null;
+          syncFields();
+        });
+        wrap.appendChild(refresh);
+      }
       if (doc.orderKind === 'trade' && field.key === 'extra-manual-amount') {
         var reset = document.createElement('button');
         reset.type = 'button';
         reset.className = 'uk-button uk-button-text';
         reset.dataset.orderResetAmount = '';
-        reset.textContent = 'Вернуть расчётную сумму';
+        var manualNote = document.createElement('span');
+        manualNote.className = 'crm-docwiz-manual-note';
+        manualNote.dataset.orderManual = '';
+        manualNote.hidden = true;
+        manualNote.textContent = 'Введено вручную';
+        wrap.appendChild(manualNote);
+        reset.textContent = 'Вернуть расчётное значение';
         reset.hidden = true;
         reset.addEventListener('click', function () {
           var mode = container.querySelector('[data-field-key="extra-amount-mode"]');
@@ -3628,6 +3748,17 @@
       renderExtraFields(doc, subject);
     }
 
+    if (step2) step2.querySelectorAll('select.uk-select').forEach(function (select) {
+      if (select.parentElement.classList.contains('crm-docwiz-select')) return;
+      var box = document.createElement('span');
+      box.className = 'crm-docwiz-select';
+      select.before(box);
+      box.appendChild(select);
+      var icon = document.createElement('span');
+      icon.setAttribute('uk-icon','chevron-down');
+      icon.setAttribute('aria-hidden','true');
+      box.appendChild(icon);
+    });
     if (step2) step2.hidden = false;
     if (step3) step3.hidden = false;
 
@@ -3748,7 +3879,7 @@
     if (el.dataset.decimal) {
       var decimal = window.CRMOrderCalculation.decimal(value);
       if (!decimal) return 'Введите число с запятой или точкой.';
-      if (!decimal.n) return 'Значение должно быть больше нуля.';
+      if (!decimal.n && el.dataset.fieldPositive === '1') return 'Значение должно быть больше нуля.';
       return el.step === '0.01' ? window.CRMOrderForms.moneyProblem(value) : '';
     }
     var parsed = Number(String(value).replace(',', '.'));
