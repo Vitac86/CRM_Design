@@ -75,16 +75,34 @@
     check('unknown accrued unit blocks total',!withQuote([Object.assign({},settings,{unit:'unknown'})],terms).result.value);
     check('foreign-currency interest excluded',!withQuote([Object.assign({},settings,{currency:'USD'})],terms).result.value);
     check('outdated nominal blocks percent total',!withQuote([settings],Object.assign({},terms,{date:'2026-11-22'})).result.value);
-    check('per-piece cash quotation skips percentage and nominal',withQuote([settings],Object.assign({},terms,{formula:'unit',amountBasis:'quoted'})).result.value==='985.00');
+    check('per-piece fixture cannot silently price a percentage order',!withQuote([settings],Object.assign({},terms,{formula:'unit',amountBasis:'quoted'})).result.value);
     check('unapproved per-piece dirty convention remains manual',!withQuote([settings],Object.assign({},terms,{formula:'unit'})).result.value);
   } finally { ref.bondData=lookup; }
   var manualTenor=Object.assign({},bondOrder,{'extra-settlement-period':'T+1','extra-order-kind':'market',
+    'extra-accrued-edited':'yes','extra-accrued-input':'0','extra-accrued-currency':'RUB'});
+  var zero=model.prepare('order-trade',s,manualTenor);
+  check('typed zero with tenor prints without confirmation',!zero.errors.length &&
+    zero.extraValues['extra-security-accrued']==='0' && !('settlementDateISO' in zero.input));
+  var oldInput=Object.assign({},bondOrder,{'extra-settlement-period':'T+1','extra-order-kind':'market',
     'extra-accrued-mode':'manual','extra-accrued-manual':'0','extra-accrued-date':'2026-11-23','extra-accrued-currency':'RUB'});
-  manualTenor['extra-accrued-confirmed']=model.accruedReviewKey(manualTenor);
-  var confirmedZero=model.prepare('order-trade',s,manualTenor);
-  check('explicit manual zero with tenor keeps its own date',!confirmedZero.errors.length &&
-    confirmedZero.extraValues['extra-security-accrued']==='0' && confirmedZero.metadata.accruedInterest.date==='2026-11-23' &&
-    !('settlementDateISO' in confirmedZero.input));
+  check('earlier entered NKD retains its date',model.prepare('order-trade',s,oldInput).metadata.accruedInterest.date==='2026-11-23');
+  var reviewed=Object.assign({},bondOrder,{'extra-accrued-mode':'manual','extra-accrued-manual':'12.31',
+    'extra-accrued-currency':'RUB','extra-manual-amount':'999,12','extra-manual-currency':'RUB',
+    'extra-amount-mode':'manual','extra-amount-reason':'По договору'});
+  var previous=JSON.parse(model.reviewKey('order-trade',s,reviewed));
+  previous[7]={mode:'manual',value:'12.31',currency:'RUB',date:'2026-11-23',source:'Введено вручную',unit:'per-security',confirmed:true};
+  reviewed.confirmedAgainst=JSON.stringify(previous);
+  var reprint=model.prepare('order-trade',s,reviewed);
+  check('previously approved amount reprints with the original numeric NKD presentation',
+    !reprint.errors.length && reprint.extraValues['extra-security-accrued']==='12,31' && reprint.extraValues['extra-trade-amount']==='999,12');
+  check('changed interest still revokes an older amount confirmation',model.prepare('order-trade',s,
+    Object.assign({},reviewed,{'extra-accrued-manual':'12.31001'})).errors.some(function (e) {return e.key==='order-review';}));
+  ['по договору','','1 2','NaN','1e3','0,1.2','-1'].forEach(function (literal) {
+    var typed=Object.assign({},bondOrder,{'extra-accrued-edited':'yes','extra-accrued-input':literal});
+    var trade=model.tradeCalculation(typed);
+    check('literal or incomplete NKD suppresses calculated amount '+JSON.stringify(literal),
+      !trade.result.value && trade.interest.displayText===literal);
+  });
   var fixtures = CRMInstrumentCatalog.SECURITY_ASSETS, originalSize=fixtures.length;
   try {
     for (var n=0;n<28;n++) {

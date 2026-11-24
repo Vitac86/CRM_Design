@@ -24,3 +24,5 @@ static-uikit/manual-smoke/final-document-review/
 # Focused pack for the manual-review findings — same builder, --only/--out.
 # Local evidence for a reviewer; the PDFs and screenshots are never committed.
 static-uikit/manual-smoke/manual-findings-fix/
+
+/static-uikit/.env.qort.local

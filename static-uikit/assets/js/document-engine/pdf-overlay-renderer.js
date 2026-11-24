@@ -2614,9 +2614,10 @@
       if (id && reference && global.CRMOrderForms.instrumentBranch(input) === 'security') {
         var date = global.CRMOrderForms.settlement(input).settlementDateISO;
         var card = reference.getSecurity(id);
-        if (!card) await reference.loadSecurity(id,date);
-        else if (/^bond-/.test(card.kind) && date && !reference.bondData(id,date)) {
-          try { await reference.loadSecurity(id,date); } catch (error) {
+        if (!card) card = await reference.loadSecurity(id,'');
+        var request = global.CRMOrderForms.bondOptions(card,input);
+        if (/^bond-/.test(card.kind) && date && !reference.bondData(id,date,request)) {
+          try { await reference.loadSecurity(id,date,undefined,request); } catch (error) {
             // A selected asset can still be printed with an explicitly confirmed manual amount.
           }
         }

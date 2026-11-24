@@ -286,13 +286,15 @@
       'extra.extra-manual-words':['extra.extra-move-amount-words','extra.extra-payout-amount-words'],
       'extra.extra-words-mode':['extra.extra-move-amount-words','extra.extra-payout-amount-words'],
       'extra.extra-amount-mode':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
+      'extra.extra-trade-date':['extra.extra-trade-amount'],
+      'extra.extra-price-rate':['extra.extra-trade-amount'],
+      'extra.extra-accrued-rate':['extra.extra-trade-amount'],
+      'extra.extra-manual-currency':['extra.extra-trade-amount'],
       'extra.extra-manual-amount':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
       'extra.selectedRequisiteId':['extra.extra-bank-account','extra.extra-bank-recipient','extra.extra-bank-name'],
       'extra.extra-settlement-date': ['extra.extra-settlement-period'],
-      'extra.extra-accrued-mode': ['extra.extra-security-accrued'],
-      'extra.extra-accrued-manual': ['extra.extra-security-accrued'],
+      'extra.extra-accrued-input': ['extra.extra-security-accrued'],
       'extra.extra-accrued-currency': ['extra.extra-security-accrued'],
-      'extra.extra-accrued-date': ['extra.extra-security-accrued'],
       'extra.extra-order-validity-mode': ['extra.extra-order-validity'],
       'extra.extra-order-validity-date': ['extra.extra-order-validity'],
       'extra.extra-otc-instrument-type': [
@@ -311,11 +313,15 @@
   function orderField(key, label, type, extra) {
     var field = Object.assign({key: key, label: label, type: type}, extra);
     var reasons = {
+      'extra-live-bond':'Показывает доступные параметры живой карточки.',
+      'extra-show-rates':'Показывает валютный пересчёт для выбранной бумаги.',
+      'extra-need-price-rate':'Управляет вводом отсутствующего курса.',
+      'extra-need-accrued-rate':'Управляет вводом второго отсутствующего курса.',
+      'extra-price-rate-key':'Связывает ручной курс с бумагой, датой и валютами.',
+      'extra-accrued-rate-key':'Связывает второй курс с бумагой, датой и валютами.',
+      'extra-rates-summary':'Показывает дату, источник и единицы курса.',
       'extra-is-bond':'Вид выбранного актива управляет доступностью НКД.',
-      'extra-accrued-summary':'Показывает происхождение и дату НКД.',
-      'extra-accrued-confirmed':'Хранит подтверждённые параметры ручного НКД.',
-      'extra-accrued-review':'Подтверждает введённый НКД на выбранную дату.',
-      'extra-accrued-status':'Состояние загрузки датированной карточки.',
+      'extra-accrued-edited':'Сохраняет введённое значение НКД, включая пустую строку.',
       'extra-estimate':'Проверка автоматического расчёта и его спецификации.',
       'extra-discrepancy':'Сравнение ручной суммы с расчётной.',
       'extra-amount-reason':'Сохраняется в записи о ручной корректировке.',
@@ -361,7 +367,7 @@
   var PAYOUT_FIXED = isValue('extra-payout-amount-mode','amount');
 
   var ORDER_BOND = all(ORDER_SECURITY_BRANCH,isValue('extra-is-bond','yes'));
-  var MANUAL_ACCRUED = all(ORDER_BOND,isValue('extra-accrued-mode','manual'));
+  var LIVE_BOND_LIMIT = all(ORDER_SECURITY_LIMIT,isValue('extra-live-bond','yes'));
   var TRADE_DOCUMENT = orderDocument('order-trade','trade','Поручение на совершение сделки',
     'poruchenie-na-sdelku.pdf','Скачать поручение на сделку',[
         {
@@ -490,16 +496,13 @@
           placeholder:'Код валюты, например RUB',showWhen:ORDER_SECURITY_BRANCH
         }),
         orderField('extra-is-bond','Облигация','internal'),
-        orderField('extra-accrued-confirmed','Подтверждение НКД','internal'),
-        orderField('extra-accrued-status','Статус загрузки НКД','internal'),
-        choice('extra-accrued-mode','Источник НКД',[['reference','Получить из справочника'],['manual','Указать вручную']],
-          {defaultValue:'reference',showWhen:ORDER_BOND}),
-        orderField('extra-accrued-manual','НКД на одну бумагу','number',{step:'any',min:0,required:true,showWhen:MANUAL_ACCRUED}),
-        orderField('extra-accrued-currency','Валюта ручного НКД','text',{required:true,showWhen:MANUAL_ACCRUED}),
-        orderField('extra-accrued-date','Дата ручного НКД','date',{required:true,
-          showWhen:all(MANUAL_ACCRUED,{source:'extra.extra-settlement-period',notEquals:'date'})}),
-        orderField('extra-accrued-summary','НКД на дату расчётов','summary',{valueFrom:'accrued',fullWidth:true,showWhen:ORDER_BOND}),
-        orderField('extra-accrued-review','Подтверждаю значение, валюту и дату ручного НКД','review',{showWhen:MANUAL_ACCRUED,fullWidth:true}),
+        orderField('extra-live-bond','Карточка облигации QORT','internal'),
+        orderField('extra-trade-date','Дата сделки для курса ЦБ','date',{showWhen:LIVE_BOND_LIMIT}),
+        orderField('extra-accrued-edited','НКД отредактирован','internal',{defaultValue:'no'}),
+        orderField('extra-accrued-input','НКД на одну бумагу','text',{showWhen:ORDER_BOND}),
+        orderField('extra-accrued-currency','Валюта НКД','text',{
+          showWhen:all(ORDER_BOND,isValue('extra-accrued-edited','yes'))
+        }),
         {
           key: 'extra-repo-ccp',
           label: 'Сделка РЕПО с ЦК',
@@ -591,9 +594,22 @@
       orderField('extra-fx-amount','Сумма сделки в валюте котировки','derived'),
       orderField('extra-derivative-amount','Сумма сделки с ПФИ','derived'),
       orderField('extra-security-accrued','НКД на дату расчётов','derived'),
+      orderField('extra-show-rates','Требуется пересчёт','internal'),
+      orderField('extra-need-price-rate','Требуется ручной курс','internal'),
+      orderField('extra-need-accrued-rate','Требуется второй ручной курс','internal'),
+      orderField('extra-price-rate-key','Дата и валюты ручного курса','internal'),
+      orderField('extra-accrued-rate-key','Дата и валюты второго курса','internal'),
+      orderField('extra-rates-summary','Валютный пересчёт','summary',{valueFrom:'rates',fullWidth:true,
+        showWhen:all(LIVE_BOND_LIMIT,isValue('extra-show-rates','yes'))}),
+      orderField('extra-price-rate','Ручной курс','number',{step:'any',positive:true,
+        showWhen:all(LIVE_BOND_LIMIT,isValue('extra-need-price-rate','yes'))}),
+      orderField('extra-accrued-rate','Ручной курс НКД','number',{step:'any',positive:true,
+        showWhen:all(LIVE_BOND_LIMIT,isValue('extra-need-accrued-rate','yes'))}),
       orderField('extra-estimate','Расчётная сумма сделки','summary',{valueFrom:'estimate',fullWidth:true}),
       orderField('extra-amount-mode','Режим расчёта','internal',{defaultValue:'auto'}),
       orderField('extra-manual-amount','Сумма сделки','number',{positive:true,step:'0.01',required:true,showWhen:ORDER_LIMIT}),
+      orderField('extra-manual-currency','Валюта ручной суммы','text',{placeholder:'Трёхбуквенный код',
+        showWhen:all(ORDER_SECURITY_LIMIT,isValue('extra-amount-mode','manual'))}),
       orderField('extra-discrepancy','Отклонение от автосуммы','readonly',{valueFrom:'discrepancy',emptyHint:'Автосумма недоступна',showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual'))}),
       orderField('extra-amount-reason','Основание ручной суммы или расхождения','text',{required:true,showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual'))}),
       orderField('order-review','Я сверил(а) ручную сумму, спецификацию и основание','review',{showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual')),fullWidth:true})
@@ -2943,8 +2959,8 @@
       message('Загрузка карточки…');
       catalog.load(String(item[catalog.idKey]),'',pending.signal).then(function (detail) {
         if (version === sequence && root.isConnected) commitItem(detail);
-      },function () {
-        if (version === sequence && root.isConnected) message('Не удалось загрузить карточку.',function () { select(item); });
+      },function (error) {
+        if (version === sequence && root.isConnected) message(error.message || 'Не удалось загрузить карточку.',function () { select(item); });
       });
     }
 
@@ -2963,10 +2979,10 @@
           renderMenu();
           search.setAttribute('aria-busy','false');
           if (nextCursor) menuAction('Показать ещё',function () { loadPage(nextCursor); });
-        },function () {
+        },function (error) {
           if (version !== sequence || !root.isConnected) return;
           search.setAttribute('aria-busy','false');
-          message('Справочник недоступен.',function () { results = previous; loadPage(cursor); });
+          message(error.message || 'Справочник недоступен.',function () { results = previous; loadPage(cursor); });
         });
       }
       search.setAttribute('aria-busy','true');
@@ -3276,17 +3292,13 @@
       if (picker) picker.syncFromValue();
       if (field.type === 'readonly' || field.type === 'summary') resolvedControls.push({ field: field, input: input });
       wrap.appendChild(picker ? picker.root : (dateField || input));
-      if (field.key === 'extra-accrued-summary') {
-        var refresh = document.createElement('button');
-        refresh.type = 'button';
-        refresh.className = 'uk-button uk-button-text';
-        refresh.dataset.refreshAccrued = '';
-        refresh.textContent = 'Обновить НКД';
-        refresh.addEventListener('click', function () {
-          savedState.bondLookupKey = null;
-          syncFields();
-        });
-        wrap.appendChild(refresh);
+      if (field.key === 'extra-accrued-input') {
+        var accruedNote = document.createElement('small');
+        accruedNote.id = input.id + '-source';
+        accruedNote.className = 'uk-text-muted';
+        accruedNote.setAttribute('aria-live','polite');
+        input.setAttribute('aria-describedby',accruedNote.id);
+        wrap.appendChild(accruedNote);
       }
       if (doc.orderKind === 'trade' && field.key === 'extra-manual-amount') {
         var reset = document.createElement('button');
@@ -3925,7 +3937,7 @@
     // Collect text/date/select/number/picker values from [data-field-key].
     document.querySelectorAll('#docwiz-extra-fields [data-field-key]').forEach(function (el) {
       var key = el.getAttribute('data-field-key');
-      var val = (el.value || '').trim();
+      var val = key === 'extra-accrued-input' ? el.value : (el.value || '').trim();
       var type = el.getAttribute('data-field-type');
       extraValues[key] = val;
       if (el.disabled) return;

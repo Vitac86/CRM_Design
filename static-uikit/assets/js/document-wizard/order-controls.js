@@ -13,6 +13,10 @@
       var n = el(key);
       if (n) { n.value = value; state.fields[key] = value; }
     }
+    function label(key, caption) {
+      var node = container.querySelector('label[for="docwiz-field-'+key+'"]');
+      if (node && node.textContent !== caption) node.textContent = caption;
+    }
     function options(key, values, preselect) {
       var n = el(key);
       if (!n) return;
@@ -42,6 +46,10 @@
       select.options[0].text = select.options.length === 1 ? 'Нет сохранённых реквизитов в этой валюте' : 'Выберите…';
     }
     if (doc.orderKind === 'trade') {
+      if (changed === 'extra-accrued-input') {
+        set('extra-accrued-edited','yes');
+        v['extra-accrued-edited'] = 'yes';
+      }
       var trade = orders.tradeCalculation(v);
       var instrument = trade.keys && v[trade.keys[0]] || '';
       var changedAsset = !!state.instrument && (instrument !== state.instrument || state.branch !== trade.branch);
@@ -49,58 +57,84 @@
         var oldPrice = {security:'extra-security-price',fx:'extra-fx-rate',derivative:'extra-derivative-premium'}[state.branch];
         if (oldPrice) set(oldPrice,'');
         if (trade.keys) set(trade.keys[2],'');
-        ['extra-manual-amount','extra-amount-reason','extra-accrued-manual','extra-accrued-date',
-          'extra-accrued-currency','extra-accrued-confirmed'].forEach(function (key) { set(key,''); });
-        set('extra-accrued-mode','reference');
+        ['extra-manual-amount','extra-manual-currency','extra-amount-reason'].forEach(function (key) { set(key,''); });
         set('extra-amount-mode','auto');
       }
       if (trade.branch === 'security' && (instrument !== state.instrument || trade.branch !== state.branch)) {
         set('extra-security-currency', trade.spec && trade.spec.currency || '');
-        set('extra-accrued-currency', trade.spec && trade.spec.currency || '');
+        var terms = trade.item && trade.item.instrumentTerms;
+        set('extra-manual-currency', terms ? terms.settlementCurrency : '');
       }
       state.branch = trade.branch;
       state.instrument = instrument;
       set('extra-is-bond', trade.isBond ? 'yes' : 'no');
 
+      var liveBond = trade.isBond && trade.item.source === 'QORT';
+      set('extra-live-bond',liveBond ? 'yes' : 'no');
+      if (changed === 'extra-trade-date') state.tradeDateEdited = true;
+      if (liveBond && !state.tradeDateEdited && state.lastTradeOrderDate !== v['extra-order-date']) {
+        set('extra-trade-date',v['extra-order-date'] || '');
+        state.lastTradeOrderDate = v['extra-order-date'];
+      }
+      v = read();
       var target = orders.settlement(v).settlementDateISO || '';
-      var lookupKey = trade.isBond && target ? instrument+'|'+target : '';
+      var request = orders.bondOptions(trade.item,v);
+      var lookupKey = trade.isBond && target ? JSON.stringify([instrument,target,request]) : '';
       var assetNode = el('extra-security-asset-id');
       if (lookupKey !== state.bondLookupKey || state.bondLookupNode !== assetNode) {
         if (state.bondController) state.bondController.abort();
         state.bondLookupKey = lookupKey;
         state.bondLookupNode = assetNode;
-        set('extra-accrued-status','');
+        state.bondMessage = '';
         if (lookupKey) {
           var controller = new AbortController();
           state.bondController = controller;
-          global.CRMInstrumentCatalog.clearBondData(instrument,target);
-          set('extra-accrued-status','Получение НКД…');
-          var timeout = setTimeout(function () { controller.abort(); },8000);
-          global.CRMInstrumentCatalog.loadSecurity(instrument,target,controller.signal).then(function () {
+          global.CRMInstrumentCatalog.clearBondData(instrument,target,request);
+          state.bondMessage = 'Получение НКД…';
+          var timeout = setTimeout(function () { controller.abort(); },15000);
+          global.CRMInstrumentCatalog.loadSecurity(instrument,target,controller.signal,request).then(function () {
             finish('');
-          },function () { finish('Не удалось получить НКД. Повторите запрос или укажите значение вручную.'); });
+          },function () { finish('Не удалось получить данные QORT. Проверьте подключение или укажите НКД вручную.'); });
           function finish(message) {
             clearTimeout(timeout);
             if (controller !== state.bondController || state.bondLookupKey !== lookupKey || !assetNode.isConnected) return;
-            set('extra-accrued-status',message);
+            state.bondMessage = message;
             assetNode.dispatchEvent(new Event('change',{bubbles:true}));
           }
         }
       }
-      var manualAccrued = trade.isBond && el('extra-accrued-mode').value === 'manual';
-      var refresh = container.querySelector('[data-refresh-accrued]');
-      if (refresh) refresh.hidden = !lookupKey || manualAccrued;
-      var accruedReview = el('extra-accrued-review'), accruedKey = orders.accruedReviewKey(read());
-      if (changed === 'extra-accrued-review') set('extra-accrued-confirmed',accruedReview.checked ? accruedKey : '');
-      if (!manualAccrued || el('extra-accrued-confirmed').value !== accruedKey) set('extra-accrued-confirmed','');
-      accruedReview.checked = !!el('extra-accrued-confirmed').value;
       trade = orders.tradeCalculation(read());
+      var interest = trade.interest;
+      if (interest) {
+        if (!interest.edited) set('extra-accrued-input',interest.displayText);
+        el('extra-accrued-currency').placeholder = interest.currency || 'Код валюты';
+        var note = container.querySelector('#docwiz-field-extra-accrued-input-source');
+        var source = interest.edited ? 'Введено вручную' : state.bondMessage || interest.message || interest.source;
+        note.textContent = [interest.currency,orders.isoToRu(interest.date),source].filter(Boolean).join(' · ');
+      }
+      label('extra-security-price',(trade.isBond ? 'Цена, % от номинала' : 'Цена одной ценной бумаги')+' *');
+      set('extra-show-rates',trade.rates.length ? 'yes' : 'no');
+      var rateBasis = JSON.stringify([instrument,request.tradeDate]);
+      ['extra-price-rate','extra-accrued-rate'].forEach(function (field) {
+        var rate = trade.rates.find(function (r) { return r.field === field; });
+        var open = rate && rate.referenceStatus !== 'official';
+        set(field.replace('extra-','extra-need-'),open ? 'yes' : 'no');
+        if (open) {
+          if (el(field+'-key').value !== rate.key) { set(field,''); set(field+'-key',rate.key); }
+          label(field,'Ручной курс, '+rate.to+' за 1 '+rate.from);
+        } else if (rate || state.rateBasis !== rateBasis) {
+          set(field,''); set(field+'-key','');
+        }
+      });
+      state.rateBasis = rateBasis;
       if (changed === 'extra-manual-amount') set('extra-amount-mode', 'manual');
       var manual = el('extra-amount-mode').value === 'manual';
       if (!manual) {
         set('extra-manual-amount', orders.formatDecimalInput(trade.result.value));
         set('extra-amount-reason', '');
       }
+      var amountCurrency = liveBond && (manual && el('extra-manual-currency').value || trade.item.instrumentTerms.settlementCurrency);
+      label('extra-manual-amount', 'Сумма сделки'+(amountCurrency ? ', '+amountCurrency : '')+' *');
       var reset = container.querySelector('[data-order-reset-amount]');
       if (reset) reset.hidden = !manual || !trade.result.value;
       var manualNote = container.querySelector('[data-order-manual]');

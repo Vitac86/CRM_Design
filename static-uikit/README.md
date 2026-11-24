@@ -360,3 +360,5 @@ Pages `subject-edit-individual.html` and `subject-register.html` include FIAS-as
 - Prototype JavaScript only; not backend or business logic.
 - Tables intentionally use horizontal scroll on mobile.
 - No pages carry redundant direct page CSS links; all page-specific CSS is loaded via `crm-static.css` except for the intentional exceptions listed in "Page-specific CSS" above.
+
+On Windows, `npm run static:uikit:orders:live` opens the same wizard with the read-only QORT reference. [Local setup, verification and manual scenarios](tools/qort/README.md)

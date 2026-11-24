@@ -117,14 +117,19 @@
     '2026-11-25': ['12.34', '12.35']
   };
   global.CRMOrderDemoBondData = function (asset, date) {
-    var levels = asset.assetId === exampleBond && bondExamples[date];
-    var quotes = (levels || []).map(function (value, i) {
-      return { assetId: asset.assetId, date: date, value: value, currency: 'RUB',
-        unit: 'per-security', section: asset.aliases[i].section, source: exampleSource };
-    });
-    var terms = levels && date !== '2026-11-25' ? { date: date, currency: 'RUB', unit: 'per-security',
-      nominal: '1000', formula: 'bond-percent', amountBasis: 'dirty', source: exampleSource } : null;
-    return { quotes: quotes, terms: terms };
+    if (!date || !/^bond-/.test(asset.kind)) return {quotes:[],terms:null};
+    var levels = asset.assetId === exampleBond ? bondExamples[date] : null;
+    var primary = levels && levels[0], otc = levels && levels[1];
+    var section = primary != null ? 1 : otc != null ? 101 : null;
+    var value = primary ?? otc ?? '0';
+    var currency = asset.calculation && asset.calculation.currency || (asset.assetId === exampleBond ? 'RUB' : '');
+    var quote = {assetId:asset.assetId,date:date,value:value,currency:currency,unit:'per-security',
+      section:section === 1 ? 'МБ ФР: T+' : section === 101 ? 'МБ ФР: OTC: Облигации с ЦК' : '',
+      sourceSectionId:section,sourceStatus:section === 1 ? 'PRIMARY_TPLUS' : section === 101 ? 'FALLBACK_OTC_101' : 'DEFAULT_ZERO',
+      source:exampleSource + (section ? ' · секция '+section : ' · нет НКД в секциях 1 и 101')};
+    var terms = levels ? {date:date,currency:'RUB',unit:'per-security',nominal:'1000',
+      formula:'bond-percent',amountBasis:'dirty',source:exampleSource} : null;
+    return {quotes:[quote],terms:terms};
   };
 
 }(typeof window !== 'undefined' ? window : this));

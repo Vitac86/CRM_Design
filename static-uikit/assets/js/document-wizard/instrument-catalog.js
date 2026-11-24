@@ -24,6 +24,15 @@
     'share-preferred': 'Акции привилегированные',
     'bond-corporate': 'Корпоративные облигации',
     'bond-government': 'Облигации федерального займа',
+    'bond-regional': 'Облигации субъектов РФ',
+    'bond-municipal': 'Муниципальные облигации',
+    'bond-euro': 'Еврооблигации',
+    'bond-central-bank': 'Облигации Банка России',
+    'bond-foreign': 'Иностранные облигации',
+    'bond-other': 'Облигации',
+    'share-foreign': 'Иностранные акции',
+    'share-other': 'Акции',
+    'security-other': 'Ценные бумаги',
     'fund-unit': 'Паи',
     'depositary-receipt': 'Депозитарные расписки'
   };
@@ -183,6 +192,7 @@
   // and a bounded search cache. An HTTP failure must never substitute a demo quotation.
   var apiMeta = global.document && global.document.querySelector('meta[name="crm-order-reference-api"]');
   var apiBase = apiMeta && apiMeta.content.replace(/\/$/, '');
+  var liveQort = apiMeta && apiMeta.dataset && apiMeta.dataset.mode === 'qort';
   var searchCache = new Map(), selectedCards = new Map(), bondCache = new Map();
 
   async function request(path, parameters, signal) {
@@ -194,10 +204,13 @@
     function abort() { controller.abort(); }
     if (signal && signal.aborted) abort();
     if (signal) signal.addEventListener('abort',abort,{once:true});
-    var timeout = setTimeout(abort,8000);
+    var timeout = setTimeout(abort,15000);
     try {
       var response = await fetch(url, {signal:controller.signal,credentials:'same-origin',headers:{Accept:'application/json'}});
-      if (!response.ok) throw new Error('Справочник недоступен (HTTP ' + response.status + ').');
+      if (!response.ok) {
+        var failure = await response.json().catch(function () { return {}; });
+        throw new Error(failure.error || ('Справочник недоступен (HTTP ' + response.status + ').'));
+      }
       return await response.json();
     } finally {
       clearTimeout(timeout);
@@ -222,20 +235,24 @@
     return page;
   }
 
-  async function loadSecurity(id, date, signal) {
-    var detail = apiBase ? await request('/'+encodeURIComponent(id), {settlementDate:date}, signal) : mockDetail(id,date);
+  function bondKey(id,date,options) {
+    var o = options || {};
+    return JSON.stringify([id,date,o.tradeDate || '',o.quotation || '',o.accruedCurrency || '']);
+  }
+  async function loadSecurity(id, date, signal, options) {
+    var detail = apiBase ? await request('/'+encodeURIComponent(id), Object.assign({settlementDate:date}, options), signal) : mockDetail(id,date);
     if (!detail || !detail.asset || detail.asset.assetId !== id) throw new Error('Карточка бумаги не найдена.');
     if (signal && signal.aborted) throw new DOMException('Отменено','AbortError');
     remember(selectedCards,id,detail.asset,32);
-    if (date) remember(bondCache,id+'|'+date,detail.bondData || {quotes:[],terms:null},64);
+    if (date) remember(bondCache,bondKey(id,date,options),detail.bondData || {quotes:[],terms:null},64);
     return detail.asset;
   }
 
-  function bondData(id,date) {
+  function bondData(id,date,options) {
     if (!date) return null;
-    return bondCache.get(id+'|'+date) || (!apiBase && mockDetail(id,date) || {}).bondData || null;
+    return bondCache.get(bondKey(id,date,options)) || (!apiBase && mockDetail(id,date) || {}).bondData || null;
   }
-  function clearBondData(id,date) { bondCache.delete(id+'|'+date); }
+  function clearBondData(id,date,options) { bondCache.delete(bondKey(id,date,options)); }
 
   function rankSimple(haystacks, query) {
     for (var i = 0; i < haystacks.length; i += 1) {
@@ -350,14 +367,26 @@
   // and this file stays a data source.
   function summarizeSecurity(asset) {
     if (!asset) return [];
-    return [
+    var terms = asset.instrumentTerms;
+    var rows = [
       { label: 'Наименование', value: asset.displayName },
       { label: 'Торговый код', value: primaryCode(asset) },
       { label: 'ISIN', value: asset.isin },
-      { label: 'Эмитент', value: asset.issuerName },
+      { label: 'Эмитент', value: asset.issuerShortName && asset.issuerShortName !== asset.issuerName
+        ? asset.issuerShortName + ' (' + asset.issuerName + ')' : asset.issuerName },
       { label: 'Вид ценной бумаги', value: securityKindLabel(asset) },
       { label: 'Для печати в поручении', value: describeSecurity(asset) }
-    ].filter(function (row) { return !!row.value; });
+    ];
+    if (terms) {
+      if (asset.kind.indexOf('bond-') === 0) {
+        rows.push({label:'Текущий номинал',value:[terms.currentNominal.replace('.',','),terms.nominalCurrency].filter(Boolean).join(' ')});
+      }
+      rows.push({label:'Котировка в QORT',value:terms.quotation === 'percent' ? 'В процентах от номинала' :
+        terms.quotation === 'cash' ? 'В деньгах за бумагу' : ''},
+        {label:'Валюта цены',value:terms.quoteCurrency}, {label:'Валюта расчётов',value:terms.settlementCurrency},
+        {label:'Источник',value:'QORT · ' + asset.asOfDate});
+    }
+    return rows.filter(function (row) { return !!row.value; });
   }
 
   function summarizeFxInstrument(item) {
@@ -372,6 +401,7 @@
   function summarizeDerivative(item) {
     if (!item) return [];
     return [
+      { label: 'Источник', value: liveQort ? 'Учебный справочник ПФИ' : '' },
       { label: 'Вид инструмента', value: derivativeKindLabel(item) },
       { label: 'Наименование', value: item.name },
       { label: 'Код контракта', value: item.code },

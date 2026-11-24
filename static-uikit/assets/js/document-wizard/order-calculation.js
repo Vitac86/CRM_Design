@@ -16,6 +16,75 @@
   function unavailable(reason, invalid) {
     return { mode: 'unavailable', value: '', reason: reason, invalid: !!invalid };
   }
+  function added(a,b) { return {n:a.n*b.d + b.n*a.d, d:a.d*b.d}; }
+  function roundedValue(amount, digits) {
+    var rounded = (2n * amount.n * 10n**BigInt(digits) + amount.d) / (2n * amount.d);
+    var s = rounded.toString().padStart(digits+1,'0');
+    return digits ? s.slice(0,-digits) + '.' + s.slice(-digits) : s;
+  }
+
+  function roundCurrency(value, currency) {
+    var amount = decimal(value);
+    if (!amount || !/^[A-Z]{3}$/.test(currency)) return String(value ?? '');
+    var digits = new Intl.NumberFormat('ru', {style:'currency',currency:currency}).resolvedOptions().maximumFractionDigits;
+    return roundedValue(amount,digits);
+  }
+
+  function converted(amount, from, to, spec) {
+    if (from === to || amount.n === 0n) return amount;
+    var rate = (spec.rates || []).find(function (r) {
+      return r.from === from && r.to === to && r.date === spec.tradeDate && ['official','manual'].includes(r.status);
+    });
+    if (!rate || !rate.legs.length) return null;
+    var currency = from;
+    for (var leg of rate.legs) {
+      var price = decimal(leg.rate), units = decimal(leg.units);
+      if (!price || !price.n || !units || !units.n) return null;
+      var factor = {n:price.n*units.d, d:price.d*units.n};
+      if (leg.from === currency) currency = leg.to;
+      else if (leg.to === currency) {
+        currency = leg.from;
+        factor = {n:factor.d,d:factor.n};
+      } else return null;
+      amount = multiplied(amount,factor);
+    }
+    return currency === to ? amount : null;
+  }
+
+  function bondAmount(spec,q,p) {
+    if (!['clean','dirty','quoted'].includes(spec.amountBasis))
+      return unavailable('Не определены правила учёта НКД.');
+    var principal = multiplied(q,p), nominal = decimal(spec.nominal);
+    var percent = spec.formula === 'bond-percent';
+    if (percent) {
+      if (!nominal || !nominal.n) return unavailable('Не определён номинал на дату расчётов.');
+      principal = multiplied(principal, nominal);
+      principal.d *= 100n;
+    }
+    var base = percent ? spec.nominalCurrency || spec.currency : spec.currency;
+    var pay = spec.settlementCurrency || spec.currency, accruedCurrency = spec.accruedCurrency || base;
+    var addAccrued = spec.amountBasis === 'dirty' && !spec.quoteIncludesAccrued;
+    var interest = {n:0n,d:1n};
+    if (addAccrued) {
+      var perBond = decimal(spec.accrued);
+      if (!perBond || !spec.accruedFor || spec.accruedFor !== spec.settlementDate)
+        return unavailable('Нет НКД на дату расчётов.');
+      interest = multiplied(q,perBond);
+    }
+    var baseDigits = (percent ? spec.nominalDigits : spec.minorDigits) ?? spec.minorDigits;
+    var interestDigits = accruedCurrency === base ? baseDigits :
+      new Intl.NumberFormat('ru',{style:'currency',currency:accruedCurrency}).resolvedOptions().maximumFractionDigits;
+    var components = {price:roundedValue(principal,baseDigits),priceCurrency:base,
+      includesAccrued:!!spec.quoteIncludesAccrued,interest:addAccrued ? roundedValue(interest,interestDigits) : '',
+      accruedCurrency:accruedCurrency,subtotalCurrency:base,
+      subtotal:base === accruedCurrency || !interest.n ? roundedValue(added(principal,interest),baseDigits) : ''};
+    var cleanPay = converted(principal,base,pay,spec), accruedPay = converted(interest,accruedCurrency,pay,spec);
+    if (!cleanPay || !accruedPay) return Object.assign(unavailable('Для пересчёта нужен курс на дату сделки.'),{components:components});
+    var value = roundedValue(added(cleanPay,accruedPay),spec.settlementDigits ?? spec.minorDigits);
+    if (!/[1-9]/.test(value)) return unavailable('После округления сумма равна нулю.',true);
+    return {mode:'auto',value:value,currency:pay,components:components,source:spec.source};
+  }
+
   function calculate(spec, quantity, price) {
     if (!spec || !spec.source || !spec.currency || spec.rounding !== 'half-up' ||
         !Number.isInteger(spec.minorDigits) || spec.minorDigits < 0 || spec.minorDigits > 6) {
@@ -25,26 +94,22 @@
     if (!q || !p || !q.n || !p.n) return unavailable('Введите положительные количество и лимитную цену.', true);
     var qs = decimal(spec.quantityStep), ps = decimal(spec.priceStep);
     if (!qs || !ps || !qs.n || !ps.n) return unavailable('Не определён шаг количества или цены.');
-    if (!multiple(q, qs) || !multiple(p, ps)) return unavailable('Количество или цена не соответствуют шагу инструмента.', true);
+    var stepPrice = p;
+    if (spec.nativeQuotation && ((spec.formula === 'bond-percent' && spec.nativeQuotation === 'cash') ||
+        (spec.formula === 'bond-cash' && spec.nativeQuotation === 'percent'))) {
+      var nominal = decimal(spec.nominal);
+      if (!nominal || !nominal.n || spec.nominalCurrency !== spec.currency)
+        return unavailable('Не подтверждён пересчёт шага цены между способами котирования.');
+      stepPrice = multiplied(p,spec.nativeQuotation === 'cash'
+        ? {n:nominal.n,d:100n*nominal.d} : {n:100n*nominal.d,d:nominal.n});
+    }
+    if (!multiple(q, qs) || !multiple(stepPrice, ps)) return unavailable('Количество или цена не соответствуют шагу инструмента.', true);
     var result = multiplied(q, p);
     var formula = quantity + ' × ' + price;
     if (spec.formula === 'unit' && spec.quantityUnit === 'pieces') {
       // Price per security and quantity in individual securities.
-    } else if (spec.formula === 'bond-percent' && spec.quantityUnit === 'pieces') {
-      var nominal = decimal(spec.nominal);
-      if (!nominal || !nominal.n || !['clean', 'dirty'].includes(spec.amountBasis))
-        return unavailable('Не определены номинал или правила учёта НКД.');
-      result = multiplied(result, nominal);
-      result.d *= 100n;
-      formula += ' × ' + spec.nominal + ' / 100';
-      if (spec.amountBasis === 'dirty') {
-        var accrued = decimal(spec.accrued);
-        if (!accrued || !spec.accruedFor || spec.accruedFor !== spec.settlementDate)
-          return unavailable('Нет НКД на дату расчётов.');
-        var interest = multiplied(q, accrued);
-        result = { n: result.n * interest.d + interest.n * result.d, d: result.d * interest.d };
-        formula += ' + ' + quantity + ' × ' + spec.accrued;
-      }
+    } else if (['bond-percent','bond-cash'].includes(spec.formula) && spec.quantityUnit === 'pieces') {
+      return bondAmount(spec,q,p);
     } else if (spec.formula === 'fx' && spec.quantityUnit === 'lots') {
       var lot = decimal(spec.lotSize), scale = decimal(spec.quoteScale);
       if (!lot || !scale || !lot.n || !scale.n) return unavailable('Не определены размер лота или масштаб котировки.');
@@ -58,13 +123,10 @@
     } else {
       return unavailable('Формула денежной суммы для этой спецификации не подтверждена.');
     }
-    var scale10 = 10n ** BigInt(spec.minorDigits);
-    var rounded = (2n * result.n * scale10 + result.d) / (2n * result.d);
-    if (!rounded) return unavailable('После округления сумма равна нулю.', true);
-    var digits = rounded.toString().padStart(spec.minorDigits + 1, '0');
-    var value = spec.minorDigits ? digits.slice(0, -spec.minorDigits) + '.' + digits.slice(-spec.minorDigits) : digits;
+    var value = roundedValue(result,spec.minorDigits);
+    if (!/[1-9]/.test(value)) return unavailable('После округления сумма равна нулю.', true);
     return { mode: 'auto', value: value, currency: spec.currency, formula: formula, source: spec.source };
   }
 
-  global.CRMOrderCalculation = { calculate: calculate, decimal: decimal, unavailable: unavailable };
+  global.CRMOrderCalculation = { calculate: calculate, decimal: decimal, roundCurrency:roundCurrency, unavailable: unavailable };
 }(typeof window !== 'undefined' ? window : this));

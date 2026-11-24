@@ -6,7 +6,7 @@
     "fields": 659,
     "registryDocuments": 24,
     "overlayBindings": 20,
-    "wizardKeys": 359,
+    "wizardKeys": 354,
     "checkKeys": 58,
     "formatterNames": 13
   },
@@ -3985,42 +3985,17 @@
     {
       "documentId": "order-trade",
       "group": "fields",
-      "key": "extra-accrued-confirmed"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
       "key": "extra-accrued-currency"
     },
     {
       "documentId": "order-trade",
       "group": "fields",
-      "key": "extra-accrued-date"
+      "key": "extra-accrued-edited"
     },
     {
       "documentId": "order-trade",
       "group": "fields",
-      "key": "extra-accrued-manual"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "extra-accrued-mode"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "extra-accrued-review"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "extra-accrued-status"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "extra-accrued-summary"
+      "key": "extra-accrued-input"
     },
     {
       "documentId": "order-trade",

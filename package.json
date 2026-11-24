@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.app.json && vite build",
     "preview": "vite preview",
     "static:uikit:orders": "node static-uikit/tools/order-reference-server.mjs",
+    "static:uikit:orders:live": "node static-uikit/tools/order-reference-server.mjs --live",
     "static:uikit:bundle": "node static-uikit/tools/build-css-bundle.mjs",
     "static:uikit:bundle:check": "node static-uikit/tools/build-css-bundle.mjs --check",
     "static:uikit:validate": "node static-uikit/tools/validate-static-uikit.mjs"
@@ -18,6 +19,7 @@
     "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
+    "@types/node": "^22.20.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
@@ -26,5 +28,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "vite": "^5.4.19"
+  },
+  "optionalDependencies": {
+    "msnodesqlv8": "6.2.2"
   }
 }

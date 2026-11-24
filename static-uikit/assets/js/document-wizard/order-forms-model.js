@@ -333,49 +333,80 @@
     return s.settlementMode === 'date' ? (calendarDate(s.settlementDateISO) ? isoToRu(s.settlementDateISO) : '') : s.settlementTenor;
   }
 
-  function accruedReviewKey(v) {
-    var s = settlement(v);
-    return JSON.stringify([v['extra-security-asset-id'], s, v['extra-order-date'] || '',
-      s.settlementMode === 'date' ? '' : v['extra-accrued-date'], text(v['extra-accrued-manual']),
-      text(v['extra-accrued-currency']).toUpperCase(), text(v['extra-security-currency']).toUpperCase()]);
+  function referenceInterest(asset, data, target) {
+    function missing(message) { return {value:'',displayText:'',date:target || '',message:message}; }
+    if (!calendarDate(target)) return missing('Для НКД из справочника выберите конкретную дату расчётов.');
+    var rows = (data && data.quotes || []).filter(function (r) { return r.assetId === asset.assetId && r.date === target; });
+    if (!rows.length) return missing('На выбранную дату нет данных НКД.');
+    var first = rows[0];
+    if (rows.some(function (r) { return !global.CRMOrderCalculation.decimal(r.value) || !r.source ||
+        r.unit !== 'per-security' || formatAmount(r.value) !== formatAmount(first.value) || r.currency !== first.currency; }))
+      return missing('Источник не подтвердил однозначное значение НКД на эту дату.');
+    var display = first.displayValue ?? global.CRMOrderCalculation.roundCurrency(first.value,first.currency);
+    return {value:String(first.value),displayText:formatDecimalInput(display),rawValue:first.rawValue,
+      sourceStatus:first.sourceStatus,sourceSectionId:first.sourceSectionId,sourceTable:first.sourceTable,
+      observationDate:first.observationDate,currency:first.currency || '',date:target,unit:first.unit,source:first.source,
+      message:!first.currency && first.sourceStatus !== 'DEFAULT_ZERO' ? 'Валюта НКД не подтверждена.' : ''};
   }
 
   function accruedInterest(asset, v, data, target) {
-    var manual = v['extra-accrued-mode'] === 'manual';
-    function missing(message) { return {mode:manual?'manual':'reference', value:'', message:message}; }
-    if (manual) {
-      var amount = text(v['extra-accrued-manual']), currency = text(v['extra-accrued-currency']).toUpperCase();
-      var date = target || v['extra-accrued-date'];
-      if (!global.CRMOrderCalculation.decimal(amount)) return missing('Введите НКД от нуля и выше.');
-      if (!calendarDate(date)) return missing('Укажите дату ручного НКД.');
-      if (!/^[A-Z]{3}$/.test(currency)) return missing('Укажите валюту НКД трёхбуквенным кодом.');
-      return {mode:'manual', value:amount.replace(',','.'), currency:currency, date:date,
-        source:'Введено вручную', unit:'per-security', confirmed:v['extra-accrued-confirmed'] === accruedReviewKey(v)};
-    }
-    if (!calendarDate(target)) return missing('Для автоматического НКД нужна конкретная дата расчётов. Календарь T+N не подключён.');
-    var rows = (data && data.quotes || []).filter(function (r) { return r.assetId === asset.assetId && r.date === target; });
-    if (!rows.length) return missing('На выбранную дату НКД в справочнике отсутствует.');
-    var first = rows[0];
-    if (rows.some(function (r) { return !global.CRMOrderCalculation.decimal(r.value) || !r.source ||
-      !/^[A-Z]{3}$/.test(r.currency) || r.unit !== 'per-security'; }))
-      return missing('Источник не подтвердил значение, валюту или единицу НКД.');
-    if (rows.some(function (r) { return formatAmount(r.value) !== formatAmount(first.value) || r.currency !== first.currency; }))
-      return missing('Значения НКД в секциях расходятся: ' + rows.map(function (r) { return r.section+' — '+formatAmount(r.value)+' '+r.currency; }).join(', ') + '. Уточните значение или введите его вручную.');
-    return {mode:'reference', value:String(first.value), currency:first.currency, date:target, unit:first.unit,
-      source:Array.from(new Set(rows.map(function (r) { return r.source; }))).sort().join(', '),
-      sections:Array.from(new Set(rows.map(function (r) { return r.section; }))).sort(), confirmed:true};
+    var reference = referenceInterest(asset,data,target);
+    var legacy = v['extra-accrued-mode'] === 'manual' && v['extra-accrued-edited'] == null;
+    if (!legacy && v['extra-accrued-edited'] !== 'yes') return reference;
+    var input = String((legacy ? v['extra-accrued-manual'] : v['extra-accrued-input']) ?? '');
+    var number = input.trim();
+    var valid = /^(?:\d+|\d{1,3}(?:[ \u00a0\u202f]\d{3})+)(?:[,.]\d+)?$/.test(number) &&
+      global.CRMOrderCalculation.decimal(number);
+    var currency = text(v['extra-accrued-currency']).toUpperCase() || reference.currency ||
+      (!data?.quotes?.length ? asset.instrumentTerms?.nominalCurrency || asset.calculation?.currency : '');
+    return {edited:true,displayText:legacy && valid ? formatAmount(input) : input,value:valid ? number.replace(/\s/g,'').replace(',','.') : '',
+      currency:currency || '',date:target || (legacy && v['extra-accrued-date']) || '',unit:'per-security',source:'Введено вручную'};
   }
 
-  function datedBondSpec(base, data, target, interest) {
+  function bondOptions(asset,v) {
+    if (!asset || asset.source !== 'QORT') return {};
+    var tradeDate = text(v['extra-trade-date'] ?? v['extra-order-date']);
+    // Previously prepared orders retain their explicit price convention when printed again.
+    var oldMode = v['extra-quotation-mode'], terms = asset.instrumentTerms || {};
+    var quotation = oldMode === 'cash' || oldMode === 'reference' && terms.quotation === 'cash' ? 'cash' : 'percent';
+    var principal = quotation === 'percent' ? terms.nominalCurrency : terms.quoteCurrency;
+    var ccy = text(v['extra-accrued-currency']).toUpperCase();
+    return {tradeDate:calendarDate(tradeDate) ? tradeDate : '',quotation:quotation,
+      accruedCurrency:ccy !== principal && /^[A-Z]{3}$/.test(ccy) ? ccy : ''};
+  }
+
+  function paymentRates(asset,data,options,v,interest) {
+    var exchange = data && data.exchange;
+    if (!exchange || exchange.date !== options.tradeDate) return [];
+    var terms = data.terms || asset.instrumentTerms;
+    var percent = data.terms ? data.terms.formula === 'bond-percent' : (options.quotation || terms.quotation) === 'percent';
+    var principal = percent ? terms.nominalCurrency : asset.instrumentTerms.quoteCurrency;
+    var amount = interest && global.CRMOrderCalculation.decimal(interest.value);
+    var currencies = [principal];
+    if (!terms.quoteIncludesAccrued && amount && amount.n !== 0n) currencies.push(interest.currency);
+    return exchange.rates.filter(function (r) { return currencies.includes(r.from); }).map(function (rate,index) {
+      var key = JSON.stringify([asset.assetId,rate.date,rate.from,rate.to]);
+      var field = index ? 'extra-accrued-rate' : 'extra-price-rate';
+      var manual = text(v[field]);
+      var used = rate.status !== 'official' && v[field+'-key'] === key && global.CRMOrderCalculation.decimal(manual);
+      var info = {field:field,key:key,referenceStatus:rate.status};
+      if (used && used.n > 0n) return Object.assign({},rate,info,{status:'manual',source:'Введено вручную',
+        legs:[{from:rate.from,to:rate.to,units:'1',rate:manual.replace(',','.')}]});
+      return Object.assign({},rate,info);
+    });
+  }
+
+  function datedBondSpec(base, data, target, interest, options, rates) {
     var terms = data && data.terms;
     if (!terms || terms.date !== target || !terms.source || !base || terms.currency !== base.currency ||
         terms.unit !== 'per-security') return null;
-    if (terms.formula === 'unit' && !['quoted','clean'].includes(terms.amountBasis)) return null;
-    var spec = Object.assign({},base,{source:terms.source,formula:terms.formula,amountBasis:terms.amountBasis,
-      nominal:terms.nominal,settlementDate:target});
-    if (interest && interest.value !== '' && interest.currency === terms.currency && interest.date === target &&
+    var formula = options.quotation === 'cash' ? 'bond-cash' : 'bond-percent';
+    if (terms.formula !== formula) return null;
+    var spec = Object.assign({},base,terms,{settlementDate:target,tradeDate:options.tradeDate,rates:rates});
+    if (interest && interest.value !== '' && (interest.currency === terms.currency || terms.settlementCurrency && (/^[A-Z]{3}$/.test(interest.currency) || interest.value === '0')) && interest.date === target &&
         interest.unit === 'per-security') {
       spec.accrued = interest.value;
+      spec.accruedCurrency = interest.currency;
       spec.accruedFor = target;
     }
     return spec;
@@ -388,9 +419,11 @@
     var spec = item && item.calculation;
     var isBond = !!(branch === 'security' && item && /^bond-/.test(item.kind));
     var target = settlement(v).settlementDateISO;
-    var data = isBond && catalog().bondData(item.assetId,target);
+    var options = isBond ? bondOptions(item,v) : {};
+    var data = isBond && catalog().bondData(item.assetId,target,options);
     var interest = isBond ? accruedInterest(item,v,data,target) : null;
-    var dated = isBond ? datedBondSpec(spec,data,target,interest) : spec;
+    var rates = isBond ? paymentRates(item,data,options,v,interest) : [];
+    var dated = isBond ? datedBondSpec(spec,data,target,interest,options,rates) : spec;
     var priceCurrency = branch === 'security' && v['extra-security-currency'] != null
       ? text(v['extra-security-currency']).toUpperCase() : (spec && spec.currency || '');
     var math = global.CRMOrderCalculation;
@@ -400,24 +433,53 @@
       result = math.unavailable('Для РЕПО и СВОП нужны условия обеих частей.');
     else if (v['extra-trade-kind'] === 'other') result = math.unavailable('Для иного вида сделки требуется подтверждённая сумма.');
     else if (!keys || !item) result = math.unavailable('Выберите инструмент из справочника.');
+    else if (spec && spec.market && spec.market !== v['extra-order-market'])
+      result = math.unavailable('Для выбранного рынка нет подтверждённой спецификации расчёта.');
     else if (branch === 'security' && spec && priceCurrency !== spec.currency)
       result = math.unavailable('Для выбранной валюты цены отсутствует спецификация расчёта.');
-    else if (isBond && !dated) result = math.unavailable('Нет подтверждённых единиц котировки и спецификации облигации на дату расчётов.');
-    else result = math.calculate(dated, v[keys[1]], v[keys[2]]);
+    else if (options.tradeDate && target && options.tradeDate > target)
+      result = math.unavailable('Дата сделки должна быть не позже даты расчётов.');
+    else if (isBond && !dated) result = math.unavailable(data && data.reason || 'Нет подтверждённых единиц котировки и спецификации облигации на дату расчётов.');
+    else {
+      result = math.calculate(dated, v[keys[1]], v[keys[2]]);
+      if (isBond && interest.edited && !interest.value && !result.invalid)
+        result = math.unavailable('Для автоматического расчёта нужен числовой НКД. Сумму можно указать вручную.');
+    }
     return {branch:branch, keys:keys, item:item, spec:dated || spec, result:result, currency:priceCurrency,
-      isBond:isBond, quotation:dated && dated.formula, interest:interest};
+      isBond:isBond, quotation:isBond ? (options.quotation === 'cash' ? 'bond-cash' : 'bond-percent') : null,
+      interest:interest,rates:rates,options:options};
   }
 
   function reviewKey(id, s, v) {
     if (id === 'order-trade') {
       var trade = tradeCalculation(v), keys = trade.keys || [];
       return JSON.stringify([id, s.id, v['extra-trade-kind'], v['extra-order-market'], v['extra-order-kind'],
-        settlement(v), trade.interest, v[keys[0]], v[keys[1]], v[keys[2]], trade.branch === 'security' ? text(v['extra-repo-ccp']) : trade.branch === 'fx' ? text(v['extra-fx-swap-ccp']) : '',
-        trade.currency, trade.result.value, trade.spec || null, v['extra-amount-mode'], v['extra-manual-amount'], v['extra-amount-reason']]);
+        settlement(v), trade.options, trade.interest, v[keys[0]], v[keys[1]], v[keys[2]], trade.branch === 'security' ? text(v['extra-repo-ccp']) : trade.branch === 'fx' ? text(v['extra-fx-swap-ccp']) : '',
+        trade.currency, v['extra-manual-currency'] || '', trade.result.value, trade.spec || null, v['extra-amount-mode'], v['extra-manual-amount'], v['extra-amount-reason']]);
     }
     var p = id === 'order-venue-transfer' ? 'extra-move-' : 'extra-payout-';
     return JSON.stringify([id, s.id, v[p + 'amount-mode'] || '', formatMoney(v[p+'amount']), v[p+'currency'],
       v['extra-words-mode'], v['extra-manual-words']]);
+  }
+
+  // Earlier confirmed orders stored the reference and its display metadata together.
+  // Migrate only the shape of that snapshot. The inputs, source, full-precision amount
+  // and calculation specification must still match before accepting the old confirmation.
+  function matchesEarlierBondReview(saved, current, v) {
+    if (!['manual','reference'].includes(v['extra-accrued-mode']) || v['extra-accrued-edited'] != null || !saved) return false;
+    var before;
+    try { before = JSON.parse(saved); } catch (_) { return false; }
+    var now = JSON.parse(current);
+    if (!Array.isArray(before) || before.length !== now.length || before[0] !== 'order-trade' || now[0] !== 'order-trade') return false;
+    var oldInterest = before[7], interest = now[7];
+    if (!oldInterest || !interest || !oldInterest.confirmed || oldInterest.mode !== v['extra-accrued-mode'] ||
+        (oldInterest.mode === 'manual') !== !!interest.edited) return false;
+    var fields = ['value','currency','date','unit','source','rawValue','sourceStatus','sourceSectionId','sourceTable','observationDate'];
+    if (!fields.every(function (name) { return oldInterest[name] === interest[name]; })) return false;
+    before[7] = interest;
+    if (before[6] && now[6] && before[6].quotation === '' && (!v['extra-quotation-mode'] || v['extra-quotation-mode'] === 'reference'))
+      before[6].quotation = now[6].quotation;
+    return JSON.stringify(before) === current;
   }
 
   function difference(manual, calculated) {
@@ -435,6 +497,37 @@
     return parts.join(',');
   }
 
+  function estimateText(trade) {
+    if (!trade) return '';
+    var result = trade.result, components = result.components;
+    if (trade.item && trade.item.source === 'QORT' && trade.isBond && components) {
+      var pieces = [(components.includesAccrued ? 'Стоимость с НКД ' : 'Чистая стоимость ') +
+        formatDecimalInput(components.price,true) + ' ' + components.priceCurrency];
+      if (components.interest) pieces.push('НКД ' + formatDecimalInput(components.interest,true) + ' ' + components.accruedCurrency);
+      var detail = pieces.join(' + ');
+      if (components.subtotal && trade.rates.length) detail += ' = ' + formatDecimalInput(components.subtotal,true) + ' ' + components.subtotalCurrency;
+      if (result.value && trade.rates.length) {
+        var manual = trade.rates.filter(function (r) { return r.status === 'manual'; }).length;
+        detail += manual === 0 ? ' → по курсу ЦБ' : manual === trade.rates.length ? ' → по ручному курсу' : ' → по официальному и ручному курсам';
+      }
+      return (result.value ? formatDecimalInput(result.value,true)+' '+result.currency : result.reason) + ' · ' + detail;
+    }
+    return result.value ? formatDecimalInput(result.value,true) + ' ' + result.currency +
+      (trade.isBond && trade.spec.source ? ' · '+trade.spec.source : '') : 'Недостаточно данных для расчёта. '+result.reason;
+  }
+
+  function rateText(trade) {
+    if (!trade) return '';
+    return trade.rates.map(function (rate) {
+      var day = isoToRu(rate.date);
+      if (rate.status === 'missing') return 'На '+day+' нет курса ЦБ для '+rate.from+' → '+rate.to+'.';
+      if (rate.status === 'ambiguous') return 'Значения курса ЦБ на '+day+' для '+rate.from+' → '+rate.to+' расходятся.';
+      if (rate.status === 'error') return 'Не удалось прочитать курс ЦБ на '+day+' для '+rate.from+' → '+rate.to+'.';
+      return (rate.status === 'manual' ? 'Ручной курс' : 'Курс ЦБ') + ' на ' + day + ' · ' +
+        rate.legs.map(function (leg) { return leg.units+' '+leg.from+' = '+formatAmount(leg.rate)+' '+leg.to; }).join(' · ');
+    }).join(' / ');
+  }
+
   function context(id, subject, values) {
     var v = values, key = id === 'order-venue-transfer' ? 'extra-move-' : 'extra-payout-';
     var trade = id === 'order-trade' ? tradeCalculation(v) : null;
@@ -442,10 +535,8 @@
     return {
       identity: identity(subject), requisites: requisiteFields(payoutRequisite(subject, v)),
       words: v[key + 'amount'] && CURRENCIES[v[key+'currency']] ? amountInWords(v[key+'amount'], v[key+'currency']) : '',
-      discrepancy: info ? difference(v['extra-manual-amount'],info.value) : '',
-      accrued: trade && trade.interest ? (trade.interest.mode !== 'manual' && v['extra-accrued-status']) || trade.interest.message || (formatAmount(trade.interest.value) + ' ' + trade.interest.currency + '/бумагу · ' + isoToRu(trade.interest.date) + ' · ' + trade.interest.source) : '',
-      estimate: info ? info.value ? formatDecimalInput(info.value, true) + ' ' + info.currency +
-        (trade.isBond && trade.spec.source ? ' · '+trade.spec.source : '') : 'Недостаточно данных для расчёта. '+info.reason : ''
+      discrepancy: info && (!v['extra-manual-currency'] || text(v['extra-manual-currency']).toUpperCase() === info.currency) ? difference(v['extra-manual-amount'],info.value) : '',
+      estimate:estimateText(trade), rates:rateText(trade)
     };
   }
 
@@ -474,9 +565,10 @@
     function safeText(s) { return !!text(s) && !/[<>\u0000-\u001f\u007f]/.test(s); }
     function confirm() {
       var against = reviewKey(id, subject, v);
-      if (v.confirmedAgainst !== against) issue('order-review', 'Проверьте и подтвердите ручную редакцию для текущих значений.');
-      metadata.lastValidatedAgainst = v.confirmedAgainst === against ? against : null;
-      keep(['confirmedAgainst']);
+      var approved = v.confirmedAgainst === against || matchesEarlierBondReview(v.confirmedAgainst,against,v);
+      if (!approved) issue('order-review', 'Проверьте и подтвердите ручную редакцию для текущих значений.');
+      metadata.lastValidatedAgainst = approved ? against : null;
+      if (approved) raw.confirmedAgainst = against;
     }
     if (!kind) issue('extra-order-type', 'Неизвестное поручение.');
     if (!/^INV[^\s]+$/i.test(ident.code)) issue('extra-brokerage-account', 'В карточке клиента отсутствует корректный код INV.');
@@ -536,16 +628,30 @@
           if (trade.isBond) {
             var interest = trade.interest;
             metadata.accruedInterest = interest;
-            keep(['extra-accrued-mode']);
-            if (v['extra-accrued-mode'] && !['reference','manual'].includes(v['extra-accrued-mode']))
-              issue('extra-accrued-mode','Выберите источник НКД.');
-            if (interest.mode === 'manual') {
-              keep(['extra-accrued-manual','extra-accrued-currency','extra-accrued-confirmed']);
-              if (!target) keep(['extra-accrued-date']);
-              if (!interest.confirmed) issue('extra-accrued-review', interest.message || 'Подтвердите НКД для текущего инструмента и даты.');
+            if (trade.item.source === 'QORT') {
+              keep(['extra-trade-date','extra-quotation-mode']);
+              metadata.tradeDate = trade.options.tradeDate;
+              metadata.quotation = trade.quotation;
+              if (trade.options.tradeDate && target && trade.options.tradeDate > target)
+                issue('extra-trade-date','Дата сделки должна быть не позже даты расчётов.');
+              if (trade.rates.length || trade.spec && trade.spec.settlementCurrency !== trade.spec.currency && trade.spec.settlementCurrency) {
+                if (!trade.options.tradeDate) issue('extra-trade-date','Укажите дату сделки для курса.');
+              }
+              metadata.exchangeRates = trade.rates;
+              trade.rates.forEach(function (rate) {
+                if (rate.status === 'manual') keep([rate.field,rate.field+'-key']);
+                if (rate.referenceStatus !== 'official' && text(v[rate.field]) && rate.status !== 'manual')
+                  issue(rate.field,'Укажите положительный курс для текущей даты и валютной пары.');
+              });
             }
-            if (interest.value !== '' && interest.confirmed) out['extra-security-accrued'] = formatAmount(interest.value) +
-              (interest.currency === trade.currency ? '' : ' '+interest.currency);
+            if (v['extra-accrued-edited'] === 'yes') {
+              keep(['extra-accrued-edited','extra-accrued-input','extra-accrued-currency']);
+            } else if (v['extra-accrued-mode'] === 'manual') {
+              keep(['extra-accrued-mode','extra-accrued-manual','extra-accrued-currency','extra-accrued-date']);
+            }
+            // Free text is a valid document entry. Only numeric interest participates in the calculation.
+            out['extra-security-accrued'] = interest.displayText +
+              (interest.value && interest.currency && interest.currency !== trade.currency ? ' '+interest.currency : '');
           }
         } else if (trade.branch==='fx') {
           oneOf('extra-fx-swap-ccp',['yes','no']); copy(['extra-fx-swap-ccp']); deriveFx(out,limit);
@@ -564,9 +670,18 @@
             confirm();
             out[keys[3]] = formatMoney(v['extra-manual-amount']);
             metadata.amount.reason = text(v['extra-amount-reason']);
-            metadata.amount.difference = difference(v['extra-manual-amount'],result.value);
-            metadata.amount.currency = trade.currency || (trade.item && trade.item.quote) || '';
-          } else if (result.value) out[keys[3]] = formatDecimalInput(result.value,true);
+            var liveSecurity = trade.item && trade.item.source === 'QORT';
+            var manualCurrency = trade.branch === 'security' ? text(v['extra-manual-currency']).toUpperCase() : '';
+            if ((liveSecurity || manualCurrency) && !/^[A-Z]{3}$/.test(manualCurrency))
+              issue('extra-manual-currency','Укажите валюту согласованной суммы трёхбуквенным кодом.');
+            if (trade.branch === 'security') keep(['extra-manual-currency']);
+            metadata.amount.currency = manualCurrency || trade.currency || (trade.item && trade.item.quote) || '';
+            if (manualCurrency && manualCurrency !== trade.currency) out[keys[3]] += ' ' + manualCurrency;
+            metadata.amount.difference = metadata.amount.currency === result.currency ? difference(v['extra-manual-amount'],result.value) : '';
+          } else if (result.value) {
+            metadata.amount.currency = result.currency;
+            out[keys[3]] = formatDecimalInput(result.value,true) + (trade.branch === 'security' && result.currency !== trade.currency ? ' '+result.currency : '');
+          }
           else issue('extra-manual-amount',result.reason + ' Введите сумму сделки.');
         }
         metadata.amount.value = out[keys[3]];
@@ -646,7 +761,7 @@
 
   global.CRMOrderForms = {
     kinds: KINDS, printable: printable, venues: venues, eligibleRequisites: eligibleRequisites, payoutRequisite: payoutRequisite,
-    settlement: settlement, settlementText: settlementText, accruedReviewKey: accruedReviewKey,
+    settlement: settlement, settlementText: settlementText, bondOptions:bondOptions, isoToRu:isoToRu,
     instrumentBranch: instrumentBranch, formatAmount: formatAmount, formatMoney: formatMoney, moneyProblem: moneyProblem,
     amountInWords: amountInWords, formatDecimalInput: formatDecimalInput, tradeCalculation: tradeCalculation, context: context, reviewKey: reviewKey, prepare: prepare
   };
