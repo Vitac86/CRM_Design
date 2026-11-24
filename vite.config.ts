@@ -9,5 +9,13 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     allowedHosts: ['.ngrok-free.dev'],
+    // The React development server shares this checkout with the private order backend.
+    fs: {
+      deny: [
+        '.env', '.env.*', '*.{crt,pem}', '**/.git/**',
+        '**/order-wizard/**', '**/*.sql', '**/static-uikit/tools/qort/**',
+        '**/static-uikit/tools/order-reference-server.mjs', '**/static-uikit/tools/qa/*qort*',
+      ],
+    },
   },
 })

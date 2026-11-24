@@ -92,12 +92,6 @@
     return Object.assign({source:'demo-spec-2026-11', formula:formula, quantityUnit:quantityUnit,
       priceStep:'0.01', quantityStep:'1', currency:'RUB', minorDigits:2, rounding:'half-up'},detail);
   }
-  SECURITY_ASSETS.forEach(function (item) {
-    if (['share-ordinary','share-preferred','fund-unit'].includes(item.kind))
-      item.calculation = demoSpec('unit','pieces');
-    else if (item.kind.indexOf('bond-') === 0)
-      item.calculation = demoSpec(null,'pieces'); // A dated detail may supply the actual quotation convention.
-  });
   FX_INSTRUMENTS.filter(function (x) { return ['FX-1001','FX-1004'].includes(x.fxId); }).forEach(function (x) {
     x.calculation = demoSpec('fx','lots',{lotSize:'1000',quoteScale:'1',priceStep:'0.0001'});
   });

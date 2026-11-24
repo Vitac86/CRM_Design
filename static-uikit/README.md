@@ -25,38 +25,19 @@
 - `package.json`
 - `vite.config.*`
 
-## How to open
-From the repo root:
+## Локальный просмотр
 
-```bash
-python -m http.server 8080
+Из рабочей копии запустите мастер с учебными справочниками и откройте [список страниц](http://127.0.0.1:8080/static-uikit/INDEX.html).
+
+```powershell
+.\order-wizard\serve.cmd --mock --port=8080
 ```
 
-Open:
-
-```
-http://localhost:8080/static-uikit/INDEX.html
-```
-
-From `static-uikit/`:
-
-```bash
-python -m http.server 8080
-```
-
-Open:
-
-```
-http://localhost:8080/INDEX.html
-```
-
-Open via uppercase `INDEX.html`. Do not assume lowercase `index.html` works on case-sensitive servers.
-
-No `npm run build` is required for the static handoff.
+Для отдельной статической поставки достаточно `INDEX.html`, `pages/` и `assets/`. Из каталога такой поставки можно запустить `python -m http.server 8080 --bind 127.0.0.1` и открыть `http://localhost:8080/INDEX.html`. Для имени `INDEX.html` важен регистр.
 
 ## Order reference preview
 
-From the repository root, run `npm run static:uikit:orders` to open the wizard with its local HTTP mock. The command prints the loopback URL. The standard static page continues to work with the bundled offline fixtures. [API contract and test data](../handoff/order-forms-qort-2026-11/QORT_FINDINGS.md).
+Из корня проекта запустите `order-wizard\serve.cmd --mock` для HTTP-справочника с тестовыми бумагами. Статическая страница также работает со встроенными образцами. [Запуск PHP и живой режим QORT](../order-wizard/README.md).
 
 ## Folder structure
 - `INDEX.html` — launcher.
@@ -361,4 +342,4 @@ Pages `subject-edit-individual.html` and `subject-register.html` include FIAS-as
 - Tables intentionally use horizontal scroll on mobile.
 - No pages carry redundant direct page CSS links; all page-specific CSS is loaded via `crm-static.css` except for the intentional exceptions listed in "Page-specific CSS" above.
 
-On Windows, `npm run static:uikit:orders:live` opens the same wizard with the read-only QORT reference. [Local setup, verification and manual scenarios](tools/qort/README.md)
+Команда `order-wizard\serve.cmd` запускает этот мастер с чтением QORT через PHP. [Ручные сценарии](tools/qort/README.md)

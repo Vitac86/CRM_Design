@@ -1,49 +1,10 @@
 # QORT в мастере поручений
 
-В существующем мастере на вкладке поручения на сделку поиск ценных бумаг читает `BACK_QORT_DB` под Windows-учётной записью процесса Node. Перевод между площадками и вывод на банк используют карточку субъекта и сохранённые реквизиты CRM. Для ручной проверки доступны все три документа. [Открыть мастер](http://127.0.0.1:4179/static-uikit/pages/document-wizard.html?subject=c-006)
+Поручение на сделку получает справочные данные через PHP под Windows-учётной записью процесса. Перевод между площадками и вывод на банковский счёт используют карточку субъекта и сохранённые реквизиты CRM. [Открыть мастер](http://127.0.0.1:4179/static-uikit/pages/document-wizard.html?subject=c-006)
 
 ## Запуск и остановка
 
-Требуются Windows, Node.js 22 или новее, Microsoft ODBC Driver 18 for SQL Server и доступ текущей учётной записи к базе. На этой машине использованы Node 24 и установленный ODBC Driver 18.
-
-```powershell
-Set-Location 'P:\Kolosov\CRM_Design'
-npm.cmd install
-if (!(Test-Path 'static-uikit\.env.qort.local')) {
-    Copy-Item 'static-uikit\.env.qort.example' 'static-uikit\.env.qort.local'
-}
-```
-
-На другой машине укажите свой SQL Server в локальном файле. Для именованного экземпляра используется один обратный слеш, для TCP-порта SQL — запись `SERVER,1433`. Пример с вымышленным именем узла приведён ниже.
-
-```dotenv
-QORT_SERVER=YOUR_SQL_SERVER\YOUR_INSTANCE
-QORT_DATABASE=BACK_QORT_DB
-QORT_TRUSTED_CONNECTION=true
-QORT_PORT=4179
-QORT_QUERY_TIMEOUT_MS=10000
-QORT_TRUST_SERVER_CERTIFICATE=false
-```
-
-```powershell
-npm.cmd run static:uikit:orders:live
-```
-
-Команда выводит адрес и слушает только `127.0.0.1`. Для остановки процесса, запущенного из консоли, нажмите `Ctrl+C`. Текущий фоновый экземпляр можно остановить в PowerShell из корня проекта следующей командой.
-
-```powershell
-$listener = Get-NetTCPConnection -LocalAddress 127.0.0.1 -LocalPort 4179 -State Listen -ErrorAction SilentlyContinue
-if ($listener) {
-    $preview = Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)"
-    if ($preview.Name -eq 'node.exe' -and $preview.CommandLine -match 'CRM_Design[\\/]static-uikit[\\/]tools[\\/]order-reference-server\.mjs.+--live') {
-        Stop-Process -Id $preview.ProcessId
-    }
-}
-```
-
-Режим с учебными бумагами запускается отдельно командой `npm.cmd run static:uikit:orders` на порту 4178. Обычная статическая страница на 8080 использует встроенный демонстрационный справочник. В live-режиме отказ SQL отображается в поиске, доступна кнопка повторного запроса. Существующие локальные справочники валютных инструментов и ПФИ подписаны в соответствующих карточках.
-
-На проверенной машине сервер использует сертификат с цепочкой, которой не доверяет ODBC. В её игнорируемом файле включён `QORT_TRUST_SERVER_CERTIFICATE=true` для этого соединения. Шифрование TLS включено. Шаблон использует стандартную проверку цепочки. Имя сервера и настройки конкретной машины хранятся в `static-uikit/.env.qort.local`. Git и HTTP-сервер мастера исключают этот файл.
+Из корня проекта запустите `order-wizard\serve.cmd` для QORT или `order-wizard\serve.cmd --mock` для тестового справочника. Команда выводит локальный URL. Остановка из консоли — Ctrl+C. Существующий локальный конфиг подключения используется обеими реализациями. [Настройка PHP, порты, запуск и сравнение с Node.js](../../../order-wizard/README.md)
 
 ## Как воспроизвести проверки
 
@@ -134,7 +95,8 @@ npm.cmd run build
 | --- | --- |
 | Мастер | `assets/js/pages/document-wizard.js`, `assets/js/document-wizard/order-controls.js`, `assets/js/document-wizard/order-forms-model.js`, `assets/js/document-wizard/order-calculation.js`, `assets/js/document-wizard/instrument-catalog.js`, `assets/js/document-wizard/instrument-securities-demo.js` |
 | Подготовка PDF к печати | `assets/js/document-engine/pdf-overlay-renderer.js` |
-| HTTP и QORT | `tools/order-reference-server.mjs`, `tools/qort/reference.mjs`, `tools/qort/card.sql`, `tools/qort/cbr-rates.sql`, `tools/qort/cbr-rates.mjs` |
+| HTTP и QORT на PHP | `../order-wizard/public/index.php`, `../order-wizard/src/` и четыре файла `tools/qort/*.sql` |
+| Контрольная версия Node.js | `tools/order-reference-server.mjs`, `tools/qort/reference.mjs`, `tools/qort/card.sql`, `tools/qort/cbr-rates.sql`, `tools/qort/cbr-rates.mjs` |
 | Регрессионные проверки | `tools/qa/qort-reference.test.mjs`, `tools/qa/run_order_qort_live_tests.py`, `tools/qa/run_order_reference_tests.py`, `tools/qa/order_rules_cases.js` |
 | Инструкция и контрольные примеры | `tools/qort/README.md` |
 

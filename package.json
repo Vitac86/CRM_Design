@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
     "preview": "vite preview",
-    "static:uikit:orders": "node static-uikit/tools/order-reference-server.mjs",
-    "static:uikit:orders:live": "node static-uikit/tools/order-reference-server.mjs --live",
+    "static:uikit:orders": "order-wizard\\serve.cmd --mock",
+    "static:uikit:orders:live": "order-wizard\\serve.cmd",
     "static:uikit:bundle": "node static-uikit/tools/build-css-bundle.mjs",
     "static:uikit:bundle:check": "node static-uikit/tools/build-css-bundle.mjs --check",
     "static:uikit:validate": "node static-uikit/tools/validate-static-uikit.mjs"

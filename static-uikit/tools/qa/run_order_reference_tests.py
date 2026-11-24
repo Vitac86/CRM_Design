@@ -1,6 +1,7 @@
 """Exercise the local HTTP reference adapter, trade wizard and all three downloaded PDF files."""
 from __future__ import annotations
 
+from contextlib import nullcontext
 import argparse
 import base64
 import json
@@ -21,17 +22,20 @@ from run_order_forms_tests import (Checks, COMPANY, INDIVIDUAL, fetch_pdf, fill_
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep", type=Path, help="save three PDFs and desktop/mobile screenshots")
+    parser.add_argument("--url", help="origin of an already running mock API")
     args = parser.parse_args()
     if args.keep:
         args.keep.mkdir(parents=True, exist_ok=True)
     qa = Checks()
     opener = build_opener(ProxyHandler({}))
     command = ["node", str(Path(STATIC_UIKIT) / "tools/order-reference-server.mjs"), "0"]
-    with subprocess.Popen(command, stdout=subprocess.PIPE, encoding="utf-8") as server:
+    preview = nullcontext(None) if args.url else subprocess.Popen(command, stdout=subprocess.PIPE, encoding="utf-8")
+    with preview as server:
         browser = None
         try:
-            entry = server.stdout.readline().strip()
-            if not entry.startswith("http://127.0.0.1:"):
+            entry = (args.url.rstrip("/") + "/static-uikit/pages/document-wizard.html?subject=c-006"
+                     if args.url else server.stdout.readline().strip())
+            if server and not entry.startswith("http://127.0.0.1:"):
                 raise RuntimeError("Local reference server did not announce its URL: " + entry)
             base = entry.split("/static-uikit/", 1)[0]
             api = base + "/api/order-reference/assets"
@@ -214,7 +218,7 @@ def main():
                 qa.check("withdrawal requisites and digits","40702810100000012345" in words and "13 316,44" in words and "INV-1011" in words)
         finally:
             if browser: browser.stop()
-            server.terminate()
+            if server: server.terminate()
     for name,ok,detail in qa.failed: print("FAIL",name,detail)
     print(f"Order reference: {len(qa.results)-len(qa.failed)}/{len(qa.results)} checks passed")
     return int(bool(qa.failed))
