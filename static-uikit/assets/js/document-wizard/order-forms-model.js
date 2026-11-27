@@ -322,6 +322,13 @@
     return {settlementMode:'tenor', settlementTenor:text(choice)};
   }
 
+  // The market date is a reference-data lookup date only. Keep the order's own term for printing.
+  function bondSettlementDate(asset, order) {
+    if (order.settlementMode === 'date') return order.settlementDateISO;
+    var date = !order.settlementTenor && asset?.instrumentTerms?.marketSettlementDate;
+    return calendarDate(date) ? date : '';
+  }
+
   function settlementText(s) {
     return s.settlementMode === 'date' ? (calendarDate(s.settlementDateISO) ? isoToRu(s.settlementDateISO) : '') : s.settlementTenor;
   }
@@ -375,6 +382,7 @@
     var terms = data && data.terms || asset.instrumentTerms;
     if (!terms || !terms.settlementCurrency) return [];
     var pay = terms.settlementCurrency;
+    if (text(v['extra-settlement-currency'] ?? pay).toUpperCase() !== pay) return [];
     var principal = options.quotation === 'cash' ? asset.instrumentTerms.quoteCurrency : terms.nominalCurrency;
     var accrued = !terms.quoteIncludesAccrued && text(interest.currency).toUpperCase();
     var currencies = [principal, accrued];
@@ -418,7 +426,8 @@
     if (branch === 'derivative' && item && !catalog().supportsDerivative(item,v['extra-order-market'])) item = null;
     var spec = item && item.calculation;
     var isBond = !!(branch === 'security' && item && /^bond-/.test(item.kind));
-    var target = settlement(v).settlementDateISO;
+    var orderSettlement = settlement(v);
+    var target = isBond ? bondSettlementDate(item,orderSettlement) : '';
     var options = isBond ? bondOptions(item,v) : {};
     var data = isBond && catalog().bondData(item.assetId,target,options);
     var interest = isBond ? accruedInterest(item,v,data,target) : null;
@@ -428,9 +437,19 @@
       ? text(v['extra-security-currency']).toUpperCase() : (spec && spec.currency || '');
     var defaultSettlement = item?.instrumentTerms?.settlementCurrency ?? spec?.settlementCurrency ?? spec?.currency ?? item?.quote ?? '';
     var settlementCurrency = v['extra-settlement-currency'] ?? defaultSettlement;
+    var pay = text(settlementCurrency).toUpperCase();
+    if (isBond && dated && pay && pay !== defaultSettlement) {
+      var percent = dated.formula === 'bond-percent';
+      if (pay === (percent ? dated.nominalCurrency : dated.currency)) {
+        dated.settlementCurrency = pay;
+        dated.settlementDigits = percent ? dated.nominalDigits : dated.minorDigits;
+      }
+    }
     var math = global.CRMOrderCalculation;
+    var price = keys && v[keys[2]];
+    if (isBond && options.quotation !== 'cash') price = text(price).replace(/\s*%$/, '');
     var result;
-    if (v['extra-order-kind'] !== 'limit') result = math.unavailable('Сумма рыночного поручения не определена.');
+    if (v['extra-order-kind'] !== 'limit' && !(v['extra-order-kind'] === 'market' && branch === 'security' && math.decimal(price))) result = math.unavailable('Сумма рыночного поручения не определена.');
     else if (branch === 'security' && v['extra-repo-ccp'] === 'yes' || branch === 'fx' && v['extra-fx-swap-ccp'] === 'yes')
       result = math.unavailable('Для РЕПО и СВОП нужны условия обеих частей.');
     else if (v['extra-trade-kind'] === 'other') result = math.unavailable('Для иного вида сделки требуется подтверждённая сумма.');
@@ -439,13 +458,13 @@
       result = math.unavailable('Для выбранного рынка нет подтверждённой спецификации расчёта.');
     else if (branch === 'security' && spec && priceCurrency !== spec.currency)
       result = math.unavailable('Для выбранной валюты цены отсутствует спецификация расчёта.');
-    else if (text(settlementCurrency).toUpperCase() !== defaultSettlement)
+    else if (pay !== (dated?.settlementCurrency || defaultSettlement))
       result = math.unavailable('Валюта расчётов отличается от валюты спецификации.');
-    else if (options.tradeDate && target && options.tradeDate > target)
+    else if (options.tradeDate && orderSettlement.settlementDateISO && options.tradeDate > orderSettlement.settlementDateISO)
       result = math.unavailable('Дата сделки должна быть не позже даты расчётов.');
     else if (isBond && !dated) result = math.unavailable(data && data.reason || 'Нет подтверждённых единиц котировки и спецификации облигации на дату расчётов.');
     else {
-      result = math.calculate(dated, v[keys[1]], v[keys[2]]);
+      result = math.calculate(dated, v[keys[1]], price);
       if (isBond && interest.edited && !interest.value && !result.invalid)
         result = math.unavailable('Для автоматического расчёта нужен числовой НКД. Сумму можно указать вручную.');
     }
@@ -671,7 +690,7 @@
 
   global.CRMOrderForms = {
     kinds: KINDS, printable: printable, venues: venues, eligibleRequisites: eligibleRequisites, payoutRequisite: payoutRequisite,
-    settlement: settlement, settlementText: settlementText, bondOptions:bondOptions, isoToRu:isoToRu,
+    settlement: settlement, settlementText: settlementText, bondSettlementDate:bondSettlementDate, bondOptions:bondOptions, isoToRu:isoToRu,
     instrumentBranch: instrumentBranch, formatAmount: formatAmount, formatMoney: formatMoney, moneyProblem: moneyProblem,
     amountInWords: amountInWords, formatDecimalInput: formatDecimalInput, tradeCalculation: tradeCalculation, context: context, reviewKey: reviewKey, prepare: prepare
   };

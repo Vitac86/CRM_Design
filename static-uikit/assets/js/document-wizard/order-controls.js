@@ -81,7 +81,7 @@
         state.lastTradeOrderDate = v['extra-order-date'];
       }
       v = read();
-      var target = orders.settlement(v).settlementDateISO || '';
+      var target = orders.bondSettlementDate(trade.item,orders.settlement(v));
       var request = orders.bondOptions(trade.item,v);
       var lookupKey = trade.isBond && target ? JSON.stringify([instrument,target,request]) : '';
       var assetNode = el('extra-security-asset-id');

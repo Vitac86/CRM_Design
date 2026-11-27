@@ -2693,9 +2693,9 @@
       var id = input['extra-security-asset-id'];
       var reference = global.CRMInstrumentCatalog;
       if (id && reference && global.CRMOrderForms.instrumentBranch(input) === 'security') {
-        var date = global.CRMOrderForms.settlement(input).settlementDateISO;
         var card = reference.getSecurity(id);
         if (!card) card = await reference.loadSecurity(id,'');
+        var date = global.CRMOrderForms.bondSettlementDate(card,global.CRMOrderForms.settlement(input));
         var request = global.CRMOrderForms.bondOptions(card,input);
         if (/^bond-/.test(card.kind) && date && !reference.bondData(id,date,request)) {
           try { await reference.loadSecurity(id,date,undefined,request); } catch (error) {
