@@ -3,7 +3,9 @@
   'use strict';
 
   function decimal(value) {
-    var s = String(value == null ? '' : value).trim().replace(/\s/g, '').replace(',', '.');
+    var s = String(value == null ? '' : value).trim();
+    if (/\s/.test(s) && !/^\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[,.]\d+)?$/.test(s)) return null;
+    s = s.replace(/\s/g, '').replace(',', '.');
     if (!/^\d{1,25}(?:\.\d{1,12})?$/.test(s)) return null;
     var parts = s.split('.');
     return { n: BigInt(parts.join('')), d: 10n ** BigInt((parts[1] || '').length) };

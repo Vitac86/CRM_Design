@@ -165,19 +165,17 @@ def check_browser(base, checks, keep, observations, ruble, fx_sample):
         shown = quote["displayValue"].replace(".",",")
         checks.check("dated reference reached the browser",wait_value("extra-accrued-input",shown))
         # Use an expressly agreed amount and currency. No FX rate is needed for this scenario.
-        fill(manual_amount="10123,45",manual_currency="RUB",amount_reason="Сумма согласована для проверки")
-        browser.eval(field("order-review")+".click()")
+        fill(order_amount="10123,45",settlement_currency="RUB")
         with pdf("poruchenie-na-sdelku",2) as doc:
             checks.check("reference accrual in its PDF cell",cell(doc[0],343.46,586.5,92.91) == shown)
             checks.check("price, quote currency and separate agreed currency",cell(doc[0],257,586.5,80)=="98,5 %"
-                         and cell(doc[0],442,586.5,101)=="CNY" and cell(doc[0],249.1,632.78,294.2)=="10 123,45 RUB")
+                         and cell(doc[0],442,586.5,101)=="CNY" and cell(doc[0],249.1,632.78,294.2)=="10123,45 RUB")
         fill(accrued_input="12,31",accrued_currency="CNY")
-        browser.eval(field("order-review")+".click()")
         with pdf("manual-accrual",2) as doc:
             checks.check("manual accrual in its PDF cell",cell(doc[0],343.46,586.5,92.91)=="12,31")
         fill(settlement_date=DATES[1])
-        checks.check("settlement date preserves the NKD edit and revokes only the manual amount confirmation",
-                     browser.eval(field("extra-accrued-input")+".value")=="12,31" and not browser.eval(field("order-review")+".checked"))
+        checks.check("settlement date preserves the edited NKD and amount",
+                     browser.eval(field("extra-accrued-input")+".value")=="12,31" and browser.eval(field("extra-order-amount")+".value")=="10123,45")
         select("order-trade")
         fill_trade_common(browser,kind="limit")
         fill(order_date=DATES[0],settlement_period="date",settlement_date=DATES[0])
@@ -188,7 +186,7 @@ def check_browser(base, checks, keep, observations, ruble, fx_sample):
             wanted = observations[day]["bondData"]["quotes"][0]
             checks.check("visible settlement "+day,wait_value("extra-accrued-input",wanted["displayValue"].replace(".",",")))
         fill(settlement_period="T+1")
-        checks.check("tenor clears dated reference",not browser.eval(field("extra-accrued-input")+".value") and "конкретную дату" in browser.eval(field("extra-accrued-input-source")+".textContent"))
+        checks.check("tenor clears dated reference",not browser.eval(field("extra-accrued-input")+".value"))
 
         select("order-trade")
         fill_trade_common(browser,kind="limit")
@@ -204,9 +202,9 @@ def check_browser(base, checks, keep, observations, ruble, fx_sample):
         if terms:
             total = (10*(Decimal(terms["nominal"])*Decimal("0.985")+Decimal(ruble_quote["value"]))).quantize(
                      Decimal("0.01"),rounding=ROUND_HALF_UP)
-            checks.check("live RUB clean price plus accrued exactly once",wait_value("extra-manual-amount",str(total).replace(".",",")))
+            checks.check("live RUB clean price plus accrued exactly once",wait_value("extra-order-amount",str(total).replace(".",",")))
         else:
-            checks.check("incomplete dated terms keep the total manual",not browser.eval(field("extra-manual-amount")+".value"))
+            checks.check("incomplete dated terms keep the total manual",not browser.eval(field("extra-order-amount")+".value"))
         select("order-trade")
         fill_trade_common(browser, kind="limit")
         fill(order_date=TRADE_DAY, settlement_period="date", settlement_date=SETTLE_DAY)
@@ -226,7 +224,7 @@ def check_browser(base, checks, keep, observations, ruble, fx_sample):
             return browser.eval("Boolean("+field(key)+".getClientRects().length)")
         checks.check("trade date defaults to application date", browser.eval(field("extra-trade-date")+".value") == TRADE_DAY)
         checks.check("automatic percentage mode and contextual price label",
-                     wait_value("extra-estimate","1 507 062,90 USD") and "Цена, % от номинала" in browser.eval(
+                     browser.eval(field("extra-settlement-currency")+".value")=="RUB" and "Цена, % от номинала" in browser.eval(
                      "document.querySelector('label[for=docwiz-field-extra-security-price]').textContent"))
         checks.check("regular text input with rounded QORT default and source",wait_value("extra-accrued-input","53,13")
                      and browser.eval(field("extra-accrued-input")+".type==='text'") and
@@ -234,63 +232,63 @@ def check_browser(base, checks, keep, observations, ruble, fx_sample):
         checks.check("no quotation mode, manual NKD mode, refresh or confirmation controls",browser.eval(
                      "!document.querySelector('[data-toggle-accrued],[data-field-key=extra-quotation-mode],"
                      "[data-field-key=extra-accrued-mode],[data-field-key=extra-accrued-review]')"))
-        checks.check("official quote includes units and date", wait_value("extra-rates-summary","23.11.2026")
-                     and wait_value("extra-rates-summary","1 USD"))
+        checks.check("official quote includes units and date",wait_value("extra-price-rate","1 USD") and
+                     "23.11.2026" in browser.eval("document.querySelector('label[for=docwiz-field-extra-price-rate]').textContent") and
+                     browser.eval(field("extra-price-rate")+".readOnly"))
         clean = Decimal(official["terms"]["nominal"])*Decimal("1.08")
         value = final_amount(clean,fixing)
         checks.check("unrounded primary NKD reaches the automatic amount",
-                     wait_value("extra-manual-amount",display(value)) and accrued == Decimal("53.129999"))
+                     wait_value("extra-order-amount",display(value)) and accrued == Decimal("53.129999"))
         with pdf(BOND_ISIN+"-percent",2) as doc:
             checks.check("exact PDF cells for percentage price, rounded NKD, quote and payment",
                          cell(doc[0],257,586.5,80)=="108 %" and cell(doc[0],343.46,586.5,92.91)=="53,13" and
                          cell(doc[0],442,586.5,101)=="USD" and cell(doc[0],249.1,632.78,294.2)==display(value,True)+" RUB")
         fill(trade_date=missing_day)
-        checks.check("missing fixing clears previous automatic amount and opens the rate input",
-                     wait_value("extra-rates-summary","курс") and visible("extra-price-rate") and
-                     browser.eval(field("extra-manual-amount")+".value") == "")
+        checks.check("missing fixing leaves the same rate control editable and the amount blank",
+                     wait_for("!"+field("extra-price-rate")+".readOnly && "+field("extra-order-amount")+".value===''") and
+                     visible("extra-price-rate"))
         fill(price_rate="80,12")
         manual_value = final_amount(clean,Decimal("80.12"))
         checks.check("manual FX recalculates immediately without changing dated NKD",
-                     wait_value("extra-manual-amount",display(manual_value)) and wait_value("extra-accrued-input","53,13"))
+                     wait_value("extra-order-amount",display(manual_value)) and wait_value("extra-accrued-input","53,13"))
         with pdf(BOND_ISIN+"-manual-rate",2) as doc:
             checks.check("manual FX reaches PDF",cell(doc[0],249.1,632.78,294.2) == display(manual_value,True)+" RUB")
-        fill(manual_amount="999,99",manual_currency="RUB",amount_reason="Сумма согласована для проверки")
-        browser.eval(field("order-review")+".click()")
-        fill(price_rate="80.15")
-        checks.check("editing the rate retains an explicit amount and revokes confirmation",
-                     browser.eval(field("extra-manual-amount")+".value")== "999,99" and not browser.eval(field("order-review")+".checked"))
+        fill(order_amount="999,99",settlement_currency="RUB",price_rate="80.15")
+        checks.check("editing the rate retains the override",browser.eval(field("extra-order-amount")+".value")=="999,99")
         fill(trade_date=TRADE_DAY)
-        checks.check("restoring the official rate retains a manual amount",
-                     wait_value("extra-estimate","1 507 062,90 USD") and browser.eval(field("extra-manual-amount")+".value")=="999,99")
-        browser.eval("document.querySelector('[data-order-reset-amount]').click()")
-        checks.check("restore automatically calculated amount",wait_value("extra-manual-amount",display(final_amount(clean,fixing))))
+        checks.check("official rate arriving retains the manual amount",
+                     wait_value("extra-price-rate","1 USD") and browser.eval(field("extra-order-amount")+".value")=="999,99")
+        select("order-trade")
+        fill_trade_common(browser,kind="limit")
+        fill(order_date=TRADE_DAY,settlement_period="date",settlement_date=SETTLE_DAY)
+        type_search(browser,"extra-security-asset-id",BOND_ISIN)
+        pick_result(browser,"extra-security-asset-id")
+        fill(security_quantity="1330",security_price="108",repo_ccp="no")
+        checks.check("fresh form calculates with the official rate",wait_value("extra-order-amount",display(value)))
         fill(accrued_input="53,13")
         entered_total=(1330*(clean+Decimal("53.13"))*fixing).quantize(cents,rounding=ROUND_HALF_UP)
         checks.check("typing the rounded number uses the operator's exact precision",
-                     entered_total != value and wait_value("extra-manual-amount",display(entered_total)))
+                     entered_total != value and wait_value("extra-order-amount",display(entered_total)))
         fill(accrued_input="4,5",accrued_currency="INR")
         alternate_fx = Decimal(alternate_leg["rate"])/Decimal(alternate_leg["units"])
         mixed = (1330*(clean*fixing+Decimal("4.5")*alternate_fx)).quantize(cents,rounding=ROUND_HALF_UP)
         checks.check("manual interest in INR uses its 100-unit CBR quote alongside USD principal",
-                     wait_value("extra-rates-summary","100 INR") and wait_value("extra-manual-amount",display(mixed)))
+                     wait_value("extra-accrued-rate","100 INR") and wait_value("extra-order-amount",display(mixed)))
         with pdf(BOND_ISIN+"-manual-interest",2) as doc:
             checks.check("mixed currency interest and RUB total print in their proper cells",
                          cell(doc[0],343.46,586.5,92.91)=="4,5 INR" and cell(doc[0],249.1,632.78,294.2)==display(mixed,True)+" RUB")
         literal = "По договору"
         fill(accrued_input=literal)
-        checks.check("arbitrary NKD text clears the automatic amount and its numeric breakdown",
-                     browser.eval(field("extra-accrued-input")+".value")==literal and
-                     browser.eval(field("extra-manual-amount")+".value")=="" and
-                     "Чистая стоимость" not in browser.eval(field("extra-estimate")+".value"))
-        fill(manual_amount="12345,67",manual_currency="RUB",amount_reason="Сумма по договору")
-        browser.eval(field("order-review")+".click()")
+        checks.check("arbitrary NKD leaves the amount empty",browser.eval(field("extra-accrued-input")+".value")==literal and
+                     browser.eval(field("extra-order-amount")+".value")=="")
+        fill(order_amount="12345,67",settlement_currency="RUB")
         with pdf(BOND_ISIN+"-text",2) as doc:
             checks.check("verbatim NKD text and agreed amount in distinct PDF fields",
-                         cell(doc[0],343.46,586.5,92.91)==literal and cell(doc[0],249.1,632.78,294.2)=="12 345,67 RUB")
+                         cell(doc[0],343.46,586.5,92.91)==literal+" INR" and cell(doc[0],249.1,632.78,294.2)=="12345,67 RUB")
         browser.eval("document.getElementById('docwiz-back-btn').click();"
                      "document.querySelector('button[data-doc-id=order-trade]').click()")
         checks.check("returning to the form preserves literal NKD and manual amount",
-                     wait_value("extra-accrued-input",literal) and browser.eval(field("extra-manual-amount")+".value")=="12345,67")
+                     wait_value("extra-accrued-input",literal) and browser.eval(field("extra-order-amount")+".value")=="12345,67")
         # Hold a real HTTP response while the operator edits the NKD field.
         browser.eval("""window.nkdFetch=window.fetch;window.fetch=async function(url,options) {
             const response=await window.nkdFetch(url,options),u=new URL(url,location);
@@ -310,7 +308,7 @@ def check_browser(base, checks, keep, observations, ruble, fx_sample):
         fill(accrued_input="",settlement_date=DATES[3])
         checks.check("an explicit blank survives the next response and preserves the manual total",
                      wait_for("!!"+cache.replace(DATES[2],DATES[3])) and browser.eval(field("extra-accrued-input")+".value")=="" and
-                     browser.eval(field("extra-manual-amount")+".value")=="12345,67")
+                     browser.eval(field("extra-order-amount")+".value")=="12345,67")
         type_search(browser,"extra-security-asset-id",ISINS[0])
         pick_result(browser,"extra-security-asset-id")
         key = str(dated["asset"]["assetId"])

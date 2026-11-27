@@ -279,7 +279,7 @@ def main() -> int:
         for k, v in values.items():
             key = "selectedRequisiteId" if k == "bank" else "extra-" + k.replace("_", "-")
             ret = set_field(browser,key,v)
-            decimal_keys = {"security_price", "fx_rate", "derivative_premium", "move_amount", "payout_amount", "manual_amount", "accrued_manual"}
+            decimal_keys = {"move_amount", "payout_amount"}
             expected = v.replace(".", ",") if k in decimal_keys else v
             checks.check(f"{doc} control {key}", ret.get("ok") and ret.get("value") == expected, str(ret))
     def confirm():
@@ -287,7 +287,7 @@ def main() -> int:
     def blocked(label, message=""):
         result = generate(browser,12000)
         checks.check(label, result["downloads"]==0 and "is-error" in result["kind"] and message in result["status"],str(result))
-    def pdf(label, *, keep=False, extra_lines=0):
+    def pdf(label, *, keep=False, extra_lines=0, literal_values=()):
         result = generate(browser,12000)
         if not checks.check(label+" generated", result["downloads"]==1 and "is-error" not in result["kind"],str(result)): return ""
         data=fetch_pdf(browser,result["url"])
@@ -352,6 +352,8 @@ def main() -> int:
                     i == 1 and abs(x-57.2) < 2 and abs(y-256.48) < 3 for i,x,y in added_marks), str(added_marks))
             checks.check(label+" cancellation stays blank",not any(i==0 and abs(x-px)<5 and abs(y-93.5)<5 for i,x,y in added_marks))
             checks.check(label+" serif 9pt",bool(spans) and all(s["size"]>=8.99 for s in spans))
+            for literal in literal_values:
+                checks.check(label+" exact PDF text "+literal,any(span["text"]==literal for span in spans))
             text_value=" ".join(" ".join(s["text"] for s in spans).split())
             checks.check(label+" CRM code",("INV-1006" if subject==INDIVIDUAL else "INV-1011") in text_value,text_value[:250])
             return text_value
@@ -396,50 +398,65 @@ def main() -> int:
         pick_result(browser,"extra-security-asset-id")
         out=pdf("trade-typical",keep=True)
         checks.check("share calculation and selected ISIN","2 725" in out and "RU0009029540" in out and "BR-2026/01006" in out,out)
-        checks.check("no mode selector",browser.eval("!document.querySelector('select[data-field-key=extra-amount-mode]')"))
-        controls = field_values(browser,["extra-manual-amount","extra-estimate","extra-security-currency"])
-        checks.check("calculation and editable amount", controls["extra-estimate"]["value"]=="2 725,00 RUB"
-                     and controls["extra-manual-amount"]["value"]=="2725,00" and not controls["extra-manual-amount"]["readOnly"])
-        checks.check("catalogue price currency editable", controls["extra-security-currency"]["value"]=="RUB"
-                     and not controls["extra-security-currency"]["readOnly"])
-        fill(manual_amount="2800.01",amount_reason="Уточнение суммы поручения")
-        blocked("manual trade requires confirmation")
-        checks.check("explicit manual difference",field_values(browser,["extra-discrepancy"])["extra-discrepancy"]["value"]=="+75,01")
-        confirm();out=pdf("trade-manual");checks.check("manual trade amount printed","2 800,01" in out,out)
-        browser.eval("document.getElementById('docwiz-back-btn').click()");click_card()
-        checks.check("manual amount survives Back",field_values(browser,["extra-manual-amount"])["extra-manual-amount"]["value"]=="2800,01")
-        fill(security_quantity="11");blocked("quantity invalidates review")
-        checks.check("quantity change preserves handwritten amount",field_values(browser,["extra-manual-amount"])["extra-manual-amount"]["value"]=="2800,01")
-        fill(security_currency="USD")
-        confirm();out=pdf("trade-currency-override")
-        checks.check("selected currency and manual amount written", "USD" in out and "2 800,01" in out,out)
-        fill(security_currency="RUB")
-        browser.eval("document.querySelector('[data-order-reset-amount]').click()")
-        checks.check("explicit restoration uses current specification",field_values(browser,["extra-manual-amount"])["extra-manual-amount"]["value"]=="2997,50")
+        amount_key = "extra-order-amount"
+        currency_key = "extra-settlement-currency"
+        def current(key=amount_key): return field_values(browser,[key])[key]["value"]
+        def aligned():
+            return browser.eval("""(()=>{const pair=document.querySelector('.crm-docwiz-amount-row');
+              const [a,b]=pair.querySelectorAll('input'), [l,r]=pair.querySelectorAll('label');
+              const box=n=>n.getBoundingClientRect();
+              return !a.readOnly && !b.readOnly && !a.disabled && !b.disabled && a.type==='text' && b.type==='text'
+                && box(a).top===box(b).top && box(l).top===box(r).top && box(a).right<=box(b).left})()""")
+        checks.check("single editable amount with QORT or fixture currency",current()=="2725,00" and current(currency_key)=="RUB" and aligned())
+        checks.check("removed manual controls",browser.eval("""!document.querySelector('[data-order-reset-amount],[data-order-manual],
+          [data-field-key=order-review],[data-field-key=extra-manual-currency],[data-field-key=extra-estimate],
+          [data-field-key=extra-amount-mode],[data-field-key=extra-amount-reason],[data-field-key=extra-discrepancy]')""".replace("\n","")))
+        browser._send("Emulation.setDeviceMetricsOverride",{"width":375,"height":800,"deviceScaleFactor":1,"mobile":True})
+        checks.check("amount and currency aligned on mobile",aligned())
+        browser._send("Emulation.clearDeviceMetricsOverride",{})
+        fields = visible_keys(browser)
         fill(security_quantity="199999999996",security_price="659,22")
-        amt=field_values(browser,["extra-estimate","extra-manual-amount"])
-        checks.check("screenshot calculation clean and exact",amt["extra-estimate"]["value"]=="131 843 999 997 363,12 RUB"
-                     and amt["extra-manual-amount"]["value"]=="131843999997363,12",str(amt))
-        fill(manual_amount="131843999997363.13",amount_reason="Уточнение итоговой суммы")
-        confirm();out=pdf("trade-large")
-        checks.check("large manual amount with exact kopecks", "131 843 999 997 363,13" in out,out)
-        fill(order_kind="market")
-        out=pdf("trade-market");checks.check("market price and no stale manual amount","Рыночная" in out and "2 800,01" not in out,out)
+        checks.check("large exact automatic amount",current()=="131843999997363,12")
+        fill(security_price="Не более 100 руб.")
+        checks.check("text price clears automatic amount without changing controls",current()=="" and fields==visible_keys(browser) and aligned())
+        fill(order_amount="Не более 10 000 руб.",settlement_period="")
+        out=pdf("trade-text");checks.check("literal price and amount with no settlement term","Не более 100 руб." in out and "Не более 10 000 руб." in out,out)
+        fill(security_quantity="11",security_price="272.50")
+        checks.check("restored numeric price leaves the override intact",current()=="Не более 10 000 руб.")
+        browser.eval("document.getElementById('docwiz-back-btn').click()");click_card()
+        checks.check("amount survives Back",current()=="Не более 10 000 руб.")
+        fill(order_amount="02800.010",security_currency="₽ & <ЦБ>",settlement_currency="у.е. / ЦБ")
+        out=pdf("trade-currency-override")
+        checks.check("manual decimal spelling and currency printed","02800.010 у.е. / ЦБ" in out and "₽ & <ЦБ>" in out,out)
+        fill(repo_ccp="yes",trade_kind="sell",security_price="до  100 ₽",order_amount="100  ₽ ✓")
+        pdf("trade-repo",keep=True,literal_values=("до  100 ₽","100  ₽ ✓ у.е. / ЦБ"))
+        fill(order_kind="market",security_price="",order_amount="02800.010")
+        out=pdf("trade-market");checks.check("market order retains the entered transaction amount","Рыночная" in out and "02800.010" in out,out)
+        fill(order_amount="",order_kind="limit",security_currency="RUB",settlement_currency="RUB",security_price="100")
+        checks.check("explicitly erased amount stays blank",current()=="")
+        type_search(browser,"extra-security-asset-id","SBER");pick_result(browser,"extra-security-asset-id")
+        fill(repo_ccp="no",security_quantity="11",security_price="100")
+        checks.check("instrument selection restores automatic calculation",current()=="1100,00")
+        fill(order_amount=current(),security_quantity="12")
+        checks.check("manually entering the calculated number also freezes it",current()=="1100,00")
         select("order-trade");fill_trade_common(browser,kind="limit")
         type_search(browser,"extra-security-asset-id","CIBSN3");pick_result(browser,"extra-security-asset-id")
         fill(security_quantity="14",security_price="98.12",repo_ccp="no")
-        blocked("bond with unknown basis requires confirmed amount")
-        fill(manual_amount="13956.10",amount_reason="Сумма согласована по спецификации выпуска")
-        confirm();out=pdf("trade-boundary",keep=True);checks.check("bond retained","RU000A10CXA6" in out and "13 956,10" in out,out)
+        checks.check("bond with unknown basis leaves amount empty",current()=="")
+        fill(order_amount="13956.10")
+        out=pdf("trade-boundary",keep=True);checks.check("bond retained","RU000A10CXA6" in out and "13956.10" in out,out)
         fill(order_market="currency");type_search(browser,"extra-fx-instrument-id","USDRUB_TOM");pick_result(browser,"extra-fx-instrument-id")
         fill(fx_lots="2",fx_rate="81.2345",fx_swap_ccp="no")
         out=pdf("trade-fx");checks.check("FX quote, no abandoned asset","162 469" in out and "RU000A10CXA6" not in out,out)
+        fill(fx_swap_ccp="yes",fx_rate="по курсу ЦБ",order_amount="до 300 & 1",settlement_currency="у.е.")
+        out=pdf("trade-swap");checks.check("swap prints entered terms","по курсу ЦБ" in out and "до 300 & 1 у.е." in out,out)
         fill(order_market="derivatives");type_search(browser,"extra-derivative-id","CA95000");pick_result(browser,"extra-derivative-id")
         fill(derivative_quantity="2",derivative_premium="12.30")
         out=pdf("trade-option");checks.check("premium, strike, expiry independent","246" in out and "95 000" in out and "18.12.2026" in out,out)
         type_search(browser,"extra-derivative-id","RI-12.26");pick_result(browser,"extra-derivative-id")
-        blocked("future lacks confirmed cash multiplier")
-        fill(order_kind="market");out=pdf("trade-future");checks.check("future has no option strike","Рыночная" in out and "95 000" not in out,out)
+        checks.check("future without confirmed multiplier leaves amount blank",current()=="")
+        fill(order_kind="market",order_amount="по договору")
+        out=pdf("trade-future");checks.check("future accepts a manual amount without an option strike","Рыночная" in out and "по договору" in out and "95 000" not in out,out)
         select("order-trade",INDIVIDUAL)
         fill_trade_common(browser,market="otc",kind="market")
         fill(otc_instrument_type="security",counterparty="Учебный контрагент",repo_ccp="no",security_quantity="5")

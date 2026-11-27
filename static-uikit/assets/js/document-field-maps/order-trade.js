@@ -2,6 +2,8 @@
 // Coordinates are points from the top left of the extracted pages.
 (function (engine) {
   'use strict';
+  // All eight text cells have room for two 9 pt lines between their printed rules.
+  var enteredText = {preserveWhitespace: true, wrappedCell: {baselineOffset: -4.5, lineHeight: 9.4, maxLines: 2}};
   var slot = engine.orderMap.slot;
   var mark = engine.orderMap.mark;
   engine.orderMap.register({
@@ -43,24 +45,24 @@
       slot("securityIssuer", "extra.extra-security-issuer", "Наименование эмитента", 0, 249.1, 523.06, 294.2),
       slot("securityType", "extra.extra-security-type", "Вид, категория (тип), выпуск, транш, серия ценной бумаги, ISIN/CFI", 0, 249.1, 539.66, 294.2, {multiline: true, maxLines: 2, lineHeight: 10, fontSize: 9}),
       slot("securityQuantity", "extra.extra-security-quantity", "Количество ценных бумаг", 0, 249.1, 566.41, 294.2),
-      slot("tradeAmount", "extra.extra-trade-amount", "Сумма сделки в валюте сделки **", 0, 249.1, 632.78, 294.2),
+      slot("tradeAmount", "extra.extra-trade-amount", "Сумма сделки в валюте сделки **", 0, 249.1, 632.78, 294.2, enteredText),
       slot("derivativeKind", "extra.extra-derivative-kind", "Вид инструмента срочного рынка", 0, 249.1, 677.43, 294.2),
       slot("derivativeName", "extra.extra-derivative-name", "Наименование производного финансового инструмента", 0, 249.1, 699.03, 294.2),
       slot("derivativeQuantity", "extra.extra-derivative-quantity", "Количество производного финансового инструмента, шт.(лотов)", 0, 249.1, 721.85, 294.2),
-      slot("derivativePremium", "extra.extra-derivative-premium", "Цена производного финансового инструмента (премия)", 0, 249.1, 744.78, 294.2),
+      slot("derivativePremium", "extra.extra-derivative-premium", "Цена производного финансового инструмента (премия)", 0, 249.1, 744.78, 294.2, enteredText),
       slot("derivativeStrike", "extra.extra-derivative-strike", "Цена исполнения страйк (для опционов)", 0, 249.1, 766.5, 294.2),
-      slot("securityPrice", "extra.extra-security-price", "Цена одной ценной бумаги", 0, 257, 586.5, 80),
+      slot("securityPrice", "extra.extra-security-price", "Цена одной ценной бумаги", 0, 257, 586.5, 80, enteredText),
       // Interior between the original rules x=340.46 and 439.37; 3 pt clear on both sides.
-      slot("securityAccrued", "extra.extra-security-accrued", "НКД", 0, 343.46, 586.5, 92.91),
-      slot("securityCurrency", "extra.extra-security-currency", "Валюта цены", 0, 442, 586.5, 101),
+      slot("securityAccrued", "extra.extra-security-accrued", "НКД", 0, 343.46, 586.5, 92.91, enteredText),
+      slot("securityCurrency", "extra.extra-security-currency", "Валюта цены", 0, 442, 586.5, 101, enteredText),
       mark("repoYes", "extra.extra-repo-ccp", "yes", "Сделка РЕПО с ЦК — Да", 0, 252.4, 615.14, 8.6),
       mark("repoNo", "extra.extra-repo-ccp", "no", "Сделка РЕПО с ЦК — Нет", 0, 278.34, 615.14, 7.7),
       slot("derivativeExpiry", "extra.extra-derivative-expiry", "Дата исполнения (экспирации)", 1, 249.1, 55.9, 294.2, {format: "dateRu"}),
-      slot("derivativeAmount", "extra.extra-derivative-amount", "Сумма сделки", 1, 249.1, 76.3, 294.2),
+      slot("derivativeAmount", "extra.extra-derivative-amount", "Сумма сделки", 1, 249.1, 76.3, 294.2, enteredText),
       slot("fxInstrument", "extra.extra-fx-instrument", "Наименование валютного инструмента/Наименование инструмента рынка драгоценных металлов", 1, 249.1, 122.76, 294.2),
       slot("fxLots", "extra.extra-fx-lots", "Количество Лотов валютного инструмента/Лотов инструмента рынка драгоценных металлов", 1, 249.1, 154.33, 294.2),
-      slot("fxRate", "extra.extra-fx-rate", "Курс валюты/Цена сделки с драгоценными металлами", 1, 249.1, 181.57, 294.2),
-      slot("fxAmount", "extra.extra-fx-amount", "Сумма сделки в валюте котировки", 1, 249.1, 205.34, 294.2),
+      slot("fxRate", "extra.extra-fx-rate", "Курс валюты/Цена сделки с драгоценными металлами", 1, 249.1, 181.57, 294.2, enteredText),
+      slot("fxAmount", "extra.extra-fx-amount", "Сумма сделки в валюте котировки", 1, 249.1, 205.34, 294.2, enteredText),
       mark("fxSwapYes", "extra.extra-fx-swap-ccp", "yes", "Сделка валютный СВОП с ЦК — Да", 1, 252.4, 235.12, 7.7),
       mark("fxSwapNo", "extra.extra-fx-swap-ccp", "no", "Сделка валютный СВОП с ЦК — Нет", 1, 276.42, 235.12, 7.7),
       mark("uncoveredAck", "check.order-uncovered-ack", null, "Я проинформирован, что данная сделка может привести к открытию непокрытой позиции.***", 1, 57.2, 256.48, 8.6)

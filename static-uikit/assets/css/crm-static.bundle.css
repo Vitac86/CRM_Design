@@ -9777,7 +9777,6 @@ body[data-page="trading-card"] {
 .crm-docwiz-select select:focus-visible { outline: 2px solid #4168ac; outline-offset: 1px; }
 .crm-docwiz-select select.crm-input-error { border-color: #bc3030; }
 .crm-docwiz-summary { display: block; color: var(--crm-text); font-weight: 600; overflow-wrap: anywhere; }
-.crm-docwiz-manual-note { font-size: 12px; color: #755520; }
 .crm-docwiz-field-wrap .uk-button-text { justify-self: start; }
 .crm-docwiz-field-wrap.crm-docwiz-review {
   grid-template-columns: auto minmax(0, 1fr);
@@ -9816,6 +9815,14 @@ body[data-page="trading-card"] {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px 14px;
+}
+
+.crm-docwiz-amount-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  column-gap: 14px;
 }
 
 .crm-docwiz-field-wrap {

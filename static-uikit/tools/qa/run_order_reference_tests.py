@@ -153,16 +153,16 @@ def main():
             qa.check("dated quote arrived",wait_for(field("extra-accrued-input")+".value==='12,34'"))
             qa.check("settlement request by AssetID and day",browser.eval(
                 "orderTestRequests.some(s=>s.includes('/A-200002?settlementDate=2026-11-23'))"))
-            qa.check("informational output and calculated total",browser.eval(
-                field("extra-estimate")+".tagName==='OUTPUT' && "+field("extra-estimate")+".tabIndex<0") and value("extra-manual-amount")=="9973,40")
+            qa.check("calculated amount in a single editable control",value("extra-order-amount")=="9973,40" and
+                     not browser.eval(field("extra-order-amount")+".readOnly") and value("extra-settlement-currency")=="RUB")
             qa.check("fixture is visibly identified", "Демо" in browser.eval(field("extra-accrued-input-source")+".textContent"))
             qa.check("native select has a clickable 44px target and one inert chevron",browser.eval(
                 """(()=>{const s=document.getElementById('docwiz-field-extra-settlement-period'),icon=s.nextElementSibling;
                 return s.tagName==='SELECT' && s.getBoundingClientRect().height>=44 && getComputedStyle(icon).pointerEvents==='none'
                 && getComputedStyle(s).backgroundImage==='none'})()"""))
-            shot("trade-reference-desktop","extra-accrued-input","extra-manual-amount",1280)
+            shot("trade-reference-desktop","extra-accrued-input","extra-order-amount",1280)
             shot("settlement-mobile","extra-settlement-period","extra-settlement-date",420)
-            shot("trade-reference-mobile","extra-accrued-input","extra-manual-amount",420)
+            shot("trade-reference-mobile","extra-accrued-input","extra-order-amount",420)
             browser._send("Emulation.setDeviceMetricsOverride",{"width":1280,"height":950,"deviceScaleFactor":1,"mobile":False})
             with save_pdf("poruchenie-na-sdelku",2) as pdf:
                 for label,x,y,w,expected in [("settlement",250.8,411.56,292.2,"23.11.2026"),("price",257,586.5,80,"98,5 %"),
@@ -171,38 +171,52 @@ def main():
                 qa.check("inactive FX and derivatives blank",not print_cell(pdf[1],249,181.57,295) and not print_cell(pdf[0],249,699.03,295))
             for tenor in ["T+0","T+1","T+2"]:
                 fill(settlement_period=tenor)
-                qa.check("tenor clears dated information "+tenor,"конкретную дату" in browser.eval(field("extra-accrued-input-source")+".textContent") and not value("extra-manual-amount"))
+                qa.check("tenor clears dated information "+tenor,not value("extra-accrued-input") and not value("extra-order-amount"))
             fill(settlement_period="date")
             qa.check("restores explicit date",value("extra-settlement-date")=="2026-11-23")
             fill(settlement_date="")
-            rejected("blank settlement date")
+            with save_pdf("blank-settlement",2) as pdf:
+                qa.check("empty calendar date leaves the settlement cell blank",not print_cell(pdf[0],250.8,411.56,292.2))
             fill(settlement_date="2026-11-18")
             rejected("settlement before order")
             fill(settlement_date="2026-11-24")
-            qa.check("zero differs from absence",wait_for(field("extra-accrued-input")+".value==='0,00'") and value("extra-manual-amount")=="9850,00")
+            qa.check("zero differs from absence",wait_for(field("extra-accrued-input")+".value==='0,00'") and value("extra-order-amount")=="9850,00")
             fill(settlement_date="2026-11-25")
             qa.check("section 1 wins over different lower-priority observations",
-                     wait_for(field("extra-accrued-input")+".value==='12,34'") and value("extra-manual-amount")=="9973,40")
+                     wait_for(field("extra-accrued-input")+".value==='12,34'") and value("extra-order-amount")=="9973,40")
             fill(settlement_date="2026-12-01")
             qa.check("both source sections empty gives zero; unconfirmed nominal leaves total empty",
-                     wait_for(field("extra-accrued-input")+".value==='0,00'") and not value("extra-manual-amount"))
+                     wait_for(field("extra-accrued-input")+".value==='0,00'") and not value("extra-order-amount"))
             fill(settlement_date="2026-11-23",accrued_input="13.01")
-            qa.check("typing numeric interest updates estimate immediately",wait_for(field("extra-manual-amount")+".value==='9980,10'"))
-            fill(manual_amount="9950,20",amount_reason="Проверено оператором")
-            rejected("difference requires confirmation")
-            browser.eval(field("order-review")+".click()")
-            shot("trade-manual-desktop","extra-accrued-input","order-review",1280)
+            qa.check("typing numeric interest updates estimate immediately",wait_for(field("extra-order-amount")+".value==='9980,10'"))
+            fill(order_amount="9950,20")
+            shot("trade-manual-desktop","extra-accrued-input","extra-settlement-currency",1280)
             with save_pdf("manual-check",2) as pdf:
                 qa.check("manual values in own cells",print_cell(pdf[0],343.46,586.5,92.91)=="13.01"
-                         and print_cell(pdf[0],249.1,632.78,294.2)=="9 950,20")
+                         and print_cell(pdf[0],249.1,632.78,294.2)=="9950,20")
             fill(settlement_date="2026-11-24")
-            qa.check("date preserves edited values and revokes the amount confirmation",
-                value("extra-accrued-input")=="13.01" and value("extra-manual-amount")=="9950,20" and
-                not browser.eval(field("order-review")+".checked"))
+            qa.check("date preserves both edited values",value("extra-accrued-input")=="13.01" and value("extra-order-amount")=="9950,20")
+            fill(accrued_input="НКД  <&>",accrued_currency="у.е.",security_currency="р & ₽",
+                 settlement_period="",order_amount="Не более 10 000 руб.",settlement_currency="у.е. & ₽")
+            with save_pdf("literal-bond",2) as pdf:
+                qa.check("text interest, spaces, symbols and both currencies print verbatim",
+                         print_cell(pdf[0],343.46,586.5,92.91)=="НКД  <&> у.е." and print_cell(pdf[0],442,586.5,101)=="р & ₽" and
+                         print_cell(pdf[0],249.1,632.78,294.2)=="Не более 10 000 руб. у.е. & ₽" and not print_cell(pdf[0],250.8,411.56,292.2))
+            price_text = "Не более 100 руб. за одну бумагу"
+            nkd_text = "НКД определяется на дату расчётов по условиям выпуска № 7, включая все изменения"
+            fill(security_price=price_text,accrued_input=nkd_text,accrued_currency="RUB",security_currency="RUB")
+            with save_pdf("long-literals",2) as pdf:
+                for x,right,text in [(257,337,price_text),(343.46,436.37,nkd_text)]:
+                    spans=[s for b in pdf[0].get_text("dict")["blocks"] for l in b.get("lines",[]) for s in l["spans"]
+                           if "Liberation" in s["font"] and x-.2<=s["origin"][0]<right and 574<s["origin"][1]<593.7]
+                    spans.sort(key=lambda s:(s["origin"][1],s["origin"][0]))
+                    qa.check("long literal fits its original cell "+str(x),
+                        "".join(s["text"] for s in spans)==text and len({round(s["origin"][1],1) for s in spans})==2
+                        and all(s["bbox"][2]<=right+.3 for s in spans),repr([s["text"] for s in spans]))
             choose("SBER")
-            qa.check("share clears price and total and hides prior bond interest",
-                not any(value(k) for k in ["extra-security-price","extra-manual-amount"]) and
-                browser.eval(field("extra-accrued-input")+".disabled") and value("extra-amount-mode")=="auto")
+            qa.check("share resets price, amount and settlement currency and hides bond interest",
+                not any(value(k) for k in ["extra-security-price","extra-order-amount"]) and
+                browser.eval(field("extra-accrued-input")+".disabled") and value("extra-settlement-currency")=="RUB")
             fill(security_price="272.5",settlement_period="T+1")
             with save_pdf("stock-check",2) as pdf:
                 qa.check("stock tenor and inactive accrued",print_cell(pdf[0],250.8,411.56,292.2)=="T+1" and not print_cell(pdf[0],343.46,586.5,92.91))

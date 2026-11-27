@@ -237,11 +237,9 @@
   var ORDER_DERIVATIVE_BRANCH = {anyOf:[{source:'extra.extra-order-market',equals:'derivatives'},
     {allOf:[{source:'extra.extra-order-market',equals:'otc'},{source:'extra.extra-otc-instrument-type',equals:'derivative'}]}]};
 
-  // A price is entered only on a limit order; a market order prints «Рыночная».
+  // Dated exchange rates are used for limit orders on QORT bonds.
   var ORDER_LIMIT = { source: 'extra.extra-order-kind', equals: 'limit' };
   var ORDER_SECURITY_LIMIT = { allOf: [ORDER_SECURITY_BRANCH, ORDER_LIMIT] };
-  var ORDER_FX_LIMIT = { allOf: [ORDER_FX_BRANCH, ORDER_LIMIT] };
-  var ORDER_DERIVATIVE_LIMIT = { allOf: [ORDER_DERIVATIVE_BRANCH, ORDER_LIMIT] };
 
   // Declarative dependency metadata for builder/QA consumers. The production
   // payload normalizer below remains authoritative; this describes which
@@ -285,12 +283,11 @@
       'extra.extra-order-date':['extra.extra-order-day','extra.extra-order-month','extra.extra-order-year'],
       'extra.extra-manual-words':['extra.extra-move-amount-words','extra.extra-payout-amount-words'],
       'extra.extra-words-mode':['extra.extra-move-amount-words','extra.extra-payout-amount-words'],
-      'extra.extra-amount-mode':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
       'extra.extra-trade-date':['extra.extra-trade-amount'],
       'extra.extra-price-rate':['extra.extra-trade-amount'],
       'extra.extra-accrued-rate':['extra.extra-trade-amount'],
-      'extra.extra-manual-currency':['extra.extra-trade-amount'],
-      'extra.extra-manual-amount':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
+      'extra.extra-settlement-currency':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
+      'extra.extra-order-amount':['extra.extra-trade-amount','extra.extra-fx-amount','extra.extra-derivative-amount'],
       'extra.selectedRequisiteId':['extra.extra-bank-account','extra.extra-bank-recipient','extra.extra-bank-name'],
       'extra.extra-settlement-date': ['extra.extra-settlement-period'],
       'extra.extra-accrued-input': ['extra.extra-security-accrued'],
@@ -314,19 +311,14 @@
     var field = Object.assign({key: key, label: label, type: type}, extra);
     var reasons = {
       'extra-live-bond':'Показывает доступные параметры живой карточки.',
-      'extra-show-rates':'Показывает валютный пересчёт для выбранной бумаги.',
-      'extra-need-price-rate':'Управляет вводом отсутствующего курса.',
-      'extra-need-accrued-rate':'Управляет вводом второго отсутствующего курса.',
+      'extra-need-price-rate':'Показывает курс при пересчёте валюты цены.',
+      'extra-need-accrued-rate':'Показывает курс при пересчёте валюты НКД.',
       'extra-price-rate-key':'Связывает ручной курс с бумагой, датой и валютами.',
       'extra-accrued-rate-key':'Связывает второй курс с бумагой, датой и валютами.',
-      'extra-rates-summary':'Показывает дату, источник и единицы курса.',
       'extra-is-bond':'Вид выбранного актива управляет доступностью НКД.',
       'extra-accrued-edited':'Сохраняет введённое значение НКД, включая пустую строку.',
-      'extra-estimate':'Проверка автоматического расчёта и его спецификации.',
-      'extra-discrepancy':'Сравнение ручной суммы с расчётной.',
-      'extra-amount-reason':'Сохраняется в записи о ручной корректировке.',
       'extra-auto-words':'Предпросмотр автоматической прописи перед подтверждением.',
-      'order-review':'Подтверждение конкретного текста или суммы хранится в метаданных поручения.'
+      'order-review':'Подтверждение ручной прописи хранится в метаданных поручения.'
     };
     if (reasons[key]) { field.workflowOnly = true; field.workflowReason = reasons[key]; }
     return field;
@@ -449,7 +441,6 @@
           key: 'extra-settlement-period',
           label: 'Срок расчётов',
           type: 'select',
-          required: true,
           options: [
             { value: 'T+0', label: 'T+0' },
             { value: 'T+1', label: 'T+1' },
@@ -457,7 +448,7 @@
             { value: 'date', label: 'Конкретная дата' }
           ]
         },
-        orderField('extra-settlement-date','Дата расчётов','date',{defaultToday:true,required:true,
+        orderField('extra-settlement-date','Дата расчётов','date',{defaultToday:true,
           showWhen:isValue('extra-settlement-period','date')}),
         { key: 'extra-counterparty', label: 'Информация о контрагенте', type: 'text' },
         { key: 'extra-order-other-info', label: 'Иная информация', type: 'text' },
@@ -486,11 +477,8 @@
         {
           key: 'extra-security-price',
           label: 'Цена одной ценной бумаги',
-          type: 'number',
-          step: 'any',
-          positive: true,
-          required: true,
-          showWhen: ORDER_SECURITY_LIMIT
+          type: 'text',
+          showWhen: ORDER_SECURITY_BRANCH
         },
         orderField('extra-security-currency','Валюта цены','text',{
           placeholder:'Код валюты, например RUB',showWhen:ORDER_SECURITY_BRANCH
@@ -500,9 +488,7 @@
         orderField('extra-trade-date','Дата сделки для курса ЦБ','date',{showWhen:LIVE_BOND_LIMIT}),
         orderField('extra-accrued-edited','НКД отредактирован','internal',{defaultValue:'no'}),
         orderField('extra-accrued-input','НКД на одну бумагу','text',{showWhen:ORDER_BOND}),
-        orderField('extra-accrued-currency','Валюта НКД','text',{
-          showWhen:all(ORDER_BOND,isValue('extra-accrued-edited','yes'))
-        }),
+        orderField('extra-accrued-currency','Валюта НКД','text',{showWhen:ORDER_BOND}),
         {
           key: 'extra-repo-ccp',
           label: 'Сделка РЕПО с ЦК',
@@ -539,11 +525,8 @@
         {
           key: 'extra-fx-rate',
           label: 'Курс валюты / цена сделки с драг. металлами',
-          type: 'number',
-          step: 'any',
-          positive: true,
-          required: true,
-          showWhen: ORDER_FX_LIMIT
+          type: 'text',
+          showWhen: ORDER_FX_BRANCH
         },
 
         {
@@ -584,35 +567,23 @@
         {
           key: 'extra-derivative-premium',
           label: 'Цена ПФИ (премия)',
-          type: 'number',
-          step: 'any',
-          positive: true,
-          required: true,
-          showWhen: ORDER_DERIVATIVE_LIMIT
+          type: 'text',
+          showWhen: ORDER_DERIVATIVE_BRANCH
         },
       orderField('extra-trade-amount','Сумма сделки с ценными бумагами','derived'),
       orderField('extra-fx-amount','Сумма сделки в валюте котировки','derived'),
       orderField('extra-derivative-amount','Сумма сделки с ПФИ','derived'),
       orderField('extra-security-accrued','НКД на дату расчётов','derived'),
-      orderField('extra-show-rates','Требуется пересчёт','internal'),
-      orderField('extra-need-price-rate','Требуется ручной курс','internal'),
-      orderField('extra-need-accrued-rate','Требуется второй ручной курс','internal'),
+      orderField('extra-need-price-rate','Пересчёт валюты цены','internal'),
+      orderField('extra-need-accrued-rate','Пересчёт валюты НКД','internal'),
       orderField('extra-price-rate-key','Дата и валюты ручного курса','internal'),
       orderField('extra-accrued-rate-key','Дата и валюты второго курса','internal'),
-      orderField('extra-rates-summary','Валютный пересчёт','summary',{valueFrom:'rates',fullWidth:true,
-        showWhen:all(LIVE_BOND_LIMIT,isValue('extra-show-rates','yes'))}),
-      orderField('extra-price-rate','Ручной курс','number',{step:'any',positive:true,
+      orderField('extra-price-rate','Курс валюты цены','text',{
         showWhen:all(LIVE_BOND_LIMIT,isValue('extra-need-price-rate','yes'))}),
-      orderField('extra-accrued-rate','Ручной курс НКД','number',{step:'any',positive:true,
+      orderField('extra-accrued-rate','Курс валюты НКД','text',{
         showWhen:all(LIVE_BOND_LIMIT,isValue('extra-need-accrued-rate','yes'))}),
-      orderField('extra-estimate','Расчётная сумма сделки','summary',{valueFrom:'estimate',fullWidth:true}),
-      orderField('extra-amount-mode','Режим расчёта','internal',{defaultValue:'auto'}),
-      orderField('extra-manual-amount','Сумма сделки','number',{positive:true,step:'0.01',required:true,showWhen:ORDER_LIMIT}),
-      orderField('extra-manual-currency','Валюта ручной суммы','text',{placeholder:'Трёхбуквенный код',
-        showWhen:all(ORDER_SECURITY_LIMIT,isValue('extra-amount-mode','manual'))}),
-      orderField('extra-discrepancy','Отклонение от автосуммы','readonly',{valueFrom:'discrepancy',emptyHint:'Автосумма недоступна',showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual'))}),
-      orderField('extra-amount-reason','Основание ручной суммы или расхождения','text',{required:true,showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual'))}),
-      orderField('order-review','Я сверил(а) ручную сумму, спецификацию и основание','review',{showWhen:all(ORDER_LIMIT,isValue('extra-amount-mode','manual')),fullWidth:true})
+      orderField('extra-order-amount','Сумма сделки','text'),
+      orderField('extra-settlement-currency','Валюта расчётов','text')
     ]);
   var TRANSFER_DOCUMENT = orderDocument('order-venue-transfer','transfer','Поручение на перевод средств между торговыми площадками',
     'poruchenie-perevod-ploshchadki.pdf','Скачать поручение на перевод',[
@@ -3009,7 +2980,7 @@
       if (value.value) {
         var priceKey = {securities:'extra-security-price',fx:'extra-fx-rate',derivatives:'extra-derivative-premium'}[field.catalog];
         var oldPrice = document.getElementById('docwiz-field-'+priceKey);
-        if (oldPrice && oldPrice.value) changeNotice.textContent = 'При смене инструмента цена, НКД и сумма сделки сбрасываются.';
+        if (oldPrice && oldPrice.value) changeNotice.textContent = 'При смене инструмента цена и сумма сделки сбрасываются.';
         value.value = '';
         renderCard(null);
         value.dispatchEvent(new Event('change', { bubbles: true }));
@@ -3208,9 +3179,7 @@
         dateField.appendChild(input);
         dateField.appendChild(dateTrigger);
       } else if (field.type === 'number') {
-        // A quantity, a price or an amount. The form asks for a number, so the
-        // control accepts a number: «100 шт.» and «сто» are not values an order
-        // can carry, and neither is a negative one.
+        // Quantities and cash-transfer amounts retain their numeric input rules.
         input = document.createElement('input');
         input.className = 'uk-input crm-input';
         var localizedDecimal = doc.orderKind && field.step !== 1;
@@ -3300,28 +3269,6 @@
         input.setAttribute('aria-describedby',accruedNote.id);
         wrap.appendChild(accruedNote);
       }
-      if (doc.orderKind === 'trade' && field.key === 'extra-manual-amount') {
-        var reset = document.createElement('button');
-        reset.type = 'button';
-        reset.className = 'uk-button uk-button-text';
-        reset.dataset.orderResetAmount = '';
-        var manualNote = document.createElement('span');
-        manualNote.className = 'crm-docwiz-manual-note';
-        manualNote.dataset.orderManual = '';
-        manualNote.hidden = true;
-        manualNote.textContent = 'Введено вручную';
-        wrap.appendChild(manualNote);
-        reset.textContent = 'Вернуть расчётное значение';
-        reset.hidden = true;
-        reset.addEventListener('click', function () {
-          var mode = container.querySelector('[data-field-key="extra-amount-mode"]');
-          mode.value = 'auto';
-          savedState.fields['extra-amount-mode'] = 'auto';
-          syncFields();
-          input.focus();
-        });
-        wrap.appendChild(reset);
-      }
       grid.appendChild(wrap);
       if (field.showWhen) {
         conditionalFields.push({
@@ -3336,7 +3283,14 @@
         });
       }
     });
-
+    if (doc.orderKind === 'trade') {
+      var amountRow = document.createElement('div');
+      amountRow.className = 'crm-docwiz-amount-row';
+      ['extra-order-amount','extra-settlement-currency'].forEach(function (key) {
+        amountRow.appendChild(grid.querySelector('[data-field-key="'+key+'"]').closest('.crm-docwiz-field-wrap'));
+      });
+      grid.appendChild(amountRow);
+    }
     container.appendChild(grid);
 
     // A check the form always carries is not a question. `hidden` marks such a
@@ -3937,8 +3891,8 @@
     // Collect text/date/select/number/picker values from [data-field-key].
     document.querySelectorAll('#docwiz-extra-fields [data-field-key]').forEach(function (el) {
       var key = el.getAttribute('data-field-key');
-      var val = key === 'extra-accrued-input' ? el.value : (el.value || '').trim();
       var type = el.getAttribute('data-field-type');
+      var val = doc.orderKind === 'trade' && type === 'text' ? el.value : (el.value || '').trim();
       extraValues[key] = val;
       if (el.disabled) return;
       var invalidDate = type === 'date' && !!val && !isValidIsoDate(val);
@@ -3967,7 +3921,11 @@
 
     var order;
     if (doc.orderKind) {
-      extraValues.confirmedAgainst = (wizardInputState[doc.id] || {}).confirmedAgainst || '';
+      var state = wizardInputState[doc.id] || {};
+      if (doc.orderKind === 'trade') {
+        if (!state.amountEdited) delete extraValues['extra-order-amount'];
+        if (!state.settlementCurrencyEdited) delete extraValues['extra-settlement-currency'];
+      } else extraValues.confirmedAgainst = state.confirmedAgainst || '';
       order = window.CRMOrderForms.prepare(doc.id, subject, extraValues);
       order.errors.forEach(function (problem) {
         var control = document.querySelector('#docwiz-extra-fields [data-field-key="' + escAttr(problem.key) + '"]');

@@ -348,12 +348,12 @@
     // renderer later draws all agree on one set of baselines.
     var regions = resolveRegions(declared, size);
     var slots = slotsFor(regions, size);
-    var paragraphs = splitParagraphs(value);
+    var paragraphs = opts.preserveWhitespace ? String(value).split(/\r\n?|\n/) : splitParagraphs(value);
     var lines = [];
     var slotIndex = 0;
 
     for (var p = 0; p < paragraphs.length; p += 1) {
-      var words = tokenize(paragraphs[p]);
+      var words = opts.preserveWhitespace ? paragraphs[p].match(/\s+|\S+/g) || [] : tokenize(paragraphs[p]);
       if (!words.length) {
         // A deliberate blank line between two blocks of text.
         if (slotIndex >= slots.length) {
@@ -373,7 +373,7 @@
         var slot = slots[slotIndex];
         var line = '';
         while (wordIndex < words.length) {
-          var candidate = line ? line + ' ' + words[wordIndex] : words[wordIndex];
+          var candidate = line + (line && !opts.preserveWhitespace ? ' ' : '') + words[wordIndex];
           if (widthOf(font, candidate, size) > slot.width + 1e-6) break;
           line = candidate;
           wordIndex += 1;

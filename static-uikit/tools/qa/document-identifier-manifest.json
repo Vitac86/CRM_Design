@@ -6,7 +6,7 @@
     "fields": 659,
     "registryDocuments": 24,
     "overlayBindings": 20,
-    "wizardKeys": 354,
+    "wizardKeys": 350,
     "checkKeys": 58,
     "formatterNames": 13
   },
@@ -4000,16 +4000,6 @@
     {
       "documentId": "order-trade",
       "group": "fields",
-      "key": "extra-amount-mode"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "extra-amount-reason"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
       "key": "extra-brokerage-account"
     },
     {
@@ -4065,16 +4055,6 @@
     {
       "documentId": "order-trade",
       "group": "fields",
-      "key": "extra-discrepancy"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "extra-estimate"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
       "key": "extra-fx-amount"
     },
     {
@@ -4110,7 +4090,7 @@
     {
       "documentId": "order-trade",
       "group": "fields",
-      "key": "extra-manual-amount"
+      "key": "extra-order-amount"
     },
     {
       "documentId": "order-trade",
@@ -4220,6 +4200,11 @@
     {
       "documentId": "order-trade",
       "group": "fields",
+      "key": "extra-settlement-currency"
+    },
+    {
+      "documentId": "order-trade",
+      "group": "fields",
       "key": "extra-settlement-date"
     },
     {
@@ -4246,11 +4231,6 @@
       "documentId": "order-trade",
       "group": "fields",
       "key": "extra-trade-kind-other"
-    },
-    {
-      "documentId": "order-trade",
-      "group": "fields",
-      "key": "order-review"
     },
     {
       "documentId": "order-venue-transfer",

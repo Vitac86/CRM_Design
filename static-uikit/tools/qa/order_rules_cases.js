@@ -86,23 +86,42 @@
   var oldInput=Object.assign({},bondOrder,{'extra-settlement-period':'T+1','extra-order-kind':'market',
     'extra-accrued-mode':'manual','extra-accrued-manual':'0','extra-accrued-date':'2026-11-23','extra-accrued-currency':'RUB'});
   check('earlier entered NKD retains its date',model.prepare('order-trade',s,oldInput).metadata.accruedInterest.date==='2026-11-23');
-  var reviewed=Object.assign({},bondOrder,{'extra-accrued-mode':'manual','extra-accrued-manual':'12.31',
-    'extra-accrued-currency':'RUB','extra-manual-amount':'999,12','extra-manual-currency':'RUB',
-    'extra-amount-mode':'manual','extra-amount-reason':'По договору'});
-  var previous=JSON.parse(model.reviewKey('order-trade',s,reviewed));
-  previous[7]={mode:'manual',value:'12.31',currency:'RUB',date:'2026-11-23',source:'Введено вручную',unit:'per-security',confirmed:true};
-  reviewed.confirmedAgainst=JSON.stringify(previous);
-  var reprint=model.prepare('order-trade',s,reviewed);
-  check('previously approved amount reprints with the original numeric NKD presentation',
-    !reprint.errors.length && reprint.extraValues['extra-security-accrued']==='12,31' && reprint.extraValues['extra-trade-amount']==='999,12');
-  check('changed interest still revokes an older amount confirmation',model.prepare('order-trade',s,
-    Object.assign({},reviewed,{'extra-accrued-manual':'12.31001'})).errors.some(function (e) {return e.key==='order-review';}));
+  var stored=Object.assign({},bondOrder,{'extra-accrued-mode':'manual','extra-accrued-manual':'12.31',
+    'extra-accrued-currency':'RUB','extra-manual-amount':'999,12','extra-manual-currency':'RUB','extra-amount-mode':'manual'});
+  var reprint=model.printable('order-trade',{subject:s,orderInput:stored});
+  check('earlier agreed amount and accrued interest reprint',reprint.extraValues['extra-security-accrued']==='12,31' &&
+    reprint.extraValues['extra-trade-amount']==='999,12');
+  ['limit','market'].forEach(function (kind) {
+    ['buy','sell','other'].forEach(function (side) {
+      var input=Object.assign({},tradeOrder,{'extra-order-kind':kind,'extra-trade-kind':side,'extra-trade-kind-other':'Обмен',
+        'extra-security-price':'Не более 100 руб.','extra-order-amount':'Не более 10 000 руб.',
+        'extra-settlement-period':'','extra-security-currency':'руб./₽','extra-settlement-currency':'по курсу & ЦБ'});
+      var order=model.prepare('order-trade',s,input);
+      var printed=model.printable('order-trade',{subject:s,orderInput:order.input}).extraValues;
+      check('literal values survive preparation and reprint '+kind+' '+side,!order.errors.length &&
+        printed['extra-trade-amount']==='Не более 10 000 руб. по курсу & ЦБ' && printed['extra-settlement-period']==='' &&
+        printed['extra-security-price']===input['extra-security-price'] && printed['extra-security-currency']==='руб./₽');
+    });
+  });
+  var quoted=Object.assign({},tradeOrder,{'extra-order-kind':'limit','extra-security-price':'272,50'});
+  check('explicitly cleared amount stays empty on reprint',model.prepare('order-trade',s,
+    Object.assign({},quoted,{'extra-order-amount':''})).extraValues['extra-trade-amount']==='');
+  check('an unsupported settlement currency cannot relabel a calculated amount',
+    !model.tradeCalculation(Object.assign({},quoted,{'extra-settlement-currency':'EUR'})).result.value);
+  check('absent settlement date is printable',!model.prepare('order-trade',s,
+    Object.assign({},bondOrder,{'extra-settlement-date':''})).errors.length);
   ['по договору','','1 2','NaN','1e3','0,1.2','-1'].forEach(function (literal) {
     var typed=Object.assign({},bondOrder,{'extra-accrued-edited':'yes','extra-accrued-input':literal});
     var trade=model.tradeCalculation(typed);
     check('literal or incomplete NKD suppresses calculated amount '+JSON.stringify(literal),
       !trade.result.value && trade.interest.displayText===literal);
   });
+  ['1 2','1e2','<100','0,1.2'].forEach(function (price) {
+    var order=model.prepare('order-trade',s,Object.assign({},quoted,{'extra-security-price':price}));
+    check('non-numeric price is printable and cannot calculate '+price,!order.errors.length &&
+      order.extraValues['extra-security-price']===price && !order.extraValues['extra-trade-amount']);
+  });
+  check('correctly grouped price calculates',model.tradeCalculation(Object.assign({},quoted,{'extra-security-price':'1 000,50'})).result.value==='1000.50');
   var fixtures = CRMInstrumentCatalog.SECURITY_ASSETS, originalSize=fixtures.length;
   try {
     for (var n=0;n<28;n++) {

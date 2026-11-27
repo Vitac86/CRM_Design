@@ -57,13 +57,17 @@
         var oldPrice = {security:'extra-security-price',fx:'extra-fx-rate',derivative:'extra-derivative-premium'}[state.branch];
         if (oldPrice) set(oldPrice,'');
         if (trade.keys) set(trade.keys[2],'');
-        ['extra-manual-amount','extra-manual-currency','extra-amount-reason'].forEach(function (key) { set(key,''); });
-        set('extra-amount-mode','auto');
+        state.amountEdited = false;
+        state.priceCurrencyEdited = false;
+        state.settlementCurrencyEdited = false;
+        set('extra-order-amount','');
       }
-      if (trade.branch === 'security' && (instrument !== state.instrument || trade.branch !== state.branch)) {
-        set('extra-security-currency', trade.spec && trade.spec.currency || '');
-        var terms = trade.item && trade.item.instrumentTerms;
-        set('extra-manual-currency', terms ? terms.settlementCurrency : '');
+      if (changed === 'extra-order-amount') state.amountEdited = true;
+      if (changed === 'extra-security-currency') state.priceCurrencyEdited = true;
+      if (changed === 'extra-settlement-currency') state.settlementCurrencyEdited = true;
+      if (instrument !== state.instrument || trade.branch !== state.branch) {
+        if (trade.branch === 'security' && !state.priceCurrencyEdited) set('extra-security-currency',trade.spec?.currency || '');
+        if (!state.settlementCurrencyEdited) set('extra-settlement-currency',trade.defaultSettlement);
       }
       state.branch = trade.branch;
       state.instrument = instrument;
@@ -85,20 +89,18 @@
         if (state.bondController) state.bondController.abort();
         state.bondLookupKey = lookupKey;
         state.bondLookupNode = assetNode;
-        state.bondMessage = '';
+        state.bondLoading = false;
         if (lookupKey) {
           var controller = new AbortController();
           state.bondController = controller;
           global.CRMInstrumentCatalog.clearBondData(instrument,target,request);
-          state.bondMessage = 'Получение НКД…';
+          state.bondLoading = true;
           var timeout = setTimeout(function () { controller.abort(); },15000);
-          global.CRMInstrumentCatalog.loadSecurity(instrument,target,controller.signal,request).then(function () {
-            finish('');
-          },function () { finish('Не удалось получить данные QORT. Проверьте подключение или укажите НКД вручную.'); });
-          function finish(message) {
+          global.CRMInstrumentCatalog.loadSecurity(instrument,target,controller.signal,request).then(finish,finish);
+          function finish() {
             clearTimeout(timeout);
             if (controller !== state.bondController || state.bondLookupKey !== lookupKey || !assetNode.isConnected) return;
-            state.bondMessage = message;
+            state.bondLoading = false;
             assetNode.dispatchEvent(new Event('change',{bubbles:true}));
           }
         }
@@ -109,36 +111,29 @@
         if (!interest.edited) set('extra-accrued-input',interest.displayText);
         el('extra-accrued-currency').placeholder = interest.currency || 'Код валюты';
         var note = container.querySelector('#docwiz-field-extra-accrued-input-source');
-        var source = interest.edited ? 'Введено вручную' : state.bondMessage || interest.message || interest.source;
-        note.textContent = [interest.currency,orders.isoToRu(interest.date),source].filter(Boolean).join(' · ');
+        var source = interest.source || (state.bondLoading ? 'Получение НКД…' : '');
+        note.textContent = source ? [interest.currency,orders.isoToRu(interest.date),source].filter(Boolean).join(' · ') : '';
       }
-      label('extra-security-price',(trade.isBond ? 'Цена, % от номинала' : 'Цена одной ценной бумаги')+' *');
-      set('extra-show-rates',trade.rates.length ? 'yes' : 'no');
-      var rateBasis = JSON.stringify([instrument,request.tradeDate]);
+      label('extra-security-price',trade.isBond ? 'Цена, % от номинала' : 'Цена одной ценной бумаги');
       ['extra-price-rate','extra-accrued-rate'].forEach(function (field) {
         var rate = trade.rates.find(function (r) { return r.field === field; });
-        var open = rate && rate.referenceStatus !== 'official';
-        set(field.replace('extra-','extra-need-'),open ? 'yes' : 'no');
-        if (open) {
-          if (el(field+'-key').value !== rate.key) { set(field,''); set(field+'-key',rate.key); }
-          label(field,'Ручной курс, '+rate.to+' за 1 '+rate.from);
-        } else if (rate || state.rateBasis !== rateBasis) {
-          set(field,''); set(field+'-key','');
+        var input = el(field);
+        set(field.replace('extra-','extra-need-'),rate ? 'yes' : 'no');
+        var official = !!rate && rate.referenceStatus === 'official';
+        if (!rate || el(field+'-key').value !== rate.key || (input.readOnly && !official)) set(field,'');
+        set(field+'-key',rate ? rate.key : '');
+        input.readOnly = official;
+        if (!rate) return;
+        var caption = official ? 'Курс ЦБ '+rate.from+' в '+rate.to : 'Курс, '+rate.to+' за 1 '+rate.from;
+        label(field,caption+(rate.date ? ' на '+orders.isoToRu(rate.date) : ''));
+        if (official) {
+          input.value = rate.legs.map(function (leg) {
+            return leg.units+' '+leg.from+' = '+orders.formatAmount(leg.rate)+' '+leg.to;
+          }).join(' · ');
+          delete state.fields[field];
         }
       });
-      state.rateBasis = rateBasis;
-      if (changed === 'extra-manual-amount') set('extra-amount-mode', 'manual');
-      var manual = el('extra-amount-mode').value === 'manual';
-      if (!manual) {
-        set('extra-manual-amount', orders.formatDecimalInput(trade.result.value));
-        set('extra-amount-reason', '');
-      }
-      var amountCurrency = liveBond && (manual && el('extra-manual-currency').value || trade.item.instrumentTerms.settlementCurrency);
-      label('extra-manual-amount', 'Сумма сделки'+(amountCurrency ? ', '+amountCurrency : '')+' *');
-      var reset = container.querySelector('[data-order-reset-amount]');
-      if (reset) reset.hidden = !manual || !trade.result.value;
-      var manualNote = container.querySelector('[data-order-manual]');
-      if (manualNote) manualNote.hidden = !manual;
+      if (!state.amountEdited) set('extra-order-amount',orders.formatDecimalInput(trade.result.value));
     } else if (changed === 'extra-words-mode' && v[changed] === 'manual' && !el('extra-manual-words').value) {
       set('extra-manual-words',orders.context(doc.id,subject,v).words);
     }

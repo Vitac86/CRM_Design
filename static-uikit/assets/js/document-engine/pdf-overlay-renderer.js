@@ -290,6 +290,47 @@
   //   { drawn: false, reason: 'hidden' | 'empty' }
   //   { drawn: true,  value, formatter, fallbackIndex, layout, regions }
   //   { drawn: false, reason: 'missing' | 'overflow', diagnostics }
+  // The legal typeface lacks some operator-entered characters, including ₽.
+  // Measure those lines with the same local font fallback used for their print image.
+  var fontCharacters = new WeakMap();
+  var referenceTextContext;
+  var systemFont = '96px "Times New Roman", serif';
+  function needsLocalGlyphs(font, value) {
+    if (!font.getCharacterSet) return false;
+    if (!fontCharacters.has(font)) fontCharacters.set(font,new Set(font.getCharacterSet()));
+    var available = fontCharacters.get(font);
+    return Array.from(value).some(function (c) { return !available.has(c.codePointAt(0)); });
+  }
+  var localTextMetrics = {
+    widthOfTextAtSize: function (value, size) {
+      if (!referenceTextContext) {
+        referenceTextContext = document.createElement('canvas').getContext('2d');
+        referenceTextContext.font = systemFont;
+      }
+      return referenceTextContext.measureText(value).width * size / 96;
+    }
+  };
+
+  function fitWrappedCell(font, value, original, wrap, size) {
+    var region = Object.assign({},original,{baselineTop:original.baselineTop+wrap.baselineOffset,
+      lineHeight:wrap.lineHeight,maxLines:wrap.maxLines});
+    var options = {size:size,minSize:size,regions:[region],preserveWhitespace:true,tokenBreak:'anywhere'};
+    var result = Layout.layoutValue(font,value,options);
+    if (result.fits) return result;
+
+    // Keep long entries inside the same printed cell. Wrap before condensing.
+    var fullWidth = Math.ceil(localTextMetrics.widthOfTextAtSize(value,size))+1;
+    while (!result.fits && region.width < fullWidth) {
+      region.width = Math.min(fullWidth,Math.max(fullWidth/wrap.maxLines,region.width*1.25));
+      result = Layout.layoutValue(localTextMetrics,value,options);
+    }
+    if (result.fits) {
+      result.widthScale = original.width/region.width;
+      result.regions[0].width = original.width;
+    }
+    return result;
+  }
+
   function layoutField(field, payload, font, options) {
     var opts = options || {};
     if (!isVisible(field, payload)) return { drawn: false, reason: 'hidden' };
@@ -316,18 +357,26 @@
       var candidate = formatValue({ format: candidates[index] }, raw);
       if (!candidate) { value = candidate; continue; }
       value = candidate;
-      var result = Layout.layoutValue(font, candidate, {
+      var localGlyphs = field.preserveWhitespace && needsLocalGlyphs(font,candidate);
+      var measure = localGlyphs ? localTextMetrics : font;
+      var result = Layout.layoutValue(measure, candidate, {
         size: size,
         minSize: minSize,
         regions: regions,
+        preserveWhitespace: field.preserveWhitespace,
         tokenBreak: field.tokenBreak,
         alignToLastRegion: field.alignToLastRegion
       });
+      if (!result.fits && field.wrappedCell && regions.length === 1) {
+        result = fitWrappedCell(measure,candidate,regions[0],field.wrappedCell,minSize);
+        if (result.widthScale) localGlyphs = true;
+      }
       attempts.push({ formatter: candidates[index] || null, value: candidate, layout: result });
       if (result.fits) {
         return {
           drawn: true,
           value: candidate,
+          localGlyphs: localGlyphs,
           formatter: candidates[index] || null,
           fallbackIndex: index,
           usedFallback: index > 0,
@@ -1861,9 +1910,38 @@
 
   // ── Drawing ────────────────────────────────────────────────────────────────
 
-  // Draw one field from a layout the engine has already decided. The renderer
-  // performs no wrapping, no shrinking and no region selection of its own — it
-  // only turns region assignments into page content.
+  async function drawLocalGlyphs(ctx, page, text, options, widthScale) {
+    var canvas = document.createElement('canvas');
+    var brush = canvas.getContext('2d');
+    brush.font = systemFont;
+    var metrics = brush.measureText(text);
+    var left = Math.ceil(Math.max(0, metrics.actualBoundingBoxLeft)) + 1;
+    var baseline = Math.ceil(metrics.actualBoundingBoxAscent) + 1;
+    canvas.width = Math.ceil((left + Math.max(metrics.width,metrics.actualBoundingBoxRight) + 1) * widthScale);
+    canvas.height = baseline + Math.ceil(metrics.actualBoundingBoxDescent) + 1;
+    brush.font = systemFont;
+    brush.scale(widthScale,1);
+    var color = options.color;
+    if (color.type === 'RGB') brush.fillStyle = 'rgb('+[color.red,color.green,color.blue].map(function (v) { return Math.round(v*255); }).join(',')+')';
+    brush.fillText(text,left,baseline);
+    var image = await ctx.pdfDoc.embedPng(canvas.toDataURL('image/png'));
+    var scale = options.size / 96;
+    page.drawImage(image,{x:options.x-left*scale*widthScale,y:options.y-(canvas.height-baseline)*scale,
+      width:canvas.width*scale,height:canvas.height*scale});
+
+    // ActualText retains the original Unicode for search, copy and text extraction.
+    var pdf = global.PDFLib;
+    page.pushOperators(pdf.PDFOperator.of('BDC',[pdf.PDFName.of('Span'),
+      ctx.pdfDoc.context.obj({ActualText:pdf.PDFHexString.fromText(text)})]));
+    // One uniform invisible run gives the replacement text a selectable area.
+    var anchor = ['|','x','z'].find(function (c) { return !text.startsWith(c) && !text.endsWith(c); });
+    var advance = options.font.widthOfTextAtSize(anchor,options.size);
+    var count = Math.max(1,Math.floor(metrics.width*scale*widthScale/advance));
+    page.drawText(anchor.repeat(count),Object.assign({},options,{opacity:0}));
+    page.pushOperators(pdf.endMarkedContent());
+  }
+
+  // Draw text at the positions already determined during preflight.
   function drawTextField(ctx, field, planned) {
     var plan = planned || layoutField(field, ctx.payload, ctx.fonts[field.font || 'legalSerif']);
     if (!plan.drawn) {
@@ -1885,18 +1963,21 @@
       var lineHeight = Layout.lineHeightAt(region, fit.size);
       var indent = line.lineIndex === 0 ? (region.firstLineIndent || 0) : 0;
       var boxWidth = region.width - indent;
-      var lineWidth = Layout.widthOf(font, line.text, fit.size);
+      var widthScale = fit.widthScale || 1;
+      var lineWidth = Layout.widthOf(plan.localGlyphs ? localTextMetrics : font,line.text,fit.size) * widthScale;
       var dx = Layout.alignOffset(region.align, lineWidth, boxWidth);
       var baseY = pageHeight - region.baselineTop + region.baselineShift -
         line.lineIndex * lineHeight;
 
-      page.drawText(line.text, {
+      var textOptions = {
         x: region.left + indent + dx,
         y: baseY,
         size: fit.size,
         font: font,
         color: ctx.color
-      });
+      };
+      if (plan.localGlyphs) ctx.localGlyphImages.push(drawLocalGlyphs(ctx,page,line.text,textOptions,widthScale));
+      else page.drawText(line.text,textOptions);
 
       if (!drawnRegions[line.regionIndex]) drawnRegions[line.regionIndex] = [];
       drawnRegions[line.regionIndex].push(line.lineIndex);
@@ -2618,7 +2699,7 @@
         var request = global.CRMOrderForms.bondOptions(card,input);
         if (/^bond-/.test(card.kind) && date && !reference.bondData(id,date,request)) {
           try { await reference.loadSecurity(id,date,undefined,request); } catch (error) {
-            // A selected asset can still be printed with an explicitly confirmed manual amount.
+            // A missing dated quote does not prevent printing the entered order terms.
           }
         }
       }
@@ -2683,6 +2764,7 @@
         pages: pages,
         fonts: context.fonts,
         payload: payload,
+        localGlyphImages: [],
         // Black unless the source document intentionally uses another colour.
         color: opts.color || PDFLib.rgb(0, 0, 0)
       };
@@ -2763,7 +2845,7 @@
 
           // No AcroForm is created, so nothing needs flattening: the values are
           // already ordinary page content.
-          return pdfDoc.save().then(function (bytes) {
+          return Promise.all(ctx.localGlyphImages).then(function () { return pdfDoc.save(); }).then(function (bytes) {
             return new Blob([bytes], { type: 'application/pdf' });
           });
             });
